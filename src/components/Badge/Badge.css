@@ -1,14 +1,16 @@
+/* Кружок 20×20; padding 4 слева и справа, чтобы две цифры давали пилюлю */
 .badge {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
+  min-width: var(--size-badge);
+  height: var(--size-badge);
+  padding: 0 var(--space-1);
   border-radius: var(--radius-pill);
   background: var(--color-accent);
   color: var(--color-accent-on);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   line-height: 1;
 }

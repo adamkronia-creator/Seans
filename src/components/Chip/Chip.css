@@ -5,21 +5,22 @@
   gap: 6px;
   height: var(--size-chip-h);
   padding: 0 var(--space-2) 0 var(--space-3);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-stroke);
   border-radius: var(--radius-pill);
   background: var(--color-bg-panel);
-  color: var(--color-text-secondary);
+  color: var(--color-text-caption);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   line-height: 1;
   white-space: nowrap;
 }
 
+/* Чипс «+»: круг 32×32, плюс 12×12 */
 .chip--icon {
   justify-content: center;
   width: var(--size-chip-h);
   padding: 0;
-  font-size: var(--size-icon);
+  font-size: 12px;
 }
 
 .chip--active {
@@ -28,18 +29,20 @@
   color: var(--color-accent-on);
 }
 
+/* Кружок со счётчиком: 20×20, при двух цифрах растягивается в пилюлю */
 .chip__count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
+  min-width: var(--size-badge);
+  height: var(--size-badge);
+  padding: 0 var(--space-1);
   border-radius: var(--radius-pill);
-  background: var(--color-chip-counter-bg);
+  background: var(--color-stroke);
   color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
 }
 
 .chip--active .chip__count {

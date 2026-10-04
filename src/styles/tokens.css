@@ -30,9 +30,11 @@
   /* Производные цвета (оценены по макету, сверить с Figma) */
   --color-border: #E6E8EC;                              /* границы чипсов, табов */
   --color-divider: #E9EBEF;                             /* разделители списка */
-  --color-chip-counter-bg: #E8EAEE;                     /* кружок счётчика в неактивном чипсе */
   --color-accent-soft: #DDEBFB;                         /* светлый акцентный фон (Избранное) */
   --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
+
+  /* Обводки и кружки неактивного чипса (из Figma) */
+  --color-stroke: #EBEDF0;
 
   /* Типографика */
   --font-family: 'Roboto Variable', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -67,7 +69,8 @@
   --radius-full: 50%;
 
   /* Размеры компонентов (оценены по макету) */
-  --size-avatar-lg: 50px;       /* аватар в списке чатов */
+  --size-avatar-lg: 52px;       /* аватар в списке чатов */
+  --size-badge: 20px;           /* кружок со счётчиком (чипсы, непрочитанные) */
   --size-avatar-sm: 34px;       /* аватар в шапке */
   --size-icon: 24px;
   --size-fab: 40px;

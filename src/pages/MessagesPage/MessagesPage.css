@@ -77,5 +77,5 @@
   background: var(--color-accent);
   box-shadow: 0 4px 12px rgb(0 136 255 / 30%);
   color: var(--color-accent-on);
-  font-size: var(--size-icon);
+  font-size: 16px; /* плюс 16×16 */
 }

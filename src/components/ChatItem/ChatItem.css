@@ -16,11 +16,13 @@
   background: var(--color-bg-panel);
 }
 
+/* Контейнер с именем и сообщением: высота 40, имя сверху, сообщение снизу */
 .chat-item__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
+  justify-content: space-between;
+  height: 40px;
   min-width: 0;
 }
 
@@ -32,9 +34,22 @@
   min-width: 0;
 }
 
+.chat-item__row--top {
+  min-height: var(--line-height-xs);
+}
+
+/* Нижняя строка: gap между текстом и кружком 8; высота как у кружка,
+   чтобы текст стоял на одном месте с кружком и без него */
+.chat-item__row--bottom {
+  gap: var(--space-2);
+  min-height: var(--size-badge);
+}
+
 .chat-item__name {
   overflow: hidden;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -43,14 +58,15 @@
   flex-shrink: 0;
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  line-height: var(--line-height-xs);
 }
 
 .chat-item__preview {
   overflow: hidden;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
