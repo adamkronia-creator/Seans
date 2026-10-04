@@ -39,7 +39,7 @@
   height: 40px;
 }
 
-/* Название 16/20 semibold чёрным (по макету) и описание 14/20, gap 4 */
+/* Название 16/20 semibold и описание 14/20, gap 4 */
 .test-card__body {
   display: flex;
   flex: 1;
@@ -58,7 +58,7 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  color: #000;
+  color: var(--color-text-primary);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   line-height: 20px;
@@ -69,7 +69,7 @@
   flex-shrink: 0;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-xs);
+  line-height: 12px;
 }
 
 .test-card__date--sent {
