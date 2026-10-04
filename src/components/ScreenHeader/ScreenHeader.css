@@ -1,0 +1,45 @@
+.screen-header {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+/* Первая строка: высота 40, заголовок по центру, по бокам необязательные кнопки */
+.screen-header__top {
+  display: grid;
+  height: 40px;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.screen-header__side {
+  display: flex;
+}
+
+.screen-header__side--end {
+  justify-self: end;
+}
+
+.screen-header__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xl);
+}
+
+/* Чипсы прокручиваются по горизонтали и выходят за край экрана */
+.screen-header__chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: -1px calc(var(--space-4) * -1);
+  padding: 1px var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.screen-header__chips::-webkit-scrollbar {
+  display: none;
+}

@@ -35,18 +35,18 @@ export interface LibraryTest {
 
 // Библиотека всех тестов приложения; порядок как в макете
 export const LIBRARY: LibraryTest[] = [
-  { id: 'smol', title: 'СМОЛ: Сокращенный многофакторный опросник личности', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#B3E49F', categories: ['practice', 'hospital'] },
-  { id: 'bhs', title: 'BHS: Шкала безнадежности А. Бека', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFD08C', categories: ['hospital'] },
-  { id: 'sq', title: 'SQ: Опросник Леонгарда-Шмишека', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FED2A3', categories: ['practice'] },
+  { id: 'smol', title: 'СМОЛ: Сокращенный многофакторный опросник личности', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#B3E59F', categories: ['practice', 'hospital'] },
+  { id: 'bhs', title: 'BHS: Шкала безнадежности А. Бека', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFD18D', categories: ['hospital'] },
+  { id: 'sq', title: 'SQ: Опросник Леонгарда-Шмишека', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FED2A4', categories: ['practice'] },
   { id: 'itt', title: 'ИТТ: Интегративный тест тревожности', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FFE177', categories: ['practice', 'project'] },
   { id: 'bdi', title: 'BDI: Шкала депрессии А. Бека', description: 'Для оценки депрессии', icon: bdiIcon, tint: '#FFCEBF', categories: ['hospital'] },
-  { id: 'ito', title: 'ИТО: Индивидуально-типологический опросник Л. Собчик', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#F2D0A4', categories: ['practice'] },
-  { id: 'ocr', title: 'ОСР: Опросник суицидального риска', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E7ECF2', categories: ['hospital'] },
+  { id: 'ito', title: 'ИТО: Индивидуально-типологический опросник Л.Н. Собчик', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#F2D1A5', categories: ['practice'] },
+  { id: 'ocr', title: 'ОСР: Опросник суицидального риска', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E8EDF2', categories: ['hospital'] },
   { id: 'phq9', title: 'PHQ-9: Опросник депрессивного состояния', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFCEBF', categories: ['hospital', 'practice'] },
   { id: 'gad7', title: 'GAD-7: Опросник генерализованного тревожного расстройства', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFCEBF', categories: ['practice', 'hospital'] },
-  { id: 'rses', title: 'RSES: Шкала самоуважения Розенберга', description: 'Для исследования самооценки', icon: rsesIcon, tint: '#FFD782', categories: ['project'] },
+  { id: 'rses', title: 'RSES: Шкала самоуважения М. Розенберга', description: 'Для исследования самооценки', icon: rsesIcon, tint: '#FFD782', categories: ['project'] },
   { id: '5pfq', title: '5PFQ: Пятифакторный опросник личности', description: 'Для оценки факторов личности', icon: pfqIcon, tint: '#F7EADC', categories: ['project', 'practice'] },
-  { id: 'scl90', title: 'SCL-90-R: Симптоматический опросник', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: '#F8F6F6', categories: ['hospital'] },
+  { id: 'scl90', title: 'SCL-90: Симптоматический опросник', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: '#F9F6F6', categories: ['hospital'] },
 ];
 
 // ——— Избранное: сердечко на карточке включает и выключает тест ———

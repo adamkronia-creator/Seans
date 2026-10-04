@@ -26,7 +26,7 @@ export const TESTS: PsyTest[] = [
   {
     id: 'itt',
     title: 'ИТТ: Интегративный тест тревожности',
-    description: 'Для выявления и оценки тревожности',
+    description: 'Для оценки тревожности',
     date: '09.10',
     status: 'sent',
     icon: ittIcon,
@@ -52,7 +52,7 @@ export const TESTS: PsyTest[] = [
   },
   {
     id: 'rses',
-    title: 'RSES: Шкала самоуважения Розенберга',
+    title: 'RSES: Шкала самоуважения М. Розенберга',
     description: 'Для исследования самооценки',
     date: '07.09',
     status: 'done',

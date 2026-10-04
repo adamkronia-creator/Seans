@@ -8,7 +8,7 @@ import {
   IconPlusChip,
 } from '../../components/icons';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
-import { SearchField } from '../../components/SearchField/SearchField';
+import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { recentTestIds, useClientData } from '../../data/clientStore';
 import {
   LIBRARY,
@@ -49,42 +49,41 @@ export function TestsPage() {
 
   return (
     <section className="tests-page">
-      <header className="tests-page__header">
-        <h1 className="tests-page__title">Тестовые материалы</h1>
-
-        <SearchField
-          value={query}
-          onChange={setQuery}
-          placeholder="Поиск тестов..."
-          trailing={
-            // Число на кнопке в макете «2»; что именно оно считает, пока неизвестно
-            <button type="button" className="tests-page__filter" aria-label="Настройки списка тестов">
-              <span className="tests-page__filter-count">2</span>
-              <IconFilterSettings />
-            </button>
-          }
-        />
-
-        <div className="tests-page__chips" role="group" aria-label="Фильтр тестов">
-          <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
-            <IconPlusChip />
-          </Chip>
-          <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Все тесты" active={filter === 'all'} onClick={() => setFilter('all')}>
-            <IconFilterAll />
-          </Chip>
-          <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Избранное" active={filter === 'favorites'} onClick={() => setFilter('favorites')}>
-            <IconFilterFavorites />
-          </Chip>
-          <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Недавние" active={filter === 'recent'} onClick={() => setFilter('recent')}>
-            <IconFilterRecent />
-          </Chip>
-          {TEST_CATEGORIES.map(({ id, label }) => (
-            <Chip key={id} active={filter === id} onClick={() => setFilter(id)}>
-              {label}
+      <ScreenHeader
+        title="Тестовые материалы"
+        searchValue={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Поиск тестов..."
+        searchTrailing={
+          // Число на кнопке в макете «2»; что именно оно считает, пока неизвестно
+          <button type="button" className="tests-page__filter" aria-label="Настройки списка тестов">
+            <span className="tests-page__filter-count">2</span>
+            <IconFilterSettings />
+          </button>
+        }
+        chipsLabel="Фильтр тестов"
+        chips={
+          <>
+            <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
+              <IconPlusChip />
             </Chip>
-          ))}
-        </div>
-      </header>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Все тесты" active={filter === 'all'} onClick={() => setFilter('all')}>
+              <IconFilterAll />
+            </Chip>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Избранное" active={filter === 'favorites'} onClick={() => setFilter('favorites')}>
+              <IconFilterFavorites />
+            </Chip>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Недавние" active={filter === 'recent'} onClick={() => setFilter('recent')}>
+              <IconFilterRecent />
+            </Chip>
+            {TEST_CATEGORIES.map(({ id, label }) => (
+              <Chip key={id} active={filter === id} onClick={() => setFilter(id)}>
+                {label}
+              </Chip>
+            ))}
+          </>
+        }
+      />
 
       {visible.length > 0 ? (
         <ul className="tests-page__list">

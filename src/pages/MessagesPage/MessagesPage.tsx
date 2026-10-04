@@ -4,7 +4,7 @@ import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
 import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
-import { SearchField } from '../../components/SearchField/SearchField';
+import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import {
   CATEGORIES,
   CURRENT_USER,
@@ -49,12 +49,14 @@ export function MessagesPage() {
 
   return (
     <section className="messages">
-      <header className="messages__header">
-        <div className="messages__top">
+      <ScreenHeader
+        title="Сообщения"
+        leading={
           <button type="button" className="messages__profile" aria-label="Профиль">
             <Avatar src={CURRENT_USER.avatar} size={40} />
           </button>
-          <h1 className="messages__title">Сообщения</h1>
+        }
+        trailing={
           <button
             type="button"
             className="messages__bell"
@@ -63,29 +65,32 @@ export function MessagesPage() {
           >
             <IconBell />
           </button>
-        </div>
-
-        <SearchField value={query} onChange={setQuery} placeholder="Поиск диалогов..." />
-
-        <div className="messages__chips" role="group" aria-label="Фильтр диалогов">
-          <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
-            <IconPlusChip />
-          </Chip>
-          <Chip active={filter === 'all'} count={countOf('all')} onClick={() => setFilter('all')}>
-            Все
-          </Chip>
-          {CATEGORIES.map(({ id, label }) => (
-            <Chip
-              key={id}
-              active={filter === id}
-              count={countOf(id)}
-              onClick={() => setFilter(id)}
-            >
-              {label}
+        }
+        searchValue={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Поиск диалогов..."
+        chipsLabel="Фильтр диалогов"
+        chips={
+          <>
+            <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
+              <IconPlusChip />
             </Chip>
-          ))}
-        </div>
-      </header>
+            <Chip active={filter === 'all'} count={countOf('all')} onClick={() => setFilter('all')}>
+              Все
+            </Chip>
+            {CATEGORIES.map(({ id, label }) => (
+              <Chip
+                key={id}
+                active={filter === id}
+                count={countOf(id)}
+                onClick={() => setFilter(id)}
+              >
+                {label}
+              </Chip>
+            ))}
+          </>
+        }
+      />
 
       {visible.length > 0 ? (
         <ul className="messages__list">

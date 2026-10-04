@@ -5,25 +5,6 @@
   min-height: 0;
 }
 
-.tests-page__header {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  /* Название → поиск → чипсы по 8; под чипсами тоже 8 */
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4) var(--space-2);
-  border-bottom: 1px solid var(--color-divider);
-  background: var(--color-bg-panel);
-}
-
-.tests-page__title {
-  height: 40px;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  line-height: 40px;
-  text-align: center;
-}
-
 /* Кнопка справа в поиске: синяя пилюля 64×32, внутри белый кружок 24 с числом и шестерёнка 24 */
 .tests-page__filter {
   display: flex;
@@ -51,19 +32,6 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   line-height: 1;
-}
-
-.tests-page__chips {
-  display: flex;
-  gap: var(--space-2);
-  margin: -1px calc(var(--space-4) * -1);
-  padding: 1px var(--space-4);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tests-page__chips::-webkit-scrollbar {
-  display: none;
 }
 
 /* Чипсы с иконкой: плюс 12, остальные 20 */
