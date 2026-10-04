@@ -3,11 +3,12 @@
   background: var(--color-bg-panel);
 }
 
-/* Панель ввода: отступы 8 сверху/снизу и 16 по бокам, элементы высотой 40, gap 12 */
+/* Панель ввода: отступы 8 сверху/снизу и 16 по бокам, элементы высотой 40, gap 12.
+   Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края */
 .composer {
   display: flex;
   flex-shrink: 0;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-3);
   padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-divider);
@@ -31,26 +32,30 @@
 .composer__field {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-end;
   min-width: 0;
-  height: 40px;
+  min-height: 40px;
   padding: 0 7px 0 9px;
   border: 1px solid var(--color-stroke);
-  border-radius: var(--radius-pill);
+  /* Стадион: при одной строке полукруги, при нескольких — скругление 20 */
+  border-radius: 20px;
   background: var(--color-bg-panel);
 }
 
 .composer__input {
   flex: 1;
   min-width: 0;
-  padding: 0;
   border: 0;
   background: none;
   outline: 0;
-  overflow: hidden;
-  white-space: pre;
+  /* Строка 19 (120% от 16 в Figma округляется до целого); 9,5 сверху и снизу дают поле 40 */
+  padding: 9.5px 0;
+  max-height: 40vh; /* дальше поле прокручивается */
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: 19px;
   -webkit-user-select: text;
   user-select: text;
 }
@@ -69,6 +74,7 @@
 .composer__emoji {
   display: flex;
   flex-shrink: 0;
+  margin-bottom: 7px; /* иконка 24 по центру нижней строки */
   color: var(--color-text-caption);
   font-size: var(--size-icon);
 }

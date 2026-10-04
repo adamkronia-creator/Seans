@@ -99,20 +99,12 @@
   gap: var(--space-2);
   height: 46px;
   padding: 0 var(--space-3);
-}
-
-.case-card__head--blue {
-  background: var(--color-accent-soft);
+  background: var(--head-bg, var(--color-accent-soft));
 }
 
 .case-card__head--note {
   height: 44px;
   padding-top: 2px;
-  background: #EEEDFD;
-}
-
-.case-card__head--brown {
-  background: rgb(172 127 94 / 10%);
 }
 
 /* Иконка 22 (24-пиксельные центрируются в этом же слоте); цвет — акцентный */
@@ -123,7 +115,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  color: var(--color-accent);
+  color: var(--head-fg, var(--color-accent));
 }
 
 .case-card__icon svg {

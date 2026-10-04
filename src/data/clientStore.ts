@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { CASE_SECTIONS, type CaseSection } from './case';
 import { CASE_NOTES, type CaseNote } from './notes';
 import { LIBRARY, TASK_LIBRARY } from './library';
 import type { PsyTest } from './tests';
@@ -30,6 +31,10 @@ interface ClientData {
   activity: Activity[];
   notes: CaseNote[];
   sessions: Session[];
+  /** Сведения кейса: редактируются (иконка, цвет, заголовок, текст) */
+  caseSections: CaseSection[];
+  /** Комментарии психолога к тестам и заданиям в истории: id записи журнала → текст */
+  comments: Record<string, string>;
 }
 
 /** Как называется тест в тексте событий и истории */
@@ -161,7 +166,13 @@ const SEED: Activity[] = [
   t('task', 'smer', 'assigned', '09.10.2026', '09:50'),
 ];
 
-let data: ClientData = { activity: SEED, notes: CASE_NOTES, sessions: SESSIONS };
+let data: ClientData = {
+  activity: SEED,
+  notes: CASE_NOTES,
+  sessions: SESSIONS,
+  caseSections: CASE_SECTIONS,
+  comments: {},
+};
 const listeners = new Set<() => void>();
 
 function update(next: Partial<ClientData>) {
@@ -192,7 +203,14 @@ export function nowStamp() {
 
 export function addNote(title: string, paragraphs: string[]) {
   const { date } = nowStamp();
-  const note: CaseNote = { id: `n${data.notes.length + 1}-${Date.now()}`, title, paragraphs, updated: date };
+  const note: CaseNote = {
+    id: `n${data.notes.length + 1}-${Date.now()}`,
+    title,
+    paragraphs,
+    icon: 'pin',
+    tone: 'purple',
+    updated: date,
+  };
   update({
     notes: [...data.notes, note],
     activity: [...data.activity, { id: nextId(), kind: 'note', ref: note.id, date }],
@@ -208,6 +226,35 @@ export function addSession(paragraphs: string[]) {
   });
 }
 
+/** Меняет сведения кейса; у текстовых разделов обновляется дата */
+export function updateSection(id: string, patch: Partial<Omit<CaseSection, 'id'>>) {
+  const { date } = nowStamp();
+  update({
+    caseSections: data.caseSections.map((x) =>
+      x.id === id ? { ...x, ...patch, ...(x.blocks ? { updated: date } : {}) } : x,
+    ),
+  });
+}
+
+/** Меняет заметку; дата обновления ставится сегодняшняя */
+export function updateNote(id: string, patch: Partial<Omit<CaseNote, 'id' | 'updated'>>) {
+  const { date } = nowStamp();
+  update({ notes: data.notes.map((x) => (x.id === id ? { ...x, ...patch, updated: date } : x)) });
+}
+
+/** Текст блока сеанса в истории; пустой массив — блок остаётся только с названием и датой */
+export function updateSessionText(id: string, paragraphs: string[]) {
+  update({ sessions: data.sessions.map((x) => (x.id === id ? { ...x, paragraphs } : x)) });
+}
+
+/** Комментарий к записи журнала (тест, задание); пустая строка удаляет комментарий */
+export function setComment(activityId: string, text: string) {
+  const comments = { ...data.comments };
+  if (text) comments[activityId] = text;
+  else delete comments[activityId];
+  update({ comments });
+}
+
 /** Тест или задание: назначено / отправлено / выполнено */
 export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState) {
   const { date, time } = nowStamp();
@@ -218,9 +265,18 @@ export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState
 
 export type HistoryEvent =
   | { id: string; kind: 'invite'; date: string; title: string; text: string }
-  | { id: string; kind: 'session'; number: number; date: string; paragraphs: string[] }
-  | { id: string; kind: 'note'; title: string; date: string; paragraphs: string[] }
-  | { id: string; kind: 'test' | 'task'; state: ActivityState; title: string; date: string; text: string };
+  | { id: string; kind: 'session'; ref: string; number: number; date: string; paragraphs: string[] }
+  | { id: string; kind: 'note'; ref: string; title: string; date: string; paragraphs: string[] }
+  | {
+      id: string;
+      kind: 'test' | 'task';
+      state: ActivityState;
+      title: string;
+      date: string;
+      text: string;
+      /** Комментарий психолога под текстом события */
+      comment?: string;
+    };
 
 export type HistoryFilter = 'all' | 'session' | 'test' | 'task' | 'note';
 
@@ -257,13 +313,21 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
         };
       case 'session': {
         const session = d.sessions.find((x) => x.id === a.ref)!;
-        return { id: a.id, kind: 'session', number: session.number, date: a.date, paragraphs: session.paragraphs };
+        return {
+          id: a.id,
+          kind: 'session',
+          ref: session.id,
+          number: session.number,
+          date: a.date,
+          paragraphs: session.paragraphs,
+        };
       }
       case 'note': {
         const note = d.notes.find((x) => x.id === a.ref)!;
         return {
           id: a.id,
           kind: 'note',
+          ref: note.id,
           title: `Заметка: ${note.title}`,
           date: a.date,
           paragraphs: note.paragraphs,
@@ -278,6 +342,7 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
           title: a.kind === 'test' ? name : `«${name}»`,
           date: `${a.date} ${a.time}`,
           text: activityText(a.kind, a.ref, a.state),
+          comment: d.comments[a.id],
         };
       }
     }

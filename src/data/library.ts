@@ -101,7 +101,7 @@ export const TASK_LIBRARY: LibraryTask[] = [
   { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: pieIcon, tint: '#6FD7A3', categories: ['svo'] },
   { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: smerIcon, tint: '#E19974', categories: ['svo', 'training'] },
   { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#B8EA6A', categories: ['svo'] },
+  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#B9EA6A', categories: ['svo'] },
   { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: '#C3ECFF', categories: ['training'] },
   { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#EAF6FF', categories: ['training'] },
   { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFDECF', categories: ['training'] },

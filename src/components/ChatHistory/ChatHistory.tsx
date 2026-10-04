@@ -1,5 +1,6 @@
 import { useState, type ComponentType, type SVGProps } from 'react';
 import { Chip } from '../Chip/Chip';
+import { EditSheet } from '../EditSheet/EditSheet';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseEdit,
@@ -16,11 +17,14 @@ import {
   IconTlNote,
 } from '../icons';
 import { CHATS, CURRENT_USER } from '../../data/chats';
-import { CASE_SECTIONS } from '../../data/case';
+import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
   doneCount,
   historyEvents,
+  setComment,
+  updateNote,
+  updateSessionText,
   useClientData,
   type HistoryEvent,
   type HistoryFilter,
@@ -51,7 +55,7 @@ function Stats({ hasData }: { hasData: boolean }) {
     { Icon: IconStatSessions, label: 'Сеансов проведено', value: n(countOf(d, 'session')) },
     { Icon: IconStatTests, label: 'Тестов пройдено', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')) },
     { Icon: IconStatTasks, label: 'Заданий выполнено', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')) },
-    { Icon: IconTabNotes, label: 'Сведений добавлено', value: n(CASE_SECTIONS.length) },
+    { Icon: IconTabNotes, label: 'Сведений добавлено', value: n(d.caseSections.length) },
     { Icon: IconStatNotes, label: 'Оставлено заметок', value: n(countOf(d, 'note')) },
   ];
   return (
@@ -118,10 +122,12 @@ function Marker({ event }: { event: HistoryEvent }) {
   );
 }
 
-function Card({ event }: { event: HistoryEvent }) {
+function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
+  // Сеанс без текста: только название и дата
+  const bare = 'paragraphs' in event && event.paragraphs.length === 0;
   return (
-    <div className="hist-card">
+    <div className={`hist-card${bare ? ' hist-card--bare' : ''}`}>
       <div className="hist-card__top">
         {event.kind === 'test' || event.kind === 'task' ? (
           <TruncatedText className="hist-card__title hist-card__title--single" text={title} />
@@ -129,7 +135,12 @@ function Card({ event }: { event: HistoryEvent }) {
           <h3 className="hist-card__title">{title}</h3>
         )}
         {event.kind !== 'invite' && (
-          <button type="button" className="hist-card__edit" aria-label="Изменить">
+          <button
+            type="button"
+            className="hist-card__edit"
+            aria-label={event.kind === 'test' || event.kind === 'task' ? 'Комментарий' : 'Изменить текст'}
+            onClick={onEdit}
+          >
             <IconCaseEdit />
           </button>
         )}
@@ -140,10 +151,15 @@ function Card({ event }: { event: HistoryEvent }) {
         ))}
       </p>
       {'text' in event ? (
-        <div className="hist-card__event">
-          <p className="hist-card__text">{event.text}</p>
-          {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
-        </div>
+        <>
+          <div className="hist-card__event">
+            <p className="hist-card__text">{event.text}</p>
+            {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
+          </div>
+          {'comment' in event && event.comment && (
+            <p className="hist-card__text hist-card__comment">{event.comment}</p>
+          )}
+        </>
       ) : (
         event.paragraphs.map((text, i) => (
           <p key={i} className="hist-card__text">
@@ -158,9 +174,11 @@ function Card({ event }: { event: HistoryEvent }) {
 /** Вкладка «История взаимодействия» в открытом чате: статистика, фильтры и лента событий */
 export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [filter, setFilter] = useState<HistoryFilter>('all');
+  const [editingId, setEditingId] = useState<string | null>(null);
   const data = useClientData();
   const events = hasData ? historyEvents(data) : [];
   const visible = filter === 'all' ? events : events.filter((e) => e.kind === filter);
+  const editing = events.find((e) => e.id === editingId);
 
   return (
     <div className="chat-history">
@@ -187,13 +205,47 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
               <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
                 {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                 <Marker event={event} />
-                <Card event={event} />
+                <Card event={event} onEdit={() => setEditingId(event.id)} />
               </li>
             );
           })}
         </ol>
       ) : (
         <p className="hist-empty">Событий пока нет</p>
+      )}
+
+      {editing && (
+        <EditSheet
+          key={editing.id}
+          heading={
+            editing.kind === 'session'
+              ? `Текст сеанса №${editing.number}`
+              : editing.kind === 'note'
+                ? 'Текст заметки'
+                : 'Комментарий'
+          }
+          initial={{
+            text:
+              editing.kind === 'session' || editing.kind === 'note'
+                ? paragraphsToText(editing.paragraphs)
+                : editing.kind === 'invite'
+                  ? ''
+                  : (editing.comment ?? ''),
+          }}
+          textLabel={editing.kind === 'test' || editing.kind === 'task' ? 'Комментарий' : 'Текст'}
+          textPlaceholder={
+            editing.kind === 'session'
+              ? 'Что произошло на сеансе. Абзацы разделяйте пустой строкой'
+              : 'Добавьте комментарий'
+          }
+          onClose={() => setEditingId(null)}
+          onSave={({ text = '' }) => {
+            if (editing.kind === 'session') updateSessionText(editing.ref, textToParagraphs(text));
+            else if (editing.kind === 'note') updateNote(editing.ref, { paragraphs: textToParagraphs(text) });
+            else if (editing.kind !== 'invite') setComment(editing.id, text);
+            setEditingId(null);
+          }}
+        />
       )}
     </div>
   );

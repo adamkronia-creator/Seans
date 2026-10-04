@@ -252,6 +252,18 @@
   margin-top: 8px;
 }
 
+/* Комментарий психолога: под текстом события, переносы строк сохраняются */
+.hist-card__comment,
+.hist-card__event + .hist-card__comment {
+  margin-top: 8px;
+  white-space: pre-line;
+}
+
+/* Блок без текста (сеанс): название и дата, без пустого места снизу */
+.hist-card--bare .hist-card__date {
+  margin-bottom: 0;
+}
+
 .hist-card__event {
   display: flex;
   gap: var(--space-2);

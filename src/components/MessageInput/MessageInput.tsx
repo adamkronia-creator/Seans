@@ -32,7 +32,7 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
     }
   };
 
-  const readText = () => (inputRef.current?.textContent ?? '').replace(/\u00a0/g, ' ');
+  const readText = () => (inputRef.current?.innerText ?? '').replace(/\u00a0/g, ' ').replace(/\n$/, '');
 
   const submit = () => {
     if (!hasText) return;
@@ -46,16 +46,17 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
+    // Enter отправляет, Shift+Enter переносит строку
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       submit();
     }
   };
 
-  // Вставляем только текст и в одну строку
+  // Вставляем только текст, переносы строк сохраняются
   const onPaste = (e: ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const plain = e.clipboardData.getData('text/plain').replace(/\s*\n\s*/g, ' ');
+    const plain = e.clipboardData.getData('text/plain').replace(/\r\n?/g, '\n');
     document.execCommand('insertText', false, plain);
   };
 
@@ -99,7 +100,7 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
             suppressContentEditableWarning
             role="textbox"
             aria-label="Сообщение"
-            aria-multiline="false"
+            aria-multiline="true"
             data-placeholder="Написать сообщение..."
             inputMode="text"
             enterKeyHint="send"
@@ -109,6 +110,8 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
               if (!e.currentTarget.textContent) e.currentTarget.innerHTML = '';
               setText(readText());
               saveRange();
+              // Поле выросло или уменьшилось: ленту нужно удержать внизу
+              requestAnimationFrame(() => onLayoutChange?.());
             }}
             onKeyDown={onKeyDown}
             onKeyUp={saveRange}

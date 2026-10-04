@@ -1,74 +1,53 @@
-import { useState, type ComponentType, type SVGProps } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Badge } from '../Badge/Badge';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
+import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import {
   IconCaseAdd,
   IconCaseAddNote,
   IconCaseAttach,
   IconCaseFileDownload,
-  IconCaseNotePin,
-  IconCaseAnamnesis,
-  IconCaseBirthday,
-  IconCaseCalendar,
-  IconCaseClient,
-  IconCaseClock,
   IconCaseEdit,
-  IconCaseFormat,
-  IconCaseGeneral,
-  IconCaseHypothesis,
   IconCaseLock,
-  IconCaseRequest,
-  IconCaseScenario,
-  IconCaseSignifiers,
-  IconCaseStructure,
-  IconCaseTransfer,
 } from '../icons';
 import {
-  CASE_SECTIONS,
-  type CaseIconId,
-  type CaseRowIconId,
+  blocksToText,
+  paragraphsToText,
+  textToBlocks,
+  textToParagraphs,
   type CaseSection,
 } from '../../data/case';
 import { CASE_FILES, type CaseFile } from '../../data/files';
 import type { CaseNote } from '../../data/notes';
-import { useClientData } from '../../data/clientStore';
+import { toneOf } from '../../data/tones';
+import { updateNote, updateSection, useClientData } from '../../data/clientStore';
+import { HEAD_ICONS, ROW_ICONS } from './caseIcons';
 import './ChatCase.css';
 
-type Icon = ComponentType<SVGProps<SVGSVGElement>>;
-
-// Иконки шапок карточек; size — размер файла иконки из Figma (22 или 24)
-const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 22 | 24 }> = {
-  general: { Icon: IconCaseGeneral, size: 22 },
-  anamnesis: { Icon: IconCaseAnamnesis, size: 22 },
-  request: { Icon: IconCaseRequest, size: 22 },
-  hypothesis: { Icon: IconCaseHypothesis, size: 24 },
-  structure: { Icon: IconCaseStructure, size: 22 },
-  signifiers: { Icon: IconCaseSignifiers, size: 24 },
-  scenario: { Icon: IconCaseScenario, size: 24 },
-  transfer: { Icon: IconCaseTransfer, size: 24 },
-};
-
-const ROW_ICONS: Record<CaseRowIconId, Icon> = {
-  client: IconCaseClient,
-  birthday: IconCaseBirthday,
-  calendar: IconCaseCalendar,
-  clock: IconCaseClock,
-  format: IconCaseFormat,
+/** Фон шапки и цвет иконки задаются переменными: цвет можно менять в редакторе */
+const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
+  const { bg, fg } = toneOf(tone);
+  return { '--head-bg': bg, '--head-fg': fg } as CSSProperties;
 };
 
 type SegmentId = 'info' | 'notes' | 'materials';
 
-function CaseCard({ section }: { section: CaseSection }) {
+function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
   const { Icon, size } = HEAD_ICONS[section.icon];
 
   return (
     <li className="case-card">
-      <div className={`case-card__head case-card__head--${section.tone}`}>
+      <div className="case-card__head" style={toneStyle(section.tone)}>
         <span className="case-card__icon" style={{ fontSize: size }}>
           <Icon />
         </span>
         <TruncatedText className="case-card__title" text={section.title} />
-        <button type="button" className="case-card__edit" aria-label={`Изменить: ${section.title}`}>
+        <button
+          type="button"
+          className="case-card__edit"
+          aria-label={`Изменить: ${section.title}`}
+          onClick={onEdit}
+        >
           <IconCaseEdit />
         </button>
       </div>
@@ -127,15 +106,16 @@ function FileCard({ file }: { file: CaseFile }) {
   );
 }
 
-function NoteCard({ note }: { note: CaseNote }) {
+function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
+  const { Icon } = HEAD_ICONS[note.icon];
   return (
     <li className="case-card">
-      <div className="case-card__head case-card__head--note">
+      <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         <span className="case-card__icon">
-          <IconCaseNotePin />
+          <Icon />
         </span>
         <TruncatedText className="case-card__title" text={note.title} />
-        <button type="button" className="case-card__edit" aria-label="Изменить заметку">
+        <button type="button" className="case-card__edit" aria-label="Изменить заметку" onClick={onEdit}>
           <IconCaseEdit />
         </button>
       </div>
@@ -153,11 +133,15 @@ function NoteCard({ note }: { note: CaseNote }) {
 
 /** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
 export function ChatCase({ hasData }: { hasData: boolean }) {
-  const { notes } = useClientData();
+  const { notes, caseSections } = useClientData();
   const [segment, setSegment] = useState<SegmentId>('info');
+  // Что сейчас редактируется: сведение или заметка
+  const [editing, setEditing] = useState<{ kind: 'section' | 'note'; id: string } | null>(null);
+  const editSection = editing?.kind === 'section' ? caseSections.find((x) => x.id === editing.id) : undefined;
+  const editNote = editing?.kind === 'note' ? notes.find((x) => x.id === editing.id) : undefined;
 
   const segments: { id: SegmentId; label: string; count: number }[] = [
-    { id: 'info', label: 'Сведения', count: hasData ? CASE_SECTIONS.length : 0 },
+    { id: 'info', label: 'Сведения', count: hasData ? caseSections.length : 0 },
     { id: 'notes', label: 'Заметки', count: hasData ? notes.length : 0 },
     { id: 'materials', label: 'Материалы', count: hasData ? CASE_FILES.length : 0 },
   ];
@@ -191,8 +175,12 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
           </button>
 
           <ul className="case-cards" hidden={!hasData}>
-            {(hasData ? CASE_SECTIONS : []).map((section) => (
-              <CaseCard key={section.id} section={section} />
+            {(hasData ? caseSections : []).map((section) => (
+              <CaseCard
+                key={section.id}
+                section={section}
+                onEdit={() => setEditing({ kind: 'section', id: section.id })}
+              />
             ))}
           </ul>
 
@@ -213,7 +201,7 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
 
           <ul className="case-cards" hidden={!hasData}>
             {notes.map((note) => (
-              <NoteCard key={note.id} note={note} />
+              <NoteCard key={note.id} note={note} onEdit={() => setEditing({ kind: 'note', id: note.id })} />
             ))}
           </ul>
 
@@ -243,6 +231,59 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
             <span>Файлы видны только вам</span>
           </p>
         </>
+      )}
+
+      {editSection && (
+        <EditSheet
+          key={editSection.id}
+          heading="Редактирование сведений"
+          initial={{
+            title: editSection.title,
+            icon: editSection.icon,
+            tone: editSection.tone,
+            ...(editSection.blocks ? { text: blocksToText(editSection.blocks) } : {}),
+            ...(editSection.rows ? { rows: editSection.rows.map((r) => r.value) } : {}),
+          }}
+          rowLabels={editSection.rows?.map((r) => r.label)}
+          textPlaceholder="Абзацы разделяйте пустой строкой, пункты списка начинайте с «• »"
+          onClose={() => setEditing(null)}
+          onSave={(v: EditValues) => {
+            updateSection(editSection.id, {
+              title: v.title,
+              icon: v.icon,
+              tone: v.tone,
+              ...(v.text !== undefined ? { blocks: textToBlocks(v.text) } : {}),
+              ...(v.rows && editSection.rows
+                ? { rows: editSection.rows.map((r, i) => ({ ...r, value: v.rows![i] })) }
+                : {}),
+            });
+            setEditing(null);
+          }}
+        />
+      )}
+
+      {editNote && (
+        <EditSheet
+          key={editNote.id}
+          heading="Редактирование заметки"
+          initial={{
+            title: editNote.title,
+            text: paragraphsToText(editNote.paragraphs),
+            icon: editNote.icon,
+            tone: editNote.tone,
+          }}
+          textPlaceholder="Абзацы разделяйте пустой строкой"
+          onClose={() => setEditing(null)}
+          onSave={(v: EditValues) => {
+            updateNote(editNote.id, {
+              title: v.title,
+              paragraphs: textToParagraphs(v.text ?? ''),
+              icon: v.icon,
+              tone: v.tone,
+            });
+            setEditing(null);
+          }}
+        />
       )}
     </div>
   );

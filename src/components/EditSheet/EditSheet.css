@@ -1,0 +1,192 @@
+/* Затемнение на весь экран; панель прижата к низу и не шире приложения (480) */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(0 0 0 / 40%);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92dvh;
+  border-radius: 16px 16px 0 0;
+  background: var(--color-bg-panel);
+  font-family: var(--font-family);
+}
+
+.sheet__header {
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.sheet__heading {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xl);
+  text-align: center;
+}
+
+.sheet__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+/* Так шапка будет выглядеть в карточке */
+.sheet__preview {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  padding: 0 var(--space-3);
+  border-radius: 12px;
+  background: var(--head-bg);
+  color: var(--head-fg);
+}
+
+.sheet__preview-icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.sheet__preview-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sheet__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 16px;
+}
+
+.sheet__input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-stroke);
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: 19px;
+  outline: 0;
+  resize: none;
+}
+
+.sheet__input--line {
+  height: 40px;
+}
+
+.sheet__input--text {
+  min-height: 96px;
+  overflow: hidden;
+}
+
+.sheet__input:focus {
+  border-color: var(--color-accent);
+}
+
+.sheet__input::placeholder {
+  color: var(--color-text-caption);
+}
+
+.sheet__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sheet__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-stroke);
+  border-radius: 12px;
+  color: var(--color-accent);
+  font-size: 24px;
+}
+
+.sheet__icon--active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.sheet__tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Цветной кружок: фон шапки с цветной обводкой цвета иконки */
+.sheet__tone {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--head-fg);
+}
+
+.sheet__tone--active {
+  outline: 2px solid var(--head-fg);
+  outline-offset: 2px;
+}
+
+.sheet__footer {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-divider);
+}
+
+.sheet__button {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-panel);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.sheet__button--primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+.sheet__button:disabled {
+  opacity: 0.4;
+}

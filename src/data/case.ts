@@ -6,7 +6,10 @@ export type CaseIconId =
   | 'structure'
   | 'signifiers'
   | 'scenario'
-  | 'transfer';
+  | 'transfer'
+  | 'pin';
+
+import type { ToneId } from './tones';
 
 export type CaseRowIconId = 'client' | 'birthday' | 'calendar' | 'clock' | 'format';
 
@@ -18,8 +21,8 @@ export interface CaseSection {
   id: string;
   title: string;
   icon: CaseIconId;
-  /** Цвет шапки: blue — стандартный, brown — клиническая гипотеза */
-  tone: 'blue' | 'brown';
+  /** Цвет шапки: синий по умолчанию, коричневый у клинической гипотезы; можно менять в редакторе */
+  tone: ToneId;
   /** Для «Общей информации»: строки «название — значение» */
   rows?: { icon: CaseRowIconId; label: string; value: string }[];
   /** Для текстовых разделов */
@@ -184,3 +187,35 @@ export const CASE_SECTIONS: CaseSection[] = [
 ];
 
 // Счётчики вкладок «Заметки» и «Материалы» пока заданы вручную (как в макете)
+
+// ——— Текст блоков в редакторе ———
+// Абзацы разделяются пустой строкой, пункты списка начинаются с «• » (по одному на строку).
+
+const BULLET = '• ';
+
+export function blocksToText(blocks: CaseBlock[]): string {
+  return blocks
+    .map((b) => (b.type === 'p' ? b.text : b.items.map((i) => BULLET + i).join('\n')))
+    .join('\n\n');
+}
+
+export function textToBlocks(text: string): CaseBlock[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean)
+    .map((chunk): CaseBlock => {
+      const lines = chunk.split('\n').map((l) => l.trim());
+      return lines.every((l) => l.startsWith(BULLET.trim()))
+        ? { type: 'ul', items: lines.map((l) => l.replace(/^•\s*/, '')).filter(Boolean) }
+        : { type: 'p', text: chunk };
+    });
+}
+
+/** Заметки и тексты сеансов: абзацы без списков */
+export const paragraphsToText = (paragraphs: string[]) => paragraphs.join('\n\n');
+export const textToParagraphs = (text: string) =>
+  text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
