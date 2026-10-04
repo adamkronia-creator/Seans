@@ -41,8 +41,10 @@ function AutoTextarea({
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Высота по тексту плюс рамка: иначе появляется лишняя полоса прокрутки
+    const border = el.offsetHeight - el.clientHeight;
     el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
+    el.style.height = `${el.scrollHeight + border}px`;
   }, [value]);
   return <textarea ref={ref} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />;
 }
@@ -130,7 +132,12 @@ export function EditSheet({
 
           {hasLook && (
             <>
-              <div className="sheet__field" role="radiogroup" aria-labelledby={`${uid}-icon`}>
+              <div
+                className="sheet__field"
+                role="radiogroup"
+                aria-labelledby={`${uid}-icon`}
+                style={{ '--head-fg': current?.fg } as CSSProperties}
+              >
                 <span className="sheet__label" id={`${uid}-icon`}>Иконка</span>
                 <div className="sheet__icons">
                   {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {

@@ -41,6 +41,11 @@
   min-height: 0;
   padding: var(--space-2) var(--space-4) var(--space-4);
   overflow-y: auto;
+  scrollbar-width: none; /* полоса прокрутки не сдвигает края: слева и справа ровно 16 */
+}
+
+.sheet__body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Так шапка будет выглядеть в карточке */
@@ -83,14 +88,17 @@
   gap: 6px;
 }
 
+/* Подпись 14/14; слева 13 (рамка 1 + внутренний отступ 12), чтобы шла ровно с текстом в поле */
 .sheet__label {
+  padding-left: 13px;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  line-height: 16px;
+  font-size: var(--font-size-sm);
+  line-height: 14px;
 }
 
 .sheet__input {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid var(--color-stroke);
   border-radius: 12px;
@@ -100,6 +108,7 @@
   font-size: var(--font-size-md);
   line-height: 19px;
   outline: 0;
+  overflow: hidden;
   resize: none;
 }
 
@@ -109,7 +118,6 @@
 
 .sheet__input--text {
   min-height: 96px;
-  overflow: hidden;
 }
 
 .sheet__input:focus {
@@ -134,13 +142,14 @@
   height: 44px;
   border: 1px solid var(--color-stroke);
   border-radius: 12px;
-  color: var(--color-accent);
+  /* Иконки окрашены в выбранный цвет шапки */
+  color: var(--head-fg, var(--color-accent));
   font-size: 24px;
 }
 
+/* Выбранная иконка: акцентная обводка, фон остаётся белым */
 .sheet__icon--active {
   border-color: var(--color-accent);
-  background: var(--color-accent-soft);
 }
 
 .sheet__tones {

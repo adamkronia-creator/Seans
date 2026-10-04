@@ -1,14 +1,37 @@
 /** Цвета шапок карточек «Кейса» и заметок: фон шапки и цвет иконки */
-export type ToneId = 'blue' | 'brown' | 'purple' | 'green' | 'orange' | 'red' | 'pink';
+export type ToneId =
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'mint'
+  | 'green'
+  | 'orange'
+  | 'red'
+  | 'pink'
+  | 'magenta'
+  | 'purple'
+  | 'brown';
 
-export const TONES: { id: ToneId; label: string; bg: string; fg: string }[] = [
-  { id: 'blue', label: 'Синий', bg: 'rgb(0 136 255 / 10%)', fg: '#0088FF' },
-  { id: 'brown', label: 'Коричневый', bg: 'rgb(172 127 94 / 10%)', fg: '#AC7F5E' },
-  { id: 'purple', label: 'Фиолетовый', bg: '#EEEDFD', fg: '#6155F5' },
-  { id: 'green', label: 'Зелёный', bg: 'rgb(52 199 89 / 10%)', fg: '#34C759' },
-  { id: 'orange', label: 'Оранжевый', bg: 'rgb(255 141 40 / 10%)', fg: '#FF8D28' },
-  { id: 'red', label: 'Красный', bg: 'rgb(255 56 60 / 10%)', fg: '#FF383C' },
-  { id: 'pink', label: 'Розовый', bg: 'rgb(203 48 224 / 10%)', fg: '#CB30E0' },
+// Цвет иконки — основной цвет из палитры (tokens.css); фон шапки — тот же цвет с прозрачностью 10%
+const tone = (id: ToneId, label: string, token: string) => ({
+  id,
+  label,
+  fg: `var(--color-${token})`,
+  bg: `color-mix(in srgb, var(--color-${token}) 10%, transparent)`,
+});
+
+export const TONES = [
+  tone('blue', 'Синий', 'blue'),
+  tone('cyan', 'Голубой', 'cyan'),
+  tone('teal', 'Бирюзовый', 'teal'),
+  tone('mint', 'Мятный', 'mint'),
+  tone('green', 'Зелёный', 'green'),
+  tone('orange', 'Оранжевый', 'orange'),
+  tone('red', 'Красный', 'red'),
+  tone('pink', 'Розовый', 'pink'),
+  tone('magenta', 'Пурпурный', 'magenta'),
+  tone('purple', 'Фиолетовый', 'purple'),
+  tone('brown', 'Коричневый', 'brown'),
 ];
 
 export const toneOf = (id: ToneId) => TONES.find((t) => t.id === id) ?? TONES[0];
