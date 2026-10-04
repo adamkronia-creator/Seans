@@ -15,7 +15,11 @@ export type CaseIconId =
   | 'crown'
   | 'bolt'
   | 'cross'
-  | 'dots';
+  | 'dots'
+  | 'checklist'
+  | 'flame'
+  | 'briefcase'
+  | 'bookmark';
 
 import type { ToneId } from './tones';
 

@@ -94,6 +94,10 @@ export { default as IconCaseHeadCrown } from '../../assets/icons/case/head-crown
 export { default as IconCaseHeadBolt } from '../../assets/icons/case/head-bolt.svg?react';
 export { default as IconCaseHeadCross } from '../../assets/icons/case/head-cross.svg?react';
 export { default as IconCaseHeadDots } from '../../assets/icons/case/head-dots.svg?react';
+export { default as IconCaseHeadChecklist } from '../../assets/icons/case/head-checklist.svg?react';
+export { default as IconCaseHeadFlame } from '../../assets/icons/case/head-flame.svg?react';
+export { default as IconCaseHeadBriefcase } from '../../assets/icons/case/head-briefcase.svg?react';
+export { default as IconCaseHeadBookmark } from '../../assets/icons/case/head-bookmark.svg?react';
 export { default as IconCaseClient } from '../../assets/icons/case/row-client.svg?react';
 export { default as IconCaseBirthday } from '../../assets/icons/case/row-birthday.svg?react';
 export { default as IconCaseCalendar } from '../../assets/icons/case/row-calendar.svg?react';

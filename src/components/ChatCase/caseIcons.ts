@@ -11,6 +11,10 @@ import {
   IconCaseHeadCrown,
   IconCaseHeadCross,
   IconCaseHeadDots,
+  IconCaseHeadChecklist,
+  IconCaseHeadFlame,
+  IconCaseHeadBriefcase,
+  IconCaseHeadBookmark,
   IconCaseHeadEye,
   IconCaseHeadHospital,
   IconCaseHeadInfo,
@@ -46,6 +50,10 @@ export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; la
   bolt: { Icon: IconCaseHeadBolt, size: 20, label: 'Молния' },
   cross: { Icon: IconCaseHeadCross, size: 20, label: 'Отмена' },
   dots: { Icon: IconCaseHeadDots, size: 20, label: 'Ещё' },
+  checklist: { Icon: IconCaseHeadChecklist, size: 20, label: 'Проверено' },
+  flame: { Icon: IconCaseHeadFlame, size: 20, label: 'Пламя' },
+  briefcase: { Icon: IconCaseHeadBriefcase, size: 20, label: 'Портфель' },
+  bookmark: { Icon: IconCaseHeadBookmark, size: 20, label: 'Закладка' },
 };
 
 export const ROW_ICONS: Record<CaseRowIconId, Icon> = {
