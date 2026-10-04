@@ -10,6 +10,10 @@ interface ChipProps {
   iconOnly?: boolean;
   onClick?: () => void;
   ariaLabel?: string;
+  /** Дополнительный класс (размер иконки и т.п.) */
+  className?: string;
+  /** Переключатель с иконкой: сообщает состояние, как обычный чипс */
+  toggle?: boolean;
 }
 
 export function Chip({
@@ -19,6 +23,8 @@ export function Chip({
   iconOnly = false,
   onClick,
   ariaLabel,
+  className,
+  toggle = false,
 }: ChipProps) {
   // Кружок со счётчиком показывается только если есть непрочитанные
   const hasCount = count !== undefined && count > 0;
@@ -27,6 +33,7 @@ export function Chip({
     active && 'chip--active',
     iconOnly && 'chip--icon',
     hasCount && 'chip--counted',
+    className,
   ]
     .filter(Boolean)
     .join(' ');
@@ -36,7 +43,7 @@ export function Chip({
       type="button"
       className={cls}
       onClick={onClick}
-      aria-pressed={iconOnly ? undefined : active}
+      aria-pressed={iconOnly && !toggle ? undefined : active}
       aria-label={ariaLabel}
     >
       {children}

@@ -309,6 +309,16 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
   return items.sort((x, y) => y.index - x.index).map((x) => x.item);
 }
 
+/** Тесты, которые психолог недавно присылал клиенту или которые клиент прошёл: id, свежие первыми */
+export function recentTestIds(d: ClientData, limit = 5): string[] {
+  const seen: string[] = [];
+  for (let i = d.activity.length - 1; i >= 0; i--) {
+    const a = d.activity[i];
+    if (a.kind === 'test' && !seen.includes(a.ref)) seen.push(a.ref);
+  }
+  return seen.slice(0, limit);
+}
+
 /** Экран «События»: действия самого клиента (приглашение, пройденные опросники и задания), новые сверху */
 export function appEvents(d: ClientData): AppEvent[] {
   const maxim = { name: 'Максим Мартынов', avatar: avatar1 };

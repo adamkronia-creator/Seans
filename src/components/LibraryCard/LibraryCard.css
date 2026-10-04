@@ -1,0 +1,37 @@
+.lib-card {
+  position: relative;
+}
+
+/* Название обрезается, не доходя до сердечка: 14 (иконка) + отступ */
+.lib-card__top {
+  padding-right: 19px;
+}
+
+/* Описание в макете на 1 ниже, чем в карточке чата */
+.lib-card .test-card__description {
+  position: relative;
+  top: 1px;
+}
+
+/* Сердечко 14×16 у правого края карточки (отступ 12), на уровне названия.
+   Область нажатия больше иконки: padding компенсируется отрицательным отступом */
+.lib-card__heart {
+  position: absolute;
+  top: 18px;
+  right: 12px;
+  display: flex;
+  width: 14px;
+  height: 16px;
+  margin: 0;
+  box-sizing: content-box;
+  padding: 8px;
+  transform: translate(8px, -8px);
+  color: var(--color-text-caption);
+  font-size: 16px;
+  line-height: 0;
+}
+
+.lib-card__heart svg {
+  width: 14px;
+  height: 16px;
+}

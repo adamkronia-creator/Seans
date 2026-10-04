@@ -3,10 +3,11 @@
   align-items: center;
   gap: var(--space-2);
   height: var(--size-search-h);
-  /* Иконка 24 в поле 40: 8 сверху, 8 снизу. Слева тоже 8 (7 + 1 рамка),
-     чтобы иконка не уезжала к левому краю поля */
-  padding: 0 var(--space-3) 0 7px;
-  border: 1px solid var(--color-border);
+  /* Иконка 24 в поле 40: 8 сверху, 8 снизу, слева тоже 8 */
+  padding: 0 var(--space-3) 0 var(--space-2);
+  /* Рамка 1 px снаружи (как в макете): поле занимает ровно 40 */
+  border: 0;
+  box-shadow: 0 0 0 1px var(--color-stroke);
   border-radius: var(--radius-pill);
   background: var(--color-bg-panel);
   color: var(--color-text-caption);
@@ -39,5 +40,10 @@
 }
 
 .search-field:focus-within {
-  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* С кнопкой справа: от края поля до кнопки 4 */
+.search-field--trailing {
+  padding-right: 4px;
 }

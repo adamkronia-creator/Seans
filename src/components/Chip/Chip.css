@@ -4,7 +4,7 @@
   align-items: center;
   gap: 6px;
   height: var(--size-chip-h);
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-2);
   border: 0;
   /* Рамка 1 px снаружи, поэтому чипс занимает ровно 32 по высоте */
   box-shadow: 0 0 0 1px var(--color-stroke);
@@ -17,19 +17,23 @@
   white-space: nowrap;
 }
 
-/* Со счётчиком: слева 8, справа 6, между текстом и счётчиком 4; без счётчика симметрично 12 */
+/* Отступы по бокам 8; со счётчиком справа 6 и между текстом и счётчиком 4 */
 .chip--counted {
   gap: 4px;
   padding-right: 6px;
   padding-left: var(--space-2);
 }
 
-/* Чипс «+»: круг 32×32, плюс 12×12 */
+/* Чипс с иконкой: круг 32×32 */
 .chip--icon {
   justify-content: center;
   width: var(--size-chip-h);
   padding: 0;
-  font-size: 12px;
+}
+
+/* Плюс 13,5×13,5 (линии 12 + округлые концы) */
+.chip--plus {
+  font-size: 13.5px;
 }
 
 .chip--active {

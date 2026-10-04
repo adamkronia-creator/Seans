@@ -3,7 +3,7 @@ import { markRead, useChats } from '../../data/chatStore';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
-import { IconBell, IconPlus } from '../../components/icons';
+import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import {
   CATEGORIES,
@@ -68,8 +68,8 @@ export function MessagesPage() {
         <SearchField value={query} onChange={setQuery} placeholder="Поиск диалогов..." />
 
         <div className="messages__chips" role="group" aria-label="Фильтр диалогов">
-          <Chip iconOnly ariaLabel="Добавить категорию">
-            <IconPlus />
+          <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
+            <IconPlusChip />
           </Chip>
           <Chip active={filter === 'all'} count={countOf('all')} onClick={() => setFilter('all')}>
             Все

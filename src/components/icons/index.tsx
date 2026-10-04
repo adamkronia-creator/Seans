@@ -36,6 +36,26 @@ export function IconPlus(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+// Плюс в чипсе «+»: линии длиной 12, толщина 1,5, с округлыми концами, итого 13,5×13,5.
+// Размер 1em = 13,5 при font-size 13.5px.
+export function IconPlusChip(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="-0.75 -0.75 13.5 13.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M6 0v12M0 6h12" />
+    </svg>
+  );
+}
+
 // Экран открытого чата
 export { default as IconTabSessions } from '../../assets/icons/chat/tab-sessions.svg?react';
 export { default as IconTabMessages } from '../../assets/icons/chat/tab-messages.svg?react';
@@ -82,3 +102,11 @@ export { default as IconTlClock } from '../../assets/icons/history/tl-clock.svg?
 export { default as IconTlDoc } from '../../assets/icons/history/tl-doc.svg?react';
 export { default as IconTlFlame } from '../../assets/icons/history/tl-flame.svg?react';
 export { default as IconChevron } from '../../assets/icons/history/chevron.svg?react';
+
+// Раздел «Психологические тесты»
+export { default as IconHeartRed } from '../../assets/icons/library/heart-red.svg?react';
+export { default as IconHeartGray } from '../../assets/icons/library/heart-gray.svg?react';
+export { default as IconFilterAll } from '../../assets/icons/library/filter-all.svg?react';
+export { default as IconFilterFavorites } from '../../assets/icons/library/filter-favorites.svg?react';
+export { default as IconFilterRecent } from '../../assets/icons/library/filter-recent.svg?react';
+export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
