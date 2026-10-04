@@ -86,7 +86,9 @@ function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'session') {
     return (
       <div className="hist-marker hist-marker--session">
-        <span className="hist-marker__number">{event.number}</span>
+        <span className="hist-marker__number">
+          <span className="hist-marker__digit">{event.number}</span>
+        </span>
         <img className="hist-marker__avatar" src={CURRENT_USER.avatar} alt="" />
         <img className="hist-marker__avatar hist-marker__avatar--ring" src={maxim.avatar} alt="" />
       </div>

@@ -148,6 +148,18 @@
   line-height: 1;
 }
 
+.hist-marker__digit {
+  display: block;
+  line-height: 1;
+}
+
+/* Цифра по центру круга: коробка текста обрезается от высоты заглавных до базовой линии (как в Badge) */
+@supports (text-box: trim-both cap alphabetic) {
+  .hist-marker__digit {
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 .hist-marker__icon,
 .hist-marker__slot {
   display: flex;
