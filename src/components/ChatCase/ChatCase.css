@@ -202,7 +202,7 @@
 .case-card__text,
 .case-card__list {
   font-size: var(--font-size-md);
-  line-height: 19px;
+  line-height: 19px; /* 120% от 16, округлено до целых, как в Figma */
 }
 
 .case-card__list {
@@ -261,9 +261,6 @@
   display: none;
 }
 
-.case-card__head--note .case-card__icon {
-  font-size: 20px;
-}
 
 /* Заметка: текст начинается на 10 от шапки */
 .case-card__body--note {
@@ -273,4 +270,8 @@
 /* В заметках зазор между названием и карандашом 8 (длина многоточия как в макете) */
 .case-card__head--note .case-card__edit {
   margin-left: 0;
+}
+
+.case-card__head--note .case-card__icon {
+  font-size: 22px;
 }
