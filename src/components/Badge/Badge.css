@@ -16,6 +16,20 @@
   line-height: 1;
 }
 
+/* Цифры: коробка текста обрезается от высоты заглавных букв до базовой линии
+   (в Figma это «cap height to baseline»). Тогда цифра стоит ровно по центру
+   круга независимо от метрик шрифта в браузере. */
+.badge__text {
+  display: block;
+  line-height: 1;
+}
+
+@supports (text-box: trim-both cap alphabetic) {
+  .badge__text {
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 .badge--accent {
   background: var(--color-accent);
   color: var(--color-accent-on);

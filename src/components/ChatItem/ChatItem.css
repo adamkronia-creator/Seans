@@ -8,7 +8,9 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  padding: 10px var(--space-4);
+  /* 16 по бокам; 12 сверху и снизу: от разделителя шапки до первого чата 12,
+     между чатами 12 до разделителя и 12 после него */
+  padding: var(--space-3) var(--space-4);
   text-align: left;
 }
 
