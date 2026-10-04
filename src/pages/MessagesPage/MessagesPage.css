@@ -53,8 +53,10 @@
   display: none;
 }
 
+/* От разделителя шапки до первого чата 12: 2 здесь + 10 внутри строки */
 .messages__list {
   flex: 1;
+  padding-top: 2px;
   overflow-y: auto;
 }
 

@@ -21,12 +21,11 @@ export function MessagesPage() {
   const [filter, setFilter] = useState<Filter>('all');
   const [chats, setChats] = useState<Chat[]>(CHATS);
 
-  // Счётчик чипса = число непрочитанных сообщений в его чатах. При нуле кружок скрыт.
-  // «Избранное» в счётчики чипсов не входит.
+  // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
+  // «Все» считает и «Избранное»; категории — только свои чаты. При нуле кружок скрыт.
   const countOf = (id: Filter) =>
-    chats
-      .filter((c) => !c.favorites && (id === 'all' || c.category === id))
-      .reduce((sum, c) => sum + c.unread, 0);
+    chats.filter((c) => c.unread > 0 && (id === 'all' || (!c.favorites && c.category === id)))
+      .length;
 
   // Открытие чата помечает его прочитанным (экрана чата пока нет)
   const markRead = (chat: Chat) =>
