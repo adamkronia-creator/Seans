@@ -184,4 +184,3 @@ export const CASE_SECTIONS: CaseSection[] = [
 ];
 
 // Счётчики вкладок «Заметки» и «Материалы» пока заданы вручную (как в макете)
-export const CASE_MATERIALS_COUNT = 10;

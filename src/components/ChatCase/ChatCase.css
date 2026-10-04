@@ -275,3 +275,65 @@
 .case-card__head--note .case-card__icon {
   font-size: 22px;
 }
+
+/* Файл: карточка 76 (отступ 12), круглая миниатюра 52, название и подпись, дата справа */
+.case-file {
+  display: flex;
+  gap: var(--space-3);
+  height: 76px;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+}
+
+.case-file__thumb {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: var(--color-text-primary);
+  font-size: var(--size-icon);
+}
+
+.case-file__thumb--image {
+  background: #BFE1FF;
+}
+
+.case-file__thumb--pdf {
+  background: #D7D4FC;
+}
+
+.case-file__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.case-file__name {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.case-file__meta {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 16px;
+}
+
+.case-file__date {
+  flex-shrink: 0;
+  margin-top: 8px;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: 12px;
+}

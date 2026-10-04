@@ -4,6 +4,8 @@ import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseAdd,
   IconCaseAddNote,
+  IconCaseAttach,
+  IconCaseFileDownload,
   IconCaseNotePin,
   IconCaseAnamnesis,
   IconCaseBirthday,
@@ -22,12 +24,12 @@ import {
   IconCaseTransfer,
 } from '../icons';
 import {
-  CASE_MATERIALS_COUNT,
   CASE_SECTIONS,
   type CaseIconId,
   type CaseRowIconId,
   type CaseSection,
 } from '../../data/case';
+import { CASE_FILES, type CaseFile } from '../../data/files';
 import { CASE_NOTES, type CaseNote } from '../../data/notes';
 import './ChatCase.css';
 
@@ -109,6 +111,21 @@ function CaseCard({ section }: { section: CaseSection }) {
   );
 }
 
+function FileCard({ file }: { file: CaseFile }) {
+  return (
+    <li className="case-file">
+      <span className={`case-file__thumb case-file__thumb--${file.kind}`}>
+        <IconCaseFileDownload />
+      </span>
+      <div className="case-file__info">
+        <TruncatedText className="case-file__name" text={file.name} />
+        <span className="case-file__meta">{file.meta}</span>
+      </div>
+      <span className="case-file__date">{file.date}</span>
+    </li>
+  );
+}
+
 function NoteCard({ note }: { note: CaseNote }) {
   return (
     <li className="case-card">
@@ -140,7 +157,7 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
   const segments: { id: SegmentId; label: string; count: number }[] = [
     { id: 'info', label: 'Сведения', count: hasData ? CASE_SECTIONS.length : 0 },
     { id: 'notes', label: 'Заметки', count: hasData ? CASE_NOTES.length : 0 },
-    { id: 'materials', label: 'Материалы', count: hasData ? CASE_MATERIALS_COUNT : 0 },
+    { id: 'materials', label: 'Материалы', count: hasData ? CASE_FILES.length : 0 },
   ];
 
   return (
@@ -204,7 +221,26 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
           </p>
         </>
       ) : (
-        <p className="case-empty">Раздел в разработке</p>
+        <>
+          <button type="button" className="case-add">
+            <svg className="case-add__border" aria-hidden="true">
+              <rect className="case-add__rect" />
+            </svg>
+            <IconCaseAttach className="case-add__icon" />
+            <span>Прикрепить файл</span>
+          </button>
+
+          <ul className="case-cards" hidden={!hasData}>
+            {CASE_FILES.map((file) => (
+              <FileCard key={file.id} file={file} />
+            ))}
+          </ul>
+
+          <p className="case-note">
+            <IconCaseLock className="case-note__icon" />
+            <span>Файлы видны только вам</span>
+          </p>
+        </>
       )}
     </div>
   );
