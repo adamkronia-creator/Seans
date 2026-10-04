@@ -48,3 +48,4 @@ export { default as IconAttach } from '../../assets/icons/chat/attach.svg?react'
 export { default as IconEmoji } from '../../assets/icons/chat/emoji.svg?react';
 export { default as IconMicrophone } from '../../assets/icons/chat/microphone.svg?react';
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
+export { default as IconSend } from '../../assets/icons/chat/send.svg?react';

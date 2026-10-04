@@ -16,8 +16,10 @@
   background: var(--color-bg-panel);
 }
 
+/* Первая строка всех экранов: высота 40, отступы 12 сверху и 16 по бокам */
 .messages__top {
   display: grid;
+  height: 40px;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
 }
@@ -35,7 +37,11 @@
 
 .messages__bell {
   display: flex;
+  align-items: center;
+  justify-content: center;
   justify-self: end;
+  width: 40px;
+  height: 40px;
   font-size: var(--size-icon);
 }
 

@@ -52,7 +52,7 @@ export function MessagesPage() {
       <header className="messages__header">
         <div className="messages__top">
           <button type="button" className="messages__profile" aria-label="Профиль">
-            <Avatar src={CURRENT_USER.avatar} size={34} />
+            <Avatar src={CURRENT_USER.avatar} size={40} />
           </button>
           <h1 className="messages__title">Сообщения</h1>
           <button

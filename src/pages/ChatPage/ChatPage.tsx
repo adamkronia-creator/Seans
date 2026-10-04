@@ -12,8 +12,7 @@ import {
 } from '../../components/icons';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
-import { useChats } from '../../data/chatStore';
-import { MESSAGES } from '../../data/messages';
+import { sendMessage, useChats, useMessages } from '../../data/chatStore';
 import { goBack } from '../../router';
 import './ChatPage.css';
 
@@ -29,14 +28,17 @@ const SECTIONS = [
 
 export function ChatPage({ chatId }: { chatId: string }) {
   const chat = useChats().find((c) => c.id === chatId);
-  const groups = MESSAGES[chatId] ?? [];
+  const groups = useMessages(chatId);
   const listRef = useRef<HTMLUListElement>(null);
 
-  // Переписка открывается внизу, у последних сообщений
-  useEffect(() => {
+  const scrollToBottom = () => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [chatId]);
+  };
+
+  // Переписка открывается внизу, у последних сообщений; новое сообщение тоже прокручивает вниз
+  const messageCount = groups.reduce((n, g) => n + g.messages.length, 0);
+  useEffect(scrollToBottom, [chatId, messageCount]);
 
   if (!chat) {
     return (
@@ -53,10 +55,12 @@ export function ChatPage({ chatId }: { chatId: string }) {
           <button type="button" className="chat__icon-button" aria-label="Назад" onClick={() => goBack()}>
             <IconBack />
           </button>
-          <Avatar src={chat.avatar} alt="" size={40} online={chat.online} />
-          <div className="chat__who">
-            <h1 className="chat__name">{chat.name}</h1>
-            <p className="chat__status">{chat.online ? 'в сети' : 'был(а) недавно'}</p>
+          <div className="chat__peer">
+            <Avatar src={chat.avatar} alt="" size={40} online={chat.online} />
+            <div className="chat__who">
+              <h1 className="chat__name">{chat.name}</h1>
+              <p className="chat__status">{chat.online ? 'в сети' : 'был(а) недавно'}</p>
+            </div>
           </div>
           <button type="button" className="chat__icon-button" aria-label="Настройки чата">
             <IconSettings />
@@ -91,7 +95,7 @@ export function ChatPage({ chatId }: { chatId: string }) {
         ))}
       </ul>
 
-      <MessageInput />
+      <MessageInput onSend={(text) => sendMessage(chatId, text)} onLayoutChange={scrollToBottom} />
     </section>
   );
 }

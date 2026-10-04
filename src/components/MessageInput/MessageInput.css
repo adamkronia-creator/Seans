@@ -1,3 +1,8 @@
+.composer-wrap {
+  flex-shrink: 0;
+  background: var(--color-bg-panel);
+}
+
 /* Панель ввода: отступы 8 сверху/снизу и 24 по бокам, элементы высотой 40, gap 12 */
 .composer {
   display: flex;
@@ -55,4 +60,42 @@
   flex-shrink: 0;
   color: var(--color-text-caption);
   font-size: var(--size-icon);
+}
+
+.composer__round--send {
+  border-color: var(--color-stroke);
+  color: var(--color-accent);
+}
+
+.composer__emoji--active {
+  color: var(--color-accent);
+}
+
+/* Когда открыта панель эмодзи, безопасный отступ снизу переходит к ней */
+.composer--panel {
+  padding-bottom: 8px;
+}
+
+/* Панель эмодзи: 8 в ряд, ячейки 40×40, прокручивается */
+.emoji-panel {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  height: 240px;
+  padding: 4px var(--space-4) calc(4px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border-top: 1px solid var(--color-divider);
+}
+
+.emoji-panel__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.emoji-panel__item:active {
+  background: var(--color-bg-app);
 }
