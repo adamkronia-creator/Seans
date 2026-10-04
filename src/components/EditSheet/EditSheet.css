@@ -83,6 +83,7 @@
 }
 
 .sheet__field {
+  container-type: inline-size; /* ширина поля нужна сеткам иконок и цветов (cqw) */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -129,12 +130,19 @@
 }
 
 .sheet__icons {
-  /* Края рядов вровень с подписями: слева и справа по 13, как у текста в поле */
+  /* Края рядов вровень с краями полей; промежуток между иконками равномерно растягивается,
+     вертикальный отступ между рядами равен ему */
+  --cols: 7;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 44px);
+  grid-template-columns: repeat(var(--cols), 44px);
   justify-content: space-between;
-  gap: var(--space-2) 0;
-  padding: 0 13px;
+  row-gap: calc((100cqw - var(--cols) * 44px) / (var(--cols) - 1));
+}
+
+@container (max-width: 307px) {
+  .sheet__icons {
+    --cols: 6;
+  }
 }
 
 .sheet__icon {
@@ -155,11 +163,17 @@
 }
 
 .sheet__tones {
+  --cols: 8;
   display: grid;
-  grid-template-columns: repeat(8, 32px);
+  grid-template-columns: repeat(var(--cols), 32px);
   justify-content: space-between;
-  gap: var(--space-3) 0;
-  padding: 0 13px;
+  row-gap: calc((100cqw - var(--cols) * 32px) / (var(--cols) - 1));
+}
+
+@container (max-width: 275px) {
+  .sheet__tones {
+    --cols: 7;
+  }
 }
 
 /* Цветной кружок: фон шапки с цветной обводкой цвета иконки */

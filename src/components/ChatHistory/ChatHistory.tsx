@@ -1,6 +1,7 @@
 import { useState, type ComponentType, type SVGProps } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
+import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseEdit,
@@ -124,11 +125,23 @@ function Marker({ event }: { event: HistoryEvent }) {
 }
 
 function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
+  const [quick, setQuick] = useState(false);
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
   // Сеанс без текста: только название и дата
-  const bare = 'paragraphs' in event && event.paragraphs.length === 0;
-  // У приглашения текста для правки нет
-  const doubleTap = useDoubleActivate(event.kind === 'invite' ? () => undefined : onEdit);
+  const bare = 'paragraphs' in event && event.paragraphs.length === 0 && !quick;
+  // Двойной клик/касание: быстрая правка текста или комментария на месте (у приглашения текста нет);
+  // полный редактор открывает карандаш
+  const doubleTap = useDoubleActivate(() => setQuick(true), event.kind !== 'invite' && !quick);
+  const saveQuick = (text: string) => {
+    setQuick(false);
+    if (event.kind === 'session') {
+      if (text !== paragraphsToText(event.paragraphs)) updateSessionText(event.ref, textToParagraphs(text));
+    } else if (event.kind === 'note') {
+      if (text !== paragraphsToText(event.paragraphs)) updateNote(event.ref, { paragraphs: textToParagraphs(text) });
+    } else if (event.kind !== 'invite') {
+      if (text !== (event.comment ?? '')) setComment(event.id, text);
+    }
+  };
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
@@ -159,16 +172,34 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
             <p className="hist-card__text">{event.text}</p>
             {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
           </div>
-          {'comment' in event && event.comment && (
-            <p className="hist-card__text hist-card__comment">{event.comment}</p>
+          {event.kind !== 'invite' && (
+            <QuickEdit
+              editing={quick}
+              value={event.comment ?? ''}
+              className="hist-card__text hist-card__comment"
+              placeholder="Комментарий"
+              onCancel={() => setQuick(false)}
+              onCommit={saveQuick}
+            >
+              {event.comment && <p className="hist-card__text hist-card__comment">{event.comment}</p>}
+            </QuickEdit>
           )}
         </>
       ) : (
-        event.paragraphs.map((text, i) => (
-          <p key={i} className="hist-card__text">
-            {text}
-          </p>
-        ))
+        <QuickEdit
+          editing={quick}
+          value={paragraphsToText(event.paragraphs)}
+          className="hist-card__text"
+          placeholder="Текст"
+          onCancel={() => setQuick(false)}
+          onCommit={saveQuick}
+        >
+          {event.paragraphs.map((text, i) => (
+            <p key={i} className="hist-card__text">
+              {text}
+            </p>
+          ))}
+        </QuickEdit>
       )}
     </div>
   );

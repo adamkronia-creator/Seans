@@ -1,5 +1,6 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import { Badge } from '../Badge/Badge';
+import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import {
@@ -35,7 +36,9 @@ type SegmentId = 'info' | 'notes' | 'materials';
 
 function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
   const { Icon, size } = HEAD_ICONS[section.icon];
-  const doubleTap = useDoubleActivate(onEdit);
+  // Двойной клик/касание: быстрая правка текста на месте; полный редактор открывает карандаш
+  const [quick, setQuick] = useState(false);
+  const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick);
 
   return (
     <li className="case-card case-card--editable" {...doubleTap}>
@@ -59,11 +62,17 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
           {section.rows.map(({ icon, label, value }) => {
             const RowIcon = ROW_ICONS[icon];
             return (
-              <li key={label} className="case-row">
-                <RowIcon className="case-row__icon" />
-                <span className="case-row__label">{label}</span>
-                <span className="case-row__value">{value}</span>
-              </li>
+              <CaseRow
+                key={label}
+                Icon={RowIcon}
+                label={label}
+                value={value}
+                onSave={(v) =>
+                  updateSection(section.id, {
+                    rows: section.rows!.map((r) => (r.label === label ? { ...r, value: v } : r)),
+                  })
+                }
+              />
             );
           })}
         </ul>
@@ -71,24 +80,70 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
 
       {section.blocks && (
         <div className="case-card__body">
-          {section.blocks.map((block, i) =>
-            block.type === 'p' ? (
-              <p key={i} className="case-card__text">
-                {block.text}
-              </p>
-            ) : (
-              <ul key={i} className="case-card__list">
-                {block.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ),
-          )}
+          <QuickEdit
+            editing={quick}
+            value={blocksToText(section.blocks)}
+            className="case-card__text"
+            onCancel={() => setQuick(false)}
+            onCommit={(text) => {
+              setQuick(false);
+              if (text !== blocksToText(section.blocks!)) updateSection(section.id, { blocks: textToBlocks(text) });
+            }}
+          >
+            {section.blocks.map((block, i) =>
+              block.type === 'p' ? (
+                <p key={i} className="case-card__text">
+                  {block.text}
+                </p>
+              ) : (
+                <ul key={i} className="case-card__list">
+                  {block.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ),
+            )}
+          </QuickEdit>
           {section.updated && (
             <p className="case-card__updated">Последнее обновление: {section.updated}</p>
           )}
         </div>
       )}
+    </li>
+  );
+}
+
+/** Строка «подпись — значение»: значение правится двойным кликом на месте */
+function CaseRow({
+  Icon,
+  label,
+  value,
+  onSave,
+}: {
+  Icon: (typeof ROW_ICONS)[keyof typeof ROW_ICONS];
+  label: string;
+  value: string;
+  onSave: (v: string) => void;
+}) {
+  const [quick, setQuick] = useState(false);
+  const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
+  return (
+    <li className="case-row" {...doubleTap}>
+      <Icon className="case-row__icon" />
+      <span className="case-row__label">{label}</span>
+      <QuickEdit
+        editing={quick}
+        value={value}
+        as="span"
+        className="case-row__value"
+        onCancel={() => setQuick(false)}
+        onCommit={(v) => {
+          setQuick(false);
+          if (v !== value) onSave(v);
+        }}
+      >
+        <span className="case-row__value">{value}</span>
+      </QuickEdit>
     </li>
   );
 }
@@ -122,7 +177,8 @@ function FileCard({ file }: { file: CaseFile }) {
 
 function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   const { Icon, size } = HEAD_ICONS[note.icon];
-  const doubleTap = useDoubleActivate(onEdit);
+  const [quick, setQuick] = useState(false);
+  const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
   return (
     <li className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
@@ -135,11 +191,22 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
         </button>
       </div>
       <div className="case-card__body case-card__body--note">
-        {note.paragraphs.map((text, i) => (
-          <p key={i} className="case-card__text">
-            {text}
-          </p>
-        ))}
+        <QuickEdit
+          editing={quick}
+          value={paragraphsToText(note.paragraphs)}
+          className="case-card__text"
+          onCancel={() => setQuick(false)}
+          onCommit={(text) => {
+            setQuick(false);
+            if (text !== paragraphsToText(note.paragraphs)) updateNote(note.id, { paragraphs: textToParagraphs(text) });
+          }}
+        >
+          {note.paragraphs.map((text, i) => (
+            <p key={i} className="case-card__text">
+              {text}
+            </p>
+          ))}
+        </QuickEdit>
         <p className="case-card__updated">Последнее обновление: {note.updated}</p>
       </div>
     </li>
