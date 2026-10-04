@@ -105,6 +105,12 @@
   background: var(--color-accent-soft);
 }
 
+.case-card__head--note {
+  height: 44px;
+  padding-top: 2px;
+  background: #EEEDFD;
+}
+
 .case-card__head--brown {
   background: rgb(172 127 94 / 10%);
 }
@@ -253,4 +259,18 @@
 
 .case-cards[hidden] {
   display: none;
+}
+
+.case-card__head--note .case-card__icon {
+  font-size: 20px;
+}
+
+/* Заметка: текст начинается на 10 от шапки */
+.case-card__body--note {
+  padding-top: 10px;
+}
+
+/* В заметках зазор между названием и карандашом 8 (длина многоточия как в макете) */
+.case-card__head--note .case-card__edit {
+  margin-left: 0;
 }

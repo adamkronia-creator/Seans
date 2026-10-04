@@ -3,6 +3,8 @@ import { Badge } from '../Badge/Badge';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseAdd,
+  IconCaseAddNote,
+  IconCaseNotePin,
   IconCaseAnamnesis,
   IconCaseBirthday,
   IconCaseCalendar,
@@ -21,12 +23,12 @@ import {
 } from '../icons';
 import {
   CASE_MATERIALS_COUNT,
-  CASE_NOTES_COUNT,
   CASE_SECTIONS,
   type CaseIconId,
   type CaseRowIconId,
   type CaseSection,
 } from '../../data/case';
+import { CASE_NOTES, type CaseNote } from '../../data/notes';
 import './ChatCase.css';
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -107,13 +109,37 @@ function CaseCard({ section }: { section: CaseSection }) {
   );
 }
 
+function NoteCard({ note }: { note: CaseNote }) {
+  return (
+    <li className="case-card">
+      <div className="case-card__head case-card__head--note">
+        <span className="case-card__icon">
+          <IconCaseNotePin />
+        </span>
+        <TruncatedText className="case-card__title" text={note.title} />
+        <button type="button" className="case-card__edit" aria-label="Изменить заметку">
+          <IconCaseEdit />
+        </button>
+      </div>
+      <div className="case-card__body case-card__body--note">
+        {note.paragraphs.map((text, i) => (
+          <p key={i} className="case-card__text">
+            {text}
+          </p>
+        ))}
+        <p className="case-card__updated">Последнее обновление: {note.updated}</p>
+      </div>
+    </li>
+  );
+}
+
 /** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
 export function ChatCase({ hasData }: { hasData: boolean }) {
   const [segment, setSegment] = useState<SegmentId>('info');
 
   const segments: { id: SegmentId; label: string; count: number }[] = [
     { id: 'info', label: 'Сведения', count: hasData ? CASE_SECTIONS.length : 0 },
-    { id: 'notes', label: 'Заметки', count: hasData ? CASE_NOTES_COUNT : 0 },
+    { id: 'notes', label: 'Заметки', count: hasData ? CASE_NOTES.length : 0 },
     { id: 'materials', label: 'Материалы', count: hasData ? CASE_MATERIALS_COUNT : 0 },
   ];
 
@@ -154,6 +180,27 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
           <p className="case-note">
             <IconCaseLock className="case-note__icon" />
             <span>Психологический кейс виден только вам</span>
+          </p>
+        </>
+      ) : segment === 'notes' ? (
+        <>
+          <button type="button" className="case-add">
+            <svg className="case-add__border" aria-hidden="true">
+              <rect className="case-add__rect" />
+            </svg>
+            <IconCaseAddNote className="case-add__icon" />
+            <span>Добавить заметку</span>
+          </button>
+
+          <ul className="case-cards" hidden={!hasData}>
+            {CASE_NOTES.map((note) => (
+              <NoteCard key={note.id} note={note} />
+            ))}
+          </ul>
+
+          <p className="case-note">
+            <IconCaseLock className="case-note__icon" />
+            <span>Заметки видны только вам</span>
           </p>
         </>
       ) : (

@@ -52,6 +52,8 @@ export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
 
 // Вкладка «Кейс»
 export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
+export { default as IconCaseAddNote } from '../../assets/icons/case/add-note.svg?react';
+export { default as IconCaseNotePin } from '../../assets/icons/case/note-pin.svg?react';
 export { default as IconCaseEdit } from '../../assets/icons/case/edit.svg?react';
 export { default as IconCaseLock } from '../../assets/icons/case/note-lock.svg?react';
 export { default as IconCaseGeneral } from '../../assets/icons/case/head-general.svg?react';
