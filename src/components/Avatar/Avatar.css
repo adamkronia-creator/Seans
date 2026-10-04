@@ -24,6 +24,17 @@
   color: var(--color-accent);
 }
 
+/* Бейдж типа события: 20×20, вплотную к правому нижнему краю аватарки */
+.avatar__badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
 .avatar__online {
   position: absolute;
   right: 0;

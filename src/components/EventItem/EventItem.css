@@ -1,0 +1,72 @@
+.event-item {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+/* Строка: аватар 52, gap 12, отступы 10 сверху/снизу и 16 по бокам */
+.event-item__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 10px var(--space-4);
+  text-align: left;
+}
+
+button.event-item__inner:active {
+  background: var(--color-bg-panel);
+}
+
+/* Имя 16/16, gap 4, описание 16/19 (переносится на несколько строк) */
+.event-item__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.event-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.event-item__name {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Дата 12, прижата к правому краю; по макету стоит на 1 px ниже центра имени */
+.event-item__date {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  transform: translateY(1px);
+}
+
+/* Шеврон 20×20 стоит по центру описания; текст до него переносится с отступом 8 */
+.event-item__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.event-item__text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: 19px;
+}
+
+.event-item__chevron {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: 20px;
+}

@@ -11,6 +11,7 @@ import {
   type Chat,
   type ChatCategory,
 } from '../../data/chats';
+import { navigate } from '../../router';
 import './MessagesPage.css';
 
 type Filter = 'all' | ChatCategory;
@@ -53,7 +54,12 @@ export function MessagesPage() {
             <Avatar src={CURRENT_USER.avatar} size={34} />
           </button>
           <h1 className="messages__title">Сообщения</h1>
-          <button type="button" className="messages__bell" aria-label="Уведомления">
+          <button
+            type="button"
+            className="messages__bell"
+            aria-label="События"
+            onClick={() => navigate('/events')}
+          >
             <IconBell />
           </button>
         </div>

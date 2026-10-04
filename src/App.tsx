@@ -1,22 +1,35 @@
 import { useState } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
+import { EventsPage } from './pages/EventsPage/EventsPage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
+import { navigate, useRoute } from './router';
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('messages');
+  const route = useRoute();
+
+  const handleTabChange = (id: TabId) => {
+    setTab(id);
+    // Нажатие на «Сообщения» ведёт на список чатов
+    if (id === 'messages') navigate('/');
+  };
 
   return (
     <div className="app">
       <main className="app__content">
         {tab === 'messages' ? (
-          <MessagesPage />
+          route === '/events' ? (
+            <EventsPage />
+          ) : (
+            <MessagesPage />
+          )
         ) : (
           <p style={{ padding: 24, color: 'var(--color-text-caption)' }}>
             Раздел в разработке
           </p>
         )}
       </main>
-      <TabBar active={tab} onChange={setTab} />
+      <TabBar active={tab} onChange={handleTabChange} />
     </div>
   );
 }
