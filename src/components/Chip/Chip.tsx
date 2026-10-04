@@ -20,7 +20,14 @@ export function Chip({
   onClick,
   ariaLabel,
 }: ChipProps) {
-  const cls = ['chip', active && 'chip--active', iconOnly && 'chip--icon']
+  // Кружок со счётчиком показывается только если есть непрочитанные
+  const hasCount = count !== undefined && count > 0;
+  const cls = [
+    'chip',
+    active && 'chip--active',
+    iconOnly && 'chip--icon',
+    hasCount && 'chip--counted',
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -33,9 +40,7 @@ export function Chip({
       aria-label={ariaLabel}
     >
       {children}
-      {count !== undefined && (
-        <Badge count={count} variant={active ? 'inverse' : 'neutral'} showZero />
-      )}
+      {hasCount && <Badge count={count} variant={active ? 'inverse' : 'neutral'} />}
     </button>
   );
 }

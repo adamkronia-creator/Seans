@@ -8,6 +8,7 @@ import {
   CATEGORIES,
   CHATS,
   CURRENT_USER,
+  type Chat,
   type ChatCategory,
 } from '../../data/chats';
 import './MessagesPage.css';
@@ -17,17 +18,22 @@ type Filter = 'all' | ChatCategory;
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const [chats, setChats] = useState<Chat[]>(CHATS);
 
-  // Счётчики чипсов считаются по обычным чатам, «Избранное» не входит
-  const regularChats = useMemo(() => CHATS.filter((c) => !c.favorites), []);
+  // Счётчик чипса = число непрочитанных сообщений в его чатах. При нуле кружок скрыт.
+  // «Избранное» в счётчики чипсов не входит.
   const countOf = (id: Filter) =>
-    id === 'all'
-      ? regularChats.length
-      : regularChats.filter((c) => c.category === id).length;
+    chats
+      .filter((c) => !c.favorites && (id === 'all' || c.category === id))
+      .reduce((sum, c) => sum + c.unread, 0);
+
+  // Открытие чата помечает его прочитанным (экрана чата пока нет)
+  const markRead = (chat: Chat) =>
+    setChats((prev) => prev.map((c) => (c.id === chat.id ? { ...c, unread: 0 } : c)));
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return CHATS.filter((chat) => {
+    return chats.filter((chat) => {
       if (filter !== 'all' && (chat.favorites || chat.category !== filter)) {
         return false;
       }
@@ -37,7 +43,7 @@ export function MessagesPage() {
         chat.lastMessage.toLowerCase().includes(q)
       );
     });
-  }, [query, filter]);
+  }, [chats, query, filter]);
 
   return (
     <section className="messages">
@@ -77,7 +83,7 @@ export function MessagesPage() {
       {visible.length > 0 ? (
         <ul className="messages__list">
           {visible.map((chat) => (
-            <ChatItem key={chat.id} chat={chat} />
+            <ChatItem key={chat.id} chat={chat} onClick={markRead} />
           ))}
         </ul>
       ) : (

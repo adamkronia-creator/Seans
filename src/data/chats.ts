@@ -45,7 +45,7 @@ export const CHATS: Chat[] = [
     online: true,
     lastMessage: 'Вы: Напомню: сеанс состоится 21/04 в 18:00. Кабинет №91.',
     time: '00:00',
-    unread: 3,
+    unread: 0, // прочитано
   },
   {
     id: 'vera',
@@ -54,7 +54,7 @@ export const CHATS: Chat[] = [
     category: 'clients',
     lastMessage: 'Заполнила дневник эмоций :)',
     time: '14:32',
-    unread: 0,
+    unread: 2, // не прочитано
   },
   {
     id: 'vladislav',
