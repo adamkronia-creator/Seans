@@ -44,3 +44,14 @@
   background: var(--color-accent-on);
   color: var(--color-accent);
 }
+
+/* Вкладка «Тесты»: те же размеры, другие цвета */
+.badge--yellow {
+  background: var(--color-yellow);
+  color: var(--color-accent-on);
+}
+
+.badge--green {
+  background: var(--color-green);
+  color: var(--color-accent-on);
+}

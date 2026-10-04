@@ -1,0 +1,90 @@
+/* Карточка 361×76: белая, радиус 12, отступы 12, тень только справа и снизу */
+.test-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+  text-align: left;
+}
+
+/* Аватарка 52×52, радиус 12; фон — цвет теста с прозрачностью 75%; картинка 40×40 */
+.test-card__avatar {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  isolation: isolate;
+}
+
+.test-card__avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint);
+  opacity: 0.75;
+}
+
+.test-card__icon {
+  width: 40px;
+  height: 40px;
+}
+
+/* Название 16/20 semibold чёрным (по макету) и описание 14/20, gap 4 */
+.test-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.test-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.test-card__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: #000;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: 20px;
+  white-space: nowrap; /* многоточие ставит TruncatedText */
+}
+
+.test-card__date {
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xs);
+}
+
+.test-card__date--sent {
+  color: var(--color-yellow);
+}
+
+.test-card__date--done {
+  color: var(--color-green);
+}
+
+.test-card__description {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

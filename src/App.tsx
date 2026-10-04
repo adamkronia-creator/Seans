@@ -16,11 +16,11 @@ export default function App() {
   };
 
   // Открытый чат занимает весь экран, без нижней панели разделов
-  if (route.startsWith('/chat/')) {
+  if (tab === 'messages' && route.startsWith('/chat/')) {
     return (
       <div className="app">
         <main className="app__content">
-          <ChatPage chatId={route.slice('/chat/'.length)} />
+          <ChatPage chatId={route.slice('/chat/'.length)} onAppTabChange={handleTabChange} />
         </main>
       </div>
     );

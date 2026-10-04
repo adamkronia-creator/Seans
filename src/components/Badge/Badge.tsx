@@ -1,10 +1,10 @@
 import './Badge.css';
 
-type BadgeVariant = 'accent' | 'neutral' | 'inverse';
+type BadgeVariant = 'accent' | 'neutral' | 'inverse' | 'yellow' | 'green';
 
 interface BadgeProps {
   count: number;
-  /** accent: синий (непрочитанные); neutral: серый (чипс); inverse: белый (активный чипс) */
+  /** accent: синий (непрочитанные); neutral: серый (чипс); inverse: белый (активный чипс); yellow/green: вкладка «Тесты» */
   variant?: BadgeVariant;
   /** Показывать кружок с нулём (для чипсов) */
   showZero?: boolean;

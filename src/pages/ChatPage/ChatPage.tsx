@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
@@ -11,6 +11,8 @@ import {
   IconTabSessions,
   IconTabTests,
 } from '../../components/icons';
+import { ChatTests } from '../../components/ChatTests/ChatTests';
+import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { sendMessage, useChats, useMessages } from '../../data/chatStore';
@@ -18,7 +20,9 @@ import { goBack } from '../../router';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
-const SECTIONS = [
+type SectionId = 'sessions' | 'messages' | 'tests' | 'practices' | 'notes' | 'library';
+
+const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabSessions }[] = [
   { id: 'sessions', label: 'Сеансы', Icon: IconTabSessions },
   { id: 'messages', label: 'Сообщения', Icon: IconTabMessages },
   { id: 'tests', label: 'Тесты', Icon: IconTabTests },
@@ -27,7 +31,14 @@ const SECTIONS = [
   { id: 'library', label: 'Материалы', Icon: IconTabLibrary },
 ];
 
-export function ChatPage({ chatId }: { chatId: string }) {
+interface ChatPageProps {
+  chatId: string;
+  /** Нажатие на кнопку нижней панели (панель видна на вкладках кроме «Сообщения») */
+  onAppTabChange: (id: TabId) => void;
+}
+
+export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
+  const [section, setSection] = useState<SectionId>('messages');
   const chat = useChats().find((c) => c.id === chatId);
   const groups = useMessages(chatId);
   const listRef = useRef<HTMLUListElement>(null);
@@ -39,7 +50,7 @@ export function ChatPage({ chatId }: { chatId: string }) {
 
   // Переписка открывается внизу, у последних сообщений; новое сообщение тоже прокручивает вниз
   const messageCount = groups.reduce((n, g) => n + g.messages.length, 0);
-  useEffect(scrollToBottom, [chatId, messageCount]);
+  useEffect(scrollToBottom, [chatId, messageCount, section]);
 
   if (!chat) {
     return (
@@ -79,9 +90,10 @@ export function ChatPage({ chatId }: { chatId: string }) {
             <button
               key={id}
               type="button"
-              className={`chat__tab${id === 'messages' ? ' chat__tab--active' : ''}`}
+              className={`chat__tab${id === section ? ' chat__tab--active' : ''}`}
               aria-label={label}
-              aria-current={id === 'messages' ? 'page' : undefined}
+              aria-current={id === section ? 'page' : undefined}
+              onClick={() => setSection(id)}
             >
               <Icon />
             </button>
@@ -89,20 +101,38 @@ export function ChatPage({ chatId }: { chatId: string }) {
         </nav>
       </header>
 
-      <ul className="chat__messages" ref={listRef}>
-        {groups.map((group) => (
-          <Fragment key={group.label}>
-            <li className="chat__day">
-              <span>{group.label}</span>
-            </li>
-            {group.messages.map((m) => (
-              <MessageBubble key={m.id} message={m} />
-            ))}
-          </Fragment>
-        ))}
-      </ul>
+      {section === 'messages' && (
+        <>
+        <ul className="chat__messages" ref={listRef}>
+          {groups.map((group) => (
+            <Fragment key={group.label}>
+              <li className="chat__day">
+                <span>{group.label}</span>
+              </li>
+              {group.messages.map((m) => (
+                <MessageBubble key={m.id} message={m} />
+              ))}
+            </Fragment>
+          ))}
+        </ul>
 
-      <MessageInput onSend={(text) => sendMessage(chatId, text)} onLayoutChange={scrollToBottom} />
+        <MessageInput onSend={(text) => sendMessage(chatId, text)} onLayoutChange={scrollToBottom} />
+        </>
+      )}
+
+      {section === 'tests' && (
+        <>
+          <ChatTests />
+          <TabBar active="messages" onChange={onAppTabChange} />
+        </>
+      )}
+
+      {(section === 'sessions' || section === 'practices' || section === 'notes' || section === 'library') && (
+        <>
+          <p className="chat__empty chat__empty--grow">Раздел в разработке</p>
+          <TabBar active="messages" onChange={onAppTabChange} />
+        </>
+      )}
     </section>
   );
 }

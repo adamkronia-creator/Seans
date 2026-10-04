@@ -1,0 +1,46 @@
+/* Лента вкладки: на сером фоне, отступы 16 по бокам; 11 от разделителя шапки */
+.chat-tests {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  padding: 11px var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.chat-tests__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Заголовок раздела: текст 16, кружок 20 справа от него; «Напомнить» прижато вправо */
+.chat-tests__heading {
+  display: flex;
+  align-items: center;
+  gap: 6.5px; /* по макету текст → кружок 6,6 */
+  height: 20px;
+  padding: 0 var(--space-3);
+}
+
+.chat-tests__title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: 20px;
+}
+
+.chat-tests__remind {
+  margin-left: auto;
+  margin-right: -8px; /* правый край текста стоит на 20 от края экрана */
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+}
+
+.chat-tests__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
