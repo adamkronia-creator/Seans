@@ -1,4 +1,4 @@
-.tests-page {
+.library-page {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -6,7 +6,7 @@
 }
 
 /* Кнопка справа в поиске: синяя пилюля 64×32, внутри белый кружок 24 с числом и шестерёнка 24 */
-.tests-page__filter {
+.library-page__filter {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -20,7 +20,7 @@
   font-size: var(--size-icon);
 }
 
-.tests-page__filter-count {
+.library-page__filter-count {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +39,7 @@
   font-size: 20px;
 }
 
-.tests-page__list {
+.library-page__list {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -49,7 +49,7 @@
   overflow-y: auto;
 }
 
-.tests-page__empty {
+.library-page__empty {
   padding: var(--space-6) var(--space-4);
   color: var(--color-text-caption);
   text-align: center;

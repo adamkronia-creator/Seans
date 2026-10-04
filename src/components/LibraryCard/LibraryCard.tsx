@@ -1,15 +1,15 @@
 import type { CSSProperties } from 'react';
 import { IconHeartGray, IconHeartRed } from '../icons';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
-import type { LibraryTest } from '../../data/library';
+import type { LibraryItem } from '../../data/library';
 import '../TestCard/TestCard.css';
 import './LibraryCard.css';
 
 interface LibraryCardProps {
-  test: LibraryTest;
+  test: LibraryItem;
   favorite: boolean;
   onToggleFavorite: (id: string) => void;
-  onClick?: (test: LibraryTest) => void;
+  onClick?: (test: LibraryItem) => void;
 }
 
 /** Карточка теста в библиотеке: вид как у карточки в чате, но справа сердечко «в избранное» */

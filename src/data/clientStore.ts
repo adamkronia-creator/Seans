@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { CASE_NOTES, type CaseNote } from './notes';
-import { TASKS } from './tasks';
-import { TESTS, type PsyTest } from './tests';
+import { LIBRARY, TASK_LIBRARY } from './library';
+import type { PsyTest } from './tests';
 import type { AppEvent } from './events';
 import avatar1 from '../assets/avatars/avatar-1.png';
 
@@ -224,15 +224,19 @@ export type HistoryEvent =
 
 export type HistoryFilter = 'all' | 'session' | 'test' | 'task' | 'note';
 
-const catalog = (kind: 'test' | 'task') => (kind === 'test' ? TESTS : TASKS);
+// Каталог тестов и заданий — библиотеки приложения; статус и дата берутся из журнала клиента
+const catalog = (kind: 'test' | 'task') => (kind === 'test' ? LIBRARY : TASK_LIBRARY);
 const itemName = (kind: 'test' | 'task', ref: string) =>
-  kind === 'test' ? TEST_META[ref].name : catalog('task').find((x) => x.id === ref)!.title;
+  kind === 'test'
+    ? (TEST_META[ref]?.name ?? LIBRARY.find((x) => x.id === ref)!.title.split(':')[0])
+    : TASK_LIBRARY.find((x) => x.id === ref)!.title;
 
 function activityText(kind: 'test' | 'task', ref: string, state: ActivityState): string {
   if (kind === 'test') {
     const meta = TEST_META[ref];
-    if (state === 'done') return meta.doneText ?? `Максим заполнил ${meta.what}`;
-    return `Вы отправили ${meta.what}`;
+    const what = meta?.what ?? `опросник «${itemName('test', ref)}»`;
+    if (state === 'done') return meta?.doneText ?? `Максим заполнил ${what}`;
+    return `Вы отправили ${what}`;
   }
   const name = itemName('task', ref);
   if (state === 'done') return `Максим выполнил психологическое задание «${name}»`;
@@ -296,7 +300,8 @@ export function doneCount(d: ClientData, kind: 'test' | 'task'): number {
 /** Тесты и задания в том виде, как их показывают вкладки: статус и дата — по последнему действию */
 export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[] {
   const items: { item: PsyTest; index: number }[] = [];
-  catalog(kind).forEach((item) => {
+  catalog(kind).forEach(({ categories: _c, ...base }) => {
+    const item = { ...base, status: 'sent' as const, date: '' };
     let last = -1;
     d.activity.forEach((a, i) => {
       if (a.kind === kind && a.ref === item.id) last = i;
@@ -309,12 +314,12 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
   return items.sort((x, y) => y.index - x.index).map((x) => x.item);
 }
 
-/** Тесты, которые психолог недавно присылал клиенту или которые клиент прошёл: id, свежие первыми */
-export function recentTestIds(d: ClientData, limit = 5): string[] {
+/** Тесты или задания, которые психолог недавно присылал клиенту (или клиент прошёл): id, свежие первыми */
+export function recentIds(d: ClientData, kind: 'test' | 'task', limit = 5): string[] {
   const seen: string[] = [];
   for (let i = d.activity.length - 1; i >= 0; i--) {
     const a = d.activity[i];
-    if (a.kind === 'test' && !seen.includes(a.ref)) seen.push(a.ref);
+    if (a.kind === kind && !seen.includes(a.ref)) seen.push(a.ref);
   }
   return seen.slice(0, limit);
 }

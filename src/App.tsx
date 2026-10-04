@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
+import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { navigate, useRoute } from './router';
@@ -38,6 +39,8 @@ export default function App() {
           )
         ) : tab === 'tests' ? (
           <TestsPage />
+        ) : tab === 'tasks' ? (
+          <TasksPage />
         ) : (
           <p style={{ padding: 24, color: 'var(--color-text-caption)' }}>
             Раздел в разработке
