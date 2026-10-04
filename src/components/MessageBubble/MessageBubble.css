@@ -1,0 +1,54 @@
+/* Пузырь: отступы 8 / 12, текст 16 / 20, радиус 18, «хвостик» 4 внизу со стороны автора */
+.bubble {
+  position: relative;
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 18px;
+  font-size: var(--font-size-md);
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble--in {
+  align-self: flex-start;
+  background: var(--color-stroke);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.bubble--out {
+  align-self: flex-end;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  border-bottom-right-radius: 4px;
+}
+
+/* Время 12 / 12 в правом нижнем углу (на 4 от низа и на 12 от края) */
+.bubble__meta {
+  position: absolute;
+  right: 12px;
+  bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--font-size-xs);
+  line-height: 12px;
+  white-space: nowrap;
+}
+
+.bubble--in .bubble__meta {
+  color: var(--color-text-caption);
+}
+
+.bubble__meta--ghost {
+  position: static;
+  margin-left: 9px; /* по макету текст → время 8,8 */
+  visibility: hidden;
+}
+
+.bubble__ticks {
+  flex-shrink: 0;
+  font-size: 11px; /* галочки 11×6; в макете стоят на 1,5 px правее и на 0,5 выше */
+  transform: translate(1.5px, -0.5px);
+}

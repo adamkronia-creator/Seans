@@ -1,0 +1,58 @@
+/* Панель ввода: отступы 8 сверху/снизу и 24 по бокам, элементы высотой 40, gap 12 */
+.composer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 24px calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.composer__round {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-panel);
+  color: var(--color-text-caption);
+  font-size: var(--size-icon);
+}
+
+.composer__field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  height: 40px;
+  padding: 0 7px 0 9px;
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-panel);
+}
+
+.composer__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  outline: 0;
+  font-size: var(--font-size-md);
+}
+
+.composer__input::placeholder {
+  color: var(--color-text-caption);
+  opacity: 1;
+}
+
+.composer__emoji {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--size-icon);
+}

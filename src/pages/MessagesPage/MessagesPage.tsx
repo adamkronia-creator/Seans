@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { markRead, useChats } from '../../data/chatStore';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
@@ -6,7 +7,6 @@ import { IconBell, IconPlus } from '../../components/icons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import {
   CATEGORIES,
-  CHATS,
   CURRENT_USER,
   type Chat,
   type ChatCategory,
@@ -19,7 +19,7 @@ type Filter = 'all' | ChatCategory;
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const [chats, setChats] = useState<Chat[]>(CHATS);
+  const chats = useChats();
 
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
   // «Все» считает и «Избранное»; категории — только свои чаты. При нуле кружок скрыт.
@@ -27,9 +27,11 @@ export function MessagesPage() {
     chats.filter((c) => c.unread > 0 && (id === 'all' || (!c.favorites && c.category === id)))
       .length;
 
-  // Открытие чата помечает его прочитанным (экрана чата пока нет)
-  const markRead = (chat: Chat) =>
-    setChats((prev) => prev.map((c) => (c.id === chat.id ? { ...c, unread: 0 } : c)));
+  // Открытие чата помечает его прочитанным и ведёт в переписку
+  const openChat = (chat: Chat) => {
+    markRead(chat.id);
+    navigate(`/chat/${chat.id}`);
+  };
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -88,7 +90,7 @@ export function MessagesPage() {
       {visible.length > 0 ? (
         <ul className="messages__list">
           {visible.map((chat) => (
-            <ChatItem key={chat.id} chat={chat} onClick={markRead} />
+            <ChatItem key={chat.id} chat={chat} onClick={openChat} />
           ))}
         </ul>
       ) : (

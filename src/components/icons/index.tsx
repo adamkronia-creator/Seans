@@ -35,3 +35,16 @@ export function IconPlus(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+// Экран открытого чата
+export { default as IconTabSessions } from '../../assets/icons/chat/tab-sessions.svg?react';
+export { default as IconTabMessages } from '../../assets/icons/chat/tab-messages.svg?react';
+export { default as IconTabTests } from '../../assets/icons/chat/tab-tests.svg?react';
+export { default as IconTabPractices } from '../../assets/icons/chat/tab-practices.svg?react';
+export { default as IconTabNotes } from '../../assets/icons/chat/tab-notes.svg?react';
+export { default as IconTabLibrary } from '../../assets/icons/chat/tab-library.svg?react';
+export { default as IconSettings } from '../../assets/icons/chat/settings.svg?react';
+export { default as IconAttach } from '../../assets/icons/chat/attach.svg?react';
+export { default as IconEmoji } from '../../assets/icons/chat/emoji.svg?react';
+export { default as IconMicrophone } from '../../assets/icons/chat/microphone.svg?react';
+export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
