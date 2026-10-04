@@ -174,7 +174,7 @@
 .case-row__label {
   flex: 1;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: var(--font-size-md);
   line-height: 20px;
 }
 
@@ -249,4 +249,8 @@
   padding: var(--space-6) 0;
   color: var(--color-text-caption);
   text-align: center;
+}
+
+.case-cards[hidden] {
+  display: none;
 }

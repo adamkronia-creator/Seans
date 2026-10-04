@@ -40,6 +40,8 @@ interface ChatPageProps {
 
 export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [section, setSection] = useState<SectionId>('messages');
+  // Тесты, задания и кейс пока есть только у Максима
+  const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);
   const groups = useMessages(chatId);
   const listRef = useRef<HTMLUListElement>(null);
@@ -123,21 +125,21 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
       {section === 'tests' && (
         <>
-          <ChatTests />
+          <ChatTests hasData={hasClientData} />
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}
 
       {section === 'tasks' && (
         <>
-          <ChatTasks />
+          <ChatTasks hasData={hasClientData} />
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}
 
       {section === 'notes' && (
         <>
-          <ChatCase />
+          <ChatCase hasData={hasClientData} />
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}

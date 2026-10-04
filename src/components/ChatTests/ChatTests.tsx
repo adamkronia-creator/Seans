@@ -24,7 +24,16 @@ const TASK_SECTIONS: SectionConfig[] = [
 ];
 
 /** Разделы со списками карточек: общий вид для вкладок «Тесты» и «Задания» */
-function SectionedList({ items, sections }: { items: PsyTest[]; sections: SectionConfig[] }) {
+function SectionedList({
+  items,
+  sections,
+  emptyText,
+}: {
+  items: PsyTest[];
+  sections: SectionConfig[];
+  emptyText: string;
+}) {
+  if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
   return (
     <div className="chat-tests">
       {sections.map(({ status, title, badge, remind }) => {
@@ -54,11 +63,23 @@ function SectionedList({ items, sections }: { items: PsyTest[]; sections: Sectio
 }
 
 /** Вкладка «Тесты» в открытом чате */
-export function ChatTests() {
-  return <SectionedList items={TESTS} sections={TEST_SECTIONS} />;
+export function ChatTests({ hasData }: { hasData: boolean }) {
+  return (
+    <SectionedList
+      items={hasData ? TESTS : []}
+      sections={TEST_SECTIONS}
+      emptyText="Тесты ещё не отправлялись"
+    />
+  );
 }
 
 /** Вкладка «Задания» в открытом чате */
-export function ChatTasks() {
-  return <SectionedList items={TASKS} sections={TASK_SECTIONS} />;
+export function ChatTasks({ hasData }: { hasData: boolean }) {
+  return (
+    <SectionedList
+      items={hasData ? TASKS : []}
+      sections={TASK_SECTIONS}
+      emptyText="Заданий пока нет"
+    />
+  );
 }

@@ -3,13 +3,13 @@
   background: var(--color-bg-panel);
 }
 
-/* Панель ввода: отступы 8 сверху/снизу и 24 по бокам, элементы высотой 40, gap 12 */
+/* Панель ввода: отступы 8 сверху/снизу и 16 по бокам, элементы высотой 40, gap 12 */
 .composer {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-3);
-  padding: 8px 24px calc(8px + env(safe-area-inset-bottom));
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
@@ -47,7 +47,18 @@
   border: 0;
   background: none;
   outline: 0;
+  overflow: hidden;
+  white-space: pre;
   font-size: var(--font-size-md);
+  line-height: 20px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.composer__input:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-caption);
+  pointer-events: none;
 }
 
 .composer__input::placeholder {

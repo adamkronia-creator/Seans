@@ -108,13 +108,13 @@ function CaseCard({ section }: { section: CaseSection }) {
 }
 
 /** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
-export function ChatCase() {
+export function ChatCase({ hasData }: { hasData: boolean }) {
   const [segment, setSegment] = useState<SegmentId>('info');
 
   const segments: { id: SegmentId; label: string; count: number }[] = [
-    { id: 'info', label: 'Сведения', count: CASE_SECTIONS.length },
-    { id: 'notes', label: 'Заметки', count: CASE_NOTES_COUNT },
-    { id: 'materials', label: 'Материалы', count: CASE_MATERIALS_COUNT },
+    { id: 'info', label: 'Сведения', count: hasData ? CASE_SECTIONS.length : 0 },
+    { id: 'notes', label: 'Заметки', count: hasData ? CASE_NOTES_COUNT : 0 },
+    { id: 'materials', label: 'Материалы', count: hasData ? CASE_MATERIALS_COUNT : 0 },
   ];
 
   return (
@@ -145,8 +145,8 @@ export function ChatCase() {
             <span>Добавить сведения</span>
           </button>
 
-          <ul className="case-cards">
-            {CASE_SECTIONS.map((section) => (
+          <ul className="case-cards" hidden={!hasData}>
+            {(hasData ? CASE_SECTIONS : []).map((section) => (
               <CaseCard key={section.id} section={section} />
             ))}
           </ul>
