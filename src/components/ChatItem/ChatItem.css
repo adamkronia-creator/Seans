@@ -1,0 +1,56 @@
+.chat-item {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+/* В макете шапка белая, а список лежит на сером фоне приложения */
+.chat-item__button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 10px var(--space-4);
+  text-align: left;
+}
+
+.chat-item__button:active {
+  background: var(--color-bg-panel);
+}
+
+.chat-item__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.chat-item__name {
+  overflow: hidden;
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-item__time {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.chat-item__preview {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

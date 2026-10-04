@@ -1,0 +1,5 @@
+node_modules
+dist
+*.tsbuildinfo
+# оригинал фото не публикуем, в проекте используется кадр 200x200
+src/assets/avatars/user-avatar.jpg

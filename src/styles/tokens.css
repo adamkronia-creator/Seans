@@ -1,0 +1,77 @@
+:root {
+  /* Фоны */
+  --color-bg-app: #F7F8FA;       /* фон приложения */
+  --color-bg-panel: #FFFFFF;     /* панели */
+
+  /* Текст */
+  --color-text-primary: #1E1E1E;   /* основной */
+  --color-text-secondary: #818C99; /* вторичный */
+  --color-text-caption: #A0A9B3;   /* подписи */
+
+  /* Акцент */
+  --color-accent: #0088FF;       /* синий, акцентный */
+
+  /* Палитра */
+  --color-green: #34C759;
+  --color-yellow: #FFCC00;
+  --color-blue: #0088FF;
+  --color-purple: #6155F5;
+  --color-pink: #CB30E0;
+  --color-orange: #FF8D28;
+  --color-red: #FF383C;
+  --color-brown: #AC7F5E;
+
+  /* Семантика */
+  --color-success: var(--color-green);
+  --color-warning: var(--color-yellow);
+  --color-error: var(--color-red);
+  --color-info: var(--color-blue);
+
+  /* Производные цвета (оценены по макету, сверить с Figma) */
+  --color-border: #E6E8EC;                              /* границы чипсов, табов */
+  --color-divider: #E9EBEF;                             /* разделители списка */
+  --color-chip-counter-bg: #E8EAEE;                     /* кружок счётчика в неактивном чипсе */
+  --color-accent-soft: #DDEBFB;                         /* светлый акцентный фон (Избранное) */
+  --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
+
+  /* Типографика */
+  --font-family: 'Roboto Variable', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;  /* основной */
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+
+  /* Межстрочные значения предварительные, сверить с Figma */
+  --line-height-xs: 16px;
+  --line-height-sm: 20px;
+  --line-height-md: 24px;
+  --line-height-lg: 24px;
+  --line-height-xl: 28px;
+
+  /* Отступы (оценены по макету, сверить с Figma) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Радиусы */
+  --radius-pill: 999px;
+  --radius-full: 50%;
+
+  /* Размеры компонентов (оценены по макету) */
+  --size-avatar-lg: 50px;       /* аватар в списке чатов */
+  --size-avatar-sm: 34px;       /* аватар в шапке */
+  --size-icon: 24px;
+  --size-fab: 40px;
+  --size-tab: 40px;
+  --size-search-h: 40px;
+  --size-chip-h: 32px;
+}
