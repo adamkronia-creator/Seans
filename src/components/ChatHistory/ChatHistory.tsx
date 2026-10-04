@@ -3,6 +3,7 @@ import { Chip } from '../Chip/Chip';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseEdit,
+  IconEventInvite,
   IconChevron,
   IconStatNotes,
   IconStatSessions,
@@ -14,10 +15,16 @@ import {
   IconTlFlame,
   IconTlNote,
 } from '../icons';
-import { CHATS } from '../../data/chats';
-import myAvatar from '../../assets/avatars/user-avatar-history.jpg';
+import { CHATS, CURRENT_USER } from '../../data/chats';
 import { CASE_SECTIONS } from '../../data/case';
-import { HISTORY, countOf, type HistoryEvent, type HistoryFilter } from '../../data/history';
+import {
+  countOf,
+  doneCount,
+  historyEvents,
+  useClientData,
+  type HistoryEvent,
+  type HistoryFilter,
+} from '../../data/clientStore';
 import './ChatHistory.css';
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -30,11 +37,6 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'note', label: 'Заметки' },
 ];
 
-/** Сколько отдельных тестов/заданий: каждый встречается дважды — «отправили» и «выполнил» */
-const distinct = (kind: 'test' | 'task') => countOf(kind);
-const doneCount = (kind: 'test' | 'task') =>
-  new Set(HISTORY.flatMap((e) => (e.kind === kind && e.state === 'done' ? [e.title] : []))).size;
-
 interface StatRow {
   Icon: Icon;
   label: string;
@@ -43,13 +45,14 @@ interface StatRow {
 }
 
 function Stats({ hasData }: { hasData: boolean }) {
+  const d = useClientData();
   const n = (value: number) => (hasData ? value : 0);
   const rows: StatRow[] = [
-    { Icon: IconStatSessions, label: 'Сеансов проведено', value: n(countOf('session')) },
-    { Icon: IconStatTests, label: 'Тестов пройдено', value: n(doneCount('test')), total: n(distinct('test')) },
-    { Icon: IconStatTasks, label: 'Заданий выполнено', value: n(doneCount('task')), total: n(distinct('task')) },
+    { Icon: IconStatSessions, label: 'Сеансов проведено', value: n(countOf(d, 'session')) },
+    { Icon: IconStatTests, label: 'Тестов пройдено', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')) },
+    { Icon: IconStatTasks, label: 'Заданий выполнено', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')) },
     { Icon: IconTabNotes, label: 'Сведений добавлено', value: n(CASE_SECTIONS.length) },
-    { Icon: IconStatNotes, label: 'Оставлено заметок', value: n(countOf('note')) },
+    { Icon: IconStatNotes, label: 'Оставлено заметок', value: n(countOf(d, 'note')) },
   ];
   return (
     <ul className="hist-stats">
@@ -70,11 +73,21 @@ function Stats({ hasData }: { hasData: boolean }) {
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
 function Marker({ event }: { event: HistoryEvent }) {
+  if (event.kind === 'invite') {
+    return (
+      <div className="hist-marker hist-marker--event">
+        <span className="hist-marker__slot">
+          <IconEventInvite />
+        </span>
+        <img className="hist-marker__avatar" src={maxim.avatar} alt="" />
+      </div>
+    );
+  }
   if (event.kind === 'session') {
     return (
       <div className="hist-marker hist-marker--session">
         <span className="hist-marker__number">{event.number}</span>
-        <img className="hist-marker__avatar" src={myAvatar} alt="" />
+        <img className="hist-marker__avatar" src={CURRENT_USER.avatar} alt="" />
         <img className="hist-marker__avatar hist-marker__avatar--ring" src={maxim.avatar} alt="" />
       </div>
     );
@@ -83,7 +96,7 @@ function Marker({ event }: { event: HistoryEvent }) {
     return (
       <div className="hist-marker hist-marker--note">
         <IconTlNote className="hist-marker__icon" />
-        <img className="hist-marker__avatar" src={myAvatar} alt="" />
+        <img className="hist-marker__avatar" src={CURRENT_USER.avatar} alt="" />
       </div>
     );
   }
@@ -96,7 +109,7 @@ function Marker({ event }: { event: HistoryEvent }) {
       </span>
       <img
         className="hist-marker__avatar"
-        src={done ? maxim.avatar : myAvatar}
+        src={done ? maxim.avatar : CURRENT_USER.avatar}
         alt=""
       />
     </div>
@@ -113,9 +126,11 @@ function Card({ event }: { event: HistoryEvent }) {
         ) : (
           <h3 className="hist-card__title">{title}</h3>
         )}
-        <button type="button" className="hist-card__edit" aria-label="Изменить">
-          <IconCaseEdit />
-        </button>
+        {event.kind !== 'invite' && (
+          <button type="button" className="hist-card__edit" aria-label="Изменить">
+            <IconCaseEdit />
+          </button>
+        )}
       </div>
       <p className="hist-card__date">
         {event.date.split(' ').map((part) => (
@@ -125,7 +140,7 @@ function Card({ event }: { event: HistoryEvent }) {
       {'text' in event ? (
         <div className="hist-card__event">
           <p className="hist-card__text">{event.text}</p>
-          <IconChevron className="hist-card__chevron" />
+          {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
         </div>
       ) : (
         event.paragraphs.map((text, i) => (
@@ -141,7 +156,8 @@ function Card({ event }: { event: HistoryEvent }) {
 /** Вкладка «История взаимодействия» в открытом чате: статистика, фильтры и лента событий */
 export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [filter, setFilter] = useState<HistoryFilter>('all');
-  const events = hasData ? HISTORY : [];
+  const data = useClientData();
+  const events = hasData ? historyEvents(data) : [];
   const visible = filter === 'all' ? events : events.filter((e) => e.kind === filter);
 
   return (
@@ -153,7 +169,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
           <Chip
             key={id}
             active={filter === id}
-            count={hasData ? countOf(id) : 0}
+            count={hasData ? countOf(data, id) : 0}
             onClick={() => setFilter(id)}
           >
             {label}
@@ -164,17 +180,10 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
       {visible.length > 0 ? (
         <ol className="hist-timeline">
           {visible.map((event, i) => {
-            const next = visible[i + 1];
+            const hasNext = i < visible.length - 1;
             return (
-              <li
-                key={event.id}
-                className={`hist-item hist-item--${event.kind}`}
-                // линия идёт до значка следующего события (у заметки значок без «ореола» 4 px)
-                style={
-                  next ? { ['--line-end' as string]: next.kind === 'note' ? '25px' : '21px' } : undefined
-                }
-              >
-                {next && <span className="hist-item__line" aria-hidden="true" />}
+              <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
+                {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                 <Marker event={event} />
                 <Card event={event} />
               </li>

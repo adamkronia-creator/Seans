@@ -30,7 +30,8 @@ import {
   type CaseSection,
 } from '../../data/case';
 import { CASE_FILES, type CaseFile } from '../../data/files';
-import { CASE_NOTES, type CaseNote } from '../../data/notes';
+import type { CaseNote } from '../../data/notes';
+import { useClientData } from '../../data/clientStore';
 import './ChatCase.css';
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -152,11 +153,12 @@ function NoteCard({ note }: { note: CaseNote }) {
 
 /** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
 export function ChatCase({ hasData }: { hasData: boolean }) {
+  const { notes } = useClientData();
   const [segment, setSegment] = useState<SegmentId>('info');
 
   const segments: { id: SegmentId; label: string; count: number }[] = [
     { id: 'info', label: 'Сведения', count: hasData ? CASE_SECTIONS.length : 0 },
-    { id: 'notes', label: 'Заметки', count: hasData ? CASE_NOTES.length : 0 },
+    { id: 'notes', label: 'Заметки', count: hasData ? notes.length : 0 },
     { id: 'materials', label: 'Материалы', count: hasData ? CASE_FILES.length : 0 },
   ];
 
@@ -210,7 +212,7 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
           </button>
 
           <ul className="case-cards" hidden={!hasData}>
-            {CASE_NOTES.map((note) => (
+            {notes.map((note) => (
               <NoteCard key={note.id} note={note} />
             ))}
           </ul>

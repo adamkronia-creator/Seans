@@ -1,10 +1,11 @@
 import { EventItem } from '../../components/EventItem/EventItem';
 import { IconBack } from '../../components/icons';
-import { EVENTS } from '../../data/events';
+import { appEvents, useClientData } from '../../data/clientStore';
 import { goBack } from '../../router';
 import './EventsPage.css';
 
 export function EventsPage() {
+  const events = appEvents(useClientData());
   return (
     <section className="events">
       <header className="events__header">
@@ -15,7 +16,7 @@ export function EventsPage() {
       </header>
 
       <ul className="events__list">
-        {EVENTS.map((event) => (
+        {events.map((event) => (
           <EventItem key={event.id} event={event} />
         ))}
       </ul>

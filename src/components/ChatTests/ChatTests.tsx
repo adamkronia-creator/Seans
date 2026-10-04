@@ -1,7 +1,7 @@
 import { Badge } from '../Badge/Badge';
 import { TestCard } from '../TestCard/TestCard';
-import { TASKS } from '../../data/tasks';
-import { TESTS, type PsyTest, type TestStatus } from '../../data/tests';
+import { itemsWithStatus, useClientData } from '../../data/clientStore';
+import type { PsyTest, TestStatus } from '../../data/tests';
 import './ChatTests.css';
 
 interface SectionConfig {
@@ -64,9 +64,10 @@ function SectionedList({
 
 /** Вкладка «Тесты» в открытом чате */
 export function ChatTests({ hasData }: { hasData: boolean }) {
+  const data = useClientData();
   return (
     <SectionedList
-      items={hasData ? TESTS : []}
+      items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       emptyText="Тесты ещё не отправлялись"
     />
@@ -75,9 +76,10 @@ export function ChatTests({ hasData }: { hasData: boolean }) {
 
 /** Вкладка «Задания» в открытом чате */
 export function ChatTasks({ hasData }: { hasData: boolean }) {
+  const data = useClientData();
   return (
     <SectionedList
-      items={hasData ? TASKS : []}
+      items={hasData ? itemsWithStatus(data, 'task') : []}
       sections={TASK_SECTIONS}
       emptyText="Заданий пока нет"
     />

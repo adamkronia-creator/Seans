@@ -153,8 +153,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 44px;
-  padding: 0 var(--space-3);
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: var(--space-3);
   color: var(--color-accent);
 }
 
