@@ -55,3 +55,14 @@
   background: var(--color-green);
   color: var(--color-accent-on);
 }
+
+/* Неактивная вкладка переключателя */
+.badge--muted {
+  background: #C8CDD3;
+  color: var(--color-accent-on);
+}
+
+/* Двузначные числа: кружок-пилюля шириной 28 (по макету) */
+.badge--wide {
+  min-width: 28px;
+}

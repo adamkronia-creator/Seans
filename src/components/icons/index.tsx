@@ -49,3 +49,21 @@ export { default as IconEmoji } from '../../assets/icons/chat/emoji.svg?react';
 export { default as IconMicrophone } from '../../assets/icons/chat/microphone.svg?react';
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
 export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
+
+// Вкладка «Кейс»
+export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
+export { default as IconCaseEdit } from '../../assets/icons/case/edit.svg?react';
+export { default as IconCaseLock } from '../../assets/icons/case/note-lock.svg?react';
+export { default as IconCaseGeneral } from '../../assets/icons/case/head-general.svg?react';
+export { default as IconCaseAnamnesis } from '../../assets/icons/case/head-anamnesis.svg?react';
+export { default as IconCaseRequest } from '../../assets/icons/case/head-request.svg?react';
+export { default as IconCaseHypothesis } from '../../assets/icons/case/head-hypothesis.svg?react';
+export { default as IconCaseStructure } from '../../assets/icons/case/head-structure.svg?react';
+export { default as IconCaseSignifiers } from '../../assets/icons/case/head-signifiers.svg?react';
+export { default as IconCaseScenario } from '../../assets/icons/case/head-scenario.svg?react';
+export { default as IconCaseTransfer } from '../../assets/icons/case/head-transfer.svg?react';
+export { default as IconCaseClient } from '../../assets/icons/case/row-client.svg?react';
+export { default as IconCaseBirthday } from '../../assets/icons/case/row-birthday.svg?react';
+export { default as IconCaseCalendar } from '../../assets/icons/case/row-calendar.svg?react';
+export { default as IconCaseClock } from '../../assets/icons/case/row-clock.svg?react';
+export { default as IconCaseFormat } from '../../assets/icons/case/row-format.svg?react';

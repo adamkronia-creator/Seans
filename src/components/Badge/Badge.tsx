@@ -1,6 +1,6 @@
 import './Badge.css';
 
-type BadgeVariant = 'accent' | 'neutral' | 'inverse' | 'yellow' | 'green';
+type BadgeVariant = 'accent' | 'neutral' | 'inverse' | 'yellow' | 'green' | 'muted';
 
 interface BadgeProps {
   count: number;
@@ -15,7 +15,10 @@ interface BadgeProps {
 export function Badge({ count, variant = 'accent', showZero = false, ariaLabel }: BadgeProps) {
   if (count <= 0 && !showZero) return null;
   return (
-    <span className={`badge badge--${variant}`} aria-label={ariaLabel}>
+    <span
+      className={`badge badge--${variant}${count >= 10 ? ' badge--wide' : ''}`}
+      aria-label={ariaLabel}
+    >
       <span className="badge__text">{count > 99 ? '99+' : count}</span>
     </span>
   );
