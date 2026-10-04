@@ -71,3 +71,14 @@ export { default as IconCaseBirthday } from '../../assets/icons/case/row-birthda
 export { default as IconCaseCalendar } from '../../assets/icons/case/row-calendar.svg?react';
 export { default as IconCaseClock } from '../../assets/icons/case/row-clock.svg?react';
 export { default as IconCaseFormat } from '../../assets/icons/case/row-format.svg?react';
+
+// История взаимодействия
+export { default as IconStatSessions } from '../../assets/icons/history/stat-sessions.svg?react';
+export { default as IconStatTests } from '../../assets/icons/history/stat-tests.svg?react';
+export { default as IconStatTasks } from '../../assets/icons/history/stat-tasks.svg?react';
+export { default as IconStatNotes } from '../../assets/icons/history/stat-notes.svg?react';
+export { default as IconTlNote } from '../../assets/icons/history/tl-note.svg?react';
+export { default as IconTlClock } from '../../assets/icons/history/tl-clock.svg?react';
+export { default as IconTlDoc } from '../../assets/icons/history/tl-doc.svg?react';
+export { default as IconTlFlame } from '../../assets/icons/history/tl-flame.svg?react';
+export { default as IconChevron } from '../../assets/icons/history/chevron.svg?react';

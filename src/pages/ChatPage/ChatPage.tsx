@@ -11,6 +11,7 @@ import {
   IconTabSessions,
   IconTabTests,
 } from '../../components/icons';
+import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChatCase } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
@@ -144,7 +145,14 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         </>
       )}
 
-      {(section === 'sessions' || section === 'library') && (
+      {section === 'library' && (
+        <>
+          <ChatHistory hasData={hasClientData} />
+          <TabBar active="messages" onChange={onAppTabChange} />
+        </>
+      )}
+
+      {section === 'sessions' && (
         <>
           <p className="chat__empty chat__empty--grow">Раздел в разработке</p>
           <TabBar active="messages" onChange={onAppTabChange} />

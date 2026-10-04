@@ -1,0 +1,281 @@
+/* Вкладка «История взаимодействия»: поля 16, 15 от разделителя шапки, блоки через 12 */
+.chat-history {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: 15px var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.chat-history > * {
+  flex-shrink: 0;
+}
+
+/* Статистика: карточка из пяти строк по 44 с разделителями 1 */
+.hist-stats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+}
+
+.hist-stats__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 44px;
+  padding: 0 var(--space-3);
+  color: var(--color-accent);
+}
+
+.hist-stats__row + .hist-stats__row {
+  margin-top: 1px;
+}
+
+.hist-stats__row + .hist-stats__row::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: var(--space-3);
+  left: var(--space-3);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.hist-stats__icon {
+  flex-shrink: 0;
+  font-size: var(--size-icon);
+}
+
+.hist-stats__label {
+  flex: 1;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: 20px;
+}
+
+.hist-stats__value {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+}
+
+.hist-stats__value--plain {
+  margin-right: 1px;
+}
+
+.hist-stats__value {
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.hist-stats__total {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+}
+
+/* Чипсы — те же, что на главном экране; прокручиваются вбок за край экрана */
+.hist-chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: -1px calc(var(--space-4) * -1);
+  padding: 1px var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+/* В этом макете рамка чипса рисуется снаружи (1 px), отступы 8 слева и 6 справа от счётчика */
+.hist-chips .chip {
+  gap: 4px;
+  padding: 0 var(--space-2);
+  border: 0;
+  box-shadow: 0 0 0 1px var(--color-stroke);
+}
+
+.hist-chips .chip--counted {
+  padding-right: 6px;
+}
+
+.hist-chips .chip--active {
+  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
+}
+
+.hist-chips::-webkit-scrollbar {
+  display: none;
+}
+
+/* Лента: значки слева (x 16), линия по центру значков, карточки от x 48 */
+.hist-timeline {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hist-item {
+  position: relative;
+  padding-left: 32px;
+}
+
+.hist-item__line {
+  position: absolute;
+  top: 61px;
+  bottom: calc(var(--line-end, 0px) * -1);
+  left: 9.5px;
+  width: 1px;
+  background: #E1E4E8;
+}
+
+.hist-item--session .hist-item__line {
+  top: 73px;
+}
+
+.hist-marker {
+  position: absolute;
+  top: 13px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 20px;
+}
+
+.hist-marker__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.hist-marker__icon,
+.hist-marker__slot {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.hist-marker__slot svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* Жёлтые часы нарисованы 28×28 с запасом 4 вокруг: выступают за слот */
+.hist-marker__slot--clock svg {
+  width: 28px;
+  height: 28px;
+  margin: -4px;
+}
+
+.hist-marker__avatar {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Клиент в сеансе наезжает на аватар психолога, вокруг рамка цвета фона */
+.hist-marker__avatar--ring {
+  margin-top: -9px;
+  box-shadow: 0 0 0 1px var(--color-bg-app);
+}
+
+/* Карточка события: белая, радиус 12, поля 12 */
+.hist-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+}
+
+.hist-card__top {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.hist-card__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-regular);
+  line-height: 22px;
+}
+
+.hist-card__title--single {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hist-card__edit {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 0;
+  color: var(--color-text-caption);
+  font-size: 22px;
+}
+
+.hist-card__date {
+  display: flex;
+  gap: 4.75px;
+  margin: 4px 0 8px;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: 12px;
+}
+
+.hist-card__text {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: 19px;
+}
+
+.hist-card__text + .hist-card__text {
+  margin-top: 8px;
+}
+
+.hist-card__event {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.hist-card__event .hist-card__text {
+  flex: 1;
+  white-space: pre-line;
+}
+
+.hist-card__chevron {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: 20px;
+}
+
+.hist-empty {
+  padding: var(--space-6) 0;
+  color: var(--color-text-caption);
+  text-align: center;
+}
