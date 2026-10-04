@@ -11,7 +11,7 @@ import {
   IconTabSessions,
   IconTabTests,
 } from '../../components/icons';
-import { ChatTests } from '../../components/ChatTests/ChatTests';
+import { ChatTasks, ChatTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
@@ -20,13 +20,13 @@ import { goBack } from '../../router';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
-type SectionId = 'sessions' | 'messages' | 'tests' | 'practices' | 'notes' | 'library';
+type SectionId = 'sessions' | 'messages' | 'tests' | 'tasks' | 'notes' | 'library';
 
 const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabSessions }[] = [
   { id: 'sessions', label: 'Сеансы', Icon: IconTabSessions },
   { id: 'messages', label: 'Сообщения', Icon: IconTabMessages },
   { id: 'tests', label: 'Тесты', Icon: IconTabTests },
-  { id: 'practices', label: 'Практики', Icon: IconTabPractices },
+  { id: 'tasks', label: 'Задания', Icon: IconTabPractices },
   { id: 'notes', label: 'Заметки', Icon: IconTabNotes },
   { id: 'library', label: 'Материалы', Icon: IconTabLibrary },
 ];
@@ -127,7 +127,14 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         </>
       )}
 
-      {(section === 'sessions' || section === 'practices' || section === 'notes' || section === 'library') && (
+      {section === 'tasks' && (
+        <>
+          <ChatTasks />
+          <TabBar active="messages" onChange={onAppTabChange} />
+        </>
+      )}
+
+      {(section === 'sessions' || section === 'notes' || section === 'library') && (
         <>
           <p className="chat__empty chat__empty--grow">Раздел в разработке</p>
           <TabBar active="messages" onChange={onAppTabChange} />

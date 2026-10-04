@@ -51,7 +51,7 @@
 .test-card__top {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 7px; /* подобран так, чтобы названия обрезались в тех же местах, что в макете */
 }
 
 .test-card__title {
@@ -70,6 +70,10 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   line-height: 12px;
+}
+
+.test-card__date--assigned {
+  color: var(--color-accent);
 }
 
 .test-card__date--sent {

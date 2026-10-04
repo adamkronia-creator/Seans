@@ -5,14 +5,15 @@ import rsesIcon from '../assets/tests/rses.png';
 import gad7Icon from '../assets/tests/gad7.png';
 import phq9Icon from '../assets/tests/phq9.png';
 
-export type TestStatus = 'sent' | 'done';
+/** assigned — назначено, sent — отправлено клиенту, done — завершено */
+export type TestStatus = 'assigned' | 'sent' | 'done';
 
 export interface PsyTest {
   id: string;
   /** Короткое название и полное: «ИТТ: Интегративный тест тревожности» */
   title: string;
   description: string;
-  /** Дата отправки (для «Отправленные») или прохождения (для «Завершенные») */
+  /** Дата назначения, отправки или завершения — по разделу */
   date: string;
   status: TestStatus;
   icon: string;
