@@ -17,7 +17,12 @@ export function SearchField({ value, onChange, placeholder }: SearchFieldProps) 
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
+        name="dialog-search"
         enterKeyHint="search"
+        autoComplete="off"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-form-type="other"
       />
     </label>
   );

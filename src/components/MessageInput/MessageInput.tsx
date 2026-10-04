@@ -54,6 +54,9 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
       <form
         className={`composer${emojiOpen ? ' composer--panel' : ''}`}
         onSubmit={submit}
+        autoComplete="off"
+        // Подсказки менеджеров паролей и автозаполнения не нужны в чате
+        data-form-type="other"
       >
         <button type="button" className="composer__round" aria-label="Прикрепить">
           <IconAttach />
@@ -67,8 +70,20 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
             onChange={(e) => setText(e.target.value)}
             onFocus={() => emojiOpen && setPanel(false)}
             placeholder="Написать сообщение..."
+            type="text"
+            name="chat-message"
+            id="chat-message"
+            inputMode="text"
             enterKeyHint="send"
             autoComplete="off"
+            autoCorrect="on"
+            autoCapitalize="sentences"
+            spellCheck
+            aria-label="Сообщение"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            data-form-type="other"
           />
           <button
             type="button"

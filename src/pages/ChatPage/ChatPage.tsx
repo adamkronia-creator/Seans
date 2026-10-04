@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
+  IconFavorites,
   IconSettings,
   IconTabLibrary,
   IconTabMessages,
@@ -56,10 +57,16 @@ export function ChatPage({ chatId }: { chatId: string }) {
             <IconBack />
           </button>
           <div className="chat__peer">
-            <Avatar src={chat.avatar} alt="" size={40} online={chat.online} />
+            {chat.favorites ? (
+              <Avatar icon={<IconFavorites />} size={40} />
+            ) : (
+              <Avatar src={chat.avatar} alt="" size={40} online={chat.online} />
+            )}
             <div className="chat__who">
               <h1 className="chat__name">{chat.name}</h1>
-              <p className="chat__status">{chat.online ? 'в сети' : 'был(а) недавно'}</p>
+              {!chat.favorites && (
+                <p className="chat__status">{chat.online ? 'в сети' : 'был(а) недавно'}</p>
+              )}
             </div>
           </div>
           <button type="button" className="chat__icon-button" aria-label="Настройки чата">
