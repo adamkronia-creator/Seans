@@ -29,7 +29,7 @@ export function ChatItem({ chat, onClick }: ChatItemProps) {
           </span>
           <span className="chat-item__row chat-item__row--bottom">
             <span className="chat-item__preview">{chat.lastMessage}</span>
-            <Badge count={chat.unread} />
+            <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
           </span>
         </span>
       </button>

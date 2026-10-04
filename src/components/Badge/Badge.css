@@ -1,4 +1,5 @@
-/* Кружок 20×20; padding 4 слева и справа, чтобы две цифры давали пилюлю */
+/* Кружок 20×20; padding 4 слева и справа, чтобы две цифры давали пилюлю.
+   Общий для чипсов и непрочитанных сообщений. */
 .badge {
   display: inline-flex;
   flex-shrink: 0;
@@ -8,9 +9,24 @@
   height: var(--size-badge);
   padding: 0 var(--space-1);
   border-radius: var(--radius-pill);
-  background: var(--color-accent);
-  color: var(--color-accent-on);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
+  /* Пропорциональные цифры: узкая «1» не уезжает влево от центра круга */
+  font-variant-numeric: proportional-nums;
   line-height: 1;
+}
+
+.badge--accent {
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+.badge--neutral {
+  background: var(--color-stroke);
+  color: var(--color-text-secondary);
+}
+
+.badge--inverse {
+  background: var(--color-accent-on);
+  color: var(--color-accent);
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Badge } from '../Badge/Badge';
 import './Chip.css';
 
 interface ChipProps {
@@ -32,7 +33,9 @@ export function Chip({
       aria-label={ariaLabel}
     >
       {children}
-      {count !== undefined && <span className="chip__count">{count}</span>}
+      {count !== undefined && (
+        <Badge count={count} variant={active ? 'inverse' : 'neutral'} showZero />
+      )}
     </button>
   );
 }

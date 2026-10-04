@@ -28,24 +28,3 @@
   background: var(--color-accent);
   color: var(--color-accent-on);
 }
-
-/* Кружок со счётчиком: 20×20, при двух цифрах растягивается в пилюлю */
-.chip__count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--size-badge);
-  height: var(--size-badge);
-  padding: 0 var(--space-1);
-  border-radius: var(--radius-pill);
-  background: var(--color-stroke);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1;
-}
-
-.chip--active .chip__count {
-  background: var(--color-accent-on);
-  color: var(--color-accent);
-}
