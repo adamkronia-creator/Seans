@@ -85,6 +85,11 @@
   gap: var(--space-3);
 }
 
+/* Двойной клик или двойное касание открывает редактор: без масштабирования по двойному тапу */
+.case-card--editable {
+  touch-action: manipulation;
+}
+
 /* Карточка: белая, радиус 12, тень справа и снизу; шапка 46 */
 .case-card {
   overflow: hidden;
@@ -265,10 +270,6 @@
   margin-left: 0;
 }
 
-.case-card__head--note .case-card__icon {
-  font-size: 22px;
-}
-
 /* Файл: карточка 76 (отступ 12), круглая миниатюра 52, название и подпись, дата справа */
 .case-file {
   display: flex;
@@ -298,6 +299,15 @@
 
 .case-file__thumb--pdf {
   background: #D7D4FC;
+}
+
+.case-file__thumb--other {
+  background: var(--color-divider);
+}
+
+.case-file--link {
+  color: inherit;
+  text-decoration: none;
 }
 
 .case-file__info {

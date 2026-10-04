@@ -7,7 +7,15 @@ export type CaseIconId =
   | 'signifiers'
   | 'scenario'
   | 'transfer'
-  | 'pin';
+  | 'pin'
+  | 'eye'
+  | 'star'
+  | 'info'
+  | 'hospital'
+  | 'crown'
+  | 'bolt'
+  | 'cross'
+  | 'dots';
 
 import type { ToneId } from './tones';
 

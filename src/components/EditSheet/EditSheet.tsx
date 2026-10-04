@@ -95,6 +95,7 @@ export function EditSheet({
 
   const current = tone ? toneOf(tone) : undefined;
   const PreviewIcon = icon ? HEAD_ICONS[icon].Icon : undefined;
+  const previewSize = icon ? HEAD_ICONS[icon].size : 22;
 
   return createPortal(
     <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -109,7 +110,7 @@ export function EditSheet({
               className="sheet__preview"
               style={{ '--head-bg': current.bg, '--head-fg': current.fg } as CSSProperties}
             >
-              <span className="sheet__preview-icon">
+              <span className="sheet__preview-icon" style={{ fontSize: previewSize }}>
                 <PreviewIcon />
               </span>
               <span className="sheet__preview-title">{title.trim() || 'Заголовок'}</span>
@@ -141,7 +142,7 @@ export function EditSheet({
                 <span className="sheet__label" id={`${uid}-icon`}>Иконка</span>
                 <div className="sheet__icons">
                   {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
-                    const { Icon, label } = HEAD_ICONS[id];
+                    const { Icon, label, size } = HEAD_ICONS[id];
                     const active = id === icon;
                     return (
                       <button
@@ -151,6 +152,7 @@ export function EditSheet({
                         aria-checked={active}
                         aria-label={label}
                         className={`sheet__icon${active ? ' sheet__icon--active' : ''}`}
+                        style={{ fontSize: size }}
                         onClick={() => setIcon(id)}
                       >
                         <Icon />

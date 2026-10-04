@@ -140,7 +140,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
       {section === 'notes' && (
         <>
-          <ChatCase hasData={hasClientData} />
+          <ChatCase hasData={hasClientData} clientId={chatId} />
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}

@@ -7,6 +7,14 @@ import {
   IconCaseClock,
   IconCaseFormat,
   IconCaseGeneral,
+  IconCaseHeadBolt,
+  IconCaseHeadCrown,
+  IconCaseHeadCross,
+  IconCaseHeadDots,
+  IconCaseHeadEye,
+  IconCaseHeadHospital,
+  IconCaseHeadInfo,
+  IconCaseHeadStar,
   IconCaseHypothesis,
   IconCaseNotePin,
   IconCaseRequest,
@@ -20,7 +28,7 @@ import type { CaseIconId, CaseRowIconId } from '../../data/case';
 export type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
 // Иконки шапок карточек; size — размер файла иконки из Figma (22 или 24)
-export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 22 | 24; label: string }> = {
+export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; label: string }> = {
   general: { Icon: IconCaseGeneral, size: 22, label: 'Человек' },
   anamnesis: { Icon: IconCaseAnamnesis, size: 22, label: 'Анамнез' },
   request: { Icon: IconCaseRequest, size: 22, label: 'Запрос' },
@@ -30,6 +38,14 @@ export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 22 | 24; label: 
   scenario: { Icon: IconCaseScenario, size: 24, label: 'Сценарий' },
   transfer: { Icon: IconCaseTransfer, size: 24, label: 'Перенос' },
   pin: { Icon: IconCaseNotePin, size: 22, label: 'Булавка' },
+  eye: { Icon: IconCaseHeadEye, size: 20, label: 'Глаз' },
+  star: { Icon: IconCaseHeadStar, size: 20, label: 'Звезда' },
+  info: { Icon: IconCaseHeadInfo, size: 20, label: 'Важно' },
+  hospital: { Icon: IconCaseHeadHospital, size: 20, label: 'Больница' },
+  crown: { Icon: IconCaseHeadCrown, size: 20, label: 'Корона' },
+  bolt: { Icon: IconCaseHeadBolt, size: 20, label: 'Молния' },
+  cross: { Icon: IconCaseHeadCross, size: 20, label: 'Отмена' },
+  dots: { Icon: IconCaseHeadDots, size: 20, label: 'Ещё' },
 };
 
 export const ROW_ICONS: Record<CaseRowIconId, Icon> = {

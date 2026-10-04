@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { CASE_SECTIONS, type CaseSection } from './case';
+import { CASE_FILES, fileKind, fileMeta, type CaseFile } from './files';
 import { CASE_NOTES, type CaseNote } from './notes';
 import { LIBRARY, TASK_LIBRARY } from './library';
 import type { PsyTest } from './tests';
@@ -35,6 +36,8 @@ interface ClientData {
   caseSections: CaseSection[];
   /** Комментарии психолога к тестам и заданиям в истории: id записи журнала → текст */
   comments: Record<string, string>;
+  /** Файлы кейса по клиентам: id чата → файлы, новые сверху */
+  files: Record<string, CaseFile[]>;
 }
 
 /** Как называется тест в тексте событий и истории */
@@ -172,6 +175,7 @@ let data: ClientData = {
   sessions: SESSIONS,
   caseSections: CASE_SECTIONS,
   comments: {},
+  files: { maxim: CASE_FILES },
 };
 const listeners = new Set<() => void>();
 
@@ -253,6 +257,23 @@ export function setComment(activityId: string, text: string) {
   if (text) comments[activityId] = text;
   else delete comments[activityId];
   update({ comments });
+}
+
+/** Прикрепляет выбранные файлы к кейсу клиента; новые идут первыми */
+export function attachFiles(clientId: string, picked: File[]) {
+  const { date } = nowStamp();
+  const added: CaseFile[] = picked.map((f, i) => {
+    const kind = fileKind(f);
+    return {
+      id: `f-${Date.now()}-${i}`,
+      name: f.name,
+      kind,
+      meta: fileMeta(kind, f.size),
+      date: date.slice(0, 5),
+      url: URL.createObjectURL(f),
+    };
+  });
+  update({ files: { ...data.files, [clientId]: [...added.reverse(), ...(data.files[clientId] ?? [])] } });
 }
 
 /** Тест или задание: назначено / отправлено / выполнено */

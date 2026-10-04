@@ -197,6 +197,7 @@
 
 /* Карточка события: белая, радиус 12, поля 12 */
 .hist-card {
+  touch-action: manipulation; /* двойное касание открывает редактор, а не масштабирует */
   display: flex;
   flex-direction: column;
   padding: var(--space-3);

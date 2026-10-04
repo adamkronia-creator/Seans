@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import { Badge } from '../Badge/Badge';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
@@ -17,10 +17,11 @@ import {
   textToParagraphs,
   type CaseSection,
 } from '../../data/case';
-import { CASE_FILES, type CaseFile } from '../../data/files';
+import type { CaseFile } from '../../data/files';
 import type { CaseNote } from '../../data/notes';
 import { toneOf } from '../../data/tones';
-import { updateNote, updateSection, useClientData } from '../../data/clientStore';
+import { attachFiles, updateNote, updateSection, useClientData } from '../../data/clientStore';
+import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { HEAD_ICONS, ROW_ICONS } from './caseIcons';
 import './ChatCase.css';
 
@@ -34,9 +35,10 @@ type SegmentId = 'info' | 'notes' | 'materials';
 
 function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
   const { Icon, size } = HEAD_ICONS[section.icon];
+  const doubleTap = useDoubleActivate(onEdit);
 
   return (
-    <li className="case-card">
+    <li className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head" style={toneStyle(section.tone)}>
         <span className="case-card__icon" style={{ fontSize: size }}>
           <Icon />
@@ -92,8 +94,8 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
 }
 
 function FileCard({ file }: { file: CaseFile }) {
-  return (
-    <li className="case-file">
+  const body = (
+    <>
       <span className={`case-file__thumb case-file__thumb--${file.kind}`}>
         <IconCaseFileDownload />
       </span>
@@ -102,16 +104,29 @@ function FileCard({ file }: { file: CaseFile }) {
         <span className="case-file__meta">{file.meta}</span>
       </div>
       <span className="case-file__date">{file.date}</span>
+    </>
+  );
+  // Загруженный файл открывается и скачивается по нажатию
+  return (
+    <li>
+      {file.url ? (
+        <a className="case-file case-file--link" href={file.url} download={file.name} target="_blank" rel="noreferrer">
+          {body}
+        </a>
+      ) : (
+        <div className="case-file">{body}</div>
+      )}
     </li>
   );
 }
 
 function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
-  const { Icon } = HEAD_ICONS[note.icon];
+  const { Icon, size } = HEAD_ICONS[note.icon];
+  const doubleTap = useDoubleActivate(onEdit);
   return (
-    <li className="case-card">
+    <li className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
-        <span className="case-card__icon">
+        <span className="case-card__icon" style={{ fontSize: size }}>
           <Icon />
         </span>
         <TruncatedText className="case-card__title" text={note.title} />
@@ -132,8 +147,10 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
 }
 
 /** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
-export function ChatCase({ hasData }: { hasData: boolean }) {
-  const { notes, caseSections } = useClientData();
+export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: string }) {
+  const { notes, caseSections, files: allFiles } = useClientData();
+  const files = allFiles[clientId] ?? [];
+  const fileInput = useRef<HTMLInputElement>(null);
   const [segment, setSegment] = useState<SegmentId>('info');
   // Что сейчас редактируется: сведение или заметка
   const [editing, setEditing] = useState<{ kind: 'section' | 'note'; id: string } | null>(null);
@@ -143,7 +160,7 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
   const segments: { id: SegmentId; label: string; count: number }[] = [
     { id: 'info', label: 'Сведения', count: hasData ? caseSections.length : 0 },
     { id: 'notes', label: 'Заметки', count: hasData ? notes.length : 0 },
-    { id: 'materials', label: 'Материалы', count: hasData ? CASE_FILES.length : 0 },
+    { id: 'materials', label: 'Материалы', count: files.length },
   ];
 
   return (
@@ -212,16 +229,28 @@ export function ChatCase({ hasData }: { hasData: boolean }) {
         </>
       ) : (
         <>
-          <button type="button" className="case-add">
+          <button type="button" className="case-add" onClick={() => fileInput.current?.click()}>
             <svg className="case-add__border" aria-hidden="true">
               <rect className="case-add__rect" />
             </svg>
             <IconCaseAttach className="case-add__icon" />
             <span>Прикрепить файл</span>
           </button>
+          {/* Системное окно выбора файлов; можно выбрать несколько */}
+          <input
+            ref={fileInput}
+            type="file"
+            multiple
+            hidden
+            onChange={(e) => {
+              const picked = Array.from(e.target.files ?? []);
+              if (picked.length > 0) attachFiles(clientId, picked);
+              e.target.value = ''; // тот же файл можно выбрать снова
+            }}
+          />
 
-          <ul className="case-cards" hidden={!hasData}>
-            {CASE_FILES.map((file) => (
+          <ul className="case-cards" hidden={files.length === 0}>
+            {files.map((file) => (
               <FileCard key={file.id} file={file} />
             ))}
           </ul>

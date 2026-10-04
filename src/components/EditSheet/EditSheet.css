@@ -129,9 +129,12 @@
 }
 
 .sheet__icons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  /* Края рядов вровень с подписями: слева и справа по 13, как у текста в поле */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 44px);
+  justify-content: space-between;
+  gap: var(--space-2) 0;
+  padding: 0 13px;
 }
 
 .sheet__icon {
@@ -144,7 +147,6 @@
   border-radius: 12px;
   /* Иконки окрашены в выбранный цвет шапки */
   color: var(--head-fg, var(--color-accent));
-  font-size: 24px;
 }
 
 /* Выбранная иконка: акцентная обводка, фон остаётся белым */
@@ -153,9 +155,11 @@
 }
 
 .sheet__tones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(8, 32px);
+  justify-content: space-between;
+  gap: var(--space-3) 0;
+  padding: 0 13px;
 }
 
 /* Цветной кружок: фон шапки с цветной обводкой цвета иконки */

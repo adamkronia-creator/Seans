@@ -86,6 +86,14 @@ export { default as IconCaseStructure } from '../../assets/icons/case/head-struc
 export { default as IconCaseSignifiers } from '../../assets/icons/case/head-signifiers.svg?react';
 export { default as IconCaseScenario } from '../../assets/icons/case/head-scenario.svg?react';
 export { default as IconCaseTransfer } from '../../assets/icons/case/head-transfer.svg?react';
+export { default as IconCaseHeadEye } from '../../assets/icons/case/head-eye.svg?react';
+export { default as IconCaseHeadStar } from '../../assets/icons/case/head-star.svg?react';
+export { default as IconCaseHeadInfo } from '../../assets/icons/case/head-info.svg?react';
+export { default as IconCaseHeadHospital } from '../../assets/icons/case/head-hospital.svg?react';
+export { default as IconCaseHeadCrown } from '../../assets/icons/case/head-crown.svg?react';
+export { default as IconCaseHeadBolt } from '../../assets/icons/case/head-bolt.svg?react';
+export { default as IconCaseHeadCross } from '../../assets/icons/case/head-cross.svg?react';
+export { default as IconCaseHeadDots } from '../../assets/icons/case/head-dots.svg?react';
 export { default as IconCaseClient } from '../../assets/icons/case/row-client.svg?react';
 export { default as IconCaseBirthday } from '../../assets/icons/case/row-birthday.svg?react';
 export { default as IconCaseCalendar } from '../../assets/icons/case/row-calendar.svg?react';

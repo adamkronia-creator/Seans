@@ -2,12 +2,30 @@
 export interface CaseFile {
   id: string;
   name: string;
-  kind: 'image' | 'pdf';
+  kind: 'image' | 'pdf' | 'other';
   /** Подпись под названием */
   meta: string;
   /** Дата добавления */
   date: string;
+  /** Ссылка на загруженный файл (blob): по ней файл можно открыть или скачать; у тестовых файлов нет */
+  url?: string;
 }
+
+/** «240 КБ» / «1.2 MB» — как в макете */
+export function formatFileSize(bytes: number): string {
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${Math.max(1, Math.round(kb))} КБ`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
+export function fileKind(file: File): CaseFile['kind'] {
+  if (file.type.startsWith('image/')) return 'image';
+  if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) return 'pdf';
+  return 'other';
+}
+
+const KIND_LABEL: Record<CaseFile['kind'], string> = { image: 'Изображение', pdf: 'PDF', other: 'Файл' };
+export const fileMeta = (kind: CaseFile['kind'], bytes: number) => `${KIND_LABEL[kind]} • ${formatFileSize(bytes)}`;
 
 export const CASE_FILES: CaseFile[] = [
   { id: 'f1', name: 'session_03_excerpt.jpeg', kind: 'image', meta: 'Изображение • 1.2 MB', date: '10.08' },

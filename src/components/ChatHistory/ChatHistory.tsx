@@ -17,6 +17,7 @@ import {
   IconTlNote,
 } from '../icons';
 import { CHATS, CURRENT_USER } from '../../data/chats';
+import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -126,8 +127,10 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
   // Сеанс без текста: только название и дата
   const bare = 'paragraphs' in event && event.paragraphs.length === 0;
+  // У приглашения текста для правки нет
+  const doubleTap = useDoubleActivate(event.kind === 'invite' ? () => undefined : onEdit);
   return (
-    <div className={`hist-card${bare ? ' hist-card--bare' : ''}`}>
+    <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
         {event.kind === 'test' || event.kind === 'task' ? (
           <TruncatedText className="hist-card__title hist-card__title--single" text={title} />
