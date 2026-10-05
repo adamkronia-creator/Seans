@@ -26,6 +26,8 @@ import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
+import { testBlank } from '../../data/testBlank';
+import { TestBlank } from './TestBlank';
 import './TestSettings.css';
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
@@ -88,6 +90,9 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [saveBlank, setSaveBlank] = useState(true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Открыт ли «Бланк тестирования» (вместо настроек, шапка та же)
+  const [blankOpen, setBlankOpen] = useState(false);
+  const blank = testBlank(test.id);
   const toastTimer = useRef<number>();
 
   const client = chatId ? CHATS.find((c) => c.id === chatId) : undefined;
@@ -123,14 +128,14 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   return (
     <section className="test-settings">
       <header className="test-settings__header">
-        <button type="button" className="test-settings__button" aria-label="Назад" onClick={onBack}>
+        <button type="button" className="test-settings__button" aria-label="Назад" onClick={blankOpen ? () => setBlankOpen(false) : onBack}>
           <IconBack />
         </button>
         <div className="test-settings__peer">
           <img className="test-settings__icon" src={test.icon} alt="" />
           <div className="test-settings__who">
             <h1 className="test-settings__name">{shortTitle(test.title)}</h1>
-            <p className="test-settings__status">Настройка теста</p>
+            <p className="test-settings__status">{blankOpen ? 'Бланк тестирования' : 'Настройка теста'}</p>
           </div>
         </div>
         <button
@@ -144,6 +149,12 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </button>
       </header>
 
+      {blankOpen && blank ? (
+        <div className="test-settings__scroll" key="blank">
+          <TestBlank data={blank} />
+        </div>
+      ) : (
+      <>
       <div className="test-settings__scroll">
         <article className="ts-card ts-card--text">
           {data.intro.split('\n\n').map((paragraph, i) => {
@@ -180,7 +191,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         {data.scales && (
           <>
             <ul className="ts-card ts-card--wide-dividers">
-              <li className="ts-row ts-row--link">
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={() => (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'))}
+                onKeyDown={(e) => e.key === 'Enter' && (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'))}
+              >
                 <IconTestBlank className="ts-row__icon" />
                 <span className="ts-row__link">Бланк тестирования</span>
                 <IconTestChevron className="ts-row__chevron" />
@@ -314,6 +331,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           Провести тест
         </button>
       </div>
+      </>
+      )}
 
       {toast && (
         <p className="test-settings__toast" role="status">
