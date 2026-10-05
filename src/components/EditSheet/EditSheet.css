@@ -54,6 +54,8 @@
   min-height: 0;
   padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
+  /* Прокручиваемое плавно уходит под верхний край панели, а не обрезается резко */
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
   scrollbar-width: none; /* полоса прокрутки не сдвигает края: слева и справа ровно 16 */
 }
 
@@ -134,6 +136,34 @@
   line-height: 20px;
 }
 
+/* Сворачивание сеток: строка 0fr → 1fr даёт плавную высоту без измерений в скрипте */
+.sheet__collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.sheet__collapse--open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.sheet__collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet__collapse,
+  .sheet__collapse--open {
+    transition: none;
+  }
+}
+
 /* Сетки иконок и цветов: отступ 8 от краёв карточки, 8 в ряд по 36,
    промежуток между ними растягивается равномерно, вертикальный отступ равен ему */
 .sheet__icons,
@@ -171,17 +201,19 @@
   border-color: var(--color-accent);
 }
 
-/* Цветной кружок 36 */
+/* Цвет: ячейка 36, как у иконки; кружок 28, выбранный обведён кольцом до границ ячейки */
 .sheet__tone {
   width: 36px;
   height: 36px;
+  padding: 2px;
+  border: 2px solid transparent;
   border-radius: var(--radius-full);
   background: var(--head-fg);
+  background-clip: content-box;
 }
 
 .sheet__tone--active {
-  outline: 2px solid var(--head-fg);
-  outline-offset: 2px;
+  border-color: var(--head-fg);
 }
 
 /* Строки «Общей информации»: подпись слева, значение справа, как в карточке */

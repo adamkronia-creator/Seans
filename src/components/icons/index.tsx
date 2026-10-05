@@ -156,3 +156,4 @@ export { default as IconFmtNumbers } from '../../assets/icons/format/list-number
 export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?react';
 export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
 export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
+export { default as IconFmtHighlight } from '../../assets/icons/format/highlight.svg?react';

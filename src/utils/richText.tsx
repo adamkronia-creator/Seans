@@ -3,7 +3,7 @@ import './rich.css';
 
 /*
  * Форматированный текст хранится обычной строкой с мини-разметкой:
- *   **жирный**  *курсив*  __подчёркнутый__  ~~зачёркнутый~~
+ *   **жирный**  *курсив*  __подчёркнутый__  ~~зачёркнутый~~  ==маркер==
  *   «• » — маркированный пункт, «1. » — нумерованный, «> » — цитата (по одной строке на пункт).
  * Блоки разделяет пустая строка. Спецсимволы в обычном тексте экранируются обратной косой чертой.
  */
@@ -71,7 +71,7 @@ export function serializeBlocks(blocks: RichBlock[]): string {
 
 // ——— Разметка → React ———
 
-const INLINE = /\\([\\*_~>•\d])|\*\*(?!\s)([^]+?)(?<!\s)\*\*|__(?!\s)([^]+?)(?<!\s)__|~~(?!\s)([^]+?)(?<!\s)~~|\*(?![\s*])([^]*?)(?<!\s)\*/;
+const INLINE = /\\([\\*_~=>•\d])|\*\*(?!\s)([^]+?)(?<!\s)\*\*|__(?!\s)([^]+?)(?<!\s)__|~~(?!\s)([^]+?)(?<!\s)~~|==(?!\s)([^]+?)(?<!\s)==|\*(?![\s*])([^]*?)(?<!\s)\*/;
 
 /** Разбирает строку с разметкой в узлы; перенос строки — <br> */
 export function renderInline(src: string, key = ''): ReactNode[] {
@@ -90,7 +90,8 @@ export function renderInline(src: string, key = ''): ReactNode[] {
     else if (m[2] !== undefined) out.push(<strong key={k}>{renderInline(m[2], k + '.')}</strong>);
     else if (m[3] !== undefined) out.push(<u key={k}>{renderInline(m[3], k + '.')}</u>);
     else if (m[4] !== undefined) out.push(<s key={k}>{renderInline(m[4], k + '.')}</s>);
-    else out.push(<em key={k}>{renderInline(m[5], k + '.')}</em>);
+    else if (m[5] !== undefined) out.push(<mark key={k} className="rich-mark">{renderInline(m[5], k + '.')}</mark>);
+    else out.push(<em key={k}>{renderInline(m[6], k + '.')}</em>);
     rest = rest.slice(m.index + m[0].length);
   }
   return out;
@@ -138,6 +139,9 @@ export function RichBlocks({ blocks, textClass, listClass }: BlocksProps) {
 
 // ——— Разметка → HTML для редактора ———
 
+/** Цвет маркера в редакторе (в карточках — тот же из rich.css) */
+export const HILITE = '#FFEB99';
+
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 function inlineHtml(src: string): string {
@@ -154,7 +158,8 @@ function inlineHtml(src: string): string {
     else if (m[2] !== undefined) out += `<b>${inlineHtml(m[2])}</b>`;
     else if (m[3] !== undefined) out += `<u>${inlineHtml(m[3])}</u>`;
     else if (m[4] !== undefined) out += `<strike>${inlineHtml(m[4])}</strike>`;
-    else out += `<i>${inlineHtml(m[5])}</i>`;
+    else if (m[5] !== undefined) out += `<span style="background-color: ${HILITE}">${inlineHtml(m[5])}</span>`;
+    else out += `<i>${inlineHtml(m[6])}</i>`;
     rest = rest.slice(m.index + m[0].length);
   }
   return out;
@@ -173,7 +178,7 @@ export function textToHtml(text: string): string {
 
 // ——— DOM редактора → разметка ———
 
-const escText = (s: string) => s.replace(/[\\*_~]/g, '\\$&');
+const escText = (s: string) => s.replace(/[\\*_~=]/g, '\\$&');
 
 /** Пробелы по краям выносятся за скобки разметки: «** слово**» не разберётся обратно */
 function wrap(mark: string, inner: string): string {
@@ -182,7 +187,7 @@ function wrap(mark: string, inner: string): string {
 }
 
 function inlineText(node: Node): string {
-  if (node.nodeType === Node.TEXT_NODE) return escText((node.textContent ?? '').replace(/ /g, ' '));
+  if (node.nodeType === Node.TEXT_NODE) return escText((node.textContent ?? '').replace(/\u200b/g, '').replace(/\u00a0/g, ' '));
   if (!(node instanceof HTMLElement)) return '';
   if (node.tagName === 'BR') return '\n';
   const inner = [...node.childNodes].map(inlineText).join('');
@@ -192,6 +197,8 @@ function inlineText(node: Node): string {
   if (tag === 'B' || tag === 'STRONG' || /^(bold|[6-9]00)$/.test(style.fontWeight)) out = wrap('**', out);
   if (tag === 'I' || tag === 'EM' || style.fontStyle === 'italic') out = wrap('*', out);
   if (tag === 'U' || /underline/.test(style.textDecorationLine || style.textDecoration)) out = wrap('__', out);
+  const bg = style.backgroundColor;
+  if (bg && bg !== 'transparent' && !/rgba\(0, 0, 0, 0\)/.test(bg)) out = wrap('==', out);
   if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL' || /line-through/.test(style.textDecorationLine || style.textDecoration))
     out = wrap('~~', out);
   return out;

@@ -34,6 +34,15 @@ interface EditSheetProps {
   onClose: () => void;
 }
 
+/** Плавно сворачиваемый блок: высота анимируется от 0 до содержимого */
+function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
+  return (
+    <div className={`sheet__collapse${open ? ' sheet__collapse--open' : ''}`} aria-hidden={!open}>
+      <div className="sheet__collapse-inner">{children}</div>
+    </div>
+  );
+}
+
 /** Textarea, которая растёт по тексту: виден весь текст без внутренней прокрутки */
 function AutoTextarea({
   value,
@@ -141,7 +150,7 @@ export function EditSheet({
                   <span className="sheet__toggle-label" id={`${uid}-icon`}>Иконка</span>
                   <Switch checked={iconOn} onChange={setIconOn} label="Иконка" />
                 </div>
-                {iconOn && (
+                <Collapse open={iconOn}>
                   <div className="sheet__icons" role="radiogroup" aria-labelledby={`${uid}-icon`}>
                     {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
                       const { Icon, label, size } = HEAD_ICONS[id];
@@ -162,7 +171,7 @@ export function EditSheet({
                       );
                     })}
                   </div>
-                )}
+                </Collapse>
               </section>
 
               <section className="sheet__card">
@@ -171,7 +180,7 @@ export function EditSheet({
                   <span className="sheet__toggle-label" id={`${uid}-tone`}>Цвет</span>
                   <Switch checked={toneOn} onChange={setToneOn} label="Цвет шапки" />
                 </div>
-                {toneOn && (
+                <Collapse open={toneOn}>
                   <div className="sheet__tones" role="radiogroup" aria-labelledby={`${uid}-tone`}>
                     {TONES.map(({ id, label, bg, fg }) => (
                       <button
@@ -186,7 +195,7 @@ export function EditSheet({
                       />
                     ))}
                   </div>
-                )}
+                </Collapse>
               </section>
             </>
           )}

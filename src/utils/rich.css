@@ -46,7 +46,6 @@
   margin: 0;
   padding-left: 12px;
   border-left: 2px solid var(--color-stroke);
-  color: var(--color-text-secondary);
 }
 
 .rich-editor p,
@@ -57,4 +56,9 @@
 .rich-editor :is(p, ul, ol, blockquote) + :is(p, ul, ol, blockquote),
 .rich-editor p > :is(ul, ol, blockquote, p) {
   margin-top: 12px;
+}
+
+.rich-mark {
+  background: #ffeb99;
+  color: inherit;
 }

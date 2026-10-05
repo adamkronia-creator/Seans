@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Clipboa
 import {
   IconFmtBold,
   IconFmtBullets,
+  IconFmtHighlight,
   IconFmtItalic,
   IconFmtNumbers,
   IconFmtQuote,
@@ -10,7 +11,7 @@ import {
   IconFmtUnderline,
   IconFmtUndo,
 } from '../icons';
-import { domToText, textToHtml } from '../../utils/richText';
+import { domToText, HILITE, textToHtml } from '../../utils/richText';
 import './RichEditor.css';
 
 /** Позиция курсора как число символов от начала поля: переживает перестройку разметки */
@@ -42,11 +43,47 @@ function placeCaret(root: HTMLElement, offset: number) {
   sel?.addRange(range);
 }
 
+/** Курсор или выделение стоят в тексте с маркером */
+function insideHighlight(root: HTMLElement): boolean {
+  const sel = window.getSelection();
+  let node: Node | null = sel?.anchorNode ?? null;
+  if (node?.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  for (; node && node !== root; node = node.parentNode) {
+    if (node instanceof HTMLElement) {
+      const bg = node.style.backgroundColor;
+      if (bg) return bg !== 'transparent' && !/rgba\(0, 0, 0, 0\)/.test(bg);
+    }
+  }
+  return false;
+}
+
+/** Курсор в конце маркера: переносим его за маркер (в невидимый символ), дальше текст идёт без выделения */
+function leaveHighlight(root: HTMLElement): boolean {
+  const sel = window.getSelection();
+  if (!sel || !sel.isCollapsed || !sel.anchorNode) return false;
+  let span: Node | null = sel.anchorNode.nodeType === Node.TEXT_NODE ? sel.anchorNode.parentNode : sel.anchorNode;
+  while (span && span !== root && !(span instanceof HTMLElement && span.style.backgroundColor)) span = span.parentNode;
+  if (!span || span === root) return false;
+  const r = document.createRange();
+  r.selectNodeContents(span);
+  r.setStart(sel.anchorNode, sel.anchorOffset);
+  if (r.toString() !== '') return false; // курсор не в конце
+  const gap = document.createTextNode('\u200b');
+  span.parentNode!.insertBefore(gap, span.nextSibling);
+  const next = document.createRange();
+  next.setStart(gap, 1);
+  next.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(next);
+  return true;
+}
+
 type Tool =
   | 'bold'
   | 'italic'
   | 'underline'
   | 'strike'
+  | 'highlight'
   | 'bullets'
   | 'numbers'
   | 'quote'
@@ -58,6 +95,7 @@ const TOOLS: { id: Tool; label: string; Icon: ComponentType<SVGProps<SVGSVGEleme
   { id: 'italic', label: 'Курсив', Icon: IconFmtItalic, command: 'italic' },
   { id: 'underline', label: 'Подчёркнутый', Icon: IconFmtUnderline, command: 'underline' },
   { id: 'strike', label: 'Зачёркнутый', Icon: IconFmtStrike, command: 'strikeThrough' },
+  { id: 'highlight', label: 'Выделить маркером', Icon: IconFmtHighlight },
   { id: 'bullets', label: 'Список с точками', Icon: IconFmtBullets, command: 'insertUnorderedList' },
   { id: 'numbers', label: 'Нумерованный список', Icon: IconFmtNumbers, command: 'insertOrderedList' },
   { id: 'quote', label: 'Цитата', Icon: IconFmtQuote },
@@ -80,6 +118,7 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
   const ref = useRef<HTMLDivElement>(null);
   const [empty, setEmpty] = useState(initial.trim() === '');
   const [state, setState] = useState<ToolState>({});
+  const pendingHl = useRef<boolean | null>(null);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -100,6 +139,7 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
       strike: document.queryCommandState('strikeThrough'),
+      highlight: pendingHl.current ?? insideHighlight(el),
       bullets: document.queryCommandState('insertUnorderedList'),
       numbers: document.queryCommandState('insertOrderedList'),
       quote: !!node?.closest('blockquote'),
@@ -127,7 +167,12 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
     if (!el) return;
     if (document.activeElement !== el) el.focus({ preventScroll: true });
     const caret = caretOffset(el);
-    if (tool.id === 'quote') {
+    if (tool.id === 'highlight') {
+      const on = pendingHl.current ?? insideHighlight(el);
+      if (!(on && leaveHighlight(el))) document.execCommand('hiliteColor', false, on ? 'transparent' : HILITE);
+      // Без выделения Chrome не отдаёт состояние маркера для ещё не набранного текста: помним сами
+      pendingHl.current = window.getSelection()?.isCollapsed ? !on : null;
+    } else if (tool.id === 'quote') {
       const sel = window.getSelection();
       const node = sel?.anchorNode instanceof Element ? sel.anchorNode : sel?.anchorNode?.parentElement;
       document.execCommand('formatBlock', false, node?.closest('blockquote') ? 'p' : 'blockquote');
@@ -157,6 +202,7 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
 
   // Enter на пустой строке цитаты выводит из цитаты, как в списках
   const onKeyDown = (e: KeyboardEvent) => {
+    if (/^(Arrow|Home|End|Page)/.test(e.key)) pendingHl.current = null;
     if (e.key !== 'Enter' || e.shiftKey) return;
     const sel = window.getSelection();
     const node = sel?.anchorNode instanceof Element ? sel.anchorNode : sel?.anchorNode?.parentElement;
@@ -207,7 +253,10 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
         onPaste={onPaste}
         onKeyDown={onKeyDown}
         onKeyUp={readState}
-        onMouseUp={readState}
+        onMouseUp={() => {
+          pendingHl.current = null;
+          readState();
+        }}
       />
     </>
   );
