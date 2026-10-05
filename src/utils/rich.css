@@ -57,8 +57,3 @@
 .rich-editor p > :is(ul, ol, blockquote, p) {
   margin-top: 12px;
 }
-
-.rich-mark {
-  background: #ffeb99;
-  color: inherit;
-}
