@@ -188,7 +188,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           })}
         </article>
 
-        {data.scales && (
+        {(data.scales || blank) && (
           <>
             <ul className="ts-card ts-card--wide-dividers">
               <li
@@ -202,13 +202,16 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 <span className="ts-row__link">Бланк тестирования</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
-              <li className="ts-row ts-row--link">
-                <IconTestConclusion className="ts-row__icon" />
-                <span className="ts-row__link">Пример заключения</span>
-                <IconTestChevron className="ts-row__chevron" />
-              </li>
+              {data.scales && (
+                <li className="ts-row ts-row--link">
+                  <IconTestConclusion className="ts-row__icon" />
+                  <span className="ts-row__link">Пример заключения</span>
+                  <IconTestChevron className="ts-row__chevron" />
+                </li>
+              )}
             </ul>
 
+            {data.scales && (
             <ul className="ts-card ts-card--wide-dividers">
               <li className="ts-row ts-row--top">
                 <IconTestScalesMain className="ts-row__icon" />
@@ -255,6 +258,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 </li>
               )}
             </ul>
+            )}
           </>
         )}
 

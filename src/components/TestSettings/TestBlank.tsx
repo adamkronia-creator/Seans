@@ -46,7 +46,9 @@ export function TestBlank({ data }: { data: TestBlankData }) {
               <ul className="blank-answers">
                 {q.answers.map((answer, j) => (
                   <li key={j} className="blank-answer">
-                    <span className={`blank-answer__dot blank-answer__dot--${ANSWER_TONES[j]}`} aria-hidden="true" />
+                    {data.tones && (
+                      <span className={`blank-answer__dot blank-answer__dot--${ANSWER_TONES[j]}`} aria-hidden="true" />
+                    )}
                     {j + 1}. {answer}
                   </li>
                 ))}
