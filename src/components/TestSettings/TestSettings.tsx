@@ -19,6 +19,7 @@ import {
   IconTestScoring,
   IconTestTime,
 } from '../icons';
+import { Switch } from '../Switch/Switch';
 import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
@@ -47,19 +48,6 @@ function Row({ Icon, label, children }: { Icon: Svg; label: string; children?: R
       <span className="ts-row__label">{label}</span>
       {children}
     </li>
-  );
-}
-
-function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      className={`ts-switch${checked ? ' ts-switch--on' : ''}`}
-      onClick={() => onChange(!checked)}
-    />
   );
 }
 

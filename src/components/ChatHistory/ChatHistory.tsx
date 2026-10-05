@@ -274,7 +274,6 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
                   ? ''
                   : (editing.comment ?? ''),
           }}
-          textLabel={editing.kind === 'test' || editing.kind === 'task' ? 'Комментарий' : 'Текст'}
           textPlaceholder={
             editing.kind === 'session'
               ? 'Что произошло на сеансе. Абзацы разделяйте пустой строкой'

@@ -311,37 +311,6 @@
   font-size: 16px;
 }
 
-/* Переключатель 37×20, ползунок 16 */
-.ts-switch {
-  position: relative;
-  flex-shrink: 0;
-  width: 37px;
-  height: 20px;
-  border-radius: 10px;
-  background: #d0d5db;
-  transition: background 0.15s;
-}
-
-.ts-switch::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: var(--radius-full);
-  background: #fff;
-  transition: transform 0.15s;
-}
-
-.ts-switch--on {
-  background: var(--color-accent);
-}
-
-.ts-switch--on::after {
-  transform: translateX(17px);
-}
-
 /* Кнопка над нижней панелью: белая полоса с разделителем, кнопка 40, как кнопки панелей */
 .test-settings__cta {
   flex-shrink: 0;

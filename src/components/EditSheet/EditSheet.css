@@ -6,20 +6,32 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgb(0 0 0 / 40%);
+  background: rgb(0 0 0 / 50%);
 }
 
+/* Панель на фоне приложения, карточки внутри белые; верхние углы 24 */
 .sheet {
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 480px;
   max-height: 92dvh;
-  border-radius: 16px 16px 0 0;
-  background: var(--color-bg-panel);
+  border-radius: 24px 24px 0 0;
+  background: var(--color-bg-app);
   font-family: var(--font-family);
 }
 
+/* Ручка 40×4: сверху 4 */
+.sheet__grab {
+  flex-shrink: 0;
+  width: 40px;
+  height: 4px;
+  margin: 4px auto 0;
+  border-radius: 2px;
+  background: rgb(129 140 153 / 50%);
+}
+
+/* Заголовок есть только у окон выбора (отправка теста) */
 .sheet__header {
   flex-shrink: 0;
   padding: var(--space-4) var(--space-4) var(--space-2);
@@ -33,13 +45,14 @@
   text-align: center;
 }
 
+/* Содержимое: от ручки 12, по бокам 16, между блоками 12 */
 .sheet__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   min-height: 0;
-  padding: var(--space-2) var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
   scrollbar-width: none; /* полоса прокрутки не сдвигает края: слева и справа ровно 16 */
 }
@@ -48,7 +61,7 @@
   display: none;
 }
 
-/* Так шапка будет выглядеть в карточке */
+/* Шапка карточки, как она будет выглядеть; заголовок вводится прямо в ней */
 .sheet__preview {
   display: flex;
   flex-shrink: 0;
@@ -71,77 +84,73 @@
   font-size: 22px;
 }
 
-.sheet__preview-title {
+.sheet__preview-input {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-lg);
-  line-height: 22px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sheet__field {
-  container-type: inline-size; /* ширина поля нужна сеткам иконок и цветов (cqw) */
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Подпись 14/14; слева 13 (рамка 1 + внутренний отступ 12), чтобы шла ровно с текстом в поле */
-.sheet__label {
-  padding-left: 13px;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: 14px;
-}
-
-.sheet__input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  border: 1px solid var(--color-stroke);
-  border-radius: 12px;
-  background: var(--color-bg-panel);
-  color: var(--color-text-primary);
-  font-family: inherit;
-  font-size: var(--font-size-md);
-  line-height: 19px;
+  padding: 0;
+  border: 0;
   outline: 0;
   overflow: hidden;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-lg);
+  line-height: 22px;
   resize: none;
 }
 
-.sheet__input--line {
-  height: 40px;
-}
-
-.sheet__input--text {
-  min-height: 96px;
-}
-
-.sheet__input:focus {
-  border-color: var(--color-accent);
-}
-
-.sheet__input::placeholder {
+.sheet__preview-input::placeholder {
   color: var(--color-text-caption);
 }
 
-.sheet__icons {
-  /* Края рядов вровень с краями полей; промежуток между иконками равномерно растягивается,
-     вертикальный отступ между рядами равен ему */
-  --cols: 7;
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 44px);
-  justify-content: space-between;
-  row-gap: calc((100cqw - var(--cols) * 44px) / (var(--cols) - 1));
+/* Белые карточки: радиус 12, тень, как в остальных экранах; ширина нужна сеткам (cqw) */
+.sheet__card {
+  container-type: inline-size;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
-@container (max-width: 307px) {
-  .sheet__icons {
-    --cols: 6;
+/* Строка с переключателем: 48, иконка 24, подпись, переключатель справа */
+.sheet__toggle-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 48px;
+  padding: 0 var(--space-3);
+}
+
+.sheet__toggle-icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.sheet__toggle-label {
+  flex: 1;
+  font-size: var(--font-size-md);
+  line-height: 20px;
+}
+
+/* Сетки иконок и цветов: отступ 8 от краёв карточки, 8 в ряд по 36,
+   промежуток между ними растягивается равномерно, вертикальный отступ равен ему */
+.sheet__icons,
+.sheet__tones {
+  --cols: 8;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 36px);
+  justify-content: space-between;
+  row-gap: calc((100cqw - 16px - var(--cols) * 36px) / (var(--cols) - 1));
+  padding: 8px;
+  border-top: 1px solid var(--color-divider);
+}
+
+@container (max-width: 331px) {
+  .sheet__icons,
+  .sheet__tones {
+    --cols: 7;
   }
 }
 
@@ -149,8 +158,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--color-stroke);
   border-radius: 12px;
   /* Иконки окрашены в выбранный цвет шапки */
@@ -162,24 +171,10 @@
   border-color: var(--color-accent);
 }
 
-.sheet__tones {
-  --cols: 8;
-  display: grid;
-  grid-template-columns: repeat(var(--cols), 32px);
-  justify-content: space-between;
-  row-gap: calc((100cqw - var(--cols) * 32px) / (var(--cols) - 1));
-}
-
-@container (max-width: 275px) {
-  .sheet__tones {
-    --cols: 7;
-  }
-}
-
-/* Цветной кружок: фон шапки с цветной обводкой цвета иконки */
+/* Цветной кружок 36 */
 .sheet__tone {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   background: var(--head-fg);
 }
@@ -189,12 +184,83 @@
   outline-offset: 2px;
 }
 
+/* Строки «Общей информации»: подпись слева, значение справа, как в карточке */
+.sheet__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-3);
+}
+
+.sheet__row + .sheet__row {
+  margin-top: 1px;
+}
+
+.sheet__row + .sheet__row::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: var(--space-3);
+  left: var(--space-3);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.sheet__row-label {
+  flex-shrink: 0;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.sheet__row-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: 20px;
+  text-align: right;
+}
+
+/* Текст: поле без рамки внутри карточки, 16/19, отступы 12 */
+.sheet__text {
+  padding: var(--space-3);
+}
+
+.sheet__text-input {
+  display: block;
+  width: 100%;
+  min-height: 57px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  background: none;
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: 19px;
+  resize: none;
+}
+
+.sheet__text-input::placeholder,
+.sheet__row-input::placeholder {
+  color: var(--color-text-caption);
+}
+
 .sheet__footer {
   display: flex;
   flex-shrink: 0;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .sheet__button {

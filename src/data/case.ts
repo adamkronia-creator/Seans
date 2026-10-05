@@ -32,9 +32,10 @@ export type CaseBlock =
 export interface CaseSection {
   id: string;
   title: string;
-  icon: CaseIconId;
-  /** Цвет шапки: синий по умолчанию, коричневый у клинической гипотезы; можно менять в редакторе */
-  tone: ToneId;
+  /** null — иконка отключена в редакторе */
+  icon: CaseIconId | null;
+  /** Цвет шапки: синий по умолчанию, коричневый у клинической гипотезы; null — шапка без цвета (белая) */
+  tone: ToneId | null;
   /** Для «Общей информации»: строки «название — значение» */
   rows?: { icon: CaseRowIconId; label: string; value: string }[];
   /** Для текстовых разделов */

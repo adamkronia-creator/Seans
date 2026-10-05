@@ -8,8 +8,8 @@ export interface CaseNote {
   title: string;
   paragraphs: string[];
   /** Иконка и цвет шапки: по умолчанию булавка на фиолетовом, меняются в редакторе */
-  icon: CaseIconId;
-  tone: ToneId;
+  icon: CaseIconId | null;
+  tone: ToneId | null;
   /** Дата последнего обновления */
   updated: string;
 }

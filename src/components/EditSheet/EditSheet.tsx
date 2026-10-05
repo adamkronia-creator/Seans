@@ -1,6 +1,8 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { HEAD_ICONS } from '../ChatCase/caseIcons';
+import { IconSheetIcon, IconSheetPalette } from '../icons';
+import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
 import { TONES, toneOf, type ToneId } from '../../data/tones';
 import './EditSheet.css';
@@ -8,19 +10,22 @@ import './EditSheet.css';
 export interface EditValues {
   title?: string;
   text?: string;
-  icon?: CaseIconId;
-  tone?: ToneId;
+  /** null — иконка выключена */
+  icon?: CaseIconId | null;
+  /** null — шапка без цвета */
+  tone?: ToneId | null;
   /** Значения строк «Общей информации», в том же порядке */
   rows?: string[];
 }
 
 interface EditSheetProps {
+  /** Название окна для экранных читалок; на экране заголовка нет */
   heading: string;
   /** Что показывать: поле появляется, если для него есть начальное значение */
   initial: EditValues;
   /** Подписи строк «Общей информации» */
   rowLabels?: string[];
-  textLabel?: string;
+  /** Подсказка в пустом поле текста (подписей над полями нет) */
   textPlaceholder?: string;
   /** Заголовок обязателен (для сведений и заметок), текст — нет */
   titleRequired?: boolean;
@@ -49,12 +54,11 @@ function AutoTextarea({
   return <textarea ref={ref} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />;
 }
 
-/** Нижняя панель редактирования: заголовок, текст, иконка и цвет шапки */
+/** Нижняя панель редактирования: заголовок прямо в шапке-превью, иконка, цвет, строки и текст */
 export function EditSheet({
   heading,
   initial,
   rowLabels,
-  textLabel = 'Текст',
   textPlaceholder,
   titleRequired = true,
   onSave,
@@ -62,8 +66,11 @@ export function EditSheet({
 }: EditSheetProps) {
   const [title, setTitle] = useState(initial.title ?? '');
   const [text, setText] = useState(initial.text ?? '');
-  const [icon, setIcon] = useState<CaseIconId | undefined>(initial.icon);
-  const [tone, setTone] = useState<ToneId | undefined>(initial.tone);
+  // Выбор иконки и цвета помнится, пока переключатель выключен: включил снова — всё на месте
+  const [icon, setIcon] = useState<CaseIconId>(initial.icon ?? 'pin');
+  const [tone, setTone] = useState<ToneId>(initial.tone ?? 'blue');
+  const [iconOn, setIconOn] = useState(initial.icon !== null);
+  const [toneOn, setToneOn] = useState(initial.tone !== null);
   const [rows, setRows] = useState(initial.rows ?? []);
   const uid = useId();
 
@@ -80,7 +87,7 @@ export function EditSheet({
 
   const hasTitle = initial.title !== undefined;
   const hasText = initial.text !== undefined;
-  const hasLook = icon !== undefined && tone !== undefined;
+  const hasLook = initial.icon !== undefined && initial.tone !== undefined;
   const canSave = !hasTitle || !titleRequired || title.trim().length > 0;
 
   const save = () => {
@@ -88,124 +95,131 @@ export function EditSheet({
     onSave({
       ...(hasTitle ? { title: title.trim() } : {}),
       ...(hasText ? { text: text.trim() } : {}),
-      ...(hasLook ? { icon, tone } : {}),
+      ...(hasLook ? { icon: iconOn ? icon : null, tone: toneOn ? tone : null } : {}),
       ...(initial.rows ? { rows: rows.map((r) => r.trim()) } : {}),
     });
   };
 
-  const current = tone ? toneOf(tone) : undefined;
-  const PreviewIcon = icon ? HEAD_ICONS[icon].Icon : undefined;
-  const previewSize = icon ? HEAD_ICONS[icon].size : 22;
+  const current = toneOf(toneOn ? tone : null);
+  const PreviewIcon = iconOn ? HEAD_ICONS[icon].Icon : undefined;
+  const previewSize = iconOn ? HEAD_ICONS[icon].size : 22;
 
   return createPortal(
     <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={heading}>
-        <div className="sheet__header">
-          <h2 className="sheet__heading">{heading}</h2>
-        </div>
+        <div className="sheet__grab" aria-hidden="true" />
 
         <div className="sheet__body">
-          {hasLook && current && PreviewIcon && (
+          {hasTitle && (
             <div
               className="sheet__preview"
               style={{ '--head-bg': current.bg, '--head-fg': current.fg } as CSSProperties}
             >
-              <span className="sheet__preview-icon" style={{ fontSize: previewSize }}>
-                <PreviewIcon />
-              </span>
-              <span className="sheet__preview-title">{title.trim() || 'Заголовок'}</span>
-            </div>
-          )}
-
-          {hasTitle && (
-            <label className="sheet__field">
-              <span className="sheet__label">Заголовок</span>
+              {PreviewIcon && (
+                <span className="sheet__preview-icon" style={{ fontSize: previewSize }}>
+                  <PreviewIcon />
+                </span>
+              )}
               <AutoTextarea
-                className="sheet__input"
+                className="sheet__preview-input"
                 rows={1}
                 value={title}
                 onChange={(v) => setTitle(v.replace(/\n/g, ' '))}
                 placeholder="Заголовок"
+                aria-label="Заголовок"
                 autoComplete="off"
               />
-            </label>
+            </div>
           )}
 
           {hasLook && (
             <>
-              <div
-                className="sheet__field"
-                role="radiogroup"
-                aria-labelledby={`${uid}-icon`}
-                style={{ '--head-fg': current?.fg } as CSSProperties}
-              >
-                <span className="sheet__label" id={`${uid}-icon`}>Иконка</span>
-                <div className="sheet__icons">
-                  {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
-                    const { Icon, label, size } = HEAD_ICONS[id];
-                    const active = id === icon;
-                    return (
+              <section className="sheet__card" style={{ '--head-fg': current.fg } as CSSProperties}>
+                <div className="sheet__toggle-row">
+                  <IconSheetIcon className="sheet__toggle-icon" />
+                  <span className="sheet__toggle-label" id={`${uid}-icon`}>Иконка</span>
+                  <Switch checked={iconOn} onChange={setIconOn} label="Иконка" />
+                </div>
+                {iconOn && (
+                  <div className="sheet__icons" role="radiogroup" aria-labelledby={`${uid}-icon`}>
+                    {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
+                      const { Icon, label, size } = HEAD_ICONS[id];
+                      const active = id === icon;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          aria-label={label}
+                          className={`sheet__icon${active ? ' sheet__icon--active' : ''}`}
+                          style={{ fontSize: size }}
+                          onClick={() => setIcon(id)}
+                        >
+                          <Icon />
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+
+              <section className="sheet__card">
+                <div className="sheet__toggle-row">
+                  <IconSheetPalette className="sheet__toggle-icon" />
+                  <span className="sheet__toggle-label" id={`${uid}-tone`}>Цвет</span>
+                  <Switch checked={toneOn} onChange={setToneOn} label="Цвет шапки" />
+                </div>
+                {toneOn && (
+                  <div className="sheet__tones" role="radiogroup" aria-labelledby={`${uid}-tone`}>
+                    {TONES.map(({ id, label, bg, fg }) => (
                       <button
                         key={id}
                         type="button"
                         role="radio"
-                        aria-checked={active}
+                        aria-checked={id === tone}
                         aria-label={label}
-                        className={`sheet__icon${active ? ' sheet__icon--active' : ''}`}
-                        style={{ fontSize: size }}
-                        onClick={() => setIcon(id)}
-                      >
-                        <Icon />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="sheet__field" role="radiogroup" aria-labelledby={`${uid}-tone`}>
-                <span className="sheet__label" id={`${uid}-tone`}>Цвет шапки</span>
-                <div className="sheet__tones">
-                  {TONES.map(({ id, label, bg, fg }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      role="radio"
-                      aria-checked={id === tone}
-                      aria-label={label}
-                      className={`sheet__tone${id === tone ? ' sheet__tone--active' : ''}`}
-                      style={{ '--head-bg': bg, '--head-fg': fg } as CSSProperties}
-                      onClick={() => setTone(id)}
-                    />
-                  ))}
-                </div>
-              </div>
+                        className={`sheet__tone${id === tone ? ' sheet__tone--active' : ''}`}
+                        style={{ '--head-bg': bg, '--head-fg': fg } as CSSProperties}
+                        onClick={() => setTone(id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
             </>
           )}
 
-          {initial.rows &&
-            rowLabels?.map((label, i) => (
-              <label key={label} className="sheet__field">
-                <span className="sheet__label">{label}</span>
-                <input
-                  className="sheet__input sheet__input--line"
-                  value={rows[i] ?? ''}
-                  onChange={(e) => setRows(rows.map((r, j) => (j === i ? e.target.value : r)))}
-                  autoComplete="off"
-                />
-              </label>
-            ))}
+          {initial.rows && rowLabels && (
+            <ul className="sheet__card sheet__rows">
+              {rowLabels.map((label, i) => (
+                <li key={label} className="sheet__row">
+                  <label className="sheet__row-label" htmlFor={`${uid}-row-${i}`}>
+                    {label}
+                  </label>
+                  <input
+                    id={`${uid}-row-${i}`}
+                    className="sheet__row-input"
+                    value={rows[i] ?? ''}
+                    onChange={(e) => setRows(rows.map((r, j) => (j === i ? e.target.value : r)))}
+                    autoComplete="off"
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
 
           {hasText && (
-            <label className="sheet__field">
-              <span className="sheet__label">{textLabel}</span>
+            <section className="sheet__card sheet__text">
               <AutoTextarea
-                className="sheet__input sheet__input--text"
-                rows={4}
+                className="sheet__text-input"
+                rows={3}
                 value={text}
                 onChange={setText}
                 placeholder={textPlaceholder}
+                aria-label={heading}
               />
-            </label>
+            </section>
           )}
         </div>
 

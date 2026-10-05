@@ -141,3 +141,7 @@ export { default as IconTestChevron } from '../../assets/icons/test/chevron-righ
 export { default as IconTestChevronDown } from '../../assets/icons/test/chevron-down.svg?react';
 export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.svg?react';
 export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';
+
+// Окно редактирования: строки «Иконка» и «Цвет»
+export { default as IconSheetIcon } from '../../assets/icons/sheet/icon-picker.svg?react';
+export { default as IconSheetPalette } from '../../assets/icons/sheet/palette.svg?react';

@@ -35,7 +35,7 @@ const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
 type SegmentId = 'info' | 'notes' | 'materials';
 
 function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
-  const { Icon, size } = HEAD_ICONS[section.icon];
+  const head = section.icon ? HEAD_ICONS[section.icon] : null;
   // Двойной клик/касание: быстрая правка текста на месте; полный редактор открывает карандаш
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick);
@@ -43,9 +43,11 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
   return (
     <li className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head" style={toneStyle(section.tone)}>
-        <span className="case-card__icon" style={{ fontSize: size }}>
-          <Icon />
-        </span>
+        {head && (
+          <span className="case-card__icon" style={{ fontSize: head.size }}>
+            <head.Icon />
+          </span>
+        )}
         <TruncatedText className="case-card__title" text={section.title} />
         <button
           type="button"
@@ -174,15 +176,17 @@ function FileCard({ file }: { file: CaseFile }) {
 }
 
 function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
-  const { Icon, size } = HEAD_ICONS[note.icon];
+  const head = note.icon ? HEAD_ICONS[note.icon] : null;
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
   return (
     <li className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
-        <span className="case-card__icon" style={{ fontSize: size }}>
-          <Icon />
-        </span>
+        {head && (
+          <span className="case-card__icon" style={{ fontSize: head.size }}>
+            <head.Icon />
+          </span>
+        )}
         <TruncatedText className="case-card__title" text={note.title} />
         <button type="button" className="case-card__edit" aria-label="Изменить заметку" onClick={onEdit}>
           <IconCaseEdit />

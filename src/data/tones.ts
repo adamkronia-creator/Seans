@@ -45,4 +45,8 @@ export const TONES = [
   tone('slate', 'Графитовый', 'slate'),
 ];
 
-export const toneOf = (id: ToneId) => TONES.find((t) => t.id === id) ?? TONES[0];
+/** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
+export const NEUTRAL_TONE = { id: null, label: 'Без цвета', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
+
+export const toneOf = (id: ToneId | null) =>
+  id === null ? NEUTRAL_TONE : (TONES.find((t) => t.id === id) ?? TONES[0]);
