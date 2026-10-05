@@ -94,7 +94,16 @@
   padding: var(--space-3);
   font-size: var(--font-size-md);
   line-height: 22px;
+}
+
+/* Между абзацами промежуток 12, а не пустая строка; переносы внутри абзаца сохраняются */
+.ts-card__paragraph {
+  margin: 0;
   white-space: pre-line;
+}
+
+.ts-card__paragraph + .ts-card__paragraph {
+  margin-top: var(--space-3);
 }
 
 .ts-card--text strong {

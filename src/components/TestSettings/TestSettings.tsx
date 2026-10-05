@@ -146,14 +146,18 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
       <div className="test-settings__scroll">
         <article className="ts-card ts-card--text">
-          {data.lead && data.intro.startsWith(data.lead) ? (
-            <>
-              <strong>{data.lead}</strong>
-              {data.intro.slice(data.lead.length)}
-            </>
-          ) : (
-            data.intro
-          )}
+          {data.intro.split('\n\n').map((paragraph, i) => (
+            <p key={i} className="ts-card__paragraph">
+              {i === 0 && data.lead && paragraph.startsWith(data.lead) ? (
+                <>
+                  <strong>{data.lead}</strong>
+                  {paragraph.slice(data.lead.length)}
+                </>
+              ) : (
+                paragraph
+              )}
+            </p>
+          ))}
         </article>
 
         {data.scales && (

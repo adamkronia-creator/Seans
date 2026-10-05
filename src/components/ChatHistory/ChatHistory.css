@@ -252,13 +252,13 @@
 .hist-flow {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-3);
 }
 
 /* Комментарий психолога: под текстом события, переносы строк сохраняются */
 .hist-card__comment,
 .hist-card__event + .hist-card__comment {
-  margin-top: 8px;
+  margin-top: var(--space-3);
   white-space: pre-line;
 }
 
