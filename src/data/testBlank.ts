@@ -13,6 +13,8 @@ export interface TestBlankData {
   rules: string[];
   /** Точки у ответов окрашены по выраженности (BDI); у шкал, где пункты обратные, их нет */
   tones?: boolean;
+  /** Нумеровать варианты ответов (по умолчанию да); у «+ / −» номера не нужны */
+  numbered?: boolean;
   questions: BlankQuestion[];
 }
 
@@ -249,10 +251,96 @@ export const BHS_BLANK: TestBlankData = {
   ],
 };
 
-/** Бланк теста из библиотеки; есть у BDI и BHS */
+/** СМОЛ: 71 утверждение, на каждое отвечают «+» (согласен) или «−» (не согласен) */
+const SMOL_ANSWERS = ['+ Согласен', '− Не согласен'];
+
+export const SMOL_BLANK: TestBlankData = {
+  numbered: false,
+  rules: [
+    'Прочитайте каждое утверждение.',
+    'Рядом с утверждением отметьте, согласны ли вы с ним: «+» — согласен, «−» — не согласен.',
+    'Отвечайте искренне — здесь нет правильных или неправильных ответов.',
+  ],
+  questions: [
+    { prompt: "У вас хороший аппетит.", answers: SMOL_ANSWERS },
+    { prompt: "По утрам вы обычно чувствуете, что выспались и отдохнули.", answers: SMOL_ANSWERS },
+    { prompt: "В вашей повседневной жизни много интересного.", answers: SMOL_ANSWERS },
+    { prompt: "Вы работаете с большим напряжением.", answers: SMOL_ANSWERS },
+    { prompt: "Временами вам приходят в голову такие нехорошие мысли, что о них лучше не рассказывать.", answers: SMOL_ANSWERS },
+    { prompt: "У вас очень редко бывает запор.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вам очень хотелось уйти из дома.", answers: SMOL_ANSWERS },
+    { prompt: "Временами у вас бывают приступы неудержимого смеха или плача.", answers: SMOL_ANSWERS },
+    { prompt: "Временами вас беспокоит тошнота и позывы на рвоту.", answers: SMOL_ANSWERS },
+    { prompt: "У вас такое впечатление, что вас никто не понимает.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вам хочется выругаться.", answers: SMOL_ANSWERS },
+    { prompt: "Каждую неделю вам снятся кошмары.", answers: SMOL_ANSWERS },
+    { prompt: "Вам труднее сосредоточиться, чем большинству людей.", answers: SMOL_ANSWERS },
+    { prompt: "С вами происходили (или происходят) странные вещи.", answers: SMOL_ANSWERS },
+    { prompt: "Вы достигли бы в жизни гораздо большего, если бы люди не были настроены против вас.", answers: SMOL_ANSWERS },
+    { prompt: "В детстве одно время вы совершали кражи.", answers: SMOL_ANSWERS },
+    { prompt: "Бывало, что по несколько дней, недель или целых месяцев вы ничем не могли заняться, потому что трудно было себя заставить включиться в работу.", answers: SMOL_ANSWERS },
+    { prompt: "У вас прерывистый и беспокойный сон.", answers: SMOL_ANSWERS },
+    { prompt: "Когда вы находитесь среди людей, вам слышатся странные вещи.", answers: SMOL_ANSWERS },
+    { prompt: "Большинство знающих вас людей не считают вас неприятным человеком.", answers: SMOL_ANSWERS },
+    { prompt: "Вам часто приходилось подчиняться кому-нибудь, кто знал меньше вашего.", answers: SMOL_ANSWERS },
+    { prompt: "Большинство людей довольны своей жизнью более, чем вы.", answers: SMOL_ANSWERS },
+    { prompt: "Очень многие преувеличивают свои несчастья, чтобы добиться сочувствия и помощи.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вы сердитесь.", answers: SMOL_ANSWERS },
+    { prompt: "Вам определенно не хватает уверенности в себе.", answers: SMOL_ANSWERS },
+    { prompt: "У вас часто бывает чувство, будто вы сделали что-то неправильное или нехорошее.", answers: SMOL_ANSWERS },
+    { prompt: "У вас часто бывают подергивания в мышцах.", answers: SMOL_ANSWERS },
+    { prompt: "Обычно вы удовлетворены своей судьбой.", answers: SMOL_ANSWERS },
+    { prompt: "Некоторые так любят командовать, что вам хочется всё сделать наперекор, хотя вы знаете, что они правы.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что против вас что-то замышляют.", answers: SMOL_ANSWERS },
+    { prompt: "Большинство людей способны добиваться выгоды не совсем честным путем.", answers: SMOL_ANSWERS },
+    { prompt: "Вас часто беспокоит желудок.", answers: SMOL_ANSWERS },
+    { prompt: "Часто вы не можете понять, почему накануне вы были в плохом настроении и раздражены.", answers: SMOL_ANSWERS },
+    { prompt: "Временами ваши мысли текли так быстро, что вы не успевали их высказать.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что ваша семейная жизнь не хуже, чем у большинства ваших знакомых.", answers: SMOL_ANSWERS },
+    { prompt: "Временами вы уверены в собственной бесполезности.", answers: SMOL_ANSWERS },
+    { prompt: "В последние годы ваше самочувствие было в основном хорошим.", answers: SMOL_ANSWERS },
+    { prompt: "У вас были периоды, во время которых вы что-то делали и потом не могли вспомнить, что именно.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что вас часто незаслуженно наказывали.", answers: SMOL_ANSWERS },
+    { prompt: "Вы никогда не чувствовали себя лучше, чем теперь.", answers: SMOL_ANSWERS },
+    { prompt: "Вам безразлично, что думают о вас другие.", answers: SMOL_ANSWERS },
+    { prompt: "С памятью у вас всё благополучно.", answers: SMOL_ANSWERS },
+    { prompt: "Вам трудно поддерживать разговор с человеком, с которым вы только что познакомились.", answers: SMOL_ANSWERS },
+    { prompt: "Большую часть времени вы чувствуете общую слабость.", answers: SMOL_ANSWERS },
+    { prompt: "У вас редко болит голова.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вам бывало трудно сохранить равновесие при ходьбе.", answers: SMOL_ANSWERS },
+    { prompt: "Не все ваши знакомые вам нравятся.", answers: SMOL_ANSWERS },
+    { prompt: "Есть люди, которые пытаются украсть ваши идеи и мысли.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что совершили поступки, которые нельзя простить.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что вы слишком застенчивы.", answers: SMOL_ANSWERS },
+    { prompt: "Вы почти всегда о чем-нибудь тревожитесь.", answers: SMOL_ANSWERS },
+    { prompt: "Ваши родители часто не одобряли ваших знакомств.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вы немного сплетничаете.", answers: SMOL_ANSWERS },
+    { prompt: "Временами вы чувствуете, что вам необыкновенно легко принимать решения.", answers: SMOL_ANSWERS },
+    { prompt: "У вас бывает сильное сердцебиение, вы часто задыхаетесь.", answers: SMOL_ANSWERS },
+    { prompt: "Вы вспыльчивы, но отходчивы.", answers: SMOL_ANSWERS },
+    { prompt: "У вас бывают периоды такого беспокойства, что трудно усидеть на месте.", answers: SMOL_ANSWERS },
+    { prompt: "Ваши родители и другие члены семьи часто придираются к вам.", answers: SMOL_ANSWERS },
+    { prompt: "Ваша судьба никого особенно не интересует.", answers: SMOL_ANSWERS },
+    { prompt: "Вы не осуждаете человека, который не прочь воспользоваться в своих интересах ошибками другого.", answers: SMOL_ANSWERS },
+    { prompt: "Иногда вы полны энергии.", answers: SMOL_ANSWERS },
+    { prompt: "За последнее время у вас ухудшилось зрение.", answers: SMOL_ANSWERS },
+    { prompt: "Часто у вас звенит или шумит в ушах.", answers: SMOL_ANSWERS },
+    { prompt: "В вашей жизни были случаи (может быть, только один), когда вы чувствовали, что на вас действуют гипнозом.", answers: SMOL_ANSWERS },
+    { prompt: "У вас бывают периоды, когда вы необычно веселы без особой причины.", answers: SMOL_ANSWERS },
+    { prompt: "Даже находясь в обществе, вы обычно чувствуете себя одиноко.", answers: SMOL_ANSWERS },
+    { prompt: "Вы считаете, что почти каждый может солгать, чтобы избежать неприятностей.", answers: SMOL_ANSWERS },
+    { prompt: "Вы чувствуете острее, чем большинство других людей.", answers: SMOL_ANSWERS },
+    { prompt: "Временами ваша голова работает как бы медленнее, чем обычно.", answers: SMOL_ANSWERS },
+    { prompt: "Вы часто разочаровываетесь в людях.", answers: SMOL_ANSWERS },
+    { prompt: "Вы злоупотребляли спиртными напитками.", answers: SMOL_ANSWERS },
+  ],
+};
+
+/** Бланк теста из библиотеки; есть у BDI, BHS и СМОЛ */
 export function testBlank(testId: string): TestBlankData | undefined {
   if (testId === 'bdi') return BDI_BLANK;
   if (testId === 'bhs') return BHS_BLANK;
+  if (testId === 'smol') return SMOL_BLANK;
   return undefined;
 }
 

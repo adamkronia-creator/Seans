@@ -49,7 +49,7 @@ export function TestBlank({ data }: { data: TestBlankData }) {
                     {data.tones && (
                       <span className={`blank-answer__dot blank-answer__dot--${ANSWER_TONES[j]}`} aria-hidden="true" />
                     )}
-                    {j + 1}. {answer}
+                    {data.numbered === false ? answer : `${j + 1}. ${answer}`}
                   </li>
                 ))}
               </ul>
