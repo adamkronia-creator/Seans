@@ -122,3 +122,22 @@ export { default as IconFilterAll } from '../../assets/icons/library/filter-all.
 export { default as IconFilterFavorites } from '../../assets/icons/library/filter-favorites.svg?react';
 export { default as IconFilterRecent } from '../../assets/icons/library/filter-recent.svg?react';
 export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
+
+// Настройки теста
+export { default as IconTestBlank } from '../../assets/icons/test/blank.svg?react';
+export { default as IconTestConclusion } from '../../assets/icons/test/conclusion.svg?react';
+export { default as IconTestScalesMain } from '../../assets/icons/test/scales-main.svg?react';
+export { default as IconTestScalesExtra } from '../../assets/icons/test/scales-extra.svg?react';
+export { default as IconTestScoring } from '../../assets/icons/test/scoring.svg?react';
+export { default as IconTestQuestions } from '../../assets/icons/test/questions.svg?react';
+export { default as IconTestTime } from '../../assets/icons/test/time.svg?react';
+export { default as IconTestAge } from '../../assets/icons/test/age.svg?react';
+export { default as IconTestGender } from '../../assets/icons/test/gender.svg?react';
+export { default as IconTestBlind } from '../../assets/icons/test/blind.svg?react';
+export { default as IconTestHide } from '../../assets/icons/test/hide.svg?react';
+export { default as IconTestSaveBlank } from '../../assets/icons/test/save-blank.svg?react';
+export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
+export { default as IconTestChevron } from '../../assets/icons/test/chevron-right.svg?react';
+export { default as IconTestChevronDown } from '../../assets/icons/test/chevron-down.svg?react';
+export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.svg?react';
+export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';

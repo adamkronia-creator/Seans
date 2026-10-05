@@ -22,6 +22,8 @@ interface LibraryPageProps {
   categories: { id: string; label: string }[];
   favorites: ReadonlySet<string>;
   onToggleFavorite: (id: string) => void;
+  /** Нажатие на карточку (открыть настройку) */
+  onOpen?: (item: LibraryItem) => void;
   /** Подписи для экранных читалок и пустых состояний */
   labels: { all: string; filters: string; emptyRecent: string };
 }
@@ -40,6 +42,7 @@ export function LibraryPage({
   categories,
   favorites,
   onToggleFavorite,
+  onOpen,
   labels,
 }: LibraryPageProps) {
   const [query, setQuery] = useState('');
@@ -106,6 +109,7 @@ export function LibraryPage({
               test={item}
               favorite={favorites.has(item.id)}
               onToggleFavorite={onToggleFavorite}
+              onClick={onOpen}
             />
           ))}
         </ul>

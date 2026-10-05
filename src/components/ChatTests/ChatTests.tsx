@@ -28,10 +28,13 @@ function SectionedList({
   items,
   sections,
   emptyText,
+  onOpen,
 }: {
   items: PsyTest[];
   sections: SectionConfig[];
   emptyText: string;
+  /** Нажатие на карточку; у заданий пока не задано */
+  onOpen?: (item: PsyTest) => void;
 }) {
   if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
   return (
@@ -52,7 +55,7 @@ function SectionedList({
             </div>
             <ul className="chat-tests__list">
               {list.map((item) => (
-                <TestCard key={item.id} test={item} />
+                <TestCard key={item.id} test={item} onClick={onOpen} />
               ))}
             </ul>
           </section>
@@ -63,13 +66,14 @@ function SectionedList({
 }
 
 /** Вкладка «Тесты» в открытом чате */
-export function ChatTests({ hasData }: { hasData: boolean }) {
+export function ChatTests({ hasData, onOpenTest }: { hasData: boolean; onOpenTest?: (id: string) => void }) {
   const data = useClientData();
   return (
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       emptyText="Тесты ещё не отправлялись"
+      onOpen={onOpenTest && ((t) => onOpenTest(t.id))}
     />
   );
 }

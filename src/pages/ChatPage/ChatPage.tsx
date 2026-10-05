@@ -18,7 +18,9 @@ import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { sendMessage, useChats, useMessages } from '../../data/chatStore';
-import { goBack } from '../../router';
+import { TestSettings } from '../../components/TestSettings/TestSettings';
+import { LIBRARY } from '../../data/library';
+import { goBack, navigate } from '../../router';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
@@ -35,11 +37,13 @@ const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabSessions }[]
 
 interface ChatPageProps {
   chatId: string;
+  /** Открыта настройка этого теста (адрес /chat/<чат>/tests/<тест>) */
+  testId?: string;
   /** Нажатие на кнопку нижней панели (панель видна на вкладках кроме «Сообщения») */
   onAppTabChange: (id: TabId) => void;
 }
 
-export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
+export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
   const [section, setSection] = useState<SectionId>('messages');
   // Тесты, задания и кейс пока есть только у Максима
   const hasClientData = chatId === 'maxim';
@@ -60,6 +64,17 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     return (
       <section className="chat">
         <p className="chat__empty">Чат не найден</p>
+      </section>
+    );
+  }
+
+  // Настройка теста заменяет шапку и вкладки чата; снизу нижняя панель приложения, как у вкладки «Тесты»
+  const settingsTest = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
+  if (settingsTest) {
+    return (
+      <section className="chat">
+        <TestSettings test={settingsTest} chatId={chatId} onBack={() => goBack(`/chat/${chatId}`)} />
+        <TabBar active="messages" onChange={onAppTabChange} />
       </section>
     );
   }
@@ -126,7 +141,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
       {section === 'tests' && (
         <>
-          <ChatTests hasData={hasClientData} />
+          <ChatTests hasData={hasClientData} onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)} />
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}

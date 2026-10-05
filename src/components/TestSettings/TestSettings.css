@@ -1,0 +1,376 @@
+.test-settings {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Шапка как в чате, без вкладок: сверху 12, строка 40, снизу 8, разделитель */
+.test-settings__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.test-settings__button--muted {
+  color: var(--color-text-caption);
+}
+
+.test-settings__button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: var(--size-icon);
+}
+
+/* Картинка 36 в рамке 40, gap 8, имя 16/16 medium и статус 12/12 через 4 */
+.test-settings__peer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.test-settings__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+}
+
+.test-settings__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  justify-content: center;
+  height: 32px;
+  min-width: 0;
+}
+
+.test-settings__name {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.test-settings__status {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: 12px;
+}
+
+/* Карточки: отступы от шапки 11 (вместе с разделителем 12) и по бокам 16, между карточками 12 */
+.test-settings__scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: 11px var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.ts-card {
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+}
+
+/* Описание: 16/22, абзацы и маркеры «●» — обычные строки текста */
+.ts-card--text {
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+  line-height: 22px;
+  white-space: pre-line;
+}
+
+.ts-card--text strong {
+  font-weight: var(--font-weight-medium);
+}
+
+/* Строка: внутри 24, отступы 12, разделитель 1 между строками (на всю ширину или с отступом 12) */
+.ts-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-3);
+}
+
+.ts-row + .ts-row {
+  margin-top: 1px;
+}
+
+.ts-row + .ts-row::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: var(--space-3);
+  left: var(--space-3);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.ts-card--wide-dividers .ts-row + .ts-row::before {
+  right: 0;
+  left: 0;
+}
+
+.ts-row--top {
+  align-items: flex-start;
+  padding-block: var(--space-3);
+}
+
+.ts-row__icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.ts-row__label {
+  flex: 1;
+  min-width: 0;
+  line-height: 20px;
+}
+
+.ts-row__value {
+  line-height: 20px;
+  text-align: right;
+}
+
+.ts-row__link {
+  flex: 1;
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+}
+
+.ts-row__chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+/* Шкалы: заголовок 16/19, пункты 14/17 через 4 */
+.ts-scale {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.ts-scale__title {
+  line-height: 19px;
+}
+
+.ts-scale__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  line-height: 17px;
+}
+
+.ts-scale__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Маркер: рамка 8, чёрная точка 6, цветные 8 */
+.ts-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.ts-dot--text {
+  background: var(--color-text-primary);
+  transform: scale(0.78);
+}
+
+.ts-dot--green {
+  background: var(--color-green);
+}
+
+.ts-dot--yellow {
+  background: var(--color-yellow);
+}
+
+.ts-dot--orange {
+  background: var(--color-orange);
+}
+
+.ts-dot--red {
+  background: var(--color-red);
+}
+
+/* Выбор формы бланка: синяя кнопка 28 с радиусом 8 и обводкой 1 */
+.ts-select {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 6px 0 12px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
+  color: var(--color-accent-on);
+}
+
+.ts-select__value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 17px;
+}
+
+.ts-select__chevron {
+  font-size: 16px;
+}
+
+.ts-select__native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Подпись над полем: 14/14, слева 12 по тексту в карточке, до карточки 4 */
+.ts-field {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ts-field__label {
+  padding-left: var(--space-3);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: 14px;
+}
+
+/* Сообщение: текст 16/19, снизу строка со счётчиком и микрофоном через 12 */
+.ts-message {
+  padding: var(--space-3);
+}
+
+.ts-message__input {
+  display: block;
+  width: 100%;
+  min-height: 19px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  background: none;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: 19px;
+  resize: none;
+  caret-color: var(--color-accent);
+}
+
+.ts-message__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  height: 16px;
+  margin-top: var(--space-3);
+  color: var(--color-text-caption);
+}
+
+.ts-message__count {
+  font-size: var(--font-size-xs);
+  line-height: 16px;
+}
+
+.ts-message__mic {
+  display: flex;
+  font-size: 16px;
+}
+
+/* Переключатель 37×20, ползунок 16 */
+.ts-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 37px;
+  height: 20px;
+  border-radius: 10px;
+  background: #d0d5db;
+  transition: background 0.15s;
+}
+
+.ts-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: #fff;
+  transition: transform 0.15s;
+}
+
+.ts-switch--on {
+  background: var(--color-accent);
+}
+
+.ts-switch--on::after {
+  transform: translateX(17px);
+}
+
+/* Кнопка над нижней панелью: белая полоса с разделителем, кнопка 40, как кнопки панелей */
+.test-settings__cta {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.test-settings__cta-button {
+  width: 100%;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.test-settings__toast {
+  position: absolute;
+  right: var(--space-4);
+  bottom: 64px;
+  left: var(--space-4);
+  z-index: 10;
+  padding: 10px var(--space-3);
+  border-radius: 12px;
+  background: rgb(30 30 30 / 92%);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  line-height: 17px;
+  text-align: center;
+}
