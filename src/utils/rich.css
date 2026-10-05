@@ -1,0 +1,60 @@
+/* Форматированный текст: показ в карточках и редактор в окне правки */
+.rich-ul,
+.rich-ol,
+.rich-editor ul,
+.rich-editor ol {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.rich-ul,
+.rich-editor ul {
+  list-style: none;
+}
+
+.rich-ul > li,
+.rich-editor ul > li {
+  position: relative;
+}
+
+/* Маркер — точка 3.5, как в макете */
+.rich-ul > li::before,
+.rich-editor ul > li::before {
+  content: '';
+  position: absolute;
+  top: 0.44em;
+  left: -14px;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.rich-ol,
+.rich-editor ol {
+  list-style: decimal;
+}
+
+/* Цифры списка выравниваются по тому же отступу, что и точки */
+.rich-ol > li::marker,
+.rich-editor ol > li::marker {
+  font-variant-numeric: tabular-nums;
+}
+
+.rich-quote,
+.rich-editor blockquote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-stroke);
+  color: var(--color-text-secondary);
+}
+
+.rich-editor p,
+.rich-editor blockquote {
+  margin: 0;
+}
+
+.rich-editor :is(p, ul, ol, blockquote) + :is(p, ul, ol, blockquote),
+.rich-editor p > :is(ul, ol, blockquote, p) {
+  margin-top: 12px;
+}

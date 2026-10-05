@@ -145,3 +145,14 @@ export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-l
 // Окно редактирования: строки «Иконка» и «Цвет»
 export { default as IconSheetIcon } from '../../assets/icons/sheet/icon-picker.svg?react';
 export { default as IconSheetPalette } from '../../assets/icons/sheet/palette.svg?react';
+
+// Инструменты форматирования текста в редакторе
+export { default as IconFmtBold } from '../../assets/icons/format/bold.svg?react';
+export { default as IconFmtItalic } from '../../assets/icons/format/italic.svg?react';
+export { default as IconFmtUnderline } from '../../assets/icons/format/underline.svg?react';
+export { default as IconFmtStrike } from '../../assets/icons/format/strike.svg?react';
+export { default as IconFmtBullets } from '../../assets/icons/format/list-bullets.svg?react';
+export { default as IconFmtNumbers } from '../../assets/icons/format/list-numbers.svg?react';
+export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?react';
+export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
+export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';

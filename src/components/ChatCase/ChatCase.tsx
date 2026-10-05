@@ -22,6 +22,7 @@ import type { CaseFile } from '../../data/files';
 import type { CaseNote } from '../../data/notes';
 import { toneOf } from '../../data/tones';
 import { attachFiles, updateNote, updateSection, useClientData } from '../../data/clientStore';
+import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { HEAD_ICONS, ROW_ICONS } from './caseIcons';
 import './ChatCase.css';
@@ -91,19 +92,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
               if (text !== blocksToText(section.blocks!)) updateSection(section.id, { blocks: textToBlocks(text) });
             }}
           >
-            {section.blocks.map((block, i) =>
-              block.type === 'p' ? (
-                <p key={i} className="case-card__text">
-                  {block.text}
-                </p>
-              ) : (
-                <ul key={i} className="case-card__list">
-                  {block.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              ),
-            )}
+            <RichBlocks blocks={section.blocks} textClass="case-card__text" listClass="case-card__list" />
           </QuickEdit>
           {section.updated && (
             <p className="case-card__updated">Последнее обновление: {section.updated}</p>
@@ -202,11 +191,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
             if (text !== paragraphsToText(note.paragraphs)) updateNote(note.id, { paragraphs: textToParagraphs(text) });
           }}
         >
-          {note.paragraphs.map((text, i) => (
-            <p key={i} className="case-card__text">
-              {text}
-            </p>
-          ))}
+          <RichBlocks blocks={parseBlocks(paragraphsToText(note.paragraphs))} textClass="case-card__text" listClass="case-card__list" />
           {quick && note.paragraphs.length === 0 && (
             <p className="case-card__text">
               <br />
@@ -347,7 +332,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             ...(editSection.rows ? { rows: editSection.rows.map((r) => r.value) } : {}),
           }}
           rowLabels={editSection.rows?.map((r) => r.label)}
-          textPlaceholder="Абзацы разделяйте пустой строкой, пункты списка начинайте с «• »"
+          textPlaceholder="Введите текст"
           onClose={() => setEditing(null)}
           onSave={(v: EditValues) => {
             updateSection(editSection.id, {
@@ -374,7 +359,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             icon: editNote.icon,
             tone: editNote.tone,
           }}
-          textPlaceholder="Абзацы разделяйте пустой строкой"
+          textPlaceholder="Введите текст"
           onClose={() => setEditing(null)}
           onSave={(v: EditValues) => {
             updateNote(editNote.id, {

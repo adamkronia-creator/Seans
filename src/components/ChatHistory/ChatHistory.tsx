@@ -18,6 +18,7 @@ import {
   IconTlNote,
 } from '../icons';
 import { CHATS, CURRENT_USER } from '../../data/chats';
+import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
@@ -180,7 +181,10 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
               onCommit={saveQuick}
             >
               {event.comment ? (
-                <p className="hist-card__text hist-card__comment">{event.comment}</p>
+                <RichBlocks
+                  blocks={parseBlocks(event.comment)}
+                  textClass="hist-card__text hist-card__comment"
+                />
               ) : (
                 quick && (
                   <p className="hist-card__text hist-card__comment">
@@ -194,14 +198,11 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
       ) : (
         <QuickEdit
           editing={quick}
+          className="hist-flow"
           onCancel={() => setQuick(false)}
           onCommit={saveQuick}
         >
-          {event.paragraphs.map((text, i) => (
-            <p key={i} className="hist-card__text">
-              {text}
-            </p>
-          ))}
+          <RichBlocks blocks={parseBlocks(paragraphsToText(event.paragraphs))} textClass="hist-card__text" />
           {quick && event.paragraphs.length === 0 && (
             <p className="hist-card__text">
               <br />
@@ -276,7 +277,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
           }}
           textPlaceholder={
             editing.kind === 'session'
-              ? 'Что произошло на сеансе. Абзацы разделяйте пустой строкой'
+              ? 'Что произошло на сеансе'
               : 'Добавьте комментарий'
           }
           onClose={() => setEditingId(null)}

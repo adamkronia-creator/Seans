@@ -203,25 +203,6 @@
   line-height: 19px; /* 120% от 16, округлено до целых, как в Figma */
 }
 
-.case-card__list {
-  padding-left: 24px;
-}
-
-.case-card__list li {
-  position: relative;
-}
-
-.case-card__list li::before {
-  content: '';
-  position: absolute;
-  top: 7px;
-  left: -14px;
-  width: 3.5px;
-  height: 3.5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
 .case-card__updated {
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);

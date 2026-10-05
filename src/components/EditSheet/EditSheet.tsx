@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { createPortal } from 'react-dom';
 import { HEAD_ICONS } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
+import { RichEditor } from '../RichEditor/RichEditor';
 import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
 import { TONES, toneOf, type ToneId } from '../../data/tones';
@@ -211,13 +212,11 @@ export function EditSheet({
 
           {hasText && (
             <section className="sheet__card sheet__text">
-              <AutoTextarea
-                className="sheet__text-input"
-                rows={3}
-                value={text}
+              <RichEditor
+                initial={initial.text ?? ''}
                 onChange={setText}
                 placeholder={textPlaceholder}
-                aria-label={heading}
+                ariaLabel={heading}
               />
             </section>
           )}

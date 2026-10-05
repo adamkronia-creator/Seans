@@ -22,12 +22,11 @@ export type CaseIconId =
   | 'bookmark';
 
 import type { ToneId } from './tones';
+import { parseBlocks, serializeBlocks, type RichBlock } from '../utils/richText';
 
 export type CaseRowIconId = 'client' | 'birthday' | 'calendar' | 'clock' | 'format';
 
-export type CaseBlock =
-  | { type: 'p'; text: string }
-  | { type: 'ul'; items: string[] };
+export type CaseBlock = RichBlock;
 
 export interface CaseSection {
   id: string;
@@ -204,26 +203,8 @@ export const CASE_SECTIONS: CaseSection[] = [
 // ——— Текст блоков в редакторе ———
 // Абзацы разделяются пустой строкой, пункты списка начинаются с «• » (по одному на строку).
 
-const BULLET = '• ';
-
-export function blocksToText(blocks: CaseBlock[]): string {
-  return blocks
-    .map((b) => (b.type === 'p' ? b.text : b.items.map((i) => BULLET + i).join('\n')))
-    .join('\n\n');
-}
-
-export function textToBlocks(text: string): CaseBlock[] {
-  return text
-    .split(/\n\s*\n/)
-    .map((chunk) => chunk.trim())
-    .filter(Boolean)
-    .map((chunk): CaseBlock => {
-      const lines = chunk.split('\n').map((l) => l.trim());
-      return lines.every((l) => l.startsWith(BULLET.trim()))
-        ? { type: 'ul', items: lines.map((l) => l.replace(/^•\s*/, '')).filter(Boolean) }
-        : { type: 'p', text: chunk };
-    });
-}
+export const blocksToText = serializeBlocks;
+export const textToBlocks = parseBlocks;
 
 /** Заметки и тексты сеансов: абзацы без списков */
 export const paragraphsToText = (paragraphs: string[]) => paragraphs.join('\n\n');

@@ -249,8 +249,10 @@
   line-height: 19px;
 }
 
-.hist-card__text + .hist-card__text {
-  margin-top: 8px;
+.hist-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Комментарий психолога: под текстом события, переносы строк сохраняются */

@@ -228,28 +228,6 @@
   text-align: right;
 }
 
-/* Текст: поле без рамки внутри карточки, 16/19, отступы 12 */
-.sheet__text {
-  padding: var(--space-3);
-}
-
-.sheet__text-input {
-  display: block;
-  width: 100%;
-  min-height: 57px;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  overflow: hidden;
-  background: none;
-  caret-color: var(--color-accent);
-  font-family: inherit;
-  font-size: var(--font-size-md);
-  line-height: 19px;
-  resize: none;
-}
-
-.sheet__text-input::placeholder,
 .sheet__row-input::placeholder {
   color: var(--color-text-caption);
 }

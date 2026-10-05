@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type ClipboardEvent, type ElementType, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { domToText } from '../../utils/richText';
 import { takeCaret } from './caret';
 import './QuickEdit.css';
 
@@ -14,31 +15,6 @@ interface Props {
   as?: ElementType;
   /** Обычное отображение: те же элементы остаются и в режиме правки */
   children: ReactNode;
-}
-
-const BULLET = '• ';
-
-/** Читает текст из редактируемого блока: абзацы и пункты списка, как они стоят на экране */
-function readText(root: HTMLElement, separator: string): string {
-  const hasBlocks = [...root.children].some((c) => /^(P|DIV|UL|OL|LI)$/.test(c.tagName));
-  if (!hasBlocks) return root.innerText.replace(/ /g, ' ').replace(/\s*\n\s*/g, ' ').trim();
-  const parts: string[] = [];
-  const clean = (t: string) => t.replace(/ /g, ' ').replace(/\n+$/, '').trim();
-  root.childNodes.forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const t = clean(node.textContent ?? '');
-      if (t) parts.push(t);
-    } else if (node instanceof HTMLElement) {
-      if (node.tagName === 'UL' || node.tagName === 'OL') {
-        const items = [...node.querySelectorAll('li')].map((li) => clean(li.innerText)).filter(Boolean);
-        if (items.length) parts.push(items.map((i) => BULLET + i).join('\n'));
-      } else {
-        const t = clean(node.innerText);
-        if (t) parts.push(t);
-      }
-    }
-  });
-  return parts.join(separator);
 }
 
 /**
@@ -73,7 +49,7 @@ export function QuickEdit({ editing, onCommit, onCancel, separator = '\n\n', cla
     const el = ref.current;
     if (done.current || !el) return;
     done.current = true;
-    const text = commit ? readText(el, separator) : '';
+    const text = commit ? domToText(el, separator) : '';
     setVersion((v) => v + 1);
     if (commit) onCommit(text);
     else onCancel();
