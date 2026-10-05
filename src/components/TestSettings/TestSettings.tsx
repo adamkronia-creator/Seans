@@ -146,18 +146,35 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
       <div className="test-settings__scroll">
         <article className="ts-card ts-card--text">
-          {data.intro.split('\n\n').map((paragraph, i) => (
-            <p key={i} className="ts-card__paragraph">
-              {i === 0 && data.lead && paragraph.startsWith(data.lead) ? (
-                <>
-                  <strong>{data.lead}</strong>
-                  {paragraph.slice(data.lead.length)}
-                </>
-              ) : (
-                paragraph
-              )}
-            </p>
-          ))}
+          {data.intro.split('\n\n').map((paragraph, i) => {
+            // Строки «● …» — маркированный список, остальные — обычный текст абзаца
+            const lines = paragraph.split('\n');
+            const items = lines.filter((l) => l.startsWith('●')).map((l) => l.replace(/^●\s*/, ''));
+            const text = lines.filter((l) => !l.startsWith('●')).join('\n');
+            return (
+              <div key={i} className="ts-card__paragraph">
+                {text && (
+                  <p>
+                    {i === 0 && data.lead && text.startsWith(data.lead) ? (
+                      <>
+                        <strong>{data.lead}</strong>
+                        {text.slice(data.lead.length)}
+                      </>
+                    ) : (
+                      text
+                    )}
+                  </p>
+                )}
+                {items.length > 0 && (
+                  <ul className="ts-card__list">
+                    {items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
         </article>
 
         {data.scales && (

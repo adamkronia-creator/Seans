@@ -89,17 +89,28 @@
   box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
-/* Описание: 16/22, абзацы и маркеры «●» — обычные строки текста */
+/* Описание: 16/19, абзацы и список с маркерами */
 .ts-card--text {
   padding: var(--space-3);
   font-size: var(--font-size-md);
-  line-height: 22px;
+  line-height: 19px; /* 120% от 16, округлено до целых, как в Figma */
 }
 
 /* Между абзацами промежуток 12, а не пустая строка; переносы внутри абзаца сохраняются */
 .ts-card__paragraph {
   margin: 0;
+}
+
+.ts-card__paragraph p {
+  margin: 0;
   white-space: pre-line;
+}
+
+/* Обычные маркеры списка (диск), с небольшим отступом от левого края */
+.ts-card__list {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
 }
 
 .ts-card__paragraph + .ts-card__paragraph {
