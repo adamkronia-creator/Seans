@@ -1,4 +1,5 @@
 import { useRef, type PointerEvent } from 'react';
+import { rememberCaret } from '../components/QuickEdit/caret';
 
 /**
  * Двойной клик мышью или двойное касание на элементе (без кнопок и полей внутри).
@@ -17,6 +18,8 @@ export function useDoubleActivate(onActivate: () => void, enabled = true) {
     const now = { t: e.timeStamp, x: e.clientX, y: e.clientY };
     if (prev && now.t - prev.t < 350 && Math.hypot(now.x - prev.x, now.y - prev.y) < 24) {
       last.current = null;
+      // Курсор встанет туда, куда нажали
+      rememberCaret(e.clientX, e.clientY);
       // Двойной клик выделяет слово: снимаем выделение и включаем быструю правку
       window.getSelection()?.removeAllRanges();
       onActivate();

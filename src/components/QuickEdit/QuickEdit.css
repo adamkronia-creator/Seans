@@ -1,20 +1,14 @@
-/* Вид не меняется: тот же шрифт и отступы, только курсор и сохранение переносов */
+/* Вид не меняется: включается только редактирование и курсор */
 .quick-edit {
-  min-height: 19px;
   outline: 0;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
   caret-color: var(--color-accent);
   -webkit-user-select: text;
   user-select: text;
 }
 
-.quick-edit:empty::before {
-  content: attr(data-placeholder);
-  color: var(--color-text-caption);
-  pointer-events: none;
-}
-
-.case-row__value.quick-edit {
-  min-width: 40px;
+/* Столбец абзацев в карточке «Кейс»: те же 12 между абзацами, что и в теле карточки */
+.quick-edit-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }

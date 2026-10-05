@@ -175,22 +175,25 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
           {event.kind !== 'invite' && (
             <QuickEdit
               editing={quick}
-              value={event.comment ?? ''}
-              className="hist-card__text hist-card__comment"
-              placeholder="Комментарий"
+              separator={'\n'}
               onCancel={() => setQuick(false)}
               onCommit={saveQuick}
             >
-              {event.comment && <p className="hist-card__text hist-card__comment">{event.comment}</p>}
+              {event.comment ? (
+                <p className="hist-card__text hist-card__comment">{event.comment}</p>
+              ) : (
+                quick && (
+                  <p className="hist-card__text hist-card__comment">
+                    <br />
+                  </p>
+                )
+              )}
             </QuickEdit>
           )}
         </>
       ) : (
         <QuickEdit
           editing={quick}
-          value={paragraphsToText(event.paragraphs)}
-          className="hist-card__text"
-          placeholder="Текст"
           onCancel={() => setQuick(false)}
           onCommit={saveQuick}
         >
@@ -199,6 +202,11 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
               {text}
             </p>
           ))}
+          {quick && event.paragraphs.length === 0 && (
+            <p className="hist-card__text">
+              <br />
+            </p>
+          )}
         </QuickEdit>
       )}
     </div>

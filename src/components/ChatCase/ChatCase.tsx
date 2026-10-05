@@ -82,8 +82,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
         <div className="case-card__body">
           <QuickEdit
             editing={quick}
-            value={blocksToText(section.blocks)}
-            className="case-card__text"
+            className="quick-edit-flow"
             onCancel={() => setQuick(false)}
             onCommit={(text) => {
               setQuick(false);
@@ -133,7 +132,6 @@ function CaseRow({
       <span className="case-row__label">{label}</span>
       <QuickEdit
         editing={quick}
-        value={value}
         as="span"
         className="case-row__value"
         onCancel={() => setQuick(false)}
@@ -142,7 +140,7 @@ function CaseRow({
           if (v !== value) onSave(v);
         }}
       >
-        <span className="case-row__value">{value}</span>
+        {value}
       </QuickEdit>
     </li>
   );
@@ -193,8 +191,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
       <div className="case-card__body case-card__body--note">
         <QuickEdit
           editing={quick}
-          value={paragraphsToText(note.paragraphs)}
-          className="case-card__text"
+          className="quick-edit-flow"
           onCancel={() => setQuick(false)}
           onCommit={(text) => {
             setQuick(false);
@@ -206,6 +203,11 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
               {text}
             </p>
           ))}
+          {quick && note.paragraphs.length === 0 && (
+            <p className="case-card__text">
+              <br />
+            </p>
+          )}
         </QuickEdit>
         <p className="case-card__updated">Последнее обновление: {note.updated}</p>
       </div>
