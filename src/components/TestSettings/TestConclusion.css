@@ -280,11 +280,6 @@
   line-height: 22px;
 }
 
-/* Между карточками заключения 14 */
-.test-settings__scroll.test-settings__scroll--conclusion {
-  gap: 14px;
-}
-
 /* При переходе по иконке карточка встаёт с отступом от шапки */
 .blank-card[id^="cc-"] {
   scroll-margin-top: 11px;

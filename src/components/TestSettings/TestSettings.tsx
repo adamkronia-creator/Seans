@@ -32,6 +32,9 @@ import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import './TestSettings.css';
 
+/** Сколько абзацев описания видно в свёрнутом виде */
+const DESC_SHORT = 2;
+
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
 interface TestSettingsProps {
@@ -104,6 +107,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [toast, setToast] = useState<string | null>(null);
   // Открыт ли «Бланк тестирования» (вместо настроек, шапка та же)
   const [blankOpen, setBlankOpen] = useState(false);
+  // Длинное описание свёрнуто до двух абзацев, пока его не раскроют
+  const [descOpen, setDescOpen] = useState(false);
   // Открыт ли «Пример заключения» (пока есть только у СМОЛ)
   const [conclusionOpen, setConclusionOpen] = useState(false);
   const blank = testBlank(test.id);
@@ -138,6 +143,36 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   };
 
   const chars = message.length;
+  const paragraphs = data.intro.split('\n\n');
+  // Строки «● …» — маркированный список, остальные — обычный текст абзаца
+  const renderParagraph = (paragraph: string, i: number) => {
+    const lines = paragraph.split('\n');
+    const items = lines.filter((l) => l.startsWith('●')).map((l) => l.replace(/^●\s*/, ''));
+    const text = lines.filter((l) => !l.startsWith('●')).join('\n');
+    return (
+      <div key={i} className="ts-card__paragraph">
+        {text && (
+          <p>
+            {i === 0 && data.lead && text.startsWith(data.lead) ? (
+              <>
+                <strong>{data.lead}</strong>
+                {text.slice(data.lead.length)}
+              </>
+            ) : (
+              text
+            )}
+          </p>
+        )}
+        {items.length > 0 && (
+          <ul className="ts-card__list">
+            {items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
   const openConclusion = () => (test.id === 'smol' ? setConclusionOpen(true) : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'));
 
@@ -166,7 +201,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </header>
 
       {conclusionOpen ? (
-        <div className="test-settings__scroll test-settings__scroll--conclusion" key="conclusion">
+        <div className="test-settings__scroll" key="conclusion">
           <TestConclusion form={form} />
         </div>
       ) : blankOpen && blank ? (
@@ -178,35 +213,27 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       <div className="test-settings__scroll">
         <CollapseCard title="Описание теста">
           <div className="ts-desc">
-            {data.intro.split('\n\n').map((paragraph, i) => {
-              // Строки «● …» — маркированный список, остальные — обычный текст абзаца
-              const lines = paragraph.split('\n');
-              const items = lines.filter((l) => l.startsWith('●')).map((l) => l.replace(/^●\s*/, ''));
-              const text = lines.filter((l) => !l.startsWith('●')).join('\n');
-              return (
-                <div key={i} className="ts-card__paragraph">
-                  {text && (
-                    <p>
-                      {i === 0 && data.lead && text.startsWith(data.lead) ? (
-                        <>
-                          <strong>{data.lead}</strong>
-                          {text.slice(data.lead.length)}
-                        </>
-                      ) : (
-                        text
-                      )}
-                    </p>
-                  )}
-                  {items.length > 0 && (
-                    <ul className="ts-card__list">
-                      {items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
+            {paragraphs.slice(0, DESC_SHORT).map((paragraph, i) => renderParagraph(paragraph, i))}
+            {paragraphs.length > DESC_SHORT && (
+              <>
+                <div className={`blank-card__collapse${descOpen ? ' blank-card__collapse--open' : ''}`} aria-hidden={!descOpen}>
+                  <div className="blank-card__inner">
+                    <div className="ts-desc__more">
+                      {paragraphs.slice(DESC_SHORT).map((paragraph, i) => renderParagraph(paragraph, i + DESC_SHORT))}
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
+                <button
+                  type="button"
+                  className="ts-desc__toggle"
+                  aria-expanded={descOpen}
+                  aria-label={descOpen ? 'Свернуть описание' : 'Показать описание полностью'}
+                  onClick={() => setDescOpen(!descOpen)}
+                >
+                  <IconTestChevronDown className={`ts-desc__chevron${descOpen ? ' ts-desc__chevron--open' : ''}`} />
+                </button>
+              </>
+            )}
           </div>
         </CollapseCard>
 

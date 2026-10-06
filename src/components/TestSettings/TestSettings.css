@@ -137,6 +137,27 @@
   margin-top: var(--space-3);
 }
 
+.ts-desc__more {
+  padding-top: var(--space-3);
+}
+
+.ts-desc__toggle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-2);
+  color: var(--color-accent);
+}
+
+.ts-desc__chevron {
+  font-size: 20px;
+  transition: transform 0.25s ease;
+}
+
+.ts-desc__chevron--open {
+  transform: rotate(180deg);
+}
+
 .ts-desc strong {
   font-weight: var(--font-weight-medium);
 }

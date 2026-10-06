@@ -121,7 +121,7 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
         <p className="cc-scale__text">
           Шкала имеет <strong className={`cc-tone--${meta.tone}`}>{scale.score} баллов</strong> из {SMOL_MAX}{' '}
           <span className="cc-muted">({pct}%)</span>, что является{' '}
-          <strong className={`cc-tone--${meta.tone}`}>{meta.verdict}</strong> показателем.
+          <strong className={`cc-tone--${meta.tone}`}>{meta.verdict}</strong> показателем{level === 'high' && ', выходящим за рамки нормативного диапазона'}.
         </p>
         <div className="cc-single">
           <div className="cc-bar">
