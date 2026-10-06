@@ -129,27 +129,65 @@
   list-style: none;
 }
 
-.blank-answer__dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 7px;
+/* Вариант ответа: радиокнопка 20 слева, текст рядом, перенос идёт под текстом */
+.blank-answer {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.blank-answer__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.blank-answer__radio {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--color-text-caption);
   border-radius: var(--radius-full);
-  vertical-align: middle;
+  transition: border-color 0.15s ease;
 }
 
-.blank-answer__dot--green {
-  background: var(--color-green);
+.blank-answer__radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  transform: scale(0);
+  transition: transform 0.15s ease;
 }
 
-.blank-answer__dot--yellow {
-  background: var(--color-yellow);
+.blank-answer__input:checked + .blank-answer__radio {
+  border-color: var(--color-accent);
 }
 
-.blank-answer__dot--orange {
-  background: var(--color-orange);
+.blank-answer__input:checked + .blank-answer__radio::after {
+  transform: scale(1);
 }
 
-.blank-answer__dot--red {
-  background: var(--color-red);
+.blank-answer__input:focus-visible + .blank-answer__radio {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.blank-answer__text {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blank-answer__radio,
+  .blank-answer__radio::after {
+    transition: none;
+  }
 }

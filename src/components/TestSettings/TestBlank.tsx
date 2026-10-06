@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { IconTestChevronUp } from '../icons';
-import { ANSWER_TONES, type TestBlankData } from '../../data/testBlank';
+import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
 /** Карточка бланка: заголовок с кнопкой «свернуть», содержимое плавно сворачивается */
@@ -26,6 +26,8 @@ function BlankCard({ title, children }: { title: string; children: ReactNode }) 
 
 /** Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент) */
 export function TestBlank({ data }: { data: TestBlankData }) {
+  // Выбранные ответы нужны только для просмотра: отметка никуда не сохраняется
+  const [picked, setPicked] = useState<Record<number, number>>({});
   return (
     <>
       <BlankCard title="Правила тестирования">
@@ -45,11 +47,20 @@ export function TestBlank({ data }: { data: TestBlankData }) {
               </p>
               <ul className="blank-answers">
                 {q.answers.map((answer, j) => (
-                  <li key={j} className="blank-answer">
-                    {data.tones && (
-                      <span className={`blank-answer__dot blank-answer__dot--${ANSWER_TONES[j]}`} aria-hidden="true" />
-                    )}
-                    {data.numbered === false ? answer : `${j + 1}. ${answer}`}
+                  <li key={j}>
+                    <label className="blank-answer">
+                      <input
+                        type="radio"
+                        className="blank-answer__input"
+                        name={`blank-q${i}`}
+                        checked={picked[i] === j}
+                        onChange={() => setPicked({ ...picked, [i]: j })}
+                      />
+                      <span className="blank-answer__radio" aria-hidden="true" />
+                      <span className="blank-answer__text">
+                        {data.numbered === false ? answer : `${j + 1}. ${answer}`}
+                      </span>
+                    </label>
                   </li>
                 ))}
               </ul>
