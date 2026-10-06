@@ -91,6 +91,7 @@ const BHS: TestSettingsData = {
   questions: 20,
   duration: '3–5 мин.',
   age: '16+',
+  forms: ['Мужская', 'Женская'],
   message: DEFAULT_MESSAGE,
 };
 

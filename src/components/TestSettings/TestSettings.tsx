@@ -251,8 +251,10 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 aria-label={descOpen ? 'Свернуть описание' : 'Показать описание полностью'}
                 onClick={() => setDescOpen(!descOpen)}
               >
-                <IconTestChevronDown className="ts-desc__chevron" />
-                <span>{descOpen ? 'Свернуть' : 'Развернуть'}</span>
+                <span className="ts-desc__label">
+                  <IconTestChevronDown className="ts-desc__chevron" />
+                  <span>{descOpen ? 'Свернуть' : 'Развернуть'}</span>
+                </span>
               </button>
             )}
           </div>

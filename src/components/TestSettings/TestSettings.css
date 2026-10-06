@@ -160,8 +160,8 @@
   background: linear-gradient(to bottom, rgb(255 255 255 / 0%), rgb(255 255 255 / 55%) 40%, rgb(255 255 255 / 92%) 80%, var(--color-bg-panel));
   color: #818c99;
   font-size: 14px;
+  font-weight: var(--font-weight-medium);
   line-height: 14px;
-  gap: 2px;
   transition:
     height 0.25s ease,
     background-color 0.25s ease;
@@ -178,7 +178,14 @@
   align-items: center;
 }
 
+.ts-desc__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .ts-desc__chevron {
+  flex: none;
   font-size: 20px;
   transition: transform 0.25s ease;
 }
