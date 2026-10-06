@@ -201,12 +201,12 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </header>
 
       {conclusionOpen ? (
-        <>
-          <div className="test-settings__scroll" key="conclusion">
+        <div className="cc-wrap" key="conclusion">
+          <div className="test-settings__scroll">
             <TestConclusion form={form} />
           </div>
           <ConclusionNav />
-        </>
+        </div>
       ) : blankOpen && blank ? (
         <div className="test-settings__scroll" key="blank">
           <TestBlank data={blank} />
@@ -240,6 +240,35 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             )}
           </div>
         </CollapseCard>
+
+        {(data.scales || blank) && (
+          <ul className="ts-card">
+            <li
+              className="ts-row ts-row--link"
+              role="button"
+              tabIndex={0}
+              onClick={openBlank}
+              onKeyDown={(e) => e.key === 'Enter' && openBlank()}
+            >
+              <IconTestBlank className="ts-row__icon" />
+              <span className="ts-row__link">Бланк тестирования</span>
+              <IconTestChevron className="ts-row__chevron" />
+            </li>
+            {data.scales && (
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={openConclusion}
+                onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
+              >
+                <IconTestConclusion className="ts-row__icon" />
+                <span className="ts-row__link">Пример заключения</span>
+                <IconTestChevron className="ts-row__chevron" />
+              </li>
+            )}
+          </ul>
+        )}
 
         {(data.questions || data.duration || data.age || data.forms) && (
           <CollapseCard title="Тестовая информация">
@@ -279,35 +308,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               )}
             </ul>
           </CollapseCard>
-        )}
-
-        {(data.scales || blank) && (
-          <ul className="ts-card ts-card--wide-dividers">
-            <li
-              className="ts-row ts-row--link"
-              role="button"
-              tabIndex={0}
-              onClick={openBlank}
-              onKeyDown={(e) => e.key === 'Enter' && openBlank()}
-            >
-              <IconTestBlank className="ts-row__icon" />
-              <span className="ts-row__link">Бланк тестирования</span>
-              <IconTestChevron className="ts-row__chevron" />
-            </li>
-            {data.scales && (
-              <li
-                className="ts-row ts-row--link"
-                role="button"
-                tabIndex={0}
-                onClick={openConclusion}
-                onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
-              >
-                <IconTestConclusion className="ts-row__icon" />
-                <span className="ts-row__link">Пример заключения</span>
-                <IconTestChevron className="ts-row__chevron" />
-              </li>
-            )}
-          </ul>
         )}
 
         {data.scales && (

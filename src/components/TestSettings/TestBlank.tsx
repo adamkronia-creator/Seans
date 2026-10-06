@@ -4,10 +4,10 @@ import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
 /** Карточка бланка: заголовок с кнопкой «свернуть», содержимое плавно сворачивается */
-export function CollapseCard({ title, badge, id, large, children }: { title: string; badge?: ReactNode; id?: string; large?: boolean; children: ReactNode }) {
+export function CollapseCard({ title, badge, id, children }: { title: string; badge?: ReactNode; id?: string; children: ReactNode }) {
   const [open, setOpen] = useState(true);
   return (
-    <section className={`blank-card${large ? ' blank-card--lg' : ''}`} id={id}>
+    <section className="blank-card" id={id}>
       <button
         type="button"
         className="blank-card__head"

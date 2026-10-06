@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 44px;
+  height: 48px;
   padding: 0 var(--space-3);
 }
 
@@ -330,24 +330,63 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  border-left: 1px dashed rgb(0 0 0 / 35%);
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 18%) 0 4px, transparent 4px 8px);
 }
 
-/* Кнопка оглавления у правого края */
-.cc-handle {
-  position: absolute;
-  right: 8px;
-  bottom: 24px;
-  z-index: 5;
+/* Ползунок быстрой прокрутки в правом поле (16): тянется за собой страницу, по нажатию открывает оглавление */
+.cc-wrap {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 92%);
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cc-rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+}
+
+.cc-thumb {
+  position: absolute;
+  top: 0;
+  right: 1px;
+  display: flex;
+  justify-content: flex-end;
+  width: 24px;
+  height: 32px;
+  padding: 4px 0;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+}
+
+.cc-thumb svg {
+  display: block;
+  filter: drop-shadow(0 0 1px rgb(0 0 0 / 10%));
+}
+
+/* Подпись текущего раздела слева от ползунка, пока его тянут */
+.cc-thumb__label {
+  position: absolute;
+  top: 50%;
+  right: 22px;
+  max-width: 240px;
+  padding: 6px 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-panel);
   box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
-  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-50%);
 }
 
 /* Оглавление: боковая панель справа поверх затемнения */

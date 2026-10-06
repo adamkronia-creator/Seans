@@ -21,13 +21,8 @@
 
 .blank-card__title {
   flex: 1;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: 19px;
-}
-
-.blank-card--lg .blank-card__title {
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
   line-height: 22px;
 }
 

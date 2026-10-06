@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   IconCaseCalendar,
   IconTestAge,
@@ -97,7 +98,7 @@ function ScaleCharts({
 }) {
   const Icon = group === 'main' ? IconTestReportMain : IconTestReportExtra;
   return (
-    <CollapseCard large title={title} id={`cc-${group}`}>
+    <CollapseCard title={title} id={`cc-${group}`}>
       <div className="cc-chart">
         <Axis kind={group} />
         <ul className={`cc-bars cc-bars--${group}`}>
@@ -128,7 +129,6 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
   const order: ScaleLevel[] = [level, ...LEVEL_ORDER.filter((l) => l !== level)];
   return (
     <CollapseCard
-      large
       title={scale.name}
       id={`cc-scale-${scale.code}`}
       badge={<span className="cc-badge">Шкала {scale.code}</span>}
@@ -184,7 +184,7 @@ export function TestConclusion({ form }: { form: string }) {
 
   return (
     <>
-      <CollapseCard large title="Общая информация" id="cc-info">
+      <CollapseCard title="Общая информация" id="cc-info">
         <ul className="cc-info">
           <li>
             <IconCaseCalendar className="cc-info__icon" />
@@ -235,29 +235,91 @@ const SECTIONS = [
   ...SMOL_CONCLUSION.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
 ];
 
+const scrollerEl = () => document.querySelector<HTMLElement>('.cc-wrap .test-settings__scroll');
+
+/** Текущий раздел — последний, верх которого уже поднялся выше верхней линии окна */
+function sectionAt(root: HTMLElement) {
+  const line = root.getBoundingClientRect().top + 24;
+  let current = SECTIONS[0];
+  for (const section of SECTIONS) {
+    const el = document.getElementById(section.id);
+    if (el && el.getBoundingClientRect().top <= line) current = section;
+  }
+  return current;
+}
+
 /**
- * Круглая кнопка у края экрана и боковая панель с оглавлением: нажатие на раздел
- * прокручивает заключение к нему, текущий раздел подсвечен.
+ * Ползунок в правом поле: ездит вместе с прокруткой, его можно тянуть (сверху подпись раздела),
+ * а по короткому нажатию он открывает боковую панель с оглавлением.
  */
 export function ConclusionNav() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(SECTIONS[0].id);
+  const [dragging, setDragging] = useState(false);
+  const [label, setLabel] = useState(SECTIONS[0].title);
+  const [scrollable, setScrollable] = useState(false);
+  const rail = useRef<HTMLDivElement>(null);
+  const thumb = useRef<HTMLDivElement>(null);
+  const press = useRef<{ y: number; moved: boolean } | null>(null);
 
-  const scroller = () => document.querySelector<HTMLElement>('.test-settings__scroll');
+  const THUMB_H = 32;
 
-  const show = () => {
-    const root = scroller();
-    if (root) {
-      const line = root.getBoundingClientRect().top + 24;
-      // Текущий раздел — последний, верх которого уже поднялся выше верхней линии
-      let current = SECTIONS[0].id;
-      for (const { id } of SECTIONS) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= line) current = id;
-      }
-      setActive(current);
-    }
+  // Положение ползунка по прокрутке
+  useEffect(() => {
+    const root = scrollerEl();
+    if (!root) return;
+    const place = () => {
+      const max = root.scrollHeight - root.clientHeight;
+      setScrollable(max > 8);
+      const travel = root.clientHeight - THUMB_H;
+      const frac = max > 0 ? root.scrollTop / max : 0;
+      if (thumb.current) thumb.current.style.transform = `translateY(${frac * travel}px)`;
+    };
+    place();
+    root.addEventListener('scroll', place, { passive: true });
+    const observer = new ResizeObserver(place);
+    observer.observe(root);
+    if (root.firstElementChild) observer.observe(root.firstElementChild);
+    return () => {
+      root.removeEventListener('scroll', place);
+      observer.disconnect();
+    };
+  }, []);
+
+  const openToc = () => {
+    const root = scrollerEl();
+    if (root) setActive(sectionAt(root).id);
     setOpen(true);
+  };
+
+  const dragTo = (clientY: number) => {
+    const root = scrollerEl();
+    const box = rail.current?.getBoundingClientRect();
+    if (!root || !box) return;
+    const travel = box.height - THUMB_H;
+    const frac = Math.min(1, Math.max(0, (clientY - box.top - THUMB_H / 2) / travel));
+    root.scrollTop = frac * (root.scrollHeight - root.clientHeight);
+    setLabel(sectionAt(root).title);
+  };
+
+  const onDown = (e: React.PointerEvent) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    press.current = { y: e.clientY, moved: false };
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const start = press.current;
+    if (!start) return;
+    if (!start.moved && Math.abs(e.clientY - start.y) > 4) {
+      start.moved = true;
+      setDragging(true);
+    }
+    if (start.moved) dragTo(e.clientY);
+  };
+  const onUp = () => {
+    const start = press.current;
+    press.current = null;
+    setDragging(false);
+    if (start && !start.moved) openToc();
   };
 
   const go = (id: string) => {
@@ -272,33 +334,51 @@ export function ConclusionNav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  const toc = (
+    <div className={`cc-toc${open ? ' cc-toc--open' : ''}`} aria-hidden={!open}>
+      <button type="button" className="cc-toc__backdrop" aria-label="Закрыть оглавление" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
+      <nav className="cc-toc__panel" aria-label="Оглавление">
+        <ul>
+          {SECTIONS.map(({ id, title }) => (
+            <li key={id}>
+              <button
+                type="button"
+                className={`cc-toc__item${id === active ? ' cc-toc__item--active' : ''}`}
+                tabIndex={open ? 0 : -1}
+                onClick={() => go(id)}
+              >
+                {title}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  );
+
   return (
     <>
-      <button type="button" className="cc-handle" aria-label="Оглавление" onClick={show}>
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M7 10l5-5 5 5" />
-          <path d="M7 14l5 5 5-5" />
-        </svg>
-      </button>
-      <div className={`cc-toc${open ? ' cc-toc--open' : ''}`} aria-hidden={!open}>
-        <button type="button" className="cc-toc__backdrop" aria-label="Закрыть оглавление" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
-        <nav className="cc-toc__panel" aria-label="Оглавление">
-          <ul>
-            {SECTIONS.map(({ id, title }) => (
-              <li key={id}>
-                <button
-                  type="button"
-                  className={`cc-toc__item${id === active ? ' cc-toc__item--active' : ''}`}
-                  tabIndex={open ? 0 : -1}
-                  onClick={() => go(id)}
-                >
-                  {title}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className="cc-rail" ref={rail} hidden={!scrollable}>
+        <div
+          ref={thumb}
+          className="cc-thumb"
+          role="button"
+          tabIndex={0}
+          aria-label="Оглавление: нажмите, чтобы открыть, или потяните, чтобы прокрутить"
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openToc()}
+        >
+          {dragging && <span className="cc-thumb__label">{label}</span>}
+          <svg width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
+            <rect x="2" y="2" width="10" height="20" rx="5" fill="#fff" />
+            <path d="M5 17l2 2 2-2M9 7L7 5 5 7" stroke="#818C99" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
       </div>
+      {createPortal(toc, document.querySelector('.app') ?? document.body)}
     </>
   );
 }

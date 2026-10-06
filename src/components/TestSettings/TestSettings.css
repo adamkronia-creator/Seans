@@ -154,8 +154,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  width: 100%;
   height: 64px;
-  padding-bottom: 4px;
+  padding-bottom: var(--space-3);
   background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-bg-panel) 85%);
   color: var(--color-accent);
   transition:
@@ -166,8 +167,9 @@
 /* Раскрыто: без градиента, стрелка вверх под текстом */
 .ts-desc__toggle--open {
   position: static;
-  height: 28px;
-  margin-top: var(--space-2);
+  width: 100%;
+  height: 20px;
+  margin-top: var(--space-3);
   padding-bottom: 0;
   background: none;
   align-items: center;
@@ -211,15 +213,10 @@
   content: '';
   position: absolute;
   top: -1px;
-  right: var(--space-3);
-  left: var(--space-3);
+  right: 0;
+  left: 40px;
   height: 1px;
   background: var(--color-divider);
-}
-
-.ts-card--wide-dividers .ts-row + .ts-row::before {
-  right: 0;
-  left: 0;
 }
 
 .ts-row--top {
