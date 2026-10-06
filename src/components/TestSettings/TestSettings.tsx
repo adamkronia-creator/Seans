@@ -29,7 +29,8 @@ import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/libra
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank, blankSections } from './TestBlank';
-import { CONCLUSION_SECTIONS, TestConclusion } from './TestConclusion';
+import { conclusionSections, TestConclusion } from './TestConclusion';
+import { conclusionFor } from '../../data/conclusions';
 import { SectionNav } from '../SectionNav/SectionNav';
 import './TestSettings.css';
 
@@ -113,6 +114,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   // Открыт ли «Пример заключения» (пока есть только у СМОЛ)
   const [conclusionOpen, setConclusionOpen] = useState(false);
   const blank = testBlank(test.id);
+  const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
 
   const client = chatId ? CHATS.find((c) => c.id === chatId) : undefined;
@@ -174,7 +176,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </div>
     );
   };
-  const openConclusion = () => (test.id === 'smol' ? setConclusionOpen(true) : notify('Пример заключения этого теста пока недоступен'));
+  const openConclusion = () => (conclusion ? setConclusionOpen(true) : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'));
 
   return (
@@ -201,12 +203,12 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </button>
       </header>
 
-      {conclusionOpen ? (
+      {conclusionOpen && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <div className="test-settings__scroll">
-            <TestConclusion form={form} />
+            <TestConclusion data={conclusion} form={form} />
           </div>
-          <SectionNav sections={CONCLUSION_SECTIONS} scroller=".test-settings__scroll" />
+          <SectionNav sections={conclusionSections(conclusion)} scroller=".test-settings__scroll" />
         </div>
       ) : blankOpen && blank ? (
         <>

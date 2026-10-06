@@ -1,7 +1,5 @@
 /* Интерпретации диапазонов шкал СМОЛ: личность, эмоции, поведение (три абзаца на диапазон) */
-export type ScaleLevel = 'low' | 'mid' | 'high';
-
-export const SMOL_INTERPRETATION: Record<string, Record<ScaleLevel, string[]>> = {
+export const SMOL_INTERPRETATION: Record<string, Record<string, string[]>> = {
   "Hs": {
     "low": [
       "Личность. Внимание к состоянию здоровья обычно умеренное. Человек не склонен чрезмерно сосредотачиваться на телесных ощущениях и, как правило, не связывает эмоциональные трудности с состоянием организма.",

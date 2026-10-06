@@ -105,8 +105,9 @@
   width: 40px;
 }
 
+/* Подпись строки: 28 для однобуквенных кодов (L, F, K), 40 для длинных */
 .cc-bars--extra .cc-bar__label {
-  width: 28px;
+  width: var(--cc-label, 28px);
 }
 
 .cc-track {
@@ -131,6 +132,14 @@
 
 .cc-fill--yellow {
   background: var(--color-yellow);
+}
+
+.cc-fill--orange {
+  background: var(--color-orange);
+}
+
+.cc-fill--accent {
+  background: var(--color-accent);
 }
 
 .cc-fill--red {
@@ -159,6 +168,7 @@
 /* Легенда: три цветных чипа по центру */
 .cc-legend {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
   margin: var(--space-3) 0 0;
@@ -195,6 +205,11 @@
   color: var(--color-green);
 }
 
+.cc-chip--orange {
+  background: rgb(255 141 40 / 12%);
+  color: var(--color-orange);
+}
+
 .cc-chip--red {
   background: rgb(255 56 60 / 12%);
   color: var(--color-red);
@@ -206,6 +221,14 @@
 
 .cc-tone--green {
   color: var(--color-green);
+}
+
+.cc-tone--orange {
+  color: var(--color-orange);
+}
+
+.cc-tone--accent {
+  color: var(--color-accent);
 }
 
 .cc-tone--red {

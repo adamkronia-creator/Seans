@@ -8,28 +8,17 @@ import {
   IconTestTime,
   IconTestTimeStart,
 } from '../icons';
-import {
-  LEVELS,
-  LEVEL_ORDER,
-  SMOL_CONCLUSION,
-  SMOL_MAX,
-  interpretation,
-  levelOf,
-  type ConclusionScale,
-  type ScaleLevel,
-} from '../../data/smolConclusion';
+import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { CollapseCard } from './TestBlank';
 import './TestConclusion.css';
 
-const AXIS_VALUES = [0, 40, 70, 110];
-
-/** Ось 0 · 40 · 70 · 110: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
-function Axis({ kind }: { kind: 'main' | 'extra' | 'single' }) {
+/** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
+function Axis({ kind, ticks, max }: { kind: 'main' | 'extra' | 'single'; ticks: number[]; max: number }) {
   return (
     <div className={`cc-axis cc-axis--${kind}`} aria-hidden="true">
       <div className="cc-axis__scale">
-        {AXIS_VALUES.map((v) => (
-          <span key={v} style={{ left: `${(v / SMOL_MAX) * 100}%` }}>
+        {ticks.map((v) => (
+          <span key={v} style={{ left: `${(v / max) * 100}%` }}>
             {v}
           </span>
         ))}
@@ -46,76 +35,85 @@ export function pointsWord(n: number) {
   return last >= 2 && last <= 4 ? 'балла' : 'баллов';
 }
 
-function Legend() {
+function Legend({ data }: { data: ConclusionData }) {
   return (
     <ul className="cc-legend">
-      {LEVEL_ORDER.map((level) => (
-        <li key={level} className={`cc-chip cc-chip--${LEVELS[level].tone}`}>
+      {data.levels.map((level) => (
+        <li key={level.key} className={`cc-chip cc-chip--${level.tone}`}>
           <span className="cc-chip__dot" />
-          {LEVELS[level].legend}
+          {level.legend}
         </li>
       ))}
     </ul>
   );
 }
 
-/** Полоса шкалы: заливка цвета диапазона по баллу из 110 и значение у конца полосы */
-function Bar({ score }: { score: number }) {
-  const level = levelOf(score);
-  const pct = (score / SMOL_MAX) * 100;
+/** Полоса шкалы: заливка цвета диапазона, значение у конца полосы, белые линии на границах диапазонов */
+function Bar({ data, scale }: { data: ConclusionData; scale: ConclusionScale }) {
+  const pct = (scale.score / scale.max) * 100;
+  const tone = scale.leveled ? levelOf(data, scale.score).tone : 'accent';
   return (
     <span className="cc-track">
-      <span className="cc-norm" style={{ left: `${(40 / SMOL_MAX) * 100}%` }} aria-hidden="true" />
-      <span className="cc-norm" style={{ left: `${(70 / SMOL_MAX) * 100}%` }} aria-hidden="true" />
-      <span className={`cc-fill cc-fill--${LEVELS[level].tone}`} style={{ width: `${pct}%` }} />
+      {scale.leveled &&
+        data.levels
+          .filter((l) => l.from > 0)
+          .map((l) => <span key={l.key} className="cc-norm" style={{ left: `${(l.from / scale.max) * 100}%` }} aria-hidden="true" />)}
+      <span className={`cc-fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
       <span className="cc-value" style={{ left: `calc(${pct}% + 4px)` }}>
-        {score}
+        {scale.score}
       </span>
     </span>
   );
 }
 
 function ScaleCharts({
+  data,
   title,
   scales,
   group,
   onOpen,
 }: {
+  data: ConclusionData;
   title: string;
   scales: ConclusionScale[];
   group: 'main' | 'extra';
   onOpen: (code: string) => void;
 }) {
   const Icon = group === 'main' ? IconTestReportMain : IconTestReportExtra;
+  // Диапазоны и общая ось есть, только если все шкалы группы с диапазонами
+  const leveled = scales.every((s) => s.leveled);
   return (
     <CollapseCard title={title} id={`cc-${group}`}>
       <div className="cc-chart">
-        <Axis kind={group} />
-        <ul className={`cc-bars cc-bars--${group}`}>
+        {leveled && <Axis kind={group} ticks={data.ticks} max={data.max} />}
+        <ul
+          className={`cc-bars cc-bars--${group}`}
+          style={{ '--cc-label': scales.some((s) => s.code.length > 1) ? '40px' : '28px' } as React.CSSProperties}
+        >
           {scales.map((s, i) => (
             <li key={s.code} className="cc-bar">
               <span className="cc-bar__label">
                 {i + 1}. {s.code}
               </span>
-              <Bar score={s.score} />
+              <Bar data={data} scale={s} />
               <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
                 <Icon />
               </button>
             </li>
           ))}
         </ul>
-        <Legend />
+        {leveled && <Legend data={data} />}
       </div>
     </CollapseCard>
   );
 }
 
-function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: number; onChart: () => void }) {
-  const level = levelOf(scale.score);
-  const meta = LEVELS[level];
-  const pct = Math.round((scale.score / SMOL_MAX) * 100);
+function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scale: ConclusionScale; index: number; onChart: () => void }) {
+  const pct = Math.round((scale.score / scale.max) * 100);
+  const level = scale.leveled ? levelOf(data, scale.score) : undefined;
   // Сначала диапазон клиента, затем остальные по возрастанию
-  const order: ScaleLevel[] = [level, ...LEVEL_ORDER.filter((l) => l !== level)];
+  const order = level ? [level, ...data.levels.filter((l) => l.key !== level.key)] : [];
+  const texts = data.interpretation[scale.code] ?? {};
   return (
     <CollapseCard
       title={scale.name}
@@ -125,33 +123,41 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
       <div className="cc-scale">
         <p className="cc-scale__text">— {scale.about}</p>
         <p className="cc-scale__text">
-          Шкала имеет <strong className={`cc-tone--${meta.tone}`}>
+          Шкала имеет{' '}
+          <strong className={level ? `cc-tone--${level.tone}` : 'cc-tone--accent'}>
             {scale.score} {pointsWord(scale.score)}
-          </strong> из {SMOL_MAX}{' '}
-          <span className="cc-muted">({pct}%)</span>, что является{' '}
-          <strong className={`cc-tone--${meta.tone}`}>{meta.verdict}</strong> показателем{level === 'high' && ', выходящим за рамки нормативного диапазона'}.
+          </strong>{' '}
+          из {scale.max} <span className="cc-muted">({pct}%)</span>
+          {level ? (
+            <>
+              , что {level.verdictPre}
+              <strong className={`cc-tone--${level.tone}`}>{level.verdict}</strong>
+              {level.verdictPost}
+            </>
+          ) : null}
+          .
         </p>
         <div className="cc-single">
           <div className="cc-bar">
             <span className="cc-bar__label">
               {index + 1}. {scale.code}
             </span>
-            <Bar score={scale.score} />
+            <Bar data={data} scale={scale} />
             <button type="button" className="cc-icon" aria-label="К диаграмме шкал" onClick={onChart}>
               <IconTestScaleChart />
             </button>
           </div>
-          <Axis kind="single" />
+          <Axis kind="single" ticks={scale.leveled ? data.ticks : [0, scale.max]} max={scale.max} />
         </div>
       </div>
       {order.map((l) => (
-        <section key={l} className="cc-level">
-          <h3 className={`cc-level__head cc-tone--${LEVELS[l].tone}`}>
+        <section key={l.key} className="cc-level">
+          <h3 className={`cc-level__head cc-tone--${l.tone}`}>
             <span className="cc-level__dot" />
-            {LEVELS[l].range}
-            <span className={`cc-level__chip cc-chip--${LEVELS[l].tone}`}>{LEVELS[l].chip}</span>
+            {l.range}
+            <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>
           </h3>
-          {interpretation(scale.code, l).map((paragraph) => (
+          {(texts[l.key] ?? []).map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </section>
@@ -160,9 +166,19 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
   );
 }
 
-/** Пример заключения по СМОЛ: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
-export function TestConclusion({ form }: { form: string }) {
-  const { info, scales } = SMOL_CONCLUSION;
+/** Разделы заключения для оглавления, по порядку на странице */
+export function conclusionSections(data: ConclusionData) {
+  return [
+    { id: 'cc-info', title: 'Общая информация' },
+    { id: 'cc-main', title: 'Основные шкалы' },
+    { id: 'cc-extra', title: 'Дополнительные шкалы' },
+    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
+  ];
+}
+
+/** Пример заключения: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
+export function TestConclusion({ data, form }: { data: ConclusionData; form: string }) {
+  const { info, scales } = data;
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
 
@@ -202,23 +218,15 @@ export function TestConclusion({ form }: { form: string }) {
         </ul>
       </CollapseCard>
 
-      <ScaleCharts title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
-      <ScaleCharts title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+      <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+      <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
 
       {main.map((s, i) => (
-        <ScaleCard key={s.code} scale={s} index={i} onChart={() => scrollTo('cc-main')} />
+        <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-main')} />
       ))}
       {extra.map((s, i) => (
-        <ScaleCard key={s.code} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
+        <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
       ))}
     </>
   );
 }
-
-/** Оглавление: разделы заключения по порядку на странице */
-export const CONCLUSION_SECTIONS = [
-  { id: 'cc-info', title: 'Общая информация' },
-  { id: 'cc-main', title: 'Основные шкалы' },
-  { id: 'cc-extra', title: 'Дополнительные шкалы' },
-  ...SMOL_CONCLUSION.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
-];
