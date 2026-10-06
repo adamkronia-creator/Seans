@@ -346,3 +346,12 @@
   flex-direction: column;
   min-height: 0;
 }
+
+/* Без общих диаграмм подпись строки — только код шкалы, без номера */
+.cc-single--plain .cc-bar__label {
+  width: 28px;
+}
+
+.cc-single--plain .cc-axis--single {
+  padding-left: 36px;
+}

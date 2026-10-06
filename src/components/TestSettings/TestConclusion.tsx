@@ -27,6 +27,9 @@ function Axis({ kind, ticks, max }: { kind: 'main' | 'extra' | 'single'; ticks: 
   );
 }
 
+/** Подпись строки: «1. Hs»; если шкала в заключении одна на диаграмму (без общих диаграмм), только код */
+const rowLabel = (data: ConclusionData, code: string, index: number) => (data.overview ? `${index + 1}. ${code}` : code);
+
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
 export function pointsWord(n: number) {
   const last = n % 10;
@@ -92,9 +95,7 @@ function ScaleCharts({
         >
           {scales.map((s, i) => (
             <li key={s.code} className="cc-bar">
-              <span className="cc-bar__label">
-                {i + 1}. {s.code}
-              </span>
+              <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
               <Bar data={data} scale={s} />
               <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
                 <Icon />
@@ -118,7 +119,7 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
     <CollapseCard
       title={scale.name}
       id={`cc-scale-${scale.code}`}
-      badge={<span className="cc-badge">Шкала {scale.code}</span>}
+      badge={data.overview ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
     >
       <div className="cc-scale">
         <p className="cc-scale__text">— {scale.about}</p>
@@ -137,15 +138,15 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
           ) : null}
           .
         </p>
-        <div className="cc-single">
+        <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
           <div className="cc-bar">
-            <span className="cc-bar__label">
-              {index + 1}. {scale.code}
-            </span>
+            <span className="cc-bar__label">{rowLabel(data, scale.code, index)}</span>
             <Bar data={data} scale={scale} />
-            <button type="button" className="cc-icon" aria-label="К диаграмме шкал" onClick={onChart}>
-              <IconTestScaleChart />
-            </button>
+            {data.overview && (
+              <button type="button" className="cc-icon" aria-label="К диаграмме шкал" onClick={onChart}>
+                <IconTestScaleChart />
+              </button>
+            )}
           </div>
           <Axis kind="single" ticks={scale.leveled ? data.ticks : [0, scale.max]} max={scale.max} />
         </div>
@@ -170,8 +171,12 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
 export function conclusionSections(data: ConclusionData) {
   return [
     { id: 'cc-info', title: 'Общая информация' },
-    { id: 'cc-main', title: 'Основные шкалы' },
-    { id: 'cc-extra', title: 'Дополнительные шкалы' },
+    ...(data.overview
+      ? [
+          { id: 'cc-main', title: 'Основные шкалы' },
+          { id: 'cc-extra', title: 'Дополнительные шкалы' },
+        ]
+      : []),
     ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
   ];
 }
@@ -218,8 +223,12 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
         </ul>
       </CollapseCard>
 
-      <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
-      <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+      {data.overview && (
+        <>
+          <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+        </>
+      )}
 
       {main.map((s, i) => (
         <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-main')} />

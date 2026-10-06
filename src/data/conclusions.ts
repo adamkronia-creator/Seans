@@ -39,6 +39,8 @@ export interface ConclusionScale {
 
 export interface ConclusionData {
   info: { date: string; time: string; duration: string; age: string };
+  /** Показывать ли общие диаграммы основных и дополнительных шкал и метки «Шкала …» */
+  overview: boolean;
   /** Максимум шкал с диапазонами */
   max: number;
   levels: ConclusionLevel[];
@@ -53,6 +55,7 @@ export const levelOf = (data: ConclusionData, score: number): ConclusionLevel =>
   data.levels.find((l) => score >= l.from && score <= l.to) ?? data.levels[data.levels.length - 1];
 
 const SMOL: ConclusionData = {
+  overview: true,
   info: { date: '25.05.2026', time: '20:28–20:46', duration: '18 мин. 43 с.', age: '23 года' },
   max: 110,
   ticks: [0, 40, 70, 110],
@@ -78,6 +81,7 @@ const SMOL: ConclusionData = {
 };
 
 const BDI: ConclusionData = {
+  overview: false,
   info: { date: '25.05.2026', time: '19:12–19:16', duration: '4 мин. 12 с.', age: '23 года' },
   max: 63,
   ticks: [0, 10, 19, 30, 63],
@@ -88,12 +92,12 @@ const BDI: ConclusionData = {
     { key: 'severe', from: 30, to: 63, range: '30 — 63', legend: 'Тяжелая', chip: 'Тяжелая депрессия', tone: 'red', verdictPre: 'соответствует уровню: ', verdict: 'тяжелая депрессия', verdictPost: '' },
   ],
   scales: [
-    { code: 'BDI', name: 'Депрессия', group: 'main', score: 22, max: 63, leveled: true, about: 'оценивает общую выраженность депрессивной симптоматики на момент обследования: сниженное настроение, пессимизм, чувство вины, снижение активности и соматические проявления.' },
+    { code: 'D', name: 'Депрессия', group: 'main', score: 22, max: 63, leveled: true, about: 'оценивает общую выраженность депрессивной симптоматики на момент обследования: сниженное настроение, пессимизм, чувство вины, снижение активности и соматические проявления.' },
     { code: 'КА', name: 'Когнитивно-аффективные проявления', group: 'extra', score: 14, max: 39, leveled: false, about: 'оценивает когнитивные и эмоциональные проявления депрессии: сниженное настроение, пессимизм, чувство вины и неудачи, самокритику и неудовлетворенность собой.' },
     { code: 'С', name: 'Соматические проявления', group: 'extra', score: 8, max: 24, leveled: false, about: 'оценивает телесные проявления депрессии: утомляемость, нарушения сна и аппетита, снижение работоспособности и интереса к жизни.' },
   ],
   interpretation: {
-    BDI: {
+    D: {
       none: [
         'Выраженных депрессивных симптомов не выявлено. Настроение, интерес к деятельности, сон и аппетит находятся в пределах обычных колебаний.',
         'Показатель не указывает на необходимость специального вмешательства; при изменении состояния тест можно повторить для сравнения.',

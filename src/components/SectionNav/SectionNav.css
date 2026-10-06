@@ -2,6 +2,7 @@
 .sec-toc {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   z-index: 20;
   visibility: hidden;
   transition: visibility 0s linear 0.25s;
