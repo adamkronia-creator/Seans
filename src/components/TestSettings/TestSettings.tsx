@@ -252,6 +252,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 onClick={() => setDescOpen(!descOpen)}
               >
                 <IconTestChevronDown className="ts-desc__chevron" />
+                <span>{descOpen ? 'Свернуть' : 'Развернуть'}</span>
               </button>
             )}
           </div>
