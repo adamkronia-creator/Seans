@@ -347,20 +347,15 @@
   min-height: 0;
 }
 
-/* Без общих диаграмм подпись строки — только код шкалы, без номера; отступы 4, столбцы стоят в ряд */
-.cc-single--plain .cc-bar {
-  gap: var(--space-1);
-}
-
-.cc-single--plain .cc-bar__label {
-  width: 24px;
-}
-
+/* Без общих диаграмм сокращений нет: столбец занимает всю ширину строки, подписи оси по краям не выходят за поля */
 .cc-single--plain .cc-axis--single {
-  padding: 0 0 0 28px;
+  padding: 0;
 }
 
-/* Последняя подпись (63, 39, 24) не выходит за поля блока: она выровнена по правому краю дорожки */
+.cc-single--plain .cc-axis__scale span:first-child {
+  transform: none;
+}
+
 .cc-single--plain .cc-axis__scale span:last-child {
   transform: translateX(-100%);
 }

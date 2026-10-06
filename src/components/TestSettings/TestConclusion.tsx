@@ -140,7 +140,7 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
         </p>
         <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
           <div className="cc-bar">
-            <span className="cc-bar__label">{rowLabel(data, scale.code, index)}</span>
+            {data.overview && <span className="cc-bar__label">{rowLabel(data, scale.code, index)}</span>}
             <Bar data={data} scale={scale} />
             {data.overview && (
               <button type="button" className="cc-icon" aria-label="К диаграмме шкал" onClick={onChart}>
@@ -177,7 +177,7 @@ export function conclusionSections(data: ConclusionData) {
           { id: 'cc-extra', title: 'Дополнительные шкалы' },
         ]
       : []),
-    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
+    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: data.overview ? `${s.name} (${s.code})` : s.name })),
   ];
 }
 
