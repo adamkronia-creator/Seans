@@ -29,7 +29,7 @@ import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/libra
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank } from './TestBlank';
-import { TestConclusion } from './TestConclusion';
+import { ConclusionNav, TestConclusion } from './TestConclusion';
 import './TestSettings.css';
 
 /** Сколько абзацев описания видно в свёрнутом виде */
@@ -201,9 +201,12 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </header>
 
       {conclusionOpen ? (
-        <div className="test-settings__scroll" key="conclusion">
-          <TestConclusion form={form} />
-        </div>
+        <>
+          <div className="test-settings__scroll" key="conclusion">
+            <TestConclusion form={form} />
+          </div>
+          <ConclusionNav />
+        </>
       ) : blankOpen && blank ? (
         <div className="test-settings__scroll" key="blank">
           <TestBlank data={blank} />
@@ -223,14 +226,15 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                     </div>
                   </div>
                 </div>
+                {/* Свёрнуто: текст плавно уходит в белый, стрелка лежит на нём; раскрыто: стрелка «вверх» под текстом */}
                 <button
                   type="button"
-                  className="ts-desc__toggle"
+                  className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
                   aria-expanded={descOpen}
                   aria-label={descOpen ? 'Свернуть описание' : 'Показать описание полностью'}
                   onClick={() => setDescOpen(!descOpen)}
                 >
-                  <IconTestChevronDown className={`ts-desc__chevron${descOpen ? ' ts-desc__chevron--open' : ''}`} />
+                  <IconTestChevronDown className="ts-desc__chevron" />
                 </button>
               </>
             )}

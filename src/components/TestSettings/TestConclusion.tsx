@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   IconCaseCalendar,
   IconTestAge,
@@ -21,24 +22,39 @@ import {
 import { CollapseCard } from './TestBlank';
 import './TestConclusion.css';
 
-/** Подписи оси 0 · 40 · 70 · 110: положение в долях ширины карточки, как в макете */
-const AXIS = {
-  main: [16.9, 40.4, 59.6, 89.2],
-  extra: [16.9, 40.4, 64.5, 90],
-  single: [16.9, 40.4, 59.6, 89.2],
-} as const;
 const AXIS_VALUES = [0, 40, 70, 110];
 
-function Axis({ kind }: { kind: keyof typeof AXIS }) {
+/** Ось 0 · 40 · 70 · 110: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
+function Axis({ kind }: { kind: 'main' | 'extra' | 'single' }) {
   return (
-    <div className="cc-axis" aria-hidden="true">
-      {AXIS_VALUES.map((v, i) => (
-        <span key={v} style={{ left: `${AXIS[kind][i]}%` }}>
-          {v}
-        </span>
-      ))}
+    <div className={`cc-axis cc-axis--${kind}`} aria-hidden="true">
+      <div className="cc-axis__scale">
+        {AXIS_VALUES.map((v) => (
+          <span key={v} style={{ left: `${(v / SMOL_MAX) * 100}%` }}>
+            {v}
+          </span>
+        ))}
+      </div>
     </div>
   );
+}
+
+/** Пунктирные линии на 40 и 70: границы нормы, видно, какие столбцы выходят за них */
+function Guides({ kind }: { kind: 'main' | 'extra' | 'single' }) {
+  return (
+    <span className={`cc-guides cc-guides--${kind}`} aria-hidden="true">
+      <span style={{ left: `${(40 / SMOL_MAX) * 100}%` }} />
+      <span style={{ left: `${(70 / SMOL_MAX) * 100}%` }} />
+    </span>
+  );
+}
+
+/** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
+export function pointsWord(n: number) {
+  const last = n % 10;
+  if (n % 100 >= 11 && n % 100 <= 14) return 'баллов';
+  if (last === 1) return 'балл';
+  return last >= 2 && last <= 4 ? 'балла' : 'баллов';
 }
 
 function Legend() {
@@ -85,6 +101,7 @@ function ScaleCharts({
       <div className="cc-chart">
         <Axis kind={group} />
         <ul className={`cc-bars cc-bars--${group}`}>
+          <Guides kind={group} />
           {scales.map((s, i) => (
             <li key={s.code} className="cc-bar">
               <span className="cc-bar__label">
@@ -119,12 +136,15 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
       <div className="cc-scale">
         <p className="cc-scale__text">— {scale.about}</p>
         <p className="cc-scale__text">
-          Шкала имеет <strong className={`cc-tone--${meta.tone}`}>{scale.score} баллов</strong> из {SMOL_MAX}{' '}
+          Шкала имеет <strong className={`cc-tone--${meta.tone}`}>
+            {scale.score} {pointsWord(scale.score)}
+          </strong> из {SMOL_MAX}{' '}
           <span className="cc-muted">({pct}%)</span>, что является{' '}
           <strong className={`cc-tone--${meta.tone}`}>{meta.verdict}</strong> показателем{level === 'high' && ', выходящим за рамки нормативного диапазона'}.
         </p>
         <div className="cc-single">
           <div className="cc-bar">
+            <Guides kind="single" />
             <span className="cc-bar__label">
               {index + 1}. {scale.code}
             </span>
@@ -164,7 +184,7 @@ export function TestConclusion({ form }: { form: string }) {
 
   return (
     <>
-      <CollapseCard large title="Общая информация">
+      <CollapseCard large title="Общая информация" id="cc-info">
         <ul className="cc-info">
           <li>
             <IconCaseCalendar className="cc-info__icon" />
@@ -203,6 +223,82 @@ export function TestConclusion({ form }: { form: string }) {
       {extra.map((s, i) => (
         <ScaleCard key={s.code} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
       ))}
+    </>
+  );
+}
+
+/** Оглавление: разделы заключения по порядку на странице */
+const SECTIONS = [
+  { id: 'cc-info', title: 'Общая информация' },
+  { id: 'cc-main', title: 'Основные шкалы' },
+  { id: 'cc-extra', title: 'Дополнительные шкалы' },
+  ...SMOL_CONCLUSION.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
+];
+
+/**
+ * Круглая кнопка у края экрана и боковая панель с оглавлением: нажатие на раздел
+ * прокручивает заключение к нему, текущий раздел подсвечен.
+ */
+export function ConclusionNav() {
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(SECTIONS[0].id);
+
+  const scroller = () => document.querySelector<HTMLElement>('.test-settings__scroll');
+
+  const show = () => {
+    const root = scroller();
+    if (root) {
+      const line = root.getBoundingClientRect().top + 24;
+      // Текущий раздел — последний, верх которого уже поднялся выше верхней линии
+      let current = SECTIONS[0].id;
+      for (const { id } of SECTIONS) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) current = id;
+      }
+      setActive(current);
+    }
+    setOpen(true);
+  };
+
+  const go = (id: string) => {
+    setOpen(false);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  return (
+    <>
+      <button type="button" className="cc-handle" aria-label="Оглавление" onClick={show}>
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M7 10l5-5 5 5" />
+          <path d="M7 14l5 5 5-5" />
+        </svg>
+      </button>
+      <div className={`cc-toc${open ? ' cc-toc--open' : ''}`} aria-hidden={!open}>
+        <button type="button" className="cc-toc__backdrop" aria-label="Закрыть оглавление" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
+        <nav className="cc-toc__panel" aria-label="Оглавление">
+          <ul>
+            {SECTIONS.map(({ id, title }) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  className={`cc-toc__item${id === active ? ' cc-toc__item--active' : ''}`}
+                  tabIndex={open ? 0 : -1}
+                  onClick={() => go(id)}
+                >
+                  {title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </>
   );
 }

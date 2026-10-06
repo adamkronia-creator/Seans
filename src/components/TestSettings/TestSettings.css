@@ -141,12 +141,36 @@
   padding-top: var(--space-3);
 }
 
+.ts-desc {
+  position: relative;
+}
+
+/* Кнопка: в свёрнутом виде покрывает последние строки белым градиентом, стрелка внизу */
 .ts-desc__toggle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
+  align-items: flex-end;
   justify-content: center;
-  width: 100%;
-  margin-top: var(--space-2);
+  height: 64px;
+  padding-bottom: 4px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-bg-panel) 85%);
   color: var(--color-accent);
+  transition:
+    height 0.25s ease,
+    background-color 0.25s ease;
+}
+
+/* Раскрыто: без градиента, стрелка вверх под текстом */
+.ts-desc__toggle--open {
+  position: static;
+  height: 28px;
+  margin-top: var(--space-2);
+  padding-bottom: 0;
+  background: none;
+  align-items: center;
 }
 
 .ts-desc__chevron {
@@ -154,7 +178,7 @@
   transition: transform 0.25s ease;
 }
 
-.ts-desc__chevron--open {
+.ts-desc__toggle--open .ts-desc__chevron {
   transform: rotate(180deg);
 }
 

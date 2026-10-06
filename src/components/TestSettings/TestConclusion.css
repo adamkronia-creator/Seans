@@ -44,7 +44,6 @@
 }
 
 .cc-axis {
-  position: relative;
   height: 14px;
   margin-bottom: var(--space-3);
   color: var(--color-text-caption);
@@ -52,13 +51,33 @@
   line-height: 14px;
 }
 
-.cc-axis span {
+/* Подписи в той же геометрии, что у полос: слева подпись строки, справа иконка */
+.cc-axis--main {
+  padding: 0 44px 0 60px;
+}
+
+.cc-axis--extra {
+  padding: 0 44px 0 48px;
+}
+
+.cc-axis--single {
+  margin: 6px 0 0;
+  padding: 0 32px 0 48px;
+}
+
+.cc-axis__scale {
+  position: relative;
+  height: 14px;
+}
+
+.cc-axis__scale span {
   position: absolute;
   top: 0;
   transform: translateX(-50%);
 }
 
 .cc-bars {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -226,12 +245,10 @@
 }
 
 .cc-single .cc-bar {
+  position: relative;
   padding: 0;
 }
 
-.cc-single .cc-axis {
-  margin: 6px calc(-1 * var(--space-3)) 0;
-}
 
 /* Диапазоны: разделитель с отступом 12, заголовок с чипом 28, абзацы через 12 */
 .cc-level {
@@ -283,4 +300,128 @@
 /* При переходе по иконке карточка встаёт с отступом от шапки */
 .blank-card[id^="cc-"] {
   scroll-margin-top: 11px;
+}
+
+/* Линии нормы 40 и 70 поверх полос: от начала до конца дорожки */
+.cc-guides {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cc-guides--main {
+  right: 44px;
+  left: 60px;
+}
+
+.cc-guides--extra {
+  right: 44px;
+  left: 48px;
+}
+
+.cc-guides--single {
+  right: 32px;
+  left: 48px;
+}
+
+.cc-guides span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed rgb(0 0 0 / 35%);
+}
+
+/* Кнопка оглавления у правого края */
+.cc-handle {
+  position: absolute;
+  right: 8px;
+  bottom: 24px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+  color: var(--color-text-primary);
+}
+
+/* Оглавление: боковая панель справа поверх затемнения */
+.cc-toc {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  visibility: hidden;
+  transition: visibility 0s linear 0.25s;
+}
+
+.cc-toc--open {
+  visibility: visible;
+  transition: none;
+}
+
+.cc-toc__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: rgb(0 0 0 / 40%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.cc-toc--open .cc-toc__backdrop {
+  opacity: 1;
+}
+
+.cc-toc__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: calc(100% - 56px);
+  padding: 52px var(--space-4) var(--space-4) var(--space-3);
+  overflow-y: auto;
+  background: var(--color-bg-app);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.cc-toc--open .cc-toc__panel {
+  transform: none;
+}
+
+.cc-toc__panel ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-toc__item {
+  width: 100%;
+  min-height: 43px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+  text-align: left;
+  line-height: 19px;
+}
+
+.cc-toc__item--active {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-toc__backdrop,
+  .cc-toc__panel {
+    transition: none;
+  }
 }
