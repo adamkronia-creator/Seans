@@ -113,6 +113,15 @@
   list-style: disc;
 }
 
+/* Списки: отступ 8 от основного текста и между пунктами */
+.ts-card__paragraph p + .ts-card__list {
+  margin-top: var(--space-2);
+}
+
+.ts-card__list li + li {
+  margin-top: var(--space-2);
+}
+
 .ts-card__paragraph + .ts-card__paragraph {
   margin-top: var(--space-3);
 }
