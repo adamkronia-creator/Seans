@@ -219,6 +219,10 @@
   background: var(--color-divider);
 }
 
+.ts-card--wide-dividers .ts-row + .ts-row::before {
+  left: 0;
+}
+
 .ts-row--top {
   align-items: flex-start;
   padding-block: var(--space-3);

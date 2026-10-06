@@ -242,7 +242,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </CollapseCard>
 
         {(data.scales || blank) && (
-          <ul className="ts-card">
+          <ul className="ts-card ts-card--wide-dividers">
             <li
               className="ts-row ts-row--link"
               role="button"

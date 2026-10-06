@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { scrollHooks } from '../AppScrollbar/scrollHooks';
 import {
   IconCaseCalendar,
   IconTestAge,
@@ -40,16 +41,6 @@ function Axis({ kind }: { kind: 'main' | 'extra' | 'single' }) {
   );
 }
 
-/** Пунктирные линии на 40 и 70: границы нормы, видно, какие столбцы выходят за них */
-function Guides({ kind }: { kind: 'main' | 'extra' | 'single' }) {
-  return (
-    <span className={`cc-guides cc-guides--${kind}`} aria-hidden="true">
-      <span style={{ left: `${(40 / SMOL_MAX) * 100}%` }} />
-      <span style={{ left: `${(70 / SMOL_MAX) * 100}%` }} />
-    </span>
-  );
-}
-
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
 export function pointsWord(n: number) {
   const last = n % 10;
@@ -77,6 +68,8 @@ function Bar({ score }: { score: number }) {
   const pct = (score / SMOL_MAX) * 100;
   return (
     <span className="cc-track">
+      <span className="cc-norm" style={{ left: `${(40 / SMOL_MAX) * 100}%` }} aria-hidden="true" />
+      <span className="cc-norm" style={{ left: `${(70 / SMOL_MAX) * 100}%` }} aria-hidden="true" />
       <span className={`cc-fill cc-fill--${LEVELS[level].tone}`} style={{ width: `${pct}%` }} />
       <span className="cc-value" style={{ left: `calc(${pct}% + 4px)` }}>
         {score}
@@ -102,7 +95,6 @@ function ScaleCharts({
       <div className="cc-chart">
         <Axis kind={group} />
         <ul className={`cc-bars cc-bars--${group}`}>
-          <Guides kind={group} />
           {scales.map((s, i) => (
             <li key={s.code} className="cc-bar">
               <span className="cc-bar__label">
@@ -144,7 +136,6 @@ function ScaleCard({ scale, index, onChart }: { scale: ConclusionScale; index: n
         </p>
         <div className="cc-single">
           <div className="cc-bar">
-            <Guides kind="single" />
             <span className="cc-bar__label">
               {index + 1}. {scale.code}
             </span>
@@ -249,42 +240,12 @@ function sectionAt(root: HTMLElement) {
 }
 
 /**
- * Ползунок в правом поле: ездит вместе с прокруткой, его можно тянуть (сверху подпись раздела),
- * а по короткому нажатию он открывает боковую панель с оглавлением.
+ * Оглавление: короткое нажатие на точку общей полосы прокрутки открывает боковую панель,
+ * а при перетаскивании рядом с точкой показывается название текущего раздела.
  */
 export function ConclusionNav() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(SECTIONS[0].id);
-  const [dragging, setDragging] = useState(false);
-  const [label, setLabel] = useState(SECTIONS[0].title);
-  const [scrollable, setScrollable] = useState(false);
-  const rail = useRef<HTMLDivElement>(null);
-  const thumb = useRef<HTMLDivElement>(null);
-  const press = useRef<{ y: number; moved: boolean } | null>(null);
-
-  const THUMB_H = 32;
-
-  // Положение ползунка по прокрутке
-  useEffect(() => {
-    const root = scrollerEl();
-    if (!root) return;
-    const place = () => {
-      const max = root.scrollHeight - root.clientHeight;
-      setScrollable(max > 8);
-      const travel = root.clientHeight - THUMB_H;
-      const frac = max > 0 ? root.scrollTop / max : 0;
-      if (thumb.current) thumb.current.style.transform = `translateY(${frac * travel}px)`;
-    };
-    place();
-    root.addEventListener('scroll', place, { passive: true });
-    const observer = new ResizeObserver(place);
-    observer.observe(root);
-    if (root.firstElementChild) observer.observe(root.firstElementChild);
-    return () => {
-      root.removeEventListener('scroll', place);
-      observer.disconnect();
-    };
-  }, []);
 
   const openToc = () => {
     const root = scrollerEl();
@@ -292,35 +253,18 @@ export function ConclusionNav() {
     setOpen(true);
   };
 
-  const dragTo = (clientY: number) => {
+  useEffect(() => {
     const root = scrollerEl();
-    const box = rail.current?.getBoundingClientRect();
-    if (!root || !box) return;
-    const travel = box.height - THUMB_H;
-    const frac = Math.min(1, Math.max(0, (clientY - box.top - THUMB_H / 2) / travel));
-    root.scrollTop = frac * (root.scrollHeight - root.clientHeight);
-    setLabel(sectionAt(root).title);
-  };
-
-  const onDown = (e: React.PointerEvent) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    press.current = { y: e.clientY, moved: false };
-  };
-  const onMove = (e: React.PointerEvent) => {
-    const start = press.current;
-    if (!start) return;
-    if (!start.moved && Math.abs(e.clientY - start.y) > 4) {
-      start.moved = true;
-      setDragging(true);
-    }
-    if (start.moved) dragTo(e.clientY);
-  };
-  const onUp = () => {
-    const start = press.current;
-    press.current = null;
-    setDragging(false);
-    if (start && !start.moved) openToc();
-  };
+    if (!root) return;
+    scrollHooks.set(root, {
+      label: () => sectionAt(root).title,
+      tap: openToc,
+    });
+    return () => {
+      scrollHooks.delete(root);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const go = (id: string) => {
     setOpen(false);
@@ -358,26 +302,6 @@ export function ConclusionNav() {
 
   return (
     <>
-      <div className="cc-rail" ref={rail} hidden={!scrollable}>
-        <div
-          ref={thumb}
-          className="cc-thumb"
-          role="button"
-          tabIndex={0}
-          aria-label="Оглавление: нажмите, чтобы открыть, или потяните, чтобы прокрутить"
-          onPointerDown={onDown}
-          onPointerMove={onMove}
-          onPointerUp={onUp}
-          onPointerCancel={onUp}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openToc()}
-        >
-          {dragging && <span className="cc-thumb__label">{label}</span>}
-          <svg width="14" height="24" viewBox="0 0 14 24" fill="none" aria-hidden="true">
-            <rect x="2" y="2" width="10" height="20" rx="5" fill="#fff" />
-            <path d="M5 17l2 2 2-2M9 7L7 5 5 7" stroke="#818C99" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </div>
       {createPortal(toc, document.querySelector('.app') ?? document.body)}
     </>
   );

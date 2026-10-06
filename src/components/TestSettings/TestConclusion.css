@@ -302,91 +302,21 @@
   scroll-margin-top: 11px;
 }
 
-/* Линии нормы 40 и 70 поверх полос: от начала до конца дорожки */
-.cc-guides {
+/* Границы нормы 40 и 70: белые сплошные линии 50%, только на строках с полосами */
+.cc-norm {
   position: absolute;
   top: 0;
   bottom: 0;
   z-index: 1;
-  pointer-events: none;
-}
-
-.cc-guides--main {
-  right: 44px;
-  left: 60px;
-}
-
-.cc-guides--extra {
-  right: 44px;
-  left: 48px;
-}
-
-.cc-guides--single {
-  right: 32px;
-  left: 48px;
-}
-
-.cc-guides span {
-  position: absolute;
-  top: 0;
-  bottom: 0;
   width: 1px;
-  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 18%) 0 4px, transparent 4px 8px);
+  background: rgb(255 255 255 / 50%);
 }
 
-/* Ползунок быстрой прокрутки в правом поле (16): тянется за собой страницу, по нажатию открывает оглавление */
 .cc-wrap {
-  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
-}
-
-.cc-rail {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 24px;
-  pointer-events: none;
-}
-
-.cc-thumb {
-  position: absolute;
-  top: 0;
-  right: 1px;
-  display: flex;
-  justify-content: flex-end;
-  width: 24px;
-  height: 32px;
-  padding: 4px 0;
-  pointer-events: auto;
-  touch-action: none;
-  cursor: grab;
-}
-
-.cc-thumb svg {
-  display: block;
-  filter: drop-shadow(0 0 1px rgb(0 0 0 / 10%));
-}
-
-/* Подпись текущего раздела слева от ползунка, пока его тянут */
-.cc-thumb__label {
-  position: absolute;
-  top: 50%;
-  right: 22px;
-  max-width: 240px;
-  padding: 6px 14px;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-panel);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
-  font-weight: var(--font-weight-semibold);
-  line-height: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transform: translateY(-50%);
 }
 
 /* Оглавление: боковая панель справа поверх затемнения */
