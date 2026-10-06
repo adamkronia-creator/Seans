@@ -27,13 +27,23 @@ export function CollapseCard({ title, badge, id, children }: { title: string; ba
   );
 }
 
+/** Разделы бланка для оглавления: два блока и каждый десятый вопрос */
+export function blankSections(data: TestBlankData) {
+  const sections = [
+    { id: 'blank-rules', title: 'Правила тестирования' },
+    { id: 'blank-qa', title: 'Вопросы и ответы' },
+  ];
+  for (let n = 10; n <= data.questions.length; n += 10) sections.push({ id: `blank-q-${n}`, title: `Вопрос ${n}` });
+  return sections;
+}
+
 /** Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент) */
 export function TestBlank({ data }: { data: TestBlankData }) {
   // Выбранные ответы нужны только для просмотра: отметка никуда не сохраняется
   const [picked, setPicked] = useState<Record<number, number>>({});
   return (
     <>
-      <CollapseCard title="Правила тестирования">
+      <CollapseCard title="Правила тестирования" id="blank-rules">
         <ol className="blank-rules">
           {data.rules.map((rule) => (
             <li key={rule}>{rule}</li>
@@ -41,10 +51,10 @@ export function TestBlank({ data }: { data: TestBlankData }) {
         </ol>
       </CollapseCard>
 
-      <CollapseCard title="Вопросы и ответы">
+      <CollapseCard title="Вопросы и ответы" id="blank-qa">
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
-            <li key={i} className="blank-question">
+            <li key={i} id={(i + 1) % 10 === 0 ? `blank-q-${i + 1}` : undefined} className="blank-question">
               <p className="blank-question__prompt">
                 <strong>{i + 1}.</strong> {q.prompt}
               </p>

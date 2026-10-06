@@ -321,3 +321,8 @@
   font-size: var(--font-size-xs);
   line-height: 12px;
 }
+
+/* При переходе по оглавлению карточка встаёт с отступом от шапки */
+.case-card {
+  scroll-margin-top: 11px;
+}

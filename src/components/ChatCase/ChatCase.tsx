@@ -1,4 +1,5 @@
 import { useRef, useState, type CSSProperties } from 'react';
+import { SectionNav } from '../SectionNav/SectionNav';
 import { Badge } from '../Badge/Badge';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
@@ -42,7 +43,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
   const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick);
 
   return (
-    <li className="case-card case-card--editable" {...doubleTap}>
+    <li id={`case-s-${section.id}`} className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head" style={toneStyle(section.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -169,7 +170,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
   return (
-    <li className="case-card case-card--editable" {...doubleTap}>
+    <li id={`case-n-${note.id}`} className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -221,8 +222,17 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
     { id: 'materials', label: 'Материалы', count: files.length },
   ];
 
+  // Оглавление по карточкам открытой вкладки: сведения или заметки
+  const navSections =
+    !hasData || segment === 'materials'
+      ? []
+      : segment === 'info'
+        ? caseSections.map((x) => ({ id: `case-s-${x.id}`, title: x.title }))
+        : notes.map((x) => ({ id: `case-n-${x.id}`, title: x.title }));
+
   return (
     <div className="chat-case">
+      <SectionNav sections={navSections} scroller=".chat-case" />
       <div className="case-segments" role="tablist" aria-label="Разделы кейса">
         {segments.map(({ id, label, count }) => (
           <button

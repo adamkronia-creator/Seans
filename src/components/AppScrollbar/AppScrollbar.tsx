@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { scrollHooks } from './scrollHooks';
 import './AppScrollbar.css';
 
-/** Высота зоны нажатия и размеры точки — как в макете: точка 12, зона 20×40 */
+/** Высота зоны нажатия и размеры точки — как в макете: точка 12, зона 40×40 */
 const HIT_H = 40;
 
 const isScrollable = (el: HTMLElement) => {
@@ -73,7 +73,13 @@ export function AppScrollbar() {
     const onScroll = (e: Event) => schedule(e.target !== target.current);
     document.addEventListener('scroll', onScroll, true);
     window.addEventListener('resize', () => schedule(true));
-    const mutations = new MutationObserver(() => schedule(true));
+    // После смены экрана или раскрытия панели с анимацией выбираем блок ещё раз, когда она закончилась
+    let settle = 0;
+    const mutations = new MutationObserver(() => {
+      schedule(true);
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => schedule(true), 320);
+    });
     mutations.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
     document.addEventListener('transitionend', () => schedule(true), true);
     schedule(true);
@@ -81,6 +87,7 @@ export function AppScrollbar() {
       cancelAnimationFrame(frame.current);
       document.removeEventListener('scroll', onScroll, true);
       mutations.disconnect();
+      window.clearTimeout(settle);
     };
   }, []);
 

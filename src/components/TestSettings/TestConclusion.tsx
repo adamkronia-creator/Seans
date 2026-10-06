@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { scrollHooks } from '../AppScrollbar/scrollHooks';
 import {
   IconCaseCalendar,
   IconTestAge,
@@ -219,90 +216,9 @@ export function TestConclusion({ form }: { form: string }) {
 }
 
 /** Оглавление: разделы заключения по порядку на странице */
-const SECTIONS = [
+export const CONCLUSION_SECTIONS = [
   { id: 'cc-info', title: 'Общая информация' },
   { id: 'cc-main', title: 'Основные шкалы' },
   { id: 'cc-extra', title: 'Дополнительные шкалы' },
   ...SMOL_CONCLUSION.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: `${s.name} (${s.code})` })),
 ];
-
-const scrollerEl = () => document.querySelector<HTMLElement>('.cc-wrap .test-settings__scroll');
-
-/** Текущий раздел — последний, верх которого уже поднялся выше верхней линии окна */
-function sectionAt(root: HTMLElement) {
-  const line = root.getBoundingClientRect().top + 24;
-  let current = SECTIONS[0];
-  for (const section of SECTIONS) {
-    const el = document.getElementById(section.id);
-    if (el && el.getBoundingClientRect().top <= line) current = section;
-  }
-  return current;
-}
-
-/**
- * Оглавление: короткое нажатие на точку общей полосы прокрутки открывает боковую панель,
- * а при перетаскивании рядом с точкой показывается название текущего раздела.
- */
-export function ConclusionNav() {
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(SECTIONS[0].id);
-
-  const openToc = () => {
-    const root = scrollerEl();
-    if (root) setActive(sectionAt(root).id);
-    setOpen(true);
-  };
-
-  useEffect(() => {
-    const root = scrollerEl();
-    if (!root) return;
-    scrollHooks.set(root, {
-      label: () => sectionAt(root).title,
-      tap: openToc,
-    });
-    return () => {
-      scrollHooks.delete(root);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const go = (id: string) => {
-    setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  const toc = (
-    <div className={`cc-toc${open ? ' cc-toc--open' : ''}`} aria-hidden={!open}>
-      <button type="button" className="cc-toc__backdrop" aria-label="Закрыть оглавление" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
-      <nav className="cc-toc__panel" aria-label="Оглавление">
-        <ul>
-          {SECTIONS.map(({ id, title }) => (
-            <li key={id}>
-              <button
-                type="button"
-                className={`cc-toc__item${id === active ? ' cc-toc__item--active' : ''}`}
-                tabIndex={open ? 0 : -1}
-                onClick={() => go(id)}
-              >
-                {title}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
-  );
-
-  return (
-    <>
-      {createPortal(toc, document.querySelector('.app') ?? document.body)}
-    </>
-  );
-}

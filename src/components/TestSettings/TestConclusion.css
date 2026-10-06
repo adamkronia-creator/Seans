@@ -140,6 +140,11 @@
 .cc-value {
   position: absolute;
   top: 0;
+  z-index: 2;
+  padding: 0 2px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--color-divider);
   font-weight: var(--font-weight-semibold);
   line-height: 24px;
 }
@@ -317,80 +322,4 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-}
-
-/* Оглавление: боковая панель справа поверх затемнения */
-.cc-toc {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  visibility: hidden;
-  transition: visibility 0s linear 0.25s;
-}
-
-.cc-toc--open {
-  visibility: visible;
-  transition: none;
-}
-
-.cc-toc__backdrop {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  background: rgb(0 0 0 / 40%);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
-.cc-toc--open .cc-toc__backdrop {
-  opacity: 1;
-}
-
-.cc-toc__panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: calc(100% - 56px);
-  padding: 52px var(--space-4) var(--space-4) var(--space-3);
-  overflow-y: auto;
-  background: var(--color-bg-app);
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
-}
-
-.cc-toc--open .cc-toc__panel {
-  transform: none;
-}
-
-.cc-toc__panel ul {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cc-toc__item {
-  width: 100%;
-  min-height: 43px;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
-  text-align: left;
-  line-height: 19px;
-}
-
-.cc-toc__item--active {
-  color: var(--color-accent);
-  font-weight: var(--font-weight-medium);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cc-toc__backdrop,
-  .cc-toc__panel {
-    transition: none;
-  }
 }

@@ -13,26 +13,26 @@
   width: 2px;
 }
 
-/* Пройденная часть: 50% акцентного */
+/* Пройденная часть: 60% серого A0A9B3 */
 .app-scrollbar__done {
   top: 0;
-  background: color-mix(in srgb, var(--color-accent) 50%, transparent);
+  background: rgb(160 169 179 / 60%);
 }
 
-/* Остаток: 50% от A0A9B3 */
+/* Остаток: 30% серого A0A9B3 */
 .app-scrollbar__rest {
   bottom: 0;
-  background: rgb(160 169 179 / 50%);
+  background: rgb(160 169 179 / 30%);
 }
 
-/* Невидимая зона нажатия 20×40: половина внутри экрана, половина за краем */
+/* Невидимая зона нажатия 40×40: половина внутри экрана, половина за краем */
 .app-scrollbar__hit {
   position: absolute;
-  right: -10px;
+  right: -20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
+  width: 40px;
   height: 40px;
   pointer-events: auto;
   touch-action: none;
@@ -42,7 +42,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--color-accent);
+  background: #a0a9b3;
 }
 
 /* Подпись раздела слева от точки, пока её тянут */

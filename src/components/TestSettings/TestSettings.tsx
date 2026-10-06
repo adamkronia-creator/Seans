@@ -28,8 +28,9 @@ import { logStep } from '../../data/clientStore';
 import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
-import { CollapseCard, TestBlank } from './TestBlank';
-import { ConclusionNav, TestConclusion } from './TestConclusion';
+import { CollapseCard, TestBlank, blankSections } from './TestBlank';
+import { CONCLUSION_SECTIONS, TestConclusion } from './TestConclusion';
+import { SectionNav } from '../SectionNav/SectionNav';
 import './TestSettings.css';
 
 /** Сколько абзацев описания видно в свёрнутом виде */
@@ -205,12 +206,15 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           <div className="test-settings__scroll">
             <TestConclusion form={form} />
           </div>
-          <ConclusionNav />
+          <SectionNav sections={CONCLUSION_SECTIONS} scroller=".test-settings__scroll" />
         </div>
       ) : blankOpen && blank ? (
-        <div className="test-settings__scroll" key="blank">
-          <TestBlank data={blank} />
-        </div>
+        <>
+          <div className="test-settings__scroll" key="blank">
+            <TestBlank data={blank} />
+          </div>
+          <SectionNav sections={blankSections(blank)} scroller=".test-settings__scroll" />
+        </>
       ) : (
       <>
       <div className="test-settings__scroll">

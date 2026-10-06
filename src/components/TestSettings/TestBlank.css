@@ -196,3 +196,9 @@
     transition: none;
   }
 }
+
+/* При переходе по оглавлению блок и вопрос встают с отступом от шапки */
+.blank-card[id],
+.blank-question[id] {
+  scroll-margin-top: 11px;
+}
