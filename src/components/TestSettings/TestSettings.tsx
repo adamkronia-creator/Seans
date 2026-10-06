@@ -34,8 +34,8 @@ import { conclusionFor } from '../../data/conclusions';
 import { SectionNav } from '../SectionNav/SectionNav';
 import './TestSettings.css';
 
-/** Сколько абзацев описания видно в свёрнутом виде */
-const DESC_SHORT = 2;
+/** Высота свёрнутого описания: 6 строк по 19 и промежуток между абзацами 12, одинаково у всех тестов */
+const DESC_COLLAPSED = 6 * 19 + 12;
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -109,8 +109,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [toast, setToast] = useState<string | null>(null);
   // Открыт ли «Бланк тестирования» (вместо настроек, шапка та же)
   const [blankOpen, setBlankOpen] = useState(false);
-  // Длинное описание свёрнуто до двух абзацев, пока его не раскроют
+  // Длинное описание свёрнуто до шести строк, пока его не раскроют
   const [descOpen, setDescOpen] = useState(false);
+  const [descFull, setDescFull] = useState(0);
+  const descRef = useRef<HTMLDivElement>(null);
+  const descLong = descFull > DESC_COLLAPSED + 19;
   // Открыт ли «Пример заключения» (пока есть только у СМОЛ)
   const [conclusionOpen, setConclusionOpen] = useState(false);
   const blank = testBlank(test.id);
@@ -146,6 +149,20 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   };
 
   const chars = message.length;
+  // Полная высота описания нужна, чтобы понять, длинное ли оно, и плавно раскрыть до нужной высоты
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el) return;
+    const measure = () => setDescFull(el.scrollHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [blankOpen, conclusionOpen]);
   const paragraphs = data.intro.split('\n\n');
   // Строки «● …» — маркированный список, остальные — обычный текст абзаца
   const renderParagraph = (paragraph: string, i: number) => {
@@ -222,27 +239,20 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       <div className="test-settings__scroll">
         <CollapseCard title="Описание теста">
           <div className="ts-desc">
-            {paragraphs.slice(0, DESC_SHORT).map((paragraph, i) => renderParagraph(paragraph, i))}
-            {paragraphs.length > DESC_SHORT && (
-              <>
-                <div className={`blank-card__collapse${descOpen ? ' blank-card__collapse--open' : ''}`} aria-hidden={!descOpen}>
-                  <div className="blank-card__inner">
-                    <div className="ts-desc__more">
-                      {paragraphs.slice(DESC_SHORT).map((paragraph, i) => renderParagraph(paragraph, i + DESC_SHORT))}
-                    </div>
-                  </div>
-                </div>
-                {/* Свёрнуто: текст плавно уходит в белый, стрелка лежит на нём; раскрыто: стрелка «вверх» под текстом */}
-                <button
-                  type="button"
-                  className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
-                  aria-expanded={descOpen}
-                  aria-label={descOpen ? 'Свернуть описание' : 'Показать описание полностью'}
-                  onClick={() => setDescOpen(!descOpen)}
-                >
-                  <IconTestChevronDown className="ts-desc__chevron" />
-                </button>
-              </>
+            <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
+              {paragraphs.map((paragraph, i) => renderParagraph(paragraph, i))}
+            </div>
+            {descLong && (
+              /* Свёрнуто: текст плавно уходит в белый, стрелка лежит на нём; раскрыто: стрелка «вверх» под текстом */
+              <button
+                type="button"
+                className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
+                aria-expanded={descOpen}
+                aria-label={descOpen ? 'Свернуть описание' : 'Показать описание полностью'}
+                onClick={() => setDescOpen(!descOpen)}
+              >
+                <IconTestChevronDown className="ts-desc__chevron" />
+              </button>
             )}
           </div>
         </CollapseCard>

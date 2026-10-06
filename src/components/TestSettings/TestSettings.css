@@ -137,15 +137,15 @@
   margin-top: var(--space-3);
 }
 
-.ts-desc__more {
-  padding-top: var(--space-3);
-}
-
 .ts-desc {
   position: relative;
 }
 
-/* Кнопка: в свёрнутом виде покрывает последние строки белым градиентом, стрелка внизу */
+.ts-desc__body {
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
 .ts-desc__toggle {
   position: absolute;
   right: 0;

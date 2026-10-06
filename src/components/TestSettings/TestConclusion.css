@@ -347,11 +347,15 @@
   min-height: 0;
 }
 
-/* Без общих диаграмм подпись строки — только код шкалы, без номера */
+/* Без общих диаграмм подпись строки — только код шкалы, без номера; отступы 4, столбцы стоят в ряд */
+.cc-single--plain .cc-bar {
+  gap: var(--space-1);
+}
+
 .cc-single--plain .cc-bar__label {
-  width: 28px;
+  width: 24px;
 }
 
 .cc-single--plain .cc-axis--single {
-  padding-left: 36px;
+  padding: 0 0 0 28px;
 }
