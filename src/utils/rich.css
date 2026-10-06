@@ -63,26 +63,26 @@
   margin-top: 12px;
 }
 
-/* Списки: между пунктами 8, от основного текста над списком 8
-   (в карточках абзацы разделены промежутком 12, поэтому у списка после текста вычитаем 4) */
+/* Списки: между пунктами 4, от основного текста над списком 4
+   (в карточках абзацы разделены промежутком 12, поэтому у списка после текста вычитаем 8) */
 .rich-ul > li + li,
 .rich-ol > li + li,
 .rich-editor li + li {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .rich-editor p + :is(ul, ol),
 .rich-editor p > :is(ul, ol) {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 p + :is(.rich-ul, .rich-ol) {
-  margin-top: -4px;
+  margin-top: -8px;
 }
 
 /* Редактор вкладывает список в свой <p>: отступ 8 ставим этому <p> */
 .rich-editor p + p:has(> :is(ul, ol):first-child) {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .rich-editor p > :is(ul, ol):first-child {

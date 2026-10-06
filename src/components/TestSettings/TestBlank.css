@@ -56,6 +56,11 @@
   overflow: hidden;
 }
 
+/* Содержимое отделено от заголовка линией 1 */
+.blank-card__body {
+  border-top: 1px solid var(--color-divider);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blank-card__chevron,
   .blank-card__collapse,
@@ -64,14 +69,13 @@
   }
 }
 
-/* Правила: нумерованный список 16/19, отступ слева 8, между пунктами 8 */
+/* Правила: нумерованный список 16/19, отступ слева 8, между пунктами 4 */
 .blank-rules {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   margin: 0;
   padding: var(--space-3) var(--space-3) var(--space-3) 20px;
-  border-top: 1px solid var(--color-divider);
   counter-reset: rule;
   list-style: none;
   font-size: var(--font-size-md);
@@ -94,14 +98,13 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--color-divider);
 }
 
-/* Вопрос: отступы 12, строки 16/20, между вопросом и ответами и между ответами 8; вопросы разделены линией на всю ширину */
+/* Вопрос: отступы 12, строки 16/20, между вопросом и ответами и между ответами 4; вопросы разделены линией на всю ширину */
 .blank-question {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: var(--space-3);
   font-size: var(--font-size-md);
   line-height: 20px;
@@ -119,11 +122,11 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* Варианты ответов: отступ слева 8, между ними 8, цветная точка 8 стоит в начале строки, перенос идёт под точкой */
+/* Варианты ответов: отступ слева 8, между ними 4, цветная точка 8 стоит в начале строки, перенос идёт под точкой */
 .blank-answers {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   margin: 0;
   padding: 0 0 0 8px;
   list-style: none;

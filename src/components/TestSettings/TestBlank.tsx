@@ -4,7 +4,7 @@ import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
 /** Карточка бланка: заголовок с кнопкой «свернуть», содержимое плавно сворачивается */
-function BlankCard({ title, children }: { title: string; children: ReactNode }) {
+export function CollapseCard({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(true);
   return (
     <section className="blank-card">
@@ -18,7 +18,9 @@ function BlankCard({ title, children }: { title: string; children: ReactNode }) 
         <IconTestChevronUp className={`blank-card__chevron${open ? '' : ' blank-card__chevron--closed'}`} />
       </button>
       <div className={`blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`} aria-hidden={!open}>
-        <div className="blank-card__inner">{children}</div>
+        <div className="blank-card__inner">
+          <div className="blank-card__body">{children}</div>
+        </div>
       </div>
     </section>
   );
@@ -30,15 +32,15 @@ export function TestBlank({ data }: { data: TestBlankData }) {
   const [picked, setPicked] = useState<Record<number, number>>({});
   return (
     <>
-      <BlankCard title="Правила тестирования">
+      <CollapseCard title="Правила тестирования">
         <ol className="blank-rules">
           {data.rules.map((rule) => (
             <li key={rule}>{rule}</li>
           ))}
         </ol>
-      </BlankCard>
+      </CollapseCard>
 
-      <BlankCard title="Вопросы и ответы">
+      <CollapseCard title="Вопросы и ответы">
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
             <li key={i} className="blank-question">
@@ -67,7 +69,7 @@ export function TestBlank({ data }: { data: TestBlankData }) {
             </li>
           ))}
         </ol>
-      </BlankCard>
+      </CollapseCard>
     </>
   );
 }

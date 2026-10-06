@@ -157,3 +157,4 @@ export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?rea
 export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
 export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
 export { default as IconTestChevronUp } from '../../assets/icons/test/chevron-up.svg?react';
+export { default as IconTestMessage } from '../../assets/icons/test/message.svg?react';
