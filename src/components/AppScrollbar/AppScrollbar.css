@@ -1,4 +1,4 @@
-/* Полоса прокрутки поверх приложения: линия 2 у правого края и точка 12 с центром на самом крае */
+/* Полоса прокрутки поверх приложения: линия 2 у правого края и точка 14 (60% серого) с центром на самом крае */
 .app-scrollbar {
   position: fixed;
   z-index: 50;
@@ -13,42 +13,42 @@
   width: 2px;
 }
 
-/* Пройденная часть: 60% серого A0A9B3 */
+/* Пройденная часть: 40% серого A0A9B3 */
 .app-scrollbar__done {
   top: 0;
-  background: rgb(160 169 179 / 60%);
+  background: rgb(160 169 179 / 40%);
 }
 
-/* Остаток: 30% серого A0A9B3 */
+/* Остаток: 20% серого A0A9B3 */
 .app-scrollbar__rest {
   bottom: 0;
-  background: rgb(160 169 179 / 30%);
+  background: rgb(160 169 179 / 20%);
 }
 
-/* Невидимая зона нажатия 40×40: половина внутри экрана, половина за краем */
+/* Невидимая зона нажатия 60×40: на экране остаётся 30×40, вторая половина за краем */
 .app-scrollbar__hit {
   position: absolute;
-  right: -20px;
+  right: -30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
+  width: 60px;
   height: 40px;
   pointer-events: auto;
   touch-action: none;
 }
 
 .app-scrollbar__dot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #a0a9b3;
+  background: rgb(160 169 179 / 60%);
 }
 
 /* Подпись раздела слева от точки, пока её тянут */
 .app-scrollbar__label {
   position: absolute;
-  right: 14px;
+  right: 16px;
   max-width: 240px;
   padding: 6px 14px;
   overflow: hidden;
