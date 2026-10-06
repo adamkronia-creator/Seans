@@ -4,41 +4,46 @@
 .rich-editor ul,
 .rich-editor ol {
   margin: 0;
-  padding-left: 24px;
-}
-
-.rich-ul,
-.rich-editor ul {
+  padding-left: 8px; /* отступ списка слева */
   list-style: none;
 }
 
-.rich-ul > li,
-.rich-editor ul > li {
-  position: relative;
+.rich-ol,
+.rich-editor ol {
+  counter-reset: rich-item;
 }
 
-/* Маркер — точка 3.5, как в макете */
+.rich-ul > li,
+.rich-ol > li,
+.rich-editor li {
+  position: relative;
+  padding-left: 12px;
+}
+
+.rich-ol > li,
+.rich-editor ol > li {
+  padding-left: 20px;
+  counter-increment: rich-item;
+}
+
+/* Маркер — точка 3.5 или номер, прижатые к левому краю списка */
 .rich-ul > li::before,
 .rich-editor ul > li::before {
   content: '';
   position: absolute;
   top: 0.44em;
-  left: -14px;
+  left: 0;
   width: 3.5px;
   height: 3.5px;
   border-radius: 50%;
   background: currentColor;
 }
 
-.rich-ol,
-.rich-editor ol {
-  list-style: decimal;
-}
-
-/* Цифры списка выравниваются по тому же отступу, что и точки */
-.rich-ol > li::marker,
-.rich-editor ol > li::marker {
-  font-variant-numeric: tabular-nums;
+.rich-ol > li::before,
+.rich-editor ol > li::before {
+  content: counter(rich-item) '.';
+  position: absolute;
+  left: 0;
 }
 
 .rich-quote,
@@ -58,12 +63,12 @@
   margin-top: 12px;
 }
 
-/* Списки: между пунктами 8, от основного текста над списком тоже 8
+/* Списки: между пунктами 4, от основного текста над списком 8
    (в карточках абзацы разделены промежутком 12, поэтому у списка после текста вычитаем 4) */
 .rich-ul > li + li,
 .rich-ol > li + li,
 .rich-editor li + li {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .rich-editor p + :is(ul, ol),
