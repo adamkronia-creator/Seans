@@ -29,6 +29,7 @@ import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/libra
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank } from './TestBlank';
+import { TestConclusion } from './TestConclusion';
 import './TestSettings.css';
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
@@ -103,6 +104,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [toast, setToast] = useState<string | null>(null);
   // Открыт ли «Бланк тестирования» (вместо настроек, шапка та же)
   const [blankOpen, setBlankOpen] = useState(false);
+  // Открыт ли «Пример заключения» (пока есть только у СМОЛ)
+  const [conclusionOpen, setConclusionOpen] = useState(false);
   const blank = testBlank(test.id);
   const toastTimer = useRef<number>();
 
@@ -135,19 +138,20 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   };
 
   const chars = message.length;
+  const openConclusion = () => (test.id === 'smol' ? setConclusionOpen(true) : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'));
 
   return (
     <section className="test-settings">
       <header className="test-settings__header">
-        <button type="button" className="test-settings__button" aria-label="Назад" onClick={blankOpen ? () => setBlankOpen(false) : onBack}>
+        <button type="button" className="test-settings__button" aria-label="Назад" onClick={blankOpen || conclusionOpen ? () => (setBlankOpen(false), setConclusionOpen(false)) : onBack}>
           <IconBack />
         </button>
         <div className="test-settings__peer">
           <img className="test-settings__icon" src={test.icon} alt="" />
           <div className="test-settings__who">
             <h1 className="test-settings__name">{shortTitle(test.title)}</h1>
-            <p className="test-settings__status">{blankOpen ? 'Бланк тестирования' : 'Настройка теста'}</p>
+            <p className="test-settings__status">{blankOpen ? 'Бланк тестирования' : conclusionOpen ? 'Пример заключения' : 'Настройка теста'}</p>
           </div>
         </div>
         <button
@@ -161,7 +165,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </button>
       </header>
 
-      {blankOpen && blank ? (
+      {conclusionOpen ? (
+        <div className="test-settings__scroll test-settings__scroll--conclusion" key="conclusion">
+          <TestConclusion form={form} />
+        </div>
+      ) : blankOpen && blank ? (
         <div className="test-settings__scroll" key="blank">
           <TestBlank data={blank} />
         </div>
@@ -256,7 +264,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               <IconTestChevron className="ts-row__chevron" />
             </li>
             {data.scales && (
-              <li className="ts-row ts-row--link">
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={openConclusion}
+                onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
+              >
                 <IconTestConclusion className="ts-row__icon" />
                 <span className="ts-row__link">Пример заключения</span>
                 <IconTestChevron className="ts-row__chevron" />

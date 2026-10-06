@@ -107,8 +107,8 @@ const SMOL: TestSettingsData = {
     extra: ['Ложь (L)', 'Достоверность (F)', 'Коррекция (K)'],
   },
   scoring: [
-    { range: '0–39', label: 'низкий показатель', tone: 'green' },
-    { range: '40–69', label: 'средний показатель', tone: 'yellow' },
+    { range: '0–39', label: 'низкий показатель', tone: 'yellow' },
+    { range: '40–69', label: 'средний показатель', tone: 'green' },
     { range: '70–110', label: 'высокий показатель', tone: 'red' },
   ],
   questions: 71,

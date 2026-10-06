@@ -1,0 +1,291 @@
+/* Общая информация: строки 44 с разделителем 1, иконка 24, значение справа */
+.cc-info {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-info li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 44px;
+  padding: 0 var(--space-3);
+}
+
+.cc-info li + li {
+  margin-top: 1px;
+}
+
+.cc-info li + li::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: 0;
+  left: 40px;
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.cc-info__icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.cc-info__label {
+  flex: 1;
+}
+
+/* Диаграмма: ось сверху, строки 24 через 12, внизу легенда */
+.cc-chart {
+  padding: 12px 0 var(--space-3);
+}
+
+.cc-axis {
+  position: relative;
+  height: 14px;
+  margin-bottom: var(--space-3);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: 14px;
+}
+
+.cc-axis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.cc-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 24px;
+  padding: 0 var(--space-3);
+}
+
+.cc-bar__label {
+  flex-shrink: 0;
+  width: 40px;
+  white-space: nowrap;
+}
+
+.cc-bars--main .cc-bar__label,
+.cc-single .cc-bar__label {
+  width: 40px;
+}
+
+.cc-bars--extra .cc-bar__label {
+  width: 28px;
+}
+
+.cc-track {
+  position: relative;
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--color-divider);
+}
+
+.cc-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 4px;
+}
+
+.cc-fill--green {
+  background: var(--color-green);
+}
+
+.cc-fill--yellow {
+  background: var(--color-yellow);
+}
+
+.cc-fill--red {
+  background: var(--color-red);
+}
+
+.cc-value {
+  position: absolute;
+  top: 0;
+  font-weight: var(--font-weight-semibold);
+  line-height: 24px;
+}
+
+.cc-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+/* Легенда: три цветных чипа по центру */
+.cc-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 16px;
+}
+
+.cc-chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.cc-chip--yellow {
+  background: rgb(255 204 0 / 12%);
+  color: var(--color-yellow);
+}
+
+.cc-chip--green {
+  background: rgb(52 199 89 / 12%);
+  color: var(--color-green);
+}
+
+.cc-chip--red {
+  background: rgb(255 56 60 / 12%);
+  color: var(--color-red);
+}
+
+.cc-tone--yellow {
+  color: var(--color-yellow);
+}
+
+.cc-tone--green {
+  color: var(--color-green);
+}
+
+.cc-tone--red {
+  color: var(--color-red);
+}
+
+/* Метка «Шкала Hs» в заголовке карточки */
+.cc-badge {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-divider);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: 17px;
+}
+
+/* Карточка шкалы: тексты 16/19 с отступами 12, абзацы через 12 */
+.cc-scale {
+  padding: var(--space-3);
+  line-height: 19px;
+}
+
+.cc-scale__text {
+  margin: 0;
+}
+
+.cc-scale__text + .cc-scale__text {
+  margin-top: var(--space-3);
+}
+
+.cc-scale strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.cc-muted {
+  color: var(--color-text-caption);
+}
+
+.cc-single {
+  margin-top: var(--space-3);
+}
+
+.cc-single .cc-bar {
+  padding: 0;
+}
+
+.cc-single .cc-axis {
+  margin: 6px calc(-1 * var(--space-3)) 0;
+}
+
+/* Диапазоны: разделитель с отступом 12, заголовок с чипом 28, абзацы через 12 */
+.cc-level {
+  margin: 0 var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-divider);
+  line-height: 19px;
+}
+
+.cc-level:last-child {
+  padding-bottom: var(--space-3);
+}
+
+.cc-level p {
+  margin: 0;
+}
+
+.cc-level p + p {
+  margin-top: var(--space-3);
+}
+
+.cc-level__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 22px;
+}
+
+.cc-level__dot {
+  width: 8px;
+  height: 8px;
+  margin-right: -2px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.cc-level__chip {
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: 22px;
+}
+
+/* Между карточками заключения 14 */
+.test-settings__scroll.test-settings__scroll--conclusion {
+  gap: 14px;
+}
+
+/* При переходе по иконке карточка встаёт с отступом от шапки */
+.blank-card[id^="cc-"] {
+  scroll-margin-top: 11px;
+}

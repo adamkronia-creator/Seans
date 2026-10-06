@@ -4,10 +4,10 @@ import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
 /** Карточка бланка: заголовок с кнопкой «свернуть», содержимое плавно сворачивается */
-export function CollapseCard({ title, children }: { title: string; children: ReactNode }) {
+export function CollapseCard({ title, badge, id, large, children }: { title: string; badge?: ReactNode; id?: string; large?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(true);
   return (
-    <section className="blank-card">
+    <section className={`blank-card${large ? ' blank-card--lg' : ''}`} id={id}>
       <button
         type="button"
         className="blank-card__head"
@@ -15,6 +15,7 @@ export function CollapseCard({ title, children }: { title: string; children: Rea
         onClick={() => setOpen(!open)}
       >
         <span className="blank-card__title">{title}</span>
+        {badge}
         <IconTestChevronUp className={`blank-card__chevron${open ? '' : ' blank-card__chevron--closed'}`} />
       </button>
       <div className={`blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`} aria-hidden={!open}>

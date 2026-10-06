@@ -158,3 +158,7 @@ export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react
 export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
 export { default as IconTestChevronUp } from '../../assets/icons/test/chevron-up.svg?react';
 export { default as IconTestMessage } from '../../assets/icons/test/message.svg?react';
+export { default as IconTestTimeStart } from '../../assets/icons/test/time-start.svg?react';
+export { default as IconTestReportMain } from '../../assets/icons/test/report-main.svg?react';
+export { default as IconTestReportExtra } from '../../assets/icons/test/report-extra.svg?react';
+export { default as IconTestScaleChart } from '../../assets/icons/test/scale-chart.svg?react';
