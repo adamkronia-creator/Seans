@@ -141,7 +141,23 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
+  padding: 7px 11px;
+  border: 1px solid var(--color-divider);
+  border-radius: 12px;
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* Выбранный вариант: акцентная обводка и лёгкая заливка */
+.blank-answer:has(.blank-answer__input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+.blank-answer:active {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .blank-answer__input {
@@ -192,6 +208,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .blank-answer,
   .blank-answer__radio,
   .blank-answer__radio::after {
     transition: none;
