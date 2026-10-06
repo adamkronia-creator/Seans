@@ -359,3 +359,8 @@
 .cc-single--plain .cc-axis--single {
   padding: 0 0 0 28px;
 }
+
+/* Последняя подпись (63, 39, 24) не выходит за поля блока: она выровнена по правому краю дорожки */
+.cc-single--plain .cc-axis__scale span:last-child {
+  transform: translateX(-100%);
+}
