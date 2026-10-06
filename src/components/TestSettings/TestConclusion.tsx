@@ -215,11 +215,13 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
             <span className="cc-info__label">Возраст</span>
             <span>{info.age}</span>
           </li>
-          <li>
-            <IconTestGender className="cc-info__icon" />
-            <span className="cc-info__label">Форма бланка</span>
-            <span>{form}</span>
-          </li>
+          {form && (
+            <li>
+              <IconTestGender className="cc-info__icon" />
+              <span className="cc-info__label">Форма бланка</span>
+              <span>{form}</span>
+            </li>
+          )}
         </ul>
       </CollapseCard>
 

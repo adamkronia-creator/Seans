@@ -343,6 +343,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                   </ul>
                 </div>
               </li>
+              {data.scales.extra.length > 0 && (
               <li className="ts-row ts-row--top">
                 <IconTestScalesExtra className="ts-row__icon" />
                 <div className="ts-scale">
@@ -357,6 +358,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                   </ul>
                 </div>
               </li>
+              )}
               {data.scoring && (
                 <li className="ts-row ts-row--top">
                   <IconTestScoring className="ts-row__icon" />

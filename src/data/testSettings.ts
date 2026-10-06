@@ -69,6 +69,31 @@ const BDI: TestSettingsData = {
   message: DEFAULT_MESSAGE,
 };
 
+const BHS: TestSettingsData = {
+  lead: 'Шкала безнадежности А. Бека («BHS») —',
+  intro: [
+    'Шкала безнадежности А. Бека («BHS») — опросник, который оценивает негативные ожидания относительно будущего, пессимизм, утрату надежды и убежденность в невозможности положительных изменений.',
+    '',
+    'Методика применяется в клинико-психологической практике для:',
+    '● Оценки выраженности безнадежности;',
+    '● Мониторинга состояния клиента в динамике;',
+    '● Выявления факторов риска, требующих внимательной клинической оценки.',
+    '',
+    'Итоговый показатель не является самостоятельным основанием для постановки диагноза.',
+  ].join('\n'),
+  scales: { main: ['Безнадежность'], extra: [] },
+  scoring: [
+    { range: '0–3', label: 'минимальная безнадежность', tone: 'green' },
+    { range: '4–8', label: 'легкая безнадежность', tone: 'yellow' },
+    { range: '9–14', label: 'умеренная безнадежность', tone: 'orange' },
+    { range: '15–20', label: 'тяжелая безнадежность', tone: 'red' },
+  ],
+  questions: 20,
+  duration: '3–5 мин.',
+  age: '16+',
+  message: DEFAULT_MESSAGE,
+};
+
 const SMOL: TestSettingsData = {
   lead: 'Сокращенный многофакторный опросник для исследования личности «СМОЛ» —',
   intro: [
@@ -120,5 +145,6 @@ const SMOL: TestSettingsData = {
 export function testSettings(test: LibraryTest): TestSettingsData {
   if (test.id === 'bdi') return BDI;
   if (test.id === 'smol') return SMOL;
+  if (test.id === 'bhs') return BHS;
   return { intro: `${test.title}.\n\n${test.description}.`, message: DEFAULT_MESSAGE };
 }
