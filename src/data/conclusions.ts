@@ -50,6 +50,8 @@ export interface ConclusionData {
   scales: ConclusionScale[];
   /** Расшифровка: код шкалы → ключ диапазона → абзацы */
   interpretation: Record<string, Record<string, string[]>>;
+  /** Одна общая диаграмма всех шкал («Шкалы тестирования») при `overview: false`; все полосы на оси 0–max */
+  summary?: boolean;
   /** Диаграмма-профиль основных шкал (пики) */
   profile?: boolean;
   /** Вывод по контрольным шкалам: согласованность ответов и возможность интерпретации */
@@ -89,6 +91,7 @@ const SMOL: ConclusionData = {
 
 const BDI: ConclusionData = {
   overview: false,
+  summary: true,
   info: { date: '25.05.2026', time: '19:12–19:16', duration: '4 мин. 12 с.', age: '23 года' },
   max: 63,
   ticks: [0, 10, 19, 30, 63],

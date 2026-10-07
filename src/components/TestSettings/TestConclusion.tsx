@@ -55,15 +55,15 @@ function Legend({ data }: { data: ConclusionData }) {
 }
 
 /** Полоса шкалы: заливка цвета диапазона, значение у конца полосы, белые линии на границах диапазонов */
-function Bar({ data, scale }: { data: ConclusionData; scale: ConclusionScale }) {
-  const pct = (scale.score / scale.max) * 100;
+function Bar({ data, scale, max = scale.max }: { data: ConclusionData; scale: ConclusionScale; max?: number }) {
+  const pct = (scale.score / max) * 100;
   const tone = scale.leveled ? levelOf(data, scale.score).tone : 'accent';
   return (
     <span className="cc-track">
       {scale.leveled &&
         data.levels
           .filter((l) => l.from > 0)
-          .map((l) => <span key={l.key} className="cc-norm" style={{ left: `${(l.from / scale.max) * 100}%` }} aria-hidden="true" />)}
+          .map((l) => <span key={l.key} className="cc-norm" style={{ left: `${(l.from / max) * 100}%` }} aria-hidden="true" />)}
       <span className={`cc-fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
       {/* У почти полной полосы справа не остаётся места: значение уходит внутрь полосы */}
       <span
@@ -129,6 +129,31 @@ function ScaleCharts({
           <span>{data.validity.text}</span>
         </p>
       )}
+    </CollapseCard>
+  );
+}
+
+/** Общая диаграмма «Шкалы тестирования»: основная и дополнительные шкалы на одной оси, без легенды */
+function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: string) => void }) {
+  return (
+    <CollapseCard title="Шкалы тестирования" id="cc-summary">
+      <div className="cc-chart">
+        <Axis kind="main" ticks={data.ticks} max={data.max} />
+        <ul className="cc-bars cc-bars--main">
+          {data.scales.map((s, i) => {
+            const Icon = s.group === 'main' ? IconTestReportMain : IconTestReportExtra;
+            return (
+              <li key={s.code} className="cc-bar">
+                <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
+                <Bar data={data} scale={s} max={data.max} />
+                <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
+                  <Icon />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </CollapseCard>
   );
 }
@@ -253,6 +278,7 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
 export function conclusionSections(data: ConclusionData) {
   return [
     { id: 'cc-info', title: 'Общая информация' },
+    ...(data.summary ? [{ id: 'cc-summary', title: 'Шкалы тестирования' }] : []),
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
@@ -332,6 +358,8 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
           </li>
         </ul>
       )}
+
+      {data.summary && <SummaryChart data={data} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />}
 
       {data.overview && (
         <>
