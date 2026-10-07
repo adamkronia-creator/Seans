@@ -105,6 +105,77 @@ function ScaleCharts({
         </ul>
         {leveled && <Legend data={data} />}
       </div>
+      {group === 'extra' && data.validity && (
+        <p className={`cc-validity${data.validity.ok ? '' : ' cc-validity--warn'}`}>
+          <svg viewBox="0 0 28 28" aria-hidden="true">
+            <circle cx="14" cy="14" r="12" fill="none" stroke="currentColor" strokeWidth="2" />
+            {data.validity.ok ? (
+              <path d="M8.5 14.5l3.8 3.8 7.2-7.6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            ) : (
+              <path d="M14 8v7.5M14 19v.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            )}
+          </svg>
+          <span>{data.validity.text}</span>
+        </p>
+      )}
+    </CollapseCard>
+  );
+}
+
+/** Профиль основных шкал: линия по пикам, коридор нормы 40–69, точки цвета диапазона */
+function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: ConclusionScale[]; onOpen: (code: string) => void }) {
+  const W = 337;
+  const left = 38;
+  const right = 14;
+  const top = 24;
+  const bottom = 196;
+  const y = (v: number) => bottom - ((bottom - top) * v) / data.max;
+  const step = (W - left - right) / scales.length;
+  const x = (i: number) => left + step * (i + 0.5);
+  const corridor = data.levels.find((l) => l.tone === 'green');
+  const pts = scales.map((s, i) => ({ s, cx: x(i), cy: y(s.score), level: levelOf(data, s.score) }));
+  return (
+    <CollapseCard title="Профиль основных шкал" id="cc-profile">
+      <div className="cc-profile">
+        <svg viewBox={`0 0 ${W} 252`} role="img" aria-label="Профиль основных шкал">
+          {corridor && (
+            <>
+              <rect className="cc-profile__band" x={left} y={y(corridor.to + 1)} width={W - left - right} height={y(corridor.from) - y(corridor.to + 1)} />
+              <line className="cc-profile__edge" x1={left} x2={W - right} y1={y(corridor.to + 1)} y2={y(corridor.to + 1)} />
+              <line className="cc-profile__edge" x1={left} x2={W - right} y1={y(corridor.from)} y2={y(corridor.from)} />
+            </>
+          )}
+          <line className="cc-profile__base" x1={left} x2={W - right} y1={bottom} y2={bottom} />
+          {data.ticks.map((v) => (
+            <text key={v} className="cc-profile__tick" x={0} y={y(v) + 4}>
+              {v}
+            </text>
+          ))}
+          <polyline className="cc-profile__line" points={pts.map((p) => `${p.cx},${p.cy}`).join(' ')} />
+          {pts.map((p) => (
+            <g key={p.s.code} className="cc-profile__point" onClick={() => onOpen(p.s.code)}>
+              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="7.5" />
+              <text
+                className={`cc-profile__value cc-profile__value--${p.level.tone}`}
+                x={p.cx}
+                y={p.level.tone === 'red' ? p.cy - 14 : p.cy + 24}
+                textAnchor="middle"
+              >
+                {p.s.score}
+              </text>
+              <text className="cc-profile__code" x={p.cx} y={bottom + 24} textAnchor="middle">
+                {p.s.code}
+              </text>
+            </g>
+          ))}
+          {pts.map((p, i) => (
+            <text key={`n${p.s.code}`} className="cc-profile__num" x={p.cx} y={bottom + 42} textAnchor="middle">
+              {i + 1}
+            </text>
+          ))}
+        </svg>
+        <Legend data={data} />
+      </div>
     </CollapseCard>
   );
 }
@@ -174,6 +245,7 @@ export function conclusionSections(data: ConclusionData) {
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
+          ...(data.profile ? [{ id: 'cc-profile', title: 'Профиль основных шкал' }] : []),
           { id: 'cc-extra', title: 'Дополнительные шкалы' },
         ]
       : []),
@@ -228,6 +300,7 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
       {data.overview && (
         <>
           <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          {data.profile && <ProfileChart data={data} scales={main} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />}
           <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
         </>
       )}

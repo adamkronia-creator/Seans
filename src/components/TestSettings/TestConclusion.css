@@ -359,3 +359,109 @@
 .cc-single--plain .cc-axis__scale span:last-child {
   transform: translateX(-100%);
 }
+
+/* Профиль основных шкал */
+.cc-profile {
+  padding: var(--space-3);
+}
+
+.cc-profile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.cc-profile__band {
+  fill: rgb(52 199 89 / 12%);
+}
+
+.cc-profile__edge {
+  stroke: rgb(52 199 89 / 45%);
+  stroke-dasharray: 3 3;
+}
+
+.cc-profile__base {
+  stroke: var(--color-divider);
+}
+
+.cc-profile__tick,
+.cc-profile__num {
+  fill: var(--color-text-caption);
+  font-size: 12px;
+}
+
+.cc-profile__code {
+  fill: var(--color-text-caption);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+}
+
+.cc-profile__line {
+  fill: none;
+  stroke: #8a929b;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.cc-profile__point {
+  cursor: pointer;
+}
+
+.cc-profile__dot {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.cc-profile__dot--red {
+  fill: var(--color-red);
+}
+
+.cc-profile__dot--green {
+  fill: var(--color-green);
+}
+
+.cc-profile__dot--yellow {
+  fill: #c08a00;
+}
+
+.cc-profile__value {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+}
+
+.cc-profile__value--red {
+  fill: var(--color-red);
+}
+
+.cc-profile__value--green {
+  fill: var(--color-green);
+}
+
+.cc-profile__value--yellow {
+  fill: #9a6b00;
+}
+
+/* Вывод по контрольным шкалам */
+.cc-validity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  line-height: 20px;
+}
+
+.cc-validity svg {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  color: var(--color-green);
+}
+
+.cc-validity--warn svg {
+  color: var(--color-orange);
+}

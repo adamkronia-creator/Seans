@@ -49,6 +49,10 @@ export interface ConclusionData {
   scales: ConclusionScale[];
   /** Расшифровка: код шкалы → ключ диапазона → абзацы */
   interpretation: Record<string, Record<string, string[]>>;
+  /** Диаграмма-профиль основных шкал (пики) */
+  profile?: boolean;
+  /** Вывод по контрольным шкалам: согласованность ответов и возможность интерпретации */
+  validity?: { ok: boolean; text: string };
 }
 
 export const levelOf = (data: ConclusionData, score: number): ConclusionLevel =>
@@ -78,6 +82,8 @@ const SMOL: ConclusionData = {
     { code: 'K', name: 'Коррекция', group: 'extra', max: 110, leveled: true, score: 63, about: 'отражает стремление контролировать самопрезентацию, скрывать трудности и защищать положительный образ себя при прохождении теста.' },
   ],
   interpretation: SMOL_INTERPRETATION,
+  profile: true,
+  validity: { ok: true, text: 'Ответы согласованы — профиль можно интерпретировать.' },
 };
 
 const BDI: ConclusionData = {
