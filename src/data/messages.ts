@@ -3,6 +3,12 @@ export interface Message {
   from: 'me' | 'them';
   text: string;
   time: string;
+  /** Статус исходящего; у старых сообщений считается «прочитано» */
+  status?: 'sending' | 'sent' | 'read';
+  /** Ответ на сообщение с этим id */
+  replyTo?: string;
+  /** Карточка рекомендованного теста (id из библиотеки) */
+  test?: string;
 }
 
 export interface MessageGroup {
@@ -16,7 +22,7 @@ export interface MessageGroup {
 export const MESSAGES: Record<string, MessageGroup[]> = {
   maxim: [
     {
-      label: '3 сентября',
+      label: '3 сентября, чт',
       messages: [
         { id: 'h1', from: 'them', text: 'Здравствуйте. Я хотел бы попробовать психоанализ, потому что в последнее время постоянно чувствую, что делаю что-то не так.', time: '14:08' },
         { id: 'h2', from: 'me', text: 'Здравствуйте, Максим. Расскажите, что происходит.', time: '14:10' },
@@ -28,7 +34,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '4 сентября',
+      label: '4 сентября, пт',
       messages: [
         { id: 'h8', from: 'them', text: 'Сегодня начальник посмотрел мой проект и сказал только: «Давай еще раз обсудим завтра».', time: '18:31' },
         { id: 'h9', from: 'them', text: 'И всё. Но я уже полдня думаю, что он решил, что я некомпетентный.', time: '18:32' },
@@ -40,13 +46,14 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '6 сентября',
+      label: '6 сентября, вс',
       messages: [
         { id: 'h15', from: 'them', text: 'Я поймал себя на том, что перед отправкой сообщения вам несколько раз перечитываю его, чтобы не написать что-нибудь глупое.', time: '12:20' },
+        { id: 'h-test', from: 'me', text: '', time: '20:10', test: 'bdi' },
       ],
     },
     {
-      label: '7 сентября',
+      label: '7 сентября, пн',
       messages: [
         { id: 'h16', from: 'them', text: 'Прошел тест, который вы рекомендовали.', time: '09:42' },
         { id: 'h17', from: 'me', text: 'Что вы почувствовали, когда увидели результат?', time: '09:45' },
@@ -58,7 +65,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '10 сентября',
+      label: '10 сентября, чт',
       messages: [
         { id: 'h23', from: 'them', text: 'Сегодня был сон.', time: '20:18' },
         { id: 'h24', from: 'me', text: 'Расскажите.', time: '20:20' },
@@ -70,32 +77,32 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '11 сентября',
+      label: '11 сентября, пт',
       messages: [
         { id: 'h30', from: 'them', text: 'Сегодня получил хорошую обратную связь на работе, но вместо радости подумал: «А вдруг он просто хотел меня поддержать?»', time: '15:10' },
       ],
     },
     {
-      label: '13 сентября',
+      label: '13 сентября, вс',
       messages: [
         { id: 'h31', from: 'them', text: 'Сделал задание про выбор.', time: '23:12' },
         { id: 'h32', from: 'me', text: 'Что было самым сложным?', time: '23:15' },
         { id: 'h33', from: 'them', text: 'Ответить на вопрос, чего я хочу.', time: '23:17' },
         { id: 'h34', from: 'them', text: 'Я написал семь вариантов, потом пять удалил.', time: '23:18' },
         { id: 'h35', from: 'them', text: 'Потому что они показались глупыми.', time: '23:20' },
-        { id: 'h36', from: 'me', text: 'Кому?', time: '23:24' },
+        { id: 'h36', from: 'me', text: 'Кому?', time: '23:24', replyTo: 'h34' },
         { id: 'h37', from: 'them', text: 'Вот это меня раздражает.', time: '23:27' },
         { id: 'h38', from: 'them', text: 'Даже когда вас нет рядом, я всё равно думаю, что кто-то оценивает мой ответ.', time: '23:28' },
       ],
     },
     {
-      label: '15 сентября',
+      label: '15 сентября, вт',
       messages: [
         { id: 'h39', from: 'them', text: 'Мне кажется, я постоянно жду какого-то окончательного подтверждения, что со мной всё в порядке.', time: '13:40' },
       ],
     },
     {
-      label: '17 сентября',
+      label: '17 сентября, чт',
       messages: [
         { id: 'h40', from: 'them', text: 'Кажется, я злюсь на вас.', time: '18:44' },
         { id: 'h41', from: 'me', text: 'Можете рассказать почему?', time: '18:47' },
@@ -108,7 +115,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '19 сентября',
+      label: '19 сентября, сб',
       messages: [
         { id: 'h48', from: 'them', text: 'Нашел фразу, которую мама часто говорила.', time: '21:41' },
         { id: 'h49', from: 'them', text: '«Не позорься и постарайся лучше».', time: '21:42' },
@@ -119,13 +126,13 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '22 сентября',
+      label: '22 сентября, вт',
       messages: [
         { id: 'h54', from: 'them', text: 'Иногда я думаю, что если кто-то скажет мне, что я хороший, мне станет легче. Но ненадолго.', time: '14:25' },
       ],
     },
     {
-      label: '24 сентября',
+      label: '24 сентября, чт',
       messages: [
         { id: 'h55', from: 'them', text: 'Сегодня на работе отказался доделывать презентацию после шести.', time: '16:32' },
         { id: 'h56', from: 'them', text: 'Раньше бы остался.', time: '16:34' },
@@ -133,12 +140,12 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
         { id: 'h58', from: 'them', text: 'Сначала свободу.', time: '16:39' },
         { id: 'h59', from: 'them', text: 'Потом чувство вины.', time: '16:40' },
         { id: 'h60', from: 'them', text: 'Потом подумал, что начальник теперь считает меня безответственным.', time: '16:42' },
-        { id: 'h61', from: 'me', text: 'И что для вас значит быть безответственным?', time: '16:44' },
+        { id: 'h61', from: 'me', text: 'И что для вас значит быть безответственным?', time: '16:44', replyTo: 'h60' },
         { id: 'h62', from: 'them', text: 'Не быть хорошим.', time: '16:47' },
       ],
     },
     {
-      label: '27 сентября',
+      label: '27 сентября, вс',
       messages: [
         { id: 'h63', from: 'them', text: 'Сделал задание «Если никто не узнает».', time: '21:03' },
         { id: 'h64', from: 'me', text: 'Что получилось?', time: '21:06' },
@@ -151,13 +158,13 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '29 сентября',
+      label: '29 сентября, вт',
       messages: [
         { id: 'h71', from: 'them', text: 'Странно, но после задания я впервые за долгое время просто купил билет и поехал один гулять. Никому ничего не объяснял.', time: '17:15' },
       ],
     },
     {
-      label: '1 октября',
+      label: '1 октября, чт',
       messages: [
         { id: 'h72', from: 'them', text: 'Сегодня впервые подумал: может быть, я вообще не знаю, чего хочу, потому что всё время пытаюсь понять, чего хотят от меня.', time: '22:16' },
         { id: 'h73', from: 'me', text: 'Когда вы это произносите, что меняется?', time: '22:20' },
@@ -167,7 +174,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '4 октября',
+      label: '4 октября, вс',
       messages: [
         { id: 'h77', from: 'them', text: 'Поссорился с девушкой.', time: '11:38' },
         { id: 'h78', from: 'me', text: 'Что произошло?', time: '11:40' },
@@ -180,16 +187,16 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
-      label: '5 октября',
+      label: '5 октября, пн',
       messages: [
         { id: 'h85', from: 'them', text: 'Раньше мне было важно получить от вас правильный ответ. Сейчас я начинаю замечать, как сильно мне вообще нужен этот «правильный ответ».', time: '13:05' },
       ],
     },
     {
-      label: '8 октября',
+      label: '8 октября, чт',
       messages: [
         { id: 'h86', from: 'them', text: 'Сегодня записал одну фразу:\n«Если я перестану стараться быть правильным, я вообще не понимаю, кто я».', time: '19:02' },
-        { id: 'h87', from: 'me', text: 'Как она вам звучит?', time: '19:05' },
+        { id: 'h87', from: 'me', text: 'Как она вам звучит?', time: '19:05', replyTo: 'h86' },
         { id: 'h88', from: 'them', text: 'Как будто это не жалоба.', time: '19:08' },
         { id: 'h89', from: 'them', text: 'Скорее вопрос.', time: '19:10' },
         { id: 'h90', from: 'them', text: 'Раньше я хотел понять, как перестать тревожиться.', time: '19:12' },

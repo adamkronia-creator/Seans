@@ -108,12 +108,19 @@
   background: var(--color-accent);
 }
 
-/* Лента: сообщения прижаты к низу; поля 16, снизу 12 до панели ввода */
+/* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 16, снизу 12 до панели ввода */
+.chat__feed {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .chat__messages {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
   min-height: 0;
   padding: var(--space-4) var(--space-4) 11px; /* 12 до нижнего края разделителя панели */
   overflow-y: auto;
@@ -123,20 +130,149 @@
   margin-top: auto;
 }
 
-/* Разделитель дня 63×28: подпись 12/16, отступ 16 и до, и после (8 + gap 8) */
-.chat__day:not(:first-child) {
-  margin-top: 8px; /* 8 + gap 8 = 16, как после даты */
+/* День одной группой: подпись дня прилипает к верху ленты, пока идёт день */
+.chat__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
+.chat__group + .chat__group {
+  margin-top: 8px; /* 8 + gap 8 = 16 до подписи дня, как после неё */
+}
+
+.chat__group--typing {
+  margin-top: 0 !important;
+}
+
+/* Разделитель дня 63×28: подпись 12/16, отступ 16 и до, и после (8 + gap 8) */
 .chat__day {
+  position: sticky;
+  top: 3px;
+  z-index: 2;
   align-self: center;
   margin-bottom: 8px; /* 8 + gap 8 = 16 */
   padding: 6px 8px;
   border-radius: var(--radius-pill);
   background: var(--color-stroke);
+  /* кольцо цвета фона отделяет прилипшую подпись от пузырей под ней */
+  box-shadow: 0 0 0 3px var(--color-bg-app);
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
+}
+
+/* Кнопка «к последним сообщениям» */
+.chat__down {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-stroke);
+  border-radius: 50%;
+  background: var(--color-bg-panel);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  color: var(--color-text-caption);
+  font-size: 24px;
+}
+
+.chat__down-badge {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  text-align: center;
+}
+
+.chat__status--typing {
+  color: var(--color-accent);
+}
+
+/* Поиск по чату в шапке */
+.chat__search {
+  gap: var(--space-1);
+}
+
+.chat__search-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  background: none;
+  outline: 0;
+  font-size: var(--font-size-md);
+}
+
+.chat__search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.chat__search-count {
+  flex: none;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+}
+
+.chat__icon-button--small {
+  width: 32px;
+  font-size: 24px;
+}
+
+.chat__icon-button:disabled {
+  opacity: 0.35;
+}
+
+/* Меню сообщения */
+.msg-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.msg-menu {
+  position: fixed;
+  margin: 0;
+  padding: 4px 0;
+  border-radius: 14px;
+  background: var(--color-bg-panel);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 18%);
+  list-style: none;
+}
+
+.msg-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  font-size: var(--font-size-md);
+  text-align: left;
+}
+
+.msg-menu__item svg {
+  color: var(--color-text-caption);
+  font-size: 20px;
+}
+
+.msg-menu__item--danger,
+.msg-menu__item--danger svg {
+  color: var(--color-red);
 }
 
 /* Между сообщениями разных авторов 12, одного автора 8 */

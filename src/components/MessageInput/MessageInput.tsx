@@ -1,5 +1,6 @@
-import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { EMOJI } from '../../data/emoji';
+import { IconClose, IconReply } from '../ChatParts/ChatIcons';
 import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
 import './MessageInput.css';
 
@@ -7,9 +8,12 @@ interface MessageInputProps {
   onSend: (text: string) => void;
   /** Высота панели поменялась (открылась панель эмодзи): ленту нужно удержать внизу */
   onLayoutChange?: () => void;
+  /** Сообщение, на которое пишется ответ */
+  reply?: { name: string; text: string };
+  onCancelReply?: () => void;
 }
 
-export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -17,6 +21,13 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
   const savedRange = useRef<Range | null>(null);
 
   const hasText = text.trim().length > 0;
+
+  // Выбран ответ: фокус в поле, ленту удерживаем внизу после появления плашки
+  useEffect(() => {
+    if (!reply) return;
+    inputRef.current?.focus();
+    requestAnimationFrame(() => onLayoutChange?.());
+  }, [reply]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setPanel = (open: boolean) => {
     setEmojiOpen(open);
@@ -86,6 +97,18 @@ export function MessageInput({ onSend, onLayoutChange }: MessageInputProps) {
 
   return (
     <div className="composer-wrap">
+      {reply && (
+        <div className="reply-bar">
+          <IconReply className="reply-bar__icon" />
+          <div className="reply-bar__text">
+            <span className="reply-bar__name">Ответ: {reply.name}</span>
+            <span className="reply-bar__quote">{reply.text}</span>
+          </div>
+          <button type="button" className="reply-bar__close" aria-label="Отменить ответ" onClick={onCancelReply}>
+            <IconClose />
+          </button>
+        </div>
+      )}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className={`composer${emojiOpen ? ' composer--panel' : ''}`}>
         <button type="button" className="composer__round" aria-label="Прикрепить">

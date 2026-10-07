@@ -50,7 +50,7 @@
   outline: 0;
   /* Строка 19 (120% от 16 в Figma округляется до целого); 9,5 сверху и снизу дают поле 40 */
   padding: 9.5px 0;
-  max-height: 40vh; /* дальше поле прокручивается */
+  max-height: 114px; /* шесть строк, дальше поле прокручивается */
   overflow-y: auto;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -115,4 +115,61 @@
 
 .emoji-panel__item:active {
   background: var(--color-bg-app);
+}
+
+/* Плашка ответа над панелью ввода */
+.reply-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 4px 8px 16px;
+  border-top: 1px solid var(--color-divider);
+}
+
+.reply-bar__icon {
+  flex: none;
+  color: var(--color-accent);
+  font-size: 20px;
+}
+
+.reply-bar__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--color-accent);
+}
+
+.reply-bar__name {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 16px;
+}
+
+.reply-bar__quote {
+  overflow: hidden;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reply-bar__close {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-text-caption);
+  font-size: 20px;
+}
+
+.reply-bar + .composer {
+  border-top: 0;
+  padding-top: 0;
 }

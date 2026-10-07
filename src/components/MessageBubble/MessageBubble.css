@@ -8,6 +8,31 @@
   line-height: 20px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: transform 0.18s ease;
+}
+
+/* Серия сообщений одного автора: время и «хвостик» только у последнего, стыки скруглены слабее, интервал 4 */
+.bubble--joined-prev {
+  margin-top: -4px;
+}
+
+.bubble--in.bubble--joined-prev {
+  border-top-left-radius: 4px;
+}
+
+.bubble--out.bubble--joined-prev {
+  border-top-right-radius: 4px;
+}
+
+.bubble--in:not(.bubble--last) {
+  border-bottom-left-radius: 4px;
+}
+
+.bubble--out:not(.bubble--last) {
+  border-bottom-right-radius: 4px;
 }
 
 .bubble--in {
@@ -51,4 +76,205 @@
   flex-shrink: 0;
   font-size: 11px; /* галочки 11×6; в макете стоят на 1,5 px правее и на 0,5 выше */
   transform: translate(1.5px, -0.5px);
+}
+
+/* Подсветка в поиске по чату */
+.bubble__mark {
+  border-radius: 3px;
+  background: rgb(255 204 0 / 55%);
+  color: inherit;
+}
+
+.bubble__mark--active {
+  background: #ffcc00;
+  color: var(--color-text-primary);
+}
+
+/* Короткая подсветка сообщения после перехода по цитате */
+@keyframes bubble-flash {
+  0%,
+  100% {
+    filter: none;
+  }
+
+  30% {
+    filter: brightness(0.9) saturate(1.3);
+  }
+}
+
+.bubble--flash {
+  animation: bubble-flash 1.1s ease;
+}
+
+/* Цитата ответа внутри пузыря */
+.bubble__quote {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 100%;
+  margin: 0 0 4px;
+  padding: 0 0 0 8px;
+  border-left: 2px solid var(--color-accent);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  line-height: 16px;
+}
+
+.bubble--out .bubble__quote {
+  border-left-color: rgb(255 255 255 / 80%);
+}
+
+.bubble__quote-name {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.bubble--out .bubble__quote-name {
+  color: var(--color-accent-on);
+}
+
+.bubble__quote-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  opacity: 0.85;
+}
+
+/* Подсказка свайпа: значок «ответить» появляется слева */
+.bubble__swipe {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background: var(--color-stroke);
+  color: var(--color-text-caption);
+  font-size: 18px;
+}
+
+/* Время в служебных иконках статуса */
+.bubble__ticks--clock,
+.bubble__ticks--single {
+  width: 11px;
+  height: 11px;
+}
+
+.bubble__ticks--single {
+  transform: translate(0, 0);
+}
+
+/* Карточка рекомендованного теста */
+.bubble--card {
+  width: 85%;
+  padding: 8px 12px 24px;
+}
+
+.tcard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: left;
+}
+
+.tcard__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.tcard__icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.tcard__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tcard__label {
+  font-size: var(--font-size-xs);
+  line-height: 14px;
+  opacity: 0.8;
+}
+
+.tcard__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 18px;
+}
+
+.tcard__open {
+  font-size: var(--font-size-sm);
+  line-height: 18px;
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+}
+
+.bubble--card .bubble__meta--card {
+  right: 12px;
+  bottom: 4px;
+}
+
+/* «Печатает…» */
+.bubble--typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 14px;
+  align-self: flex-start;
+}
+
+.bubble--typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-caption);
+  animation: typing-dot 1.1s infinite ease-in-out;
+}
+
+.bubble--typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bubble--typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble,
+  .bubble--flash,
+  .bubble--typing i {
+    animation: none;
+    transition: none;
+  }
 }
