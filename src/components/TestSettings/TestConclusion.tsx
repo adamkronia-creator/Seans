@@ -139,9 +139,9 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
   const corridor = data.levels.find((l) => l.tone === 'green');
   const pts = scales.map((s, i) => ({ s, cx: x(i), cy: y(s.score), level: levelOf(data, s.score) }));
   return (
-    <CollapseCard title="Профиль основных шкал" id="cc-profile">
+    <CollapseCard title="Профиль шкал" id="cc-profile">
       <div className="cc-profile">
-        <svg viewBox={`0 0 ${W} ${bottom + 48}`} role="img" aria-label="Профиль основных шкал">
+        <svg viewBox={`0 0 ${W} ${bottom + 48}`} role="img" aria-label="Профиль шкал">
           {corridor && (
             <>
               <rect className="cc-profile__band" x={left} y={y(corridor.to + 1)} width={W - left - right} height={y(corridor.from) - y(corridor.to + 1)} />
@@ -151,18 +151,18 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
           )}
           <line className="cc-profile__base" x1={left} x2={W - right} y1={bottom} y2={bottom} />
           {data.ticks.map((v) => (
-            <text key={v} className="cc-profile__tick" x={left - 6} y={y(v) + 4} textAnchor="end">
+            <text key={v} className="cc-profile__tick" x={left - 8} y={y(v) + 4} textAnchor="end">
               {v}
             </text>
           ))}
           <polyline className="cc-profile__line" points={pts.map((p) => `${p.cx},${p.cy}`).join(' ')} />
           {pts.map((p) => (
             <g key={p.s.code} className="cc-profile__point" onClick={() => onOpen(p.s.code)}>
-              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="5.5" />
+              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="3" />
               <text
                 className={`cc-profile__value cc-profile__value--${p.level.tone}`}
                 x={p.cx}
-                y={p.level.tone === 'red' ? p.cy - 14 : p.cy + 26}
+                y={p.level.tone === 'red' ? p.cy - 10 : p.cy + 22}
                 textAnchor="middle"
               >
                 {p.s.score}
@@ -249,7 +249,7 @@ export function conclusionSections(data: ConclusionData) {
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
-          ...(data.profile ? [{ id: 'cc-profile', title: 'Профиль основных шкал' }] : []),
+          ...(data.profile ? [{ id: 'cc-profile', title: 'Профиль шкал' }] : []),
           { id: 'cc-extra', title: 'Дополнительные шкалы' },
         ]
       : []),
