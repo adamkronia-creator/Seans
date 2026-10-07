@@ -141,7 +141,7 @@
 }
 
 .chat__group + .chat__group {
-  margin-top: 8px; /* 8 + gap 8 = 16 до подписи дня, как после неё */
+  margin-top: 16px; /* до подписи дня 16, как после неё (у ленты нет gap) */
 }
 
 .chat__group--typing {
