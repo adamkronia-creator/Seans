@@ -158,7 +158,7 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
           <polyline className="cc-profile__line" points={pts.map((p) => `${p.cx},${p.cy}`).join(' ')} />
           {pts.map((p) => (
             <g key={p.s.code} className="cc-profile__point" onClick={() => onOpen(p.s.code)}>
-              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="3" />
+              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="4" />
               <text
                 className={`cc-profile__value cc-profile__value--${p.level.tone}`}
                 x={p.cx}
