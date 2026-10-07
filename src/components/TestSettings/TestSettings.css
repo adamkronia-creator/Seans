@@ -323,6 +323,11 @@
   background: var(--color-red);
 }
 
+/* Пятый уровень шкалы: тёмно-красный */
+.ts-dot--darkred {
+  background: #a8161c;
+}
+
 /* Выбор формы бланка: синяя кнопка 28 с радиусом 8 и обводкой 1 */
 .ts-select {
   position: relative;

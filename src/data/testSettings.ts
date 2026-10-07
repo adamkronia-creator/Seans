@@ -7,7 +7,7 @@ import type { LibraryTest } from './library';
  */
 
 /** 'text' — нейтральная чёрная точка: пункт про шкалу, а не про уровень (пишется «Шкала — диапазон») */
-export type ScoreTone = 'green' | 'yellow' | 'orange' | 'red' | 'text';
+export type ScoreTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred' | 'text';
 
 export interface TestSettingsData {
   /** Описание теста; пустая строка между абзацами, «●» — маркер списка, как в макете */
@@ -339,6 +339,18 @@ const PHQ9: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
+  scales: { main: ['Депрессия (D)'], extra: [] },
+  scoring: [
+    { range: '0–4', label: 'нет симптомов', tone: 'green' },
+    { range: '5–9', label: 'легкая депрессия', tone: 'yellow' },
+    { range: '10–14', label: 'средняя депрессия', tone: 'orange' },
+    { range: '15–19', label: 'средне-тяжелая депрессия', tone: 'red' },
+    { range: '20–27', label: 'тяжелая депрессия', tone: 'darkred' },
+  ],
+  questions: 9,
+  duration: '2–3 мин.',
+  age: '16+',
+  forms: ['Мужская', 'Женская'],
   message: DEFAULT_MESSAGE,
 };
 
