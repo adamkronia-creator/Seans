@@ -149,9 +149,25 @@ const BHS: ConclusionData = {
   },
 };
 
-/** Заключение СМОЛ по результату прохождения: Т-баллы вместо условных, остальное (диапазоны, расшифровки) то же, что в примере */
+/** Заключение по результату прохождения: баллы вместо условных, остальное (диапазоны, расшифровки) то же, что в примере */
+function withScores(base: ConclusionData, scores: Record<string, number>, info: ConclusionData['info'], validity?: ConclusionData['validity']): ConclusionData {
+  return { ...base, info, validity, scales: base.scales.map((s) => ({ ...s, score: scores[s.code] })) };
+}
+
+/** СМОЛ: Т-баллы по шкалам и вывод по контрольным шкалам */
 export function smolResult(scores: Record<string, number>, info: ConclusionData['info'], validity: ConclusionData['validity']): ConclusionData {
-  return { ...SMOL, info, validity, scales: SMOL.scales.map((s) => ({ ...s, score: scores[s.code] })) };
+  return withScores(SMOL, scores, info, validity);
+}
+
+/** BDI: общая сумма (шкала «Депрессия») и две подшкалы */
+export function bdiResult(score: { total: number; cognitive: number; somatic: number }, info: ConclusionData['info']): ConclusionData {
+  const [main, cognitive, somatic] = BDI.scales;
+  return withScores(BDI, { [main.code]: score.total, [cognitive.code]: score.cognitive, [somatic.code]: score.somatic }, info);
+}
+
+/** BHS: сумма баллов безнадёжности */
+export function bhsResult(score: number, info: ConclusionData['info']): ConclusionData {
+  return withScores(BHS, { [BHS.scales[0].code]: score }, info);
 }
 
 /** Пример заключения для теста из библиотеки; у остальных тестов пока нет */

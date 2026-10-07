@@ -219,7 +219,7 @@ export const BDI_BLANK: TestBlankData = {
 };
 
 /** Шкала безнадежности Бека (BHS): 20 утверждений, у каждого один и тот же ряд ответов 1–4 */
-const BHS_ANSWERS = ['Совсем неверно', 'Скорее неверно', 'Скорее верно', 'Совсем верно'];
+export const BHS_ANSWERS = ['Совсем неверно', 'Скорее неверно', 'Скорее верно', 'Совсем верно'];
 
 export const BHS_BLANK: TestBlankData = {
   rules: BLANK_RULES,

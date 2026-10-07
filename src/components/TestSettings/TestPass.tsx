@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/selfTest';
+import { answerQuestion, finishRun, formAffectsScore, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { SectionNav } from '../SectionNav/SectionNav';
 import { useSheet } from './TestActions';
@@ -11,7 +11,7 @@ import './TestPass.css';
 interface TestPassProps {
   testId: string;
   blank: TestBlankData;
-  /** Формы бланка; если их больше одной, выбор показан в начале: от формы зависят нормы подсчёта */
+  /** Формы бланка; выбор показан в начале, только если от формы зависит подсчёт (нормы), иначе форма берётся из настроек */
   forms?: string[];
   form: string;
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
@@ -81,7 +81,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
     answerQuestion(testId, question, answer);
   };
 
-  const showForms = forms !== undefined && forms.length > 1;
+  const showForms = forms !== undefined && forms.length > 1 && formAffectsScore(testId);
   const sections = [...(showForms ? [{ id: 'pass-form', title: 'Форма бланка' }] : []), ...blankSections(blank)];
 
   return (

@@ -158,6 +158,16 @@
   line-height: 24px;
 }
 
+.cc-value--inside {
+  margin-left: 0;
+  background: transparent;
+  color: #fff;
+}
+
+.cc-value--inside.cc-value--dark {
+  color: var(--color-text-primary);
+}
+
 .cc-icon {
   display: flex;
   flex-shrink: 0;

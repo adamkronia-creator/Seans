@@ -65,7 +65,11 @@ function Bar({ data, scale }: { data: ConclusionData; scale: ConclusionScale }) 
           .filter((l) => l.from > 0)
           .map((l) => <span key={l.key} className="cc-norm" style={{ left: `${(l.from / scale.max) * 100}%` }} aria-hidden="true" />)}
       <span className={`cc-fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
-      <span className="cc-value" style={{ left: `calc(${pct}% + 4px)` }}>
+      {/* У почти полной полосы справа не остаётся места: значение уходит внутрь полосы */}
+      <span
+        className={`cc-value${pct > 88 ? ` cc-value--inside${tone === 'yellow' ? ' cc-value--dark' : ''}` : ''}`}
+        style={pct > 88 ? { right: `calc(${100 - pct}% + 6px)` } : { left: `calc(${pct}% + 4px)` }}
+      >
         {scale.score}
       </span>
     </span>

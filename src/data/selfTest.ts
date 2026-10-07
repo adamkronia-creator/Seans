@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { receiveMessage } from './chatStore';
-import { smolResult, type ConclusionData } from './conclusions';
+import { scoreBdi, scoreBhs } from './beckScoring';
+import { bdiResult, bhsResult, smolResult, type ConclusionData } from './conclusions';
 import { LIBRARY } from './library';
 import { scoreSmol } from './smolScoring';
 
@@ -100,13 +101,20 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
     const scores = scoreSmol(answers, form === 'Женская');
     return smolResult(scores.t, info, scores.validity);
   },
+  bdi: (answers, _form, info) => bdiResult(scoreBdi(answers), info),
+  bhs: (answers, _form, info) => bhsResult(scoreBhs(answers), info),
 };
 
 export const canPassSelf = (testId: string) => testId in SCORERS;
 
+/** Тесты, где форма бланка меняет подсчёт (нормы для мужчин и женщин): для них форму выбирают в начале прохождения */
+export const formAffectsScore = (testId: string) => testId === 'smol';
+
 /** Текст сообщения в «Избранном» о пройденном тесте */
 const PASSED_TEXT: Record<string, string> = {
   smol: 'Вы прошли сокращенный многофакторный опросник для исследования личности «СМОЛ»',
+  bdi: 'Вы прошли шкалу депрессии А. Бека «BDI»',
+  bhs: 'Вы прошли шкалу безнадежности А. Бека «BHS»',
 };
 
 const passedText = (testId: string) =>
