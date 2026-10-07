@@ -146,18 +146,20 @@
   transition: max-height 0.25s ease;
 }
 
+/* Текст → 12 → разделитель по ширине поля текста → 12 → кнопка → 12 до конца блока */
 .ts-desc__clip {
   position: relative;
+  padding-bottom: var(--space-3);
 }
 
-/* Затухание текста в белый на последних трёх строках свёрнутого описания */
+/* Мягкий свет: последние строки свёрнутого текста уходят в белый и сходят на нет у разделителя */
 .ts-desc__fade {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  height: 64px;
-  background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-bg-panel) 92%);
+  height: 76px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-bg-panel) 88%);
   opacity: 1;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -167,7 +169,14 @@
   opacity: 0;
 }
 
-/* Кнопка под текстом: от текста 12, свёрнуто до конца блока 12, развёрнуто 24 (область нажатия 8 по краям) */
+.ts-desc__rule {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--color-divider);
+}
+
+/* Область нажатия 8 по краям: видимые отступы 12 сверху (разделитель) и 12 снизу (конец блока) */
 .ts-desc__toggle {
   display: flex;
   justify-content: center;
@@ -175,12 +184,8 @@
   padding: 8px 24px;
   color: var(--color-accent);
   font-size: 14px;
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
   line-height: 14px;
-}
-
-.ts-desc__toggle--open {
-  margin-bottom: 4px;
 }
 
 .ts-desc strong {

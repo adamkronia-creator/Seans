@@ -246,6 +246,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
               {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
             </div>
+            {descLong && <hr className="ts-desc__rule" />}
             {descLong && (
               <button
                 type="button"
