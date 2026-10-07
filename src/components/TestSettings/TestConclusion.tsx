@@ -315,6 +315,11 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
       {extra.map((s, i) => (
         <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
       ))}
+
+      <p className="cc-note">
+        Опросник — это диагностическая методика. Итоговые показатели описывают состояние человека на момент прохождения и не являются медицинским
+        диагнозом.
+      </p>
     </>
   );
 }

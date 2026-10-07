@@ -465,3 +465,12 @@
 .cc-validity--warn svg {
   color: var(--color-orange);
 }
+
+/* Подпись после всех блоков заключения */
+.cc-note {
+  margin: 0;
+  padding: 0 var(--space-3);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: 120%;
+}
