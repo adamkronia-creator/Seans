@@ -1,8 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
-  IconBack,
-  IconHeartGrayLg,
-  IconHeartRedLg,
   IconTestAge,
   IconTestBlank,
   IconTestBlind,
@@ -15,7 +12,6 @@ import {
   IconTestMic,
   IconTestQuestions,
   IconTestSaveBlank,
-  IconTestScaleChart,
   IconTestScalesExtra,
   IconTestScalesMain,
   IconTestScoring,
@@ -26,14 +22,15 @@ import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
-import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/library';
+import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank, blankSections } from './TestBlank';
 import { conclusionSections, TestConclusion } from './TestConclusion';
+import { TestHeader } from './TestHeader';
 import { TestPass } from './TestPass';
 import { conclusionFor } from '../../data/conclusions';
-import { canPassSelf, useSelfRun } from '../../data/selfTest';
+import { canPassSelf } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
 import './TestSettings.css';
 
@@ -42,15 +39,14 @@ const DESC_COLLAPSED = 6 * 19 + 12;
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
-/** Что показано под шапкой: настройки, бланк, пример заключения, прохождение теста или его результат */
-type View = 'settings' | 'blank' | 'conclusion' | 'pass' | 'result';
+/** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
+type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка теста',
   blank: 'Бланк тестирования',
   conclusion: 'Пример заключения',
   pass: 'Прохождение теста',
-  result: 'Результат тестирования',
 };
 
 interface TestSettingsProps {
@@ -59,9 +55,6 @@ interface TestSettingsProps {
   chatId?: string;
   onBack: () => void;
 }
-
-/** В шапке название без аббревиатуры: «BDI: Шкала депрессии А. Бека» → «Шкала депрессии А. Бека» */
-const shortTitle = (title: string) => title.replace(/^[^:]+:\s*/, '');
 
 /** Строка карточки: иконка 24, подпись и значение или переключатель справа */
 function Row({ Icon, label, children }: { Icon: Svg; label: string; children?: React.ReactNode }) {
@@ -112,7 +105,6 @@ function MessageField({ value, onChange }: { value: string; onChange: (v: string
  */
 export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
-  const favorite = useFavorites().has(test.id);
   const [form, setForm] = useState(data.forms?.[0] ?? '');
   const [message, setMessage] = useState(data.message);
   const [messageOn, setMessageOn] = useState(true);
@@ -121,14 +113,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [saveBlank, setSaveBlank] = useState(true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  // Вместо настроек можно открыть бланк, пример заключения, прохождение или результат; шапка та же
+  // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
   const [view, setView] = useState<View>('settings');
   // Длинное описание свёрнуто до шести строк, пока его не раскроют
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
   const descRef = useRef<HTMLDivElement>(null);
   const descLong = descFull > DESC_COLLAPSED + 19;
-  const run = useSelfRun(test.id);
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
@@ -212,43 +203,21 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   return (
     <section className="test-settings">
-      <header className="test-settings__header">
-        <button type="button" className="test-settings__button" aria-label="Назад" onClick={view === 'settings' ? onBack : () => setView('settings')}>
-          <IconBack />
-        </button>
-        <div className="test-settings__peer">
-          <img className="test-settings__icon" src={test.icon} alt="" />
-          <div className="test-settings__who">
-            <h1 className="test-settings__name">{shortTitle(test.title)}</h1>
-            <p className="test-settings__status">{STATUS[view]}</p>
-          </div>
-        </div>
-        <button
-          type="button"
-          className={`test-settings__button${favorite ? '' : ' test-settings__button--muted'}`}
-          aria-label={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
-          aria-pressed={favorite}
-          onClick={() => toggleFavorite(test.id)}
-        >
-          {favorite ? <IconHeartRedLg /> : <IconHeartGrayLg />}
-        </button>
-      </header>
+      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : () => setView('settings')} />
 
-      {view === 'result' && run.result ? (
-        <div className="cc-wrap" key="result">
-          <div className="test-settings__scroll">
-            <TestConclusion data={run.result.data} form={run.result.form} />
-          </div>
-          <SectionNav sections={conclusionSections(run.result.data)} scroller=".test-settings__scroll" />
-        </div>
-      ) : view === 'pass' && blank ? (
+      {view === 'pass' && blank ? (
         <TestPass
           testId={test.id}
           blank={blank}
           forms={data.forms}
           form={form}
+          saveBlank={saveBlank}
           onFormChange={setForm}
-          onDone={() => setView('result')}
+          onDone={() => {
+            // Результат лежит в «Избранное» → «Тесты», в чате «Избранное» появилось сообщение с кнопкой к нему
+            setView('settings');
+            notify('Тест пройден. Результат — в чате «Избранное»');
+          }}
         />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
@@ -313,19 +282,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               >
                 <IconTestConclusion className="ts-row__icon" />
                 <span className="ts-row__link">Пример заключения</span>
-                <IconTestChevron className="ts-row__chevron" />
-              </li>
-            )}
-            {run.result && (
-              <li
-                className="ts-row ts-row--link"
-                role="button"
-                tabIndex={0}
-                onClick={() => setView('result')}
-                onKeyDown={(e) => e.key === 'Enter' && setView('result')}
-              >
-                <IconTestScaleChart className="ts-row__icon" />
-                <span className="ts-row__link">Результат прохождения</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
             )}

@@ -169,6 +169,12 @@
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
+/* Сохранённый бланк: ответы видны, менять их нельзя */
+.blank-answer--locked {
+  cursor: default;
+  pointer-events: none;
+}
+
 .blank-answer__input {
   position: absolute;
   width: 1px;

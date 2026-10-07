@@ -230,6 +230,98 @@
   bottom: 4px;
 }
 
+/* Сообщение с кнопками под пузырём, как у ботов в Telegram: кнопки той же ширины, что пузырь, интервал 4 */
+.bubble-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: fit-content;
+  max-width: 85%;
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  user-select: none;
+  transition: transform 0.18s ease;
+}
+
+.bubble-group--in {
+  align-self: flex-start;
+}
+
+.bubble-group--out {
+  align-self: flex-end;
+}
+
+.bubble-group > .bubble {
+  max-width: none;
+}
+
+/* Нижние углы пузыря, обращённые к кнопкам, почти прямые; «хвостик» переходит на нижнюю кнопку */
+.bubble--with-buttons.bubble--in,
+.bubble--with-buttons.bubble--out {
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.bubble-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Кнопка 40: серо-голубая плашка (вторичный цвет, чуть темнее ради белого текста), подпись по центру, стрелка в углу */
+.bubble-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 28px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-text-secondary) 85%, #000);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 18px;
+  text-align: center;
+  transition: filter 0.15s ease;
+}
+
+.bubble-button:active {
+  filter: brightness(0.9);
+}
+
+.bubble-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.bubble-button__arrow {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  opacity: 0.85;
+}
+
+.bubble-buttons li:last-child .bubble-button {
+  border-bottom-right-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+
+.bubble-group--in .bubble-buttons li:last-child .bubble-button {
+  border-bottom-left-radius: 4px;
+}
+
+.bubble-group--out .bubble-buttons li:last-child .bubble-button {
+  border-bottom-right-radius: 4px;
+}
+
 /* «Печатает…» */
 .bubble--typing {
   display: flex;
@@ -272,6 +364,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .bubble,
+  .bubble-group,
+  .bubble-button,
   .bubble--flash,
   .bubble--typing i {
     animation: none;

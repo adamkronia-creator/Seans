@@ -14,13 +14,14 @@ import {
 } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChatCase } from '../../components/ChatCase/ChatCase';
-import { ChatTasks, ChatTests } from '../../components/ChatTests/ChatTests';
+import { ChatTasks, ChatTests, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
+import { TestResult } from '../../components/TestSettings/TestResult';
 import { TestSettings } from '../../components/TestSettings/TestSettings';
 import { LIBRARY } from '../../data/library';
 import { goBack, navigate } from '../../router';
@@ -38,9 +39,9 @@ const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabSessions }[]
   { id: 'library', label: 'Материалы', Icon: IconTabLibrary },
 ];
 
-/** Сообщения одной серии: тот же автор, не карточка и разница меньше 5 минут */
+/** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
-  if (!a || !b || a.from !== b.from || a.test || b.test) return false;
+  if (!a || !b || a.from !== b.from || a.test || b.test || a.buttons || b.buttons) return false;
   const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
@@ -104,11 +105,13 @@ interface ChatPageProps {
   chatId: string;
   /** Открыта настройка этого теста (адрес /chat/<чат>/tests/<тест>) */
   testId?: string;
+  /** Открыт результат самостоятельного прохождения (адрес /chat/<чат>/result/<результат>) */
+  resultId?: string;
   /** Нажатие на кнопку нижней панели (панель видна на вкладках кроме «Сообщения») */
   onAppTabChange: (id: TabId) => void;
 }
 
-export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
+export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageProps) {
   const [section, setSection] = useState<SectionId>('messages');
   // Тесты, задания и кейс пока есть только у Максима
   const hasClientData = chatId === 'maxim';
@@ -137,7 +140,8 @@ export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
 
-  // Переписка открывается внизу, у последних сообщений
+  // Переписка открывается внизу, у последних сообщений; так же после возврата из теста или результата
+  const overlay = Boolean(testId || resultId);
   useEffect(() => {
     scrollToBottom();
     atBottom.current = true;
@@ -145,7 +149,7 @@ export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
     setReplyTo(null);
     setSearchOpen(false);
     setQuery('');
-  }, [chatId, section]);
+  }, [chatId, section, overlay]);
 
   // Новое сообщение: своё или когда читаешь последнее, лента едет вниз; иначе копится счётчик входящих
   const messageCount = flat.length;
@@ -198,6 +202,16 @@ export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
     return (
       <section className="chat">
         <p className="chat__empty">Чат не найден</p>
+      </section>
+    );
+  }
+
+  // Результат теста заменяет шапку и вкладки чата так же, как настройка теста
+  if (resultId) {
+    return (
+      <section className="chat">
+        <TestResult resultId={resultId} onBack={() => goBack(`/chat/${chatId}`)} />
+        <TabBar active="messages" onChange={onAppTabChange} />
       </section>
     );
   }
@@ -328,6 +342,7 @@ export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
                         onMenu={(message, rect) => setMenu({ message, rect })}
                         onQuoteClick={jumpTo}
                         onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
+                        onOpenLink={navigate}
                       />
                     );
                   })}
@@ -380,7 +395,11 @@ export function ChatPage({ chatId, testId, onAppTabChange }: ChatPageProps) {
 
       {section === 'tests' && (
         <>
-          <ChatTests hasData={hasClientData} onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)} />
+          {chat.favorites ? (
+            <SelfTests onOpen={(id) => navigate(`/chat/${chatId}/result/${id}`)} />
+          ) : (
+            <ChatTests hasData={hasClientData} onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)} />
+          )}
           <TabBar active="messages" onChange={onAppTabChange} />
         </>
       )}

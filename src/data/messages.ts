@@ -9,6 +9,14 @@ export interface Message {
   replyTo?: string;
   /** Карточка рекомендованного теста (id из библиотеки) */
   test?: string;
+  /** Кнопки под пузырём, как у ботов в Telegram */
+  buttons?: MessageButton[];
+}
+
+export interface MessageButton {
+  label: string;
+  /** Адрес внутри приложения (hash-маршрут без «#»), например «/chat/favorites/result/r1» */
+  href: string;
 }
 
 export interface MessageGroup {

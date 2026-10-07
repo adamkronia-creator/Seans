@@ -1,6 +1,8 @@
 import { Badge } from '../Badge/Badge';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
+import { LIBRARY } from '../../data/library';
+import { useSelfResults } from '../../data/selfTest';
 import type { PsyTest, TestStatus } from '../../data/tests';
 import './ChatTests.css';
 
@@ -74,6 +76,24 @@ export function ChatTests({ hasData, onOpenTest }: { hasData: boolean; onOpenTes
       sections={TEST_SECTIONS}
       emptyText="Тесты ещё не отправлялись"
       onOpen={onOpenTest && ((t) => onOpenTest(t.id))}
+    />
+  );
+}
+
+/** Вкладка «Тесты» в чате «Избранное»: тесты, которые психолог прошёл сам, новые сверху */
+export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
+  const results = useSelfResults();
+  const items = results.flatMap<PsyTest>((r) => {
+    const test = LIBRARY.find((t) => t.id === r.testId);
+    // id карточки — id результата: по нему открывается заключение
+    return test ? [{ id: r.id, title: test.title, description: test.description, date: r.date, status: 'done', icon: test.icon, tint: test.tint }] : [];
+  });
+  return (
+    <SectionedList
+      items={items}
+      sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
+      emptyText="Пройденных тестов пока нет"
+      onOpen={(t) => onOpen(t.id)}
     />
   );
 }

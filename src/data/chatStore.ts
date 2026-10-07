@@ -63,18 +63,10 @@ function patchMessage(chatId: string, id: string, patch: Partial<Message>) {
   emit();
 }
 
-/** Показывать ли «печатает…» после отправки (демонстрация: ответа за этим не следует) */
-const SIMULATE_TYPING = true;
+const clock = () => new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
-/** Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано» */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string) {
-  const text = rawText.trim();
-  if (!text) return;
-
-  const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-  const id = String(nextId++);
-  const message: Message = { id, from: 'me', text, time, status: 'sending', ...(replyTo ? { replyTo } : {}) };
-
+/** Добавляет сообщение в конец переписки, в день «Сегодня» */
+function appendToday(chatId: string, message: Message) {
   const groups = messages[chatId] ?? [];
   const last = groups[groups.length - 1];
   messages = {
@@ -84,6 +76,29 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string) {
         ? [...groups.slice(0, -1), { ...last, messages: [...last.messages, message] }]
         : [...groups, { label: 'Сегодня', messages: [message] }],
   };
+}
+
+/**
+ * Входящее сообщение (от собеседника или от самого приложения, как от бота): попадает в переписку
+ * и в превью чата, счётчик непрочитанных растёт.
+ */
+export function receiveMessage(chatId: string, content: Pick<Message, 'text' | 'buttons'>) {
+  appendToday(chatId, { id: String(nextId++), from: 'them', time: clock(), ...content });
+  chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
+  setPreview(chatId);
+  emit();
+}
+
+/** Показывать ли «печатает…» после отправки (демонстрация: ответа за этим не следует) */
+const SIMULATE_TYPING = true;
+
+/** Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано» */
+export function sendMessage(chatId: string, rawText: string, replyTo?: string) {
+  const text = rawText.trim();
+  if (!text) return;
+
+  const id = String(nextId++);
+  appendToday(chatId, { id, from: 'me', text, time: clock(), status: 'sending', ...(replyTo ? { replyTo } : {}) });
   setPreview(chatId);
   emit();
 

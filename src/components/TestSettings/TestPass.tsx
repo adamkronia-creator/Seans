@@ -14,8 +14,10 @@ interface TestPassProps {
   /** Формы бланка; если их больше одной, выбор показан в начале: от формы зависят нормы подсчёта */
   forms?: string[];
   form: string;
+  /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
+  saveBlank: boolean;
   onFormChange: (form: string) => void;
-  /** Результат посчитан и сохранён: открыть заключение */
+  /** Результат посчитан и сохранён */
   onDone: () => void;
 }
 
@@ -48,7 +50,7 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
  * Прохождение теста самому: бланк с выбором ответов, внизу счётчик и кнопка «Завершить тест».
  * Пока не отвечено на всё, кнопка ведёт к первому вопросу без ответа.
  */
-export function TestPass({ testId, blank, forms, form, onFormChange, onDone }: TestPassProps) {
+export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, onDone }: TestPassProps) {
   const run = useSelfRun(testId);
   const total = blank.questions.length;
   const answered = Object.keys(run.answers).length;
@@ -71,7 +73,7 @@ export function TestPass({ testId, blank, forms, form, onFormChange, onDone }: T
       later(() => setMissing((m) => (m === first ? null : m)), 3000);
       return;
     }
-    if (finishRun(testId, total, form)) onDone();
+    if (finishRun(testId, total, form, saveBlank)) onDone();
   };
 
   const onAnswer = (question: number, answer: number) => {

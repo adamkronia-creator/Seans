@@ -267,6 +267,10 @@
   font-size: 20px;
 }
 
+.ts-row--link {
+  cursor: pointer;
+}
+
 /* Шкалы: заголовок 16/19, пункты 14/17 через 4 */
 .ts-scale {
   display: flex;

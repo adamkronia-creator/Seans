@@ -2,7 +2,7 @@ import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryTest } from '../../data/library';
 import { IconReadTicks } from '../icons';
-import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
+import { IconClock, IconLinkArrow, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -61,6 +61,8 @@ interface MessageBubbleProps {
   onMenu: (m: Message, rect: DOMRect) => void;
   onQuoteClick: (id: string) => void;
   onOpenTest: (id: string) => void;
+  /** Нажатие на кнопку под сообщением: переход по адресу кнопки */
+  onOpenLink: (href: string) => void;
 }
 
 export function MessageBubble({
@@ -76,6 +78,7 @@ export function MessageBubble({
   onMenu,
   onQuoteClick,
   onOpenTest,
+  onOpenLink,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
   const [dx, setDx] = useState(0);
@@ -166,6 +169,34 @@ export function MessageBubble({
         <span className="bubble__meta bubble__meta--card">
           <Meta message={message} />
         </span>
+      </li>
+    );
+  }
+
+  // Сообщение с кнопками (как у ботов в Telegram): пузырь и под ним кнопки той же ширины
+  if (message.buttons?.length) {
+    return (
+      <li {...common} className={`bubble-group bubble-group--${out ? 'out' : 'in'}`}>
+        {swipeHint}
+        <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons${activeMatch ? ' bubble--match' : ''}`}>
+          <Highlighted text={message.text} query={query} active={activeMatch} />
+          <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">
+            <Meta message={message} />
+          </span>
+          <span className="bubble__meta">
+            <Meta message={message} />
+          </span>
+        </div>
+        <ul className="bubble-buttons">
+          {message.buttons.map((button) => (
+            <li key={button.href}>
+              <button type="button" className="bubble-button" onClick={() => onOpenLink(button.href)}>
+                {button.label}
+                <IconLinkArrow className="bubble-button__arrow" />
+              </button>
+            </li>
+          ))}
+        </ul>
       </li>
     );
   }

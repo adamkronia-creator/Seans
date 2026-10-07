@@ -24,13 +24,19 @@ export default function App() {
   };
 
   // Открытый чат занимает весь экран, без нижней панели разделов.
-  // Адрес: /chat/<чат> или /chat/<чат>/tests/<тест> (настройка теста внутри чата)
-  const chatRoute = route.match(/^\/chat\/([^/]+)(?:\/tests\/([^/]+))?/);
+  // Адрес: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата)
+  // или /chat/<чат>/result/<результат> (результат самостоятельного прохождения)
+  const chatRoute = route.match(/^\/chat\/([^/]+)(?:\/(tests|result)\/([^/]+))?/);
   if (tab === 'messages' && chatRoute) {
     return (
       <div className="app">
         <main className="app__content">
-          <ChatPage chatId={chatRoute[1]} testId={chatRoute[2]} onAppTabChange={handleTabChange} />
+          <ChatPage
+            chatId={chatRoute[1]}
+            testId={chatRoute[2] === 'tests' ? chatRoute[3] : undefined}
+            resultId={chatRoute[2] === 'result' ? chatRoute[3] : undefined}
+            onAppTabChange={handleTabChange}
+          />
         </main>
       </div>
     );

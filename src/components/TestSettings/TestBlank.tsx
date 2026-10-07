@@ -40,7 +40,8 @@ export function blankSections(data: TestBlankData) {
 /** Прохождение: ответы хранятся снаружи, чтобы можно было посчитать результат */
 export interface BlankFill {
   answers: Record<number, number>;
-  onAnswer: (question: number, answer: number) => void;
+  /** Без обработчика бланк показан только для просмотра: отмеченные ответы видны, менять их нельзя */
+  onAnswer?: (question: number, answer: number) => void;
   /** Вопрос без ответа, к которому ведёт «Завершить тест»: он подсвечивается */
   missing?: number | null;
 }
@@ -52,8 +53,9 @@ export interface BlankFill {
 export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFill }) {
   const [picked, setPicked] = useState<Record<number, number>>({});
   const answers = fill ? fill.answers : picked;
+  const locked = fill !== undefined && !fill.onAnswer;
   const choose = (question: number, answer: number) =>
-    fill ? fill.onAnswer(question, answer) : setPicked({ ...picked, [question]: answer });
+    fill ? fill.onAnswer?.(question, answer) : setPicked({ ...picked, [question]: answer });
   return (
     <>
       <CollapseCard title="Правила тестирования" id="blank-rules">
@@ -74,12 +76,13 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
               <ul className="blank-answers">
                 {q.answers.map((answer, j) => (
                   <li key={j}>
-                    <label className="blank-answer">
+                    <label className={`blank-answer${locked ? ' blank-answer--locked' : ''}`}>
                       <input
                         type="radio"
                         className="blank-answer__input"
                         name={`blank-q${i}`}
                         checked={answers[i] === j}
+                        disabled={locked}
                         onChange={() => choose(i, j)}
                       />
                       <span className="blank-answer__radio" aria-hidden="true" />

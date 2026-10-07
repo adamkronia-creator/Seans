@@ -1,6 +1,8 @@
 import {
   IconCaseCalendar,
   IconTestAge,
+  IconTestBlank,
+  IconTestChevron,
   IconTestGender,
   IconTestReportExtra,
   IconTestReportMain,
@@ -10,6 +12,7 @@ import {
 } from '../icons';
 import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { CollapseCard } from './TestBlank';
+import './TestSettings.css';
 import './TestConclusion.css';
 
 /** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
@@ -257,8 +260,15 @@ export function conclusionSections(data: ConclusionData) {
   ];
 }
 
-/** Пример заключения: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
-export function TestConclusion({ data, form }: { data: ConclusionData; form: string }) {
+interface TestConclusionProps {
+  data: ConclusionData;
+  form: string;
+  /** Есть сохранённый бланк: между общей информацией и шкалами появляется кнопка «Посмотреть бланк тестирования» */
+  onOpenBlank?: () => void;
+}
+
+/** Заключение: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
+export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps) {
   const { info, scales } = data;
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
@@ -302,6 +312,22 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
           )}
         </ul>
       </CollapseCard>
+
+      {onOpenBlank && (
+        <ul className="ts-card ts-card--wide-dividers">
+          <li
+            className="ts-row ts-row--link"
+            role="button"
+            tabIndex={0}
+            onClick={onOpenBlank}
+            onKeyDown={(e) => e.key === 'Enter' && onOpenBlank()}
+          >
+            <IconTestBlank className="ts-row__icon" />
+            <span className="ts-row__link">Посмотреть бланк тестирования</span>
+            <IconTestChevron className="ts-row__chevron" />
+          </li>
+        </ul>
+      )}
 
       {data.overview && (
         <>
