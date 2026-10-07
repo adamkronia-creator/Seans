@@ -7,7 +7,7 @@ import './TestActions.css';
 
 export type TestAction = 'self' | 'one' | 'many';
 
-function useSheet(onClose: () => void) {
+export function useSheet(onClose: () => void) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);

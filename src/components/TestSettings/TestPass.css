@@ -1,0 +1,76 @@
+/* Прохождение теста: форма бланка, счётчик ответов над кнопкой, подтверждение сброса */
+
+/* Выбор формы: отступы 12, как у вопросов бланка */
+.test-pass__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.test-pass__hint {
+  margin: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: 120%;
+}
+
+/* Полоса с кнопкой: подпись и «Сбросить» 12/12, полоса прогресса 4, затем кнопка; промежутки 8 */
+.test-pass__cta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.test-pass__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 12px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 12px;
+}
+
+.test-pass__reset {
+  margin: -8px;
+  padding: 8px;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 12px;
+}
+
+.test-pass__bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-divider);
+}
+
+.test-pass__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-accent);
+  transition: width 0.2s ease;
+}
+
+/* Сообщение стоит прямо над полосой с кнопкой, которая здесь выше обычной */
+.test-pass__cta .test-pass__toast {
+  bottom: calc(100% + var(--space-2));
+}
+
+.test-pass__confirm {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: 19px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-pass__bar > span {
+    transition: none;
+  }
+}

@@ -38,7 +38,8 @@ export interface ConclusionScale {
 }
 
 export interface ConclusionData {
-  info: { date: string; time: string; duration: string; age: string };
+  /** Возраст есть не всегда: при самостоятельном прохождении его не спрашивают, строка тогда скрыта */
+  info: { date: string; time: string; duration: string; age?: string };
   /** Показывать ли общие диаграммы основных и дополнительных шкал и метки «Шкала …» */
   overview: boolean;
   /** Максимум шкал с диапазонами */
@@ -147,6 +148,11 @@ const BHS: ConclusionData = {
     },
   },
 };
+
+/** Заключение СМОЛ по результату прохождения: Т-баллы вместо условных, остальное (диапазоны, расшифровки) то же, что в примере */
+export function smolResult(scores: Record<string, number>, info: ConclusionData['info'], validity: ConclusionData['validity']): ConclusionData {
+  return { ...SMOL, info, validity, scales: SMOL.scales.map((s) => ({ ...s, score: scores[s.code] })) };
+}
 
 /** Пример заключения для теста из библиотеки; у остальных тестов пока нет */
 export function conclusionFor(testId: string): ConclusionData | undefined {

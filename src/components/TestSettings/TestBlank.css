@@ -117,6 +117,15 @@
   border-top: 1px solid var(--color-divider);
 }
 
+/* Вопрос без ответа, к которому ведёт «Завершить тест»: мягкая красная подсветка */
+.blank-question--missing {
+  background: color-mix(in srgb, var(--color-red) 8%, transparent);
+}
+
+.blank-question--missing .blank-answer {
+  border-color: color-mix(in srgb, var(--color-red) 45%, transparent);
+}
+
 .blank-question__prompt {
   margin: 0;
 }

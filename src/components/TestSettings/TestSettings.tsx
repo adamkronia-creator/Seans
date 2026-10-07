@@ -15,6 +15,7 @@ import {
   IconTestMic,
   IconTestQuestions,
   IconTestSaveBlank,
+  IconTestScaleChart,
   IconTestScalesExtra,
   IconTestScalesMain,
   IconTestScoring,
@@ -30,7 +31,9 @@ import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank, blankSections } from './TestBlank';
 import { conclusionSections, TestConclusion } from './TestConclusion';
+import { TestPass } from './TestPass';
 import { conclusionFor } from '../../data/conclusions';
+import { canPassSelf, useSelfRun } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
 import './TestSettings.css';
 
@@ -38,6 +41,17 @@ import './TestSettings.css';
 const DESC_COLLAPSED = 6 * 19 + 12;
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
+
+/** Что показано под шапкой: настройки, бланк, пример заключения, прохождение теста или его результат */
+type View = 'settings' | 'blank' | 'conclusion' | 'pass' | 'result';
+
+const STATUS: Record<View, string> = {
+  settings: 'Настройка теста',
+  blank: 'Бланк тестирования',
+  conclusion: 'Пример заключения',
+  pass: 'Прохождение теста',
+  result: 'Результат тестирования',
+};
 
 interface TestSettingsProps {
   test: LibraryTest;
@@ -107,15 +121,14 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [saveBlank, setSaveBlank] = useState(true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  // Открыт ли «Бланк тестирования» (вместо настроек, шапка та же)
-  const [blankOpen, setBlankOpen] = useState(false);
+  // Вместо настроек можно открыть бланк, пример заключения, прохождение или результат; шапка та же
+  const [view, setView] = useState<View>('settings');
   // Длинное описание свёрнуто до шести строк, пока его не раскроют
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
   const descRef = useRef<HTMLDivElement>(null);
   const descLong = descFull > DESC_COLLAPSED + 19;
-  // Открыт ли «Пример заключения» (пока есть только у СМОЛ)
-  const [conclusionOpen, setConclusionOpen] = useState(false);
+  const run = useSelfRun(test.id);
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
@@ -143,7 +156,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const pick = (action: TestAction) => {
     if (action === 'self') {
       setSheet(null);
-      notify('Бланк теста для самостоятельного прохождения пока недоступен');
+      if (blank && canPassSelf(test.id)) setView('pass');
+      else notify('Бланк теста для самостоятельного прохождения пока недоступен');
     } else if (action === 'one' && chatId) send([chatId]);
     else setSheet(action);
   };
@@ -162,7 +176,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [blankOpen, conclusionOpen]);
+  }, [view]);
   const paragraphs = data.intro.split('\n\n');
   // Строки «● …» — маркированный список, остальные — обычный текст абзаца
   const renderParagraph = (paragraph: string, i: number) => {
@@ -193,20 +207,20 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </div>
     );
   };
-  const openConclusion = () => (conclusion ? setConclusionOpen(true) : notify('Пример заключения этого теста пока недоступен'));
-  const openBlank = () => (blank ? setBlankOpen(true) : notify('Бланк этого теста пока недоступен'));
+  const openConclusion = () => (conclusion ? setView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
+  const openBlank = () => (blank ? setView('blank') : notify('Бланк этого теста пока недоступен'));
 
   return (
     <section className="test-settings">
       <header className="test-settings__header">
-        <button type="button" className="test-settings__button" aria-label="Назад" onClick={blankOpen || conclusionOpen ? () => (setBlankOpen(false), setConclusionOpen(false)) : onBack}>
+        <button type="button" className="test-settings__button" aria-label="Назад" onClick={view === 'settings' ? onBack : () => setView('settings')}>
           <IconBack />
         </button>
         <div className="test-settings__peer">
           <img className="test-settings__icon" src={test.icon} alt="" />
           <div className="test-settings__who">
             <h1 className="test-settings__name">{shortTitle(test.title)}</h1>
-            <p className="test-settings__status">{blankOpen ? 'Бланк тестирования' : conclusionOpen ? 'Пример заключения' : 'Настройка теста'}</p>
+            <p className="test-settings__status">{STATUS[view]}</p>
           </div>
         </div>
         <button
@@ -220,14 +234,30 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </button>
       </header>
 
-      {conclusionOpen && conclusion ? (
+      {view === 'result' && run.result ? (
+        <div className="cc-wrap" key="result">
+          <div className="test-settings__scroll">
+            <TestConclusion data={run.result.data} form={run.result.form} />
+          </div>
+          <SectionNav sections={conclusionSections(run.result.data)} scroller=".test-settings__scroll" />
+        </div>
+      ) : view === 'pass' && blank ? (
+        <TestPass
+          testId={test.id}
+          blank={blank}
+          forms={data.forms}
+          form={form}
+          onFormChange={setForm}
+          onDone={() => setView('result')}
+        />
+      ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <div className="test-settings__scroll">
             <TestConclusion data={conclusion} form={form} />
           </div>
           <SectionNav sections={conclusionSections(conclusion)} scroller=".test-settings__scroll" />
         </div>
-      ) : blankOpen && blank ? (
+      ) : view === 'blank' && blank ? (
         <>
           <div className="test-settings__scroll" key="blank">
             <TestBlank data={blank} />
@@ -283,6 +313,19 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               >
                 <IconTestConclusion className="ts-row__icon" />
                 <span className="ts-row__link">Пример заключения</span>
+                <IconTestChevron className="ts-row__chevron" />
+              </li>
+            )}
+            {run.result && (
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={() => setView('result')}
+                onKeyDown={(e) => e.key === 'Enter' && setView('result')}
+              >
+                <IconTestScaleChart className="ts-row__icon" />
+                <span className="ts-row__link">Результат прохождения</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
             )}

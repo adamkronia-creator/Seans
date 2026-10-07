@@ -286,11 +286,13 @@ export function TestConclusion({ data, form }: { data: ConclusionData; form: str
             <span className="cc-info__label">Длительность</span>
             <span>{info.duration}</span>
           </li>
-          <li>
-            <IconTestAge className="cc-info__icon" />
-            <span className="cc-info__label">Возраст</span>
-            <span>{info.age}</span>
-          </li>
+          {info.age && (
+            <li>
+              <IconTestAge className="cc-info__icon" />
+              <span className="cc-info__label">Возраст</span>
+              <span>{info.age}</span>
+            </li>
+          )}
           {form && (
             <li>
               <IconTestGender className="cc-info__icon" />

@@ -248,7 +248,7 @@ export const BHS_BLANK: TestBlankData = {
 };
 
 /** СМОЛ: 71 утверждение, на каждое отвечают «+» (согласен) или «−» (не согласен) */
-const SMOL_ANSWERS = ['Верно', 'Неверно'];
+export const SMOL_ANSWERS = ['Верно', 'Неверно'];
 
 export const SMOL_BLANK: TestBlankData = {
   numbered: false,

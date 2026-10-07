@@ -37,10 +37,23 @@ export function blankSections(data: TestBlankData) {
   return sections;
 }
 
-/** Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент) */
-export function TestBlank({ data }: { data: TestBlankData }) {
-  // Выбранные ответы нужны только для просмотра: отметка никуда не сохраняется
+/** Прохождение: ответы хранятся снаружи, чтобы можно было посчитать результат */
+export interface BlankFill {
+  answers: Record<number, number>;
+  onAnswer: (question: number, answer: number) => void;
+  /** Вопрос без ответа, к которому ведёт «Завершить тест»: он подсвечивается */
+  missing?: number | null;
+}
+
+/**
+ * Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент).
+ * Без `fill` бланк только для просмотра: отметка никуда не сохраняется.
+ */
+export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFill }) {
   const [picked, setPicked] = useState<Record<number, number>>({});
+  const answers = fill ? fill.answers : picked;
+  const choose = (question: number, answer: number) =>
+    fill ? fill.onAnswer(question, answer) : setPicked({ ...picked, [question]: answer });
   return (
     <>
       <CollapseCard title="Правила тестирования" id="blank-rules">
@@ -54,7 +67,7 @@ export function TestBlank({ data }: { data: TestBlankData }) {
       <CollapseCard title="Вопросы и ответы" id="blank-qa">
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
-            <li key={i} id={(i + 1) % 10 === 0 ? `blank-q-${i + 1}` : undefined} className="blank-question">
+            <li key={i} id={`blank-q-${i + 1}`} className={`blank-question${fill?.missing === i ? ' blank-question--missing' : ''}`}>
               <p className="blank-question__prompt">
                 <strong>{i + 1}.</strong> {q.prompt}
               </p>
@@ -66,8 +79,8 @@ export function TestBlank({ data }: { data: TestBlankData }) {
                         type="radio"
                         className="blank-answer__input"
                         name={`blank-q${i}`}
-                        checked={picked[i] === j}
-                        onChange={() => setPicked({ ...picked, [i]: j })}
+                        checked={answers[i] === j}
+                        onChange={() => choose(i, j)}
                       />
                       <span className="blank-answer__radio" aria-hidden="true" />
                       <span className="blank-answer__text">
