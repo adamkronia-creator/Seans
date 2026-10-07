@@ -143,12 +143,16 @@ function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: s
           {data.scales.map((s, i) => {
             const Icon = s.group === 'main' ? IconTestReportMain : IconTestReportExtra;
             return (
-              <li key={s.code} className="cc-bar">
-                <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
-                <Bar data={data} scale={s} max={data.max} />
-                <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
-                  <Icon />
-                </button>
+              <li key={s.code}>
+                <div className="cc-bar">
+                  <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
+                  {/* Полоса дополнительной шкалы идёт от 0 до её собственного максимума, подпись под ней: 0 и максимум */}
+                  <Bar data={data} scale={s} max={s.leveled ? data.max : s.max} />
+                  <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
+                    <Icon />
+                  </button>
+                </div>
+                {!s.leveled && <Axis kind="main" ticks={[0, s.max]} max={s.max} />}
               </li>
             );
           })}

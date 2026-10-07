@@ -60,6 +60,11 @@
   padding: 0 44px 0 48px;
 }
 
+/* Подпись под полосой дополнительной шкалы в общей диаграмме */
+.cc-bars li > .cc-axis {
+  margin: 4px 0 0;
+}
+
 .cc-axis--single {
   margin: 6px 0 0;
   padding: 0 32px 0 48px;
