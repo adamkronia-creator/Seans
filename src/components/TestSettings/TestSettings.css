@@ -290,11 +290,15 @@
 
 .ts-scale__list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* длинные названия переносятся, точка остаётся у первой строки */
   gap: var(--space-1);
 }
 
 /* Маркер: рамка 8, чёрная точка 6, цветные 8 */
+.ts-scale__list .ts-dot {
+  margin-top: 4.5px; /* по центру первой строки 17px */
+}
+
 .ts-dot {
   flex-shrink: 0;
   width: 8px;
