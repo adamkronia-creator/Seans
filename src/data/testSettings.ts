@@ -70,9 +70,9 @@ const BDI: TestSettingsData = {
 };
 
 const BHS: TestSettingsData = {
-  lead: 'Beck Hopeless Scale «BHS» —',
+  lead: 'Beck Hopelessness Scale «BHS» —',
   intro: [
-    'Beck Hopeless Scale «BHS» — оригинальный опросник Аарона Бека, некоммерческое издание.',
+    'Beck Hopelessness Scale «BHS» — оригинальный опросник Аарона Бека, некоммерческое издание.',
     '',
     'Стандартизированная методика, предназначенная для количественной оценки безнадежности.',
     '',
