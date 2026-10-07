@@ -328,11 +328,92 @@ export const SMOL_BLANK: TestBlankData = {
   ],
 };
 
-/** Бланк теста из библиотеки; есть у BDI, BHS и СМОЛ */
+/** ИТТ: 30 утверждений в двух частях — «Сейчас, в данный момент» и «В последнее время»; у каждой части свои четыре варианта ответа 1–4 */
+const ITT_NOW = ['Совсем нет', 'Слабо выражено', 'Выражено', 'Очень выражено'];
+const ITT_LATELY = ['Почти никогда', 'Редко', 'Часто', 'Почти все время'];
+
+export const ITT_BLANK: TestBlankData = {
+  rules: BLANK_RULES,
+  questions: [
+    { prompt: "Сейчас, в данный момент: Я нахожусь в напряжении.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я расстроен.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я тревожусь о будущем.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я нервничаю.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я озабочен.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я возбужден.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я ощущаю непонятную угрозу.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я быстро устаю.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я не уверен в себе.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я избегаю любых конфликтов.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я легко прихожу в замешательство.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я ощущаю свою бесполезность.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я плохо сплю.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я ощущаю себя утомленным.", answers: ITT_NOW },
+    { prompt: "Сейчас, в данный момент: Я эмоционально чувствителен.", answers: ITT_NOW },
+    { prompt: "В последнее время: Я находился в напряжении.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я расстраивался.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я тревожился о будущем.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я нервничал.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я бывал озабочен.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я бывал возбужден.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я ощущал непонятную угрозу.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я быстро уставал.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я бывал не уверен в себе.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я избегал любых конфликтов.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я легко приходил в замешательство.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я ощущал свою бесполезность.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я плохо спал.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я ощущал себя утомленным.", answers: ITT_LATELY },
+    { prompt: "В последнее время: Я бывал эмоционально чувствителен.", answers: ITT_LATELY },
+  ],
+};
+
+/** ОСР: 29 утверждений, на каждое отвечают «+» (согласен) или «−» (не согласен) */
+const OCR_ANSWERS = ['Согласен (+)', 'Не согласен (−)'];
+
+export const OCR_BLANK: TestBlankData = {
+  numbered: false,
+  rules: BLANK_RULES,
+  questions: [
+    { prompt: "Вы всё чувствуете острее, чем большинство людей.", answers: OCR_ANSWERS },
+    { prompt: "Вас часто одолевают мрачные мысли.", answers: OCR_ANSWERS },
+    { prompt: "Теперь вы уже не надеетесь добиться желаемого положения в жизни.", answers: OCR_ANSWERS },
+    { prompt: "В случае неудачи вам трудно начать новое дело.", answers: OCR_ANSWERS },
+    { prompt: "Вам определенно не везет в жизни.", answers: OCR_ANSWERS },
+    { prompt: "Работать вам стало труднее, чем раньше.", answers: OCR_ANSWERS },
+    { prompt: "Большинство людей довольны жизнью больше, чем вы.", answers: OCR_ANSWERS },
+    { prompt: "Вы считаете, что смерть является искуплением.", answers: OCR_ANSWERS },
+    { prompt: "Только зрелый человек может принять решение уйти из жизни.", answers: OCR_ANSWERS },
+    { prompt: "Временами у вас бывают приступы неудержимого смеха или плача.", answers: OCR_ANSWERS },
+    { prompt: "Обычно вы осторожны с людьми, которые относятся к вам дружелюбнее, чем вы ожидали.", answers: OCR_ANSWERS },
+    { prompt: "Вы считаете себя обреченным человеком.", answers: OCR_ANSWERS },
+    { prompt: "Мало кто искренне пытается помочь другим, если это связано с неудобствами.", answers: OCR_ANSWERS },
+    { prompt: "У вас такое впечатление, что вас никто не понимает.", answers: OCR_ANSWERS },
+    { prompt: "Человек, который вводит других в соблазн, оставляя без присмотра ценное имущество, виноват примерно столько же, сколько и тот, кто это имущество похищает.", answers: OCR_ANSWERS },
+    { prompt: "В вашей жизни не было таких неудач, когда казалось, что всё кончено.", answers: OCR_ANSWERS },
+    { prompt: "Обычно вы удовлетворены своей судьбой.", answers: OCR_ANSWERS },
+    { prompt: "Вы считаете, что всегда нужно вовремя ставить точку.", answers: OCR_ANSWERS },
+    { prompt: "В вашей жизни есть люди, привязанность к которым может очень повлиять на ваши решения и даже изменить их.", answers: OCR_ANSWERS },
+    { prompt: "Когда вас обижают, вы стремитесь во что бы то ни стало показать обидчику, что он поступил несправедливо.", answers: OCR_ANSWERS },
+    { prompt: "Часто вы так переживаете, что это мешает вам говорить.", answers: OCR_ANSWERS },
+    { prompt: "Вам часто кажется, что обстоятельства, в которых вы оказались, отличаются особой несправедливостью.", answers: OCR_ANSWERS },
+    { prompt: "Иногда вам кажется, что вы вдруг сделали что-то скверное или даже хуже.", answers: OCR_ANSWERS },
+    { prompt: "Будущее представляется вам довольно беспросветным.", answers: OCR_ANSWERS },
+    { prompt: "Большинство людей способны добиваться выгоды не совсем честным путем.", answers: OCR_ANSWERS },
+    { prompt: "Будущее слишком расплывчато, чтобы строить серьезные планы.", answers: OCR_ANSWERS },
+    { prompt: "Мало кому в жизни пришлось испытать то, что пережили вы.", answers: OCR_ANSWERS },
+    { prompt: "Вы склонны так остро переживать неприятности, что не можете выкинуть мысли об этом из головы.", answers: OCR_ANSWERS },
+    { prompt: "Часто вы действуете необдуманно, повинуясь первому порыву.", answers: OCR_ANSWERS },
+  ],
+};
+
+/** Бланк теста из библиотеки; есть у BDI, BHS, СМОЛ, ИТТ и ОСР */
 export function testBlank(testId: string): TestBlankData | undefined {
   if (testId === 'bdi') return BDI_BLANK;
   if (testId === 'bhs') return BHS_BLANK;
   if (testId === 'smol') return SMOL_BLANK;
+  if (testId === 'itt') return ITT_BLANK;
+  if (testId === 'ocr') return OCR_BLANK;
   return undefined;
 }
 
