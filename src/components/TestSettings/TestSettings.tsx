@@ -376,9 +376,9 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                         <p className="ts-scale__title">{title}</p>
                         <ul className="ts-scale__list">
                           {items.map(({ range, label, tone }) => (
-                            <li key={range}>
+                            <li key={label}>
                               <span className={`ts-dot ts-dot--${tone}`} />
-                              {range} — {label}
+                              {tone === 'text' ? `${label} — ${range}` : `${range} — ${label}`}
                             </li>
                           ))}
                         </ul>
