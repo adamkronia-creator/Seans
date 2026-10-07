@@ -177,6 +177,12 @@
   list-style: none;
 }
 
+/* В дополнительных шкалах разделителя над маркерами нет */
+.cc-chart:has(.cc-bars--extra) .cc-legend {
+  padding-top: 0;
+  border-top: 0;
+}
+
 .cc-profile .cc-legend {
   margin-right: 0;
   margin-left: 0;

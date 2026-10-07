@@ -139,7 +139,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   line-clamp: 1;
-  opacity: 0.85;
+  color: var(--color-accent);
 }
 
 /* Подсказка свайпа: значок «ответить» появляется слева */
@@ -281,9 +281,10 @@
   width: 100%;
   min-height: 40px;
   padding: 6px 28px;
+  border: 1px solid var(--color-accent);
   border-radius: 6px;
-  background: color-mix(in srgb, var(--color-text-secondary) 85%, #000);
-  color: #fff;
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: 18px;
@@ -292,7 +293,7 @@
 }
 
 .bubble-button:active {
-  filter: brightness(0.9);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .bubble-button:focus-visible {
@@ -302,8 +303,8 @@
 
 .bubble-button__arrow {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 5px;
+  right: 5px;
   width: 10px;
   height: 10px;
   opacity: 0.85;

@@ -139,7 +139,7 @@ export function finishRun(testId: string, total: number, form: string, saveBlank
 
   receiveMessage(FAVORITES_CHAT, {
     text: passedText(testId),
-    buttons: [{ label: 'Посмотреть результат', href: `/chat/${FAVORITES_CHAT}/result/${result.id}` }],
+    buttons: [{ label: 'Посмотреть заключение теста', href: `/chat/${FAVORITES_CHAT}/result/${result.id}` }],
   });
   return result;
 }
