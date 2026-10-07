@@ -159,7 +159,13 @@
   bottom: 0;
   left: 0;
   height: 76px;
-  background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-bg-panel) 88%);
+  /* у нижней строки текста (12 над разделителем) белого 65%, чисто белый только последние 2 px до разделителя */
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0%),
+    rgb(255 255 255 / 65%) calc(100% - 12px),
+    var(--color-bg-panel) calc(100% - 2px)
+  );
   opacity: 1;
   pointer-events: none;
   transition: opacity 0.25s ease;
