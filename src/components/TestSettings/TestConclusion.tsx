@@ -127,8 +127,8 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
   const W = 337;
   const left = 38;
   const right = 14;
-  const top = 24;
-  const bottom = 196;
+  const top = 22;
+  const bottom = 150;
   const y = (v: number) => bottom - ((bottom - top) * v) / data.max;
   const step = (W - left - right) / scales.length;
   const x = (i: number) => left + step * (i + 0.5);
@@ -137,7 +137,7 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
   return (
     <CollapseCard title="Профиль основных шкал" id="cc-profile">
       <div className="cc-profile">
-        <svg viewBox={`0 0 ${W} 252`} role="img" aria-label="Профиль основных шкал">
+        <svg viewBox={`0 0 ${W} ${bottom + 48}`} role="img" aria-label="Профиль основных шкал">
           {corridor && (
             <>
               <rect className="cc-profile__band" x={left} y={y(corridor.to + 1)} width={W - left - right} height={y(corridor.from) - y(corridor.to + 1)} />
@@ -158,18 +158,18 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
               <text
                 className={`cc-profile__value cc-profile__value--${p.level.tone}`}
                 x={p.cx}
-                y={p.level.tone === 'red' ? p.cy - 14 : p.cy + 24}
+                y={p.level.tone === 'red' ? p.cy - 14 : p.cy + 26}
                 textAnchor="middle"
               >
                 {p.s.score}
               </text>
-              <text className="cc-profile__code" x={p.cx} y={bottom + 24} textAnchor="middle">
+              <text className="cc-profile__code" x={p.cx} y={bottom + 28} textAnchor="middle">
                 {p.s.code}
               </text>
             </g>
           ))}
           {pts.map((p, i) => (
-            <text key={`n${p.s.code}`} className="cc-profile__num" x={p.cx} y={bottom + 42} textAnchor="middle">
+            <text key={`n${p.s.code}`} className="cc-profile__num" x={p.cx} y={bottom + 46} textAnchor="middle">
               {i + 1}
             </text>
           ))}

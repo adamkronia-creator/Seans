@@ -393,13 +393,13 @@
 
 .cc-profile__code {
   fill: var(--color-text-caption);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: var(--font-weight-medium);
 }
 
 .cc-profile__line {
   fill: none;
-  stroke: #8a929b;
+  stroke: #a0a9b3;
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
@@ -422,11 +422,11 @@
 }
 
 .cc-profile__dot--yellow {
-  fill: #c08a00;
+  fill: var(--color-yellow);
 }
 
 .cc-profile__value {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: var(--font-weight-medium);
 }
 
@@ -439,7 +439,7 @@
 }
 
 .cc-profile__value--yellow {
-  fill: #9a6b00;
+  fill: var(--color-yellow);
 }
 
 /* Вывод по контрольным шкалам */
