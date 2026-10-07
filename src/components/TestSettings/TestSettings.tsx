@@ -239,16 +239,19 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       <div className="test-settings__scroll">
         <CollapseCard title="Описание теста">
           <div className="ts-desc">
-            <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
-              {paragraphs.map((paragraph, i) => renderParagraph(paragraph, i))}
+            <div className="ts-desc__clip">
+              <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
+                {paragraphs.map((paragraph, i) => renderParagraph(paragraph, i))}
+              </div>
+              {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
+              {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
             </div>
             {descLong && (
-              /* Свёрнуто: текст плавно уходит в белый, стрелка лежит на нём; раскрыто: стрелка «вверх» под текстом */
               <button
                 type="button"
                 className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
                 aria-expanded={descOpen}
-                                onClick={() => setDescOpen(!descOpen)}
+                onClick={() => setDescOpen(!descOpen)}
               >
                 {descOpen ? 'Скрыть' : 'Читать далее'}
               </button>
