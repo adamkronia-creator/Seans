@@ -107,13 +107,17 @@ function ScaleCharts({
       </div>
       {group === 'extra' && data.validity && (
         <p className={`cc-validity${data.validity.ok ? '' : ' cc-validity--warn'}`}>
-          <svg viewBox="0 0 28 28" aria-hidden="true">
-            <circle cx="14" cy="14" r="12" fill="none" stroke="currentColor" strokeWidth="2" />
+          <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
             {data.validity.ok ? (
-              <path d="M8.5 14.5l3.8 3.8 7.2-7.6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M21.3739 13.3738C21.7644 12.9833 21.7644 12.3502 21.3739 11.9596C20.9834 11.5691 20.3503 11.5691 19.9598 11.9596L14.0002 17.9191L12.0406 15.9597C11.6501 15.5691 11.0169 15.5691 10.6264 15.9597C10.2359 16.3502 10.2359 16.9833 10.6264 17.3738L13.2931 20.0405C13.6836 20.431 14.3167 20.431 14.7072 20.0405L21.3739 13.3738Z" />
             ) : (
-              <path d="M14 8v7.5M14 19v.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path d="M15 9.5a1 1 0 0 1 2 0v7a1 1 0 0 1-2 0v-7ZM16 19.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
             )}
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M15.9998 1.66675C8.08376 1.66675 1.6665 8.084 1.6665 16.0001C1.6665 23.9162 8.08376 30.3334 15.9998 30.3334C23.916 30.3334 30.3332 23.9162 30.3332 16.0001C30.3332 8.084 23.916 1.66675 15.9998 1.66675ZM3.6665 16.0001C3.6665 9.18857 9.18833 3.66675 15.9998 3.66675C22.8113 3.66675 28.3332 9.18857 28.3332 16.0001C28.3332 22.8115 22.8113 28.3334 15.9998 28.3334C9.18833 28.3334 3.6665 22.8115 3.6665 16.0001Z"
+            />
           </svg>
           <span>{data.validity.text}</span>
         </p>
@@ -125,7 +129,7 @@ function ScaleCharts({
 /** Профиль основных шкал: линия по пикам, коридор нормы 40–69, точки цвета диапазона */
 function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: ConclusionScale[]; onOpen: (code: string) => void }) {
   const W = 337;
-  const left = 38;
+  const left = 28;
   const right = 14;
   const top = 22;
   const bottom = 150;
@@ -147,14 +151,14 @@ function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: 
           )}
           <line className="cc-profile__base" x1={left} x2={W - right} y1={bottom} y2={bottom} />
           {data.ticks.map((v) => (
-            <text key={v} className="cc-profile__tick" x={0} y={y(v) + 4}>
+            <text key={v} className="cc-profile__tick" x={left - 6} y={y(v) + 4} textAnchor="end">
               {v}
             </text>
           ))}
           <polyline className="cc-profile__line" points={pts.map((p) => `${p.cx},${p.cy}`).join(' ')} />
           {pts.map((p) => (
             <g key={p.s.code} className="cc-profile__point" onClick={() => onOpen(p.s.code)}>
-              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="7.5" />
+              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="5.5" />
               <text
                 className={`cc-profile__value cc-profile__value--${p.level.tone}`}
                 x={p.cx}

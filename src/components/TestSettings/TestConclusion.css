@@ -392,7 +392,7 @@
 }
 
 .cc-profile__code {
-  fill: var(--color-text-caption);
+  fill: var(--color-text-primary);
   font-size: 16px;
   font-weight: var(--font-weight-medium);
 }
@@ -457,8 +457,8 @@
 
 .cc-validity svg {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   color: var(--color-green);
 }
 
