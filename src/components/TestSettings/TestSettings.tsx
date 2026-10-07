@@ -309,6 +309,9 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               )}
               {data.forms && (
                 <Row Icon={IconTestGender} label="Форма бланка">
+                  {data.forms.length === 1 ? (
+                    <span className="ts-row__value">{data.forms[0]}</span>
+                  ) : (
                   <label className="ts-select">
                     <span className="ts-select__value">{form}</span>
                     <IconTestChevronDown className="ts-select__chevron" />
@@ -323,6 +326,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                       ))}
                     </select>
                   </label>
+                  )}
                 </Row>
               )}
             </ul>
