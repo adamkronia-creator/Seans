@@ -364,8 +364,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               )}
               {(
                 [
-                  [data.scoring, data.scoringExtra ? 'Система баллов основных шкал:' : 'Система баллов:'],
-                  [data.scoringExtra, 'Система баллов дополнительных шкал:'],
+                  [data.scoring, data.scoringExtra ? 'Система баллов (Осн. шкалы):' : 'Система баллов:'],
+                  [data.scoringExtra, 'Система баллов (Доп. шкалы):'],
                 ] as const
               ).map(
                 ([items, title]) =>
