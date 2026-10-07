@@ -17,6 +17,8 @@ export interface TestSettingsData {
   scales?: { main: string[]; extra: string[] };
   /** Система баллов: диапазон, пояснение и цвет точки */
   scoring?: { range: string; label: string; tone: ScoreTone }[];
+  /** Отдельная система баллов дополнительных шкал (если отличается от основных) */
+  scoringExtra?: { range: string; label: string; tone: ScoreTone }[];
   questions?: number;
   duration?: string;
   age?: string;
@@ -122,6 +124,33 @@ const ITO: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
+  scales: {
+    main: [
+      'Экстраверсия (Эк)',
+      'Спонтанность (Сп)',
+      'Агрессивность (Аг)',
+      'Ригидность (Рг)',
+      'Интроверсия (Ин)',
+      'Сензитивность (Сз)',
+      'Тревожность (Тр)',
+      'Лабильность (Лб)',
+    ],
+    extra: ['Шкала искренности (Ис)', 'Шкала аггравации (Агг)'],
+  },
+  scoring: [
+    { range: '0–1', label: 'гипоэмотивный показатель', tone: 'yellow' },
+    { range: '2–4', label: 'нормативный показатель', tone: 'green' },
+    { range: '5–7', label: 'заострение черты', tone: 'orange' },
+    { range: '8–9', label: 'дезадаптивный показатель', tone: 'red' },
+  ],
+  scoringExtra: [
+    { range: '0–5', label: 'достоверно', tone: 'green' },
+    { range: '6–9', label: 'не достоверно', tone: 'red' },
+  ],
+  questions: 91,
+  duration: '20–25 мин.',
+  age: '16+',
+  forms: ['Мужская', 'Женская'],
   message: DEFAULT_MESSAGE,
 };
 

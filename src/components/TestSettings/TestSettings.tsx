@@ -362,21 +362,29 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 </div>
               </li>
               )}
-              {data.scoring && (
-                <li className="ts-row ts-row--top">
-                  <IconTestScoring className="ts-row__icon" />
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Система баллов:</p>
-                    <ul className="ts-scale__list">
-                      {data.scoring.map(({ range, label, tone }) => (
-                        <li key={range}>
-                          <span className={`ts-dot ts-dot--${tone}`} />
-                          {range} — {label}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
+              {(
+                [
+                  [data.scoring, data.scoringExtra ? 'Система баллов основных шкал:' : 'Система баллов:'],
+                  [data.scoringExtra, 'Система баллов дополнительных шкал:'],
+                ] as const
+              ).map(
+                ([items, title]) =>
+                  items && (
+                    <li key={title} className="ts-row ts-row--top">
+                      <IconTestScoring className="ts-row__icon" />
+                      <div className="ts-scale">
+                        <p className="ts-scale__title">{title}</p>
+                        <ul className="ts-scale__list">
+                          {items.map(({ range, label, tone }) => (
+                            <li key={range}>
+                              <span className={`ts-dot ts-dot--${tone}`} />
+                              {range} — {label}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </li>
+                  ),
               )}
             </ul>
           </CollapseCard>
