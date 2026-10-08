@@ -97,6 +97,11 @@
   left: 0;
 }
 
+/* Единственное правило — обычный абзац с теми же отступами, без номера */
+.blank-rules--single {
+  padding: var(--space-3);
+}
+
 .blank-questions {
   margin: 0;
   padding: 0;

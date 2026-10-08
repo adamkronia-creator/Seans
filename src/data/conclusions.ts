@@ -1,3 +1,5 @@
+import type { Phq9Scores } from './screeningScoring';
+import { FREQUENCY_ANSWERS } from './testBlank';
 import { SMOL_INTERPRETATION } from './smolInterpretation';
 
 /*
@@ -5,7 +7,7 @@ import { SMOL_INTERPRETATION } from './smolInterpretation';
  * и расшифровка диапазонов, как увидит психолог. Структура общая для всех тестов.
  */
 
-export type LevelTone = 'green' | 'yellow' | 'orange' | 'red';
+export type LevelTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred';
 
 /** Диапазон баллов шкалы: границы, подписи и цвет */
 export interface ConclusionLevel {
@@ -62,6 +64,8 @@ export interface ConclusionData {
   blocks?: { key: string; title: string }[];
   /** Вывод по контрольным шкалам: согласованность ответов и возможность интерпретации */
   validity?: { ok: boolean; text: string };
+  /** Предупреждение психологу над шкалами (например, ответ о суицидальных мыслях в PHQ-9); нет, если тревожных ответов не было */
+  alert?: string;
 }
 
 export const levelOf = (data: ConclusionData, score: number): ConclusionLevel =>
@@ -156,6 +160,68 @@ const BHS: ConclusionData = {
       severe: ['Негативные ожидания относительно будущего выражены значительно. Характерны ощущение бесперспективности, убежденность в отсутствии положительных изменений и существенное снижение надежды. Необходима профессиональная оценка состояния.'],
     },
   },
+};
+
+/** Предупреждение психологу, если на девятый вопрос PHQ-9 (мысли о смерти или самоповреждении) ответили не «Совсем нет» */
+function suicidalAlert(answer: number | undefined): string | undefined {
+  if (!answer) return undefined;
+  return `Пункт 9 (мысли о смерти или самоповреждении): отмечен ответ «${FREQUENCY_ANSWERS[answer]}». Независимо от общего балла необходимо уточнить суицидальный риск.`;
+}
+
+/** GAD-7: сумма 0–21; границы 0–4 / 5–9 / 10–14 / 15–21 — стандартные для методики */
+const GAD7: ConclusionData = {
+  overview: false,
+  flat: true,
+  info: { date: '25.05.2026', time: '19:12–19:14', duration: '1 мин. 48 с.', age: '23 года' },
+  max: 21,
+  ticks: [0, 5, 10, 15, 21],
+  levels: [
+    { key: 'none', from: 0, to: 4, range: '0 — 4', legend: 'Нет симптомов', chip: 'Нет симптомов', tone: 'green', verdictPre: 'является ', verdict: 'минимальным', verdictPost: ' показателем' },
+    { key: 'mild', from: 5, to: 9, range: '5 — 9', legend: 'Легкая', chip: 'Легкая тревожность', tone: 'yellow', verdictPre: 'является ', verdict: 'низким', verdictPost: ' показателем' },
+    { key: 'moderate', from: 10, to: 14, range: '10 — 14', legend: 'Средняя', chip: 'Средняя тревожность', tone: 'orange', verdictPre: 'является ', verdict: 'средним', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+    { key: 'severe', from: 15, to: 21, range: '15 — 21', legend: 'Тяжелая', chip: 'Тяжелая тревожность', tone: 'red', verdictPre: 'является ', verdict: 'тяжелым', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+  ],
+  scales: [
+    { code: 'A', name: 'Тревожность', group: 'main', score: 11, max: 21, leveled: true, about: 'оценивает выраженность симптомов генерализованной тревоги за последние две недели: чрезмерное беспокойство, напряжение, неспособность расслабиться, раздражительность и ожидание неблагоприятных событий.' },
+  ],
+  interpretation: {
+    A: {
+      none: ['Выраженных симптомов тревоги не выявлено. Беспокойство, напряжение и раздражительность находятся в пределах обычных колебаний и не мешают повседневной жизни.'],
+      mild: ['Отмечаются отдельные симптомы тревоги: периодическое беспокойство, напряжение или раздражительность. Обычно такой уровень не нарушает привычный образ жизни; рекомендуется наблюдение за динамикой состояния и обсуждение выявленных симптомов с клиентом.'],
+      moderate: ['Тревога выражена заметно: беспокойство трудно контролировать, сложно расслабиться, возможны раздражительность и внутреннее напряжение. Состояние может ощутимо влиять на повседневное функционирование. С этого уровня рекомендуется дальнейшая клиническая оценка.'],
+      severe: ['Тревога выражена значительно: постоянное беспокойство, неспособность расслабиться, ощущение надвигающейся опасности и выраженные трудности в повседневной жизни. Необходима профессиональная оценка состояния и обсуждение дальнейшей помощи.'],
+    },
+  },
+};
+
+/** PHQ-9: сумма 0–27; границы уровней заданы в настройках теста */
+const PHQ9: ConclusionData = {
+  overview: false,
+  flat: true,
+  info: { date: '25.05.2026', time: '19:12–19:15', duration: '2 мин. 31 с.', age: '23 года' },
+  max: 27,
+  ticks: [0, 5, 10, 15, 20, 27],
+  levels: [
+    { key: 'none', from: 0, to: 4, range: '0 — 4', legend: 'Нет симптомов', chip: 'Нет симптомов', tone: 'green', verdictPre: 'является ', verdict: 'минимальным', verdictPost: ' показателем' },
+    { key: 'mild', from: 5, to: 9, range: '5 — 9', legend: 'Легкая', chip: 'Легкая депрессия', tone: 'yellow', verdictPre: 'является ', verdict: 'низким', verdictPost: ' показателем' },
+    { key: 'moderate', from: 10, to: 14, range: '10 — 14', legend: 'Средняя', chip: 'Средняя депрессия', tone: 'orange', verdictPre: 'является ', verdict: 'средним', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+    { key: 'modsevere', from: 15, to: 19, range: '15 — 19', legend: 'Средне-тяжелая', chip: 'Средне-тяжелая депрессия', tone: 'red', verdictPre: 'является ', verdict: 'средне-тяжелым', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+    { key: 'severe', from: 20, to: 27, range: '20 — 27', legend: 'Тяжелая', chip: 'Тяжелая депрессия', tone: 'darkred', verdictPre: 'является ', verdict: 'тяжелым', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+  ],
+  scales: [
+    { code: 'D', name: 'Депрессия', group: 'main', score: 12, max: 27, leveled: true, about: 'оценивает выраженность депрессивной симптоматики за последние две недели: сниженное настроение, утрату интереса и удовольствия, нарушения сна и аппетита, усталость, трудности с концентрацией и мысли о причинении себе вреда.' },
+  ],
+  interpretation: {
+    D: {
+      none: ['Выраженных депрессивных симптомов не выявлено. Настроение, интерес к привычным делам, сон и уровень энергии находятся в пределах обычных колебаний.'],
+      mild: ['Отмечаются отдельные депрессивные симптомы: периодическое снижение настроения или интереса, усталость, нарушения сна или аппетита. Рекомендуется наблюдение за динамикой состояния и обсуждение выявленных симптомов с клиентом.'],
+      moderate: ['Депрессивные симптомы выражены заметно: сниженное настроение, потеря интереса к привычным делам, утомляемость, трудности с концентрацией. Состояние может ощутимо влиять на повседневную жизнь. С этого уровня рекомендуется дальнейшая клиническая оценка.'],
+      modsevere: ['Депрессивная симптоматика выражена значительно и заметно ограничивает повседневное функционирование. Необходима клиническая оценка состояния, в том числе рисков, и обсуждение возможных видов помощи.'],
+      severe: ['Депрессивная симптоматика выражена в тяжелой степени. Необходима профессиональная оценка состояния, включая суицидальный риск, и подбор дальнейшей помощи.'],
+    },
+  },
+  // В примере показано, как выглядит предупреждение о девятом вопросе
+  alert: suicidalAlert(1),
 };
 
 /** Баллы, заданные «в порядке шкал» (по месту в списке `scales`): так коды шкал не нужно повторять в подсчёте */
@@ -330,6 +396,16 @@ export function bhsResult(score: number, info: ConclusionData['info']): Conclusi
   return withScores(BHS, { [BHS.scales[0].code]: score }, info);
 }
 
+/** GAD-7: сумма баллов тревожности */
+export function gad7Result(score: number, info: ConclusionData['info']): ConclusionData {
+  return withScores(GAD7, { [GAD7.scales[0].code]: score }, info);
+}
+
+/** PHQ-9: сумма баллов депрессии и предупреждение, если на девятый вопрос ответили не «Совсем нет» */
+export function phq9Result(score: Phq9Scores, info: ConclusionData['info']): ConclusionData {
+  return { ...withScores(PHQ9, { [PHQ9.scales[0].code]: score.total }, info), alert: suicidalAlert(score.suicidal) };
+}
+
 /** ОСР: «Вероятность» (0–29) и девять факторов в порядке шкал: Дм, Аф, Ун, Нс, СП, СК, Мк, ВП, АС */
 export function osrResult(score: { total: number; factors: number[] }, info: ConclusionData['info']): ConclusionData {
   return withScores(OSR, byOrder(OSR, [score.total, ...score.factors]), info);
@@ -346,6 +422,6 @@ export function ittResult(
 
 /** Пример заключения для теста из библиотеки; у остальных тестов пока нет */
 export function conclusionFor(testId: string): ConclusionData | undefined {
-  const examples: Record<string, ConclusionData> = { smol: SMOL, bdi: BDI, bhs: BHS, itt: ITT, ocr: OSR };
+  const examples: Record<string, ConclusionData> = { smol: SMOL, bdi: BDI, bhs: BHS, itt: ITT, ocr: OSR, gad7: GAD7, phq9: PHQ9 };
   return examples[testId];
 }

@@ -409,13 +409,58 @@ export const OCR_BLANK: TestBlankData = {
   ],
 };
 
-/** Бланк теста из библиотеки; есть у BDI, BHS, СМОЛ, ИТТ и ОСР */
+/**
+ * GAD-7 и PHQ-9: одно правило и один ряд ответов на все вопросы. Ответ даёт от 0 до 3 баллов по порядку,
+ * поэтому номера у вариантов не показываем: номер в бланке (1–4) не совпал бы с баллом.
+ */
+export const FREQUENCY_ANSWERS = [
+  'Совсем нет',
+  'В течение нескольких дней',
+  'Более чем половину этого времени',
+  'Почти каждый день',
+];
+
+const FREQUENCY_RULE = 'Оцените, пожалуйста, насколько часто следующие проблемы беспокоили вас в течение прошедших двух недель.';
+
+export const GAD7_BLANK: TestBlankData = {
+  numbered: false,
+  rules: [FREQUENCY_RULE],
+  questions: [
+    { prompt: 'Чувство тревоги или раздражения.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Неспособность справиться со своим беспокойством.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Чрезмерное беспокойство по разным поводам.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Неспособность расслабляться.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Ощущение такого беспокойства, что трудно найти себе место.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Склонность быстро испытывать злость или раздражительность.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Чувство страха, как будто может случиться что-то ужасное.', answers: FREQUENCY_ANSWERS },
+  ],
+};
+
+export const PHQ9_BLANK: TestBlankData = {
+  numbered: false,
+  rules: [FREQUENCY_RULE],
+  questions: [
+    { prompt: 'Снижение интереса и удовольствия от привычных дел.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Чувство подавленности или безнадежности.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Проблемы со сном (неспособность заснуть, раннее пробуждение или слишком долгий сон).', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Чувство усталости или недостатка энергии.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Плохой аппетит или переедание.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Плохое мнение о себе или чувство, что не смог оправдать ожиданий своей семьи.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Проблемы с концентрацией внимания (например, при чтении газеты или просмотре телевизионной передачи).', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Замедленность движений или речи, которая стала заметна другим людям, или, напротив, суетливость, когда движения и речь стали более быстрыми и беспокойными.', answers: FREQUENCY_ANSWERS },
+    { prompt: 'Мысли о том, что мне бы хотелось умереть или причинить себе боль.', answers: FREQUENCY_ANSWERS },
+  ],
+};
+
+/** Бланк теста из библиотеки; есть у BDI, BHS, СМОЛ, ИТТ, ОСР, GAD-7 и PHQ-9 */
 export function testBlank(testId: string): TestBlankData | undefined {
   if (testId === 'bdi') return BDI_BLANK;
   if (testId === 'bhs') return BHS_BLANK;
   if (testId === 'smol') return SMOL_BLANK;
   if (testId === 'itt') return ITT_BLANK;
   if (testId === 'ocr') return OCR_BLANK;
+  if (testId === 'gad7') return GAD7_BLANK;
+  if (testId === 'phq9') return PHQ9_BLANK;
   return undefined;
 }
 

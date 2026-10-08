@@ -152,6 +152,10 @@
   background: var(--color-red);
 }
 
+.cc-fill--darkred {
+  background: var(--color-darkred);
+}
+
 .cc-value {
   position: absolute;
   top: 0;
@@ -243,6 +247,11 @@
   color: var(--color-red);
 }
 
+.cc-chip--darkred {
+  background: rgb(168 22 28 / 12%);
+  color: var(--color-darkred);
+}
+
 .cc-tone--yellow {
   color: var(--color-yellow);
 }
@@ -261,6 +270,10 @@
 
 .cc-tone--red {
   color: var(--color-red);
+}
+
+.cc-tone--darkred {
+  color: var(--color-darkred);
 }
 
 /* Метка «Шкала Hs» в заголовке карточки */
@@ -410,6 +423,28 @@
 
 .cc-validity--warn svg {
   color: var(--color-orange);
+}
+
+/* Предупреждение психологу над шкалами: отдельная карточка со значком */
+.cc-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--color-bg-panel);
+  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+  font-size: var(--font-size-md);
+  line-height: 20px;
+}
+
+.cc-alert svg {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  color: var(--color-red);
 }
 
 /* Подпись после всех блоков заключения */

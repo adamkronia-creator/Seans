@@ -1,10 +1,11 @@
 import { useSyncExternalStore } from 'react';
 import { receiveMessage } from './chatStore';
 import { scoreBdi, scoreBhs } from './beckScoring';
-import { bdiResult, bhsResult, ittResult, osrResult, smolResult, type ConclusionData } from './conclusions';
+import { bdiResult, bhsResult, gad7Result, ittResult, osrResult, phq9Result, smolResult, type ConclusionData } from './conclusions';
 import { scoreItt } from './ittScoring';
 import { LIBRARY } from './library';
 import { scoreOsr } from './osrScoring';
+import { scoreGad7, scorePhq9 } from './screeningScoring';
 import { scoreSmol } from './smolScoring';
 
 /*
@@ -108,6 +109,8 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
   // Мужская форма — нормы для взрослых и юношей, женская — для девушек
   itt: (answers, form, info) => ittResult(scoreItt(answers, form === 'Женская'), info),
   ocr: (answers, _form, info) => osrResult(scoreOsr(answers), info),
+  gad7: (answers, _form, info) => gad7Result(scoreGad7(answers), info),
+  phq9: (answers, _form, info) => phq9Result(scorePhq9(answers), info),
 };
 
 export const canPassSelf = (testId: string) => testId in SCORERS;
@@ -130,6 +133,8 @@ const PASSED_TEXT: Record<string, string> = {
   bhs: 'Вы прошли шкалу безнадежности А. Бека «BHS»',
   itt: 'Вы прошли интегративный тест тревожности «ИТТ»',
   ocr: 'Вы прошли опросник суицидального риска «ОСР»',
+  gad7: 'Вы прошли опросник генерализованного тревожного расстройства «GAD-7»',
+  phq9: 'Вы прошли опросник депрессивного состояния «PHQ-9»',
 };
 
 const passedText = (testId: string) =>

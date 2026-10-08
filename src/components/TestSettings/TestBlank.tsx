@@ -59,11 +59,16 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
   return (
     <>
       <CollapseCard title="Правила тестирования" id="blank-rules">
-        <ol className="blank-rules">
-          {data.rules.map((rule) => (
-            <li key={rule}>{rule}</li>
-          ))}
-        </ol>
+        {data.rules.length === 1 ? (
+          // Одно правило не нумеруем: «1.» перед единственным пунктом лишнее
+          <p className="blank-rules blank-rules--single">{data.rules[0]}</p>
+        ) : (
+          <ol className="blank-rules">
+            {data.rules.map((rule) => (
+              <li key={rule}>{rule}</li>
+            ))}
+          </ol>
+        )}
       </CollapseCard>
 
       <CollapseCard title="Вопросы и ответы" id="blank-qa">
