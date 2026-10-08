@@ -249,7 +249,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
     <section key={l.key} className={`cc-level${flat ? ' cc-level--flat' : ''}`}>
       <h3 className={`cc-level__head cc-tone--${l.tone}`}>
         <span className="cc-level__dot" />
-        {flat ? `${l.range}: ${data.overview ? `${l.chip} показатель` : l.chip}` : l.range}
+        {flat ? `${l.range}: ${l.heading ?? (data.overview ? `${l.chip} показатель` : l.chip)}` : l.range}
         {!flat && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
       </h3>
       {(texts[l.key] ?? []).map((paragraph) => (
@@ -335,7 +335,7 @@ export function conclusionSections(data: ConclusionData) {
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
-          { id: 'cc-extra', title: 'Дополнительные шкалы' },
+          ...(data.scales.some((s) => s.group === 'extra') ? [{ id: 'cc-extra', title: 'Дополнительные шкалы' }] : []),
         ]
       : []),
     ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: data.overview || data.blocks ? `${s.name} (${s.code})` : s.name })),
@@ -354,6 +354,8 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
   const { info, scales } = data;
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
+  // У дополнительных шкал может быть своя система диапазонов (у ИТО — «достоверно / не достоверно»)
+  const extraData: ConclusionData = data.extra ? { ...data, ...data.extra } : data;
 
   const scrollTo = (id: string, block: ScrollLogicalPosition = 'start') => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block });
@@ -452,7 +454,9 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
       {data.overview && (
         <>
           <ScaleCharts data={data} title="Основные шкалы" id="cc-main" scales={main} legend onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
-          <ScaleCharts data={data} title="Дополнительные шкалы" id="cc-extra" scales={extra} validity onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          {extra.length > 0 && (
+            <ScaleCharts data={extraData} title="Дополнительные шкалы" id="cc-extra" scales={extra} validity onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          )}
         </>
       )}
 
@@ -465,7 +469,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
             <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview || (data.summary && data.flat) ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
           {extra.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview || (data.summary && data.flat) ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
+            <ScaleCard key={s.code} data={extraData} scale={s} onChart={data.overview || (data.summary && data.flat) ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
         </>
       )}
