@@ -6,7 +6,8 @@
  *
  * Общий показатель части — сумма 15 ответов (0–45); он переводится в стэн (1–9) по таблице нормы.
  *
- * Пять компонентов считаются по утверждениям части: у каждого утверждения свой диагностический коэффициент для ответов 1, 2 и 3
+ * Пять компонентов (ЭД, АСТ, ФОБ, ОП, СЗ) считаются отдельно для каждой части — так получаются компоненты ситуационной (-С)
+ * и личностной (-Л) тревожности. У каждого утверждения свой диагностический коэффициент для ответов 1, 2 и 3
  * (ответ 0 даёт 0). Сумма коэффициентов компонента переводится в стэн по таблице нормы. Нормы заданы отдельно для группы
  * «взрослые и юноши» и для девушек; в приложении мужская форма бланка считается по первой, женская — по второй.
  *
@@ -82,11 +83,15 @@ const PART = 15;
 export interface IttScores {
   /** Ситуационная тревожность (СТ-С), стэн 1–9 */
   situational: number;
+  /** Компоненты ситуационной тревожности (стэны 1–9): ЭД-С, АСТ-С, ФОБ-С, ОП-С, СЗ-С */
+  situationalComponents: number[];
   /** Личностная тревожность (СТ-Л), стэн 1–9 */
   personal: number;
-  /** Компоненты ситуационной тревожности (стэны 1–9): ЭД-С, АСТ-С, ФОБ-С, ОП-С, СЗ-С */
-  components: number[];
+  /** Компоненты личностной тревожности (стэны 1–9): ЭД-Л, АСТ-Л, ФОБ-Л, ОП-Л, СЗ-Л */
+  personalComponents: number[];
 }
+
+const ORDER: Component[] = ['emotional', 'asthenic', 'phobic', 'outlook', 'social'];
 
 /**
  * Подсчёт ИТТ. `answers` — 30 ответов подряд (0–3): первые 15 — «сейчас», следующие 15 — «в последнее время».
@@ -94,24 +99,29 @@ export interface IttScores {
  */
 export function scoreItt(answers: ReadonlyArray<number | undefined>, girl: boolean): IttScores {
   const group: keyof Norms = girl ? 'girl' : 'adult';
-  const answer = (part: number, n: number) => answers[part * PART + n - 1] ?? 0;
-  const total = (part: number) => {
-    let sum = 0;
-    for (let n = 1; n <= PART; n++) sum += answer(part, n);
-    return sum;
+
+  /** Общий показатель и компоненты одной части теста (0 — «сейчас», 1 — «в последнее время») */
+  const part = (index: number) => {
+    const answer = (n: number) => answers[index * PART + n - 1] ?? 0;
+    let total = 0;
+    const sums: Record<Component, number> = { emotional: 0, asthenic: 0, phobic: 0, outlook: 0, social: 0 };
+    for (let n = 1; n <= PART; n++) {
+      const a = answer(n);
+      total += a;
+      if (a > 0) sums[ITEMS[n].component] += ITEMS[n].k[a - 1];
+    }
+    return {
+      total: stanine(total, TOTAL_NORMS[group]),
+      components: ORDER.map((c) => stanine(sums[c], COMPONENT_NORMS[c][group])),
+    };
   };
 
-  // Компоненты — по первой части («сейчас»): в заключении они заданы как ЭД-С, АСТ-С, ФОБ-С, ОП-С, СЗ-С
-  const sums: Record<Component, number> = { emotional: 0, asthenic: 0, phobic: 0, outlook: 0, social: 0 };
-  for (let n = 1; n <= PART; n++) {
-    const a = answer(0, n);
-    if (a > 0) sums[ITEMS[n].component] += ITEMS[n].k[a - 1];
-  }
-  const order: Component[] = ['emotional', 'asthenic', 'phobic', 'outlook', 'social'];
-
+  const now = part(0);
+  const lately = part(1);
   return {
-    situational: stanine(total(0), TOTAL_NORMS[group]),
-    personal: stanine(total(1), TOTAL_NORMS[group]),
-    components: order.map((c) => stanine(sums[c], COMPONENT_NORMS[c][group])),
+    situational: now.total,
+    situationalComponents: now.components,
+    personal: lately.total,
+    personalComponents: lately.components,
   };
 }

@@ -139,20 +139,36 @@ function ScaleCharts({
 /** Ширина подписи строки в px на один знак кода; короткие коды (D, КА, Вер) умещаются в 40, длинные (ФОБ-С) требуют больше */
 const LABEL_CHAR = 11;
 
-/** Общая диаграмма «Шкалы тестирования»: основная и дополнительные шкалы на одной оси, без легенды */
-function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: string) => void }) {
-  const label = Math.max(40, Math.ceil(Math.max(...data.scales.map((s) => s.code.length)) * LABEL_CHAR));
+/**
+ * Блок диаграммы («Шкалы тестирования» или один из блоков теста): полосы шкал, под каждой подпись оси с небольшим отступом.
+ * У шкалы без диапазонов полоса идёт от 0 до её собственного максимума; маркеры диапазонов внизу отделены разделителем.
+ */
+function ScaleBlock({
+  data,
+  title,
+  id,
+  scales,
+  legend,
+  onOpen,
+}: {
+  data: ConclusionData;
+  title: string;
+  id: string;
+  scales: ConclusionScale[];
+  legend?: boolean;
+  onOpen: (code: string) => void;
+}) {
+  const label = Math.max(40, Math.ceil(Math.max(...scales.map((s) => s.code.length)) * LABEL_CHAR));
   return (
-    <CollapseCard title="Шкалы тестирования" id="cc-summary">
+    <CollapseCard title={title} id={id}>
       <div className="cc-chart" style={{ '--cc-main-label': `${label}px` } as React.CSSProperties}>
         <ul className="cc-bars cc-bars--main">
-          {data.scales.map((s, i) => {
+          {scales.map((s, i) => {
             const Icon = s.group === 'main' ? IconTestReportMain : IconTestReportExtra;
             return (
               <li key={s.code}>
                 <div className="cc-bar">
                   <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
-                  {/* Полоса дополнительной шкалы идёт от 0 до её собственного максимума, подпись под ней: 0 и максимум */}
                   <Bar data={data} scale={s} max={s.leveled ? data.max : s.max} />
                   <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
                     <Icon />
@@ -163,6 +179,7 @@ function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: s
             );
           })}
         </ul>
+        {legend && <Legend data={data} />}
       </div>
     </CollapseCard>
   );
@@ -236,7 +253,7 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
     <CollapseCard
       title={scale.name}
       id={`cc-scale-${scale.code}`}
-      badge={data.overview ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
+      badge={data.overview || data.blocks ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
     >
       <div className="cc-scale">
         <p className="cc-scale__text">— {scale.about}</p>
@@ -289,6 +306,7 @@ export function conclusionSections(data: ConclusionData) {
   return [
     { id: 'cc-info', title: 'Общая информация' },
     ...(data.summary ? [{ id: 'cc-summary', title: 'Шкалы тестирования' }] : []),
+    ...(data.blocks ?? []).map((b) => ({ id: `cc-block-${b.key}`, title: b.title })),
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
@@ -296,7 +314,7 @@ export function conclusionSections(data: ConclusionData) {
           { id: 'cc-extra', title: 'Дополнительные шкалы' },
         ]
       : []),
-    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: data.overview ? `${s.name} (${s.code})` : s.name })),
+    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: data.overview || data.blocks ? `${s.name} (${s.code})` : s.name })),
   ];
 }
 
@@ -369,7 +387,21 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         </ul>
       )}
 
-      {data.summary && <SummaryChart data={data} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />}
+      {data.summary && (
+        <ScaleBlock data={data} title="Шкалы тестирования" id="cc-summary" scales={scales} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+      )}
+
+      {data.blocks?.map((b) => (
+        <ScaleBlock
+          key={b.key}
+          data={data}
+          title={b.title}
+          id={`cc-block-${b.key}`}
+          scales={scales.filter((s) => s.block === b.key)}
+          legend
+          onOpen={(c) => scrollTo(`cc-scale-${c}`)}
+        />
+      ))}
 
       {data.overview && (
         <>
@@ -379,12 +411,19 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         </>
       )}
 
-      {main.map((s, i) => (
-        <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-main')} />
-      ))}
-      {extra.map((s, i) => (
-        <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
-      ))}
+      {data.blocks ? (
+        // Карточки идут в порядке блоков: основная шкала блока и её дополнительные
+        scales.map((s, i) => <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo(`cc-block-${s.block}`)} />)
+      ) : (
+        <>
+          {main.map((s, i) => (
+            <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-main')} />
+          ))}
+          {extra.map((s, i) => (
+            <ScaleCard key={s.code} data={data} scale={s} index={i} onChart={() => scrollTo('cc-extra')} />
+          ))}
+        </>
+      )}
 
       <p className="cc-note">
         Опросник — это диагностическая методика. Итоговые показатели описывают состояние человека на момент прохождения и не являются медицинским
