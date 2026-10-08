@@ -205,17 +205,18 @@ const OSR: ConclusionData = {
 
 const ITT: ConclusionData = {
   overview: false,
+  flat: true,
   blocks: [
-    { key: 'situational', title: 'Ситуационная тревожность' },
+    { key: 'situational', title: 'Тревожность на данный момент' },
     { key: 'personal', title: 'Личностная тревожность' },
   ],
   info: { date: '25.05.2026', time: '19:12–19:17', duration: '4 мин. 36 с.', age: '23 года' },
   max: 9,
   ticks: [0, 4, 7, 9],
   levels: [
-    { key: 'low', from: 0, to: 3, range: '0 — 3', legend: 'Низкий', chip: 'Низкий уровень', tone: 'yellow', verdictPre: 'соответствует ', verdict: 'низкому уровню', verdictPost: '' },
-    { key: 'norm', from: 4, to: 6, range: '4 — 6', legend: 'Средний', chip: 'Нормативный уровень', tone: 'green', verdictPre: 'соответствует ', verdict: 'нормативному уровню', verdictPost: '' },
-    { key: 'high', from: 7, to: 9, range: '7 — 9', legend: 'Высокий', chip: 'Высокий уровень', tone: 'red', verdictPre: 'соответствует ', verdict: 'высокому уровню', verdictPost: '' },
+    { key: 'low', from: 0, to: 3, range: '0 — 3', legend: 'Низкий', chip: 'Низкий показатель', tone: 'yellow', verdictPre: 'является ', verdict: 'низким', verdictPost: ' показателем' },
+    { key: 'norm', from: 4, to: 6, range: '4 — 6', legend: 'Средний', chip: 'Средний показатель', tone: 'green', verdictPre: 'является ', verdict: 'средним нормативным', verdictPost: ' показателем' },
+    { key: 'high', from: 7, to: 9, range: '7 — 9', legend: 'Высокий', chip: 'Высокий показатель', tone: 'red', verdictPre: 'является ', verdict: 'высоким', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
   ],
   scales: [
     { code: 'СТ-С', name: 'Ситуационная тревожность', group: 'main', block: 'situational', score: 6, max: 9, leveled: true, about: 'оценивает выраженность тревоги в данный момент: напряжение, беспокойство и эмоциональный дискомфорт, которые человек испытывает сейчас, в текущей ситуации.' },

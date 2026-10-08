@@ -93,20 +93,24 @@ function Bar({ data, scale, max = scale.max }: { data: ConclusionData; scale: Co
 function ScaleCharts({
   data,
   title,
+  id,
   scales,
-  group,
+  legend,
+  validity,
   onOpen,
 }: {
   data: ConclusionData;
   title: string;
+  id: string;
   scales: ConclusionScale[];
-  group: 'main' | 'extra';
+  legend?: boolean;
+  validity?: boolean;
   onOpen: (code: string) => void;
 }) {
   return (
-    <CollapseCard title={title} id={`cc-${group}`}>
+    <CollapseCard title={title} id={id}>
       <div className="cc-chart cc-chart--flat">
-        <ul className={`cc-bars cc-bars--${group}`}>
+        <ul className="cc-bars cc-bars--main">
           {scales.map((s, i) => (
             <li key={s.code} id={`cc-bar-${s.code}`}>
               {/* Строка целиком ведёт к описанию шкалы; из карточки та же полоса ведёт обратно */}
@@ -119,7 +123,8 @@ function ScaleCharts({
                 onKeyDown={(e) => e.key === 'Enter' && onOpen(s.code)}
               >
                 <span className="cc-bar__name">
-                  {i + 1}.&nbsp;{s.chartName ?? s.name} <span className="cc-bar__code">({s.code})</span>
+                  {data.overview ? `${i + 1}.\u00A0` : ''}
+                  {s.chartName ?? s.name} <span className="cc-bar__code">({s.code})</span>
                 </span>
                 <div className="cc-bar">
                   <Bar data={data} scale={s} />
@@ -128,10 +133,10 @@ function ScaleCharts({
             </li>
           ))}
         </ul>
-        <Axis kind={group} ticks={data.ticks} max={data.max} flat />
-        {group === 'main' && <Legend data={data} />}
+        <Axis kind="main" ticks={data.ticks} max={data.max} flat />
+        {legend && <Legend data={data} />}
       </div>
-      {group === 'extra' && data.validity && (
+      {validity && data.validity && (
         <p className={`cc-validity${data.validity.ok ? '' : ' cc-validity--warn'}`}>
           <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
             {data.validity.ok ? (
@@ -210,7 +215,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
     <section key={l.key} className={`cc-level${flat ? ' cc-level--flat' : ''}`}>
       <h3 className={`cc-level__head cc-tone--${l.tone}`}>
         <span className="cc-level__dot" />
-        {flat ? `${l.range}: ${l.chip}${data.overview ? ' показатель' : ''}` : l.range}
+        {flat ? `${l.range}: ${data.overview ? `${l.chip} показатель` : l.chip}` : l.range}
         {!flat && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
       </h3>
       {(texts[l.key] ?? []).map((paragraph) => (
@@ -376,28 +381,40 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         <ScaleBlock data={data} title="Шкалы тестирования" id="cc-summary" scales={scales} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
       )}
 
-      {data.blocks?.map((b) => (
-        <ScaleBlock
-          key={b.key}
-          data={data}
-          title={b.title}
-          id={`cc-block-${b.key}`}
-          scales={scales.filter((s) => s.block === b.key)}
-          legend
-          onOpen={(c) => scrollTo(`cc-scale-${c}`)}
-        />
-      ))}
+      {data.blocks?.map((b) =>
+        data.flat ? (
+          <ScaleCharts
+            key={b.key}
+            data={data}
+            title={b.title}
+            id={`cc-block-${b.key}`}
+            scales={scales.filter((s) => s.block === b.key)}
+            legend
+            onOpen={(c) => scrollTo(`cc-scale-${c}`)}
+          />
+        ) : (
+          <ScaleBlock
+            key={b.key}
+            data={data}
+            title={b.title}
+            id={`cc-block-${b.key}`}
+            scales={scales.filter((s) => s.block === b.key)}
+            legend
+            onOpen={(c) => scrollTo(`cc-scale-${c}`)}
+          />
+        ),
+      )}
 
       {data.overview && (
         <>
-          <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
-          <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          <ScaleCharts data={data} title="Основные шкалы" id="cc-main" scales={main} legend onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          <ScaleCharts data={data} title="Дополнительные шкалы" id="cc-extra" scales={extra} validity onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
         </>
       )}
 
       {data.blocks ? (
         // Карточки идут в порядке блоков: основная шкала блока и её дополнительные
-        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={s.block ? () => scrollTo(`cc-block-${s.block}`) : undefined} />)
+        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={s.block ? () => (data.flat ? scrollTo(`cc-bar-${s.code}`, 'center') : scrollTo(`cc-block-${s.block}`)) : undefined} />)
       ) : (
         <>
           {main.map((s) => (
