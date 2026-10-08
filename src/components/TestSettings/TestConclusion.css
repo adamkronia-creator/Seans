@@ -271,7 +271,7 @@
   background: var(--color-divider);
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
-  line-height: 17px;
+  line-height: 16px;
 }
 
 /* Карточка шкалы: тексты 16/19 с отступами 12, абзацы через 12 */
@@ -501,4 +501,122 @@
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
   line-height: 120%;
+}
+
+/* СМОЛ: названия над столбцами 14/16, столбцы на всю ширину, одна общая ось и крупные маркеры */
+.cc-chart--flat .cc-bar__name {
+  margin: 0 var(--space-3) 4px;
+  font-size: var(--font-size-sm);
+  line-height: 16px;
+}
+
+.cc-chart--flat .cc-track,
+.cc-chart--flat .cc-fill,
+.cc-single--flat .cc-track,
+.cc-single--flat .cc-fill {
+  border-radius: 4px;
+}
+
+.cc-chart--flat .cc-value,
+.cc-single--flat .cc-value {
+  background: transparent;
+}
+
+.cc-axis--even {
+  display: flex;
+  justify-content: space-between;
+  height: 12px;
+  margin: 0;
+  padding: 0 var(--space-3);
+  line-height: 12px;
+}
+
+.cc-chart--flat > .cc-axis--even {
+  margin-top: var(--space-3);
+}
+
+.cc-single--flat .cc-axis--even {
+  margin-top: 4px;
+  padding: 0;
+}
+
+.cc-chart--flat .cc-legend,
+.cc-chart--flat:has(.cc-bars--extra) .cc-legend,
+.cc-profile .cc-legend {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+.cc-chart--flat .cc-chip,
+.cc-profile .cc-chip {
+  gap: 4px;
+  height: 26px;
+}
+
+.cc-chart--flat .cc-chip__dot,
+.cc-profile .cc-chip__dot {
+  width: 10px;
+  height: 10px;
+}
+
+.cc-single--flat {
+  margin-top: var(--space-2);
+}
+
+.cc-single--flat .cc-bar {
+  padding: 0;
+}
+
+.cc-scale:has(.cc-single--flat) .cc-scale__text + .cc-scale__text {
+  margin-top: var(--space-2);
+}
+
+.cc-scale:has(.cc-single--flat) {
+  padding-bottom: 0;
+}
+
+.cc-single--flat {
+  margin-bottom: var(--space-3);
+}
+
+.cc-level--flat .cc-level__head {
+  display: block;
+  height: auto;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: 19px;
+}
+
+.cc-level--flat .cc-level__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: 0;
+}
+
+.cc-level--flat p + p {
+  margin-top: var(--space-2);
+}
+
+.cc-level--flat:last-child {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+/* В макете СМОЛ белых линий на границах диапазонов нет, значение — medium */
+.cc-chart--flat .cc-norm,
+.cc-single--flat .cc-norm {
+  display: none;
+}
+
+.cc-chart--flat .cc-value,
+.cc-single--flat .cc-value {
+  font-weight: var(--font-weight-medium);
+}
+
+/* С меткой «Шкала Hs» шапка 46: метка 24 с полями 11 */
+.blank-card__head:has(.cc-badge) {
+  padding-top: 11px;
+  padding-bottom: 11px;
 }
