@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { IconTestChevronUp } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
@@ -69,7 +69,9 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
       <CollapseCard title="Вопросы и ответы" id="blank-qa">
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
-            <li key={i} id={`blank-q-${i + 1}`} className={`blank-question${fill?.missing === i ? ' blank-question--missing' : ''}`}>
+            <Fragment key={i}>
+            {q.heading && <li className="blank-heading">{q.heading}</li>}
+            <li id={`blank-q-${i + 1}`} className={`blank-question${fill?.missing === i ? ' blank-question--missing' : ''}`}>
               <p className="blank-question__prompt">
                 <strong>{i + 1}.</strong> {q.prompt}
               </p>
@@ -94,6 +96,7 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
                 ))}
               </ul>
             </li>
+            </Fragment>
           ))}
         </ol>
       </CollapseCard>

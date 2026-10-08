@@ -29,6 +29,7 @@ import { CollapseCard, TestBlank, blankSections } from './TestBlank';
 import { conclusionSections, TestConclusion } from './TestConclusion';
 import { TestHeader } from './TestHeader';
 import { TestPass } from './TestPass';
+import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { canPassSelf } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
@@ -115,6 +116,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [toast, setToast] = useState<string | null>(null);
   // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
   const [view, setView] = useState<View>('settings');
+  // Результат только что пройденного теста: открывается вместо настроек, «назад» возвращает к ним
+  const [resultId, setResultId] = useState<string | null>(null);
   // Длинное описание свёрнуто до шести строк, пока его не раскроют
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
@@ -167,7 +170,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [view]);
+  }, [view, resultId]);
   const paragraphs = data.intro.split('\n\n');
   // Строки «● …» — маркированный список, остальные — обычный текст абзаца
   const renderParagraph = (paragraph: string, i: number) => {
@@ -201,6 +204,19 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const openConclusion = () => (conclusion ? setView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? setView('blank') : notify('Бланк этого теста пока недоступен'));
 
+  if (resultId) {
+    return (
+      <>
+        <TestResult resultId={resultId} onBack={() => setResultId(null)} />
+        {toast && (
+          <p className="test-settings__toast" role="status">
+            {toast}
+          </p>
+        )}
+      </>
+    );
+  }
+
   return (
     <section className="test-settings">
       <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : () => setView('settings')} />
@@ -213,10 +229,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           form={form}
           saveBlank={saveBlank}
           onFormChange={setForm}
-          onDone={() => {
-            // Результат лежит в «Избранное» → «Тесты», в чате «Избранное» появилось сообщение с кнопкой к нему
+          onDone={(id) => {
+            // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
             setView('settings');
-            notify('Тест пройден. Результат — в чате «Избранное»');
+            setResultId(id);
+            notify('Заключение теста сохранено в избранном');
           }}
         />
       ) : view === 'conclusion' && conclusion ? (

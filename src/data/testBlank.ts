@@ -11,6 +11,8 @@ export const BLANK_RULES = [
 ];
 
 export interface BlankQuestion {
+  /** Пояснение перед группой вопросов («Сейчас, в данный момент:»): показано один раз над первым вопросом группы */
+  heading?: string;
   prompt: string;
   /** Четыре варианта ответа, по возрастанию выраженности */
   answers: string[];
@@ -335,41 +337,41 @@ const ITT_LATELY = ['Почти никогда', 'Редко', 'Часто', 'П
 export const ITT_BLANK: TestBlankData = {
   rules: BLANK_RULES,
   questions: [
-    { prompt: "Сейчас, в данный момент: Я нахожусь в напряжении.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я расстроен.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я тревожусь о будущем.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я нервничаю.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я озабочен.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я возбужден.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я ощущаю непонятную угрозу.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я быстро устаю.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я не уверен в себе.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я избегаю любых конфликтов.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я легко прихожу в замешательство.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я ощущаю свою бесполезность.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я плохо сплю.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я ощущаю себя утомленным.", answers: ITT_NOW },
-    { prompt: "Сейчас, в данный момент: Я эмоционально чувствителен.", answers: ITT_NOW },
-    { prompt: "В последнее время: Я находился в напряжении.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я расстраивался.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я тревожился о будущем.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я нервничал.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я бывал озабочен.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я бывал возбужден.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я ощущал непонятную угрозу.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я быстро уставал.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я бывал не уверен в себе.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я избегал любых конфликтов.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я легко приходил в замешательство.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я ощущал свою бесполезность.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я плохо спал.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я ощущал себя утомленным.", answers: ITT_LATELY },
-    { prompt: "В последнее время: Я бывал эмоционально чувствителен.", answers: ITT_LATELY },
+    { heading: 'Сейчас, в данный момент:', prompt: "Я нахожусь в напряжении.", answers: ITT_NOW },
+    { prompt: "Я расстроен.", answers: ITT_NOW },
+    { prompt: "Я тревожусь о будущем.", answers: ITT_NOW },
+    { prompt: "Я нервничаю.", answers: ITT_NOW },
+    { prompt: "Я озабочен.", answers: ITT_NOW },
+    { prompt: "Я возбужден.", answers: ITT_NOW },
+    { prompt: "Я ощущаю непонятную угрозу.", answers: ITT_NOW },
+    { prompt: "Я быстро устаю.", answers: ITT_NOW },
+    { prompt: "Я не уверен в себе.", answers: ITT_NOW },
+    { prompt: "Я избегаю любых конфликтов.", answers: ITT_NOW },
+    { prompt: "Я легко прихожу в замешательство.", answers: ITT_NOW },
+    { prompt: "Я ощущаю свою бесполезность.", answers: ITT_NOW },
+    { prompt: "Я плохо сплю.", answers: ITT_NOW },
+    { prompt: "Я ощущаю себя утомленным.", answers: ITT_NOW },
+    { prompt: "Я эмоционально чувствителен.", answers: ITT_NOW },
+    { heading: 'В последнее время:', prompt: "Я находился в напряжении.", answers: ITT_LATELY },
+    { prompt: "Я расстраивался.", answers: ITT_LATELY },
+    { prompt: "Я тревожился о будущем.", answers: ITT_LATELY },
+    { prompt: "Я нервничал.", answers: ITT_LATELY },
+    { prompt: "Я бывал озабочен.", answers: ITT_LATELY },
+    { prompt: "Я бывал возбужден.", answers: ITT_LATELY },
+    { prompt: "Я ощущал непонятную угрозу.", answers: ITT_LATELY },
+    { prompt: "Я быстро уставал.", answers: ITT_LATELY },
+    { prompt: "Я бывал не уверен в себе.", answers: ITT_LATELY },
+    { prompt: "Я избегал любых конфликтов.", answers: ITT_LATELY },
+    { prompt: "Я легко приходил в замешательство.", answers: ITT_LATELY },
+    { prompt: "Я ощущал свою бесполезность.", answers: ITT_LATELY },
+    { prompt: "Я плохо спал.", answers: ITT_LATELY },
+    { prompt: "Я ощущал себя утомленным.", answers: ITT_LATELY },
+    { prompt: "Я бывал эмоционально чувствителен.", answers: ITT_LATELY },
   ],
 };
 
-/** ОСР: 29 утверждений, на каждое отвечают «+» (согласен) или «−» (не согласен) */
-const OCR_ANSWERS = ['Согласен (+)', 'Не согласен (−)'];
+/** ОСР: 29 утверждений, на каждое отвечают «Верно» (+) или «Неверно» (−) */
+const OCR_ANSWERS = ['Верно', 'Неверно'];
 
 export const OCR_BLANK: TestBlankData = {
   numbered: false,

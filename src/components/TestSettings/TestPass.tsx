@@ -17,8 +17,8 @@ interface TestPassProps {
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
   saveBlank: boolean;
   onFormChange: (form: string) => void;
-  /** Результат посчитан и сохранён */
-  onDone: () => void;
+  /** Результат посчитан и сохранён: id результата */
+  onDone: (resultId: string) => void;
 }
 
 function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConfirm: () => void; onClose: () => void }) {
@@ -73,7 +73,8 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
       later(() => setMissing((m) => (m === first ? null : m)), 3000);
       return;
     }
-    if (finishRun(testId, total, form, saveBlank)) onDone();
+    const result = finishRun(testId, total, form, saveBlank);
+    if (result) onDone(result.id);
   };
 
   const onAnswer = (question: number, answer: number) => {

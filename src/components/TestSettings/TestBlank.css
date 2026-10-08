@@ -103,6 +103,21 @@
   list-style: none;
 }
 
+/* Пояснение к группе вопросов («Сейчас, в данный момент:»): отдельная плашка над первым вопросом группы */
+.blank-heading {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-divider);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+}
+
+.blank-heading:first-child {
+  border-top: 0;
+}
+
 /* Вопрос: отступы 12, строки 16/20, между вопросом и ответами и между ответами 4; вопросы разделены линией на всю ширину */
 .blank-question {
   display: flex;
