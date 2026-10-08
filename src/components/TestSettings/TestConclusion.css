@@ -53,7 +53,7 @@
 
 /* Подписи в той же геометрии, что у полос: слева подпись строки, справа иконка */
 .cc-axis--main {
-  padding: 0 44px 0 60px;
+  padding: 0 44px 0 calc(var(--cc-main-label, 40px) + 20px);
 }
 
 .cc-axis--extra {
@@ -105,7 +105,10 @@
   white-space: nowrap;
 }
 
-.cc-bars--main .cc-bar__label,
+.cc-bars--main .cc-bar__label {
+  width: var(--cc-main-label, 40px);
+}
+
 .cc-single .cc-bar__label {
   width: 40px;
 }

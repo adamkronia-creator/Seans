@@ -371,7 +371,7 @@ export const ITT_BLANK: TestBlankData = {
 };
 
 /** ОСР: 29 утверждений, на каждое отвечают «Верно» (+) или «Неверно» (−) */
-const OCR_ANSWERS = ['Верно', 'Неверно'];
+export const OCR_ANSWERS = ['Верно', 'Неверно'];
 
 export const OCR_BLANK: TestBlankData = {
   numbered: false,

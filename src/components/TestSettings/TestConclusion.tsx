@@ -133,11 +133,15 @@ function ScaleCharts({
   );
 }
 
+/** Ширина подписи строки в px на один знак кода; короткие коды (D, КА, Вер) умещаются в 40, длинные (ФОБ-С) требуют больше */
+const LABEL_CHAR = 11;
+
 /** Общая диаграмма «Шкалы тестирования»: основная и дополнительные шкалы на одной оси, без легенды */
 function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: string) => void }) {
+  const label = Math.max(40, Math.ceil(Math.max(...data.scales.map((s) => s.code.length)) * LABEL_CHAR));
   return (
     <CollapseCard title="Шкалы тестирования" id="cc-summary">
-      <div className="cc-chart">
+      <div className="cc-chart" style={{ '--cc-main-label': `${label}px` } as React.CSSProperties}>
         <Axis kind="main" ticks={data.ticks} max={data.max} />
         <ul className="cc-bars cc-bars--main">
           {data.scales.map((s, i) => {

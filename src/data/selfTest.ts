@@ -1,8 +1,10 @@
 import { useSyncExternalStore } from 'react';
 import { receiveMessage } from './chatStore';
 import { scoreBdi, scoreBhs } from './beckScoring';
-import { bdiResult, bhsResult, smolResult, type ConclusionData } from './conclusions';
+import { bdiResult, bhsResult, ittResult, osrResult, smolResult, type ConclusionData } from './conclusions';
+import { scoreItt } from './ittScoring';
 import { LIBRARY } from './library';
+import { scoreOsr } from './osrScoring';
 import { scoreSmol } from './smolScoring';
 
 /*
@@ -103,18 +105,31 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
   },
   bdi: (answers, _form, info) => bdiResult(scoreBdi(answers), info),
   bhs: (answers, _form, info) => bhsResult(scoreBhs(answers), info),
+  // Мужская форма — нормы для взрослых и юношей, женская — для девушек
+  itt: (answers, form, info) => ittResult(scoreItt(answers, form === 'Женская'), info),
+  ocr: (answers, _form, info) => osrResult(scoreOsr(answers), info),
 };
 
 export const canPassSelf = (testId: string) => testId in SCORERS;
 
+/** Подсказки под выбором формы бланка: тесты, где форма меняет подсчёт (нормы), и чем именно */
+const FORM_HINT: Record<string, string> = {
+  smol: 'От формы бланка зависит перевод баллов в Т-баллы.',
+  itt: 'От формы бланка зависят нормы для перевода баллов в стэны: мужская — для взрослых и юношей, женская — для девушек.',
+};
+
 /** Тесты, где форма бланка меняет подсчёт (нормы для мужчин и женщин): для них форму выбирают в начале прохождения */
-export const formAffectsScore = (testId: string) => testId === 'smol';
+export const formAffectsScore = (testId: string) => testId in FORM_HINT;
+
+export const formHint = (testId: string): string => FORM_HINT[testId] ?? '';
 
 /** Текст сообщения в «Избранном» о пройденном тесте */
 const PASSED_TEXT: Record<string, string> = {
   smol: 'Вы прошли сокращенный многофакторный опросник для исследования личности «СМОЛ»',
   bdi: 'Вы прошли шкалу депрессии А. Бека «BDI»',
   bhs: 'Вы прошли шкалу безнадежности А. Бека «BHS»',
+  itt: 'Вы прошли интегративный тест тревожности «ИТТ»',
+  ocr: 'Вы прошли опросник суицидального риска «ОСР»',
 };
 
 const passedText = (testId: string) =>

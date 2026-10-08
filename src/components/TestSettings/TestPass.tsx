@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { answerQuestion, finishRun, formAffectsScore, resetRun, useSelfRun } from '../../data/selfTest';
+import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { SectionNav } from '../SectionNav/SectionNav';
 import { useSheet } from './TestActions';
@@ -108,7 +108,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
                   </li>
                 ))}
               </ul>
-              <p className="test-pass__hint">От формы бланка зависит перевод баллов в Т-баллы.</p>
+              <p className="test-pass__hint">{formHint(testId)}</p>
             </div>
           </CollapseCard>
         )}
