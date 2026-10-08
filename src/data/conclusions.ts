@@ -140,10 +140,10 @@ const BHS: ConclusionData = {
   max: 20,
   ticks: [0, 4, 9, 15, 20],
   levels: [
-    { key: 'min', from: 0, to: 3, range: '0 — 3', legend: 'Минимальная', chip: 'Минимальная безнадежность', tone: 'green', verdictPre: 'соответствует уровню: ', verdict: 'минимальная безнадежность', verdictPost: '' },
-    { key: 'mild', from: 4, to: 8, range: '4 — 8', legend: 'Легкая', chip: 'Легкая безнадежность', tone: 'yellow', verdictPre: 'соответствует уровню: ', verdict: 'легкая безнадежность', verdictPost: '' },
-    { key: 'moderate', from: 9, to: 14, range: '9 — 14', legend: 'Средняя', chip: 'Средняя безнадежность', tone: 'orange', verdictPre: 'соответствует уровню: ', verdict: 'средняя безнадежность', verdictPost: '' },
-    { key: 'severe', from: 15, to: 20, range: '15 — 20', legend: 'Тяжелая', chip: 'Тяжелая безнадежность', tone: 'red', verdictPre: 'соответствует уровню: ', verdict: 'тяжелая безнадежность', verdictPost: '' },
+    { key: 'min', from: 0, to: 3, range: '0 — 3', legend: 'Минимальная', chip: 'Минимальная безнадежность', tone: 'green', verdictPre: 'является ', verdict: 'минимальным', verdictPost: ' показателем' },
+    { key: 'mild', from: 4, to: 8, range: '4 — 8', legend: 'Легкая', chip: 'Легкая безнадежность', tone: 'yellow', verdictPre: 'является ', verdict: 'низким', verdictPost: ' показателем' },
+    { key: 'moderate', from: 9, to: 14, range: '9 — 14', legend: 'Средняя', chip: 'Средняя безнадежность', tone: 'orange', verdictPre: 'является ', verdict: 'средним', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
+    { key: 'severe', from: 15, to: 20, range: '15 — 20', legend: 'Тяжелая', chip: 'Тяжелая безнадежность', tone: 'red', verdictPre: 'является ', verdict: 'тяжелым', verdictPost: ' показателем, выходящим за рамки нормативного диапазона' },
   ],
   scales: [
     { code: 'H', name: 'Безнадежность', group: 'main', score: 11, max: 20, leveled: true, about: 'оценивает негативные ожидания относительно будущего, пессимизм, утрату надежды и убежденность в невозможности положительных изменений.' },
