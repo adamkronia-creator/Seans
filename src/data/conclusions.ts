@@ -301,5 +301,6 @@ export function ittResult(score: { situational: number; personal: number; compon
 
 /** Пример заключения для теста из библиотеки; у остальных тестов пока нет */
 export function conclusionFor(testId: string): ConclusionData | undefined {
-  return testId === 'smol' ? SMOL : testId === 'bdi' ? BDI : testId === 'bhs' ? BHS : undefined;
+  const examples: Record<string, ConclusionData> = { smol: SMOL, bdi: BDI, bhs: BHS, itt: ITT, ocr: OSR };
+  return examples[testId];
 }
