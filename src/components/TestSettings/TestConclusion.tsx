@@ -15,6 +15,9 @@ import { CollapseCard } from './TestBlank';
 import './TestSettings.css';
 import './TestConclusion.css';
 
+/** Число для показа: десятичная запятая («3,2»), целые без дроби */
+const fmt = (n: number) => String(Math.round(n * 10) / 10).replace('.', ',');
+
 /** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
 function Axis({ kind, ticks, max }: { kind: 'main' | 'extra' | 'single'; ticks: number[]; max: number }) {
   return (
@@ -22,7 +25,7 @@ function Axis({ kind, ticks, max }: { kind: 'main' | 'extra' | 'single'; ticks: 
       <div className="cc-axis__scale">
         {ticks.map((v) => (
           <span key={v} style={{ left: `${(v / max) * 100}%` }}>
-            {v}
+            {fmt(v)}
           </span>
         ))}
       </div>
@@ -35,6 +38,7 @@ const rowLabel = (data: ConclusionData, code: string, index: number) => (data.ov
 
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
 export function pointsWord(n: number) {
+  if (!Number.isInteger(n)) return 'балла'; // 3,2 балла
   const last = n % 10;
   if (n % 100 >= 11 && n % 100 <= 14) return 'баллов';
   if (last === 1) return 'балл';
@@ -70,7 +74,7 @@ function Bar({ data, scale, max = scale.max }: { data: ConclusionData; scale: Co
         className={`cc-value${pct > 88 ? ` cc-value--inside${tone === 'yellow' ? ' cc-value--dark' : ''}` : ''}`}
         style={pct > 88 ? { right: `calc(${100 - pct}% + 6px)` } : { left: `calc(${pct}% + 4px)` }}
       >
-        {scale.score}
+        {fmt(scale.score)}
       </span>
     </span>
   );
@@ -260,9 +264,9 @@ function ScaleCard({ data, scale, index, onChart }: { data: ConclusionData; scal
         <p className="cc-scale__text">
           Шкала имеет{' '}
           <strong className={level ? `cc-tone--${level.tone}` : 'cc-tone--accent'}>
-            {scale.score} {pointsWord(scale.score)}
+            {fmt(scale.score)} {pointsWord(scale.score)}
           </strong>{' '}
-          из {scale.max} <span className="cc-muted">({pct}%)</span>
+          из {fmt(scale.max)} <span className="cc-muted">({pct}%)</span>
           {level ? (
             <>
               , что {level.verdictPre}
