@@ -265,14 +265,24 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
       {(data.overview ? order.slice(0, 1) : order).map(renderLevel)}
       {data.overview && order.length > 1 && (
         <>
-          <div className="cc-more">
-            <button type="button" className="ts-desc__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
-              {open ? 'Скрыть' : 'Читать далее'}
-            </button>
-          </div>
+          {/* Свёрнуто — кнопка между диапазоном клиента и остальными; развёрнуто — «Скрыть» в самом конце */}
+          {!open && (
+            <div className="cc-more">
+              <button type="button" className="ts-desc__toggle" aria-expanded={false} onClick={() => setOpen(true)}>
+                Читать далее
+              </button>
+            </div>
+          )}
           <div className={`cc-rest${open ? ' cc-rest--open' : ''}`}>
             <div className="cc-rest__inner">{order.slice(1).map(renderLevel)}</div>
           </div>
+          {open && (
+            <div className="cc-more cc-more--end">
+              <button type="button" className="ts-desc__toggle" aria-expanded onClick={() => setOpen(false)}>
+                Скрыть
+              </button>
+            </div>
+          )}
         </>
       )}
     </CollapseCard>

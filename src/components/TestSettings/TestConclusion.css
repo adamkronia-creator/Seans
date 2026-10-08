@@ -444,8 +444,10 @@
   border-radius: 4px;
 }
 
+/* Значение лежит поверх линий диапазонов, фона у него нет */
 .cc-chart--flat .cc-value,
 .cc-single--flat .cc-value {
+  background: transparent;
   font-weight: var(--font-weight-medium);
 }
 
@@ -454,7 +456,7 @@
 .cc-single--flat .cc-norm {
   bottom: 0;
   width: 1.5px;
-  background: #fff;
+  background: rgb(255 255 255 / 50%);
   transform: translateX(-50%);
 }
 
@@ -544,6 +546,10 @@
 .cc-more {
   margin: 0 var(--space-3);
   border-top: 1px solid var(--color-divider);
+}
+
+.cc-more--end {
+  border-top: 0;
 }
 
 .cc-more .ts-desc__toggle {
