@@ -136,6 +136,8 @@ export { default as IconTestGender } from '../../assets/icons/test/gender.svg?re
 export { default as IconTestBlind } from '../../assets/icons/test/blind.svg?react';
 export { default as IconTestHide } from '../../assets/icons/test/hide.svg?react';
 export { default as IconTestSaveBlank } from '../../assets/icons/test/save-blank.svg?react';
+export { default as IconTestViewList } from '../../assets/icons/test/view-list.svg?react';
+export { default as IconTestViewSingle } from '../../assets/icons/test/view-single.svg?react';
 export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
 export { default as IconTestChevron } from '../../assets/icons/test/chevron-right.svg?react';
 export { default as IconTestPass } from '../../assets/icons/test/pass.svg?react';

@@ -46,6 +46,101 @@ export interface BlankFill {
   missing?: number | null;
 }
 
+/** Правила бланка: одно правило — обычный абзац, несколько — нумерованный список */
+export function BlankRules({ rules }: { rules: string[] }) {
+  if (rules.length === 1) {
+    // Одно правило не нумеруем: «1.» перед единственным пунктом лишнее
+    return <p className="blank-rules blank-rules--single">{rules[0]}</p>;
+  }
+  return (
+    <ol className="blank-rules">
+      {rules.map((rule) => (
+        <li key={rule}>{rule}</li>
+      ))}
+    </ol>
+  );
+}
+
+interface BlankQuestionBodyProps {
+  data: TestBlankData;
+  /** Номер вопроса (с 0) */
+  index: number;
+  /** Номер выбранного ответа */
+  answer: number | undefined;
+  /** Ответы видны, но менять их нельзя */
+  locked: boolean;
+  /** Номер перед формулировкой («12.»): в списке нужен, на экране одного вопроса номер уже стоит в заголовке */
+  numberedPrompt?: boolean;
+  onChoose: (answer: number) => void;
+}
+
+/** Вопрос с вариантами ответов: список вариантов или пара утверждений со шкалой (5PFQ) */
+export function BlankQuestionBody({ data, index, answer, locked, numberedPrompt = true, onChoose }: BlankQuestionBodyProps) {
+  const q = data.questions[index];
+  const prompt = (
+    <p className="blank-question__prompt">
+      {numberedPrompt && (
+        <>
+          <strong>{index + 1}.</strong>{' '}
+        </>
+      )}
+      {q.prompt}
+    </p>
+  );
+
+  if (q.opposite !== undefined) {
+    // Пара утверждений (5PFQ): между ними шкала −2 … 2, левые значения тянут к верхнему утверждению, правые — к нижнему
+    return (
+      <>
+        {prompt}
+        <ul className="blank-scale" role="radiogroup" aria-label="Какое утверждение ближе">
+          {q.answers.map((text, j) => (
+            <li key={j}>
+              <label className={`blank-scale__item${locked ? ' blank-answer--locked' : ''}`}>
+                <input
+                  type="radio"
+                  className="blank-answer__input"
+                  name={`blank-q${index}`}
+                  checked={answer === j}
+                  disabled={locked}
+                  onChange={() => onChoose(j)}
+                />
+                <span className="blank-answer__radio" aria-hidden="true" />
+                <span className="blank-scale__value">{text}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+        <p className="blank-question__prompt">{q.opposite}</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {prompt}
+      <ul className="blank-answers">
+        {q.answers.map((text, j) => (
+          <li key={j}>
+            <label className={`blank-answer${locked ? ' blank-answer--locked' : ''}`}>
+              <input
+                type="radio"
+                className="blank-answer__input"
+                name={`blank-q${index}`}
+                checked={answer === j}
+                disabled={locked}
+                onChange={() => onChoose(j)}
+              />
+              <span className="blank-answer__radio" aria-hidden="true" />
+              <span className="blank-answer__text">{data.numbered === false ? text : `${j + 1}. ${text}`}</span>
+            </label>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 /**
  * Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент).
  * Без `fill` бланк только для просмотра: отметка никуда не сохраняется.
@@ -59,76 +154,26 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
   return (
     <>
       <CollapseCard title="Правила тестирования" id="blank-rules">
-        {data.rules.length === 1 ? (
-          // Одно правило не нумеруем: «1.» перед единственным пунктом лишнее
-          <p className="blank-rules blank-rules--single">{data.rules[0]}</p>
-        ) : (
-          <ol className="blank-rules">
-            {data.rules.map((rule) => (
-              <li key={rule}>{rule}</li>
-            ))}
-          </ol>
-        )}
+        <BlankRules rules={data.rules} />
       </CollapseCard>
 
       <CollapseCard title="Вопросы и ответы" id="blank-qa">
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
             <Fragment key={i}>
-            {q.heading && <li className="blank-heading">{q.heading}</li>}
-            <li
-              id={`blank-q-${i + 1}`}
-              className={`blank-question${q.opposite !== undefined ? ' blank-question--pair' : ''}${fill?.missing === i ? ' blank-question--missing' : ''}`}
-            >
-              <p className="blank-question__prompt">
-                <strong>{i + 1}.</strong> {q.prompt}
-              </p>
-              {q.opposite !== undefined ? (
-                // Пара утверждений (5PFQ): между ними шкала −2 … 2, левые значения тянут к верхнему утверждению, правые — к нижнему
-                <>
-                  <ul className="blank-scale" role="radiogroup" aria-label="Какое утверждение ближе">
-                    {q.answers.map((answer, j) => (
-                      <li key={j}>
-                        <label className={`blank-scale__item${locked ? ' blank-answer--locked' : ''}`}>
-                          <input
-                            type="radio"
-                            className="blank-answer__input"
-                            name={`blank-q${i}`}
-                            checked={answers[i] === j}
-                            disabled={locked}
-                            onChange={() => choose(i, j)}
-                          />
-                          <span className="blank-answer__radio" aria-hidden="true" />
-                          <span className="blank-scale__value">{answer}</span>
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="blank-question__prompt">{q.opposite}</p>
-                </>
-              ) : (
-                <ul className="blank-answers">
-                  {q.answers.map((answer, j) => (
-                    <li key={j}>
-                      <label className={`blank-answer${locked ? ' blank-answer--locked' : ''}`}>
-                        <input
-                          type="radio"
-                          className="blank-answer__input"
-                          name={`blank-q${i}`}
-                          checked={answers[i] === j}
-                          disabled={locked}
-                          onChange={() => choose(i, j)}
-                        />
-                        <span className="blank-answer__radio" aria-hidden="true" />
-                        <span className="blank-answer__text">
-                          {data.numbered === false ? answer : `${j + 1}. ${answer}`}
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+              {q.heading && <li className="blank-heading">{q.heading}</li>}
+              <li
+                id={`blank-q-${i + 1}`}
+                className={`blank-question${q.opposite !== undefined ? ' blank-question--pair' : ''}${fill?.missing === i ? ' blank-question--missing' : ''}`}
+              >
+                <BlankQuestionBody
+                  data={data}
+                  index={i}
+                  answer={answers[i]}
+                  locked={locked}
+                  onChoose={(answer) => choose(i, answer)}
+                />
+              </li>
             </Fragment>
           ))}
         </ol>
