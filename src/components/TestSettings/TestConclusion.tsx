@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   IconCaseCalendar,
   IconTestAge,
@@ -18,19 +19,9 @@ import './TestConclusion.css';
 const fmt = (n: number) => String(Math.round(n * 10) / 10).replace('.', ',');
 
 /** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
-function Axis({ kind, ticks, max, even }: { kind: 'main' | 'extra' | 'single'; ticks: number[]; max: number; even?: boolean }) {
-  // even: подписи распределены поровну от левого края полосы до правого, как в макете
-  if (even) {
-    return (
-      <div className={`cc-axis cc-axis--${kind} cc-axis--even`} aria-hidden="true">
-        {ticks.map((v) => (
-          <span key={v}>{fmt(v)}</span>
-        ))}
-      </div>
-    );
-  }
+function Axis({ kind, ticks, max, flat }: { kind: 'main' | 'extra' | 'single'; ticks: number[]; max: number; flat?: boolean }) {
   return (
-    <div className={`cc-axis cc-axis--${kind}`} aria-hidden="true">
+    <div className={`cc-axis cc-axis--${kind}${flat ? ' cc-axis--flat' : ''}`} aria-hidden="true">
       <div className="cc-axis__scale">
         {ticks.map((v) => (
           <span key={v} style={{ left: `${(v / max) * 100}%` }}>
@@ -41,7 +32,6 @@ function Axis({ kind, ticks, max, even }: { kind: 'main' | 'extra' | 'single'; t
     </div>
   );
 }
-
 
 /**
  * Полное название шкалы над столбцом: «Ипохондрия (Hs)», при общих диаграммах с номером — «1. Ипохондрия (Hs)».
@@ -105,29 +95,41 @@ function ScaleCharts({
   title,
   scales,
   group,
+  onOpen,
 }: {
   data: ConclusionData;
   title: string;
   scales: ConclusionScale[];
   group: 'main' | 'extra';
+  onOpen: (code: string) => void;
 }) {
   return (
     <CollapseCard title={title} id={`cc-${group}`}>
       <div className="cc-chart cc-chart--flat">
         <ul className={`cc-bars cc-bars--${group}`}>
           {scales.map((s, i) => (
-            <li key={s.code}>
-              <span className="cc-bar__name">
-                {i + 1}.&nbsp;{s.chartName ?? s.name} <span className="cc-bar__code">({s.code})</span>
-              </span>
-              <div className="cc-bar">
-                <Bar data={data} scale={s} />
+            <li key={s.code} id={`cc-bar-${s.code}`}>
+              {/* Строка целиком ведёт к описанию шкалы; из карточки та же полоса ведёт обратно */}
+              <div
+                className="cc-row"
+                role="button"
+                tabIndex={0}
+                aria-label={`К описанию шкалы ${s.name}`}
+                onClick={() => onOpen(s.code)}
+                onKeyDown={(e) => e.key === 'Enter' && onOpen(s.code)}
+              >
+                <span className="cc-bar__name">
+                  {i + 1}.&nbsp;{s.chartName ?? s.name} <span className="cc-bar__code">({s.code})</span>
+                </span>
+                <div className="cc-bar">
+                  <Bar data={data} scale={s} />
+                </div>
               </div>
             </li>
           ))}
         </ul>
-        <Axis kind={group} ticks={data.ticks} max={data.max} even />
-        <Legend data={data} />
+        <Axis kind={group} ticks={data.ticks} max={data.max} flat />
+        {group === 'main' && <Legend data={data} />}
       </div>
       {group === 'extra' && data.validity && (
         <p className={`cc-validity${data.validity.ok ? '' : ' cc-validity--warn'}`}>
@@ -195,70 +197,25 @@ function ScaleBlock({
   );
 }
 
-/** Профиль основных шкал: линия по пикам, коридор нормы 40–69, точки цвета диапазона */
-function ProfileChart({ data, scales, onOpen }: { data: ConclusionData; scales: ConclusionScale[]; onOpen: (code: string) => void }) {
-  const W = 337;
-  const left = 28;
-  const right = 14;
-  const top = 22;
-  const bottom = 150;
-  const y = (v: number) => bottom - ((bottom - top) * v) / data.max;
-  const step = (W - left - right) / scales.length;
-  const x = (i: number) => left + step * (i + 0.5);
-  const corridor = data.levels.find((l) => l.tone === 'green');
-  const pts = scales.map((s, i) => ({ s, cx: x(i), cy: y(s.score), level: levelOf(data, s.score) }));
-  return (
-    <CollapseCard title="Профиль шкал" id="cc-profile">
-      <div className="cc-profile">
-        <svg viewBox={`0 0 ${W} ${bottom + 48}`} role="img" aria-label="Профиль шкал">
-          {corridor && (
-            <>
-              <rect className="cc-profile__band" x={left} y={y(corridor.to + 1)} width={W - left - right} height={y(corridor.from) - y(corridor.to + 1)} />
-              <line className="cc-profile__edge" x1={left} x2={W - right} y1={y(corridor.to + 1)} y2={y(corridor.to + 1)} />
-              <line className="cc-profile__edge" x1={left} x2={W - right} y1={y(corridor.from)} y2={y(corridor.from)} />
-            </>
-          )}
-          <line className="cc-profile__base" x1={left} x2={W - right} y1={bottom} y2={bottom} />
-          {data.ticks.map((v) => (
-            <text key={v} className="cc-profile__tick" x={left - 8} y={y(v) + 4} textAnchor="end">
-              {v}
-            </text>
-          ))}
-          <polyline className="cc-profile__line" points={pts.map((p) => `${p.cx},${p.cy}`).join(' ')} />
-          {pts.map((p) => (
-            <g key={p.s.code} className="cc-profile__point" onClick={() => onOpen(p.s.code)}>
-              <circle className={`cc-profile__dot cc-profile__dot--${p.level.tone}`} cx={p.cx} cy={p.cy} r="6" />
-              <text
-                className={`cc-profile__value cc-profile__value--${p.level.tone}`}
-                x={p.cx}
-                y={p.level.tone === 'red' ? p.cy - 12 : p.cy + 24}
-                textAnchor="middle"
-              >
-                {p.s.score}
-              </text>
-              <text className="cc-profile__code" x={p.cx} y={bottom + 28} textAnchor="middle">
-                {p.s.code}
-              </text>
-            </g>
-          ))}
-          {pts.map((p, i) => (
-            <text key={`n${p.s.code}`} className="cc-profile__num" x={p.cx} y={bottom + 46} textAnchor="middle">
-              {i + 1}
-            </text>
-          ))}
-        </svg>
-        <Legend data={data} />
-      </div>
-    </CollapseCard>
-  );
-}
-
-function ScaleCard({ data, scale }: { data: ConclusionData; scale: ConclusionScale }) {
+function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: ConclusionScale; onChart: () => void }) {
+  const [open, setOpen] = useState(false);
   const pct = Math.round((scale.score / scale.max) * 100);
   const level = scale.leveled ? levelOf(data, scale.score) : undefined;
   // Сначала диапазон клиента, затем остальные по возрастанию
   const order = level ? [level, ...data.levels.filter((l) => l.key !== level.key)] : [];
   const texts = data.interpretation[scale.code] ?? {};
+  const renderLevel = (l: (typeof order)[number]) => (
+    <section key={l.key} className={`cc-level${data.overview ? ' cc-level--flat' : ''}`}>
+      <h3 className={`cc-level__head cc-tone--${l.tone}`}>
+        <span className="cc-level__dot" />
+        {data.overview ? `${l.range}: ${l.chip} показатель` : l.range}
+        {!data.overview && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
+      </h3>
+      {(texts[l.key] ?? []).map((paragraph) => (
+        <p key={paragraph}>{paragraph}</p>
+      ))}
+    </section>
+  );
   return (
     <CollapseCard
       title={scale.name}
@@ -283,11 +240,18 @@ function ScaleCard({ data, scale }: { data: ConclusionData; scale: ConclusionSca
           .
         </p>
         {data.overview ? (
-          <div className="cc-single cc-single--flat">
+          <div
+            className="cc-single cc-single--flat cc-row"
+            role="button"
+            tabIndex={0}
+            aria-label="К диаграмме шкал"
+            onClick={onChart}
+            onKeyDown={(e) => e.key === 'Enter' && onChart()}
+          >
             <div className="cc-bar">
               <Bar data={data} scale={scale} />
             </div>
-            <Axis kind="single" ticks={data.ticks} max={scale.max} even />
+            <Axis kind="single" ticks={data.ticks} max={scale.max} flat />
           </div>
         ) : (
           <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
@@ -298,18 +262,19 @@ function ScaleCard({ data, scale }: { data: ConclusionData; scale: ConclusionSca
           </div>
         )}
       </div>
-      {order.map((l) => (
-        <section key={l.key} className={`cc-level${data.overview ? ' cc-level--flat' : ''}`}>
-          <h3 className={`cc-level__head cc-tone--${l.tone}`}>
-            <span className="cc-level__dot" />
-            {data.overview ? `${l.range}: ${l.chip} показатель` : l.range}
-            {!data.overview && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
-          </h3>
-          {(texts[l.key] ?? []).map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </section>
-      ))}
+      {(data.overview ? order.slice(0, 1) : order).map(renderLevel)}
+      {data.overview && order.length > 1 && (
+        <>
+          <div className="cc-more">
+            <button type="button" className="ts-desc__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
+              {open ? 'Скрыть' : 'Читать далее'}
+            </button>
+          </div>
+          <div className={`cc-rest${open ? ' cc-rest--open' : ''}`}>
+            <div className="cc-rest__inner">{order.slice(1).map(renderLevel)}</div>
+          </div>
+        </>
+      )}
     </CollapseCard>
   );
 }
@@ -323,7 +288,6 @@ export function conclusionSections(data: ConclusionData) {
     ...(data.overview
       ? [
           { id: 'cc-main', title: 'Основные шкалы' },
-          ...(data.profile ? [{ id: 'cc-profile', title: 'Профиль шкал' }] : []),
           { id: 'cc-extra', title: 'Дополнительные шкалы' },
         ]
       : []),
@@ -344,8 +308,8 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollTo = (id: string, block: ScrollLogicalPosition = 'start') => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block });
   };
 
   return (
@@ -418,22 +382,21 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
 
       {data.overview && (
         <>
-          <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" />
-          {data.profile && <ProfileChart data={data} scales={main} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />}
-          <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" />
+          <ScaleCharts data={data} title="Основные шкалы" scales={main} group="main" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          <ScaleCharts data={data} title="Дополнительные шкалы" scales={extra} group="extra" onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
         </>
       )}
 
       {data.blocks ? (
         // Карточки идут в порядке блоков: основная шкала блока и её дополнительные
-        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} />)
+        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-block-${s.block}`)} />)
       ) : (
         <>
           {main.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-bar-${s.code}`, 'center')} />
           ))}
           {extra.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-bar-${s.code}`, 'center')} />
           ))}
         </>
       )}

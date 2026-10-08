@@ -58,8 +58,6 @@ export interface ConclusionData {
   summary?: boolean;
   /** Блоки диаграмм вместо общих: у каждого свой заголовок и шкалы с `block` = ключу; под столбцами подписи оси, внизу маркеры диапазонов */
   blocks?: { key: string; title: string }[];
-  /** Диаграмма-профиль основных шкал (пики) */
-  profile?: boolean;
   /** Вывод по контрольным шкалам: согласованность ответов и возможность интерпретации */
   validity?: { ok: boolean; text: string };
 }
@@ -91,7 +89,6 @@ const SMOL: ConclusionData = {
     { code: 'K', name: 'Коррекция', group: 'extra', max: 110, chartName: 'Шкала коррекции', leveled: true, score: 63, about: 'отражает стремление контролировать самопрезентацию, скрывать трудности и защищать положительный образ себя при прохождении теста.' },
   ],
   interpretation: SMOL_INTERPRETATION,
-  profile: true,
   validity: { ok: true, text: 'Ответы согласованы — профиль можно интерпретировать.' },
 };
 

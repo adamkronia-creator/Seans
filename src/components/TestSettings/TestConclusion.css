@@ -388,88 +388,6 @@
   transform: translateX(-100%);
 }
 
-/* Профиль основных шкал */
-.cc-profile {
-  padding: var(--space-3);
-}
-
-.cc-profile svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.cc-profile__band {
-  fill: rgb(52 199 89 / 12%);
-}
-
-.cc-profile__edge {
-  stroke: rgb(52 199 89 / 45%);
-  stroke-dasharray: 3 3;
-}
-
-.cc-profile__base {
-  stroke: var(--color-divider);
-}
-
-.cc-profile__tick,
-.cc-profile__num {
-  fill: var(--color-text-caption);
-  font-size: 12px;
-}
-
-.cc-profile__code {
-  fill: var(--color-text-primary);
-  font-size: 16px;
-  font-weight: var(--font-weight-medium);
-}
-
-.cc-profile__line {
-  fill: none;
-  stroke: #a0a9b3;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-
-.cc-profile__point {
-  cursor: pointer;
-}
-
-.cc-profile__dot {
-  stroke: #fff;
-  stroke-width: 1.5;
-}
-
-.cc-profile__dot--red {
-  fill: var(--color-red);
-}
-
-.cc-profile__dot--green {
-  fill: var(--color-green);
-}
-
-.cc-profile__dot--yellow {
-  fill: var(--color-yellow);
-}
-
-.cc-profile__value {
-  font-size: 16px;
-  font-weight: var(--font-weight-medium);
-}
-
-.cc-profile__value--red {
-  fill: var(--color-red);
-}
-
-.cc-profile__value--green {
-  fill: var(--color-green);
-}
-
-.cc-profile__value--yellow {
-  fill: var(--color-yellow);
-}
-
 /* Вывод по контрольным шкалам */
 .cc-validity {
   display: flex;
@@ -504,6 +422,15 @@
 }
 
 /* СМОЛ: названия над столбцами 14/16, столбцы на всю ширину, одна общая ось и крупные маркеры */
+.cc-row {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cc-row:active .cc-bar {
+  opacity: 0.8;
+}
+
 .cc-chart--flat .cc-bar__name {
   margin: 0 var(--space-3) 4px;
   font-size: var(--font-size-sm);
@@ -519,64 +446,79 @@
 
 .cc-chart--flat .cc-value,
 .cc-single--flat .cc-value {
-  background: transparent;
+  font-weight: var(--font-weight-medium);
 }
 
-.cc-axis--even {
-  display: flex;
-  justify-content: space-between;
+/* Границы диапазонов: тонкая линия через полосу и зазор под ней; значение закрывает её своим фоном и не страдает */
+.cc-chart--flat .cc-norm,
+.cc-single--flat .cc-norm {
+  bottom: -12px;
+  background: rgb(30 30 30 / 22%);
+}
+
+.cc-single--flat .cc-norm {
+  bottom: -4px;
+}
+
+/* Подписи оси стоят точно под границами диапазонов; крайние прижаты к краям поля и за него не выходят */
+.cc-axis--flat {
   height: 12px;
   margin: 0;
   padding: 0 var(--space-3);
   line-height: 12px;
 }
 
-.cc-chart--flat > .cc-axis--even {
+.cc-axis--flat .cc-axis__scale {
+  height: 12px;
+}
+
+.cc-axis--flat .cc-axis__scale span:first-child {
+  transform: none;
+}
+
+.cc-axis--flat .cc-axis__scale span:last-child {
+  transform: translateX(-100%);
+}
+
+.cc-chart--flat > .cc-axis--flat {
   margin-top: var(--space-3);
 }
 
-.cc-single--flat .cc-axis--even {
+.cc-single--flat .cc-axis--flat {
   margin-top: 4px;
   padding: 0;
 }
 
-.cc-chart--flat .cc-legend,
-.cc-chart--flat:has(.cc-bars--extra) .cc-legend,
-.cc-profile .cc-legend {
+.cc-chart--flat .cc-legend {
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-divider);
 }
 
-.cc-chart--flat .cc-chip,
-.cc-profile .cc-chip {
+.cc-chart--flat .cc-chip {
   gap: 4px;
   height: 26px;
 }
 
-.cc-chart--flat .cc-chip__dot,
-.cc-profile .cc-chip__dot {
+.cc-chart--flat .cc-chip__dot {
   width: 10px;
   height: 10px;
 }
 
 .cc-single--flat {
-  margin-top: var(--space-2);
+  display: block;
+  margin: var(--space-2) 0 var(--space-3);
 }
 
 .cc-single--flat .cc-bar {
   padding: 0;
 }
 
-.cc-scale:has(.cc-single--flat) .cc-scale__text + .cc-scale__text {
-  margin-top: var(--space-2);
-}
-
 .cc-scale:has(.cc-single--flat) {
   padding-bottom: 0;
 }
 
-.cc-single--flat {
-  margin-bottom: var(--space-3);
+.cc-scale:has(.cc-single--flat) .cc-scale__text + .cc-scale__text {
+  margin-top: var(--space-2);
 }
 
 .cc-level--flat .cc-level__head {
@@ -600,19 +542,38 @@
   margin-top: var(--space-2);
 }
 
-.cc-level--flat:last-child {
+/* «Читать далее» между диапазоном клиента и остальными: разделитель, кнопка, свёрнутые диапазоны */
+.cc-more {
+  margin: 0 var(--space-3);
+  border-top: 1px solid var(--color-divider);
+}
+
+.cc-more .ts-desc__toggle {
+  margin: 4px auto;
+}
+
+.cc-rest {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.cc-rest--open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.cc-rest__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cc-rest .cc-level--flat:last-child {
   border-bottom: 1px solid var(--color-divider);
-}
-
-/* В макете СМОЛ белых линий на границах диапазонов нет, значение — medium */
-.cc-chart--flat .cc-norm,
-.cc-single--flat .cc-norm {
-  display: none;
-}
-
-.cc-chart--flat .cc-value,
-.cc-single--flat .cc-value {
-  font-weight: var(--font-weight-medium);
 }
 
 /* С меткой «Шкала Hs» шапка 46: метка 24 с полями 11 */
