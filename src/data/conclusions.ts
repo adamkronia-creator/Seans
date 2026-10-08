@@ -164,14 +164,15 @@ const byOrder = (base: ConclusionData, values: number[]): Record<string, number>
 
 const OSR: ConclusionData = {
   overview: false,
+  flat: true,
   summary: true,
   info: { date: '25.05.2026', time: '19:12–19:19', duration: '6 мин. 48 с.', age: '23 года' },
   max: 29,
   ticks: [0, 10, 18, 29],
   levels: [
-    { key: 'low', from: 0, to: 9, range: '0 — 9', legend: 'Низкая', chip: 'Низкая вероятность', tone: 'green', verdictPre: 'соответствует уровню: ', verdict: 'низкая вероятность суицидального риска', verdictPost: '' },
-    { key: 'mid', from: 10, to: 17, range: '10 — 17', legend: 'Средняя', chip: 'Средняя вероятность', tone: 'yellow', verdictPre: 'соответствует уровню: ', verdict: 'средняя вероятность суицидального риска', verdictPost: '' },
-    { key: 'high', from: 18, to: 29, range: '18 — 29', legend: 'Высокая', chip: 'Высокая вероятность', tone: 'red', verdictPre: 'соответствует уровню: ', verdict: 'высокая вероятность суицидального риска', verdictPost: '' },
+    { key: 'low', from: 0, to: 9, range: '0 — 9', legend: 'Низкая', chip: 'Низкая вероятность', tone: 'green', verdictPre: 'является ', verdict: 'низким', verdictPost: ' риском' },
+    { key: 'mid', from: 10, to: 17, range: '10 — 17', legend: 'Средняя', chip: 'Средняя вероятность', tone: 'yellow', verdictPre: 'является ', verdict: 'средним', verdictPost: ' риском, выходящим за рамки нормативного диапазона' },
+    { key: 'high', from: 18, to: 29, range: '18 — 29', legend: 'Высокая', chip: 'Высокая вероятность', tone: 'red', verdictPre: 'является ', verdict: 'высоким', verdictPost: ' риском, выходящим за рамки нормативного диапазона' },
   ],
   scales: [
     { code: 'Вер', name: 'Вероятность', group: 'main', score: 14, max: 29, leveled: true, about: 'оценивает общую вероятность суицидального риска по числу утверждений опросника, с которыми человек согласился (ответ «Верно»): чем больше таких ответов, тем выше показатель.' },

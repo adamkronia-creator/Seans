@@ -19,13 +19,28 @@ import './TestConclusion.css';
 const fmt = (n: number) => String(Math.round(n * 10) / 10).replace('.', ',');
 
 /** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
-function Axis({ kind, ticks, max, flat }: { kind: 'main' | 'extra' | 'single'; ticks: number[]; max: number; flat?: boolean }) {
+/** Подписи оси шкалы без диапазонов: начало и конец числами, посередине 25%, 50% и 75% */
+const percentTicks = (max: number) => [0, max * 0.25, max * 0.5, max * 0.75, max];
+
+function Axis({
+  kind,
+  ticks,
+  max,
+  flat,
+  percent,
+}: {
+  kind: 'main' | 'extra' | 'single';
+  ticks: number[];
+  max: number;
+  flat?: boolean;
+  percent?: boolean;
+}) {
   return (
     <div className={`cc-axis cc-axis--${kind}${flat ? ' cc-axis--flat' : ''}`} aria-hidden="true">
       <div className="cc-axis__scale">
         {ticks.map((v) => (
           <span key={v} style={{ left: `${(v / max) * 100}%` }}>
-            {fmt(v)}
+            {percent && v > 0 && v < max ? `${Math.round((v / max) * 100)}%` : fmt(v)}
           </span>
         ))}
       </div>
@@ -97,6 +112,7 @@ function ScaleCharts({
   scales,
   legend,
   validity,
+  axisEach,
   onOpen,
 }: {
   data: ConclusionData;
@@ -105,6 +121,8 @@ function ScaleCharts({
   scales: ConclusionScale[];
   legend?: boolean;
   validity?: boolean;
+  /** Подпись оси под каждым столбцом (когда у шкал разные диапазоны) вместо одной общей внизу */
+  axisEach?: boolean;
   onOpen: (code: string) => void;
 }) {
   return (
@@ -129,11 +147,20 @@ function ScaleCharts({
                 <div className="cc-bar">
                   <Bar data={data} scale={s} />
                 </div>
+                {axisEach && (
+                  <Axis
+                    kind="main"
+                    ticks={s.leveled ? data.ticks : percentTicks(s.max)}
+                    max={s.leveled ? data.max : s.max}
+                    percent={!s.leveled}
+                    flat
+                  />
+                )}
               </div>
             </li>
           ))}
         </ul>
-        <Axis kind="main" ticks={data.ticks} max={data.max} flat />
+        {!axisEach && <Axis kind="main" ticks={data.ticks} max={data.max} flat />}
         {legend && <Legend data={data} />}
       </div>
       {validity && data.validity && (
@@ -254,7 +281,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
             <div className="cc-bar">
               <Bar data={data} scale={scale} />
             </div>
-            <Axis kind="single" ticks={scale.leveled ? data.ticks : [0, scale.max]} max={scale.max} flat />
+            <Axis kind="single" ticks={scale.leveled ? data.ticks : percentTicks(scale.max)} max={scale.max} percent={!scale.leveled} flat />
           </div>
         ) : (
           <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
@@ -377,9 +404,12 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         </ul>
       )}
 
-      {data.summary && (
-        <ScaleBlock data={data} title="Шкалы тестирования" id="cc-summary" scales={scales} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
-      )}
+      {data.summary &&
+        (data.flat ? (
+          <ScaleCharts data={data} title="Шкалы тестирования" id="cc-summary" scales={scales} axisEach onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+        ) : (
+          <ScaleBlock data={data} title="Шкалы тестирования" id="cc-summary" scales={scales} onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+        ))}
 
       {data.blocks?.map((b) =>
         data.flat ? (
@@ -418,10 +448,10 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
       ) : (
         <>
           {main.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview || (data.summary && data.flat) ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
           {extra.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview || (data.summary && data.flat) ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
         </>
       )}

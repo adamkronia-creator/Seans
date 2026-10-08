@@ -585,3 +585,13 @@
   padding-top: 11px;
   padding-bottom: 11px;
 }
+
+/* Подпись оси под каждым столбцом общей диаграммы: отступ 8 */
+.cc-chart--flat .cc-row > .cc-axis--flat {
+  margin-top: var(--space-2);
+  padding: 0;
+}
+
+.cc-chart--flat .cc-row > .cc-axis--flat .cc-axis__scale {
+  margin: 0 var(--space-3);
+}
