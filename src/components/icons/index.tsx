@@ -138,6 +138,9 @@ export { default as IconTestHide } from '../../assets/icons/test/hide.svg?react'
 export { default as IconTestSaveBlank } from '../../assets/icons/test/save-blank.svg?react';
 export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
 export { default as IconTestChevron } from '../../assets/icons/test/chevron-right.svg?react';
+export { default as IconTestPass } from '../../assets/icons/test/pass.svg?react';
+export { default as IconTestSend } from '../../assets/icons/test/send.svg?react';
+export { default as IconTestSendMany } from '../../assets/icons/test/send-many.svg?react';
 export { default as IconTestChevronDown } from '../../assets/icons/test/chevron-down.svg?react';
 export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.svg?react';
 export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';

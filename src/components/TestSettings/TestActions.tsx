@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Avatar } from '../Avatar/Avatar';
 import { CHATS } from '../../data/chats';
+import { IconTestChevron, IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import '../EditSheet/EditSheet.css';
 import './TestActions.css';
 
@@ -21,37 +22,30 @@ export function useSheet(onClose: () => void) {
 }
 
 interface ActionSheetProps {
-  /** Имя клиента, если тест открыт из его чата: тогда «Отправить клиенту» шлёт ему сразу */
-  clientName?: string;
   onPick: (action: TestAction) => void;
   onClose: () => void;
 }
 
 /** Что сделать с тестом: пройти самому, отправить клиенту или нескольким */
-export function ActionSheet({ clientName, onPick, onClose }: ActionSheetProps) {
+export function ActionSheet({ onPick, onClose }: ActionSheetProps) {
   useSheet(onClose);
-  const options: { id: TestAction; title: string; hint: string }[] = [
-    { id: 'self', title: 'Пройти самому', hint: 'Пройти тест самому, без отправки' },
-    {
-      id: 'one',
-      title: clientName ? `Отправить клиенту: ${clientName}` : 'Отправить клиенту',
-      hint: clientName ? 'Сообщение и тест уйдут в этот чат' : 'Выберите одного клиента',
-    },
-    { id: 'many', title: 'Отправить нескольким', hint: 'Выберите клиентов из списка' },
+  const options = [
+    { id: 'self' as const, title: 'Пройти', Icon: IconTestPass },
+    { id: 'one' as const, title: 'Отправить', Icon: IconTestSend },
+    { id: 'many' as const, title: 'Отправить нескольким', Icon: IconTestSendMany },
   ];
   return createPortal(
     <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label="Провести тест">
-        <div className="sheet__header">
-          <h2 className="sheet__heading">Провести тест</h2>
-        </div>
-        <div className="sheet__body">
-          <ul className="test-actions">
-            {options.map(({ id, title, hint }) => (
+      <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
+        <div className="sheet__grab" aria-hidden="true" />
+        <div className="sheet__body test-actions-body">
+          <ul className="test-actions test-actions--cards">
+            {options.map(({ id, title, Icon }) => (
               <li key={id}>
-                <button type="button" className="test-actions__item" onClick={() => onPick(id)}>
-                  <span className="test-actions__title">{title}</span>
-                  <span className="test-actions__hint">{hint}</span>
+                <button type="button" className="test-actions__card" onClick={() => onPick(id)}>
+                  <Icon className="test-actions__icon" aria-hidden="true" />
+                  <span className="test-actions__card-title">{title}</span>
+                  <IconTestChevron className="test-actions__arrow" aria-hidden="true" />
                 </button>
               </li>
             ))}

@@ -53,3 +53,46 @@
 .test-actions__mark--on {
   border: 6px solid var(--color-accent);
 }
+
+/* Меню «Пройти или отправить»: белые карточки с иконкой и стрелкой */
+.test-actions-body {
+  padding-top: 12px;
+}
+
+.test-actions--cards {
+  gap: 12px;
+}
+
+.test-actions__card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  color: #1e1e1e;
+  text-align: left;
+}
+
+.test-actions__icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #0088ff;
+}
+
+.test-actions__card-title {
+  flex: 1;
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.test-actions__arrow {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #1e1e1e;
+}

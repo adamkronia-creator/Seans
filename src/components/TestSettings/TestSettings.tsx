@@ -102,7 +102,7 @@ function MessageField({ value, onChange }: { value: string; onChange: (v: string
 
 /**
  * Экран «Настройка теста»: шапка с названием и сердечком, описание, шкалы, параметры,
- * сообщение клиенту, переключатели и кнопка «Провести тест» над нижней панелью.
+ * сообщение клиенту, переключатели и кнопка «Пройти или отправить» над нижней панелью.
  */
 export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
@@ -126,9 +126,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
-
-  const client = chatId ? CHATS.find((c) => c.id === chatId) : undefined;
-  const clientName = client?.name;
 
   const notify = (text: string) => {
     setToast(text);
@@ -450,7 +447,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
       <div className="test-settings__cta">
         <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
-          Провести тест
+          Пройти или отправить
         </button>
       </div>
       </>
@@ -462,7 +459,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </p>
       )}
 
-      {sheet === 'actions' && <ActionSheet clientName={clientName} onPick={pick} onClose={() => setSheet(null)} />}
+      {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
       {(sheet === 'one' || sheet === 'many') && (
         <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />
       )}
