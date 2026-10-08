@@ -51,13 +51,10 @@
   line-height: 14px;
 }
 
-/* Подписи в той же геометрии, что у полос: слева подпись строки, справа иконка */
-.cc-axis--main {
-  padding: 0 44px 0 calc(var(--cc-main-label, 40px) + 20px);
-}
-
+/* Подписи в той же геометрии, что у полос: слева поле 12, справа иконка */
+.cc-axis--main,
 .cc-axis--extra {
-  padding: 0 44px 0 48px;
+  padding: 0 44px 0 var(--space-3);
 }
 
 /* Подпись под полосой дополнительной шкалы в общей диаграмме */
@@ -105,17 +102,20 @@
   white-space: nowrap;
 }
 
-.cc-bars--main .cc-bar__label {
-  width: var(--cc-main-label, 40px);
-}
-
 .cc-single .cc-bar__label {
   width: 40px;
 }
 
-/* Подпись строки: 28 для однобуквенных кодов (L, F, K), 40 для длинных */
-.cc-bars--extra .cc-bar__label {
-  width: var(--cc-label, 28px);
+/* Полное название шкалы над столбцом: поля 12 как у полосы, отступ до полосы 4 — как между полосой и подписью оси */
+.cc-bar__name {
+  display: block;
+  margin: 0 var(--space-3) 4px;
+  color: var(--color-text-primary);
+  line-height: 20px;
+}
+
+.cc-bar__code {
+  white-space: nowrap;
 }
 
 .cc-track {

@@ -36,6 +36,19 @@ function Axis({ kind, ticks, max }: { kind: 'main' | 'extra' | 'single'; ticks: 
 /** Подпись строки: «1. Hs»; если шкала в заключении одна на диаграмму (без общих диаграмм), только код */
 const rowLabel = (data: ConclusionData, code: string, index: number) => (data.overview ? `${index + 1}. ${code}` : code);
 
+/**
+ * Полное название шкалы над столбцом: «Ипохондрия (Hs)», при общих диаграммах с номером — «1. Ипохондрия (Hs)».
+ * Код в скобках не переносится по дефису («ЭД-С» на узком экране не должен разорваться), номер не отрывается от названия.
+ */
+function RowName({ data, scale, index }: { data: ConclusionData; scale: ConclusionScale; index: number }) {
+  return (
+    <span className="cc-bar__name">
+      {data.overview ? `${index + 1}.\u00A0` : ''}
+      {scale.name} <span className="cc-bar__code">({scale.code})</span>
+    </span>
+  );
+}
+
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
 export function pointsWord(n: number) {
   if (!Number.isInteger(n)) return 'балла'; // 3,2 балла
@@ -99,14 +112,11 @@ function ScaleCharts({
   return (
     <CollapseCard title={title} id={`cc-${group}`}>
       <div className="cc-chart">
-        <ul
-          className={`cc-bars cc-bars--${group}`}
-          style={{ '--cc-label': scales.some((s) => s.code.length > 1) ? '40px' : '28px' } as React.CSSProperties}
-        >
+        <ul className={`cc-bars cc-bars--${group}`}>
           {scales.map((s, i) => (
             <li key={s.code}>
+              <RowName data={data} scale={s} index={i} />
               <div className="cc-bar">
-                <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
                 <Bar data={data} scale={s} />
                 <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
                   <Icon />
@@ -140,9 +150,6 @@ function ScaleCharts({
   );
 }
 
-/** Ширина подписи строки в px на один знак кода; короткие коды (D, КА, Вер) умещаются в 40, длинные (ФОБ-С) требуют больше */
-const LABEL_CHAR = 11;
-
 /**
  * Блок диаграммы («Шкалы тестирования» или один из блоков теста): полосы шкал, под каждой подпись оси с небольшим отступом.
  * У шкалы без диапазонов полоса идёт от 0 до её собственного максимума; маркеры диапазонов внизу отделены разделителем.
@@ -162,17 +169,16 @@ function ScaleBlock({
   legend?: boolean;
   onOpen: (code: string) => void;
 }) {
-  const label = Math.max(40, Math.ceil(Math.max(...scales.map((s) => s.code.length)) * LABEL_CHAR));
   return (
     <CollapseCard title={title} id={id}>
-      <div className="cc-chart" style={{ '--cc-main-label': `${label}px` } as React.CSSProperties}>
+      <div className="cc-chart">
         <ul className="cc-bars cc-bars--main">
           {scales.map((s, i) => {
             const Icon = s.group === 'main' ? IconTestReportMain : IconTestReportExtra;
             return (
               <li key={s.code}>
+                <RowName data={data} scale={s} index={i} />
                 <div className="cc-bar">
-                  <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
                   <Bar data={data} scale={s} max={s.leveled ? data.max : s.max} />
                   <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
                     <Icon />
