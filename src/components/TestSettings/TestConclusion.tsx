@@ -95,18 +95,21 @@ function ScaleCharts({
   return (
     <CollapseCard title={title} id={`cc-${group}`}>
       <div className="cc-chart">
-        {leveled && <Axis kind={group} ticks={data.ticks} max={data.max} />}
         <ul
           className={`cc-bars cc-bars--${group}`}
           style={{ '--cc-label': scales.some((s) => s.code.length > 1) ? '40px' : '28px' } as React.CSSProperties}
         >
           {scales.map((s, i) => (
-            <li key={s.code} className="cc-bar">
-              <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
-              <Bar data={data} scale={s} />
-              <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
-                <Icon />
-              </button>
+            <li key={s.code}>
+              <div className="cc-bar">
+                <span className="cc-bar__label">{rowLabel(data, s.code, i)}</span>
+                <Bar data={data} scale={s} />
+                <button type="button" className="cc-icon" aria-label={`К описанию шкалы ${s.name}`} onClick={() => onOpen(s.code)}>
+                  <Icon />
+                </button>
+              </div>
+              {/* Подпись оси под каждой полосой, с небольшим отступом */}
+              {leveled && <Axis kind={group} ticks={data.ticks} max={data.max} />}
             </li>
           ))}
         </ul>
@@ -142,7 +145,6 @@ function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: s
   return (
     <CollapseCard title="Шкалы тестирования" id="cc-summary">
       <div className="cc-chart" style={{ '--cc-main-label': `${label}px` } as React.CSSProperties}>
-        <Axis kind="main" ticks={data.ticks} max={data.max} />
         <ul className="cc-bars cc-bars--main">
           {data.scales.map((s, i) => {
             const Icon = s.group === 'main' ? IconTestReportMain : IconTestReportExtra;
@@ -156,7 +158,7 @@ function SummaryChart({ data, onOpen }: { data: ConclusionData; onOpen: (code: s
                     <Icon />
                   </button>
                 </div>
-                {!s.leveled && <Axis kind="main" ticks={[0, s.max]} max={s.max} />}
+                <Axis kind="main" ticks={s.leveled ? data.ticks : [0, s.max]} max={s.leveled ? data.max : s.max} />
               </li>
             );
           })}
