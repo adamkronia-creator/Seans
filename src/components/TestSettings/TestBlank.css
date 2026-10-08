@@ -142,7 +142,8 @@
   background: color-mix(in srgb, var(--color-red) 8%, transparent);
 }
 
-.blank-question--missing .blank-answer {
+.blank-question--missing .blank-answer,
+.blank-question--missing .blank-scale__item {
   border-color: color-mix(in srgb, var(--color-red) 45%, transparent);
 }
 
@@ -242,8 +243,64 @@
   min-width: 0;
 }
 
+/* Пара утверждений (5PFQ): верхнее утверждение, пять значений −2 … 2 в ряд, нижнее; вокруг шкалы отступ 8 */
+.blank-question--pair {
+  gap: var(--space-2);
+}
+
+.blank-scale {
+  display: flex;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blank-scale li {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Значение шкалы: радиокнопка 20 и число под ней, как у обычного варианта ответа — обводка и заливка при выборе */
+.blank-scale__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 7px 0 6px;
+  border: 1px solid var(--color-divider);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.blank-scale__item:has(.blank-answer__input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+.blank-scale__item:active {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.blank-scale__value {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.blank-scale__item:has(.blank-answer__input:checked) .blank-scale__value {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blank-answer,
+  .blank-scale__item,
   .blank-answer__radio,
   .blank-answer__radio::after {
     transition: none;

@@ -10,13 +10,13 @@ import {
   IconTestTime,
   IconTestTimeStart,
 } from '../icons';
-import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
+import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { CollapseCard } from './TestBlank';
 import './TestSettings.css';
 import './TestConclusion.css';
 
-/** Число для показа: десятичная запятая («3,2»), целые без дроби */
-const fmt = (n: number) => String(Math.round(n * 10) / 10).replace('.', ',');
+/** Число для показа: десятичная запятая и до двух знаков («3,2», «1,24»), целые без дроби */
+const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
 /** Ось: подписи стоят над своими местами на полосе (та же геометрия, что у строк) */
 /** Подписи оси шкалы без диапазонов: начало и конец числами, посередине 25%, 50% и 75% */
@@ -86,11 +86,11 @@ function Legend({ data }: { data: ConclusionData }) {
 /** Полоса шкалы: заливка цвета диапазона, значение у конца полосы, белые линии на границах диапазонов */
 function Bar({ data, scale, max = scale.max }: { data: ConclusionData; scale: ConclusionScale; max?: number }) {
   const pct = (scale.score / max) * 100;
-  const tone = scale.leveled ? levelOf(data, scale.score).tone : 'accent';
+  const tone = scale.leveled ? levelOf(data, scale.score, scale).tone : 'accent';
   return (
     <span className="cc-track">
       {scale.leveled &&
-        data.levels
+        levelsOf(data, scale)
           .filter((l) => l.from > 0)
           .map((l) => <span key={l.key} className="cc-norm" style={{ left: `${(l.from / max) * 100}%` }} aria-hidden="true" />)}
       <span className={`cc-fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
@@ -168,8 +168,8 @@ function ScaleCharts({
                 {axisEach && (
                   <Axis
                     kind="main"
-                    ticks={s.leveled ? data.ticks : percentTicks(s.max)}
-                    max={s.leveled ? data.max : s.max}
+                    ticks={s.leveled ? (s.ticks ?? data.ticks) : percentTicks(s.max)}
+                    max={s.max}
                     percent={!s.leveled}
                     flat
                   />
@@ -225,7 +225,7 @@ function ScaleBlock({
                     <Icon />
                   </button>
                 </div>
-                <Axis kind="main" ticks={s.leveled ? data.ticks : [0, s.max]} max={s.leveled ? data.max : s.max} />
+                <Axis kind="main" ticks={s.leveled ? (s.ticks ?? data.ticks) : [0, s.max]} max={s.max} />
               </li>
             );
           })}
@@ -241,9 +241,9 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
   // Вид как у СМОЛ: полоса с границами диапазонов, расшифровка с «Читать далее»
   const flat = data.overview || !!data.flat;
   const pct = Math.round((scale.score / scale.max) * 100);
-  const level = scale.leveled ? levelOf(data, scale.score) : undefined;
+  const level = scale.leveled ? levelOf(data, scale.score, scale) : undefined;
   // Сначала диапазон клиента, затем остальные по возрастанию
-  const order = level ? [level, ...data.levels.filter((l) => l.key !== level.key)] : [];
+  const order = level ? [level, ...levelsOf(data, scale).filter((l) => l.key !== level.key)] : [];
   const texts = data.interpretation[scale.code] ?? {};
   const renderLevel = (l: (typeof order)[number]) => (
     <section key={l.key} className={`cc-level${flat ? ' cc-level--flat' : ''}`}>
@@ -288,14 +288,14 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
             <div className="cc-bar">
               <Bar data={data} scale={scale} />
             </div>
-            <Axis kind="single" ticks={scale.leveled ? data.ticks : percentTicks(scale.max)} max={scale.max} percent={!scale.leveled} flat />
+            <Axis kind="single" ticks={scale.leveled ? (scale.ticks ?? data.ticks) : percentTicks(scale.max)} max={scale.max} percent={!scale.leveled} flat />
           </div>
         ) : (
           <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
             <div className="cc-bar">
               <Bar data={data} scale={scale} />
             </div>
-            <Axis kind="single" ticks={scale.leveled ? data.ticks : [0, scale.max]} max={scale.max} />
+            <Axis kind="single" ticks={scale.leveled ? (scale.ticks ?? data.ticks) : [0, scale.max]} max={scale.max} />
           </div>
         )}
       </div>
@@ -436,6 +436,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
             id={`cc-block-${b.key}`}
             scales={scales.filter((s) => s.block === b.key)}
             legend
+            axisEach={data.axisEach}
             onOpen={(c) => scrollTo(`cc-scale-${c}`)}
           />
         ) : (

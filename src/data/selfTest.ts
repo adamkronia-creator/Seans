@@ -1,10 +1,12 @@
 import { useSyncExternalStore } from 'react';
 import { receiveMessage } from './chatStore';
 import { scoreBdi, scoreBhs } from './beckScoring';
-import { bdiResult, bhsResult, gad7Result, ittResult, osrResult, phq9Result, smolResult, sqResult, itoResult, type ConclusionData } from './conclusions';
+import { bdiResult, bhsResult, gad7Result, ittResult, osrResult, pfq5Result, phq9Result, scl90Result, smolResult, sqResult, itoResult, type ConclusionData } from './conclusions';
 import { scoreItt } from './ittScoring';
 import { LIBRARY } from './library';
 import { scoreOsr } from './osrScoring';
+import { scorePfq5 } from './pfq5Scoring';
+import { scoreScl90 } from './scl90Scoring';
 import { scoreGad7, scorePhq9 } from './screeningScoring';
 import { scoreIto } from './itoScoring';
 import { scoreSq } from './sqScoring';
@@ -115,6 +117,8 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
   phq9: (answers, _form, info) => phq9Result(scorePhq9(answers), info),
   sq: (answers, _form, info) => sqResult(scoreSq(answers), info),
   ito: (answers, _form, info) => itoResult(scoreIto(answers), info),
+  scl90: (answers, _form, info) => scl90Result(scoreScl90(answers), info),
+  '5pfq': (answers, _form, info) => pfq5Result(scorePfq5(answers), info),
 };
 
 export const canPassSelf = (testId: string) => testId in SCORERS;
@@ -141,6 +145,8 @@ const PASSED_TEXT: Record<string, string> = {
   phq9: 'Вы прошли опросник депрессивного состояния «PHQ-9»',
   sq: 'Вы прошли опросник Леонгарда-Шмишека «SQ»',
   ito: 'Вы прошли индивидуально-типологический опросник «ИТО»',
+  scl90: 'Вы прошли симптоматический опросник «SCL-90»',
+  '5pfq': 'Вы прошли пятифакторный опросник личности «5PFQ»',
 };
 
 const passedText = (testId: string) =>
