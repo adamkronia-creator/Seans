@@ -164,7 +164,7 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
               {q.heading && <li className="blank-heading">{q.heading}</li>}
               <li
                 id={`blank-q-${i + 1}`}
-                className={`blank-question${q.opposite !== undefined ? ' blank-question--pair' : ''}${fill?.missing === i ? ' blank-question--missing' : ''}`}
+                className={`blank-question${fill?.missing === i ? ' blank-question--missing' : ''}`}
               >
                 <BlankQuestionBody
                   data={data}

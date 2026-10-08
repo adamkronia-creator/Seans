@@ -36,7 +36,6 @@ interface PassQuestionProps {
 /** Экран одного вопроса: заголовок «Вопрос 12 из 90» со ссылкой на все вопросы, ниже сам вопрос с вариантами ответов */
 export function PassQuestion({ data, index, answer, dir, missing, onChoose, onPick, onOpenAll }: PassQuestionProps) {
   const heading = headingOf(data, index);
-  const pair = data.questions[index].opposite !== undefined;
   // Время последнего нажатия пальцем или мышью: по нему отличаем нажатие от выбора клавишей
   const pointerAt = useRef(-Infinity);
 
@@ -53,7 +52,7 @@ export function PassQuestion({ data, index, answer, dir, missing, onChoose, onPi
       <div className={`pass-q__body pass-q__body--${dir}`} key={index}>
         {heading && <p className="blank-heading">{heading}</p>}
         <div
-          className={`blank-question blank-question--single${pair ? ' blank-question--pair' : ''}${missing ? ' blank-question--missing' : ''}`}
+          className={`blank-question${missing ? ' blank-question--missing' : ''}`}
           onPointerDown={() => {
             pointerAt.current = performance.now();
           }}

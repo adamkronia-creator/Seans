@@ -123,14 +123,15 @@
   border-top: 0;
 }
 
-/* Вопрос: отступы 12, строки 16/20, между вопросом и ответами и между ответами 4; вопросы разделены линией на всю ширину */
+/* Вопрос: отступы 12, текст 18/24, между текстом и ответами 12; вопросы разделены линией на всю ширину.
+   Те же размеры в просмотре бланка, прохождении списком и прохождении по одному вопросу */
 .blank-question {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-3);
   padding: var(--space-3);
-  font-size: var(--font-size-md);
-  line-height: 20px;
+  font-size: var(--font-size-lg);
+  line-height: 24px;
 }
 
 .blank-question + .blank-question {
@@ -155,23 +156,23 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* Варианты ответов: отступ слева 8, между ними 4, цветная точка 8 стоит в начале строки, перенос идёт под точкой */
+/* Варианты ответов: друг под другом, между ними 8 */
 .blank-answers {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Вариант ответа: радиокнопка 20 слева, текст рядом, перенос идёт под текстом */
+/* Вариант ответа: радиокнопка 20 слева, текст рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем */
 .blank-answer {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
-  padding: 7px 11px;
+  padding: 11px;
   border: 1px solid var(--color-divider);
   border-radius: 12px;
   cursor: pointer;
@@ -238,16 +239,15 @@
   outline-offset: 2px;
 }
 
+/* Текст варианта 16/20: крупнее только сама формулировка вопроса */
 .blank-answer__text {
   flex: 1;
   min-width: 0;
+  font-size: var(--font-size-md);
+  line-height: 20px;
 }
 
-/* Пара утверждений (5PFQ): верхнее утверждение, пять значений −2 … 2 в ряд, нижнее; вокруг шкалы отступ 8 */
-.blank-question--pair {
-  gap: var(--space-2);
-}
-
+/* Пара утверждений (5PFQ): верхнее утверждение, пять значений −2 … 2 в ряд, нижнее; промежутки 12, как у остальных вопросов */
 .blank-scale {
   display: flex;
   gap: var(--space-1);
@@ -268,7 +268,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: 7px 0 6px;
+  padding: 11px 0 10px;
   border: 1px solid var(--color-divider);
   border-radius: 12px;
   cursor: pointer;

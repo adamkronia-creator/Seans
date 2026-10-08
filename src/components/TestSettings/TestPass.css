@@ -139,31 +139,6 @@
   }
 }
 
-/* Вопрос на отдельном экране: текст 18/24, отступы 12; варианты выше (44) и с промежутком 8 — удобнее попадать пальцем */
-.blank-question--single,
-.blank-question--single.blank-question--pair {
-  gap: var(--space-3);
-  font-size: var(--font-size-lg);
-  line-height: 24px;
-}
-
-.blank-question--single .blank-answers {
-  gap: var(--space-2);
-}
-
-.blank-question--single .blank-answer {
-  padding: 11px;
-}
-
-.blank-question--single .blank-answer__text {
-  font-size: var(--font-size-md);
-  line-height: 20px;
-}
-
-.blank-question--single .blank-scale__item {
-  padding: 11px 0 10px;
-}
-
 /* Окно «Все вопросы»: строка с правилами и сетка номеров 44×44 с промежутком 8 */
 .pass-jump__rules {
   width: 100%;
