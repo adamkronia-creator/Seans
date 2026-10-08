@@ -197,19 +197,21 @@ function ScaleBlock({
   );
 }
 
-function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: ConclusionScale; onChart: () => void }) {
+function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: ConclusionScale; onChart?: () => void }) {
   const [open, setOpen] = useState(false);
+  // Вид как у СМОЛ: полоса с границами диапазонов, расшифровка с «Читать далее»
+  const flat = data.overview || !!data.flat;
   const pct = Math.round((scale.score / scale.max) * 100);
   const level = scale.leveled ? levelOf(data, scale.score) : undefined;
   // Сначала диапазон клиента, затем остальные по возрастанию
   const order = level ? [level, ...data.levels.filter((l) => l.key !== level.key)] : [];
   const texts = data.interpretation[scale.code] ?? {};
   const renderLevel = (l: (typeof order)[number]) => (
-    <section key={l.key} className={`cc-level${data.overview ? ' cc-level--flat' : ''}`}>
+    <section key={l.key} className={`cc-level${flat ? ' cc-level--flat' : ''}`}>
       <h3 className={`cc-level__head cc-tone--${l.tone}`}>
         <span className="cc-level__dot" />
-        {data.overview ? `${l.range}: ${l.chip} показатель` : l.range}
-        {!data.overview && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
+        {flat ? `${l.range}: ${l.chip}${data.overview ? ' показатель' : ''}` : l.range}
+        {!flat && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
       </h3>
       {(texts[l.key] ?? []).map((paragraph) => (
         <p key={paragraph}>{paragraph}</p>
@@ -239,19 +241,15 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
           ) : null}
           .
         </p>
-        {data.overview ? (
+        {flat ? (
           <div
-            className="cc-single cc-single--flat cc-row"
-            role="button"
-            tabIndex={0}
-            aria-label="К диаграмме шкал"
-            onClick={onChart}
-            onKeyDown={(e) => e.key === 'Enter' && onChart()}
+            className={`cc-single cc-single--flat${onChart ? ' cc-row' : ''}`}
+            {...(onChart ? { role: 'button', tabIndex: 0, 'aria-label': 'К диаграмме шкал', onClick: onChart, onKeyDown: (e: React.KeyboardEvent) => e.key === 'Enter' && onChart() } : {})}
           >
             <div className="cc-bar">
               <Bar data={data} scale={scale} />
             </div>
-            <Axis kind="single" ticks={data.ticks} max={scale.max} flat />
+            <Axis kind="single" ticks={scale.leveled ? data.ticks : [0, scale.max]} max={scale.max} flat />
           </div>
         ) : (
           <div className={`cc-single${data.overview ? '' : ' cc-single--plain'}`}>
@@ -262,8 +260,8 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
           </div>
         )}
       </div>
-      {(data.overview ? order.slice(0, 1) : order).map(renderLevel)}
-      {data.overview && order.length > 1 && (
+      {(flat ? order.slice(0, 1) : order).map(renderLevel)}
+      {flat && order.length > 1 && (
         <>
           {/* Свёрнуто — кнопка между диапазоном клиента и остальными; развёрнуто — «Скрыть» в самом конце */}
           {!open && (
@@ -399,14 +397,14 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
 
       {data.blocks ? (
         // Карточки идут в порядке блоков: основная шкала блока и её дополнительные
-        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-block-${s.block}`)} />)
+        scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={s.block ? () => scrollTo(`cc-block-${s.block}`) : undefined} />)
       ) : (
         <>
           {main.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-bar-${s.code}`, 'center')} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
           {extra.map((s) => (
-            <ScaleCard key={s.code} data={data} scale={s} onChart={() => scrollTo(`cc-bar-${s.code}`, 'center')} />
+            <ScaleCard key={s.code} data={data} scale={s} onChart={data.overview ? () => scrollTo(`cc-bar-${s.code}`, 'center') : undefined} />
           ))}
         </>
       )}

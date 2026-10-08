@@ -94,7 +94,7 @@ const BHS: TestSettingsData = {
   scoring: [
     { range: '0–3', label: 'минимальная безнадежность', tone: 'green' },
     { range: '4–8', label: 'легкая безнадежность', tone: 'yellow' },
-    { range: '9–14', label: 'умеренная безнадежность', tone: 'orange' },
+    { range: '9–14', label: 'средняя безнадежность', tone: 'orange' },
     { range: '15–20', label: 'тяжелая безнадежность', tone: 'red' },
   ],
   questions: 20,
