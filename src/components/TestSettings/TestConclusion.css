@@ -449,15 +449,13 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* Границы диапазонов: тонкая линия через полосу и зазор под ней; значение закрывает её своим фоном и не страдает */
+/* Границы диапазонов: белая линия 1,5 px поверх цвета столбца, строго в пределах столбца */
 .cc-chart--flat .cc-norm,
 .cc-single--flat .cc-norm {
-  bottom: -12px;
-  background: rgb(30 30 30 / 22%);
-}
-
-.cc-single--flat .cc-norm {
-  bottom: -4px;
+  bottom: 0;
+  width: 1.5px;
+  background: #fff;
+  transform: translateX(-50%);
 }
 
 /* Подписи оси стоят точно под границами диапазонов; крайние прижаты к краям поля и за него не выходят */
