@@ -54,7 +54,7 @@ export function IconPlusChip(props: SVGProps<SVGSVGElement>) {
 }
 
 // Экран открытого чата
-export { default as IconTabSessions } from '../../assets/icons/chat/tab-sessions.svg?react';
+export { default as IconTabBooking } from '../../assets/icons/chat/tab-booking.svg?react';
 export { default as IconTabMessages } from '../../assets/icons/chat/tab-messages.svg?react';
 export { default as IconTabTests } from '../../assets/icons/chat/tab-tests.svg?react';
 export { default as IconTabPractices } from '../../assets/icons/chat/tab-practices.svg?react';

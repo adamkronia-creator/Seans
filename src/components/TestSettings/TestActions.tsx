@@ -1,25 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Avatar } from '../Avatar/Avatar';
 import { CHATS } from '../../data/chats';
 import { IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
+import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
 import './TestActions.css';
 
 export type TestAction = 'self' | 'one' | 'many';
-
-export function useSheet(onClose: () => void) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [onClose]);
-}
 
 interface ActionSheetProps {
   onPick: (action: TestAction) => void;

@@ -1,0 +1,459 @@
+/* Вкладка «Запись на прием»: лента карточек на фоне приложения, внизу кнопка (61 = 44 + поля 8 + линия 1) */
+.booking {
+  --toast-bottom: calc(61px + var(--space-2));
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.booking__scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.booking__scroll > * {
+  flex-shrink: 0;
+}
+
+.booking__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Заголовок раздела, как во вкладке «Тесты»: название, число, ссылка справа */
+.booking__heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+}
+
+.booking__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.booking__count {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
+}
+
+.booking__link {
+  margin-left: auto;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.booking__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Ничего не запланировано */
+.booking__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+  text-align: center;
+}
+
+.booking__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.booking__empty-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.booking__empty-text {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+/* Кнопка внизу: белая полоса с разделителем, кнопка 44 */
+.booking__cta {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.booking__cta-button {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Кнопки в карточках: ряд из равных, высота 40 */
+.bk-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.bk-button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  white-space: nowrap;
+}
+
+.bk-button svg {
+  flex-shrink: 0;
+  font-size: var(--size-icon-sm);
+}
+
+.bk-button--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+.bk-button--danger {
+  color: var(--color-red-text);
+}
+
+/* Карточка приема: белая, радиус 16, внутри поля 16 и расстояния 12 */
+.appt {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+}
+
+.appt__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+/* Что это и в каком состоянии: цветная точка и подпись тихим цветом */
+.appt__eyebrow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.appt__eyebrow::before {
+  content: '';
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: var(--radius-full);
+  background: var(--dot);
+}
+
+.appt__eyebrow--green {
+  --dot: var(--color-green);
+}
+
+.appt__eyebrow--accent {
+  --dot: var(--color-accent);
+}
+
+.appt__eyebrow--yellow {
+  --dot: var(--color-yellow);
+}
+
+.appt__date {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.appt__time {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.appt__note {
+  margin: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+/* Комментарий к предложению */
+.appt__quote {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+/* Третье действие («Отказаться») отдельной строкой на всю ширину */
+.appt__foot {
+  border-top: 1px solid var(--color-divider);
+}
+
+.appt__foot-button {
+  display: block;
+  width: 100%;
+  height: 44px;
+  color: var(--color-red-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Место приема */
+.place {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+}
+
+.place__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.place__address {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.place__pin {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-accent);
+  font-size: var(--size-icon-sm);
+}
+
+.place__address-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  overflow-wrap: anywhere;
+}
+
+.place__detail {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.place__label {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+}
+
+.place__text {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.place__text--empty {
+  color: var(--color-text-placeholder);
+}
+
+/* Карта: сверху карточки на всю ширину. До нажатия плитка, после — рамка с картой */
+.place-map {
+  position: relative;
+  width: 100%;
+  background: var(--color-bg-fill);
+}
+
+.place-map--tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 120px;
+  padding: 0 var(--space-4);
+  text-align: center;
+}
+
+.place-map__icon {
+  margin-bottom: var(--space-1);
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.place-map__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+.place-map__hint {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.place-map--ready {
+  height: 184px;
+}
+
+/* Карта не двигается пальцем: иначе она перехватывала бы прокрутку страницы и листание вкладок */
+.place-map__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+
+.place-map__open {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-float);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+/* История: одна карточка, строки через разделитель */
+.history-card {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+}
+
+.history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history__row {
+  position: relative;
+  padding: var(--space-3) var(--space-4);
+}
+
+.history__row + .history__row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.history__status {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+.history__status--green {
+  color: var(--color-green-text);
+}
+
+.history__status--red {
+  color: var(--color-red-text);
+}
+
+.history__status--gray {
+  color: var(--color-text-secondary);
+}
+
+.history__when {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.history__sub {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  overflow-wrap: anywhere;
+}
+
+.history__more {
+  display: block;
+  width: 100%;
+  height: 44px;
+  border-top: 1px solid var(--color-divider);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}

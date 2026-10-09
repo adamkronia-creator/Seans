@@ -3,7 +3,7 @@ import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSel
 import type { TestBlankData } from '../../data/testBlank';
 import { SectionNav } from '../SectionNav/SectionNav';
 import { Toast } from '../Toast/Toast';
-import { useSheet } from './TestActions';
+import { useSheet } from '../EditSheet/useSheet';
 import { BlankRules, CollapseCard, TestBlank, blankSections } from './TestBlank';
 import { JumpSheet, PassQuestion } from './TestPassSingle';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';

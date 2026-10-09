@@ -59,6 +59,9 @@
   --color-stroke: #E3E7EC;                              /* тонкие обводки и кольца */
   --color-accent-soft: rgb(0 136 255 / 10%);            /* #0088FF, 10%: подложки акцентных значков и выбранных строк */
   --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
+  --color-green-soft: rgb(52 199 89 / 14%);             /* подложки меток: подтверждено, состоялось */
+  --color-yellow-soft: rgb(255 204 0 / 20%);            /* ждем ответа */
+  --color-red-soft: rgb(255 56 60 / 10%);               /* отказ, отмена */
 
   /* Шрифт: Inter с оптическими размерами (мелкий кегль рисуется шире и разборчивее, крупный плотнее) */
   --font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

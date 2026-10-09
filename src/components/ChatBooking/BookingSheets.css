@@ -1,0 +1,175 @@
+/* Окна вкладки «Запись на прием». Общий каркас окна, строки и кнопки — в EditSheet.css */
+
+/* Что именно меняем: под заголовком, мелко и по центру */
+.bk-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.bk-text {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+/* Переключатель «Точное время / Промежуток»: как в «Кейсе» — дорожка 36, выбранный сегмент белый */
+.bk-segments {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+  height: 36px;
+  padding: 2px;
+  border-radius: 10px;
+  background: var(--color-bg-fill-strong);
+}
+
+.bk-segments__item {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.bk-segments__item--active {
+  background: var(--color-bg-panel);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 10%);
+  color: var(--color-text-primary);
+}
+
+/* Дата и время: строки как в «Общей информации», значение справа. Встроенные выбиралки телефона остаются */
+.bk-fields {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bk-fields .sheet__row-input {
+  appearance: none;
+  min-height: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bk-fields .sheet__row-input::-webkit-date-and-time-value {
+  text-align: right;
+}
+
+.bk-hint {
+  margin: var(--space-2) var(--space-1) 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.bk-hint--error {
+  color: var(--color-red-text);
+}
+
+/* Подсказка внутри карточки, а не под ней */
+.bk-hint--inside {
+  margin: var(--space-3) 0 0;
+}
+
+/* Карточка с подписью и содержимым */
+.bk-card {
+  padding: var(--space-3) var(--space-4);
+}
+
+.bk-label {
+  display: block;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+}
+
+/* Поле без рамки внутри белой карточки; высота растет по тексту (AutoTextarea) */
+.bk-textarea {
+  display: block;
+  width: 100%;
+  min-height: 22px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  resize: none;
+}
+
+.bk-textarea::placeholder {
+  color: var(--color-text-caption);
+}
+
+/* Выбор из нескольких: чипсы в несколько строк */
+.bk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bk-chip {
+  height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-fill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.bk-chip--active {
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+/* Красная кнопка действия (отказ, отмена) */
+.sheet__button--danger {
+  background: var(--color-red-text);
+  color: var(--color-accent-on);
+}
+
+/* «Открыть в картах»: строки со ссылками в одной карточке */
+.bk-links {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.bk-links li + li {
+  border-top: 1px solid var(--color-divider);
+}
+
+.bk-link {
+  display: flex;
+  color: inherit;
+  text-decoration: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.bk-link__icon {
+  flex-shrink: 0;
+  color: var(--color-text-placeholder);
+  font-size: var(--size-icon-sm);
+}

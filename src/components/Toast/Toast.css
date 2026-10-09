@@ -1,0 +1,20 @@
+/* Подсказка внизу: тёмная плашка с белым текстом 14/20. Стоит над нижней панелью разделов, а там, где есть кнопка, — над кнопкой (61: 44 + поля 8 + линия 1).
+   Экран, где подсказка стоит в своём блоке, задаёт высоту от низа блока переменной --toast-bottom */
+.test-settings__toast {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--toast-bottom, calc(var(--size-tab) + env(safe-area-inset-bottom) + var(--space-3)));
+  left: var(--space-4);
+  z-index: 10;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgb(20 24 31 / 92%);
+  color: var(--color-accent-on);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
+}
+
+.test-settings__toast--cta {
+  bottom: calc(var(--size-tab) + env(safe-area-inset-bottom) + 61px + var(--space-2));
+}

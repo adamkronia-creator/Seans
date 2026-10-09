@@ -5,13 +5,14 @@ import {
   IconSearch,
   IconFavorites,
   IconSettings,
+  IconTabBooking,
   IconTabLibrary,
   IconTabMessages,
   IconTabNotes,
   IconTabPractices,
-  IconTabSessions,
   IconTabTests,
 } from '../../components/icons';
+import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChatCase } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTests } from '../../components/ChatTests/ChatTests';
@@ -29,11 +30,11 @@ import { useBackHandler } from '../../utils/backHandler';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
-// Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
-type SectionId = 'sessions' | 'messages' | 'tests' | 'tasks' | 'notes' | 'library';
+// Разделы карточки собеседника; при открытии чата виден «Сообщения»
+type SectionId = 'booking' | 'messages' | 'tests' | 'tasks' | 'notes' | 'library';
 
-const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabSessions }[] = [
-  { id: 'sessions', label: 'Сеансы', Icon: IconTabSessions },
+const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabBooking }[] = [
+  { id: 'booking', label: 'Запись на прием', Icon: IconTabBooking },
   { id: 'messages', label: 'Сообщения', Icon: IconTabMessages },
   { id: 'tests', label: 'Тесты', Icon: IconTabTests },
   { id: 'tasks', label: 'Задания', Icon: IconTabPractices },
@@ -113,12 +114,14 @@ interface SectionPageProps {
   chatId: string;
   /** Чат «Избранное»: вместо тестов клиента показываются свои */
   favorites: boolean;
+  /** Имя собеседника без фамилии */
+  peerName: string;
   hasClientData: boolean;
   onAppTabChange: (id: TabId) => void;
 }
 
 /** Страница раздела, кроме переписки: содержимое и снизу панель приложения. Не перерисовывается, пока не изменились эти поля */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, onAppTabChange }: SectionPageProps) {
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName, hasClientData, onAppTabChange }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -134,7 +137,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
       {id === 'tasks' && <ChatTasks hasData={hasClientData} />}
       {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
-      {id === 'sessions' && <p className="chat__empty chat__empty--grow">Раздел в разработке</p>}
+      {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} favorites={favorites} />}
       <TabBar active="messages" onChange={onAppTabChange} />
     </>
   );
@@ -330,7 +333,14 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       id === 'messages' ? (
         messagesPage
       ) : (
-        <SectionPage id={id} chatId={chatId} favorites={Boolean(chat.favorites)} hasClientData={hasClientData} onAppTabChange={onAppTabChange} />
+        <SectionPage
+          id={id}
+          chatId={chatId}
+          favorites={Boolean(chat.favorites)}
+          peerName={chat.name.split(' ')[0]}
+          hasClientData={hasClientData}
+          onAppTabChange={onAppTabChange}
+        />
       ),
   }));
 

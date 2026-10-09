@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { IconTestChevron } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
-import { useSheet } from './TestActions';
+import { useSheet } from '../EditSheet/useSheet';
 import { BlankQuestionBody } from './TestBlank';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';

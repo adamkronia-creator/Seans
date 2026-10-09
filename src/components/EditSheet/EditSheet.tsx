@@ -1,10 +1,11 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useState, type CSSProperties } from 'react';
 import { HEAD_ICONS } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
 import { RichEditor } from '../RichEditor/RichEditor';
 import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
 import { TONES, toneOf, type ToneId } from '../../data/tones';
+import { AutoTextarea } from './AutoTextarea';
 import { SheetOverlay } from './SheetOverlay';
 import './EditSheet.css';
 
@@ -41,27 +42,6 @@ function Collapse({ open, children }: { open: boolean; children: React.ReactNode
       <div className="sheet__collapse-inner">{children}</div>
     </div>
   );
-}
-
-/** Textarea, которая растёт по тексту: виден весь текст без внутренней прокрутки */
-function AutoTextarea({
-  value,
-  onChange,
-  ...rest
-}: { value: string; onChange: (v: string) => void } & Omit<
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  'value' | 'onChange'
->) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    // Высота по тексту плюс рамка: иначе появляется лишняя полоса прокрутки
-    const border = el.offsetHeight - el.clientHeight;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight + border}px`;
-  }, [value]);
-  return <textarea ref={ref} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />;
 }
 
 /** Нижняя панель редактирования: заголовок прямо в шапке-превью, иконка, цвет, строки и текст */

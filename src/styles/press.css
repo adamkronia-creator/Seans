@@ -15,11 +15,17 @@
 .ts-row,
 .msg-menu__item,
 .cc-row,
+.bk-link,
+.appt__foot-button,
+.history__more,
 .sec-toc__backdrop {
   --press-scale: 1;
 }
 
 .blank-card__head[data-pressed],
+.bk-link[data-pressed],
+.appt__foot-button[data-pressed],
+.history__more[data-pressed],
 .ts-row--link[data-pressed],
 .msg-menu__item[data-pressed] {
   background: var(--color-bg-pressed);
