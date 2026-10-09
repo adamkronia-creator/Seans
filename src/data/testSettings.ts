@@ -402,6 +402,15 @@ const GAD7: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
+  scales: { main: ['Тревожность'], extra: [] },
+  scoring: [
+    { range: '0–4', label: 'минимальная тревожность', tone: 'green' },
+    { range: '5–9', label: 'легкая тревожность', tone: 'yellow' },
+    { range: '10–14', label: 'средняя тревожность', tone: 'orange' },
+    { range: '15–21', label: 'высокая тревожность', tone: 'red' },
+  ],
+  questions: 7,
+  duration: '2–3 мин.',
   message: DEFAULT_MESSAGE,
 };
 
