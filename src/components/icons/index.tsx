@@ -11,9 +11,7 @@ export { default as IconBell } from '../../assets/icons/notifications.svg?react'
 export { default as IconFavorites } from '../../assets/icons/favorites.svg?react';
 export { default as IconBack } from '../../assets/icons/back.svg?react';
 export { default as IconChevronRight } from '../../assets/icons/chevron-right.svg?react';
-// Иконки типов событий (бейдж 20×20 на аватарке)
-export { default as IconEventTask } from '../../assets/icons/event-task.svg?react';
-export { default as IconEventSurvey } from '../../assets/icons/event-survey.svg?react';
+// Значок приглашения (лента истории)
 export { default as IconEventInvite } from '../../assets/icons/event-invite.svg?react';
 
 // Плюс 12×12: нет в присланных иконках, нарисован по размерам из макета

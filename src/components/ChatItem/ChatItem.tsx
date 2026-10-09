@@ -5,7 +5,7 @@ import { IconFavorites } from '../icons';
 import './ChatItem.css';
 
 // Размер аватара в списке чатов (см. --size-avatar-lg в tokens.css)
-const AVATAR_SIZE = 52;
+const AVATAR_SIZE = 48;
 
 interface ChatItemProps {
   chat: Chat;
@@ -14,7 +14,7 @@ interface ChatItemProps {
 
 export function ChatItem({ chat, onClick }: ChatItemProps) {
   return (
-    <li className="chat-item">
+    <li className={`chat-item${chat.unread > 0 ? ' chat-item--unread' : ''}`}>
       <button type="button" className="chat-item__button" onClick={() => onClick?.(chat)}>
         {chat.favorites ? (
           <Avatar icon={<IconFavorites />} size={AVATAR_SIZE} />

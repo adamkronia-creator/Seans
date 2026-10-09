@@ -8,7 +8,7 @@ export function TestsPage() {
     <LibraryPage
       kind="test"
       title="Тестовые материалы"
-      searchPlaceholder="Поиск тестов..."
+      searchPlaceholder="Поиск по тестам"
       items={LIBRARY}
       categories={TEST_CATEGORIES}
       favorites={useFavorites()}

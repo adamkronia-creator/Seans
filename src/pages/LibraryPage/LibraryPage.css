@@ -5,38 +5,22 @@
   min-height: 0;
 }
 
-/* Кнопка справа в поиске: синяя пилюля 64×32, внутри белый кружок 24 с числом и шестерёнка 24 */
+/* Кнопка настроек списка в конце поля поиска: круг 32 */
 .library-page__filter {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 4px;
-  height: 32px;
-  padding: 0 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
-  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
-  color: var(--color-accent-on);
-  font-size: var(--size-icon);
-}
-
-.library-page__filter-count {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-full);
-  background: var(--color-accent-on);
-  color: var(--color-accent);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1;
+  color: var(--color-text-secondary);
+  font-size: var(--size-icon-sm);
 }
 
-/* Чипсы с иконкой: плюс 12, остальные 20 */
+/* Чипсы с иконкой: плюс 14, остальные 18 */
 .chip--glyph-lg {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .library-page__list {
@@ -45,13 +29,14 @@
   flex-direction: column;
   gap: var(--space-2);
   min-height: 0;
-  padding: 11px var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
 .library-page__empty {
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-8) var(--space-4);
   color: var(--color-text-secondary);
-  text-shadow: var(--text-glow);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   text-align: center;
 }

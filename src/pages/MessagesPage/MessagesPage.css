@@ -6,29 +6,29 @@
   min-height: 0;
 }
 
-.messages__profile {
-  display: flex;
-}
-
+.messages__profile,
 .messages__bell {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
+  color: var(--color-text-primary);
   font-size: var(--size-icon);
 }
 
-/* От разделителя шапки до первого чата 12: все внутри строки (см. ChatItem.css) */
+/* Список на белой панели во всю высоту: ниже последнего чата тот же фон, а не пустота */
 .messages__list {
   flex: 1;
   overflow-y: auto;
+  background: var(--color-bg-row);
 }
 
 .messages__empty {
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-8) var(--space-4);
   color: var(--color-text-secondary);
-  text-shadow: var(--text-glow);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   text-align: center;
 }
 
@@ -43,7 +43,7 @@
   height: var(--size-fab);
   border-radius: var(--radius-full);
   background: var(--color-accent);
-  box-shadow: 0 4px 12px rgb(0 136 255 / 30%);
+  box-shadow: 0 6px 16px rgb(0 136 255 / 32%), 0 1px 3px rgb(16 24 40 / 12%);
   color: var(--color-accent-on);
-  font-size: 16px; /* плюс 16×16 */
+  font-size: 18px; /* плюс 18×18 */
 }

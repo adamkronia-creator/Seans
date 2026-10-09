@@ -8,11 +8,9 @@ interface AvatarProps {
   online?: boolean;
   /** Вместо фото: иконка на цветном фоне (например, «Избранное») */
   icon?: ReactNode;
-  /** Бейдж 20×20 в правом нижнем углу (тип события) */
-  badge?: ReactNode;
 }
 
-export function Avatar({ src, alt = '', size = 50, online, icon, badge }: AvatarProps) {
+export function Avatar({ src, alt = '', size = 48, online, icon }: AvatarProps) {
   return (
     <span className="avatar" style={{ width: size, height: size }}>
       {icon ? (
@@ -23,7 +21,6 @@ export function Avatar({ src, alt = '', size = 50, online, icon, badge }: Avatar
         <img className="avatar__img" src={src} alt={alt} />
       )}
       {online && <span className="avatar__online" aria-label="В сети" />}
-      {badge && <span className="avatar__badge">{badge}</span>}
     </span>
   );
 }

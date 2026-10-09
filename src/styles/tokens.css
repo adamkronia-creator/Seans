@@ -1,16 +1,21 @@
+/*
+ * Дизайн-система «Сеанса». Один акцентный цвет, спокойные нейтральные поверхности, шрифт Inter,
+ * сетка отступов 4. Старые имена переменных сохранены: экраны, которые ещё не переведены на новую систему, берут новые значения.
+ */
 :root {
-  /* Фоны */
-  --color-bg-app: #F7F8FA;       /* фон приложения: сплошной, для панелей и листов поверх обоев */
-  --color-bg-wallpaper: #DBE5ED; /* средний цвет обоев (background.webp): пока картинка грузится и по бокам на широких экранах */
-  --color-bg-panel: #FFFFFF;     /* панели */
-  --color-bg-row: rgb(255 255 255 / 84%); /* строки списков без карточек (чаты, события): белая дымка поверх обоев, чтобы текст читался */
-  --color-bg-row-pressed: rgb(222 230 239 / 94%); /* та же строка под пальцем */
-  --text-glow: 0 0 8px rgb(255 255 255 / 90%), 0 0 2px rgb(255 255 255 / 80%); /* белое свечение для подписей, которые лежат прямо на обоях */
+  /* Поверхности */
+  --color-bg-app: #F3F5F8;       /* фон приложения: под карточками и за краями на широких экранах */
+  --color-bg-panel: #FFFFFF;     /* шапки, нижние панели, карточки, листы */
+  --color-bg-fill: #EDF0F4;      /* поля ввода и неактивные чипсы: заливка без рамки */
+  --color-bg-row: var(--color-bg-panel);   /* строки списков (чаты, события) */
+  --color-bg-row-pressed: #F1F3F7;         /* та же строка под пальцем */
+  --text-glow: none;             /* подписи на обоях больше не подсвечиваются */
 
-  /* Текст */
-  --color-text-primary: #1E1E1E;   /* основной */
-  --color-text-secondary: #818C99; /* вторичный */
-  --color-text-caption: #A0A9B3;   /* подписи */
+  /* Текст: три ступени, все читаются на белом (≥ 4,3:1) */
+  --color-text-primary: #14181F;   /* основной */
+  --color-text-secondary: #566071; /* вторичный: описания, превью */
+  --color-text-caption: #707B8B;   /* подписи: время, даты, подсказки */
+  --color-text-placeholder: #98A1AE; /* подсказка в пустом поле, неактивные значки */
 
   /* Акцент */
   --color-accent: #0088FF;       /* синий, акцентный */
@@ -40,54 +45,63 @@
   --color-error: var(--color-red);
   --color-info: var(--color-blue);
 
-  /* Производные цвета (оценены по макету, сверить с Figma) */
-  --color-border: #E6E8EC;                              /* границы чипсов, табов */
-  --color-divider: #EBEDF0;                             /* разделители списка и шапки (по макету «События») */
-  --color-accent-soft: rgb(0 136 255 / 10%);            /* #0088FF, 10% (фон «Избранного») */
+  /* Производные цвета */
+  --color-border: #E3E7EC;                              /* границы полей и карточек */
+  --color-divider: #ECEFF3;                             /* разделители списков и шапок */
+  --color-stroke: #E3E7EC;                              /* тонкие обводки и кольца */
+  --color-accent-soft: rgb(0 136 255 / 10%);            /* #0088FF, 10%: подложки акцентных значков и выбранных строк */
   --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
 
-  /* Обводки и кружки неактивного чипса (из Figma) */
-  --color-stroke: #EBEDF0;
-
-  /* Типографика */
-  --font-family: 'Roboto Variable', 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Шрифт: Inter с оптическими размерами (мелкий кегль рисуется шире и разборчивее, крупный плотнее) */
+  --font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
+  --font-weight-medium: 500;     /* кнопки, чипсы, подписи-акценты */
+  --font-weight-semibold: 600;   /* заголовки и имена */
+  --font-weight-bold: 700;       /* только крупный заголовок экрана */
 
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;  /* основной */
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
+  /* Шкала кеглей и высот строк. Текст, который читают, идёт с высотой строки ≈ 1,45; одиночные подписи плотнее */
+  --font-size-2xs: 11px;  --line-height-2xs: 14px;  /* подписи вкладок */
+  --font-size-xs: 12px;   --line-height-xs: 16px;   /* время, даты, счётчики */
+  --font-size-sm: 14px;   --line-height-sm: 20px;   /* описания, превью, чипсы */
+  --font-size-md: 15px;   --line-height-md: 22px;   /* основной текст */
+  --font-size-lg: 17px;   --line-height-lg: 24px;   /* заголовки карточек, верхняя панель */
+  --font-size-xl: 24px;   --line-height-xl: 30px;   /* заголовок экрана */
 
-  /* Межстрочные значения предварительные, сверить с Figma */
-  --line-height-xs: 16px;
-  --line-height-sm: 20px;
-  --line-height-md: 24px;
-  --line-height-lg: 24px;
-  --line-height-xl: 28px;
+  --letter-spacing-title: -0.012em;  /* от 17 px кегль плотнее */
+  --letter-spacing-display: -0.022em; /* от 24 px ещё плотнее */
 
-  /* Отступы (оценены по макету, сверить с Figma) */
+  /* Отступы: сетка 4 */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
-  --space-4: 16px;
+  --space-4: 16px;               /* поля экрана */
   --space-5: 20px;
   --space-6: 24px;
+  --space-8: 32px;
 
   /* Радиусы */
+  --radius-sm: 8px;
+  --radius-md: 12px;             /* поля ввода, кнопки, значки */
+  --radius-lg: 16px;             /* карточки */
+  --radius-xl: 20px;             /* пузыри сообщений */
+  --radius-sheet: 24px;          /* верх нижних листов */
   --radius-pill: 999px;
   --radius-full: 50%;
 
-  /* Размеры компонентов (оценены по макету) */
-  --size-avatar-lg: 52px;       /* аватар в списке чатов */
-  --size-badge: 20px;           /* кружок со счётчиком (чипсы, непрочитанные) */
-  --size-avatar-sm: 34px;       /* аватар в шапке */
+  /* Тени: только у того, что парит над страницей */
+  --shadow-float: 0 4px 16px rgb(16 24 40 / 14%), 0 1px 3px rgb(16 24 40 / 8%);
+  --shadow-sheet: 0 -8px 32px rgb(16 24 40 / 16%);
+
+  /* Размеры компонентов */
+  --size-avatar-lg: 48px;       /* аватар в списке чатов и событий */
+  --size-avatar-sm: 36px;       /* аватар в шапке */
+  --size-badge: 20px;           /* кружок со счётчиком непрочитанных */
   --size-icon: 24px;
-  --size-fab: 40px;
-  --size-tab: 40px;
+  --size-icon-sm: 20px;
+  --size-fab: 52px;
+  --size-tab: 56px;             /* высота нижней панели разделов без безопасной зоны */
   --size-search-h: 40px;
   --size-chip-h: 32px;
+  --size-bar-h: 48px;           /* строка заголовка экрана */
 }

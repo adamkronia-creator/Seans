@@ -20,12 +20,14 @@ body {
 
 body {
   margin: 0;
-  background: var(--color-bg-wallpaper);
+  background: var(--color-bg-app);
   color: var(--color-text-primary);
   font-family: var(--font-family);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
   font-weight: var(--font-weight-regular);
+  font-optical-sizing: auto;
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   text-size-adjust: 100%;
@@ -76,11 +78,11 @@ img {
   margin: 0 auto;
 }
 
-/* Обои: картинка на всю ширину каркаса под всеми экранами; шапки, панели и карточки остаются белыми поверх неё.
-   У каждого экрана они свои, чтобы верхний был непрозрачным и нижний не просвечивал сквозь него */
+/* Фон сплошной: шапки, панели и карточки белые, между ними спокойная светлая заливка.
+   У каждого экрана он свой, чтобы верхний был непрозрачным и нижний не просвечивал сквозь него */
 .app,
 .screen {
-  background: var(--color-bg-wallpaper) url('../assets/background.webp') center / cover no-repeat;
+  background: var(--color-bg-app);
 }
 
 /*

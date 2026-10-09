@@ -1,16 +1,8 @@
-import type { ComponentType, SVGProps } from 'react';
-import type { AppEvent, EventType } from '../../data/events';
+import type { AppEvent } from '../../data/events';
 import { Avatar } from '../Avatar/Avatar';
-import { IconChevronRight, IconEventInvite, IconEventSurvey, IconEventTask } from '../icons';
 import './EventItem.css';
 
-const AVATAR_SIZE = 52;
-
-const TYPE_ICON: Record<EventType, ComponentType<SVGProps<SVGSVGElement>>> = {
-  task: IconEventTask,
-  survey: IconEventSurvey,
-  invite: IconEventInvite,
-};
+const AVATAR_SIZE = 48;
 
 interface EventItemProps {
   event: AppEvent;
@@ -18,20 +10,15 @@ interface EventItemProps {
 }
 
 export function EventItem({ event, onClick }: EventItemProps) {
-  const TypeIcon = TYPE_ICON[event.type];
-
   const content = (
     <>
-      <Avatar src={event.avatar} size={AVATAR_SIZE} badge={<TypeIcon />} />
+      <Avatar src={event.avatar} size={AVATAR_SIZE} />
       <span className="event-item__body">
         <span className="event-item__top">
           <span className="event-item__name">{event.name}</span>
           <span className="event-item__date">{event.date}</span>
         </span>
-        <span className="event-item__row">
-          <span className="event-item__text">{event.text}</span>
-          {event.link && <IconChevronRight className="event-item__chevron" />}
-        </span>
+        <span className="event-item__text">{event.text}</span>
       </span>
     </>
   );

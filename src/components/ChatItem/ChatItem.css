@@ -1,18 +1,26 @@
+/* Строка чата: аватар 48, отступы 12 и 16, разделитель от текста до правого края */
 .chat-item {
-  border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-row);
 }
 
-/* В макете шапка белая, а список лежит на сером фоне приложения; на обоях строки покрыты белой дымкой */
 .chat-item__button {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  /* 16 по бокам; 10 сверху и снизу: от разделителя шапки до первого чата 10,
-     между чатами 10 до разделителя и 10 после него */
-  padding: 10px var(--space-4);
+  padding: var(--space-3) var(--space-4);
   text-align: left;
+}
+
+.chat-item + .chat-item .chat-item__button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: calc(var(--space-4) + var(--size-avatar-lg) + var(--space-3));
+  height: 1px;
+  background: var(--color-divider);
 }
 
 .chat-item__button:active,
@@ -20,14 +28,11 @@
   background: var(--color-bg-row-pressed);
 }
 
-/* Контейнер с именем и сообщением: высота 40, имя сверху, сообщение снизу */
 .chat-item__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: space-between;
-  flex-shrink: 0;
-  height: 40px;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -39,12 +44,7 @@
   min-width: 0;
 }
 
-.chat-item__row--top {
-  min-height: var(--line-height-xs);
-}
-
-/* Нижняя строка: gap между текстом и кружком 8; высота как у кружка,
-   чтобы текст стоял на одном месте с кружком и без него */
+/* Нижняя строка высотой с кружок: текст стоит на одном месте с кружком и без него */
 .chat-item__row--bottom {
   gap: var(--space-2);
   min-height: var(--size-badge);
@@ -52,9 +52,10 @@
 
 .chat-item__name {
   overflow: hidden;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  letter-spacing: var(--letter-spacing-title);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -62,21 +63,21 @@
 .chat-item__time {
   flex-shrink: 0;
   color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
   line-height: var(--line-height-xs);
+}
+
+.chat-item--unread .chat-item__time {
+  color: var(--color-accent);
 }
 
 .chat-item__preview {
   overflow: hidden;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-xs);
+  line-height: var(--line-height-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Список вплотную к разделителю шапки: прежние 2 px отступа сверху перенесены в первую строку */
-.chat-item:first-child .chat-item__button {
-  padding-top: 12px;
 }

@@ -16,7 +16,7 @@ export function Badge({ count, variant = 'accent', showZero = false, ariaLabel }
   if (count <= 0 && !showZero) return null;
   return (
     <span
-      className={`badge badge--${variant}${count >= 10 ? ' badge--wide' : ''}`}
+      className={`badge badge--${variant}`}
       aria-label={ariaLabel}
     >
       <span className="badge__text">{count > 99 ? '99+' : count}</span>

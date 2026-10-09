@@ -91,24 +91,24 @@ export function MessagesPage() {
     <section ref={root} className="messages">
       <ScreenHeader
         title="Сообщения"
-        leading={
-          <button type="button" className="messages__profile" aria-label="Профиль">
-            <Avatar src={CURRENT_USER.avatar} size={40} />
-          </button>
-        }
         trailing={
-          <button
-            type="button"
-            className="messages__bell"
-            aria-label="События"
-            onClick={() => navigate('/events')}
-          >
-            <IconBell />
-          </button>
+          <>
+            <button
+              type="button"
+              className="messages__bell"
+              aria-label="События"
+              onClick={() => navigate('/events')}
+            >
+              <IconBell />
+            </button>
+            <button type="button" className="messages__profile" aria-label="Профиль">
+              <Avatar src={CURRENT_USER.avatar} size={32} />
+            </button>
+          </>
         }
         searchValue={query}
         onSearchChange={setQuery}
-        searchPlaceholder="Поиск диалогов..."
+        searchPlaceholder="Поиск по чатам"
         chipsLabel="Фильтр диалогов"
         chips={
           <>

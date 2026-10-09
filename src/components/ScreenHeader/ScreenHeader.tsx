@@ -4,9 +4,7 @@ import './ScreenHeader.css';
 
 interface ScreenHeaderProps {
   title: string;
-  /** Слева в первой строке (аватарка профиля) */
-  leading?: ReactNode;
-  /** Справа в первой строке (колокольчик) */
+  /** Справа в строке заголовка (уведомления, профиль) */
   trailing?: ReactNode;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -19,12 +17,11 @@ interface ScreenHeaderProps {
 }
 
 /**
- * Общая шапка разделов «Сообщения» и «Психологические тесты»:
- * строка заголовка 40 → 8 → поиск 40 → 8 → чипсы 32 → 8, разделитель снизу.
+ * Общая шапка разделов «Сообщения» и «Психологические тесты»: крупный заголовок слева, действия справа,
+ * ниже поиск и чипсы. Белая панель с тонким разделителем снизу.
  */
 export function ScreenHeader({
   title,
-  leading,
   trailing,
   searchValue,
   onSearchChange,
@@ -36,9 +33,8 @@ export function ScreenHeader({
   return (
     <header className="screen-header">
       <div className="screen-header__top">
-        <div className="screen-header__side screen-header__side--start">{leading}</div>
         <h1 className="screen-header__title">{title}</h1>
-        <div className="screen-header__side screen-header__side--end">{trailing}</div>
+        {trailing && <div className="screen-header__side">{trailing}</div>}
       </div>
 
       <SearchField

@@ -1,24 +1,23 @@
-/* Кружок 20×20; padding 4 слева и справа, чтобы две цифры давали пилюлю.
-   Общий для чипсов и непрочитанных сообщений. */
+/* Кружок со счётчиком 20: одна цифра — круг, две — пилюля. Общий для непрочитанных сообщений и вкладок */
 .badge {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-width: var(--size-badge);
   height: var(--size-badge);
-  padding: 0 var(--space-1);
+  padding: 0 6px;
   border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   /* Пропорциональные цифры: узкая «1» не уезжает влево от центра круга */
   font-variant-numeric: proportional-nums;
   line-height: 1;
 }
 
-/* Цифры: коробка текста обрезается от высоты заглавных букв до базовой линии
-   (в Figma это «cap height to baseline»). Тогда цифра стоит ровно по центру
-   круга независимо от метрик шрифта в браузере. */
+/* Цифры: коробка текста обрезается от высоты заглавных букв до базовой линии.
+   Тогда цифра стоит ровно по центру круга независимо от метрик шрифта в браузере. */
 .badge__text {
   display: block;
   line-height: 1;
@@ -36,7 +35,7 @@
 }
 
 .badge--neutral {
-  background: var(--color-stroke);
+  background: var(--color-bg-fill);
   color: var(--color-text-secondary);
 }
 
@@ -48,7 +47,7 @@
 /* Вкладка «Тесты»: те же размеры, другие цвета */
 .badge--yellow {
   background: var(--color-yellow);
-  color: var(--color-accent-on);
+  color: var(--color-text-primary);
 }
 
 .badge--green {
@@ -58,11 +57,6 @@
 
 /* Неактивная вкладка переключателя */
 .badge--muted {
-  background: #C8CDD3;
+  background: var(--color-text-placeholder);
   color: var(--color-accent-on);
-}
-
-/* Двузначные числа: кружок-пилюля шириной 28 (по макету) */
-.badge--wide {
-  min-width: 28px;
 }

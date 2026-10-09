@@ -1,27 +1,36 @@
+/* Чипс: заливка без рамки, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный */
 .chip {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   gap: 6px;
   height: var(--size-chip-h);
-  padding: 0 var(--space-2);
+  padding: 0 14px;
   border: 0;
-  /* Рамка 1 px снаружи, поэтому чипс занимает ровно 32 по высоте */
-  box-shadow: 0 0 0 1px var(--color-stroke);
   border-radius: var(--radius-pill);
-  background: var(--color-bg-panel);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: 1;
   white-space: nowrap;
 }
 
-/* Отступы по бокам 8; со счётчиком справа 6 и между текстом и счётчиком 4 */
-.chip--counted {
-  gap: 4px;
-  padding-right: 6px;
-  padding-left: var(--space-2);
+/* Число непрочитанных рядом с названием: просто цифры, без кружка внутри чипса */
+.chip__count {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.chip--active {
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+.chip--active .chip__count {
+  color: rgb(255 255 255 / 80%);
 }
 
 /* Чипс с иконкой: круг 32×32 */
@@ -31,22 +40,16 @@
   padding: 0;
 }
 
-/* Плюс 13,5×13,5 (линии 12 + округлые концы) */
+/* Плюс 14×14 */
 .chip--plus {
-  font-size: 13.5px;
-}
-
-.chip--active {
-  background: var(--color-accent);
-  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
-  color: var(--color-accent-on);
+  font-size: 14px;
 }
 
 /*
- * Чипсы, за которыми идут страницы (список чатов, история): фон с рамкой у невыбранного и у выбранного — два слоя друг под другом,
+ * Чипсы, за которыми идут страницы (список чатов, история): заливка у невыбранного и у выбранного — два слоя друг под другом,
  * а между ними перетекает прозрачность. --w (от 0 до 1, насколько чипс «выбран») задаёт followChips по положению страниц,
  * пока их ведёт палец, так что цвет идёт за пальцем, как у значков вкладок в чате. Прозрачность слоёв считает видеокарта:
- * перерисовывать чипсы на каждом кадре жеста не нужно (в длинной истории это заметно тормозило). Цвет текста и кружка
+ * перерисовывать чипсы на каждом кадре жеста не нужно (в длинной истории это заметно тормозило). Цвет текста
  * переключается на середине.
  */
 .chip--follow,
@@ -55,7 +58,6 @@
   position: relative;
   isolation: isolate;
   background: none;
-  box-shadow: none;
 }
 
 .chip--follow.chip--active {
@@ -79,13 +81,11 @@
 }
 
 .chip--follow::before {
-  background: var(--color-bg-panel);
-  box-shadow: 0 0 0 1px var(--color-stroke);
+  background: var(--color-bg-fill);
   opacity: calc(1 - var(--w));
 }
 
 .chip--follow::after {
   background: var(--color-accent);
-  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
   opacity: var(--w);
 }

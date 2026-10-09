@@ -71,9 +71,7 @@ export function LibraryPage({
         onSearchChange={setQuery}
         searchPlaceholder={searchPlaceholder}
         searchTrailing={
-          // Число на кнопке в макете «2»; что именно оно считает, пока неизвестно
           <button type="button" className="library-page__filter" aria-label="Настройки списка">
-            <span className="library-page__filter-count">2</span>
             <IconFilterSettings />
           </button>
         }

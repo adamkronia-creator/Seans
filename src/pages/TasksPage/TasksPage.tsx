@@ -12,7 +12,7 @@ export function TasksPage() {
     <LibraryPage
       kind="task"
       title="Психологические задания"
-      searchPlaceholder="Поиск заданий..."
+      searchPlaceholder="Поиск по заданиям"
       items={TASK_LIBRARY}
       categories={TASK_CATEGORIES}
       favorites={useTaskFavorites()}

@@ -1,16 +1,26 @@
+/* Строка события: как строка чата — аватар 48, отступы 12 и 16, разделитель от текста */
 .event-item {
-  border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-row);
 }
 
-/* Строка: аватар 52, gap 12, отступы 10 сверху/снизу и 16 по бокам */
 .event-item__inner {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   width: 100%;
-  padding: 10px var(--space-4);
+  padding: var(--space-3) var(--space-4);
   text-align: left;
+}
+
+.event-item + .event-item .event-item__inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: calc(var(--space-4) + var(--size-avatar-lg) + var(--space-3));
+  height: 1px;
+  background: var(--color-divider);
 }
 
 button.event-item__inner:active,
@@ -18,62 +28,46 @@ button.event-item__inner[data-pressed] {
   background: var(--color-bg-row-pressed);
 }
 
-/* Имя 16/16, gap 4, описание 16/19 (переносится на несколько строк) */
 .event-item__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
   min-width: 0;
 }
 
 .event-item__top {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--space-3);
 }
 
 .event-item__name {
   overflow: hidden;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  letter-spacing: var(--letter-spacing-title);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Дата 12, прижата к правому краю; по макету стоит на 1 px ниже центра имени */
 .event-item__date {
   flex-shrink: 0;
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
   line-height: var(--line-height-xs);
-  transform: translateY(1px);
 }
 
-/* Шеврон 20×20 стоит по центру описания; текст до него переносится с отступом 8 */
-.event-item__row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
+/* Что произошло: главное в строке, до двух строк */
 .event-item__text {
-  flex: 1;
-  min-width: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.2; /* 120% */
-}
-
-.event-item__chevron {
-  flex-shrink: 0;
-  color: var(--color-text-caption);
-  font-size: 20px;
-}
-
-/* Список вплотную к разделителю шапки: прежние 2 px отступа сверху перенесены в первую строку */
-.event-item:first-child .event-item__inner {
-  padding-top: 12px;
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }

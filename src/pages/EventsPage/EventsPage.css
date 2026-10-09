@@ -5,14 +5,14 @@
   min-height: 0;
 }
 
-/* Первая строка как на экране чатов: высота 40, сверху 12, по бокам 16;
-   кнопка «назад» 24×24 в контейнере 40×40, заголовок по центру */
+/* Верхняя панель вложенного экрана: «назад» слева (зона нажатия 40), заголовок слева от него */
 .events__header {
-  display: grid;
+  display: flex;
   flex-shrink: 0;
-  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-1);
+  min-height: var(--size-bar-h);
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
@@ -21,20 +21,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-self: start;
   width: 40px;
   height: 40px;
   font-size: var(--size-icon);
 }
 
 .events__title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-xl);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
 }
 
-/* От разделителя шапки до первого события 12: 2 здесь + 10 внутри строки */
 .events__list {
   flex: 1;
   overflow-y: auto;
+  background: var(--color-bg-row);
 }
