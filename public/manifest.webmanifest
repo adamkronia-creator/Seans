@@ -1,0 +1,9 @@
+{
+  "name": "Сеанс",
+  "short_name": "Сеанс",
+  "lang": "ru",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF"
+}
