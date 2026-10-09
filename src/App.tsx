@@ -142,7 +142,7 @@ export default function App() {
     if (tab === 'tasks') return page('tasks', <TasksPage />);
     return page(
       `tab/${tab}`,
-      <p style={{ padding: 24, color: 'var(--color-text-secondary)', textShadow: 'var(--text-glow)' }}>Раздел в разработке</p>,
+      <p style={{ padding: 24, color: 'var(--color-text-secondary)' }}>Раздел в разработке</p>,
     );
   };
 

@@ -25,10 +25,6 @@
   background: var(--color-bg-pressed);
 }
 
-.ts-row--link[data-pressed] {
-  border-radius: 12px;
-}
-
 .hist-card__event--link[data-pressed] {
   opacity: 0.55;
 }

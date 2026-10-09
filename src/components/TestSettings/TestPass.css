@@ -1,52 +1,53 @@
 /* Прохождение теста: форма бланка, счётчик ответов над кнопкой, подтверждение сброса */
 
-/* Выбор формы: отступы 12, как у вопросов бланка */
+/* Выбор формы: поля 16, как у вопросов бланка */
 .test-pass__form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3);
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
 .test-pass__hint {
   margin: 0;
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
-  line-height: 120%;
+  line-height: var(--line-height-sm);
 }
 
-/* Полоса с кнопкой: подпись и «Сбросить» 12/12, полоса прогресса 4, затем кнопка; промежутки 8 */
+/* Полоса с кнопкой: подпись и «Сбросить» 12/16, полоса прогресса 4, затем кнопка; промежутки 8 */
 .test-pass__cta {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  padding-top: var(--space-3);
 }
 
 .test-pass__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 12px;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
-  line-height: 12px;
+  line-height: var(--line-height-xs);
 }
 
+/* Область нажатия шире подписи на 8 со всех сторон, видимые отступы остаются прежними */
 .test-pass__reset {
   margin: -8px;
   padding: 8px;
   color: var(--color-accent);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  line-height: 12px;
+  line-height: var(--line-height-xs);
 }
 
 .test-pass__bar {
   height: 4px;
   overflow: hidden;
   border-radius: 2px;
-  background: var(--color-divider);
+  background: var(--color-bg-fill-strong);
 }
 
 .test-pass__bar > span {
@@ -65,11 +66,11 @@
 .test-pass__confirm {
   margin: 0;
   font-size: var(--font-size-md);
-  line-height: 19px;
+  line-height: var(--line-height-md);
   text-align: center;
 }
 
-/* По одному: ряд кнопок 40 с промежутком 8. «Назад» уже, «Далее» и «Завершить тест» шире; на правилах одна кнопка «Начать» */
+/* По одному: ряд кнопок 44 с промежутком 8. «Назад» уже, «Далее» и «Завершить тест» шире; на правилах одна кнопка «Начать» */
 .test-pass__buttons {
   display: flex;
   gap: var(--space-2);
@@ -91,13 +92,12 @@
 
 .test-pass__back {
   flex: 1;
-  height: 40px;
-  border: 1px solid var(--color-stroke);
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-panel);
-  color: var(--color-text-secondary);
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Один вопрос: заголовок как у карточек бланка, под ним линия 1, справа ссылка «Все вопросы» */
@@ -105,7 +105,7 @@
   border-bottom: 1px solid var(--color-divider);
 }
 
-/* Область нажатия шире текста на 8 со всех сторон, видимые отступы остаются 12 */
+/* Область нажатия шире текста на 8 со всех сторон, видимые отступы остаются прежними */
 .pass-q__all {
   flex-shrink: 0;
   margin: -8px;
@@ -113,7 +113,7 @@
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 14px;
+  line-height: var(--line-height-sm);
 }
 
 /* Вопрос выезжает: вперёд справа, назад слева */
@@ -149,7 +149,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: var(--space-4);
 }
 
 .pass-jump__grid {
@@ -161,8 +161,8 @@
 .pass-jump__cell {
   width: 100%;
   height: 44px;
-  border: 1px solid var(--color-divider);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-panel);
   color: var(--color-text-secondary);
   font-size: var(--font-size-md);

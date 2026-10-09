@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-  IconCaseCalendar,
-  IconTestAge,
-  IconTestBlank,
-  IconTestChevron,
-  IconTestGender,
-  IconTestReportExtra,
-  IconTestReportMain,
-  IconTestTime,
-  IconTestTimeStart,
-} from '../icons';
+import { IconTestChevron, IconTestReportExtra, IconTestReportMain } from '../icons';
 import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { CollapseCard } from './TestBlank';
 import './TestSettings.css';
@@ -366,32 +356,27 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
       <CollapseCard title="Общая информация" id="cc-info">
         <ul className="cc-info">
           <li>
-            <IconCaseCalendar className="cc-info__icon" />
             <span className="cc-info__label">Дата прохождения</span>
-            <span>{info.date}</span>
+            <span className="cc-info__value">{info.date}</span>
           </li>
           <li>
-            <IconTestTimeStart className="cc-info__icon" />
             <span className="cc-info__label">Время прохождения</span>
-            <span>{info.time}</span>
+            <span className="cc-info__value">{info.time}</span>
           </li>
           <li>
-            <IconTestTime className="cc-info__icon" />
             <span className="cc-info__label">Длительность</span>
-            <span>{info.duration}</span>
+            <span className="cc-info__value">{info.duration}</span>
           </li>
           {info.age && (
             <li>
-              <IconTestAge className="cc-info__icon" />
               <span className="cc-info__label">Возраст</span>
-              <span>{info.age}</span>
+              <span className="cc-info__value">{info.age}</span>
             </li>
           )}
           {form && (
             <li>
-              <IconTestGender className="cc-info__icon" />
               <span className="cc-info__label">Форма бланка</span>
-              <span>{form}</span>
+              <span className="cc-info__value">{form}</span>
             </li>
           )}
         </ul>
@@ -405,7 +390,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
       )}
 
       {onOpenBlank && (
-        <ul className="ts-card ts-card--wide-dividers">
+        <ul className="ts-card">
           <li
             className="ts-row ts-row--link"
             role="button"
@@ -413,7 +398,6 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
             onClick={onOpenBlank}
             onKeyDown={(e) => e.key === 'Enter' && onOpenBlank()}
           >
-            <IconTestBlank className="ts-row__icon" />
             <span className="ts-row__link">Посмотреть бланк тестирования</span>
             <IconTestChevron className="ts-row__chevron" />
           </li>

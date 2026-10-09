@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Avatar } from '../Avatar/Avatar';
 import { CHATS } from '../../data/chats';
-import { IconTestChevron, IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
+import { IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestActions.css';
@@ -38,14 +38,13 @@ export function ActionSheet({ onPick, onClose }: ActionSheetProps) {
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
         <div className="sheet__grab" aria-hidden="true" />
-        <div className="sheet__body test-actions-body">
+        <div className="sheet__body">
           <ul className="test-actions test-actions--cards">
             {options.map(({ id, title, Icon }) => (
               <li key={id}>
                 <button type="button" className="test-actions__card" onClick={() => onPick(id)}>
                   <Icon className="test-actions__icon" aria-hidden="true" />
                   <span className="test-actions__card-title">{title}</span>
-                  <IconTestChevron className="test-actions__arrow" aria-hidden="true" />
                 </button>
               </li>
             ))}

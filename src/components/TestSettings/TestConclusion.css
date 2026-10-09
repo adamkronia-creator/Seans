@@ -1,4 +1,4 @@
-/* Общая информация: строки 44 с разделителем 1, иконка 24, значение справа */
+/* Общая информация: строки от 48, подпись слева тише, значение справа; разделитель от поля 16 до края */
 .cc-info {
   margin: 0;
   padding: 0;
@@ -9,52 +9,51 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  height: 48px;
-  padding: 0 var(--space-3);
-}
-
-.cc-info li + li {
-  margin-top: 1px;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
 }
 
 .cc-info li + li::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 0;
   right: 0;
-  left: 40px;
+  left: var(--space-4);
   height: 1px;
   background: var(--color-divider);
 }
 
-.cc-info__icon {
-  flex-shrink: 0;
-  color: var(--color-accent);
-  font-size: var(--size-icon);
-}
-
 .cc-info__label {
   flex: 1;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.cc-info__value {
+  line-height: var(--line-height-md);
+  text-align: right;
 }
 
 /* Диаграмма: ось сверху, строки 24 через 12, внизу легенда */
 .cc-chart {
-  padding: 12px 0 var(--space-3);
+  padding: var(--space-4) 0;
 }
 
 .cc-axis {
-  height: 14px;
+  height: 16px;
   margin-bottom: var(--space-3);
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  line-height: 14px;
+  line-height: var(--line-height-xs);
 }
 
-/* Подписи в той же геометрии, что у полос: слева поле 12, справа иконка */
+/* Подписи в той же геометрии, что у полос: слева поле 16, справа значок 24 и промежуток 8 */
 .cc-axis--main,
 .cc-axis--extra {
-  padding: 0 44px 0 var(--space-3);
+  padding: 0 48px 0 var(--space-4);
 }
 
 /* Подпись под полосой дополнительной шкалы в общей диаграмме */
@@ -69,7 +68,7 @@
 
 .cc-axis__scale {
   position: relative;
-  height: 14px;
+  height: 16px;
 }
 
 .cc-axis__scale span {
@@ -93,7 +92,7 @@
   align-items: center;
   gap: var(--space-2);
   height: 24px;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
 }
 
 .cc-bar__label {
@@ -106,12 +105,12 @@
   width: 40px;
 }
 
-/* Полное название шкалы над столбцом: поля 12 как у полосы, отступ до полосы 4 — как между полосой и подписью оси */
+/* Полное название шкалы над столбцом: поля 16 как у полосы, отступ до полосы 4 — как между полосой и подписью оси */
 .cc-bar__name {
   display: block;
-  margin: 0 var(--space-3) 4px;
+  margin: 0 var(--space-4) 4px;
   color: var(--color-text-primary);
-  line-height: 20px;
+  line-height: var(--line-height-md);
 }
 
 .cc-bar__code {
@@ -171,7 +170,7 @@
 .cc-value--inside {
   margin-left: 0;
   background: transparent;
-  color: #fff;
+  color: var(--color-accent-on);
 }
 
 .cc-value--inside.cc-value--dark {
@@ -185,13 +184,13 @@
   font-size: var(--size-icon);
 }
 
-/* Легенда: три цветных чипа по центру */
+/* Легенда: цветные метки по центру, разделитель по ширине полей */
 .cc-legend {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-3);
-  margin: var(--space-3) var(--space-3) 0; /* разделитель по ширине полей: 12 от графика, 12 до маркеров */
+  gap: var(--space-2);
+  margin: var(--space-3) var(--space-4) 0;
   padding: var(--space-3) 0 0;
   border-top: 1px solid var(--color-divider);
   list-style: none;
@@ -208,89 +207,102 @@
   margin-left: 0;
 }
 
+/* Метка уровня: заливка 14% цвета уровня, подпись основным цветом, цвет несёт точка */
 .cc-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   height: 24px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  line-height: 16px;
+  line-height: var(--line-height-xs);
 }
 
 .cc-chip__dot {
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
-  background: currentColor;
+  background: var(--tone);
 }
 
 .cc-chip--yellow {
-  background: rgb(255 204 0 / 12%);
-  color: var(--color-yellow);
+  --tone: var(--color-yellow);
 }
 
 .cc-chip--green {
-  background: rgb(52 199 89 / 12%);
-  color: var(--color-green);
+  --tone: var(--color-green);
 }
 
 .cc-chip--orange {
-  background: rgb(255 141 40 / 12%);
-  color: var(--color-orange);
+  --tone: var(--color-orange);
 }
 
 .cc-chip--red {
-  background: rgb(255 56 60 / 12%);
-  color: var(--color-red);
+  --tone: var(--color-red);
 }
 
 .cc-chip--darkred {
-  background: rgb(168 22 28 / 12%);
-  color: var(--color-darkred);
+  --tone: var(--color-darkred);
 }
 
+.cc-chip--yellow,
+.cc-chip--green,
+.cc-chip--orange,
+.cc-chip--red,
+.cc-chip--darkred {
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+}
+
+/* Цвет уровня в тексте: тёмные оттенки (светлые на белом не читаются), точка остаётся яркой */
 .cc-tone--yellow {
-  color: var(--color-yellow);
+  --tone-dot: var(--color-yellow);
+  color: var(--color-yellow-text);
 }
 
 .cc-tone--green {
-  color: var(--color-green);
+  --tone-dot: var(--color-green);
+  color: var(--color-green-text);
 }
 
 .cc-tone--orange {
-  color: var(--color-orange);
+  --tone-dot: var(--color-orange);
+  color: var(--color-orange-text);
 }
 
 .cc-tone--accent {
+  --tone-dot: var(--color-accent);
   color: var(--color-accent);
 }
 
 .cc-tone--red {
-  color: var(--color-red);
+  --tone-dot: var(--color-red);
+  color: var(--color-red-text);
 }
 
 .cc-tone--darkred {
+  --tone-dot: var(--color-darkred);
   color: var(--color-darkred);
 }
 
 /* Метка «Шкала Hs» в заголовке карточки */
 .cc-badge {
   flex-shrink: 0;
-  padding: 4px 12px;
+  padding: 2px var(--space-2);
   border-radius: var(--radius-pill);
-  background: var(--color-divider);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  line-height: 16px;
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
 }
 
-/* Карточка шкалы: тексты 16/19 с отступами 12, абзацы через 12 */
+/* Карточка шкалы: тексты 15/22 с полями 16, абзацы через 12 */
 .cc-scale {
-  padding: var(--space-3);
-  line-height: 19px;
+  padding: var(--space-3) var(--space-4);
+  line-height: var(--line-height-md);
 }
 
 .cc-scale__text {
@@ -318,17 +330,12 @@
   padding: 0;
 }
 
-
-/* Диапазоны: разделитель с отступом 12, заголовок с чипом 28, абзацы через 12 */
+/* Диапазоны: разделитель по ширине полей, заголовок с меткой, абзацы через 12 */
 .cc-level {
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-4);
   padding: var(--space-3) 0;
   border-top: 1px solid var(--color-divider);
-  line-height: 19px;
-}
-
-.cc-level:last-child {
-  padding-bottom: var(--space-3);
+  line-height: var(--line-height-md);
 }
 
 .cc-level p {
@@ -342,12 +349,12 @@
 .cc-level__head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 28px;
+  gap: var(--space-2);
+  min-height: 28px;
   margin: 0 0 var(--space-2);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  line-height: 22px;
+  line-height: var(--line-height-lg);
 }
 
 .cc-level__dot {
@@ -355,20 +362,15 @@
   height: 8px;
   margin-right: -2px;
   border-radius: var(--radius-full);
-  background: currentColor;
+  background: var(--tone-dot, currentColor);
 }
 
 .cc-level__chip {
-  padding: 3px 12px;
+  padding: 2px 10px;
   border-radius: var(--radius-pill);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 22px;
-}
-
-/* При переходе по иконке карточка встаёт с отступом от шапки */
-.blank-card[id^="cc-"] {
-  scroll-margin-top: 11px;
+  line-height: var(--line-height-sm);
 }
 
 /* Границы нормы 40 и 70: белые сплошные линии 50%, только на строках с полосами */
@@ -407,58 +409,55 @@
   align-items: center;
   gap: var(--space-3);
   margin: 0;
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-divider);
-  color: var(--color-text);
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-md);
 }
 
 .cc-validity svg {
   flex: none;
-  width: 32px;
-  height: 32px;
-  color: var(--color-green);
+  width: var(--size-icon);
+  height: var(--size-icon);
+  color: var(--color-green-text);
 }
 
 .cc-validity--warn svg {
-  color: var(--color-orange);
+  color: var(--color-orange-text);
 }
 
-/* Предупреждение психологу над шкалами: отдельная карточка со значком */
+/* Предупреждение психологу над шкалами: отдельная карточка с красноватой заливкой и значком */
 .cc-alert {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-3);
-  flex-shrink: 0;
   margin: 0;
-  padding: var(--space-3);
-  border-radius: 12px;
-  background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-red) 8%, var(--color-bg-panel));
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-md);
 }
 
 .cc-alert svg {
   flex: none;
-  width: 32px;
-  height: 32px;
-  color: var(--color-red);
+  width: var(--size-icon);
+  height: var(--size-icon);
+  color: var(--color-red-text);
 }
 
-/* Подпись после всех блоков заключения */
-/* Примечание оформлено как цитата: слева акцентная линия */
+/* Примечание после всех блоков заключения: тихая подпись по центру */
 .cc-note {
   margin: 0;
-  padding: 2px var(--space-3);
-  border-left: 3px solid var(--color-accent);
+  padding: var(--space-1) var(--space-2);
   color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  line-height: 120%;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-align: center;
 }
 
-/* СМОЛ: названия над столбцами 14/16, столбцы на всю ширину, одна общая ось и крупные маркеры */
+/* СМОЛ: названия над столбцами 14/20, столбцы на всю ширину, одна общая ось */
 .cc-row {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -470,9 +469,9 @@
 }
 
 .cc-chart--flat .cc-bar__name {
-  margin: 0 var(--space-3) 4px;
+  margin: 0 var(--space-4) 4px;
   font-size: var(--font-size-sm);
-  line-height: 16px;
+  line-height: var(--line-height-sm);
 }
 
 .cc-chart--flat .cc-track,
@@ -500,14 +499,14 @@
 
 /* Подписи оси стоят точно под границами диапазонов; крайние прижаты к краям поля и за него не выходят */
 .cc-axis--flat {
-  height: 12px;
+  height: 16px;
   margin: 0;
-  padding: 0 var(--space-3);
-  line-height: 12px;
+  padding: 0 var(--space-4);
+  line-height: 16px;
 }
 
 .cc-axis--flat .cc-axis__scale {
-  height: 12px;
+  height: 16px;
 }
 
 .cc-axis--flat .cc-axis__scale span:first-child {
@@ -532,16 +531,6 @@
   border-top: 1px solid var(--color-divider);
 }
 
-.cc-chart--flat .cc-chip {
-  gap: 4px;
-  height: 26px;
-}
-
-.cc-chart--flat .cc-chip__dot {
-  width: 10px;
-  height: 10px;
-}
-
 .cc-single--flat {
   display: block;
   margin: var(--space-2) 0 var(--space-3);
@@ -561,11 +550,11 @@
 
 .cc-level--flat .cc-level__head {
   display: block;
-  height: auto;
+  min-height: 0;
   margin-bottom: var(--space-2);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: 19px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
 }
 
 .cc-level--flat .cc-level__dot {
@@ -582,7 +571,7 @@
 
 /* «Читать далее» между диапазоном клиента и остальными: разделитель, кнопка, свёрнутые диапазоны */
 .cc-more {
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-4);
   border-top: 1px solid var(--color-divider);
 }
 
@@ -618,12 +607,6 @@
   border-bottom: 1px solid var(--color-divider);
 }
 
-/* С меткой «Шкала Hs» шапка 46: метка 24 с полями 11 */
-.blank-card__head:has(.cc-badge) {
-  padding-top: 11px;
-  padding-bottom: 11px;
-}
-
 /* Подпись оси под каждым столбцом общей диаграммы: отступ 8 */
 .cc-chart--flat .cc-row > .cc-axis--flat {
   margin-top: var(--space-2);
@@ -631,5 +614,5 @@
 }
 
 .cc-chart--flat .cc-row > .cc-axis--flat .cc-axis__scale {
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-4);
 }

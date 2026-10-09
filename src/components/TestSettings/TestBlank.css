@@ -1,10 +1,9 @@
-/* Карточка бланка: заголовок 46 с кнопкой «свернуть», разделитель 1, содержимое с отступами 12 */
+/* Карточка бланка: заголовок 52 с кнопкой «свернуть», разделитель 1, содержимое с полями 16 */
 .blank-card {
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
 .blank-card__head {
@@ -13,24 +12,24 @@
   justify-content: space-between;
   gap: var(--space-3);
   width: 100%;
-  min-height: 46px;
-  padding: 12px var(--space-3);
+  min-height: 52px;
+  padding: 0 var(--space-4);
   text-align: left;
 }
-
 
 .blank-card__title {
   flex: 1;
   min-width: 0;
   font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.2;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .blank-card__chevron {
   flex-shrink: 0;
-  color: var(--color-text-primary);
-  font-size: 22px;
+  color: var(--color-text-caption);
+  font-size: var(--size-icon-sm);
   transition: transform 0.25s ease;
 }
 
@@ -72,22 +71,22 @@
   }
 }
 
-/* Правила: тот же текст 18/24 и отступы 12, что у вопросов; номер выступает слева, между пунктами 12 */
+/* Правила: текст 15/22, поля 16, между пунктами 12; номер выступает слева */
 .blank-rules {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   margin: 0;
-  padding: var(--space-3);
+  padding: var(--space-4);
   counter-reset: rule;
   list-style: none;
-  font-size: var(--font-size-lg);
-  line-height: 24px;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
 }
 
 .blank-rules li {
   position: relative;
-  padding-left: 28px;
+  padding-left: var(--space-6);
   counter-increment: rule;
 }
 
@@ -95,12 +94,14 @@
   content: counter(rule) '.';
   position: absolute;
   left: 0;
-  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Единственное правило — обычный абзац с теми же отступами, без номера */
 .blank-rules--single {
-  padding: var(--space-3);
+  display: block;
 }
 
 .blank-questions {
@@ -109,30 +110,30 @@
   list-style: none;
 }
 
-/* Пояснение к группе вопросов («Сейчас, в данный момент:», «В последнее время:»): плашка 16/20 с отступами 12, у всех групп одинаковая */
+/* Пояснение к группе вопросов («Сейчас, в данный момент:», «В последнее время:»): плашка с полями 12 / 16, у всех групп одинаковая */
 .blank-heading {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-divider);
-  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  background: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: 20px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
 }
 
 .blank-heading:first-child {
   border-top: 0;
 }
 
-/* Вопрос: отступы 12, текст 18/24, между текстом и ответами 12; вопросы разделены линией на всю ширину.
+/* Вопрос: поля 16, формулировка 16/22, между ней и ответами 12; вопросы разделены линией на всю ширину.
    Те же размеры в просмотре бланка, прохождении списком и прохождении по одному вопросу */
 .blank-question {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: var(--space-4);
   font-size: var(--font-size-lg);
-  line-height: 24px;
+  line-height: var(--line-height-lg);
 }
 
 .blank-question + .blank-question {
@@ -154,7 +155,7 @@
 }
 
 .blank-question__prompt strong {
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Варианты ответов: друг под другом, между ними 8 */
@@ -167,15 +168,17 @@
   list-style: none;
 }
 
-/* Вариант ответа: радиокнопка 20 слева, текст рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем */
+/* Вариант ответа: радиокнопка 20 слева, текст 15/22 рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем */
 .blank-answer {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: var(--space-2);
-  padding: 11px;
-  border: 1px solid var(--color-divider);
-  border-radius: 12px;
+  gap: var(--space-3);
+  padding: 10px var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -205,6 +208,7 @@
   opacity: 0;
 }
 
+/* Кружок 20 стоит по центру первой строки текста 22 */
 .blank-answer__radio {
   display: flex;
   flex-shrink: 0;
@@ -212,7 +216,8 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  border: 1.5px solid var(--color-text-caption);
+  margin-top: 1px;
+  border: 1.5px solid var(--color-text-placeholder);
   border-radius: var(--radius-full);
   transition: border-color 0.15s ease;
 }
@@ -240,12 +245,9 @@
   outline-offset: 2px;
 }
 
-/* Текст варианта 16/20: крупнее только сама формулировка вопроса */
 .blank-answer__text {
   flex: 1;
   min-width: 0;
-  font-size: var(--font-size-md);
-  line-height: 20px;
 }
 
 /* Пара утверждений (5PFQ): верхнее утверждение, пять значений −2 … 2 в ряд, нижнее; промежутки 12, как у остальных вопросов */
@@ -269,9 +271,9 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: 11px 0 10px;
-  border: 1px solid var(--color-divider);
-  border-radius: 12px;
+  padding: 10px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -290,8 +292,8 @@
 .blank-scale__value {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  line-height: 16px;
   font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
 }
 
 .blank-scale__item:has(.blank-answer__input:checked) .blank-scale__value {
@@ -311,5 +313,5 @@
 /* При переходе по оглавлению блок и вопрос встают с отступом от шапки */
 .blank-card[id],
 .blank-question[id] {
-  scroll-margin-top: 11px;
+  scroll-margin-top: var(--space-3);
 }

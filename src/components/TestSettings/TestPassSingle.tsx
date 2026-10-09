@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { IconTestBlank, IconTestChevron } from '../icons';
+import { IconTestChevron } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
 import { useSheet } from './TestActions';
 import { BlankQuestionBody } from './TestBlank';
@@ -110,7 +110,6 @@ export function JumpSheet({ total, answers, current, rulesLabel, onPick, onRules
           <ul className="ts-card">
             <li>
               <button type="button" className="ts-row ts-row--link pass-jump__rules" onClick={onRules}>
-                <IconTestBlank className="ts-row__icon" aria-hidden="true" />
                 <span className="ts-row__link">{rulesLabel}</span>
                 <IconTestChevron className="ts-row__chevron" aria-hidden="true" />
               </button>

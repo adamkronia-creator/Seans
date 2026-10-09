@@ -1,21 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
-  IconTestAge,
-  IconTestBlank,
-  IconTestBlind,
   IconTestChevron,
   IconTestChevronDown,
-  IconTestConclusion,
-  IconTestMessage,
-  IconTestGender,
-  IconTestHide,
   IconTestMic,
-  IconTestQuestions,
-  IconTestSaveBlank,
-  IconTestScalesExtra,
-  IconTestScalesMain,
-  IconTestScoring,
-  IconTestTime,
   IconTestViewList,
   IconTestViewSingle,
 } from '../icons';
@@ -40,8 +27,8 @@ import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
 
-/** Высота свёрнутого описания: 6 строк по 19 и промежуток между абзацами 12, одинаково у всех тестов */
-const DESC_COLLAPSED = 6 * 19 + 12;
+/** Высота свёрнутого описания: 6 строк по 22 и промежуток между абзацами 12, одинаково у всех тестов */
+const DESC_COLLAPSED = 6 * 22 + 12;
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -62,12 +49,26 @@ interface TestSettingsProps {
   onBack: () => void;
 }
 
-/** Строка карточки: иконка 24, подпись и значение или переключатель справа */
-function Row({ Icon, label, children }: { Icon: Svg; label: string; children?: React.ReactNode }) {
+/** Строка карточки: подпись и значение или переключатель справа; значок бывает только у способа показа вопросов */
+function Row({
+  Icon,
+  label,
+  value,
+  info,
+  children,
+}: {
+  Icon?: Svg;
+  label: string;
+  /** Значение справа от подписи: строка превращается в «сведение» с тихой подписью */
+  value?: string | number;
+  info?: boolean;
+  children?: React.ReactNode;
+}) {
   return (
-    <li className="ts-row">
-      <Icon className="ts-row__icon" />
+    <li className={`ts-row${info || value !== undefined ? ' ts-row--info' : ''}`}>
+      {Icon && <Icon className="ts-row__icon" />}
       <span className="ts-row__label">{label}</span>
+      {value !== undefined && <span className="ts-row__value">{value}</span>}
       {children}
     </li>
   );
@@ -129,7 +130,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
   const descRef = useRef<HTMLDivElement>(null);
-  const descLong = descFull > DESC_COLLAPSED + 19;
+  const descLong = descFull > DESC_COLLAPSED + 22;
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
@@ -293,7 +294,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </CollapseCard>
 
         {(data.scales || blank) && (
-          <ul className="ts-card ts-card--wide-dividers">
+          <ul className="ts-card">
             <li
               className="ts-row ts-row--link"
               role="button"
@@ -301,7 +302,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               onClick={openBlank}
               onKeyDown={(e) => e.key === 'Enter' && openBlank()}
             >
-              <IconTestBlank className="ts-row__icon" />
               <span className="ts-row__link">Бланк тестирования</span>
               <IconTestChevron className="ts-row__chevron" />
             </li>
@@ -313,7 +313,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 onClick={openConclusion}
                 onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
               >
-                <IconTestConclusion className="ts-row__icon" />
                 <span className="ts-row__link">Пример заключения</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
@@ -325,39 +324,31 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           <CollapseCard title="Тестовая информация">
             <ul className="ts-rows">
               {data.questions !== undefined && (
-                <Row Icon={IconTestQuestions} label="Количество вопросов">
-                  <span className="ts-row__value">{data.questions}</span>
-                </Row>
+                <Row label="Количество вопросов" value={data.questions} />
               )}
               {data.duration && (
-                <Row Icon={IconTestTime} label="Время выполнения">
-                  <span className="ts-row__value">{data.duration}</span>
-                </Row>
+                <Row label="Время выполнения" value={data.duration} />
               )}
               {data.age && (
-                <Row Icon={IconTestAge} label="Возраст">
-                  <span className="ts-row__value">{data.age}</span>
-                </Row>
+                <Row label="Возраст" value={data.age} />
               )}
               {data.forms && (
-                <Row Icon={IconTestGender} label="Форма бланка">
-                  {data.forms.length === 1 ? (
-                    <span className="ts-row__value">{data.forms[0]}</span>
-                  ) : (
-                  <label className="ts-select">
-                    <span className="ts-select__value">{form}</span>
-                    <IconTestChevronDown className="ts-select__chevron" />
-                    <select
-                      className="ts-select__native"
-                      aria-label="Форма бланка"
-                      value={form}
-                      onChange={(e) => setForm(e.target.value)}
-                    >
-                      {data.forms.map((f) => (
-                        <option key={f}>{f}</option>
-                      ))}
-                    </select>
-                  </label>
+                <Row label="Форма бланка" info value={data.forms.length === 1 ? data.forms[0] : undefined}>
+                  {data.forms.length > 1 && (
+                    <label className="ts-select">
+                      <span className="ts-select__value">{form}</span>
+                      <IconTestChevronDown className="ts-select__chevron" />
+                      <select
+                        className="ts-select__native"
+                        aria-label="Форма бланка"
+                        value={form}
+                        onChange={(e) => setForm(e.target.value)}
+                      >
+                        {data.forms.map((f) => (
+                          <option key={f}>{f}</option>
+                        ))}
+                      </select>
+                    </label>
                   )}
                 </Row>
               )}
@@ -369,7 +360,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           <CollapseCard title="Шкалы и баллы">
             <ul className="ts-rows">
               <li className="ts-row ts-row--top">
-                <IconTestScalesMain className="ts-row__icon" />
                 <div className="ts-scale">
                   <p className="ts-scale__title">Основные шкалы:</p>
                   <ul className="ts-scale__list">
@@ -384,7 +374,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               </li>
               {data.scales.extra.length > 0 && (
               <li className="ts-row ts-row--top">
-                <IconTestScalesExtra className="ts-row__icon" />
                 <div className="ts-scale">
                   <p className="ts-scale__title">Дополнительные шкалы:</p>
                   <ul className="ts-scale__list">
@@ -407,7 +396,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 ([items, title]) =>
                   items && (
                     <li key={title} className="ts-row ts-row--top">
-                      <IconTestScoring className="ts-row__icon" />
                       <div className="ts-scale">
                         <p className="ts-scale__title">{title}</p>
                         <ul className="ts-scale__list">
@@ -428,13 +416,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <CollapseCard title="Особенности тестирования">
           <ul className="ts-rows">
-            <Row Icon={IconTestBlind} label="Слепое тестирование">
+            <Row label="Слепое тестирование">
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
-            <Row Icon={IconTestHide} label="Скрыть заключение">
+            <Row label="Скрыть заключение">
               <Switch checked={hideConclusion} onChange={setHideConclusion} label="Скрыть заключение" />
             </Row>
-            <Row Icon={IconTestSaveBlank} label="Сохранить бланк">
+            <Row label="Сохранить бланк">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
             </Row>
           </ul>
@@ -462,7 +450,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
-            <Row Icon={IconTestMessage} label="Сообщение для клиента">
+            <Row label="Сообщение для клиента">
               <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>
@@ -492,7 +480,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </>
       )}
 
-      {toast && <Toast text={toast} />}
+      {toast && <Toast text={toast} className={view === 'settings' ? 'test-settings__toast--cta' : undefined} />}
 
       {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
       {(sheet === 'one' || sheet === 'many') && (

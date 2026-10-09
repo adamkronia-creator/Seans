@@ -5,19 +5,16 @@
   min-height: 0;
 }
 
-/* Шапка как в чате, без вкладок: сверху 12, строка 40, снизу 8, разделитель */
+/* Шапка как у чата, без вкладок: строка 56, кнопки 40, значок теста 36, снизу разделитель */
 .test-settings__header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) var(--space-2);
+  gap: var(--space-1);
+  min-height: 56px;
+  padding: 0 var(--space-2);
   border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
-}
-
-.test-settings__button--muted {
-  color: var(--color-text-caption);
 }
 
 .test-settings__button {
@@ -30,12 +27,16 @@
   font-size: var(--size-icon);
 }
 
-/* Картинка 36 в рамке 40, gap 8, имя 16/16 medium и статус 12/12 через 4 */
+.test-settings__button--muted {
+  color: var(--color-text-caption);
+}
+
+/* Значок 36, gap 12, имя и раздел */
 .test-settings__peer {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -43,24 +44,22 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  margin: 2px;
 }
 
 .test-settings__who {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-1);
   justify-content: center;
-  height: 32px;
   min-width: 0;
 }
 
 .test-settings__name {
   overflow: hidden;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  letter-spacing: var(--letter-spacing-title);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -68,32 +67,34 @@
 .test-settings__status {
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  line-height: 12px;
+  line-height: var(--line-height-xs);
 }
 
-/* Карточки: отступы от шапки 11 (вместе с разделителем 12) и по бокам 16, между карточками 12 */
+/* Карточки: от шапки и по бокам 16 (сверху 12), между карточками 12 */
 .test-settings__scroll {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: var(--space-3);
   min-height: 0;
-  padding: 11px var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
+/* Карточка: белая, радиус 16, без тени; содержимое с полями 16, как у заголовка карточки бланка */
 .ts-card {
   flex-shrink: 0;
-  border-radius: 12px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
-/* Описание внутри карточки: отступы 12, текст 16/19 (120% от 16, округлено до целых, как в Figma) */
+/* Описание: поля 12 / 16, текст 15/22 */
 .ts-desc {
-  padding: var(--space-3);
+  position: relative;
+  padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-md);
-  line-height: 19px;
+  line-height: var(--line-height-md);
 }
 
 /* Между абзацами промежуток 12, а не пустая строка; переносы внутри абзаца сохраняются */
@@ -106,7 +107,7 @@
   white-space: pre-line;
 }
 
-/* Список: без отступа слева, точка 6 в начале строки, перенос идёт под точкой (как в макете) */
+/* Список: без отступа слева, точка 6 в начале строки, перенос идёт под точкой */
 .ts-card__list {
   margin: 0;
   padding-left: 0;
@@ -118,7 +119,7 @@
   display: inline-block;
   width: 6px;
   height: 6px;
-  margin: 0 7px 0 1.5px;
+  margin: 0 8px 0 2px;
   border-radius: 50%;
   background: currentColor;
   vertical-align: middle;
@@ -137,19 +138,20 @@
   margin-top: var(--space-3);
 }
 
-.ts-desc {
-  position: relative;
-}
-
 .ts-desc__body {
   overflow: hidden;
   transition: max-height 0.25s ease;
 }
 
-/* Текст → 12 → разделитель по ширине поля текста → 12 → кнопка → 12 до конца блока */
+/* Текст → 12 → разделитель по ширине текста → 12 → кнопка → 12 до конца блока */
 .ts-desc__clip {
   position: relative;
   padding-bottom: var(--space-3);
+}
+
+/* Короткое описание без кнопки: нижний отступ даёт сама карточка */
+.ts-desc:not(:has(.ts-desc__rule)) .ts-desc__clip {
+  padding-bottom: 0;
 }
 
 /* Мягкий свет: последние строки свёрнутого текста уходят в белый и сходят на нет у разделителя */
@@ -158,7 +160,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  height: 76px;
+  height: 72px;
   /* у нижней строки текста (12 над разделителем) белого 65%, чисто белый только последние 2 px до разделителя */
   background: linear-gradient(
     to bottom,
@@ -189,9 +191,9 @@
   margin: 4px auto -8px;
   padding: 8px 24px;
   color: var(--color-accent);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 14px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
 }
 
 .ts-desc strong {
@@ -205,32 +207,24 @@
   list-style: none;
 }
 
-/* Строка: внутри 24, отступы 12, разделитель 1 между строками (на всю ширину или с отступом 12) */
+/* Строка: высота не меньше 48, поля 16, разделитель от поля до правого края */
 .ts-row {
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-height: 48px;
-  padding: 0 var(--space-3);
-}
-
-.ts-row + .ts-row {
-  margin-top: 1px;
+  padding: var(--space-2) var(--space-4);
 }
 
 .ts-row + .ts-row::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: 0;
   right: 0;
-  left: 40px;
+  left: var(--space-4);
   height: 1px;
   background: var(--color-divider);
-}
-
-.ts-card--wide-dividers .ts-row + .ts-row::before {
-  left: 0;
 }
 
 .ts-row--top {
@@ -238,20 +232,29 @@
   padding-block: var(--space-3);
 }
 
+/* Значок строки остался только у способа показа вопросов: он показывает, как выглядит вариант */
 .ts-row__icon {
   flex-shrink: 0;
   color: var(--color-accent);
-  font-size: var(--size-icon);
+  font-size: var(--size-icon-sm);
 }
 
 .ts-row__label {
   flex: 1;
   min-width: 0;
-  line-height: 20px;
+  line-height: var(--line-height-md);
+}
+
+/* Сведения о тесте: подпись тише, значение справа основным цветом, как в «Общей информации» кейса */
+.ts-row--info .ts-row__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }
 
 .ts-row__value {
-  line-height: 20px;
+  max-width: 60%;
+  line-height: var(--line-height-md);
   text-align: right;
 }
 
@@ -259,19 +262,20 @@
   flex: 1;
   color: var(--color-accent);
   font-weight: var(--font-weight-medium);
-  line-height: 20px;
+  line-height: var(--line-height-md);
 }
 
 .ts-row__chevron {
   flex-shrink: 0;
-  font-size: 20px;
+  color: var(--color-text-placeholder);
+  font-size: var(--size-icon-sm);
 }
 
 .ts-row--link {
   cursor: pointer;
 }
 
-/* Шкалы: заголовок 16/19, пункты 14/17 через 4 */
+/* Шкалы: заголовок 15/22 жирным, пункты 14/20 через 4 */
 .ts-scale {
   display: flex;
   flex: 1;
@@ -281,7 +285,8 @@
 }
 
 .ts-scale__title {
-  line-height: 19px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
 }
 
 .ts-scale__list {
@@ -289,18 +294,18 @@
   flex-direction: column;
   gap: var(--space-1);
   font-size: var(--font-size-sm);
-  line-height: 17px;
+  line-height: var(--line-height-sm);
 }
 
 .ts-scale__list li {
   display: flex;
   align-items: flex-start; /* длинные названия переносятся, точка остаётся у первой строки */
-  gap: var(--space-1);
+  gap: 6px;
 }
 
 /* Маркер: рамка 8, чёрная точка 6, цветные 8 */
 .ts-scale__list .ts-dot {
-  margin-top: 4.5px; /* по центру первой строки 17px */
+  margin-top: 6px; /* по центру первой строки 20px */
 }
 
 .ts-dot {
@@ -336,25 +341,24 @@
   background: var(--color-darkred);
 }
 
-/* Выбор формы бланка: синяя кнопка 28 с радиусом 8 и обводкой 1 */
+/* Выбор формы бланка: тихая кнопка 32 на подложке акцента */
 .ts-select {
   position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 4px;
-  height: 28px;
-  padding: 0 6px 0 12px;
-  border-radius: 8px;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
-  color: var(--color-accent-on);
+  gap: var(--space-1);
+  height: 32px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
 }
 
 .ts-select__value {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 17px;
+  line-height: var(--line-height-sm);
 }
 
 .ts-select__chevron {
@@ -370,30 +374,15 @@
   cursor: pointer;
 }
 
-/* Подпись над полем: 14/14, слева 12 по тексту в карточке, до карточки 4 */
-.ts-field {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.ts-field__label {
-  padding-left: var(--space-3);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  line-height: 14px;
-}
-
-/* Сообщение: текст 16/19, снизу строка со счётчиком и микрофоном через 12 */
+/* Сообщение: текст 15/22, снизу строка со счётчиком и микрофоном */
 .ts-message {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
 }
 
 .ts-message__input {
   display: block;
   width: 100%;
-  min-height: 19px;
+  min-height: 22px;
   padding: 0;
   border: 0;
   outline: 0;
@@ -402,7 +391,7 @@
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: var(--font-size-md);
-  line-height: 19px;
+  line-height: var(--line-height-md);
   resize: none;
   caret-color: var(--color-accent);
 }
@@ -411,23 +400,26 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-1);
-  height: 16px;
-  margin-top: var(--space-3);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
   color: var(--color-text-caption);
 }
 
 .ts-message__count {
   font-size: var(--font-size-xs);
-  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-xs);
 }
 
+/* Область нажатия шире значка на 6 со всех сторон, видимый отступ остаётся прежним */
 .ts-message__mic {
   display: flex;
-  font-size: 16px;
+  margin: -6px;
+  padding: 6px;
+  font-size: var(--size-icon-sm);
 }
 
-/* Кнопка над нижней панелью: белая полоса с разделителем, кнопка 40, как кнопки панелей */
+/* Кнопка над нижней панелью: белая полоса с разделителем, кнопка 44 */
 .test-settings__cta {
   flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
@@ -437,25 +429,30 @@
 
 .test-settings__cta-button {
   width: 100%;
-  height: 40px;
-  border-radius: var(--radius-pill);
+  height: 44px;
+  border-radius: var(--radius-md);
   background: var(--color-accent);
   color: var(--color-accent-on);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
+/* Подсказка внизу: тёмная плашка с белым текстом 14/20. Стоит над нижней панелью разделов, а там, где есть кнопка, — над кнопкой (61: 44 + поля 8 + линия 1) */
 .test-settings__toast {
   position: absolute;
   right: var(--space-4);
-  bottom: 64px;
+  bottom: calc(var(--size-tab) + env(safe-area-inset-bottom) + var(--space-3));
   left: var(--space-4);
   z-index: 10;
-  padding: 10px var(--space-3);
-  border-radius: 12px;
-  background: rgb(30 30 30 / 92%);
-  color: #fff;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgb(20 24 31 / 92%);
+  color: var(--color-accent-on);
   font-size: var(--font-size-sm);
-  line-height: 17px;
+  line-height: var(--line-height-sm);
   text-align: center;
+}
+
+.test-settings__toast--cta {
+  bottom: calc(var(--size-tab) + env(safe-area-inset-bottom) + 61px + var(--space-2));
 }

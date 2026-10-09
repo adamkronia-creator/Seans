@@ -10,7 +10,6 @@ export { default as IconSearch } from '../../assets/icons/search.svg?react';
 export { default as IconBell } from '../../assets/icons/notifications.svg?react';
 export { default as IconFavorites } from '../../assets/icons/favorites.svg?react';
 export { default as IconBack } from '../../assets/icons/back.svg?react';
-export { default as IconChevronRight } from '../../assets/icons/chevron-right.svg?react';
 // Значок приглашения (лента истории)
 export { default as IconEventInvite } from '../../assets/icons/event-invite.svg?react';
 
@@ -96,7 +95,6 @@ export { default as IconCaseHeadChecklist } from '../../assets/icons/case/head-c
 export { default as IconCaseHeadFlame } from '../../assets/icons/case/head-flame.svg?react';
 export { default as IconCaseHeadBriefcase } from '../../assets/icons/case/head-briefcase.svg?react';
 export { default as IconCaseHeadBookmark } from '../../assets/icons/case/head-bookmark.svg?react';
-export { default as IconCaseCalendar } from '../../assets/icons/case/row-calendar.svg?react';
 
 // История взаимодействия
 export { default as IconTlNote } from '../../assets/icons/history/tl-note.svg?react';
@@ -114,18 +112,6 @@ export { default as IconFilterRecent } from '../../assets/icons/library/filter-r
 export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
 
 // Настройки теста
-export { default as IconTestBlank } from '../../assets/icons/test/blank.svg?react';
-export { default as IconTestConclusion } from '../../assets/icons/test/conclusion.svg?react';
-export { default as IconTestScalesMain } from '../../assets/icons/test/scales-main.svg?react';
-export { default as IconTestScalesExtra } from '../../assets/icons/test/scales-extra.svg?react';
-export { default as IconTestScoring } from '../../assets/icons/test/scoring.svg?react';
-export { default as IconTestQuestions } from '../../assets/icons/test/questions.svg?react';
-export { default as IconTestTime } from '../../assets/icons/test/time.svg?react';
-export { default as IconTestAge } from '../../assets/icons/test/age.svg?react';
-export { default as IconTestGender } from '../../assets/icons/test/gender.svg?react';
-export { default as IconTestBlind } from '../../assets/icons/test/blind.svg?react';
-export { default as IconTestHide } from '../../assets/icons/test/hide.svg?react';
-export { default as IconTestSaveBlank } from '../../assets/icons/test/save-blank.svg?react';
 export { default as IconTestViewList } from '../../assets/icons/test/view-list.svg?react';
 export { default as IconTestViewSingle } from '../../assets/icons/test/view-single.svg?react';
 export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
@@ -152,8 +138,5 @@ export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?rea
 export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
 export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
 export { default as IconTestChevronUp } from '../../assets/icons/test/chevron-up.svg?react';
-export { default as IconTestMessage } from '../../assets/icons/test/message.svg?react';
-export { default as IconTestTimeStart } from '../../assets/icons/test/time-start.svg?react';
 export { default as IconTestReportMain } from '../../assets/icons/test/report-main.svg?react';
 export { default as IconTestReportExtra } from '../../assets/icons/test/report-extra.svg?react';
-export { default as IconTestScaleChart } from '../../assets/icons/test/scale-chart.svg?react';
