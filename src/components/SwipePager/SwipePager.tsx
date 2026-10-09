@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
+import { startTransition, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { canScrollSideways, elastic, flingScroll, guardClick, reducedMotion, runSpring, SWIPE_SLOP, VelocityTracker } from '../../utils/swipe';
 import './SwipePager.css';
 
@@ -51,8 +52,10 @@ interface Gesture {
 
 /**
  * Страницы в ряд, которые листаются пальцем и идут за ним: чат переключает так разделы
- * (сообщения, тесты, задания, кейс, история). Все страницы остаются в разметке, поэтому у каждой
+ * (сообщения, тесты, задания, кейс, история). Однажды показанная страница остаётся в разметке, поэтому у неё
  * сохраняются прокрутка и введённое; неактивные недоступны для нажатий и клавиатуры (inert).
+ * Рисуются страницы не все сразу (открытие чата стало бы заметно дольше): сначала текущая, остальные дорисовываются
+ * в простое, начиная с ближайших, а если жест тянет к ещё не нарисованной, она рисуется в тот же миг.
  *
  * Как договариваются жесты:
  *  - вертикальная прокрутка остаётся за браузером (touch-action: pan-y), пейджер берёт только горизонтальное движение;
@@ -71,9 +74,54 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, className 
   const stopSpring = useRef<(() => void) | null>(null);
   const live = useRef({ index, count: pages.length, onIndexChange, onPosition });
 
+  /** Какие страницы уже нарисованы (текущая рисуется всегда) */
+  const [loaded, setLoaded] = useState<ReadonlySet<number>>(() => new Set([index]));
+  const loadedNow = useRef(loaded);
+
   useLayoutEffect(() => {
     live.current = { index, count: pages.length, onIndexChange, onPosition };
+    loadedNow.current = loaded;
   });
+
+  // Страница, на которую пришли, остаётся нарисованной и после ухода: прокрутка и введённое не теряются
+  useEffect(() => {
+    setLoaded((prev) => (prev.has(index) ? prev : new Set(prev).add(index)));
+  }, [index]);
+
+  // Остальные дорисовываются по одной в простое, сначала ближайшие. Пока страницы движутся или их тянут, ждём
+  useEffect(() => {
+    let next = -1;
+    for (let i = 0; i < pages.length; i += 1) {
+      if (!loaded.has(i) && i !== index && (next < 0 || Math.abs(i - index) < Math.abs(next - index))) next = i;
+    }
+    if (next < 0) return;
+    let timer = 0;
+    let idle = 0;
+    const load = () => {
+      if (document.body.classList.contains('is-paging') || document.documentElement.classList.contains('is-swiping')) {
+        timer = window.setTimeout(load, 300);
+        return;
+      }
+      startTransition(() => setLoaded((prev) => (prev.has(next) ? prev : new Set(prev).add(next))));
+    };
+    const whenIdle = () => {
+      // У Safari requestIdleCallback нет: там просто чуть позже
+      if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(load, { timeout: 1500 });
+      else timer = window.setTimeout(load, 50);
+    };
+    // Первая — когда уже закончилась анимация открытия и палец мог начать листать; дальше с небольшими паузами
+    timer = window.setTimeout(whenIdle, loaded.size <= 1 ? 600 : 200);
+    return () => {
+      window.clearTimeout(timer);
+      if (idle) window.cancelIdleCallback?.(idle);
+    };
+  }, [loaded, index, pages.length]);
+
+  /** Нарисовать страницу немедленно: к ней уже тянут палец, а она ещё не готова */
+  const ensureLoaded = useCallback((i: number) => {
+    if (i < 0 || i >= live.current.count || i === live.current.index || loadedNow.current.has(i)) return;
+    flushSync(() => setLoaded((prev) => (prev.has(i) ? prev : new Set(prev).add(i))));
+  }, []);
 
   const apply = useCallback((value: number) => {
     position.current = value;
@@ -262,6 +310,8 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, className 
           stopSpring.current?.(); // схватили страницы на ходу: дальше ведёт палец
           stopSpring.current = null;
           g.base = position.current;
+          // Страница, к которой тянут, должна быть готова, а не появляться пустой
+          ensureLoaded(dx < 0 ? Math.floor(g.base) + 1 : Math.ceil(g.base) - 1);
         }
         g.anchorX = e.clientX;
         claim(g, e);
@@ -345,14 +395,14 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, className 
       }
       stopFling?.();
     };
-  }, [apply, settle]);
+  }, [apply, settle, ensureLoaded]);
 
   return (
     <div ref={viewport} className={`swipe-pager${className ? ` ${className}` : ''}`} data-page={index}>
       <div ref={track} className="swipe-pager__track">
-        {pages.map((page) => (
+        {pages.map((page, i) => (
           <div key={page.key} className="swipe-pager__page">
-            {page.node}
+            {i === index || loaded.has(i) ? page.node : null}
           </div>
         ))}
       </div>
