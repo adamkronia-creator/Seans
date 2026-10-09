@@ -6,7 +6,7 @@ import {
   pickableStarts,
   problemWith,
   type Appointment,
-  type Place,
+  type Info,
   type ProposalInput,
   type Slot,
 } from '../../data/appointments';
@@ -15,7 +15,7 @@ import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
-import { IconExternal } from './BookingIcons';
+import { IconBookingExternal } from '../icons';
 import { MAP_LINKS } from './geocode';
 import './BookingSheets.css';
 
@@ -354,18 +354,19 @@ export function ReasonSheet({ title, text, placeholder, back, confirm, onConfirm
   );
 }
 
-// ---------------------------------------------------------------- место приема
+// ---------------------------------------------------------------- информация о приеме
 
-/** Адрес, как пройти и что принести */
-export function PlaceSheet({ place, onSave, onClose }: { place: Place; onSave: (place: Place) => void; onClose: () => void }) {
+/** Адрес, как пройти, что принести и оплата сеанса */
+export function InfoSheet({ info, onSave, onClose }: { info: Info; onSave: (info: Info) => void; onClose: () => void }) {
   const uid = useId();
-  const [address, setAddress] = useState(place.address);
-  const [howTo, setHowTo] = useState(place.howTo);
-  const [bring, setBring] = useState(place.bring);
+  const [address, setAddress] = useState(info.address);
+  const [howTo, setHowTo] = useState(info.howTo);
+  const [bring, setBring] = useState(info.bring);
+  const [payment, setPayment] = useState(info.payment);
   const canSave = address.trim().length > 0;
   return (
     <Frame
-      title="Место приема"
+      title="Информация о приеме"
       onClose={onClose}
       footer={
         <>
@@ -376,7 +377,7 @@ export function PlaceSheet({ place, onSave, onClose }: { place: Place; onSave: (
             type="button"
             className="sheet__button sheet__button--primary"
             disabled={!canSave}
-            onClick={() => onSave({ address, howTo, bring })}
+            onClick={() => onSave({ address, howTo, bring, payment })}
           >
             Сохранить
           </button>
@@ -426,6 +427,19 @@ export function PlaceSheet({ place, onSave, onClose }: { place: Place; onSave: (
           placeholder="Документы, дневник, сменная обувь"
         />
       </section>
+      <section className="sheet__card bk-card">
+        <label className="bk-label" htmlFor={`${uid}-payment`}>
+          Оплата сеанса
+        </label>
+        <AutoTextarea
+          id={`${uid}-payment`}
+          className="bk-textarea"
+          rows={2}
+          value={payment}
+          onChange={setPayment}
+          placeholder="Стоимость и как заплатить: наличными, переводом"
+        />
+      </section>
     </Frame>
   );
 }
@@ -450,7 +464,7 @@ export function MapsSheet({ address, onClose }: { address: string; onClose: () =
           <li key={id}>
             <a className="bk-link" href={url(address)} target="_blank" rel="noopener noreferrer" onClick={onClose}>
               <span>{name}</span>
-              <IconExternal className="bk-link__icon" />
+              <IconBookingExternal className="bk-link__icon" />
             </a>
           </li>
         ))}

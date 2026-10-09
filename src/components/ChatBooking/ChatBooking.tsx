@@ -6,7 +6,7 @@ import {
   declineProposal,
   editProposal,
   proposeTime,
-  savePlace,
+  saveInfo,
   useBooking,
   viewOf,
   withdrawProposal,
@@ -15,14 +15,14 @@ import {
 import { useNow } from '../../utils/useNow';
 import { Toast } from '../Toast/Toast';
 import { AppointmentCard, HistoryList, type CardAction } from './AppointmentCard';
-import { IconCalendarEmpty } from './BookingIcons';
-import { MapsSheet, newDraft, PlaceSheet, ProposeSheet, RangeSheet, ReasonSheet, rescheduleDraft } from './BookingSheets';
+import { IconBookingCalendar } from '../icons';
+import { InfoSheet, MapsSheet, newDraft, ProposeSheet, RangeSheet, ReasonSheet, rescheduleDraft } from './BookingSheets';
 import { slotShort } from './bookingText';
-import { PlaceCard } from './PlaceCard';
+import { InfoCard } from './InfoCard';
 import './ChatBooking.css';
 
 type SheetState =
-  | { kind: 'propose' | 'place' | 'maps' }
+  | { kind: 'propose' | 'info' | 'maps' }
   | { kind: 'reschedule' | 'counter' | 'edit' | 'range' | 'decline' | 'cancel'; a: Appointment };
 
 /** Сколько записей истории видно, пока список не раскрыт */
@@ -69,11 +69,11 @@ interface ChatBookingProps {
 
 /**
  * Вкладка «Запись на прием» в открытом чате. Любая сторона предлагает время (точное или промежуток), другая соглашается,
- * отказывается или отвечает своим временем; подтвержденный прием можно перенести или отменить. Ниже место приема:
- * адрес с картой, как пройти и что принести.
+ * отказывается или отвечает своим временем; подтвержденный прием можно перенести или отменить. Ниже информация о приеме:
+ * адрес с картой, как пройти, что принести и оплата сеанса.
  */
 export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
-  const { items, place } = useBooking();
+  const { items, info } = useBooking();
   const now = useNow();
   const view = useMemo(() => viewOf(items, chatId, now), [items, chatId, now]);
   const [sheet, setSheet] = useState<SheetState | null>(null);
@@ -112,7 +112,7 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
 
   const copyAddress = async () => {
     try {
-      await navigator.clipboard.writeText(place.address);
+      await navigator.clipboard.writeText(info.address);
       say('Адрес скопирован');
     } catch {
       say('Не удалось скопировать');
@@ -127,7 +127,7 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
         {nothingPlanned && (
           <div className="booking__empty">
             <span className="booking__empty-icon">
-              <IconCalendarEmpty />
+              <IconBookingCalendar />
             </span>
             <p className="booking__empty-title">{view.past.length > 0 ? 'Ближайших приемов нет' : 'Приема пока нет'}</p>
             <p className="booking__empty-text">Предложите время или дождитесь предложения от собеседника</p>
@@ -162,8 +162,8 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
           </Section>
         )}
 
-        <Section title="Место приема" action={{ label: 'Изменить', onClick: () => setSheet({ kind: 'place' }) }}>
-          <PlaceCard place={place} onCopy={() => void copyAddress()} onMaps={() => setSheet({ kind: 'maps' })} />
+        <Section title="Информация о приеме" action={{ label: 'Изменить', onClick: () => setSheet({ kind: 'info' }) }}>
+          <InfoCard info={info} onCopy={() => void copyAddress()} onMaps={() => setSheet({ kind: 'maps' })} />
         </Section>
 
         {view.past.length > 0 && (
@@ -293,18 +293,18 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
           onClose={closeSheet}
         />
       )}
-      {sheet?.kind === 'place' && (
-        <PlaceSheet
-          place={place}
+      {sheet?.kind === 'info' && (
+        <InfoSheet
+          info={info}
           onSave={(next) => {
-            savePlace(next);
+            saveInfo(next);
             closeSheet();
-            say('Место приема сохранено');
+            say('Информация о приеме сохранена');
           }}
           onClose={closeSheet}
         />
       )}
-      {sheet?.kind === 'maps' && <MapsSheet address={place.address} onClose={closeSheet} />}
+      {sheet?.kind === 'maps' && <MapsSheet address={info.address} onClose={closeSheet} />}
     </div>
   );
 }

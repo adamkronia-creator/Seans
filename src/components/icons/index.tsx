@@ -67,6 +67,15 @@ export { default as IconMicrophone } from '../../assets/icons/chat/microphone.sv
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
 export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
 
+// Вкладка «Запись на прием»: адрес, карта и оплата присланы, остальные значки временные (заменить файлом с тем же именем)
+export { default as IconBookingPin } from '../../assets/icons/booking/pin.svg?react';
+export { default as IconBookingRoute } from '../../assets/icons/booking/route.svg?react';
+export { default as IconBookingWallet } from '../../assets/icons/booking/wallet.svg?react';
+export { default as IconBookingDirections } from '../../assets/icons/booking/directions.svg?react';
+export { default as IconBookingBag } from '../../assets/icons/booking/bag.svg?react';
+export { default as IconBookingCalendar } from '../../assets/icons/booking/calendar.svg?react';
+export { default as IconBookingExternal } from '../../assets/icons/booking/external.svg?react';
+
 // Вкладка «Кейс»
 export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
 export { default as IconCaseAttach } from '../../assets/icons/case/attach-file.svg?react';

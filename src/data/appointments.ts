@@ -45,13 +45,15 @@ export interface Appointment {
   updatedAt: number;
 }
 
-/** Место приема одно на все чаты: у психолога один кабинет */
-export interface Place {
+/** Информация о приеме одна на все чаты: у психолога один кабинет и свои условия */
+export interface Info {
   address: string;
   /** Как пройти в кабинет */
   howTo: string;
   /** Что принести */
   bring: string;
+  /** Оплата сеанса: сколько стоит и как заплатить */
+  payment: string;
 }
 
 export interface ProposalInput {
@@ -208,20 +210,21 @@ function seedItems(): Appointment[] {
   ];
 }
 
-const SEED_PLACE: Place = {
+const SEED_INFO: Info = {
   address: 'Екатеринбург, ул. Мира, 19',
   howTo: 'Вход со двора, через арку. Домофон 91, третий этаж, лифт справа. Кабинет №91 — вторая дверь налево.',
   bring: 'Ничего особенного. Если вели дневник эмоций, возьмите его.',
+  payment: '3 500 ₽ за сеанс. Перевод по номеру телефона +7 900 000-00-00 или наличными в кабинете.',
 };
 
 // ---------------------------------------------------------------- хранилище
 
 interface BookingState {
   items: Appointment[];
-  place: Place;
+  info: Info;
 }
 
-let state: BookingState = { items: seedItems(), place: SEED_PLACE };
+let state: BookingState = { items: seedItems(), info: SEED_INFO };
 let counter = 100;
 const listeners = new Set<() => void>();
 
@@ -342,6 +345,9 @@ export function cancelAppointment(id: string, reason?: string) {
   });
 }
 
-export function savePlace(place: Place) {
-  commit({ ...state, place: { address: place.address.trim(), howTo: place.howTo.trim(), bring: place.bring.trim() } });
+export function saveInfo(info: Info) {
+  commit({
+    ...state,
+    info: { address: info.address.trim(), howTo: info.howTo.trim(), bring: info.bring.trim(), payment: info.payment.trim() },
+  });
 }

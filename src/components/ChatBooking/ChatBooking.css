@@ -260,57 +260,50 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Место приема */
-.place {
+/* Информация о приеме: карта сверху на всю ширину, ниже строки: значок, подпись и текст */
+.info {
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
 }
 
-.place__main {
+.info__row {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4);
-}
-
-.place__address {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.place__pin {
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: var(--color-accent);
-  font-size: var(--size-icon-sm);
-}
-
-.place__address-text {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-md);
-  overflow-wrap: anywhere;
-}
-
-.place__detail {
   padding: var(--space-3) var(--space-4);
+}
+
+.info__row + .info__row {
   border-top: 1px solid var(--color-divider);
 }
 
-.place__label {
-  margin: 0 0 var(--space-1);
+.info__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.info__icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.info__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.info__label {
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-xs);
 }
 
-.place__text {
+.info__text {
   margin: 0;
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
@@ -318,7 +311,11 @@
   white-space: pre-line;
 }
 
-.place__text--empty {
+.info__text--strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.info__text--empty {
   color: var(--color-text-placeholder);
 }
 

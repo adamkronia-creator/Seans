@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { embedUrl, geocode, type Point } from './geocode';
-import { IconMap } from './BookingIcons';
+import { IconBookingRoute } from '../icons';
 
 type MapState =
   | { kind: 'idle' }
@@ -70,7 +70,7 @@ export function PlaceMap({ address, onOpenMaps }: { address: string; onOpenMaps:
   const { label, hint } = TEXT[state.kind];
   return (
     <button type="button" className="place-map place-map--tile" disabled={state.kind === 'loading'} onClick={show}>
-      <IconMap className="place-map__icon" />
+      <IconBookingRoute className="place-map__icon" />
       <span className="place-map__label">{label}</span>
       {hint && <span className="place-map__hint">{hint}</span>}
     </button>
