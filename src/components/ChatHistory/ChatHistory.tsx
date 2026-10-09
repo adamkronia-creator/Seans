@@ -246,8 +246,10 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             const hasNext = i < visible.length - 1;
             return (
               <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
-                {hasNext && <span className="hist-item__line" aria-hidden="true" />}
-                <Marker event={event} />
+                <div className="hist-rail">
+                  <Marker event={event} />
+                  {hasNext && <span className="hist-item__line" aria-hidden="true" />}
+                </div>
                 <Card event={event} onEdit={() => setEditingId(event.id)} />
               </li>
             );

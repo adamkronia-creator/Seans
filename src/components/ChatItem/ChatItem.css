@@ -1,8 +1,9 @@
 .chat-item {
   border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-row);
 }
 
-/* В макете шапка белая, а список лежит на сером фоне приложения */
+/* В макете шапка белая, а список лежит на сером фоне приложения; на обоях строки покрыты белой дымкой */
 .chat-item__button {
   display: flex;
   align-items: center;

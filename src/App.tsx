@@ -60,7 +60,7 @@ export default function App() {
         ) : tab === 'tasks' ? (
           <TasksPage />
         ) : (
-          <p style={{ padding: 24, color: 'var(--color-text-caption)' }}>
+          <p style={{ padding: 24, color: 'var(--color-text-secondary)', textShadow: 'var(--text-glow)' }}>
             Раздел в разработке
           </p>
         )}

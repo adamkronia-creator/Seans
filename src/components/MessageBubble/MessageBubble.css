@@ -37,7 +37,7 @@
 
 .bubble--in {
   align-self: flex-start;
-  background: var(--color-stroke);
+  background: var(--color-bg-panel); /* на обоях белый, как карточки: серый (--color-stroke) сливался бы с ними */
   color: var(--color-text-primary);
   border-bottom-left-radius: 4px;
 }
@@ -153,8 +153,8 @@
   height: 32px;
   margin-top: -16px;
   border-radius: 50%;
-  background: var(--color-stroke);
-  color: var(--color-text-caption);
+  background: var(--color-bg-panel);
+  color: var(--color-text-secondary);
   font-size: 18px;
 }
 

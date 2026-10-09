@@ -109,29 +109,35 @@
   padding-left: 32px;
 }
 
-.hist-item__line {
-  position: absolute;
-  top: 13px;
-  bottom: -25px; /* до значка следующего события: 12 зазор + 13 */
-  left: 9.5px;
-  width: 1px;
-  background: #E1E4E8;
-}
-
-/* Значок + аватарки лежат на «подложке» цвета фона шире на 4 px со всех сторон:
-   линия прерывается за 4 px до значка и через 4 px после последней аватарки */
-.hist-marker {
+/* Рейка слева от карточки: значок с аватарками и под ним линия до значка следующего события.
+   Поля значка (4 px со всех сторон) и есть разрыв: линия обрывается за 4 px до значка и через 4 px после
+   последней аватарки. Подложки цвета фона нет, поэтому под значками видны обои. */
+.hist-rail {
   position: absolute;
   top: 9px;
+  bottom: -21px; /* до верха значка следующего события: 12 зазор + 9 */
   left: -4px;
-  z-index: 1;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 28px;
+}
+
+.hist-item__line {
+  flex: 1;
+  width: 1px;
+  min-height: 0;
+  background: rgb(94 107 123 / 20%); /* серо-синяя дымка: на сером фоне даёт прежний #E1E4E8, на обоях остаётся видна */
+}
+
+.hist-marker {
+  display: flex;
+  flex-shrink: 0;
   flex-direction: column;
   gap: 4px;
   box-sizing: border-box;
   width: 28px;
   padding: 4px;
-  background: var(--color-bg-app);
 }
 
 .hist-marker__number {
@@ -189,10 +195,10 @@
   object-fit: cover;
 }
 
-/* Клиент в сеансе наезжает на аватар психолога, вокруг рамка цвета фона */
+/* Клиент в сеансе наезжает на аватар психолога, вокруг белая рамка */
 .hist-marker__avatar--ring {
   margin-top: -9px;
-  box-shadow: 0 0 0 1px var(--color-bg-app);
+  box-shadow: 0 0 0 1px var(--color-bg-panel);
 }
 
 /* Карточка события: белая, радиус 12, поля 12 */
@@ -286,6 +292,7 @@
 
 .hist-empty {
   padding: var(--space-6) 0;
-  color: var(--color-text-caption);
+  color: var(--color-text-secondary);
+  text-shadow: var(--text-glow);
   text-align: center;
 }

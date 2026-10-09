@@ -1,5 +1,6 @@
 .event-item {
   border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-row);
 }
 
 /* Строка: аватар 52, gap 12, отступы 10 сверху/снизу и 16 по бокам */

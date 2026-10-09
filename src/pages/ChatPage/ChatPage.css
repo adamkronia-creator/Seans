@@ -11,7 +11,8 @@
 
 .chat__empty {
   padding: var(--space-6) var(--space-4);
-  color: var(--color-text-caption);
+  color: var(--color-text-secondary);
+  text-shadow: var(--text-glow);
   text-align: center;
 }
 
@@ -157,10 +158,10 @@
   margin-bottom: 16px; /* 16 + gap 8 = 24 */
   padding: 6px 8px;
   border-radius: var(--radius-pill);
-  background: var(--color-stroke);
-  /* кольцо цвета фона отделяет прилипшую подпись от пузырей под ней */
-  box-shadow: 0 0 0 3px var(--color-bg-app);
-  color: var(--color-text-caption);
+  /* белая плашка с мягкой тенью: на обоях и поверх белых пузырей, под которыми она прилипает, видна без кольца */
+  background: var(--color-bg-panel);
+  box-shadow: 0 1px 3px rgb(30 50 80 / 16%);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
 }

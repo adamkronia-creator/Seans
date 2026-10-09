@@ -48,6 +48,7 @@
 .chat-tests__empty {
   flex: 1;
   padding: var(--space-6) var(--space-4);
-  color: var(--color-text-caption);
+  color: var(--color-text-secondary);
+  text-shadow: var(--text-glow);
   text-align: center;
 }
