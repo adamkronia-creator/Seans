@@ -7,8 +7,10 @@ export interface Message {
   status?: 'sending' | 'sent' | 'read';
   /** Ответ на сообщение с этим id */
   replyTo?: string;
-  /** Карточка рекомендованного теста (id из библиотеки) */
+  /** Карточка теста (id из библиотеки): аватарка, название, подпись и кнопка под сообщением */
   test?: string;
+  /** Подпись карточки: «Присланный тест» (отправлен клиенту, кнопка «Пройти») или «Пройденный тест» (кнопка «Посмотреть»); без значения — присланный */
+  testKind?: 'sent' | 'passed';
   /** Кнопки под пузырём, как у ботов в Telegram */
   buttons?: MessageButton[];
 }
@@ -57,7 +59,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       label: '6 сентября, вс',
       messages: [
         { id: 'h15', from: 'them', text: 'Я поймал себя на том, что перед отправкой сообщения вам несколько раз перечитываю его, чтобы не написать что-нибудь глупое.', time: '12:20' },
-        { id: 'h-test', from: 'me', text: '', time: '20:10', test: 'bdi' },
+        { id: 'h-test', from: 'me', text: '', time: '20:10', test: 'bdi', testKind: 'sent' },
       ],
     },
     {

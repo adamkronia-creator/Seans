@@ -169,10 +169,20 @@
   transform: translate(0, 0);
 }
 
-/* Карточка рекомендованного теста */
-.bubble--card {
+/* Карточка теста: аватарка 48 слева, подпись, название; ниже текст; кнопка под пузырём */
+.bubble-group--card {
   width: 85%;
-  padding: 8px 12px 24px;
+}
+
+.bubble--tcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Без текста время стоит под названием: нужен запас снизу */
+.bubble--tcard-bare {
+  padding-bottom: 24px;
 }
 
 .tcard {
@@ -218,16 +228,8 @@
   line-height: 18px;
 }
 
-.tcard__open {
-  font-size: var(--font-size-sm);
-  line-height: 18px;
-  font-weight: var(--font-weight-medium);
-  text-decoration: underline;
-}
-
-.bubble--card .bubble__meta--card {
-  right: 12px;
-  bottom: 4px;
+.tcard__body {
+  margin: 0;
 }
 
 /* Сообщение с кнопками под пузырём, как у ботов в Telegram: кнопки той же ширины, что пузырь, интервал 4 */
@@ -272,19 +274,18 @@
   list-style: none;
 }
 
-/* Кнопка 40: серо-голубая плашка (вторичный цвет, чуть темнее ради белого текста), подпись по центру, стрелка в углу */
+/* Кнопка 40: синяя, белая подпись по центру, обводка 1 — акцентный цвет с прозрачностью 10% */
 .bubble-button {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-height: 40px;
-  padding: 6px 28px;
-  border: 1px solid var(--color-accent);
+  padding: 6px 16px;
+  border: 1px solid var(--color-accent-soft);
   border-radius: 6px;
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
-  color: var(--color-text-primary);
+  background: var(--color-accent);
+  color: var(--color-accent-on);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: 18px;
@@ -293,21 +294,12 @@
 }
 
 .bubble-button:active {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  filter: brightness(0.9);
 }
 
 .bubble-button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-.bubble-button__arrow {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 10px;
-  height: 10px;
-  opacity: 0.85;
 }
 
 .bubble-buttons li:last-child .bubble-button {

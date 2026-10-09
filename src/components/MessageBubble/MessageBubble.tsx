@@ -2,7 +2,7 @@ import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryTest } from '../../data/library';
 import { IconReadTicks } from '../icons';
-import { IconClock, IconLinkArrow, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
+import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -150,25 +150,44 @@ export function MessageBubble({
     </span>
   );
 
+  // Карточка теста: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
   if (message.test) {
+    const passed = message.testKind === 'passed';
+    const link = passed ? message.buttons?.[0] : undefined;
     return (
-      <li {...common} className={`bubble bubble--card bubble--${out ? 'out' : 'in'}${joinPrev ? ' bubble--joined-prev' : ''}`}>
+      <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
-        <button type="button" className="tcard" onClick={() => onOpenTest(message.test!)}>
-          {test && (
-            <span className="tcard__icon" style={{ background: test.tint }}>
-              <img src={test.icon} alt="" />
+        <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons bubble--tcard${message.text ? '' : ' bubble--tcard-bare'}${activeMatch ? ' bubble--match' : ''}`}>
+          <div className="tcard">
+            {test && (
+              <span className="tcard__icon" style={{ background: test.tint }}>
+                <img src={test.icon} alt="" />
+              </span>
+            )}
+            <span className="tcard__text">
+              <span className="tcard__label">{passed ? 'Пройденный тест' : 'Присланный тест'}</span>
+              <span className="tcard__title">{test?.title ?? 'Тест'}</span>
             </span>
-          )}
-          <span className="tcard__text">
-            <span className="tcard__label">Рекомендованный тест</span>
-            <span className="tcard__title">{test?.title ?? 'Тест'}</span>
-            <span className="tcard__open">Открыть тест</span>
+          </div>
+          {message.text ? (
+            <p className="tcard__body">
+              <Highlighted text={message.text} query={query} active={activeMatch} />
+              <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">
+                <Meta message={message} />
+              </span>
+            </p>
+          ) : null}
+          <span className="bubble__meta">
+            <Meta message={message} />
           </span>
-        </button>
-        <span className="bubble__meta bubble__meta--card">
-          <Meta message={message} />
-        </span>
+        </div>
+        <ul className="bubble-buttons">
+          <li>
+            <button type="button" className="bubble-button" onClick={() => (link ? onOpenLink(link.href) : onOpenTest(message.test!))}>
+              {passed ? 'Посмотреть' : 'Пройти'}
+            </button>
+          </li>
+        </ul>
       </li>
     );
   }
@@ -192,7 +211,6 @@ export function MessageBubble({
             <li key={button.href}>
               <button type="button" className="bubble-button" onClick={() => onOpenLink(button.href)}>
                 {button.label}
-                <IconLinkArrow className="bubble-button__arrow" />
               </button>
             </li>
           ))}

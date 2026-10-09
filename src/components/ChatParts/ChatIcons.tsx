@@ -58,10 +58,3 @@ export const IconTickSingle = (p: SVGProps<SVGSVGElement>) => (
     <path d="M2.5 6.4l2.4 2.4L9.6 3.6" />
   </svg>
 );
-
-/** Стрелка в углу кнопки под сообщением: кнопка ведёт на другой экран */
-export const IconLinkArrow = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base({ viewBox: '0 0 12 12', strokeWidth: 1.4, ...p })}>
-    <path d="M3.5 2.5h6v6M9.5 2.5l-7 7" />
-  </svg>
-);

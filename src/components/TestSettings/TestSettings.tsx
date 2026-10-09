@@ -139,7 +139,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   const send = (ids: string[]) => {
     ids.forEach((id) => {
-      if (messageOn) sendMessage(id, message);
+      // В чат уходит карточка теста; сообщение клиенту, если оно включено, стоит в ней текстом
+      sendMessage(id, messageOn ? message : '', undefined, { test: test.id, testKind: 'sent' });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
       if (id === 'maxim') logStep('test', test.id, 'sent');
     });

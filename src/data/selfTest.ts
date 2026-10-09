@@ -179,7 +179,9 @@ export function finishRun(testId: string, total: number, form: string, saveBlank
 
   receiveMessage(FAVORITES_CHAT, {
     text: passedText(testId),
-    buttons: [{ label: 'Посмотреть заключение теста', href: `/chat/${FAVORITES_CHAT}/result/${result.id}` }],
+    test: testId,
+    testKind: 'passed',
+    buttons: [{ label: 'Посмотреть', href: `/chat/${FAVORITES_CHAT}/result/${result.id}` }],
   });
   return result;
 }
