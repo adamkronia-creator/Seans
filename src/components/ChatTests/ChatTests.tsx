@@ -1,4 +1,3 @@
-import { Badge } from '../Badge/Badge';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
 import { LIBRARY } from '../../data/library';
@@ -9,20 +8,19 @@ import './ChatTests.css';
 interface SectionConfig {
   status: TestStatus;
   title: string;
-  badge: 'accent' | 'yellow' | 'green';
   /** Есть ссылка «Напомнить» справа */
   remind?: boolean;
 }
 
 const TEST_SECTIONS: SectionConfig[] = [
-  { status: 'sent', title: 'Отправленные', badge: 'yellow', remind: true },
-  { status: 'done', title: 'Завершенные', badge: 'green' },
+  { status: 'sent', title: 'Отправленные', remind: true },
+  { status: 'done', title: 'Завершенные' },
 ];
 
 const TASK_SECTIONS: SectionConfig[] = [
-  { status: 'assigned', title: 'Назначенные', badge: 'accent', remind: true },
-  { status: 'sent', title: 'Отправленные', badge: 'yellow', remind: true },
-  { status: 'done', title: 'Завершенные', badge: 'green' },
+  { status: 'assigned', title: 'Назначенные', remind: true },
+  { status: 'sent', title: 'Отправленные', remind: true },
+  { status: 'done', title: 'Завершенные' },
 ];
 
 /** Разделы со списками карточек: общий вид для вкладок «Тесты» и «Задания» */
@@ -41,14 +39,14 @@ function SectionedList({
   if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
   return (
     <div className="chat-tests">
-      {sections.map(({ status, title, badge, remind }) => {
+      {sections.map(({ status, title, remind }) => {
         const list = items.filter((t) => t.status === status);
         if (list.length === 0) return null;
         return (
           <section key={status} className="chat-tests__section">
             <div className="chat-tests__heading">
               <h2 className="chat-tests__title">{title}</h2>
-              <Badge count={list.length} variant={badge} ariaLabel={`Всего: ${list.length}`} />
+              <span className="chat-tests__count" aria-label={`Всего: ${list.length}`}>{list.length}</span>
               {remind && (
                 <button type="button" className="chat-tests__remind">
                   Напомнить

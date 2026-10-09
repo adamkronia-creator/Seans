@@ -2,36 +2,32 @@
   position: relative;
 }
 
-/* Название обрезается, не доходя до сердечка: 14 (иконка) + отступ */
+/* Название обрезается, не доходя до сердечка: иконка 16 + отступ */
 .lib-card__top {
-  padding-right: 19px;
+  padding-right: var(--space-5);
 }
 
-/* Описание в макете на 1 ниже, чем в карточке чата */
-.lib-card .test-card__description {
-  position: relative;
-  top: 1px;
-}
-
-/* Сердечко 14×16 у правого края карточки (отступ 12), на уровне названия.
+/* Сердечко у правого края карточки (отступ 12), на уровне названия.
    Область нажатия больше иконки: padding компенсируется отрицательным отступом */
 .lib-card__heart {
   position: absolute;
-  top: 18px;
-  right: 12px;
+  top: var(--space-3);
+  right: var(--space-3);
   display: flex;
-  width: 14px;
-  height: 16px;
+  width: 16px;
+  height: 20px;
   margin: 0;
   box-sizing: content-box;
-  padding: 8px;
-  transform: translate(8px, -8px);
-  color: var(--color-text-caption);
+  padding: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  transform: translate(var(--space-2), calc(var(--space-2) * -1));
+  color: var(--color-text-placeholder);
   font-size: 16px;
   line-height: 0;
 }
 
 .lib-card__heart svg {
-  width: 14px;
+  width: 16px;
   height: 16px;
 }

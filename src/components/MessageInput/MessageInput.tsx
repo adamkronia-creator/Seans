@@ -124,7 +124,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
             role="textbox"
             aria-label="Сообщение"
             aria-multiline="true"
-            data-placeholder="Написать сообщение..."
+            data-placeholder="Сообщение"
             inputMode="text"
             enterKeyHint="send"
             autoCapitalize="sentences"

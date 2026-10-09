@@ -24,7 +24,6 @@ export type CaseIconId =
 import type { ToneId } from './tones';
 import { parseBlocks, serializeBlocks, type RichBlock } from '../utils/richText';
 
-export type CaseRowIconId = 'client' | 'birthday' | 'calendar' | 'clock' | 'format';
 
 export type CaseBlock = RichBlock;
 
@@ -36,7 +35,7 @@ export interface CaseSection {
   /** Цвет шапки: синий по умолчанию, коричневый у клинической гипотезы; null — шапка без цвета (белая) */
   tone: ToneId | null;
   /** Для «Общей информации»: строки «название — значение» */
-  rows?: { icon: CaseRowIconId; label: string; value: string }[];
+  rows?: { label: string; value: string }[];
   /** Для текстовых разделов */
   blocks?: CaseBlock[];
   /** Дата последнего обновления (для текстовых разделов) */
@@ -51,11 +50,11 @@ export const CASE_SECTIONS: CaseSection[] = [
     icon: 'general',
     tone: 'blue',
     rows: [
-      { icon: 'client', label: 'Клиент', value: 'Мартынов Максим' },
-      { icon: 'birthday', label: 'Дата рождения', value: '14.03.1997 (29 лет)' },
-      { icon: 'calendar', label: 'Дата первого приема', value: '03.09.2026' },
-      { icon: 'clock', label: 'Длительность терапии', value: '4 нед. 1 день' },
-      { icon: 'format', label: 'Формат работы', value: 'Очный' },
+      { label: 'Клиент', value: 'Мартынов Максим' },
+      { label: 'Дата рождения', value: '14.03.1997 (29 лет)' },
+      { label: 'Дата первого приема', value: '03.09.2026' },
+      { label: 'Длительность терапии', value: '4 нед. 1 день' },
+      { label: 'Формат работы', value: 'Очный' },
     ],
   },
   {

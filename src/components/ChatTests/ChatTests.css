@@ -1,11 +1,11 @@
-/* Лента вкладки: на сером фоне, отступы 16 по бокам; 11 от разделителя шапки */
+/* Лента вкладки: карточки на фоне приложения, поля 16, 12 от разделителя шапки */
 .chat-tests {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
   min-height: 0;
-  padding: 11px var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
@@ -15,28 +15,34 @@
   gap: var(--space-2);
 }
 
-/* Заголовок раздела: текст 16, кружок 20 справа от него; «Напомнить» прижато вправо */
+/* Заголовок раздела: название и число рядом; «Напомнить» прижато вправо */
 .chat-tests__heading {
   display: flex;
-  align-items: center;
-  gap: 6.5px; /* по макету текст → кружок 6,6 */
-  height: 20px;
-  padding: 0 var(--space-3);
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
 }
 
 .chat-tests__title {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  line-height: 20px;
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.chat-tests__count {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
 }
 
 .chat-tests__remind {
   margin-left: auto;
-  margin-right: -8px; /* правый край текста стоит на 20 от края экрана */
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 14px;
+  line-height: var(--line-height-sm);
 }
 
 .chat-tests__list {
@@ -47,8 +53,9 @@
 
 .chat-tests__empty {
   flex: 1;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-8) var(--space-4);
   color: var(--color-text-secondary);
-  text-shadow: var(--text-glow);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   text-align: center;
 }

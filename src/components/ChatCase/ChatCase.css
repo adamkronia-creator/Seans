@@ -1,11 +1,11 @@
-/* Лента вкладки «Кейс»: поля 16, 11 от разделителя шапки, расстояния между блоками 12 */
+/* Лента вкладки «Кейс»: поля 16, 12 от разделителя шапки, расстояния между блоками 12 */
 .chat-case {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: var(--space-3);
   min-height: 0;
-  padding: 11px var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
@@ -13,70 +13,65 @@
   flex-shrink: 0;
 }
 
-/* Переключатель: контейнер 32, радиус 8, отступ 2; сегмент 28, радиус 6, тень как у карточек */
+/* Переключатель: дорожка 36, радиус 10, отступ 2; сегменты поровну, выбранный белый */
 .case-segments {
   display: flex;
-  justify-content: space-between;
-  height: 32px;
+  gap: 2px;
+  height: 36px;
   padding: 2px;
-  border-radius: 8px;
-  background: #F1F2F4;
+  border-radius: 10px;
+  background: var(--color-bg-fill-strong);
 }
 
 .case-segments__item {
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: 4.5px;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: 6px;
-  color: var(--color-text-caption);
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
+  line-height: 1;
 }
 
 .case-segments__item--active {
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 10%);
   color: var(--color-text-primary);
 }
 
-/* «Добавить сведения»: пунктирная рамка 1 px (штрих 4, пробел 2), радиус 12, высота 50 */
+.case-segments__count {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 359px) {
+  .case-segments__item {
+    gap: var(--space-1);
+    font-size: 13px;
+  }
+}
+
+/* «Добавить»: тихая кнопка на всю ширину, акцентная подпись на подложке акцента, высота 44 */
 .case-add {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  height: 50px;
+  gap: var(--space-2);
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-regular);
-}
-
-.case-add__border {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.case-add__rect {
-  x: 0.5px;
-  y: 0.5px;
-  width: calc(100% - 1px);
-  height: calc(100% - 1px);
-  rx: 11.5px;
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 1px;
-  stroke-dasharray: 4 2;
+  font-weight: var(--font-weight-medium);
 }
 
 .case-add__icon {
-  font-size: var(--size-icon);
+  font-size: var(--size-icon-sm);
 }
 
 .case-cards {
@@ -90,36 +85,30 @@
   touch-action: manipulation;
 }
 
-/* Карточка: белая, радиус 12, тень справа и снизу; шапка 46 */
+/* Карточка: белая, радиус 16, без тени. Шапка: значок на цветной плитке, название, карандаш */
 .case-card {
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
 .case-card__head {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  height: 46px;
-  padding: 0 var(--space-3);
-  background: var(--head-bg, var(--color-accent-soft));
+  gap: var(--space-3);
+  padding: var(--space-3);
 }
 
-.case-card__head--note {
-  height: 44px;
-  padding-top: 2px;
-}
-
-/* Иконка 22 (24-пиксельные центрируются в этом же слоте); цвет — акцентный */
+/* Плитка 32 цвета раздела (10% цвета, значок полным цветом); без цвета — без плитки, значок акцентный */
 .case-card__icon {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--head-bg, var(--color-accent-soft));
   color: var(--head-fg, var(--color-accent));
 }
 
@@ -127,112 +116,101 @@
   flex-shrink: 0;
 }
 
+/* Название до двух строк: на узком экране «Анамнестические сведения» не обрезается на полуслове */
 .case-card__title {
+  display: -webkit-box;
   flex: 1;
   min-width: 0;
   overflow: hidden;
   font-size: var(--font-size-lg);
-  line-height: 22px;
-  white-space: nowrap;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .case-card__edit {
   display: flex;
   flex-shrink: 0;
-  margin-left: 4px;
-  color: var(--color-text-caption);
-  font-size: 22px;
+  color: var(--color-text-placeholder);
+  font-size: var(--size-icon-sm);
 }
 
-/* Общая информация: строки 44 + разделитель 1 (с отступом 40 слева) */
+/* Общая информация: подпись слева, значение справа; строки разделены линией от края до края внутри полей 16 */
 .case-row {
-  position: relative;
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  box-sizing: border-box;
-  min-height: 48px;
-  padding: var(--space-3);
-  color: var(--color-accent);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: 0 var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-divider);
 }
 
-.case-row + .case-row {
-  margin-top: 1px;
-}
-
-.case-row + .case-row::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  right: 0;
-  left: 40px;
-  height: 1px;
-  background: var(--color-divider);
-}
-
-.case-row__icon {
-  flex-shrink: 0;
-  font-size: var(--size-icon);
-}
-
+/* Подпись при нехватке места переносится, значение стоит целиком, пока не займёт больше 60% строки */
 .case-row__label {
-  flex: 1;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: 20px;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
 }
 
 .case-row__value {
+  flex: 0 0 auto;
+  max-width: 60%;
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-md);
   text-align: right;
 }
 
-/* Текстовые разделы: отступы 12, текст 16/19, абзацы через 12, дата обновления справа */
+/* Текстовые разделы: поля 12, текст 15/22, абзацы через 12, дата обновления справа */
 .case-card__body {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: 0 var(--space-3) var(--space-3);
 }
 
 .case-card__text,
 .case-card__list {
   font-size: var(--font-size-md);
-  line-height: 19px; /* 120% от 16, округлено до целых, как в Figma */
+  line-height: var(--line-height-md);
 }
 
 .case-card__updated {
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  line-height: 12px;
+  line-height: var(--line-height-xs);
   text-align: right;
 }
 
-/* Подсказка внизу: 328×40, радиус 12, содержимое по центру */
+/* Подсказка внизу: тихая подпись по центру */
 .case-note {
   display: flex;
   align-self: center;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   max-width: 100%;
-  padding: var(--space-2) var(--space-3);
-  border-radius: 12px;
-  background: #ECF2F9;
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  line-height: 24px;
+  padding: var(--space-1) 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .case-note__icon {
   flex-shrink: 0;
-  font-size: var(--size-icon);
+  font-size: 14px;
 }
 
 .case-empty {
-  padding: var(--space-6) 0;
-  color: var(--color-text-caption);
+  padding: var(--space-8) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   text-align: center;
 }
 
@@ -240,26 +218,19 @@
   display: none;
 }
 
-
-/* Заметка: текст начинается на 10 от шапки */
+/* Заметка: текст сразу под шапкой */
 .case-card__body--note {
-  padding-top: 10px;
+  padding-top: 0;
 }
 
-/* В заметках зазор между названием и карандашом 8 (длина многоточия как в макете) */
-.case-card__head--note .case-card__edit {
-  margin-left: 0;
-}
-
-/* Файл: карточка 76 (отступ 12), круглая миниатюра 52, название и подпись, дата справа */
+/* Файл: карточка с круглой миниатюрой 44, название и подпись, дата справа */
 .case-file {
   display: flex;
+  align-items: center;
   gap: var(--space-3);
-  height: 76px;
   padding: var(--space-3);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
 .case-file__thumb {
@@ -267,8 +238,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   color: var(--color-text-primary);
   font-size: var(--size-icon);
@@ -283,7 +254,7 @@
 }
 
 .case-file__thumb--other {
-  background: var(--color-divider);
+  background: var(--color-bg-fill);
 }
 
 .case-file--link {
@@ -295,34 +266,35 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
   min-width: 0;
-  padding-top: 4px;
 }
 
 .case-file__name {
   overflow: hidden;
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: 20px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .case-file__meta {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  line-height: 16px;
+  line-height: var(--line-height-sm);
 }
 
 .case-file__date {
   flex-shrink: 0;
-  margin-top: 8px;
+  align-self: flex-start;
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  line-height: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
 }
 
 /* При переходе по оглавлению карточка встаёт с отступом от шапки */
 .case-card {
-  scroll-margin-top: 11px;
+  scroll-margin-top: var(--space-3);
 }

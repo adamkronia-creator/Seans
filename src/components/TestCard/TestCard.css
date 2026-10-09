@@ -1,26 +1,25 @@
-/* Карточка 361×76: белая, радиус 12, отступы 12, тень только справа и снизу */
+/* Карточка теста: белая, радиус 16, отступы 12, без тени. Значок 48, название до двух строк, описание в одну */
 .test-card {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-3);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
   text-align: left;
 }
 
-/* Аватарка 52×52, радиус 12; фон — цвет теста с прозрачностью 75%; картинка 40×40 */
+/* Значок 48×48, радиус 12; фон — цвет теста с прозрачностью 75%; картинка 36×36 */
 .test-card__avatar {
   position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
   isolation: isolate;
 }
 
@@ -35,60 +34,53 @@
 }
 
 .test-card__icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
-/* Название 16/20 semibold и описание 14/20, gap 4 */
 .test-card__body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 2px;
   min-width: 0;
 }
 
 .test-card__top {
   display: flex;
-  align-items: center;
-  gap: 7px; /* подобран так, чтобы названия обрезались в тех же местах, что в макете */
+  align-items: flex-start;
+  gap: var(--space-2);
 }
 
+/* Название целиком, если помещается в две строки: обрезать на полуслове нечем оправдаться, когда есть место */
 .test-card__title {
+  display: -webkit-box;
   flex: 1;
   min-width: 0;
   overflow: hidden;
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
-  line-height: 20px;
-  white-space: nowrap; /* многоточие ставит TruncatedText */
+  line-height: var(--line-height-sm);
+  letter-spacing: var(--letter-spacing-title);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
+/* Дата: один спокойный цвет; состояние тестов и так видно по заголовку раздела */
 .test-card__date {
   flex-shrink: 0;
+  color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: 12px;
-}
-
-.test-card__date--assigned {
-  color: var(--color-accent);
-}
-
-.test-card__date--sent {
-  color: var(--color-yellow);
-}
-
-.test-card__date--done {
-  color: var(--color-green);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
 }
 
 .test-card__description {
   overflow: hidden;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  line-height: 20px;
+  line-height: var(--line-height-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

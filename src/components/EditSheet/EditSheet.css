@@ -6,7 +6,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgb(0 0 0 / 50%);
+  background: rgb(16 24 40 / 40%);
 }
 
 /* Панель на фоне приложения, карточки внутри белые; верхние углы 24 */
@@ -16,19 +16,19 @@
   width: 100%;
   max-width: 480px;
   max-height: 92dvh;
-  border-radius: 24px 24px 0 0;
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   background: var(--color-bg-app);
   font-family: var(--font-family);
 }
 
-/* Ручка 40×4: сверху 4 */
+/* Ручка 36×4: сверху 8 */
 .sheet__grab {
   flex-shrink: 0;
-  width: 40px;
+  width: 36px;
   height: 4px;
-  margin: 4px auto 0;
+  margin: var(--space-2) auto 0;
   border-radius: 2px;
-  background: rgb(129 140 153 / 50%);
+  background: rgb(112 123 139 / 40%);
 }
 
 /* Заголовок есть только у окон выбора (отправка теста) */
@@ -39,9 +39,10 @@
 
 .sheet__heading {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-xl);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
   text-align: center;
 }
 
@@ -70,21 +71,24 @@
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--space-2);
-  min-height: 46px;
+  gap: var(--space-3);
+  min-height: 56px;
   padding: 0 var(--space-3);
-  border-radius: 12px;
-  background: var(--head-bg);
-  color: var(--head-fg);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
 }
 
+/* Плитка 32 цвета раздела со значком, как в шапке карточки «Кейса» */
 .sheet__preview-icon {
   display: flex;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   align-items: center;
   justify-content: center;
+  border-radius: 10px;
+  background: var(--head-bg);
+  color: var(--head-fg);
   font-size: 22px;
 }
 
@@ -100,7 +104,8 @@
   caret-color: var(--color-accent);
   font-family: inherit;
   font-size: var(--font-size-lg);
-  line-height: 22px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
   resize: none;
 }
 
@@ -108,13 +113,12 @@
   color: var(--color-text-caption);
 }
 
-/* Белые карточки: радиус 12, тень, как в остальных экранах; ширина нужна сеткам (cqw) */
+/* Белые карточки: радиус 16, без тени, как в остальных экранах; ширина нужна сеткам (cqw) */
 .sheet__card {
   container-type: inline-size;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 2px 2px 4px rgb(0 0 0 / 5%);
 }
 
 /* Строка с переключателем: 48, иконка 24, подпись, переключатель справа */
@@ -135,7 +139,7 @@
 .sheet__toggle-label {
   flex: 1;
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-sm);
 }
 
 /* Сворачивание сеток: строка 0fr → 1fr даёт плавную высоту без измерений в скрипте */
@@ -192,8 +196,8 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--color-stroke);
-  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
   /* Иконки окрашены в выбранный цвет шапки */
   color: var(--head-fg, var(--color-accent));
 }
@@ -244,7 +248,9 @@
 
 .sheet__row-label {
   flex-shrink: 0;
-  line-height: 20px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   white-space: nowrap;
 }
 
@@ -258,7 +264,7 @@
   caret-color: var(--color-accent);
   font-family: inherit;
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-md);
   text-align: right;
 }
 
@@ -277,17 +283,15 @@
 
 .sheet__button {
   flex: 1;
-  height: 40px;
-  border: 1px solid var(--color-stroke);
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-panel);
-  color: var(--color-text-secondary);
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 .sheet__button--primary {
-  border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-accent-on);
 }

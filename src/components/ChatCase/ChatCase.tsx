@@ -1,8 +1,6 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import { SectionNav } from '../SectionNav/SectionNav';
-import { Badge } from '../Badge/Badge';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
-import { TruncatedText } from '../TruncatedText/TruncatedText';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import {
   IconCaseAdd,
@@ -25,7 +23,7 @@ import { toneOf } from '../../data/tones';
 import { attachFiles, updateNote, updateSection, useClientData } from '../../data/clientStore';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
-import { HEAD_ICONS, ROW_ICONS } from './caseIcons';
+import { HEAD_ICONS } from './caseIcons';
 import './ChatCase.css';
 
 /** Фон шапки и цвет иконки задаются переменными: цвет можно менять в редакторе */
@@ -50,7 +48,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
             <head.Icon />
           </span>
         )}
-        <TruncatedText className="case-card__title" text={section.title} />
+        <span className="case-card__title">{section.title}</span>
         <button
           type="button"
           className="case-card__edit"
@@ -63,22 +61,18 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
 
       {section.rows && (
         <ul className="case-card__rows">
-          {section.rows.map(({ icon, label, value }) => {
-            const RowIcon = ROW_ICONS[icon];
-            return (
-              <CaseRow
-                key={label}
-                Icon={RowIcon}
-                label={label}
-                value={value}
-                onSave={(v) =>
-                  updateSection(section.id, {
-                    rows: section.rows!.map((r) => (r.label === label ? { ...r, value: v } : r)),
-                  })
-                }
-              />
-            );
-          })}
+          {section.rows.map(({ label, value }) => (
+            <CaseRow
+              key={label}
+              label={label}
+              value={value}
+              onSave={(v) =>
+                updateSection(section.id, {
+                  rows: section.rows!.map((r) => (r.label === label ? { ...r, value: v } : r)),
+                })
+              }
+            />
+          ))}
         </ul>
       )}
 
@@ -106,12 +100,10 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
 
 /** Строка «подпись — значение»: значение правится двойным кликом на месте */
 function CaseRow({
-  Icon,
   label,
   value,
   onSave,
 }: {
-  Icon: (typeof ROW_ICONS)[keyof typeof ROW_ICONS];
   label: string;
   value: string;
   onSave: (v: string) => void;
@@ -120,7 +112,6 @@ function CaseRow({
   const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
   return (
     <li className="case-row" {...doubleTap}>
-      <Icon className="case-row__icon" />
       <span className="case-row__label">{label}</span>
       <QuickEdit
         editing={quick}
@@ -145,7 +136,7 @@ function FileCard({ file }: { file: CaseFile }) {
         <IconCaseFileDownload />
       </span>
       <div className="case-file__info">
-        <TruncatedText className="case-file__name" text={file.name} />
+        <span className="case-file__name">{file.name}</span>
         <span className="case-file__meta">{file.meta}</span>
       </div>
       <span className="case-file__date">{file.date}</span>
@@ -177,7 +168,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
             <head.Icon />
           </span>
         )}
-        <TruncatedText className="case-card__title" text={note.title} />
+        <span className="case-card__title">{note.title}</span>
         <button type="button" className="case-card__edit" aria-label="Изменить заметку" onClick={onEdit}>
           <IconCaseEdit />
         </button>
@@ -244,7 +235,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             onClick={() => setSegment(id)}
           >
             <span>{label}</span>
-            <Badge count={count} variant={segment === id ? 'accent' : 'muted'} />
+            {count > 0 && <span className="case-segments__count">{count}</span>}
           </button>
         ))}
       </div>
@@ -252,9 +243,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       {segment === 'info' ? (
         <>
           <button type="button" className="case-add">
-            <svg className="case-add__border" aria-hidden="true">
-              <rect className="case-add__rect" />
-            </svg>
             <IconCaseAdd className="case-add__icon" />
             <span>Добавить сведения</span>
           </button>
@@ -277,9 +265,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       ) : segment === 'notes' ? (
         <>
           <button type="button" className="case-add">
-            <svg className="case-add__border" aria-hidden="true">
-              <rect className="case-add__rect" />
-            </svg>
             <IconCaseAddNote className="case-add__icon" />
             <span>Добавить заметку</span>
           </button>
@@ -298,9 +283,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       ) : (
         <>
           <button type="button" className="case-add" onClick={() => fileInput.current?.click()}>
-            <svg className="case-add__border" aria-hidden="true">
-              <rect className="case-add__rect" />
-            </svg>
             <IconCaseAttach className="case-add__icon" />
             <span>Прикрепить файл</span>
           </button>

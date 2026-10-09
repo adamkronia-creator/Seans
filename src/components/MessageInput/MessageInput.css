@@ -3,14 +3,14 @@
   background: var(--color-bg-panel);
 }
 
-/* Панель ввода: отступы 8 сверху/снизу и 16 по бокам, элементы высотой 40, gap 12.
+/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле — заливка.
    Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края */
 .composer {
   display: flex;
   flex-shrink: 0;
   align-items: flex-end;
-  gap: var(--space-3);
-  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
@@ -22,10 +22,8 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--color-stroke);
   border-radius: var(--radius-full);
-  background: var(--color-bg-panel);
-  color: var(--color-text-caption);
+  color: var(--color-text-secondary);
   font-size: var(--size-icon);
 }
 
@@ -35,11 +33,10 @@
   align-items: flex-end;
   min-width: 0;
   min-height: 40px;
-  padding: 0 7px 0 9px;
-  border: 1px solid var(--color-stroke);
+  padding: 0 var(--space-2) 0 var(--space-3);
   /* Стадион: при одной строке полукруги, при нескольких — скругление 20 */
-  border-radius: 20px;
-  background: var(--color-bg-panel);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-fill);
 }
 
 .composer__input {
@@ -48,14 +45,14 @@
   border: 0;
   background: none;
   outline: 0;
-  /* Строка 19 (120% от 16 в Figma округляется до целого); 9,5 сверху и снизу дают поле 40 */
-  padding: 9.5px 0;
-  max-height: 114px; /* шесть строк, дальше поле прокручивается */
+  /* Строка 22, по 9 сверху и снизу дают поле 40 */
+  padding: 9px 0;
+  max-height: 150px; /* шесть строк, дальше поле прокручивается */
   overflow-y: auto;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
   font-size: var(--font-size-md);
-  line-height: 19px;
+  line-height: var(--line-height-md);
   -webkit-user-select: text;
   user-select: text;
 }
@@ -74,14 +71,15 @@
 .composer__emoji {
   display: flex;
   flex-shrink: 0;
-  margin-bottom: 7px; /* иконка 24 по центру нижней строки */
-  color: var(--color-text-caption);
+  margin-bottom: var(--space-2); /* иконка 24 по центру нижней строки */
+  color: var(--color-text-secondary);
   font-size: var(--size-icon);
 }
 
+/* Отправить: акцентный круг 40 со стрелкой */
 .composer__round--send {
-  border-color: var(--color-stroke);
-  color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-on);
 }
 
 .composer__emoji--active {
@@ -90,7 +88,7 @@
 
 /* Когда открыта панель эмодзи, безопасный отступ снизу переходит к ней */
 .composer--panel {
-  padding-bottom: 8px;
+  padding-bottom: var(--space-2);
 }
 
 /* Панель эмодзи: 8 в ряд, ячейки 40×40, прокручивается */
@@ -98,7 +96,7 @@
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   height: 240px;
-  padding: 4px var(--space-4) calc(4px + env(safe-area-inset-bottom));
+  padding: var(--space-1) var(--space-4) calc(var(--space-1) + env(safe-area-inset-bottom));
   overflow-y: auto;
   border-top: 1px solid var(--color-divider);
 }
@@ -108,13 +106,13 @@
   align-items: center;
   justify-content: center;
   height: 44px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-sm);
   font-size: 26px;
   line-height: 1;
 }
 
 .emoji-panel__item:active {
-  background: var(--color-bg-app);
+  background: var(--color-bg-fill);
 }
 
 /* Плашка ответа над панелью ввода */
@@ -122,38 +120,37 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 8px 4px 8px 16px;
+  padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
   border-top: 1px solid var(--color-divider);
 }
 
 .reply-bar__icon {
   flex: none;
   color: var(--color-accent);
-  font-size: 20px;
+  font-size: var(--size-icon-sm);
 }
 
 .reply-bar__text {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
-  padding-left: 8px;
+  padding-left: var(--space-2);
   border-left: 2px solid var(--color-accent);
 }
 
 .reply-bar__name {
   color: var(--color-accent);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 16px;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
 }
 
 .reply-bar__quote {
   overflow: hidden;
-  color: var(--color-text-caption);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  line-height: 16px;
+  line-height: var(--line-height-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -166,7 +163,7 @@
   width: 40px;
   height: 40px;
   color: var(--color-text-caption);
-  font-size: 20px;
+  font-size: var(--size-icon-sm);
 }
 
 .reply-bar + .composer {

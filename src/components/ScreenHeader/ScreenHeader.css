@@ -21,9 +21,9 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-xl);
+  line-height: var(--line-height-2xl);
   letter-spacing: var(--letter-spacing-display);
   text-overflow: ellipsis;
   white-space: nowrap;

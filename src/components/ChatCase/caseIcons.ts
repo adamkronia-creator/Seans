@@ -1,11 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 import {
   IconCaseAnamnesis,
-  IconCaseBirthday,
-  IconCaseCalendar,
-  IconCaseClient,
-  IconCaseClock,
-  IconCaseFormat,
   IconCaseGeneral,
   IconCaseHeadBolt,
   IconCaseHeadCrown,
@@ -27,7 +22,7 @@ import {
   IconCaseStructure,
   IconCaseTransfer,
 } from '../icons';
-import type { CaseIconId, CaseRowIconId } from '../../data/case';
+import type { CaseIconId } from '../../data/case';
 
 export type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -54,12 +49,4 @@ export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; la
   flame: { Icon: IconCaseHeadFlame, size: 20, label: 'Пламя' },
   briefcase: { Icon: IconCaseHeadBriefcase, size: 20, label: 'Портфель' },
   bookmark: { Icon: IconCaseHeadBookmark, size: 20, label: 'Закладка' },
-};
-
-export const ROW_ICONS: Record<CaseRowIconId, Icon> = {
-  client: IconCaseClient,
-  birthday: IconCaseBirthday,
-  calendar: IconCaseCalendar,
-  clock: IconCaseClock,
-  format: IconCaseFormat,
 };

@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 import { IconHeartGray, IconHeartRed } from '../icons';
-import { TruncatedText } from '../TruncatedText/TruncatedText';
 import type { LibraryItem } from '../../data/library';
 import '../TestCard/TestCard.css';
 import './LibraryCard.css';
@@ -22,7 +21,7 @@ export function LibraryCard({ test, favorite, onToggleFavorite, onClick }: Libra
         </span>
         <span className="test-card__body">
           <span className="test-card__top lib-card__top">
-            <TruncatedText className="test-card__title" text={test.title} />
+            <span className="test-card__title">{test.title}</span>
           </span>
           <span className="test-card__description">{test.description}</span>
         </span>

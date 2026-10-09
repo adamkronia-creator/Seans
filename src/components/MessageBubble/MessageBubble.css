@@ -1,11 +1,11 @@
-/* Пузырь: отступы 8 / 12, текст 16 / 20, радиус 18, «хвостик» 4 внизу со стороны автора */
+/* Пузырь: отступы 8 / 12, текст 15 / 22, радиус 18, «хвостик» 6 внизу со стороны автора */
 .bubble {
   position: relative;
   max-width: 85%;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   border-radius: 18px;
   font-size: var(--font-size-md);
-  line-height: 20px;
+  line-height: var(--line-height-md);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   touch-action: pan-y;
@@ -20,45 +20,46 @@
 }
 
 .bubble--in.bubble--joined-prev {
-  border-top-left-radius: 4px;
+  border-top-left-radius: 6px;
 }
 
 .bubble--out.bubble--joined-prev {
-  border-top-right-radius: 4px;
+  border-top-right-radius: 6px;
 }
 
 .bubble--in:not(.bubble--last) {
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 6px;
 }
 
 .bubble--out:not(.bubble--last) {
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 6px;
 }
 
 .bubble--in {
   align-self: flex-start;
-  background: var(--color-bg-panel); /* на обоях белый, как карточки: серый (--color-stroke) сливался бы с ними */
+  background: var(--color-bg-panel);
   color: var(--color-text-primary);
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 6px;
 }
 
 .bubble--out {
   align-self: flex-end;
   background: var(--color-accent);
   color: var(--color-accent-on);
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 6px;
 }
 
-/* Время 12 / 12 в правом нижнем углу (на 4 от низа и на 12 от края) */
+/* Время 11 в правом нижнем углу (на 6 от низа и на 12 от края) */
 .bubble__meta {
   position: absolute;
-  right: 12px;
-  bottom: 4px;
+  right: var(--space-3);
+  bottom: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  font-size: var(--font-size-xs);
-  line-height: 12px;
+  gap: 3px;
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-2xs);
   white-space: nowrap;
 }
 
@@ -66,15 +67,19 @@
   color: var(--color-text-caption);
 }
 
+.bubble--out .bubble__meta {
+  color: rgb(255 255 255 / 80%);
+}
+
 .bubble__meta--ghost {
   position: static;
-  margin-left: 9px; /* по макету текст → время 8,8 */
+  margin-left: 10px;
   visibility: hidden;
 }
 
 .bubble__ticks {
   flex-shrink: 0;
-  font-size: 11px; /* галочки 11×6; в макете стоят на 1,5 px правее и на 0,5 выше */
+  font-size: 11px; /* галочки 11×6 */
   transform: translate(1.5px, -0.5px);
 }
 
@@ -112,12 +117,12 @@
   flex-direction: column;
   gap: 2px;
   max-width: 100%;
-  margin: 0 0 4px;
-  padding: 0 0 0 8px;
+  margin: 0 0 var(--space-1);
+  padding: 0 0 0 var(--space-2);
   border-left: 2px solid var(--color-accent);
   text-align: left;
   font-size: var(--font-size-sm);
-  line-height: 16px;
+  line-height: var(--line-height-xs);
 }
 
 .bubble--out .bubble__quote {
@@ -154,6 +159,7 @@
   margin-top: -16px;
   border-radius: 50%;
   background: var(--color-bg-panel);
+  box-shadow: var(--shadow-float);
   color: var(--color-text-secondary);
   font-size: 18px;
 }
@@ -200,7 +206,7 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .tcard__icon img {
@@ -218,14 +224,14 @@
 
 .tcard__label {
   font-size: var(--font-size-xs);
-  line-height: 14px;
+  line-height: var(--line-height-xs);
   opacity: 0.8;
 }
 
 .tcard__title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 18px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
 }
 
 .tcard__body {
@@ -261,8 +267,8 @@
 /* Нижние углы пузыря, обращённые к кнопкам, почти прямые; «хвостик» переходит на нижнюю кнопку */
 .bubble--with-buttons.bubble--in,
 .bubble--with-buttons.bubble--out {
-  border-bottom-right-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
 }
 
 .bubble-buttons {
@@ -274,28 +280,28 @@
   list-style: none;
 }
 
-/* Кнопка 40: синяя, белая подпись по центру, обводка 1 — акцентный цвет с прозрачностью 10% */
+/* Кнопка под пузырём: белая с акцентной подписью, высота 40, как инлайн-кнопки ботов: отдельное действие, а не ещё один синий пузырь */
 .bubble-button {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-height: 40px;
-  padding: 6px 16px;
-  border: 1px solid var(--color-accent-soft);
-  border-radius: 6px;
-  background: var(--color-accent);
-  color: var(--color-accent-on);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: 18px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-panel);
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
   text-align: center;
   transition: filter 0.15s ease;
 }
 
 .bubble-button:active,
 .bubble-button[data-pressed] {
-  filter: brightness(0.9);
+  filter: brightness(0.94);
 }
 
 .bubble-button:focus-visible {
@@ -309,11 +315,11 @@
 }
 
 .bubble-group--in .bubble-buttons li:last-child .bubble-button {
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 6px;
 }
 
 .bubble-group--out .bubble-buttons li:last-child .bubble-button {
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 6px;
 }
 
 /* «Печатает…» */

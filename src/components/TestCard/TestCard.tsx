@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react';
-import { TruncatedText } from '../TruncatedText/TruncatedText';
 import type { PsyTest } from '../../data/tests';
 import './TestCard.css';
 
@@ -20,8 +19,8 @@ export function TestCard({ test, onClick }: TestCardProps) {
         </span>
         <span className="test-card__body">
           <span className="test-card__top">
-            <TruncatedText className="test-card__title" text={test.title} />
-            <span className={`test-card__date test-card__date--${test.status}`}>{test.date}</span>
+            <span className="test-card__title">{test.title}</span>
+            <span className="test-card__date">{test.date}</span>
           </span>
           <span className="test-card__description">{test.description}</span>
         </span>

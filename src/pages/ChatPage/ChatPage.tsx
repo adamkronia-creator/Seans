@@ -382,9 +382,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             </button>
             <div className="chat__peer">
               {chat.favorites ? (
-                <Avatar icon={<IconFavorites />} size={40} />
+                <Avatar icon={<IconFavorites />} size={36} />
               ) : (
-                <Avatar src={chat.avatar} alt="" size={40} online={chat.online} />
+                <Avatar src={chat.avatar} alt="" size={36} online={chat.online} />
               )}
               <div className="chat__who">
                 <h1 className="chat__name">{chat.name}</h1>

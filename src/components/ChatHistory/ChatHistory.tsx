@@ -1,25 +1,19 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { SwipePager } from '../SwipePager/SwipePager';
-import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseEdit,
   IconEventInvite,
   IconChevron,
-  IconStatNotes,
-  IconStatSessions,
-  IconStatTasks,
-  IconStatTests,
-  IconTabNotes,
   IconTlClock,
   IconTlDoc,
   IconTlFlame,
   IconTlNote,
 } from '../icons';
-import { CHATS, CURRENT_USER } from '../../data/chats';
+import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultPath } from '../../data/resultLinks';
@@ -40,8 +34,6 @@ import {
 } from '../../data/clientStore';
 import './ChatHistory.css';
 
-type Icon = ComponentType<SVGProps<SVGSVGElement>>;
-
 const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'all', label: 'Все' },
   { id: 'session', label: 'Сеансы' },
@@ -50,33 +42,32 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'note', label: 'Заметки' },
 ];
 
-interface StatRow {
-  Icon: Icon;
+interface StatItem {
   label: string;
   value: number;
   total?: number;
 }
 
+/** Сводка в одну строку: число крупно, под ним подпись; у тестов и заданий «выполнено / всего» */
 function Stats({ hasData }: { hasData: boolean }) {
   const d = useClientData();
   const n = (value: number) => (hasData ? value : 0);
-  const rows: StatRow[] = [
-    { Icon: IconStatSessions, label: 'Сеансов проведено', value: n(countOf(d, 'session')) },
-    { Icon: IconStatTests, label: 'Тестов пройдено', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')) },
-    { Icon: IconStatTasks, label: 'Заданий выполнено', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')) },
-    { Icon: IconTabNotes, label: 'Сведений добавлено', value: n(d.caseSections.length) },
-    { Icon: IconStatNotes, label: 'Оставлено заметок', value: n(countOf(d, 'note')) },
+  const items: StatItem[] = [
+    { label: 'Сеансы', value: n(countOf(d, 'session')) },
+    { label: 'Тесты', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')) },
+    { label: 'Задания', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')) },
+    { label: 'Сведения', value: n(d.caseSections.length) },
+    { label: 'Заметки', value: n(countOf(d, 'note')) },
   ];
   return (
     <ul className="hist-stats">
-      {rows.map(({ Icon, label, value, total }) => (
-        <li key={label} className="hist-stats__row">
-          <Icon className="hist-stats__icon" />
-          <span className="hist-stats__label">{label}</span>
-          <span className={`hist-stats__value${total === undefined ? ' hist-stats__value--plain' : ''}`}>
+      {items.map(({ label, value, total }) => (
+        <li key={label} className="hist-stats__item">
+          <span className="hist-stats__value">
             {value}
-            {total !== undefined && <span className="hist-stats__total">из {total}</span>}
+            {total !== undefined && <span className="hist-stats__total">/{total}</span>}
           </span>
+          <span className="hist-stats__label">{label}</span>
         </li>
       ))}
     </ul>
@@ -85,48 +76,45 @@ function Stats({ hasData }: { hasData: boolean }) {
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
+/** Кто сделал: подпись у даты вместо аватарок под значком */
+function authorOf(event: HistoryEvent) {
+  const client = maxim.name.split(' ')[0];
+  if (event.kind === 'invite') return client;
+  if (event.kind === 'session') return `Вы и ${client}`;
+  if (event.kind === 'note') return 'Вы';
+  return event.state === 'done' ? client : 'Вы';
+}
+
+/** Значок события на рейке: номер сеанса или значок типа */
 function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'invite') {
     return (
-      <div className="hist-marker hist-marker--event">
-        <span className="hist-marker__slot">
-          <IconEventInvite />
-        </span>
-        <img className="hist-marker__avatar" src={maxim.avatar} alt="" />
+      <div className="hist-marker">
+        <IconEventInvite />
       </div>
     );
   }
   if (event.kind === 'session') {
     return (
-      <div className="hist-marker hist-marker--session">
+      <div className="hist-marker">
         <span className="hist-marker__number">
           <span className="hist-marker__digit">{event.number}</span>
         </span>
-        <img className="hist-marker__avatar" src={CURRENT_USER.avatar} alt="" />
-        <img className="hist-marker__avatar hist-marker__avatar--ring" src={maxim.avatar} alt="" />
       </div>
     );
   }
   if (event.kind === 'note') {
     return (
-      <div className="hist-marker hist-marker--note">
-        <IconTlNote className="hist-marker__icon" />
-        <img className="hist-marker__avatar" src={CURRENT_USER.avatar} alt="" />
+      <div className="hist-marker">
+        <IconTlNote />
       </div>
     );
   }
   const done = event.state === 'done';
   const StateIcon = done ? (event.kind === 'test' ? IconTlDoc : IconTlFlame) : IconTlClock;
   return (
-    <div className="hist-marker hist-marker--event">
-      <span className={`hist-marker__slot${done ? '' : ' hist-marker__slot--clock'}`}>
-        <StateIcon />
-      </span>
-      <img
-        className="hist-marker__avatar"
-        src={done ? maxim.avatar : CURRENT_USER.avatar}
-        alt=""
-      />
+    <div className={`hist-marker${done ? '' : ' hist-marker--clock'}`}>
+      <StateIcon />
     </div>
   );
 }
@@ -154,11 +142,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
-        {event.kind === 'test' || event.kind === 'task' ? (
-          <TruncatedText className="hist-card__title hist-card__title--single" text={title} />
-        ) : (
-          <h3 className="hist-card__title">{title}</h3>
-        )}
+        <h3 className={`hist-card__title${event.kind === 'test' || event.kind === 'task' ? ' hist-card__title--single' : ''}`}>{title}</h3>
         {event.kind !== 'invite' && (
           <button
             type="button"
@@ -174,6 +158,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
         {event.date.split(' ').map((part) => (
           <span key={part}>{part}</span>
         ))}
+        <span>{authorOf(event)}</span>
       </p>
       {'text' in event ? (
         <>

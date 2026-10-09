@@ -10,16 +10,16 @@
 }
 
 .chat__empty {
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-8) var(--space-4);
   color: var(--color-text-secondary);
-  text-shadow: var(--text-glow);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
   text-align: center;
 }
 
-/* Шапка: сверху 12, строка 40, до вкладок 8, вкладки 36, снизу разделитель */
+/* Шапка: строка 56 (кнопки 40, аватар 36), под ней вкладки разделов 44, снизу разделитель */
 .chat__header {
   flex-shrink: 0;
-  padding: var(--space-3) 0 0;
   border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
@@ -27,8 +27,9 @@
 .chat__top {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-4);
+  gap: var(--space-1);
+  min-height: 56px;
+  padding: 0 var(--space-2);
 }
 
 .chat__icon-button {
@@ -41,31 +42,29 @@
   font-size: var(--size-icon);
 }
 
-/* Аватарка 40, gap 8, блок с именем и статусом высотой 32 */
+/* Аватарка 36, gap 12, блок с именем и статусом */
 .chat__peer {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-width: 0;
 }
 
-/* Имя 16/16 medium, gap 4, статус 12/12 */
 .chat__who {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-1);
   justify-content: center; /* без статуса (Избранное) имя стоит по центру */
-  height: 32px;
   min-width: 0;
 }
 
 .chat__name {
   overflow: hidden;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+  letter-spacing: var(--letter-spacing-title);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -73,27 +72,25 @@
 .chat__status {
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
-  line-height: 12px;
+  line-height: var(--line-height-xs);
 }
 
-/* Шесть вкладок 40×36 равномерно по ширине; под активной синяя полоса 2 px внизу.
-   Полоса и цвет значков идут за страницами (--p — положение в разделах, --w — насколько вкладка «выбрана»), их задаёт SwipePager */
+/* Шесть вкладок равной ширины; под активной акцентная полоска 3 px внизу, на разделителе шапки.
+   Полоска и цвет значков идут за страницами (--p — положение в разделах, --w — насколько вкладка «выбрана»), их задаёт SwipePager */
 .chat__tabs {
   position: relative;
   display: flex;
-  justify-content: space-between;
-  margin-top: var(--space-2);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-2);
 }
 
 .chat__tab {
   --w: 0;
   position: relative;
   display: flex;
+  flex: 1;
+  align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 36px;
-  padding-top: 4px;
+  height: 44px;
   color: var(--color-text-caption);
   font-size: var(--size-icon);
 }
@@ -110,24 +107,26 @@
   }
 }
 
-/* Полоса 40×2 стоит под вкладкой: слева 16 + номер раздела × шаг вкладок ((ширина − 32 − 40) / 5) */
+/* Полоска 24×3 под значком: слева 8 + (номер раздела + ½) × ширина вкладки ((ширина − 16) / 6) − половина полоски */
 .chat__tab-line {
   position: absolute;
-  bottom: -1px; /* перекрывает разделитель шапки: полоса 2 px */
-  left: calc(16px + var(--p, 1) * (100% - 72px) / 5);
-  width: 40px;
-  height: 2px;
+  bottom: -1px; /* на разделителе шапки */
+  left: calc(8px + (var(--p, 1) + 0.5) * (100% - 16px) / 6 - 12px);
+  width: 24px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
   background: var(--color-accent);
   pointer-events: none;
 }
 
-/* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 16, снизу 12 до панели ввода */
+/* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 12 */
 .chat__feed {
   position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  background: var(--color-bg-chat);
 }
 
 .chat__messages {
@@ -135,7 +134,7 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding: var(--space-4) var(--space-4) 11px; /* 12 до нижнего края разделителя панели */
+  padding: var(--space-3);
   overflow-y: auto;
 }
 
@@ -147,53 +146,51 @@
 .chat__group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .chat__group + .chat__group {
-  margin-top: 24px; /* до подписи дня 24, как после неё (у ленты нет gap) */
+  margin-top: var(--space-4);
 }
 
 .chat__group--typing {
   margin-top: 0 !important;
 }
 
-/* Разделитель дня 63×28: подпись 12/16, отступ 16 и до, и после (8 + gap 8) */
+/* Подпись дня: плашка без тени, непрозрачная — прилипая, она закрывает пузыри под собой */
 .chat__day {
   position: sticky;
-  top: 3px;
+  top: var(--space-1);
   z-index: 2;
   align-self: center;
-  margin-bottom: 16px; /* 16 + gap 8 = 24 */
-  padding: 6px 8px;
+  margin-bottom: var(--space-2);
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
-  /* белая плашка с мягкой тенью: на обоях и поверх белых пузырей, под которыми она прилипает, видна без кольца */
-  background: var(--color-bg-panel);
-  box-shadow: 0 1px 3px rgb(30 50 80 / 16%);
+  background: var(--color-bg-pill);
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-xs);
 }
 
 /* Кнопка «к последним сообщениям» */
 .chat__down {
   position: absolute;
-  right: 16px;
-  bottom: 12px;
+  right: var(--space-3);
+  bottom: var(--space-3);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--color-stroke);
   border-radius: 50%;
   background: var(--color-bg-panel);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
-  color: var(--color-text-caption);
-  font-size: 24px;
+  box-shadow: var(--shadow-float);
+  color: var(--color-text-secondary);
+  font-size: var(--size-icon);
 }
 
 .chat__down-badge {
@@ -207,7 +204,7 @@
   background: var(--color-accent);
   color: var(--color-accent-on);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   line-height: 20px;
   text-align: center;
 }
@@ -239,11 +236,12 @@
   flex: none;
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 .chat__icon-button--small {
   width: 32px;
-  font-size: 24px;
+  font-size: var(--size-icon);
 }
 
 .chat__icon-button:disabled {
@@ -260,10 +258,10 @@
 .msg-menu {
   position: fixed;
   margin: 0;
-  padding: 4px 0;
-  border-radius: 14px;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
-  box-shadow: 0 4px 24px rgb(0 0 0 / 18%);
+  box-shadow: var(--shadow-float);
   list-style: none;
 }
 
@@ -273,14 +271,14 @@
   gap: var(--space-3);
   width: 100%;
   height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
   font-size: var(--font-size-md);
   text-align: left;
 }
 
 .msg-menu__item svg {
   color: var(--color-text-caption);
-  font-size: 20px;
+  font-size: var(--size-icon-sm);
 }
 
 .msg-menu__item--danger,
@@ -288,8 +286,8 @@
   color: var(--color-red);
 }
 
-/* Между сообщениями разных авторов 12, одного автора 8 */
+/* Между сообщениями разных авторов 12, одного автора 4 */
 .bubble--in + .bubble--out,
 .bubble--out + .bubble--in {
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
