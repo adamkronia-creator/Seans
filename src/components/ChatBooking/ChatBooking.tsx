@@ -15,7 +15,7 @@ import {
 import { useNow } from '../../utils/useNow';
 import { Toast } from '../Toast/Toast';
 import { AppointmentCard, HistoryList, type CardAction } from './AppointmentCard';
-import { IconBookingCalendar } from '../icons';
+import { IconBookingCalendar, IconTabBooking } from '../icons';
 import { InfoSheet, MapsSheet, newDraft, ProposeSheet, RangeSheet, ReasonSheet, rescheduleDraft } from './BookingSheets';
 import { slotShort } from './bookingText';
 import { InfoCard } from './InfoCard';
@@ -90,7 +90,18 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
 
   if (favorites) {
-    return <p className="chat__empty chat__empty--grow">Запись на прием доступна в чатах с клиентами и коллегами</p>;
+    return (
+      <div className="booking">
+        <div className="booking__scroll">
+          <div className="booking__empty">
+            <span className="booking__empty-icon">
+              <IconTabBooking />
+            </span>
+            <p className="booking__empty-text">Запись на прием доступна в чатах с клиентами и коллегами</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const pending = [...view.incoming, ...view.outgoing];

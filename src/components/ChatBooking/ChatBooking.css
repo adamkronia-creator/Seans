@@ -408,7 +408,33 @@
 
 .history__row {
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+}
+
+/* Значок стоит у первой строки (высота 20, как у подписи статуса) */
+.history__icon {
+  flex-shrink: 0;
+  font-size: var(--size-icon-sm);
+}
+
+.history__icon--green {
+  color: var(--color-green-text);
+}
+
+.history__icon--red {
+  color: var(--color-red-text);
+}
+
+.history__icon--gray {
+  color: var(--color-text-secondary);
+}
+
+.history__body {
+  flex: 1;
+  min-width: 0;
 }
 
 .history__row + .history__row::before {

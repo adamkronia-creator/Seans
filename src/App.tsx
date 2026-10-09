@@ -1,5 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
+import { ComingSoon } from './components/ComingSoon/ComingSoon';
+import { IconPlanner, IconReading } from './components/icons';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
@@ -13,6 +15,12 @@ import { goBack, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition } from './utils/transition';
+
+/** Разделы нижней панели, которых еще нет: значок и название на пустом экране */
+const COMING_SOON = {
+  planner: { title: 'Ежедневник', Icon: IconPlanner },
+  reading: { title: 'Материалы для чтения', Icon: IconReading },
+} as const;
 
 /** Что показывает адрес: key один и тот же, пока на экране тот же экран, поэтому при смене слоёв он не рисуется заново */
 interface Screen {
@@ -140,10 +148,8 @@ export default function App() {
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />) : page('tests', <TestsPage />);
     }
     if (tab === 'tasks') return page('tasks', <TasksPage />);
-    return page(
-      `tab/${tab}`,
-      <p style={{ padding: 24, color: 'var(--color-text-secondary)' }}>Раздел в разработке</p>,
-    );
+    const soon = COMING_SOON[tab];
+    return page(`tab/${tab}`, <ComingSoon Icon={soon.Icon} title={soon.title} />);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой

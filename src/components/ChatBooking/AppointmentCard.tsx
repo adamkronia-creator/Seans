@@ -1,5 +1,7 @@
+import type { ComponentType, SVGProps } from 'react';
 import { bounds, phaseOf, type Appointment } from '../../data/appointments';
 import { dayLong, dayShort, untilDay } from '../../utils/ruDate';
+import { IconBookingCancelled, IconBookingDone, IconBookingMoved, IconBookingPending } from '../icons';
 import { slotDetail, slotShort, slotTime } from './bookingText';
 
 export type CardAction = 'reschedule' | 'cancel' | 'accept' | 'counter' | 'decline' | 'edit' | 'withdraw';
@@ -104,36 +106,53 @@ export function AppointmentCard({ a, peerName, now, replaced, moving, nearest, o
   );
 }
 
-/** Подпись и цвет строки истории */
-function historyInfo(a: Appointment, now: Date, peerName: string): { status: string; tone: 'green' | 'red' | 'gray'; sub?: string } {
+interface HistoryInfo {
+  status: string;
+  /** Цвет подписи и значка: состоялся — зеленый, отказ и отмена — красный, остальное — серый */
+  tone: 'green' | 'red' | 'gray';
+  /** Значок статуса: по форме видно, чем закончилось, даже без цвета */
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  sub?: string;
+}
+
+/** Подпись, цвет и значок строки истории */
+function historyInfo(a: Appointment, now: Date, peerName: string): HistoryInfo {
   const who = a.closedBy === 'me' ? 'вы' : peerName;
   switch (a.status) {
     case 'confirmed':
-      return { status: 'Состоялся', tone: 'green' };
+      return { status: 'Состоялся', tone: 'green', Icon: IconBookingDone };
     case 'cancelled':
-      return { status: `Отменен · ${who}`, tone: 'red', sub: a.reason };
+      return { status: `Отменен · ${who}`, tone: 'red', Icon: IconBookingCancelled, sub: a.reason };
     case 'declined':
-      return { status: `${a.replaces ? 'Перенос отклонен' : 'Отказ'} · ${who}`, tone: 'red', sub: a.reason };
+      return { status: `${a.replaces ? 'Перенос отклонен' : 'Отказ'} · ${who}`, tone: 'red', Icon: IconBookingCancelled, sub: a.reason };
     case 'moved':
-      return { status: 'Перенесен', tone: 'gray', sub: a.movedTo ? `На ${dayShort(a.movedTo.date, now)}, ${a.movedTo.start}` : undefined };
+      return {
+        status: 'Перенесен',
+        tone: 'gray',
+        Icon: IconBookingMoved,
+        sub: a.movedTo ? `На ${dayShort(a.movedTo.date, now)}, ${a.movedTo.start}` : undefined,
+      };
     default:
-      return { status: 'Не согласован', tone: 'gray', sub: phaseOf(a, now) === 'expired' ? 'Время прошло' : undefined };
+      return { status: 'Не согласован', tone: 'gray', Icon: IconBookingPending, sub: phaseOf(a, now) === 'expired' ? 'Время прошло' : undefined };
   }
 }
 
-/** История: что состоялось, отменено, перенесено. Одна белая карточка со строками */
+/** История: что состоялось, отменено, перенесено. Одна белая карточка со строками: значок статуса и три строки текста */
 export function HistoryList({ items, peerName, now }: { items: Appointment[]; peerName: string; now: Date }) {
   return (
     <ul className="history">
       {items.map((a) => {
-        const { status, tone, sub } = historyInfo(a, now, peerName);
+        const { status, tone, Icon, sub } = historyInfo(a, now, peerName);
         return (
           <li key={a.id} className="history__row">
-            <p className={`history__status history__status--${tone}`}>{status}</p>
-            <p className="history__when">
-              {dayShort(a.slot.date, now)} · {slotTime(a.slot, a.duration)}
-            </p>
-            {sub && <p className="history__sub">{a.status === 'cancelled' || a.status === 'declined' ? `«${sub}»` : sub}</p>}
+            <Icon className={`history__icon history__icon--${tone}`} aria-hidden="true" />
+            <div className="history__body">
+              <p className={`history__status history__status--${tone}`}>{status}</p>
+              <p className="history__when">
+                {dayShort(a.slot.date, now)} · {slotTime(a.slot, a.duration)}
+              </p>
+              {sub && <p className="history__sub">{a.status === 'cancelled' || a.status === 'declined' ? `«${sub}»` : sub}</p>}
+            </div>
           </li>
         );
       })}

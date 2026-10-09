@@ -67,7 +67,7 @@ export { default as IconMicrophone } from '../../assets/icons/chat/microphone.sv
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
 export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
 
-// Вкладка «Запись на прием»: все значки присланы, кроме external (временный, заменить файлом с тем же именем)
+// Вкладка «Запись на прием»: присланы все значки, кроме status-* (временные: статусы в истории приемов, заменить файлом с тем же именем)
 export { default as IconBookingPin } from '../../assets/icons/booking/pin.svg?react';
 export { default as IconBookingRoute } from '../../assets/icons/booking/route.svg?react';
 export { default as IconBookingInMaps } from '../../assets/icons/booking/in-maps.svg?react';
@@ -77,6 +77,10 @@ export { default as IconBookingDirections } from '../../assets/icons/booking/dir
 export { default as IconBookingBag } from '../../assets/icons/booking/bag.svg?react';
 export { default as IconBookingCalendar } from '../../assets/icons/booking/calendar.svg?react';
 export { default as IconBookingExternal } from '../../assets/icons/booking/external.svg?react';
+export { default as IconBookingDone } from '../../assets/icons/booking/status-done.svg?react';
+export { default as IconBookingCancelled } from '../../assets/icons/booking/status-cancelled.svg?react';
+export { default as IconBookingMoved } from '../../assets/icons/booking/status-moved.svg?react';
+export { default as IconBookingPending } from '../../assets/icons/booking/status-pending.svg?react';
 
 // Вкладка «Кейс»
 export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
