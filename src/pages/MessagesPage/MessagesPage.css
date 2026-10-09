@@ -19,10 +19,9 @@
   font-size: var(--size-icon);
 }
 
-/* От разделителя шапки до первого чата 12: 2 здесь + 10 внутри строки */
+/* От разделителя шапки до первого чата 12: все внутри строки (см. ChatItem.css) */
 .messages__list {
   flex: 1;
-  padding-top: 2px;
   overflow-y: auto;
 }
 

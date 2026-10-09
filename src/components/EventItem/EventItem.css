@@ -71,3 +71,8 @@ button.event-item__inner:active {
   color: var(--color-text-caption);
   font-size: 20px;
 }
+
+/* Список вплотную к разделителю шапки: прежние 2 px отступа сверху перенесены в первую строку */
+.event-item:first-child .event-item__inner {
+  padding-top: 12px;
+}

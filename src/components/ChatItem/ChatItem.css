@@ -74,3 +74,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Список вплотную к разделителю шапки: прежние 2 px отступа сверху перенесены в первую строку */
+.chat-item:first-child .chat-item__button {
+  padding-top: 12px;
+}
