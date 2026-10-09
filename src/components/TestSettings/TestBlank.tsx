@@ -27,16 +27,6 @@ export function CollapseCard({ title, badge, id, children }: { title: string; ba
   );
 }
 
-/** Разделы бланка для оглавления: два блока и каждый десятый вопрос */
-export function blankSections(data: TestBlankData) {
-  const sections = [
-    { id: 'blank-rules', title: 'Правила тестирования' },
-    { id: 'blank-qa', title: 'Вопросы и ответы' },
-  ];
-  for (let n = 10; n <= data.questions.length; n += 10) sections.push({ id: `blank-q-${n}`, title: `Вопрос ${n}` });
-  return sections;
-}
-
 /** Прохождение: ответы хранятся снаружи, чтобы можно было посчитать результат */
 export interface BlankFill {
   answers: Record<number, number>;

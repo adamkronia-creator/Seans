@@ -17,8 +17,7 @@
 .cc-row,
 .bk-link,
 .appt__foot-button,
-.history__more,
-.sec-toc__backdrop {
+.history__more {
   --press-scale: 1;
 }
 

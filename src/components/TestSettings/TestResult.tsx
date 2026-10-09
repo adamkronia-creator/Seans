@@ -5,12 +5,11 @@ import type { ConclusionData } from '../../data/conclusions';
 import { LIBRARY } from '../../data/library';
 import { testBlank } from '../../data/testBlank';
 import { useSelfResult } from '../../data/selfTest';
-import { SectionNav } from '../SectionNav/SectionNav';
 import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
-import { TestBlank, blankSections } from './TestBlank';
+import { TestBlank } from './TestBlank';
 import { TestHeader } from './TestHeader';
-import { conclusionSections, TestConclusion } from './TestConclusion';
+import { TestConclusion } from './TestConclusion';
 import './TestSettings.css';
 
 interface TestResultProps {
@@ -78,18 +77,14 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
         onBack={showBlank ? () => transition(() => setBlankOpen(false), 'back') : onBack}
       />
       {showBlank ? (
-        <>
-          <div className="test-settings__scroll" key="blank">
-            <TestBlank data={blank} fill={{ answers: result.answers! }} />
-          </div>
-          <SectionNav sections={blankSections(blank)} scroller=".test-settings__scroll" />
-        </>
+        <div className="test-settings__scroll" key="blank">
+          <TestBlank data={blank} fill={{ answers: result.answers! }} />
+        </div>
       ) : (
         <div className="cc-wrap" key="result">
           <div className="test-settings__scroll">
             <TestConclusion data={data} form={result.form} onOpenBlank={blank ? () => transition(() => setBlankOpen(true), 'forward') : undefined} />
           </div>
-          <SectionNav sections={conclusionSections(data)} scroller=".test-settings__scroll" />
         </div>
       )}
     </section>

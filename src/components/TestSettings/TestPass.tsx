@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
-import { SectionNav } from '../SectionNav/SectionNav';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
-import { BlankRules, CollapseCard, TestBlank, blankSections } from './TestBlank';
+import { BlankRules, CollapseCard, TestBlank } from './TestBlank';
 import { JumpSheet, PassQuestion } from './TestPassSingle';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
@@ -145,7 +144,6 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
   };
 
   const showForms = forms !== undefined && forms.length > 1 && formAffectsScore(testId);
-  const sections = [...(showForms ? [{ id: 'pass-form', title: 'Форма бланка' }] : []), ...blankSections(blank)];
 
   const formCard = showForms && (
     <CollapseCard title="Форма бланка" id="pass-form">
@@ -196,7 +194,6 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
           />
         )}
       </div>
-      {!single && <SectionNav sections={sections} scroller=".test-settings__scroll" />}
 
       <div className="test-settings__cta test-pass__cta">
         <div className="test-pass__meta">

@@ -316,22 +316,6 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
   );
 }
 
-/** Разделы заключения для оглавления, по порядку на странице */
-export function conclusionSections(data: ConclusionData) {
-  return [
-    { id: 'cc-info', title: 'Общая информация' },
-    ...(data.summary ? [{ id: 'cc-summary', title: 'Шкалы тестирования' }] : []),
-    ...(data.blocks ?? []).map((b) => ({ id: `cc-block-${b.key}`, title: b.title })),
-    ...(data.overview
-      ? [
-          { id: 'cc-main', title: 'Основные шкалы' },
-          ...(data.scales.some((s) => s.group === 'extra') ? [{ id: 'cc-extra', title: 'Дополнительные шкалы' }] : []),
-        ]
-      : []),
-    ...data.scales.map((s) => ({ id: `cc-scale-${s.code}`, title: data.overview || data.blocks ? `${s.name} (${s.code})` : s.name })),
-  ];
-}
-
 interface TestConclusionProps {
   data: ConclusionData;
   form: string;

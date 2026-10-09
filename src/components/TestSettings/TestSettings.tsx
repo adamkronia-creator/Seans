@@ -14,14 +14,13 @@ import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
-import { CollapseCard, TestBlank, blankSections } from './TestBlank';
-import { conclusionSections, TestConclusion } from './TestConclusion';
+import { CollapseCard, TestBlank } from './TestBlank';
+import { TestConclusion } from './TestConclusion';
 import { TestHeader } from './TestHeader';
 import { TestPass, type QuestionView } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { canPassSelf } from '../../data/selfTest';
-import { SectionNav } from '../SectionNav/SectionNav';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
@@ -258,15 +257,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           <div className="test-settings__scroll">
             <TestConclusion data={conclusion} form={form} />
           </div>
-          <SectionNav sections={conclusionSections(conclusion)} scroller=".test-settings__scroll" />
         </div>
       ) : view === 'blank' && blank ? (
-        <>
-          <div className="test-settings__scroll" key="blank">
-            <TestBlank data={blank} />
-          </div>
-          <SectionNav sections={blankSections(blank)} scroller=".test-settings__scroll" />
-        </>
+        <div className="test-settings__scroll" key="blank">
+          <TestBlank data={blank} />
+        </div>
       ) : (
       <>
       <div className="test-settings__scroll">
