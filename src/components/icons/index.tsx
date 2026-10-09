@@ -67,7 +67,7 @@ export { default as IconMicrophone } from '../../assets/icons/chat/microphone.sv
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
 export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
 
-// Вкладка «Запись на прием»: присланы все значки, кроме status-* (временные: статусы в истории приемов, заменить файлом с тем же именем)
+// Вкладка «Запись на прием»: все значки присланы; status-* — статусы в истории приемов (заменяются файлом с тем же именем)
 export { default as IconBookingPin } from '../../assets/icons/booking/pin.svg?react';
 export { default as IconBookingRoute } from '../../assets/icons/booking/route.svg?react';
 export { default as IconBookingInMaps } from '../../assets/icons/booking/in-maps.svg?react';
