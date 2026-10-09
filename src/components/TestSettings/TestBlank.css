@@ -72,22 +72,22 @@
   }
 }
 
-/* Правила: нумерованный список 16/19, отступ слева 8, между пунктами 4 */
+/* Правила: тот же текст 18/24 и отступы 12, что у вопросов; номер выступает слева, между пунктами 12 */
 .blank-rules {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-3);
   margin: 0;
-  padding: var(--space-3) var(--space-3) var(--space-3) 20px;
+  padding: var(--space-3);
   counter-reset: rule;
   list-style: none;
-  font-size: var(--font-size-md);
-  line-height: 19px;
+  font-size: var(--font-size-lg);
+  line-height: 24px;
 }
 
 .blank-rules li {
   position: relative;
-  padding-left: 20px;
+  padding-left: 28px;
   counter-increment: rule;
 }
 
@@ -95,6 +95,7 @@
   content: counter(rule) '.';
   position: absolute;
   left: 0;
+  font-weight: var(--font-weight-medium);
 }
 
 /* Единственное правило — обычный абзац с теми же отступами, без номера */
@@ -108,13 +109,13 @@
   list-style: none;
 }
 
-/* Пояснение к группе вопросов («Сейчас, в данный момент:»): отдельная плашка над первым вопросом группы */
+/* Пояснение к группе вопросов («Сейчас, в данный момент:», «В последнее время:»): плашка 16/20 с отступами 12, у всех групп одинаковая */
 .blank-heading {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3);
   border-top: 1px solid var(--color-divider);
   background: color-mix(in srgb, var(--color-accent) 8%, transparent);
   color: var(--color-accent);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   line-height: 20px;
 }
