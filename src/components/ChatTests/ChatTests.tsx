@@ -67,15 +67,23 @@ function SectionedList({
   );
 }
 
-/** Вкладка «Тесты» в открытом чате */
-export function ChatTests({ hasData, onOpenTest }: { hasData: boolean; onOpenTest?: (id: string) => void }) {
+/** Вкладка «Тесты» в открытом чате: отправленный тест открывает его настройку, завершённый — результат клиента */
+export function ChatTests({
+  hasData,
+  onOpenTest,
+  onOpenResult,
+}: {
+  hasData: boolean;
+  onOpenTest?: (id: string) => void;
+  onOpenResult?: (id: string) => void;
+}) {
   const data = useClientData();
   return (
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       emptyText="Тесты ещё не отправлялись"
-      onOpen={onOpenTest && ((t) => onOpenTest(t.id))}
+      onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTest?.(t.id))}
     />
   );
 }

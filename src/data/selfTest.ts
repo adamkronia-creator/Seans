@@ -123,6 +123,19 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
 
 export const canPassSelf = (testId: string) => testId in SCORERS;
 
+/**
+ * Заключение по готовым ответам: так считается и самостоятельное прохождение, и результат клиента.
+ * Вернёт undefined, если для теста ещё нет подсчёта.
+ */
+export function conclusionFromAnswers(
+  testId: string,
+  answers: number[],
+  form: string,
+  info: ConclusionData['info'],
+): ConclusionData | undefined {
+  return SCORERS[testId]?.(answers, form, info);
+}
+
 /** Подсказки под выбором формы бланка: тесты, где форма меняет подсчёт (нормы), и чем именно */
 const FORM_HINT: Record<string, string> = {
   smol: 'От формы бланка зависит перевод баллов в Т-баллы.',

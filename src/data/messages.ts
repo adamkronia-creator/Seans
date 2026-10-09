@@ -1,3 +1,5 @@
+import { clientResultPath } from './resultLinks';
+
 export interface Message {
   id: string;
   from: 'me' | 'them';
@@ -54,14 +56,14 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
         { id: 'h12', from: 'me', text: 'Тем не менее вы уже знаете, что он о вас думает.', time: '19:08' },
         { id: 'h13', from: 'them', text: 'Получается, да.', time: '19:11' },
         { id: 'h14', from: 'them', text: 'Я постоянно так делаю. Пытаюсь угадать, что человек думает обо мне.', time: '19:13' },
-        { id: 't-phq9-done', from: 'them', text: 'Максим заполнил опросник депрессивного состояния «PHQ-9»', time: '21:22', test: 'phq9', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: '/chat/maxim/tests/phq9' }] },
+        { id: 't-phq9-done', from: 'them', text: 'Максим заполнил опросник депрессивного состояния «PHQ-9»', time: '21:22', test: 'phq9', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'phq9') }] },
       ],
     },
     {
       label: '5 сентября, сб',
       messages: [
         { id: 't-gad7-sent', from: 'me', text: 'Доброе утро, Максим. Отправляю опросник о тревоге, он займёт 2–3 минуты. Отвечайте так, как есть: правильных ответов здесь нет.', time: '10:08', test: 'gad7', testKind: 'sent' },
-        { id: 't-gad7-done', from: 'them', text: 'Максим заполнил опросник генерализованного тревожного расстройства «GAD-7»', time: '19:08', test: 'gad7', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: '/chat/maxim/tests/gad7' }] },
+        { id: 't-gad7-done', from: 'them', text: 'Максим заполнил опросник генерализованного тревожного расстройства «GAD-7»', time: '19:08', test: 'gad7', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'gad7') }] },
       ],
     },
     {
@@ -74,7 +76,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       label: '7 сентября, пн',
       messages: [
         { id: 't-rses-sent', from: 'me', text: 'Максим, здравствуйте. Прошу вас пройти короткий опросник о том, как вы относитесь к себе. Он поможет мне лучше понять вашу самооценку. Времени займёт немного, и ответы нужны ваши собственные, без подготовки.', time: '09:31', test: 'rses', testKind: 'sent' },
-        { id: 't-rses-done', from: 'them', text: 'Максим заполнил опросник самоуважения Розенберга «RSES»', time: '20:51', test: 'rses', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: '/chat/maxim/tests/rses' }] },
+        { id: 't-rses-done', from: 'them', text: 'Максим заполнил опросник самоуважения Розенберга «RSES»', time: '20:51', test: 'rses', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'rses') }] },
         { id: 'h16', from: 'them', text: 'Прошел тест, который вы рекомендовали.', time: '20:53' },
         { id: 'h17', from: 'me', text: 'Что вы почувствовали, когда увидели результат?', time: '20:56' },
         { id: 'h18', from: 'them', text: 'Первое — захотелось понять, нормальный ли он.', time: '20:58' },
@@ -88,7 +90,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       label: '9 сентября, ср',
       messages: [
         { id: 't-5pfq-sent', from: 'me', text: 'Максим, предлагаю пройти пятифакторный опросник личности. Он длиннее предыдущих, около 20–25 минут, поэтому выберите спокойное время. Он покажет, какие черты характера у вас выражены сильнее.', time: '12:15', test: '5pfq', testKind: 'sent' },
-        { id: 't-5pfq-done', from: 'them', text: 'Максим заполнил пятифакторный опросник личности «5PFQ»', time: '22:14', test: '5pfq', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: '/chat/maxim/tests/5pfq' }] },
+        { id: 't-5pfq-done', from: 'them', text: 'Максим заполнил пятифакторный опросник личности «5PFQ»', time: '22:14', test: '5pfq', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', '5pfq') }] },
       ],
     },
     {
@@ -108,7 +110,7 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       messages: [
         { id: 't-scl90-sent', from: 'me', text: 'Максим, отправляю симптоматический опросник SCL-90. В нём 90 пунктов, на него уйдёт 12–15 минут. Отвечайте о том, как вы себя чувствовали в течение последней недели.', time: '11:04', test: 'scl90', testKind: 'sent' },
         { id: 'h30', from: 'them', text: 'Сегодня получил хорошую обратную связь на работе, но вместо радости подумал: «А вдруг он просто хотел меня поддержать?»', time: '15:10' },
-        { id: 't-scl90-done', from: 'them', text: 'Максим заполнил симптоматический опросник «SCL-90»', time: '20:53', test: 'scl90', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: '/chat/maxim/tests/scl90' }] },
+        { id: 't-scl90-done', from: 'them', text: 'Максим заполнил симптоматический опросник «SCL-90»', time: '20:53', test: 'scl90', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'scl90') }] },
       ],
     },
     {

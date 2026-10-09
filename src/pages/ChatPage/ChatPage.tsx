@@ -24,6 +24,7 @@ import type { Message } from '../../data/messages';
 import { TestResult } from '../../components/TestSettings/TestResult';
 import { TestSettings } from '../../components/TestSettings/TestSettings';
 import { LIBRARY } from '../../data/library';
+import { clientResultPath } from '../../data/resultLinks';
 import { goBack, navigate } from '../../router';
 import './ChatPage.css';
 
@@ -398,7 +399,11 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
           {chat.favorites ? (
             <SelfTests onOpen={(id) => navigate(`/chat/${chatId}/result/${id}`)} />
           ) : (
-            <ChatTests hasData={hasClientData} onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)} />
+            <ChatTests
+              hasData={hasClientData}
+              onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
+              onOpenResult={(id) => navigate(clientResultPath(chatId, id))}
+            />
           )}
           <TabBar active="messages" onChange={onAppTabChange} />
         </>

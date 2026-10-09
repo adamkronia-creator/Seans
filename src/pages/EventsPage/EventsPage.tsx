@@ -1,7 +1,7 @@
 import { EventItem } from '../../components/EventItem/EventItem';
 import { IconBack } from '../../components/icons';
 import { appEvents, useClientData } from '../../data/clientStore';
-import { goBack } from '../../router';
+import { goBack, navigate } from '../../router';
 import './EventsPage.css';
 
 export function EventsPage() {
@@ -17,7 +17,7 @@ export function EventsPage() {
 
       <ul className="events__list">
         {events.map((event) => (
-          <EventItem key={event.id} event={event} />
+          <EventItem key={event.id} event={event} onClick={(e) => e.href && navigate(e.href)} />
         ))}
       </ul>
     </section>

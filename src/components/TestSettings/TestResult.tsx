@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { IconBack } from '../icons';
+import { findClientResult } from '../../data/clientResults';
+import type { ConclusionData } from '../../data/conclusions';
 import { LIBRARY } from '../../data/library';
 import { testBlank } from '../../data/testBlank';
 import { useSelfResult } from '../../data/selfTest';
@@ -14,12 +16,22 @@ interface TestResultProps {
   onBack: () => void;
 }
 
+/** Что показывает экран: у собственного прохождения заключение есть всегда, у результата клиента — если для теста заведён подсчёт */
+interface ShownResult {
+  testId: string;
+  data?: ConclusionData;
+  form: string;
+  answers?: Record<number, number>;
+}
+
 /**
- * Результат самостоятельного прохождения: заключение с общей информацией и шкалами.
- * Если при прохождении было включено «Сохранить бланк», в нём есть кнопка к бланку со всеми ответами.
+ * Результат теста: заключение с общей информацией и шкалами. Открывается для собственного прохождения психолога
+ * и для теста, который прошёл клиент (кнопка «Посмотреть» под сообщением, карточка во вкладке «Тесты», «События»).
+ * Если сохранены ответы (у результатов клиента они есть всегда, у своих — при включённой «Сохранить бланк»), в заключении есть кнопка к бланку со всеми ответами.
  */
 export function TestResult({ resultId, onBack }: TestResultProps) {
-  const result = useSelfResult(resultId);
+  const own = useSelfResult(resultId);
+  const result: ShownResult | undefined = own ?? findClientResult(resultId);
   const [blankOpen, setBlankOpen] = useState(false);
   const test = result && LIBRARY.find((t) => t.id === result.testId);
 
@@ -38,6 +50,19 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
     );
   }
 
+  const status = own ? 'Результат тестирования' : 'Результат клиента';
+  const { data } = result;
+
+  // Для некоторых тестов (RSES) в приложении ещё нет шкал и подсчёта: заключение построить не из чего
+  if (!data) {
+    return (
+      <section className="test-settings">
+        <TestHeader test={test} status={status} onBack={onBack} />
+        <p className="chat__empty chat__empty--grow">Заключение для этого теста пока недоступно</p>
+      </section>
+    );
+  }
+
   const blank = result.answers ? testBlank(result.testId) : undefined;
   const showBlank = blankOpen && blank && result.answers;
 
@@ -45,7 +70,7 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
     <section className="test-settings">
       <TestHeader
         test={test}
-        status={showBlank ? 'Бланк тестирования' : 'Результат тестирования'}
+        status={showBlank ? 'Бланк тестирования' : status}
         onBack={showBlank ? () => setBlankOpen(false) : onBack}
       />
       {showBlank ? (
@@ -58,9 +83,9 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
       ) : (
         <div className="cc-wrap" key="result">
           <div className="test-settings__scroll">
-            <TestConclusion data={result.data} form={result.form} onOpenBlank={blank ? () => setBlankOpen(true) : undefined} />
+            <TestConclusion data={data} form={result.form} onOpenBlank={blank ? () => setBlankOpen(true) : undefined} />
           </div>
-          <SectionNav sections={conclusionSections(result.data)} scroller=".test-settings__scroll" />
+          <SectionNav sections={conclusionSections(data)} scroller=".test-settings__scroll" />
         </div>
       )}
     </section>
