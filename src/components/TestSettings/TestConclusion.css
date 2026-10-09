@@ -448,9 +448,11 @@
 }
 
 /* Подпись после всех блоков заключения */
+/* Примечание оформлено как цитата: слева акцентная линия */
 .cc-note {
   margin: 0;
-  padding: 0 var(--space-3);
+  padding: 2px var(--space-3);
+  border-left: 3px solid var(--color-accent);
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
   line-height: 120%;
