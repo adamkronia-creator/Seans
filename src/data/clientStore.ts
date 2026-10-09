@@ -293,6 +293,8 @@ export type HistoryEvent =
       id: string;
       kind: 'test' | 'task';
       state: ActivityState;
+      /** Тест или задание из библиотеки */
+      ref: string;
       title: string;
       date: string;
       text: string;
@@ -361,6 +363,7 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
           id: a.id,
           kind: a.kind,
           state: a.state,
+          ref: a.ref,
           title: a.kind === 'test' ? name : `«${name}»`,
           date: `${a.date} ${a.time}`,
           text: activityText(a.kind, a.ref, a.state),

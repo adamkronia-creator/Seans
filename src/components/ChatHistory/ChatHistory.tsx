@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useState, type ComponentType, type SVGProps } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
@@ -20,6 +21,8 @@ import {
 import { CHATS, CURRENT_USER } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
+import { clientResultPath } from '../../data/resultLinks';
+import { navigate } from '../../router';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -143,6 +146,8 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
       if (text !== (event.comment ?? '')) setComment(event.id, text);
     }
   };
+  // Выполненный клиентом тест открывает его результат
+  const resultPath = event.kind === 'test' && event.state === 'done' ? clientResultPath('maxim', event.ref) : undefined;
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
@@ -169,7 +174,12 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
       </p>
       {'text' in event ? (
         <>
-          <div className="hist-card__event">
+          <div
+            className={`hist-card__event${resultPath ? ' hist-card__event--link' : ''}`}
+            {...(resultPath
+              ? { role: 'link', tabIndex: 0, onClick: () => navigate(resultPath), onKeyDown: (e: React.KeyboardEvent) => e.key === 'Enter' && navigate(resultPath) }
+              : {})}
+          >
             <p className="hist-card__text">{event.text}</p>
             {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
           </div>
