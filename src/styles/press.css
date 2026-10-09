@@ -1,0 +1,44 @@
+/*
+ * Нажатие как на телефоне. Размер меняет utils/pressEffect.ts (кнопка уменьшается и пружинит обратно),
+ * а пока элемент нажат, на нём стоит data-pressed: по нему здесь задана подсветка.
+ * Строки списков и заголовки карточек на всю ширину не уменьшаются (--press-scale: 1), у них подсвечивается фон.
+ */
+
+:root {
+  --color-bg-pressed: rgb(0 0 0 / 5%); /* нажатая строка внутри белой карточки */
+}
+
+.chat-item__button,
+.event-item__inner,
+.hist-card__event--link,
+.blank-card__head,
+.ts-row,
+.msg-menu__item,
+.cc-row,
+.sec-toc__backdrop {
+  --press-scale: 1;
+}
+
+.blank-card__head[data-pressed],
+.ts-row--link[data-pressed],
+.msg-menu__item[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+.ts-row--link[data-pressed] {
+  border-radius: 12px;
+}
+
+.hist-card__event--link[data-pressed] {
+  opacity: 0.55;
+}
+
+/* Долгое нажатие на кнопку не выделяет текст и не вызывает системное меню (Safari на iPhone) */
+button,
+[role='button'],
+[role='link'],
+summary {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Avatar } from '../Avatar/Avatar';
 import { CHATS } from '../../data/chats';
 import { IconTestChevron, IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
+import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestActions.css';
 
@@ -34,8 +34,8 @@ export function ActionSheet({ onPick, onClose }: ActionSheetProps) {
     { id: 'one' as const, title: 'Отправить', Icon: IconTestSend },
     { id: 'many' as const, title: 'Отправить нескольким', Icon: IconTestSendMany },
   ];
-  return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  return (
+    <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
         <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__body test-actions-body">
@@ -57,8 +57,7 @@ export function ActionSheet({ onPick, onClose }: ActionSheetProps) {
           </button>
         </div>
       </div>
-    </div>,
-    document.body,
+    </SheetOverlay>
   );
 }
 
@@ -76,8 +75,8 @@ export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
   const [picked, setPicked] = useState<string[]>([]);
   const toggle = (id: string) =>
     setPicked((p) => (mode === 'one' ? [id] : p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
-  return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  return (
+    <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Кому отправить">
         <div className="sheet__header">
           <h2 className="sheet__heading">{mode === 'one' ? 'Кому отправить?' : 'Выберите клиентов'}</h2>
@@ -118,7 +117,6 @@ export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
           </button>
         </div>
       </div>
-    </div>,
-    document.body,
+    </SheetOverlay>
   );
 }

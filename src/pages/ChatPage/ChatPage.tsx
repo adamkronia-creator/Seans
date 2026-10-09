@@ -26,6 +26,8 @@ import { TestSettings } from '../../components/TestSettings/TestSettings';
 import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { goBack, navigate } from '../../router';
+import { useExitAnimation } from '../../utils/exitAnimation';
+import { transition } from '../../utils/transition';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
@@ -67,6 +69,8 @@ function MessageMenu({
   onReply: () => void;
   onDelete: () => void;
 }) {
+  const backdropRef = useRef<HTMLDivElement>(null);
+  useExitAnimation(backdropRef);
   const items = [
     { label: 'Ответить', Icon: IconReply, run: onReply },
     ...(message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined) }] : []),
@@ -77,10 +81,13 @@ function MessageMenu({
   const maxLeft = (bounds?.right ?? window.innerWidth) - MENU_W - 8;
   const left = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - MENU_W : rect.left, maxLeft));
   const topLimit = bounds?.top ?? 0;
-  const top = rect.top - h - 8 >= topLimit ? rect.top - h - 8 : Math.min(rect.bottom + 8, window.innerHeight - h - 8);
+  const above = rect.top - h - 8 >= topLimit;
+  const top = above ? rect.top - h - 8 : Math.min(rect.bottom + 8, window.innerHeight - h - 8);
+  // Меню вырастает от пузыря: над ним — от нижнего края, под ним — от верхнего; сторону задаёт автор сообщения
+  const origin = `${above ? 'bottom' : 'top'} ${message.from === 'me' ? 'right' : 'left'}`;
   return (
-    <div className="msg-menu__backdrop" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
-      <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W }} onClick={(e) => e.stopPropagation()}>
+    <div ref={backdropRef} className="msg-menu__backdrop" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
+      <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
         {items.map(({ label, Icon, run, danger }) => (
           <li key={label}>
             <button
@@ -308,7 +315,7 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
               className={`chat__tab${id === section ? ' chat__tab--active' : ''}`}
               aria-label={label}
               aria-current={id === section ? 'page' : undefined}
-              onClick={() => setSection(id)}
+              onClick={() => id !== section && transition(() => setSection(id), 'fade')}
             >
               <Icon />
             </button>

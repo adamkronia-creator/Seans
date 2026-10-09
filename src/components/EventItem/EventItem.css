@@ -13,8 +13,9 @@
   text-align: left;
 }
 
-button.event-item__inner:active {
-  background: var(--color-bg-panel);
+button.event-item__inner:active,
+button.event-item__inner[data-pressed] {
+  background: var(--color-bg-row-pressed);
 }
 
 /* Имя 16/16, gap 4, описание 16/19 (переносится на несколько строк) */

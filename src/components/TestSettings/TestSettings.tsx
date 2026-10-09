@@ -35,6 +35,8 @@ import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { canPassSelf } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
+import { Toast } from '../Toast/Toast';
+import { transition } from '../../utils/transition';
 import './TestSettings.css';
 
 /** Высота свёрнутого описания: 6 строк по 19 и промежуток между абзацами 12, одинаково у всех тестов */
@@ -151,9 +153,15 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   const pick = (action: TestAction) => {
     if (action === 'self') {
-      setSheet(null);
-      if (blank && canPassSelf(test.id)) setView('pass');
-      else notify('Бланк теста для самостоятельного прохождения пока недоступен');
+      if (blank && canPassSelf(test.id)) {
+        transition(() => {
+          setSheet(null);
+          setView('pass');
+        }, 'forward');
+      } else {
+        setSheet(null);
+        notify('Бланк теста для самостоятельного прохождения пока недоступен');
+      }
     } else if (action === 'one' && chatId) send([chatId]);
     else setSheet(action);
   };
@@ -203,25 +211,23 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </div>
     );
   };
-  const openConclusion = () => (conclusion ? setView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
-  const openBlank = () => (blank ? setView('blank') : notify('Бланк этого теста пока недоступен'));
+  // Бланк, заключение и прохождение открываются как следующий экран: выезжают справа, «назад» возвращает к настройкам
+  const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
+  const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
+  const openBlank = () => (blank ? openView('blank') : notify('Бланк этого теста пока недоступен'));
 
   if (resultId) {
     return (
       <>
-        <TestResult resultId={resultId} onBack={() => setResultId(null)} />
-        {toast && (
-          <p className="test-settings__toast" role="status">
-            {toast}
-          </p>
-        )}
+        <TestResult resultId={resultId} onBack={() => transition(() => setResultId(null), 'back')} />
+        {toast && <Toast text={toast} />}
       </>
     );
   }
 
   return (
     <section className="test-settings">
-      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : () => setView('settings')} />
+      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : () => openView('settings')} />
 
       {view === 'pass' && blank ? (
         <TestPass
@@ -234,9 +240,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           onFormChange={setForm}
           onDone={(id) => {
             // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
-            setView('settings');
-            setResultId(id);
-            notify('Заключение теста сохранено в избранном');
+            transition(() => {
+              setView('settings');
+              setResultId(id);
+              notify('Заключение теста сохранено в избранном');
+            }, 'forward');
           }}
         />
       ) : view === 'conclusion' && conclusion ? (
@@ -479,11 +487,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       </>
       )}
 
-      {toast && (
-        <p className="test-settings__toast" role="status">
-          {toast}
-        </p>
-      )}
+      {toast && <Toast text={toast} />}
 
       {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
       {(sheet === 'one' || sheet === 'many') && (

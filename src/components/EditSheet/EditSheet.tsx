@@ -1,11 +1,11 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { createPortal } from 'react-dom';
 import { HEAD_ICONS } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
 import { RichEditor } from '../RichEditor/RichEditor';
 import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
 import { TONES, toneOf, type ToneId } from '../../data/tones';
+import { SheetOverlay } from './SheetOverlay';
 import './EditSheet.css';
 
 export interface EditValues {
@@ -114,8 +114,8 @@ export function EditSheet({
   const PreviewIcon = iconOn ? HEAD_ICONS[icon].Icon : undefined;
   const previewSize = iconOn ? HEAD_ICONS[icon].size : 22;
 
-  return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  return (
+    <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={heading}>
         <div className="sheet__grab" aria-hidden="true" />
 
@@ -245,7 +245,6 @@ export function EditSheet({
           </button>
         </div>
       </div>
-    </div>,
-    document.body,
+    </SheetOverlay>
   );
 }

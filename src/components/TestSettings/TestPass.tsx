@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { SectionNav } from '../SectionNav/SectionNav';
+import { Toast } from '../Toast/Toast';
 import { useSheet } from './TestActions';
 import { BlankRules, CollapseCard, TestBlank, blankSections } from './TestBlank';
 import { JumpSheet, PassQuestion } from './TestPassSingle';
+import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestPass.css';
 
@@ -32,8 +33,8 @@ interface TestPassProps {
 
 function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConfirm: () => void; onClose: () => void }) {
   useSheet(onClose);
-  return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  return (
+    <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Сбросить ответы">
         <div className="sheet__header">
           <h2 className="sheet__heading">Сбросить ответы?</h2>
@@ -50,8 +51,7 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
           </button>
         </div>
       </div>
-    </div>,
-    document.body,
+    </SheetOverlay>
   );
 }
 
@@ -243,11 +243,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
             Завершить тест
           </button>
         )}
-        {toast && (
-          <p className="test-settings__toast test-pass__toast" role="status">
-            {toast}
-          </p>
-        )}
+        {toast && <Toast text={toast} className="test-pass__toast" />}
       </div>
 
       {jumpOpen && (

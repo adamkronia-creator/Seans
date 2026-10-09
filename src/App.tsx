@@ -8,6 +8,7 @@ import { TestSettings } from './components/TestSettings/TestSettings';
 import { LIBRARY } from './data/library';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { goBack, navigate, useRoute } from './router';
+import { transition } from './utils/transition';
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('messages');
@@ -18,9 +19,14 @@ export default function App() {
   const testRoute = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
 
   const handleTabChange = (id: TabId) => {
-    setTab(id);
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
-    if (id === 'messages' || route.startsWith('/tests/')) navigate('/');
+    const toRoot = (id === 'messages' || route.startsWith('/tests/')) && route !== '/';
+    if (id === tab && !toRoot) return;
+    // Другая вкладка — мягкая смена содержимого; та же вкладка — возврат к её списку: открытый экран уезжает вправо
+    transition(() => {
+      setTab(id);
+      if (toRoot) navigate('/', 'none');
+    }, id === tab ? 'back' : 'fade');
   };
 
   // Открытый чат занимает весь экран, без нижней панели разделов.

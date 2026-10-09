@@ -15,8 +15,9 @@
   text-align: left;
 }
 
-.chat-item__button:active {
-  background: var(--color-bg-panel);
+.chat-item__button:active,
+.chat-item__button[data-pressed] {
+  background: var(--color-bg-row-pressed);
 }
 
 /* Контейнер с именем и сообщением: высота 40, имя сверху, сообщение снизу */

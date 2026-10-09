@@ -464,7 +464,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.cc-row:active .cc-bar {
+.cc-row:active .cc-bar,
+.cc-row[data-pressed] .cc-bar {
   opacity: 0.8;
 }
 

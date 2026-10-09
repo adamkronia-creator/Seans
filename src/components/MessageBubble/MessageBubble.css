@@ -293,7 +293,8 @@
   transition: filter 0.15s ease;
 }
 
-.bubble-button:active {
+.bubble-button:active,
+.bubble-button[data-pressed] {
   filter: brightness(0.9);
 }
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { IconTestBlank, IconTestChevron } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
 import { useSheet } from './TestActions';
 import { BlankQuestionBody } from './TestBlank';
+import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestPass.css';
 
@@ -100,8 +100,8 @@ export function JumpSheet({ total, answers, current, rulesLabel, onPick, onRules
     currentRef.current?.scrollIntoView({ block: 'center' });
   }, []);
 
-  return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+  return (
+    <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Все вопросы">
         <div className="sheet__header">
           <h2 className="sheet__heading">Все вопросы</h2>
@@ -147,7 +147,6 @@ export function JumpSheet({ total, answers, current, rulesLabel, onPick, onRules
           </button>
         </div>
       </div>
-    </div>,
-    document.body,
+    </SheetOverlay>
   );
 }

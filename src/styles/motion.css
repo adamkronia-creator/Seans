@@ -1,0 +1,204 @@
+/*
+ * Движение интерфейса: переходы между экранами, окна снизу, меню, подсказки.
+ * Переходы запускает utils/transition.ts, уход окон и подсказок — utils/exitAnimation.ts (копия узла с классом is-leaving).
+ */
+
+:root {
+  --ease-ios: cubic-bezier(0.25, 0.8, 0.25, 1); /* быстрый старт и долгое замедление, как у системных переходов телефона */
+  --vt-duration: 0.38s;
+}
+
+/* ---------- Переходы между экранами (View Transitions API) ---------- */
+
+/* Каркас получает имя снимка только на время перехода: иначе его слой был бы всегда и менял бы привязку fixed-элементов */
+html[data-transition] .app {
+  view-transition-name: app;
+}
+
+/* Фон страницы одинаков до и после: его не анимируем */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Снимки непрозрачные, поэтому без сложения цветов, а края выезжающего экрана не выходят за каркас приложения */
+::view-transition-group(app) {
+  overflow: clip;
+}
+
+::view-transition-old(app),
+::view-transition-new(app) {
+  mix-blend-mode: normal;
+}
+
+/* Вперёд: новый экран выезжает справа с тенью, прежний чуть сдвигается влево и темнеет */
+html[data-transition='forward']::view-transition-old(app) {
+  animation: vt-push-out var(--vt-duration) var(--ease-ios) both;
+}
+
+html[data-transition='forward']::view-transition-new(app) {
+  animation: vt-push-in var(--vt-duration) var(--ease-ios) both;
+  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+}
+
+/* Назад: текущий экран уезжает вправо поверх, под ним возвращается предыдущий */
+html[data-transition='back']::view-transition-old(app) {
+  z-index: 1;
+  animation: vt-pop-out var(--vt-duration) var(--ease-ios) both;
+  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+}
+
+html[data-transition='back']::view-transition-new(app) {
+  animation: vt-pop-in var(--vt-duration) var(--ease-ios) both;
+}
+
+/* Смена вкладки или раздела: новое проявляется поверх прежнего */
+html[data-transition='fade']::view-transition-old(app) {
+  animation: none;
+}
+
+html[data-transition='fade']::view-transition-new(app) {
+  animation: vt-fade-in 0.2s ease-out both;
+}
+
+@keyframes vt-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes vt-push-out {
+  to {
+    transform: translateX(-26%);
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes vt-pop-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes vt-pop-in {
+  from {
+    transform: translateX(-26%);
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- Окна снизу ---------- */
+
+/* Затемнение проявляется (меняется только цвет фона, сама панель не просвечивает), панель выезжает снизу */
+.sheet-overlay {
+  animation: overlay-in 0.26s ease-out both;
+}
+
+.sheet {
+  animation: sheet-in 0.36s var(--ease-ios) both;
+}
+
+/* При закрытии остаётся копия окна (utils/exitAnimation.ts): панель уезжает вниз, затемнение уходит */
+.sheet-overlay.is-leaving {
+  pointer-events: none;
+  animation: overlay-out 0.24s ease-in both;
+}
+
+.sheet-overlay.is-leaving .sheet {
+  animation: sheet-out 0.26s cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+@keyframes overlay-in {
+  from {
+    background-color: rgb(0 0 0 / 0%);
+  }
+}
+
+@keyframes overlay-out {
+  to {
+    background-color: rgb(0 0 0 / 0%);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* ---------- Меню сообщения ---------- */
+
+/* Растёт от края пузыря (точка отсчёта задана в разметке) */
+.msg-menu {
+  animation: menu-in 0.2s var(--ease-ios) both;
+}
+
+.msg-menu__backdrop.is-leaving {
+  pointer-events: none;
+}
+
+.msg-menu__backdrop.is-leaving .msg-menu {
+  animation: menu-out 0.12s ease-in both;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+@keyframes menu-out {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+/* ---------- Подсказка внизу экрана ---------- */
+
+.test-settings__toast {
+  animation: toast-in 0.28s var(--ease-ios) both;
+}
+
+.test-settings__toast.is-leaving {
+  pointer-events: none;
+  animation: toast-out 0.2s ease-in both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Тем, кто просит поменьше движения, всё появляется сразу */
+@media (prefers-reduced-motion: reduce) {
+  .sheet-overlay,
+  .sheet,
+  .msg-menu,
+  .test-settings__toast {
+    animation: none;
+  }
+}
