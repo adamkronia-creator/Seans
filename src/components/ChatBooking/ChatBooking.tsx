@@ -15,7 +15,7 @@ import {
 import { useNow } from '../../utils/useNow';
 import { Toast } from '../Toast/Toast';
 import { AppointmentCard, HistoryList, type CardAction } from './AppointmentCard';
-import { IconBookingCalendar, IconTabBooking } from '../icons';
+import { IconBookingCalendar } from '../icons';
 import { InfoSheet, MapsSheet, newDraft, ProposeSheet, RangeSheet, ReasonSheet, rescheduleDraft } from './BookingSheets';
 import { slotShort } from './bookingText';
 import { InfoCard } from './InfoCard';
@@ -63,8 +63,6 @@ interface ChatBookingProps {
   chatId: string;
   /** Имя собеседника без фамилии: «Максим» */
   peerName: string;
-  /** Чат «Избранное»: записываться не к кому */
-  favorites: boolean;
 }
 
 /**
@@ -72,7 +70,7 @@ interface ChatBookingProps {
  * отказывается или отвечает своим временем; подтвержденный прием можно перенести или отменить. Ниже информация о приеме:
  * адрес с картой, как пройти, что принести и оплата сеанса.
  */
-export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
+export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
   const { items, info } = useBooking();
   const now = useNow();
   const view = useMemo(() => viewOf(items, chatId, now), [items, chatId, now]);
@@ -88,21 +86,6 @@ export function ChatBooking({ chatId, peerName, favorites }: ChatBookingProps) {
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   }, []);
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
-
-  if (favorites) {
-    return (
-      <div className="booking">
-        <div className="booking__scroll">
-          <div className="booking__empty">
-            <span className="booking__empty-icon">
-              <IconTabBooking />
-            </span>
-            <p className="booking__empty-text">Запись на прием доступна в чатах с клиентами и коллегами</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const pending = [...view.incoming, ...view.outgoing];
   const nothingPlanned = view.upcoming.length === 0 && pending.length === 0;

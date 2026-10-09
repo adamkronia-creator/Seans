@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
@@ -41,6 +41,10 @@ const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabBooking }[] 
   { id: 'notes', label: 'Кейс', Icon: IconTabNotes },
   { id: 'library', label: 'Материалы', Icon: IconTabLibrary },
 ];
+
+/** В «Избранном» нет записи на прием и истории взаимодействия: записываться не к кому, взаимодействовать не с кем */
+const FAVORITES_HIDDEN: SectionId[] = ['booking', 'library'];
+const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
@@ -137,7 +141,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName,
       {id === 'tasks' && <ChatTasks hasData={hasClientData} />}
       {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
-      {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} favorites={favorites} />}
+      {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} />}
       <TabBar active="messages" onChange={onAppTabChange} />
     </>
   );
@@ -151,10 +155,13 @@ interface ChatPageProps {
 
 /** Чат с собеседником. Настройка теста и результат открываются поверх него отдельными экранами (ChatScreens.tsx) */
 export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
-  const [section, setSection] = useState<SectionId>('messages');
+  const [picked, setSection] = useState<SectionId>('messages');
   // Тесты, задания и кейс пока есть только у Максима
   const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);
+  const sections = chat?.favorites ? FAVORITES_SECTIONS : SECTIONS;
+  // Выбранного раздела может не быть в списке (чат сменился на «Избранное»): тогда открыта переписка
+  const section: SectionId = sections.some(({ id }) => id === picked) ? picked : 'messages';
   const groups = useMessages(chatId);
   const typing = useTyping(chatId);
   const listRef = useRef<HTMLDivElement>(null);
@@ -242,17 +249,20 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Жест «назад» при открытом поиске закрывает его, как кнопка в строке поиска
   useBackHandler(searchOpen && section === 'messages', closeSearch);
 
-  const index = SECTIONS.findIndex((item) => item.id === section);
+  const index = sections.findIndex((item) => item.id === section);
 
   // Шапка идёт за страницами: полоса под вкладкой и цвет значков следуют за положением, а не прыгают на готовый выбор
   const tabsRef = useRef<HTMLElement>(null);
-  const showPosition = useCallback((position: number) => {
-    const nav = tabsRef.current;
-    if (!nav) return;
-    const p = Math.min(SECTIONS.length - 1, Math.max(0, position));
-    nav.style.setProperty('--p', String(p));
-    for (let i = 0; i < SECTIONS.length; i += 1) (nav.children[i] as HTMLElement).style.setProperty('--w', String(Math.max(0, 1 - Math.abs(p - i))));
-  }, []);
+  const showPosition = useCallback(
+    (position: number) => {
+      const nav = tabsRef.current;
+      if (!nav) return;
+      const p = Math.min(sections.length - 1, Math.max(0, position));
+      nav.style.setProperty('--p', String(p));
+      for (let i = 0; i < sections.length; i += 1) (nav.children[i] as HTMLElement).style.setProperty('--w', String(Math.max(0, 1 - Math.abs(p - i))));
+    },
+    [sections],
+  );
 
   if (!chat) {
     return (
@@ -327,7 +337,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     </>
   );
 
-  const pages = SECTIONS.map(({ id }) => ({
+  const pages = sections.map(({ id }) => ({
     key: id,
     node:
       id === 'messages' ? (
@@ -416,8 +426,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           </div>
         )}
 
-        <nav className="chat__tabs" aria-label="Разделы" ref={tabsRef}>
-          {SECTIONS.map(({ id, label, Icon }) => (
+        <nav className="chat__tabs" aria-label="Разделы" ref={tabsRef} style={{ '--n': sections.length } as CSSProperties}>
+          {sections.map(({ id, label, Icon }) => (
             <button
               key={id}
               type="button"
@@ -433,7 +443,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         </nav>
       </header>
 
-      <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(SECTIONS[i].id)} onPosition={showPosition} />
+      <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} onPosition={showPosition} />
 
       {menu && (
         <MessageMenu
