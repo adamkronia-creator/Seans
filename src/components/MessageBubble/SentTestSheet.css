@@ -1,0 +1,50 @@
+/* Окно «Настройки теста» под карточкой отправленного теста: строки «подпись — значение» в белой карточке */
+.sent-sheet__subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
+}
+
+.sent-sheet__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sent-sheet__value {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  text-align: right;
+}
+
+.sent-sheet__value--on {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.sent-sheet__value--off {
+  color: var(--color-text-caption);
+}
+
+.sent-sheet__icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-size: var(--size-icon-sm);
+}
+
+.sent-sheet__hint {
+  margin: 0;
+  padding: 0 var(--space-3);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}

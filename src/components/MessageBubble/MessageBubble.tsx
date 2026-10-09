@@ -61,6 +61,8 @@ interface MessageBubbleProps {
   onMenu: (m: Message, rect: DOMRect) => void;
   onQuoteClick: (id: string) => void;
   onOpenTest: (id: string) => void;
+  /** Кнопка «Настройки теста» под карточкой теста, отправленного вами */
+  onTestSettings: (m: Message) => void;
   /** Нажатие на кнопку под сообщением: переход по адресу кнопки */
   onOpenLink: (href: string) => void;
 }
@@ -78,6 +80,7 @@ export function MessageBubble({
   onMenu,
   onQuoteClick,
   onOpenTest,
+  onTestSettings,
   onOpenLink,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
@@ -156,6 +159,8 @@ export function MessageBubble({
   if (message.test) {
     const passed = message.testKind === 'passed';
     const link = passed ? message.buttons?.[0] : undefined;
+    // Тест, который прислали вы, клиенту уже ушел: пройти его тут нечего, кнопка показывает настройки, с какими он отправлен
+    const settings = out && !passed;
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
@@ -185,8 +190,12 @@ export function MessageBubble({
         </div>
         <ul className="bubble-buttons">
           <li>
-            <button type="button" className="bubble-button" onClick={() => (link ? onOpenLink(link.href) : onOpenTest(message.test!))}>
-              {passed ? 'Посмотреть' : 'Пройти'}
+            <button
+              type="button"
+              className="bubble-button"
+              onClick={() => (settings ? onTestSettings(message) : link ? onOpenLink(link.href) : onOpenTest(message.test!))}
+            >
+              {settings ? 'Настройки теста' : passed ? 'Посмотреть' : 'Пройти'}
             </button>
           </li>
         </ul>

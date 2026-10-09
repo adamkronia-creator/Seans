@@ -96,7 +96,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 

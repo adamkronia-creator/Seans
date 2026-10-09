@@ -18,6 +18,7 @@ import { ChatCase } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
+import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
@@ -27,6 +28,7 @@ import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
+import { installBubbleGradient } from '../../utils/bubbleGradient';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
@@ -171,6 +173,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [unseen, setUnseen] = useState(0);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [menu, setMenu] = useState<{ message: Message; rect: DOMRect } | null>(null);
+  // Карточка отправленного теста, чьи настройки показаны в окне
+  const [settingsOf, setSettingsOf] = useState<Message | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
@@ -185,6 +189,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     const el = listRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
+
+  // Градиент исходящих пузырей привязан к окну ленты (utils/bubbleGradient.ts)
+  const hasChat = Boolean(chat);
+  useEffect(() => {
+    const feed = listRef.current;
+    return feed ? installBubbleGradient(feed) : undefined;
+  }, [hasChat]);
 
   // Переписка открывается внизу, у последних сообщений. Уйдя в тест или результат, чат остаётся под ним как был
   useEffect(() => {
@@ -300,6 +311,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onMenu={(message, rect) => setMenu({ message, rect })}
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
+                    onTestSettings={setSettingsOf}
                     onOpenLink={navigate}
                   />
                 );
@@ -458,6 +470,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           }}
         />
       )}
+
+      {settingsOf && <SentTestSheet message={settingsOf} test={LIBRARY.find((t) => t.id === settingsOf.test)} onClose={() => setSettingsOf(null)} />}
     </section>
   );
 }

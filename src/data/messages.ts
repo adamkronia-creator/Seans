@@ -11,11 +11,27 @@ export interface Message {
   replyTo?: string;
   /** Карточка теста (id из библиотеки): аватарка, название, подпись и кнопка под сообщением */
   test?: string;
-  /** Подпись карточки: «Присланный тест» (отправлен клиенту, кнопка «Пройти») или «Пройденный тест» (кнопка «Посмотреть»); без значения — присланный */
+  /** Подпись карточки: «Присланный тест» (у отправленного вами кнопка «Настройки теста») или «Пройденный тест» (кнопка «Посмотреть»); без значения — присланный */
   testKind?: 'sent' | 'passed';
+  /** С какими настройками тест отправлен клиенту; у старых сообщений нет, тогда считаются настройки по умолчанию */
+  testOptions?: SentTestOptions;
   /** Кнопки под пузырём, как у ботов в Telegram */
   buttons?: MessageButton[];
 }
+
+/** Настройки, с которыми тест ушел клиенту (то, что стояло на экране «Настройка теста» в момент отправки) */
+export interface SentTestOptions {
+  blind: boolean;
+  hideConclusion: boolean;
+  saveBlank: boolean;
+  /** Как показывать вопросы при прохождении: все списком или по одному */
+  questionView: 'list' | 'single';
+  /** Форма бланка, если у теста их несколько */
+  form?: string;
+}
+
+/** Настройки по умолчанию: как на экране «Настройка теста» до того, как их тронули */
+export const DEFAULT_SENT_OPTIONS: SentTestOptions = { blind: true, hideConclusion: true, saveBlank: true, questionView: 'list' };
 
 export interface MessageButton {
   label: string;
