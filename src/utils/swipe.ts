@@ -25,7 +25,7 @@ export const wheelTaken = new WeakSet<Event>();
 
 const pagingNow = new Set<object>();
 
-/** Страницы пейджера между местами: полоса прокрутки приложения прячется, пока так хотя бы у одного пейджера */
+/** Страницы пейджера между местами (класс is-paging на body): пока так хотя бы у одного пейджера, остальные страницы не дорисовываются */
 export function setPaging(who: object, between: boolean) {
   if (between) pagingNow.add(who);
   else pagingNow.delete(who);

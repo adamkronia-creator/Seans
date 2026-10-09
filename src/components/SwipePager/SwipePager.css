@@ -63,8 +63,3 @@
 .swipe-pager__head * {
   touch-action: pan-y pinch-zoom;
 }
-
-/* Страницы между местами: полоса прокрутки приложения не показывает прокрутку уезжающей страницы */
-body.is-paging .app-scrollbar {
-  visibility: hidden;
-}

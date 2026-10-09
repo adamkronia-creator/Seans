@@ -143,7 +143,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
   const target = useRef(index);
   const stopSpring = useRef<(() => void) | null>(null);
   const live = useRef({ index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight });
-  /** Собственная метка пейджера: по ней полоса прокрутки приложения знает, что страницы между местами */
+  /** Собственная метка пейджера: по ней знаем, что его страницы между местами (setPaging) */
   const self = useRef({}).current;
   /** Высоты страниц по номерам (для autoHeight); у ненарисованной 0 */
   const heights = useRef<number[]>([]);

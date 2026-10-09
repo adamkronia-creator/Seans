@@ -154,24 +154,10 @@ html.is-grabbing * {
   user-select: none !important;
 }
 
-/* Экраны сдвинуты жестом: полоса прокрутки приложения не показывает прокрутку уезжающего */
-body.is-edge-back .app-scrollbar {
-  visibility: hidden;
-}
-
 .app__content {
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-/* Родные полосы прокрутки скрыты: вместо них общая полоса приложения (AppScrollbar) */
-* {
-  scrollbar-width: none;
-}
-
-*::-webkit-scrollbar {
-  display: none;
 }
