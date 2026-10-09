@@ -34,8 +34,9 @@
   color: var(--color-accent-on);
 }
 
+/* Невыбранный чипс залит тем же серым (--color-bg-fill), поэтому кружок темнее его: серо-синий 16 % */
 .badge--neutral {
-  background: var(--color-bg-fill);
+  background: rgb(112 123 139 / 16%);
   color: var(--color-text-secondary);
 }
 

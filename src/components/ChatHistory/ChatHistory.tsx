@@ -124,9 +124,12 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
   // Сеанс без текста: только название и дата
   const bare = 'paragraphs' in event && event.paragraphs.length === 0 && !quick;
-  // Двойной клик/касание: быстрая правка текста или комментария на месте (у приглашения текста нет);
-  // полный редактор открывает карандаш
-  const doubleTap = useDoubleActivate(() => setQuick(true), event.kind !== 'invite' && !quick);
+  // Тест или задание, которое отправили или назначили вы: клиент его еще не выполнил, комментировать и открывать нечего
+  const outgoing = (event.kind === 'test' || event.kind === 'task') && event.state !== 'done';
+  // Править можно все, кроме приглашения и отправленного: двойной клик/касание — быстрая правка текста или комментария
+  // на месте, полный редактор открывает карандаш
+  const editable = event.kind !== 'invite' && !outgoing;
+  const doubleTap = useDoubleActivate(() => setQuick(true), editable && !quick);
   const saveQuick = (text: string) => {
     setQuick(false);
     if (event.kind === 'session') {
@@ -143,7 +146,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
         <h3 className={`hist-card__title${event.kind === 'test' || event.kind === 'task' ? ' hist-card__title--single' : ''}`}>{title}</h3>
-        {event.kind !== 'invite' && (
+        {editable && (
           <button
             type="button"
             className="hist-card__edit"
@@ -169,9 +172,9 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
               : {})}
           >
             <p className="hist-card__text">{event.text}</p>
-            {event.kind !== 'invite' && <IconChevron className="hist-card__chevron" />}
+            {editable && <IconChevron className="hist-card__chevron" />}
           </div>
-          {event.kind !== 'invite' && (
+          {editable && (
             <QuickEdit
               editing={quick}
               separator={'\n'}

@@ -16,21 +16,14 @@
   white-space: nowrap;
 }
 
-/* Число непрочитанных рядом с названием: просто цифры, без кружка внутри чипса */
-.chip__count {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+/* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 6, как от верха и низа */
+.chip--counted {
+  padding-right: 6px;
 }
 
 .chip--active {
   background: var(--color-accent);
   color: var(--color-accent-on);
-}
-
-.chip--active .chip__count {
-  color: rgb(255 255 255 / 80%);
 }
 
 /* Чипс с иконкой: круг 32×32 */
