@@ -46,16 +46,21 @@ export interface BlankFill {
   missing?: number | null;
 }
 
+/** Варианты ответов в правилах («Совсем нет») набраны курсивом */
+function ruleText(rule: string) {
+  return rule.split(/(«[^»]*»)/).map((part, i) => (part.startsWith('«') ? <em key={i}>{part}</em> : part));
+}
+
 /** Правила бланка: одно правило — обычный абзац, несколько — нумерованный список */
 export function BlankRules({ rules }: { rules: string[] }) {
   if (rules.length === 1) {
     // Одно правило не нумеруем: «1.» перед единственным пунктом лишнее
-    return <p className="blank-rules blank-rules--single">{rules[0]}</p>;
+    return <p className="blank-rules blank-rules--single">{ruleText(rules[0])}</p>;
   }
   return (
     <ol className="blank-rules">
       {rules.map((rule) => (
-        <li key={rule}>{rule}</li>
+        <li key={rule}>{ruleText(rule)}</li>
       ))}
     </ol>
   );
