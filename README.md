@@ -28,4 +28,4 @@ npm run dev
 - `src/components/` — Avatar, Badge, Chip, SearchField, ChatItem, TabBar, icons
 - `src/pages/MessagesPage/` — экран «Сообщения»
 - `src/data/chats.ts` — тестовые чаты
-- `src/assets/` — иконки (SVG), аватарки. Иконки вкладки «Запись на прием» лежат в `assets/icons/booking/` и подключены в `components/icons/index.tsx`: `pin`, `route`, `wallet` и значок вкладки `chat/tab-booking.svg` присланные; `directions`, `bag`, `calendar`, `external` временные, заменяются файлом с тем же именем (цвета `#0088FF`/`#1E1E1E`/`#818C99`/`#A0A9B3` при сборке становятся цветом текста)
+- `src/assets/` — иконки (SVG), аватарки. Иконки вкладки «Запись на прием» лежат в `assets/icons/booking/` и подключены в `components/icons/index.tsx`: все присланные, кроме `external` (стрелка у ссылок в окне «Открыть в картах», временная: заменяется файлом с тем же именем); значок самой вкладки — `chat/tab-booking.svg` (цвета `#0088FF`/`#1E1E1E`/`#818C99`/`#A0A9B3` при сборке становятся цветом текста)

@@ -1,7 +1,13 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react';
 import type { Info } from '../../data/appointments';
-import { IconBookingBag, IconBookingDirections, IconBookingPin, IconBookingRoute, IconBookingWallet } from '../icons';
-import { IconCopy } from '../ChatParts/ChatIcons';
+import {
+  IconBookingBag,
+  IconBookingCopy,
+  IconBookingDirections,
+  IconBookingInMaps,
+  IconBookingPin,
+  IconBookingWallet,
+} from '../icons';
 import { PlaceMap } from './PlaceMap';
 
 interface RowProps {
@@ -41,11 +47,11 @@ export function InfoCard({ info, onCopy, onMaps }: { info: Info; onCopy: () => v
       <Row Icon={IconBookingPin} label="Адрес" text={info.address} strong>
         <div className="bk-actions">
           <button type="button" className="bk-button" onClick={onCopy}>
-            <IconCopy />
+            <IconBookingCopy />
             Скопировать
           </button>
           <button type="button" className="bk-button" onClick={onMaps}>
-            <IconBookingRoute />В картах
+            <IconBookingInMaps />В картах
           </button>
         </div>
       </Row>
