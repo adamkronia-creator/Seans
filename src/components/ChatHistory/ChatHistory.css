@@ -84,13 +84,14 @@
   font-weight: var(--font-weight-regular);
 }
 
-/* Чипсы — те же, что на главном экране; прокручиваются вбок за край экрана */
+/* Чипсы — те же, что на главном экране; уходят вбок за край экрана. Двигает их скрипт (data-hscroll, SwipePager),
+   а не браузер: иначе боковое движение пальца по ним не дошло бы до листания разделов, когда чипсы дошли до края */
 .hist-chips {
   display: flex;
   gap: var(--space-2);
   margin: -1px calc(var(--space-4) * -1);
   padding: 1px var(--space-4);
-  overflow-x: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
 }
 

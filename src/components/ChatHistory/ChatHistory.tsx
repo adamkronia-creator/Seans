@@ -237,7 +237,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     <div className="chat-history">
       <Stats hasData={hasData} />
 
-      <div className="hist-chips" role="group" aria-label="Фильтр событий">
+      <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
         {FILTERS.map(({ id, label }) => (
           <Chip
             key={id}

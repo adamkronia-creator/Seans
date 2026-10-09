@@ -76,8 +76,10 @@
   line-height: 12px;
 }
 
-/* Шесть вкладок 40×36 равномерно по ширине; у активной синяя полоса 2 px внизу */
+/* Шесть вкладок 40×36 равномерно по ширине; под активной синяя полоса 2 px внизу.
+   Полоса и цвет значков идут за страницами (--p — положение в разделах, --w — насколько вкладка «выбрана»), их задаёт SwipePager */
 .chat__tabs {
+  position: relative;
   display: flex;
   justify-content: space-between;
   margin-top: var(--space-2);
@@ -85,6 +87,7 @@
 }
 
 .chat__tab {
+  --w: 0;
   position: relative;
   display: flex;
   justify-content: center;
@@ -96,17 +99,26 @@
 }
 
 .chat__tab--active {
+  --w: 1;
   color: var(--color-accent);
 }
 
-.chat__tab--active::after {
-  content: '';
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .chat__tab,
+  .chat__tab--active {
+    color: color-mix(in srgb, var(--color-accent) calc(var(--w) * 100%), var(--color-text-caption));
+  }
+}
+
+/* Полоса 40×2 стоит под вкладкой: слева 16 + номер раздела × шаг вкладок ((ширина − 32 − 40) / 5) */
+.chat__tab-line {
   position: absolute;
-  right: 0;
   bottom: -1px; /* перекрывает разделитель шапки: полоса 2 px */
-  left: 0;
+  left: calc(16px + var(--p, 1) * (100% - 72px) / 5);
+  width: 40px;
   height: 2px;
   background: var(--color-accent);
+  pointer-events: none;
 }
 
 /* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 16, снизу 12 до панели ввода */

@@ -133,6 +133,8 @@ export function MessageBubble({
   const common = {
     ref,
     'data-mid': message.id,
+    // Вправо жест здесь — ответ на сообщение, поэтому листание разделов его не перехватывает (влево листает)
+    'data-swipe-lock': 'right',
     onPointerDown,
     onPointerMove,
     onPointerUp: end,

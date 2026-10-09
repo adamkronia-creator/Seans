@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
@@ -18,6 +18,7 @@ import { ChatTasks, ChatTests, SelfTests } from '../../components/ChatTests/Chat
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
+import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
@@ -27,7 +28,6 @@ import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { goBack, navigate } from '../../router';
 import { useExitAnimation } from '../../utils/exitAnimation';
-import { transition } from '../../utils/transition';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; открыт «Сообщения», остальные пока без экранов
@@ -109,6 +109,38 @@ function MessageMenu({
   );
 }
 
+interface SectionPageProps {
+  id: Exclude<SectionId, 'messages'>;
+  chatId: string;
+  /** Чат «Избранное»: вместо тестов клиента показываются свои */
+  favorites: boolean;
+  hasClientData: boolean;
+  onAppTabChange: (id: TabId) => void;
+}
+
+/** Страница раздела, кроме переписки: содержимое и снизу панель приложения. Не перерисовывается, пока не изменились эти поля */
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, onAppTabChange }: SectionPageProps) {
+  return (
+    <>
+      {id === 'tests' &&
+        (favorites ? (
+          <SelfTests onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
+        ) : (
+          <ChatTests
+            hasData={hasClientData}
+            onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
+            onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
+          />
+        ))}
+      {id === 'tasks' && <ChatTasks hasData={hasClientData} />}
+      {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
+      {id === 'library' && <ChatHistory hasData={hasClientData} />}
+      {id === 'sessions' && <p className="chat__empty chat__empty--grow">Раздел в разработке</p>}
+      <TabBar active="messages" onChange={onAppTabChange} />
+    </>
+  );
+});
+
 interface ChatPageProps {
   chatId: string;
   /** Открыта настройка этого теста (адрес /chat/<чат>/tests/<тест>) */
@@ -155,6 +187,10 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
     atBottom.current = true;
     setUnseen(0);
     setReplyTo(null);
+  }, [chatId, overlay]);
+
+  // Листая разделы, переписку не теряем: прокрутка, набранный текст и ответ остаются на месте. Закрывается только поиск
+  useEffect(() => {
     setSearchOpen(false);
     setQuery('');
   }, [chatId, section, overlay]);
@@ -206,6 +242,18 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
     setQuery('');
   };
 
+  const index = SECTIONS.findIndex((item) => item.id === section);
+
+  // Шапка идёт за страницами: полоса под вкладкой и цвет значков следуют за положением, а не прыгают на готовый выбор
+  const tabsRef = useRef<HTMLElement>(null);
+  const showPosition = useCallback((position: number) => {
+    const nav = tabsRef.current;
+    if (!nav) return;
+    const p = Math.min(SECTIONS.length - 1, Math.max(0, position));
+    nav.style.setProperty('--p', String(p));
+    for (let i = 0; i < SECTIONS.length; i += 1) (nav.children[i] as HTMLElement).style.setProperty('--w', String(Math.max(0, 1 - Math.abs(p - i))));
+  }, []);
+
   if (!chat) {
     return (
       <section className="chat">
@@ -234,6 +282,81 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
       </section>
     );
   }
+
+  // Переписка: лента и панель ввода. Меню сообщения стоит вне страниц (ему нужен весь экран, а не сдвинутая страница)
+  const messagesPage = (
+    <>
+      <div className="chat__feed">
+        <div className="chat__messages" ref={listRef} onScroll={onFeedScroll}>
+          {groups.map((group) => (
+            <ul className="chat__group" key={group.label}>
+              <li className="chat__day">
+                <span>{group.label}</span>
+              </li>
+              {group.messages.map((m, i) => {
+                const prev = group.messages[i - 1];
+                const next = group.messages[i + 1];
+                return (
+                  <MessageBubble
+                    key={m.id}
+                    message={m}
+                    replyTarget={m.replyTo ? byId.get(m.replyTo) : undefined}
+                    peerName={chat.name.split(' ')[0]}
+                    showMeta={!sameRun(m, next)}
+                    joinPrev={sameRun(prev, m)}
+                    query={q}
+                    activeMatch={m.id === activeId}
+                    test={m.test ? LIBRARY.find((t) => t.id === m.test) : undefined}
+                    onReply={setReplyTo}
+                    onMenu={(message, rect) => setMenu({ message, rect })}
+                    onQuoteClick={jumpTo}
+                    onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
+                    onOpenLink={navigate}
+                  />
+                );
+              })}
+            </ul>
+          ))}
+          {typing && (
+            <ul className="chat__group chat__group--typing">
+              <li className="bubble bubble--in bubble--typing" aria-label="печатает">
+                <i />
+                <i />
+                <i />
+              </li>
+            </ul>
+          )}
+        </div>
+
+        {(distance > 240 || unseen > 0) && (
+          <button type="button" className="chat__down" aria-label="К последним сообщениям" onClick={() => scrollToBottom(true)}>
+            <IconChevronDown />
+            {unseen > 0 && <span className="chat__down-badge">{unseen}</span>}
+          </button>
+        )}
+      </div>
+
+      <MessageInput
+        onSend={(text) => {
+          sendMessage(chatId, text, replyTo?.id);
+          setReplyTo(null);
+        }}
+        onLayoutChange={() => atBottom.current && scrollToBottom()}
+        reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
+        onCancelReply={() => setReplyTo(null)}
+      />
+    </>
+  );
+
+  const pages = SECTIONS.map(({ id }) => ({
+    key: id,
+    node:
+      id === 'messages' ? (
+        messagesPage
+      ) : (
+        <SectionPage id={id} chatId={chatId} favorites={Boolean(chat.favorites)} hasClientData={hasClientData} onAppTabChange={onAppTabChange} />
+      ),
+  }));
 
   return (
     <section className="chat">
@@ -307,7 +430,7 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
           </div>
         )}
 
-        <nav className="chat__tabs" aria-label="Разделы">
+        <nav className="chat__tabs" aria-label="Разделы" ref={tabsRef}>
           {SECTIONS.map(({ id, label, Icon }) => (
             <button
               key={id}
@@ -315,133 +438,29 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
               className={`chat__tab${id === section ? ' chat__tab--active' : ''}`}
               aria-label={label}
               aria-current={id === section ? 'page' : undefined}
-              onClick={() => id !== section && transition(() => setSection(id), 'fade')}
+              onClick={() => setSection(id)}
             >
               <Icon />
             </button>
           ))}
+          <span className="chat__tab-line" aria-hidden="true" />
         </nav>
       </header>
 
-      {section === 'messages' && (
-        <>
-          <div className="chat__feed">
-            <div className="chat__messages" ref={listRef} onScroll={onFeedScroll}>
-              {groups.map((group) => (
-                <ul className="chat__group" key={group.label}>
-                  <li className="chat__day">
-                    <span>{group.label}</span>
-                  </li>
-                  {group.messages.map((m, i) => {
-                    const prev = group.messages[i - 1];
-                    const next = group.messages[i + 1];
-                    return (
-                      <MessageBubble
-                        key={m.id}
-                        message={m}
-                        replyTarget={m.replyTo ? byId.get(m.replyTo) : undefined}
-                        peerName={chat.name.split(' ')[0]}
-                        showMeta={!sameRun(m, next)}
-                        joinPrev={sameRun(prev, m)}
-                        query={q}
-                        activeMatch={m.id === activeId}
-                        test={m.test ? LIBRARY.find((t) => t.id === m.test) : undefined}
-                        onReply={setReplyTo}
-                        onMenu={(message, rect) => setMenu({ message, rect })}
-                        onQuoteClick={jumpTo}
-                        onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
-                        onOpenLink={navigate}
-                      />
-                    );
-                  })}
-                </ul>
-              ))}
-              {typing && (
-                <ul className="chat__group chat__group--typing">
-                  <li className="bubble bubble--in bubble--typing" aria-label="печатает">
-                    <i />
-                    <i />
-                    <i />
-                  </li>
-                </ul>
-              )}
-            </div>
+      <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(SECTIONS[i].id)} onPosition={showPosition} />
 
-            {(distance > 240 || unseen > 0) && (
-              <button type="button" className="chat__down" aria-label="К последним сообщениям" onClick={() => scrollToBottom(true)}>
-                <IconChevronDown />
-                {unseen > 0 && <span className="chat__down-badge">{unseen}</span>}
-              </button>
-            )}
-          </div>
-
-          <MessageInput
-            onSend={(text) => {
-              sendMessage(chatId, text, replyTo?.id);
-              setReplyTo(null);
-            }}
-            onLayoutChange={() => atBottom.current && scrollToBottom()}
-            reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
-            onCancelReply={() => setReplyTo(null)}
-          />
-
-          {menu && (
-            <MessageMenu
-              message={menu.message}
-              rect={menu.rect}
-              bounds={listRef.current?.getBoundingClientRect()}
-              onClose={() => setMenu(null)}
-              onReply={() => setReplyTo(menu.message)}
-              onDelete={() => {
-                if (replyTo?.id === menu.message.id) setReplyTo(null);
-                deleteMessage(chatId, menu.message.id);
-              }}
-            />
-          )}
-        </>
-      )}
-
-      {section === 'tests' && (
-        <>
-          {chat.favorites ? (
-            <SelfTests onOpen={(id) => navigate(`/chat/${chatId}/result/${id}`)} />
-          ) : (
-            <ChatTests
-              hasData={hasClientData}
-              onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
-              onOpenResult={(id) => navigate(clientResultPath(chatId, id))}
-            />
-          )}
-          <TabBar active="messages" onChange={onAppTabChange} />
-        </>
-      )}
-
-      {section === 'tasks' && (
-        <>
-          <ChatTasks hasData={hasClientData} />
-          <TabBar active="messages" onChange={onAppTabChange} />
-        </>
-      )}
-
-      {section === 'notes' && (
-        <>
-          <ChatCase hasData={hasClientData} clientId={chatId} />
-          <TabBar active="messages" onChange={onAppTabChange} />
-        </>
-      )}
-
-      {section === 'library' && (
-        <>
-          <ChatHistory hasData={hasClientData} />
-          <TabBar active="messages" onChange={onAppTabChange} />
-        </>
-      )}
-
-      {section === 'sessions' && (
-        <>
-          <p className="chat__empty chat__empty--grow">Раздел в разработке</p>
-          <TabBar active="messages" onChange={onAppTabChange} />
-        </>
+      {menu && (
+        <MessageMenu
+          message={menu.message}
+          rect={menu.rect}
+          bounds={listRef.current?.getBoundingClientRect()}
+          onClose={() => setMenu(null)}
+          onReply={() => setReplyTo(menu.message)}
+          onDelete={() => {
+            if (replyTo?.id === menu.message.id) setReplyTo(null);
+            deleteMessage(chatId, menu.message.id);
+          }}
+        />
       )}
     </section>
   );

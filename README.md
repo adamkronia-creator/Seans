@@ -14,6 +14,7 @@ npm run dev
 - `src/styles/motion.css`, `press.css` — движение: переходы между экранами, окна, меню, подсказки, подсветка нажатия
 - `src/utils/transition.ts` — анимация смены экрана (View Transitions: вперёд, назад, плавная смена); адреса и направление — в `src/router.ts`
 - `src/utils/pressEffect.ts` — нажатие как на телефоне (кнопка уменьшается и пружинит); `inertiaScroll.ts` — инерция колеса мыши; `exitAnimation.ts` — уход окон
+- `src/components/SwipePager/`, `src/utils/swipe.ts` — листание разделов чата пальцем: страницы идут за пальцем, пружина доводки, резинка у краёв; пузыри (`data-swipe-lock`) и блоки с боковой прокруткой (`data-hscroll`) договариваются с пейджером о жестах
 - `src/components/` — Avatar, Badge, Chip, SearchField, ChatItem, TabBar, icons
 - `src/pages/MessagesPage/` — экран «Сообщения»
 - `src/data/chats.ts` — тестовые чаты
