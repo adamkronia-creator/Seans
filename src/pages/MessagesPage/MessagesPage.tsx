@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
 import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
+import { SwipePager } from '../../components/SwipePager/SwipePager';
 import {
   CATEGORIES,
   CURRENT_USER,
@@ -12,14 +13,35 @@ import {
   type ChatCategory,
 } from '../../data/chats';
 import { navigate } from '../../router';
+import { followChips } from '../../utils/followChips';
+import { revealChip } from '../../utils/revealChip';
 import './MessagesPage.css';
 
 type Filter = 'all' | ChatCategory;
 
+/** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
+const FILTERS: Filter[] = ['all', ...CATEGORIES.map(({ id }) => id)];
+
+/** Чаты одного фильтра: страница пейджера, у каждой своя прокрутка */
+const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOpen: (chat: Chat) => void }) {
+  return chats.length > 0 ? (
+    <ul className="messages__list">
+      {chats.map((chat) => (
+        <ChatItem key={chat.id} chat={chat} onClick={onOpen} />
+      ))}
+    </ul>
+  ) : (
+    <p className="messages__empty">Ничего не найдено</p>
+  );
+});
+
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const chats = useChats();
+  const root = useRef<HTMLElement>(null);
 
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
   // «Все» считает и «Избранное»; категории — только свои чаты. При нуле кружок скрыт.
@@ -28,27 +50,45 @@ export function MessagesPage() {
       .length;
 
   // Открытие чата помечает его прочитанным и ведёт в переписку
-  const openChat = (chat: Chat) => {
+  const openChat = useCallback((chat: Chat) => {
     markRead(chat.id);
     navigate(`/chat/${chat.id}`);
-  };
+  }, []);
 
-  const visible = useMemo(() => {
+  // По странице на фильтр: пролистать список вбок можно так же, как разделы в чате
+  const lists = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return chats.filter((chat) => {
-      if (filter !== 'all' && (chat.favorites || chat.category !== filter)) {
-        return false;
-      }
-      if (!q) return true;
-      return (
-        chat.name.toLowerCase().includes(q) ||
-        chat.lastMessage.toLowerCase().includes(q)
-      );
-    });
-  }, [chats, query, filter]);
+    const matches = (chat: Chat) => !q || chat.name.toLowerCase().includes(q) || chat.lastMessage.toLowerCase().includes(q);
+    return FILTERS.map((id) => chats.filter((chat) => (id === 'all' || (!chat.favorites && chat.category === id)) && matches(chat)));
+  }, [chats, query]);
+
+  const pages = useMemo(
+    () => FILTERS.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} onOpen={openChat} /> })),
+    [lists, openChat],
+  );
+
+  const index = FILTERS.indexOf(filter);
+  const shown = dragIndex ?? index;
+
+  const onDrag = useCallback((position: number | null) => {
+    setDragIndex(position === null ? null : Math.round(Math.min(FILTERS.length - 1, Math.max(0, position))));
+  }, []);
+
+  // Цвет чипсов идёт за положением страниц, а не прыгает на середине (чипс «+» не фильтр: он вне страниц)
+  const onPosition = useCallback((position: number) => {
+    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--icon)');
+    if (chips) followChips(chips, position);
+  }, []);
+
+  // Выбранный чипс виден целиком, даже если до него пролистали пальцем или он был за краем
+  useEffect(() => {
+    const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
+    const chip = row?.querySelector<HTMLElement>('.chip--active');
+    if (row && chip) revealChip(row, chip);
+  }, [shown]);
 
   return (
-    <section className="messages">
+    <section ref={root} className="messages">
       <ScreenHeader
         title="Сообщения"
         leading={
@@ -75,13 +115,14 @@ export function MessagesPage() {
             <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
               <IconPlusChip />
             </Chip>
-            <Chip active={filter === 'all'} count={countOf('all')} onClick={() => setFilter('all')}>
+            <Chip follow active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')}>
               Все
             </Chip>
-            {CATEGORIES.map(({ id, label }) => (
+            {CATEGORIES.map(({ id, label }, i) => (
               <Chip
                 key={id}
-                active={filter === id}
+                follow
+                active={shown === i + 1}
                 count={countOf(id)}
                 onClick={() => setFilter(id)}
               >
@@ -92,15 +133,7 @@ export function MessagesPage() {
         }
       />
 
-      {visible.length > 0 ? (
-        <ul className="messages__list">
-          {visible.map((chat) => (
-            <ChatItem key={chat.id} chat={chat} onClick={openChat} />
-          ))}
-        </ul>
-      ) : (
-        <p className="messages__empty">Ничего не найдено</p>
-      )}
+      <SwipePager index={index} pages={pages} onIndexChange={(i) => setFilter(FILTERS[i])} onPosition={onPosition} onDrag={onDrag} />
 
       <button type="button" className="messages__fab" aria-label="Новый диалог">
         <IconPlus />

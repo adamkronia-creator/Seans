@@ -7,6 +7,42 @@
 /** Касание началось у левого края и принадлежит жесту «назад»: листанию разделов на нём делать нечего */
 export const edgeTouch = { active: false };
 
+/**
+ * Какой пейджер сейчас ведёт палец. Пейджеры бывают вложенными (фильтры истории внутри разделов чата), и жест
+ * принадлежит ближайшему из них, который может двигаться в эту сторону; остальные его не берут.
+ */
+const fingerOwners = new Map<number, Element>();
+export const fingerOwner = {
+  of: (pointerId: number) => fingerOwners.get(pointerId),
+  take: (pointerId: number, host: Element) => void fingerOwners.set(pointerId, host),
+  drop: (pointerId: number, host: Element) => {
+    if (fingerOwners.get(pointerId) === host) fingerOwners.delete(pointerId);
+  },
+};
+
+/** Колесо или тачпад: событие уже разобрал вложенный пейджер, внешнему оно не нужно */
+export const wheelTaken = new WeakSet<Event>();
+
+const pagingNow = new Set<object>();
+
+/** Страницы пейджера между местами: полоса прокрутки приложения прячется, пока так хотя бы у одного пейджера */
+export function setPaging(who: object, between: boolean) {
+  if (between) pagingNow.add(who);
+  else pagingNow.delete(who);
+  document.body.classList.toggle('is-paging', pagingNow.size > 0);
+}
+
+/**
+ * Жест идёт: на корне стоит is-swiping (по нему дорисовка страниц ждёт конца жеста; стилей у этого класса нет). Мышью тянут ещё
+ * и с курсором-«хваткой» без выделения текста (is-grabbing): эти правила стоят на всех элементах сразу, а смена такого класса
+ * пересчитывает стили всего документа (на слабом телефоне это десятки миллисекунд посреди жеста), поэтому у касаний их нет.
+ */
+export function setSwiping(on: boolean, pointerType = 'touch') {
+  const root = document.documentElement;
+  root.classList.toggle('is-swiping', on);
+  root.classList.toggle('is-grabbing', on && pointerType === 'mouse');
+}
+
 /** Сдвиг пальца, после которого это уже движение, а не нажатие; так же считает пузырь сообщения и эффект нажатия */
 export const SWIPE_SLOP = 10;
 

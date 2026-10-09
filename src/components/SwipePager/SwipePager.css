@@ -35,6 +35,35 @@
   min-height: 0;
 }
 
+/*
+ * Пейджер внутри прокручиваемого блока (фильтры истории): окно не заполняет всё свободное место, а по высоте равно странице.
+ * Каждая страница занимает столько, сколько ей нужно, а высоту окна ставит скрипт: у страницы на месте — её, пока страницы идут — самой высокой из видимых.
+ */
+.swipe-pager--auto {
+  display: block;
+  flex: none;
+}
+
+.swipe-pager--auto .swipe-pager__track {
+  align-items: flex-start;
+}
+
+.swipe-pager--auto .swipe-pager__page {
+  align-self: flex-start;
+}
+
+/* Высоту ставим этой обёртке, а не сдвигаемому ряду: ряд на своём слое, и менять ему размер дорого */
+.swipe-pager__body {
+  overflow: hidden;
+  overflow: clip;
+}
+
+/* Шапка над страницами лежит в окне жеста, но не в ряду: за пальцем не едет, листать за неё можно */
+.swipe-pager__head,
+.swipe-pager__head * {
+  touch-action: pan-y pinch-zoom;
+}
+
 /* Страницы между местами: полоса прокрутки приложения не показывает прокрутку уезжающей страницы */
 body.is-paging .app-scrollbar {
   visibility: hidden;

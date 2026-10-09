@@ -14,6 +14,8 @@ interface ChipProps {
   className?: string;
   /** Переключатель с иконкой: сообщает состояние, как обычный чипс */
   toggle?: boolean;
+  /** За чипсом идут страницы пейджера: цвет перетекает вслед за пальцем (см. followChips) */
+  follow?: boolean;
 }
 
 export function Chip({
@@ -25,12 +27,14 @@ export function Chip({
   ariaLabel,
   className,
   toggle = false,
+  follow = false,
 }: ChipProps) {
   // Кружок со счётчиком показывается только если есть непрочитанные
   const hasCount = count !== undefined && count > 0;
   const cls = [
     'chip',
     active && 'chip--active',
+    follow && 'chip--follow',
     iconOnly && 'chip--icon',
     hasCount && 'chip--counted',
     className,

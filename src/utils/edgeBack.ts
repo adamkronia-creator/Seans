@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import { currentBackHandler } from './backHandler';
-import { edgeTouch, guardClick, reducedMotion, runSpring, SWIPE_SLOP, takeOver, VelocityTracker } from './swipe';
+import { edgeTouch, guardClick, reducedMotion, runSpring, setSwiping, SWIPE_SLOP, takeOver, VelocityTracker } from './swipe';
 
 /*
  * Жест «назад» как в приложениях на телефоне: потянули экран от левого края — он едет за пальцем, а под ним уже виден
@@ -107,7 +107,7 @@ export function useEdgeBack(appRef: RefObject<HTMLElement>, { enabled, onCommit,
         } catch {
           // уже отпущен
         }
-        document.documentElement.classList.remove('is-swiping');
+        setSwiping(false);
         gesture.releaseGuard?.();
         gesture = null;
       }
@@ -162,7 +162,7 @@ export function useEdgeBack(appRef: RefObject<HTMLElement>, { enabled, onCommit,
       } catch {
         // уже отпущен
       }
-      document.documentElement.classList.remove('is-swiping');
+      setSwiping(false);
       g.releaseGuard?.();
       if (g.phase === 'drag') settle(g, now, cancelled);
     };
@@ -218,7 +218,7 @@ export function useEdgeBack(appRef: RefObject<HTMLElement>, { enabled, onCommit,
         }
         takeOver(app, g.origin, e);
         g.releaseGuard = guardClick();
-        document.documentElement.classList.add('is-swiping');
+        setSwiping(true, g.kind);
         if (g.kind === 'mouse') window.getSelection()?.removeAllRanges();
         g.anchor = e.clientX;
         g.tracker.push(e.timeStamp, e.clientX);

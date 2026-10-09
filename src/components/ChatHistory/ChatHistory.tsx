@@ -1,8 +1,9 @@
 import type React from 'react';
-import { useState, type ComponentType, type SVGProps } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
+import { SwipePager } from '../SwipePager/SwipePager';
 import { TruncatedText } from '../TruncatedText/TruncatedText';
 import {
   IconCaseEdit,
@@ -23,6 +24,8 @@ import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultPath } from '../../data/resultLinks';
 import { navigate } from '../../router';
+import { followChips } from '../../utils/followChips';
+import { revealChip } from '../../utils/revealChip';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -224,43 +227,21 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   );
 }
 
-/** Вкладка «История взаимодействия» в открытом чате: статистика, фильтры и лента событий */
-export function ChatHistory({ hasData }: { hasData: boolean }) {
-  const [filter, setFilter] = useState<HistoryFilter>('all');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const data = useClientData();
-  const events = hasData ? historyEvents(data) : [];
-  const visible = filter === 'all' ? events : events.filter((e) => e.kind === filter);
-  const editing = events.find((e) => e.id === editingId);
-
+/** События одного фильтра: страница пейджера. Своей прокрутки у неё нет, листает весь раздел */
+const HistoryList = memo(function HistoryList({ events, onEdit }: { events: HistoryEvent[]; onEdit: (id: string) => void }) {
   return (
-    <div className="chat-history">
-      <Stats hasData={hasData} />
-
-      <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
-        {FILTERS.map(({ id, label }) => (
-          <Chip
-            key={id}
-            active={filter === id}
-            count={hasData ? countOf(data, id) : 0}
-            onClick={() => setFilter(id)}
-          >
-            {label}
-          </Chip>
-        ))}
-      </div>
-
-      {visible.length > 0 ? (
+    <div className="hist-page">
+      {events.length > 0 ? (
         <ol className="hist-timeline">
-          {visible.map((event, i) => {
-            const hasNext = i < visible.length - 1;
+          {events.map((event, i) => {
+            const hasNext = i < events.length - 1;
             return (
               <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
                 <div className="hist-rail">
                   <Marker event={event} />
                   {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                 </div>
-                <Card event={event} onEdit={() => setEditingId(event.id)} />
+                <Card event={event} onEdit={() => onEdit(event.id)} />
               </li>
             );
           })}
@@ -268,6 +249,88 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
       ) : (
         <p className="hist-empty">Событий пока нет</p>
       )}
+    </div>
+  );
+});
+
+/**
+ * Вкладка «История взаимодействия» в открытом чате: статистика, фильтры и лента событий.
+ * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
+ * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
+ */
+export function ChatHistory({ hasData }: { hasData: boolean }) {
+  const [filter, setFilter] = useState<HistoryFilter>('all');
+  // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const data = useClientData();
+  const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
+  const editing = events.find((e) => e.id === editingId);
+
+  const pages = useMemo(
+    () =>
+      FILTERS.map(({ id }) => ({
+        key: id,
+        node: <HistoryList events={id === 'all' ? events : events.filter((e) => e.kind === id)} onEdit={setEditingId} />,
+      })),
+    [events],
+  );
+
+  const index = FILTERS.findIndex((item) => item.id === filter);
+  const shown = dragIndex ?? index;
+
+  const onDrag = useCallback((position: number | null) => {
+    setDragIndex(position === null ? null : Math.round(Math.min(FILTERS.length - 1, Math.max(0, position))));
+  }, []);
+
+  // Цвет чипсов идёт за положением страниц, а не прыгает на середине
+  const onPosition = useCallback((position: number) => {
+    const chips = root.current?.querySelectorAll<HTMLElement>('.hist-chips .chip');
+    if (chips) followChips(chips, position);
+  }, []);
+
+  // Выбранный чипс виден целиком, даже если до него пролистали пальцем
+  useEffect(() => {
+    const row = root.current?.querySelector<HTMLElement>('.hist-chips');
+    const chip = row?.querySelector<HTMLElement>('.chip--active');
+    if (row && chip) revealChip(row, chip);
+  }, [shown]);
+
+  // Статистика и чипсы стоят над лентами: не едут вместе с ними, но за них тоже можно листать
+  const header = (
+    <>
+      <Stats hasData={hasData} />
+
+      <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
+        {FILTERS.map(({ id, label }, i) => (
+          <Chip
+            key={id}
+            follow
+            active={shown === i}
+            count={hasData ? countOf(data, id) : 0}
+            onClick={() => setFilter(id)}
+          >
+            {label}
+          </Chip>
+        ))}
+      </div>
+    </>
+  );
+
+  return (
+    <div ref={root} className="chat-history">
+      <SwipePager
+        className="chat-history__pager"
+        autoHeight
+        nested
+        index={index}
+        pages={pages}
+        header={header}
+        onIndexChange={(i) => setFilter(FILTERS[i].id)}
+        onPosition={onPosition}
+        onDrag={onDrag}
+      />
 
       {editing && (
         <EditSheet

@@ -142,9 +142,11 @@ img {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
-/* Пока жест ведёт экран или страницы, текст не выделяется, а курсор мыши показывает, что тянут */
-html.is-swiping,
-html.is-swiping * {
+/* Мышью тянут с курсором-«хваткой» и без выделения текста. Эти правила стоят на всех элементах сразу (user-select наследуется),
+   поэтому они только у мыши (см. setSwiping): у касаний смена такого класса пересчитывала бы стили всего документа
+   посреди жеста, а выделять текст пальцем при горизонтальном движении и так нечем */
+html.is-grabbing,
+html.is-grabbing * {
   cursor: grabbing !important;
   -webkit-user-select: none !important;
   user-select: none !important;

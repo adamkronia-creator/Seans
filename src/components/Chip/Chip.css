@@ -41,3 +41,51 @@
   box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
   color: var(--color-accent-on);
 }
+
+/*
+ * Чипсы, за которыми идут страницы (список чатов, история): фон с рамкой у невыбранного и у выбранного — два слоя друг под другом,
+ * а между ними перетекает прозрачность. --w (от 0 до 1, насколько чипс «выбран») задаёт followChips по положению страниц,
+ * пока их ведёт палец, так что цвет идёт за пальцем, как у значков вкладок в чате. Прозрачность слоёв считает видеокарта:
+ * перерисовывать чипсы на каждом кадре жеста не нужно (в длинной истории это заметно тормозило). Цвет текста и кружка
+ * переключается на середине.
+ */
+.chip--follow,
+.chip--follow.chip--active {
+  --w: 0;
+  position: relative;
+  isolation: isolate;
+  background: none;
+  box-shadow: none;
+}
+
+.chip--follow.chip--active {
+  --w: 1;
+}
+
+.chip--follow::before,
+.chip--follow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Пока цвет чипса идёт за пальцем (followChips ставит data-moving), слои на видеокарте; в покое они обычные, и чипс рисуется так же, как любой другой, пиксель в пиксель */
+.chip--follow[data-moving]::before,
+.chip--follow[data-moving]::after {
+  will-change: opacity;
+}
+
+.chip--follow::before {
+  background: var(--color-bg-panel);
+  box-shadow: 0 0 0 1px var(--color-stroke);
+  opacity: calc(1 - var(--w));
+}
+
+.chip--follow::after {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px rgb(0 136 255 / 20%);
+  opacity: var(--w);
+}
