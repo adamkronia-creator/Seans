@@ -36,6 +36,7 @@ import { conclusionFor } from '../../data/conclusions';
 import { canPassSelf } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
 import { Toast } from '../Toast/Toast';
+import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
 
@@ -215,6 +216,10 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
   const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? openView('blank') : notify('Бланк этого теста пока недоступен'));
+  // Жест «назад» из результата, бланка, заключения или прохождения ведёт к настройкам, как кнопка в шапке
+  useBackHandler(Boolean(resultId) || view !== 'settings', () =>
+    resultId ? transition(() => setResultId(null), 'back') : openView('settings'),
+  );
 
   if (resultId) {
     return (

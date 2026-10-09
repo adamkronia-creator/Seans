@@ -6,6 +6,7 @@ import { LIBRARY } from '../../data/library';
 import { testBlank } from '../../data/testBlank';
 import { useSelfResult } from '../../data/selfTest';
 import { SectionNav } from '../SectionNav/SectionNav';
+import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
 import { TestBlank, blankSections } from './TestBlank';
 import { TestHeader } from './TestHeader';
@@ -34,6 +35,8 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
   const own = useSelfResult(resultId);
   const result: ShownResult | undefined = own ?? findClientResult(resultId);
   const [blankOpen, setBlankOpen] = useState(false);
+  // Жест «назад» из бланка ведёт к заключению, как кнопка в шапке
+  useBackHandler(blankOpen, () => transition(() => setBlankOpen(false), 'back'));
   const test = result && LIBRARY.find((t) => t.id === result.testId);
 
   // Результаты живут, пока открыта страница: после перезагрузки по прямой ссылке их уже нет

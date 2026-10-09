@@ -74,8 +74,85 @@ img {
   max-width: 480px;
   height: 100%;
   margin: 0 auto;
-  /* Обои: картинка на всю ширину каркаса под всеми экранами; шапки, панели и карточки остаются белыми поверх неё */
+}
+
+/* Обои: картинка на всю ширину каркаса под всеми экранами; шапки, панели и карточки остаются белыми поверх неё.
+   У каждого экрана они свои, чтобы верхний был непрозрачным и нижний не просвечивал сквозь него */
+.app,
+.screen {
   background: var(--color-bg-wallpaper) url('../assets/background.webp') center / cover no-repeat;
+}
+
+/*
+ * Экраны лежат слоями друг на друге (App.tsx). Верхний виден, нижний (тот, куда вернёмся) спрятан, но уже нарисован:
+ * жест «назад» (utils/edgeBack.ts) сдвигает верхний вправо, и под ним показывается нижний.
+ * Вне жеста у слоя нет ни transform, ни will-change: иначе position: fixed внутри него привязался бы к слою, а не к окну.
+ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen[data-layer='under'] {
+  visibility: hidden;
+}
+
+/* Затемнение нижнего экрана, пока верхний его закрывает; светлеет по мере того, как верхний уезжает */
+.screen__dim {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: rgb(0 0 0 / 10%);
+  pointer-events: none;
+}
+
+.app.is-edge-dragging {
+  overflow: clip; /* уезжающий экран не выходит за края каркаса на широком окне */
+}
+
+.app.is-edge-dragging > .screen {
+  will-change: transform;
+}
+
+.app.is-edge-dragging > .screen[data-layer='top'] {
+  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+}
+
+.app.is-edge-dragging > .screen[data-layer='under'] {
+  visibility: visible;
+}
+
+.app.is-edge-dragging > .screen[data-layer='under'] > .screen__dim {
+  display: block;
+}
+
+/* Браузер считает touch-action только до ближайшего блока с прокруткой (выше он не заглядывает), поэтому «только вертикально»
+   нужно каждому элементу экрана. Иначе горизонтальное движение пальца, начатое у края, браузер отнимет у жеста «назад»
+   (и у листания разделов чата). Двойное касание при этом не масштабирует страницу, а сведение пальцев работает */
+.screen,
+.screen * {
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Ряды, которые сами прокручиваются вбок, остаются на браузере */
+.screen .screen-header__chips,
+.screen .screen-header__chips * {
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+/* Пока жест ведёт экран или страницы, текст не выделяется, а курсор мыши показывает, что тянут */
+html.is-swiping,
+html.is-swiping * {
+  cursor: grabbing !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* Экраны сдвинуты жестом: полоса прокрутки приложения не показывает прокрутку уезжающего */
+body.is-edge-back .app-scrollbar {
+  visibility: hidden;
 }
 
 .app__content {

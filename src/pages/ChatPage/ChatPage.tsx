@@ -22,11 +22,10 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
-import { TestResult } from '../../components/TestSettings/TestResult';
-import { TestSettings } from '../../components/TestSettings/TestSettings';
 import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { goBack, navigate } from '../../router';
+import { useBackHandler } from '../../utils/backHandler';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
@@ -86,7 +85,7 @@ function MessageMenu({
   // Меню вырастает от пузыря: над ним — от нижнего края, под ним — от верхнего; сторону задаёт автор сообщения
   const origin = `${above ? 'bottom' : 'top'} ${message.from === 'me' ? 'right' : 'left'}`;
   return (
-    <div ref={backdropRef} className="msg-menu__backdrop" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
+    <div ref={backdropRef} className="msg-menu__backdrop" data-no-swipe onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
       <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
         {items.map(({ label, Icon, run, danger }) => (
           <li key={label}>
@@ -143,15 +142,12 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
 
 interface ChatPageProps {
   chatId: string;
-  /** Открыта настройка этого теста (адрес /chat/<чат>/tests/<тест>) */
-  testId?: string;
-  /** Открыт результат самостоятельного прохождения (адрес /chat/<чат>/result/<результат>) */
-  resultId?: string;
   /** Нажатие на кнопку нижней панели (панель видна на вкладках кроме «Сообщения») */
   onAppTabChange: (id: TabId) => void;
 }
 
-export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageProps) {
+/** Чат с собеседником. Настройка теста и результат открываются поверх него отдельными экранами (ChatScreens.tsx) */
+export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [section, setSection] = useState<SectionId>('messages');
   // Тесты, задания и кейс пока есть только у Максима
   const hasClientData = chatId === 'maxim';
@@ -180,20 +176,19 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
 
-  // Переписка открывается внизу, у последних сообщений; так же после возврата из теста или результата
-  const overlay = Boolean(testId || resultId);
+  // Переписка открывается внизу, у последних сообщений. Уйдя в тест или результат, чат остаётся под ним как был
   useEffect(() => {
     scrollToBottom();
     atBottom.current = true;
     setUnseen(0);
     setReplyTo(null);
-  }, [chatId, overlay]);
+  }, [chatId]);
 
   // Листая разделы, переписку не теряем: прокрутка, набранный текст и ответ остаются на месте. Закрывается только поиск
   useEffect(() => {
     setSearchOpen(false);
     setQuery('');
-  }, [chatId, section, overlay]);
+  }, [chatId, section]);
 
   // Новое сообщение: своё или когда читаешь последнее, лента едет вниз; иначе копится счётчик входящих
   const messageCount = flat.length;
@@ -241,6 +236,8 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
     setSearchOpen(false);
     setQuery('');
   };
+  // Жест «назад» при открытом поиске закрывает его, как кнопка в строке поиска
+  useBackHandler(searchOpen && section === 'messages', closeSearch);
 
   const index = SECTIONS.findIndex((item) => item.id === section);
 
@@ -258,27 +255,6 @@ export function ChatPage({ chatId, testId, resultId, onAppTabChange }: ChatPageP
     return (
       <section className="chat">
         <p className="chat__empty">Чат не найден</p>
-      </section>
-    );
-  }
-
-  // Результат теста заменяет шапку и вкладки чата так же, как настройка теста
-  if (resultId) {
-    return (
-      <section className="chat">
-        <TestResult resultId={resultId} onBack={() => goBack(`/chat/${chatId}`)} />
-        <TabBar active="messages" onChange={onAppTabChange} />
-      </section>
-    );
-  }
-
-  // Настройка теста заменяет шапку и вкладки чата; снизу нижняя панель приложения, как у вкладки «Тесты»
-  const settingsTest = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
-  if (settingsTest) {
-    return (
-      <section className="chat">
-        <TestSettings test={settingsTest} chatId={chatId} onBack={() => goBack(`/chat/${chatId}`)} />
-        <TabBar active="messages" onChange={onAppTabChange} />
       </section>
     );
   }

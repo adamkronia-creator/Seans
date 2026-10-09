@@ -35,14 +35,6 @@
   min-height: 0;
 }
 
-/* Пока страницы тянут, текст не выделяется, а курсор мыши показывает, что тянут */
-html.is-swiping,
-html.is-swiping * {
-  cursor: grabbing !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
-
 /* Страницы между местами: полоса прокрутки приложения не показывает прокрутку уезжающей страницы */
 body.is-paging .app-scrollbar {
   visibility: hidden;

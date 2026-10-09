@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLayer } from '../../utils/layer';
 import { scrollHooks } from '../AppScrollbar/scrollHooks';
 import './SectionNav.css';
 
@@ -9,12 +10,15 @@ export interface NavSection {
   title: string;
 }
 
+/** Элемент страницы по id: ищем в своём экране, чтобы экран под ним (при жесте «назад») не подменил нужный */
+const byId = (scope: ParentNode, id: string) => scope.querySelector<HTMLElement>(`[id="${id}"]`);
+
 /** Текущий раздел — последний, верх которого уже поднялся выше верхней линии окна */
-function sectionAt(root: HTMLElement, sections: NavSection[]) {
+function sectionAt(scope: ParentNode, root: HTMLElement, sections: NavSection[]) {
   const line = root.getBoundingClientRect().top + 24;
   let current = sections[0];
   for (const section of sections) {
-    const el = document.getElementById(section.id);
+    const el = byId(scope, section.id);
     if (el && el.getBoundingClientRect().top <= line) current = section;
   }
   return current;
@@ -29,14 +33,18 @@ export function SectionNav({ sections, scroller }: { sections: NavSection[]; scr
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(sections[0]?.id);
   const key = sections.map((s) => s.id).join('|');
+  // Оглавление лежит в своём экране-слое и едет вместе с ним; вне слоёв — в каркасе приложения
+  const { element: host } = useLayer();
+  const scope: ParentNode = host ?? document;
 
   useEffect(() => {
-    const root = document.querySelector<HTMLElement>(scroller);
+    if (host === null) return; // слой ещё не нарисован
+    const root = scope.querySelector<HTMLElement>(scroller);
     if (!root || sections.length === 0) return;
     scrollHooks.set(root, {
-      label: () => sectionAt(root, sections).title,
+      label: () => sectionAt(scope, root, sections).title,
       tap: () => {
-        setActive(sectionAt(root, sections).id);
+        setActive(sectionAt(scope, root, sections).id);
         setOpen(true);
       },
     });
@@ -44,7 +52,7 @@ export function SectionNav({ sections, scroller }: { sections: NavSection[]; scr
       scrollHooks.delete(root);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scroller, key]);
+  }, [scroller, key, host]);
 
   useEffect(() => {
     if (!open) return;
@@ -53,11 +61,11 @@ export function SectionNav({ sections, scroller }: { sections: NavSection[]; scr
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  if (sections.length === 0) return null;
+  if (sections.length === 0 || host === null) return null;
 
   const go = (id: string) => {
     setOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    byId(scope, id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const toc = (
@@ -82,5 +90,5 @@ export function SectionNav({ sections, scroller }: { sections: NavSection[]; scr
     </div>
   );
 
-  return createPortal(toc, document.querySelector('.app') ?? document.body);
+  return createPortal(toc, host ?? document.querySelector('.app') ?? document.body);
 }

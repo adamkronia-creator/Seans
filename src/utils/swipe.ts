@@ -4,6 +4,9 @@
  * жест «назад» от левого края и закрытие окон снизу.
  */
 
+/** Касание началось у левого края и принадлежит жесту «назад»: листанию разделов на нём делать нечего */
+export const edgeTouch = { active: false };
+
 /** Сдвиг пальца, после которого это уже движение, а не нажатие; так же считает пузырь сообщения и эффект нажатия */
 export const SWIPE_SLOP = 10;
 
@@ -90,6 +93,31 @@ export function runSpring({ from, to, velocity = 0, stiffness = 560, rest = 0.00
     alive = false;
     cancelAnimationFrame(frame);
   };
+}
+
+/**
+ * Жест забирает указатель себе: дальнейшие события идут в `host`, а тем, кто ждал продолжения на месте касания
+ * (пузырь с долгим нажатием, подсвеченная кнопка), рассылается отмена. Разосланное нами событие недоверенное
+ * (isTrusted === false): свои обработчики жестов его пропускают.
+ */
+export function takeOver(host: Element, origin: Element, e: PointerEvent) {
+  try {
+    host.setPointerCapture(e.pointerId);
+  } catch {
+    // указатель уже снят: жест всё равно доведём по событиям
+  }
+  if (origin.isConnected) {
+    origin.dispatchEvent(
+      new PointerEvent('pointercancel', {
+        bubbles: true,
+        pointerId: e.pointerId,
+        pointerType: e.pointerType,
+        isPrimary: true,
+        clientX: e.clientX,
+        clientY: e.clientY,
+      }),
+    );
+  }
 }
 
 /**

@@ -12,6 +12,9 @@ import { flushSync } from 'react-dom';
  */
 export type TransitionKind = 'forward' | 'back' | 'fade' | 'none';
 
+/** Событие на window: анимация перехода закончилась и на экране снова настоящие блоки, а не снимки */
+export const TRANSITION_END = 'app:transition-end';
+
 interface ViewTransitionLike {
   finished: Promise<unknown>;
 }
@@ -64,5 +67,7 @@ export function transition(update: () => void, kind: TransitionKind = 'fade'): v
     .catch(() => undefined)
     .finally(() => {
       if (id === serial) delete root.dataset.transition;
+      // Пока шёл переход, на месте экрана были его снимки: тем, кто ищет блоки под пальцем (полоса прокрутки), пора поискать снова
+      window.dispatchEvent(new Event(TRANSITION_END));
     });
 }

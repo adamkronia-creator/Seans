@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { TRANSITION_END } from '../../utils/transition';
 import { scrollHooks } from './scrollHooks';
 import './AppScrollbar.css';
 
@@ -82,9 +83,13 @@ export function AppScrollbar() {
     });
     mutations.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
     document.addEventListener('transitionend', () => schedule(true), true);
+    // Во время перехода между экранами под пальцем снимки, а не блоки: после него ищем прокручиваемый блок заново
+    const onTransitionEnd = () => schedule(true);
+    window.addEventListener(TRANSITION_END, onTransitionEnd);
     schedule(true);
     return () => {
       cancelAnimationFrame(frame.current);
+      window.removeEventListener(TRANSITION_END, onTransitionEnd);
       document.removeEventListener('scroll', onScroll, true);
       mutations.disconnect();
       window.clearTimeout(settle);

@@ -1,6 +1,17 @@
 import { startTransition, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { canScrollSideways, elastic, flingScroll, guardClick, reducedMotion, runSpring, SWIPE_SLOP, VelocityTracker } from '../../utils/swipe';
+import {
+  canScrollSideways,
+  edgeTouch,
+  elastic,
+  flingScroll,
+  guardClick,
+  reducedMotion,
+  runSpring,
+  SWIPE_SLOP,
+  takeOver,
+  VelocityTracker,
+} from '../../utils/swipe';
 import './SwipePager.css';
 
 export interface PagerPage {
@@ -199,23 +210,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, className 
 
     /** Пейджер или прокрутка внутри берут жест себе: остальным (пузырь ждёт долгого нажатия, кнопка подсвечена) сообщаем об отмене */
     const claim = (g: Gesture, e: PointerEvent) => {
-      try {
-        el.setPointerCapture(e.pointerId);
-      } catch {
-        // указатель уже снят: жест всё равно доведём по событиям
-      }
-      if (g.origin.isConnected) {
-        g.origin.dispatchEvent(
-          new PointerEvent('pointercancel', {
-            bubbles: true,
-            pointerId: e.pointerId,
-            pointerType: e.pointerType,
-            isPrimary: true,
-            clientX: e.clientX,
-            clientY: e.clientY,
-          }),
-        );
-      }
+      takeOver(el, g.origin, e);
       g.releaseGuard = guardClick();
       document.documentElement.classList.add('is-swiping');
       if (g.kind === 'mouse') window.getSelection()?.removeAllRanges();
@@ -253,7 +248,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, className 
     };
 
     const onDown = (e: PointerEvent) => {
-      if (!e.isPrimary) return;
+      if (!e.isPrimary || edgeTouch.active) return; // у левого края касание принадлежит жесту «назад»
       if (gesture) finish(e.timeStamp, true); // прежний жест оборвался без отпускания (палец ушёл за окно)
       const origin = e.target instanceof Element ? e.target : null;
       if (!origin) return;
