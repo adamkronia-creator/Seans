@@ -27,8 +27,8 @@
   font-size: var(--size-icon);
 }
 
-.test-settings__button--muted {
-  color: var(--color-text-caption);
+.test-settings__button--muted svg {
+  opacity: 0.45;
 }
 
 /* Значок 36, gap 12, имя и раздел */
