@@ -47,15 +47,15 @@ function head(tip: P, from: P, size = 6.5, spread = 0.52) {
 }
 
 /** Связь между двумя узлами: концы не доходят до кружков, у стрелки острие на конце (или с обоих концов) */
-function Link({ from, to, ra = 13, rb = 13, gap = 4, tone = 'ink', dotted = false, arrow = 'end' }: { from: P; to: P; ra?: number; rb?: number; gap?: number; tone?: Tone; dotted?: boolean; arrow?: 'end' | 'both' | 'none' }) {
+function Link({ part = 'link', from, to, ra = 13, rb = 13, gap = 4, tone = 'ink', dotted = false, arrow = 'end' }: { part?: string; from: P; to: P; ra?: number; rb?: number; gap?: number; tone?: Tone; dotted?: boolean; arrow?: 'end' | 'both' | 'none' }) {
   const a = toward(from, to, ra + gap);
   const b = toward(to, from, rb + gap);
   const heads = [arrow !== 'none' ? head(b, a) : '', arrow === 'both' ? head(a, b) : ''].join('');
   return (
-    <>
+    <g data-part={part}>
       <path className={cls('dg__ln', `dg__ln--${tone}`, dotted && 'dg__ln--dot')} d={`M${n2(a[0])} ${n2(a[1])}L${n2(b[0])} ${n2(b[1])}`} />
       {heads && <path className={cls('dg__ln', `dg__ln--${tone}`)} d={heads} />}
-    </>
+    </g>
   );
 }
 
@@ -66,9 +66,9 @@ function dots(r: number) {
 }
 
 /** Узел схемы: кружок с буквой (курсивом, как в формулах), у буквы может быть индекс */
-function Node({ at, r = 13, label, sub, tone = 'ink', dotted = false, size = 15 }: { at: P; r?: number; label: string; sub?: string; tone?: Tone; dotted?: boolean; size?: number }) {
+function Node({ part, at, r = 13, label, sub, tone = 'ink', dotted = false, size = 15 }: { part?: string; at: P; r?: number; label: string; sub?: string; tone?: Tone; dotted?: boolean; size?: number }) {
   return (
-    <>
+    <g data-part={part ?? `node-${label}${sub ?? ''}`}>
       <circle cx={at[0]} cy={at[1]} r={r} className={cls('dg__ln', `dg__ln--${tone}`, dotted && 'dg__ln--dot')} style={dotted ? dots(r) : undefined} />
       <text x={at[0]} y={at[1]} dy=".36em" textAnchor="middle" fontSize={size} className={cls('dg__t', `dg__t--${tone}`)}>
         {label}
@@ -78,7 +78,7 @@ function Node({ at, r = 13, label, sub, tone = 'ink', dotted = false, size = 15 
           </tspan>
         )}
       </text>
-    </>
+    </g>
   );
 }
 
@@ -90,13 +90,13 @@ function SchemaL() {
   const A: P = [146, 90];
   return (
     <>
-      <Link from={S} to={A} tone="acc" dotted arrow="none" ra={14} rb={14} gap={5} />
-      <Link from={A} to={a1} />
-      <Link from={a1} to={a} />
-      <Link from={a} to={S} />
+      <Link part="axis-S-A" from={S} to={A} tone="acc" dotted arrow="none" ra={14} rb={14} gap={5} />
+      <Link part="path-A-a1" from={A} to={a1} />
+      <Link part="path-a1-a" from={a1} to={a} />
+      <Link part="path-a-S" from={a} to={S} />
       <Node at={S} label="S" tone="acc" />
       <Node at={A} label="A" tone="acc" />
-      <Node at={a1} label="a′" />
+      <Node part="node-a1" at={a1} label="a′" />
       <Node at={a} label="a" />
     </>
   );
@@ -106,13 +106,13 @@ function SchemaL() {
 function Formula() {
   return (
     <>
-      <text x="34" y="56" dy=".36em" textAnchor="middle" fontSize="42" className="dg__t dg__t--ink dg__t--lg">
+      <text data-part="subject-S" x="34" y="56" dy=".36em" textAnchor="middle" fontSize="42" className="dg__t dg__t--ink dg__t--lg">
         S
       </text>
-      <path className="dg__ln dg__ln--acc" d="M24 76L45 36" />
-      <path className="dg__ln dg__ln--acc" d="M88 38L104 56L88 74L72 56Z" />
-      <circle cx="142" cy="56" r="23" className="dg__ln dg__ln--ink dg__ln--dot" style={dots(23)} />
-      <text x="142" y="56" dy=".36em" textAnchor="middle" fontSize="32" className="dg__t dg__t--faint dg__t--lg">
+      <path data-part="subject-bar" className="dg__ln dg__ln--acc" d="M24 76L45 36" />
+      <path data-part="lozenge" className="dg__ln dg__ln--acc" d="M88 38L104 56L88 74L72 56Z" />
+      <circle data-part="object-circle" cx="142" cy="56" r="23" className="dg__ln dg__ln--ink dg__ln--dot" style={dots(23)} />
+      <text data-part="object-a" x="142" y="56" dy=".36em" textAnchor="middle" fontSize="32" className="dg__t dg__t--faint dg__t--lg">
         a
       </text>
     </>
@@ -133,17 +133,19 @@ function Bell() {
   const t0 = 1.35;
   return (
     <>
-      <path className="dg__soft" d={area} />
-      <path className="dg__ln dg__ln--ink" d={curve} />
-      <path className="dg__ln dg__ln--ink" d="M10 90H166" />
-      {[-2, -1, 0, 1, 2].map((t) => (
-        <path key={t} className="dg__ln dg__ln--ink" d={`M${n2(x(t))} 90V${t === 0 ? 96 : 94}`} />
-      ))}
-      <text x="88" y="107" textAnchor="middle" fontSize="13" className="dg__t dg__t--ink">
+      <path data-part="area-68" className="dg__soft" d={area} />
+      <path data-part="curve" className="dg__ln dg__ln--ink" d={curve} />
+      <path data-part="axis" className="dg__ln dg__ln--ink" d="M10 90H166" />
+      <g data-part="ticks">
+        {[-2, -1, 0, 1, 2].map((t) => (
+          <path key={t} className="dg__ln dg__ln--ink" d={`M${n2(x(t))} 90V${t === 0 ? 96 : 94}`} />
+        ))}
+      </g>
+      <text data-part="mu" x="88" y="107" textAnchor="middle" fontSize="13" className="dg__t dg__t--ink">
         μ
       </text>
-      <path className="dg__ln dg__ln--acc dg__ln--dot" d={`M${n2(x(t0))} 88V${n2(y(t0) + 7)}`} />
-      <circle cx={n2(x(t0))} cy={n2(y(t0))} r="4.6" className="dg__ln dg__ln--acc" />
+      <path data-part="result-line" className="dg__ln dg__ln--acc dg__ln--dot" d={`M${n2(x(t0))} 88V${n2(y(t0) + 7)}`} />
+      <circle data-part="result-point" cx={n2(x(t0))} cy={n2(y(t0))} r="4.6" className="dg__ln dg__ln--acc" />
     </>
   );
 }
@@ -156,9 +158,9 @@ function Abc() {
   const D: P = [88, 88];
   return (
     <>
-      <Link from={A} to={B} />
-      <Link from={B} to={C} />
-      <Link from={D} to={B} tone="acc" dotted />
+      <Link part="arrow-A-B" from={A} to={B} />
+      <Link part="arrow-B-C" from={B} to={C} />
+      <Link part="arrow-D-B" from={D} to={B} tone="acc" dotted />
       <Node at={A} label="A" />
       <Node at={B} label="B" />
       <Node at={C} label="C" />
@@ -173,7 +175,7 @@ function Chain() {
   return (
     <>
       {xs.slice(0, -1).map((x, i) => (
-        <Link key={x} from={[x, 56]} to={[xs[i + 1], 56]} ra={17} rb={17} tone={i === 0 ? 'acc' : 'ink'} dotted />
+        <Link key={x} part={`arrow-S${i + 1}-S${i + 2}`} from={[x, 56]} to={[xs[i + 1], 56]} ra={17} rb={17} tone={i === 0 ? 'acc' : 'ink'} dotted />
       ))}
       {xs.map((x, i) => (
         <Node key={x} at={[x, 56]} r={17} label="S" sub={String(i + 1)} size={17} tone={i === 0 ? 'acc' : 'ink'} dotted />
@@ -186,13 +188,13 @@ function Chain() {
 function Levels() {
   return (
     <>
-      <path className="dg__soft" d="M72 40L104 40L88 12Z" />
-      <path className="dg__soft dg__soft--weak" d="M38 66L138 66L88 104Z" />
-      <path className="dg__ln dg__ln--acc" d="M88 12L104 40H72Z" />
-      <path className="dg__ln dg__ln--ink" d="M72 40L38 66L88 104L138 66L104 40" />
-      <path className="dg__ln dg__ln--ink" d="M38 66H138" />
-      <path className="dg__ln dg__ln--faint dg__ln--dot" d="M12 40H164" />
-      <path className="dg__ln dg__ln--faint" d="M160 14V90M155.5 84.5L160 90.5L164.5 84.5" />
+      <path data-part="tip-fill" className="dg__soft" d="M72 40L104 40L88 12Z" />
+      <path data-part="deep-fill" className="dg__soft dg__soft--weak" d="M38 66L138 66L88 104Z" />
+      <path data-part="tip" className="dg__ln dg__ln--acc" d="M88 12L104 40H72Z" />
+      <path data-part="body" className="dg__ln dg__ln--ink" d="M72 40L38 66L88 104L138 66L104 40" />
+      <path data-part="tier" className="dg__ln dg__ln--ink" d="M38 66H138" />
+      <path data-part="waterline" className="dg__ln dg__ln--faint dg__ln--dot" d="M12 40H164" />
+      <path data-part="downward-arrow" className="dg__ln dg__ln--faint" d="M160 14V90M155.5 84.5L160 90.5L164.5 84.5" />
     </>
   );
 }
@@ -204,14 +206,14 @@ function Triangle() {
   const B: P = [136, 90];
   return (
     <>
-      <Link from={M} to={E} arrow="both" />
-      <Link from={M} to={B} arrow="both" />
-      <Link from={E} to={B} arrow="both" />
-      <Node at={M} label="М" />
-      <Node at={E} label="Э" />
-      <Node at={B} label="П" />
-      <circle cx="88" cy="68" r="3.2" className="dg__fill-acc" />
-      <circle cx="88" cy="68" r="8.5" className="dg__ln dg__ln--acc dg__ln--dot" style={dots(8.5)} />
+      <Link part="edge-thoughts-emotions" from={M} to={E} arrow="both" />
+      <Link part="edge-thoughts-behavior" from={M} to={B} arrow="both" />
+      <Link part="edge-emotions-behavior" from={E} to={B} arrow="both" />
+      <Node part="node-thoughts" at={M} label="М" />
+      <Node part="node-emotions" at={E} label="Э" />
+      <Node part="node-behavior" at={B} label="П" />
+      <circle data-part="client-dot" cx="88" cy="68" r="3.2" className="dg__fill-acc" />
+      <circle data-part="client-ring" cx="88" cy="68" r="8.5" className="dg__ln dg__ln--acc dg__ln--dot" style={dots(8.5)} />
     </>
   );
 }
@@ -221,17 +223,19 @@ function Record() {
   const cols = [20, 65.3, 110.7, 156];
   return (
     <>
-      <path className="dg__soft" d="M20 36V22a8 8 0 0 1 8-8H148a8 8 0 0 1 8 8V36Z" />
-      <rect x="20" y="14" width="136" height="84" rx="8" className="dg__ln dg__ln--ink" />
-      <path className="dg__ln dg__ln--ink" d="M20 36H156M65.3 14V98M110.7 14V98" />
+      <path data-part="header-fill" className="dg__soft" d="M20 36V22a8 8 0 0 1 8-8H148a8 8 0 0 1 8 8V36Z" />
+      <rect data-part="frame" x="20" y="14" width="136" height="84" rx="8" className="dg__ln dg__ln--ink" />
+      <path data-part="grid" className="dg__ln dg__ln--ink" d="M20 36H156M65.3 14V98M110.7 14V98" />
       {['A', 'B', 'C'].map((c, i) => (
-        <text key={c} x={(cols[i] + cols[i + 1]) / 2} y="25.5" dy=".36em" textAnchor="middle" fontSize="13" className="dg__t dg__t--acc">
+        <text key={c} data-part={`column-${c}`} x={(cols[i] + cols[i + 1]) / 2} y="25.5" dy=".36em" textAnchor="middle" fontSize="13" className="dg__t dg__t--acc">
           {c}
         </text>
       ))}
-      {[0, 1, 2].map((i) =>
-        [54, 74].map((yy) => <path key={`${i}-${yy}`} className="dg__ln dg__ln--faint dg__ln--dot" d={`M${n2(cols[i] + 9)} ${yy}H${n2(cols[i + 1] - 9)}`} />),
-      )}
+      <g data-part="empty-cells">
+        {[0, 1, 2].map((i) =>
+          [54, 74].map((yy) => <path key={`${i}-${yy}`} className="dg__ln dg__ln--faint dg__ln--dot" d={`M${n2(cols[i] + 9)} ${yy}H${n2(cols[i + 1] - 9)}`} />),
+        )}
+      </g>
     </>
   );
 }
@@ -242,11 +246,11 @@ function Window() {
   for (let x = 14; x <= 162; x += 2) wave.push(`${x} ${n2(58 + 9 * Math.sin(((x - 14) / 58) * 2 * Math.PI))}`);
   return (
     <>
-      <rect x="14" y="36" width="148" height="44" className="dg__soft" />
-      <path className="dg__ln dg__ln--faint dg__ln--dot" d="M14 36H162M14 80H162" />
-      <path className="dg__ln dg__ln--faint" d="M82 22L88 16L94 22M82 94L88 100L94 94" />
-      <path className="dg__ln dg__ln--acc" d={`M${wave.join('L')}`} />
-      <circle cx="162" cy={n2(58 + 9 * Math.sin(((162 - 14) / 58) * 2 * Math.PI))} r="3.6" className="dg__fill-acc" />
+      <rect data-part="band" x="14" y="36" width="148" height="44" className="dg__soft" />
+      <path data-part="limits" className="dg__ln dg__ln--faint dg__ln--dot" d="M14 36H162M14 80H162" />
+      <path data-part="chevrons" className="dg__ln dg__ln--faint" d="M82 22L88 16L94 22M82 94L88 100L94 94" />
+      <path data-part="wave" className="dg__ln dg__ln--acc" d={`M${wave.join('L')}`} />
+      <circle data-part="wave-end" cx="162" cy={n2(58 + 9 * Math.sin(((162 - 14) / 58) * 2 * Math.PI))} r="3.6" className="dg__fill-acc" />
     </>
   );
 }
@@ -259,11 +263,11 @@ function Dyad() {
       <clipPath id={id}>
         <circle cx="106" cy="56" r="32" />
       </clipPath>
-      <circle cx="70" cy="56" r="32" className="dg__soft" clipPath={`url(#${id})`} />
-      <circle cx="70" cy="56" r="32" className="dg__ln dg__ln--ink" />
-      <circle cx="106" cy="56" r="32" className="dg__ln dg__ln--acc dg__ln--dot" style={dots(32)} />
-      <circle cx="70" cy="56" r="2.6" className="dg__fill-ink" />
-      <circle cx="106" cy="56" r="2.6" className="dg__fill-acc" />
+      <circle data-part="overlap" cx="70" cy="56" r="32" className="dg__soft" clipPath={`url(#${id})`} />
+      <circle data-part="circle-left" cx="70" cy="56" r="32" className="dg__ln dg__ln--ink" />
+      <circle data-part="circle-right" cx="106" cy="56" r="32" className="dg__ln dg__ln--acc dg__ln--dot" style={dots(32)} />
+      <circle data-part="dot-left" cx="70" cy="56" r="2.6" className="dg__fill-ink" />
+      <circle data-part="dot-right" cx="106" cy="56" r="2.6" className="dg__fill-acc" />
     </>
   );
 }
@@ -273,10 +277,10 @@ function ObjectA() {
   const ang = (-32 * Math.PI) / 180;
   return (
     <>
-      <ellipse cx="88" cy="56" rx="60" ry="32" className="dg__ln dg__ln--faint dg__ln--dot" style={dots(46)} />
-      <circle cx={n2(88 + 60 * Math.cos(ang))} cy={n2(56 + 32 * Math.sin(ang))} r="4.4" className="dg__ln dg__ln--ink" />
-      <circle cx="88" cy="56" r="21" className="dg__ln dg__ln--acc" />
-      <text x="88" y="56" dy=".36em" textAnchor="middle" fontSize="28" className="dg__t dg__t--acc dg__t--lg">
+      <ellipse data-part="orbit" cx="88" cy="56" rx="60" ry="32" className="dg__ln dg__ln--faint dg__ln--dot" style={dots(46)} />
+      <circle data-part="satellite" cx={n2(88 + 60 * Math.cos(ang))} cy={n2(56 + 32 * Math.sin(ang))} r="4.4" className="dg__ln dg__ln--ink" />
+      <circle data-part="core" cx="88" cy="56" r="21" className="dg__ln dg__ln--acc" />
+      <text data-part="letter-a" x="88" y="56" dy=".36em" textAnchor="middle" fontSize="28" className="dg__t dg__t--acc dg__t--lg">
         a
       </text>
     </>
@@ -335,14 +339,14 @@ export function Rings({ letters = false, stroke = 2.2, gap = 2.2 }: { letters?: 
   return (
     <>
       {[0, 1, 2].map((i) => (
-        <path key={i} d={ringArcs(i, stroke, gap).join('')} className={cls('dg__ln', `dg__ln--${tones[i]}`)} style={{ strokeWidth: stroke, strokeLinecap: 'butt' }} />
+        <path key={i} data-part={`ring-${'RSI'[i]}`} d={ringArcs(i, stroke, gap).join('')} className={cls('dg__ln', `dg__ln--${tones[i]}`)} style={{ strokeWidth: stroke, strokeLinecap: 'butt' }} />
       ))}
       {letters &&
         ['R', 'S', 'I'].map((ch, i) => {
           const a = ((-90 + i * 120) * Math.PI) / 180;
           const c = ringCenter(i);
           return (
-            <text key={ch} x={n2(c[0] + Math.cos(a) * 19)} y={n2(c[1] + Math.sin(a) * 19)} dy=".36em" textAnchor="middle" fontSize="14" className="dg__t dg__t--acc">
+            <text key={ch} data-part={`letter-${ch}`} x={n2(c[0] + Math.cos(a) * 19)} y={n2(c[1] + Math.sin(a) * 19)} dy=".36em" textAnchor="middle" fontSize="14" className="dg__t dg__t--acc">
               {ch}
             </text>
           );
