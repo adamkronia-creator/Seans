@@ -69,6 +69,10 @@ function Layer({ top, children }: { top: boolean; children: ReactNode }) {
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('messages');
+  // Вкладка, из которой открыли чат (из «Ежедневника»): «назад» из чата возвращает на неё, а не к списку чатов
+  const [origin, setOrigin] = useState<TabId | null>(null);
+  /** Чат уже открыт: возврат на корень считается возвратом из него (а не просто моментом до перехода) */
+  const away = useRef(false);
   const { path: route, prev } = useRoute();
   const appRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +85,8 @@ export default function App() {
 
   const handleTabChange = useCallback((id: TabId) => {
     const { route: current, tab: active } = latest.current;
+    // Вкладку выбрали сами: возвращаться на ту, откуда открыли чат, уже не нужно
+    setOrigin(null);
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
     const toRoot = (id === 'messages' || current.startsWith('/tests/')) && current !== '/';
     if (id === active && !toRoot) return;
@@ -91,30 +97,33 @@ export default function App() {
     }, id === active ? 'back' : 'fade');
   }, []);
 
-  /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад ведет к списку чатов */
+  /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад возвращает на ту вкладку */
   const openChat = useCallback((chatId: string, section: ChatSection) => {
     wantSection(chatId, section);
+    const from = latest.current.tab;
     transition(() => {
+      away.current = false;
+      setOrigin(from);
       setTab('messages');
       navigate(`/chat/${chatId}`, 'none');
     }, 'forward');
   }, []);
 
   /** Обычный экран приложения: содержимое и нижняя панель разделов */
-  const page = (key: string, node: ReactNode): Resolved => ({
+  const page = (key: string, node: ReactNode, at: TabId): Resolved => ({
     key,
     build: () => (
       <>
         <main className="app__content">{node}</main>
-        <TabBar active={tab} onChange={handleTabChange} />
+        <TabBar active={at} onChange={handleTabChange} />
       </>
     ),
   });
 
   /** Что показывает адрес: ключ экрана и как его построить (строится один раз, пока экран на месте) */
-  const resolve = (path: string): Resolved => {
+  const resolve = (path: string, at: TabId): Resolved => {
     // Открытый чат занимает весь экран, без нижней панели разделов
-    const chatRoute = tab === 'messages' ? path.match(CHAT_ROUTE) : null;
+    const chatRoute = at === 'messages' ? path.match(CHAT_ROUTE) : null;
     if (chatRoute) {
       const [, chatId, kind, id] = chatRoute;
       if (CHATS.some((chat) => chat.id === chatId)) {
@@ -150,26 +159,26 @@ export default function App() {
       };
     }
 
-    if (tab === 'messages') return path === '/events' ? page('events', <EventsPage />) : page('messages', <MessagesPage />);
-    if (tab === 'tests') {
+    if (at === 'messages') return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at);
+    if (at === 'tests') {
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
-      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />) : page('tests', <TestsPage />);
+      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at) : page('tests', <TestsPage />, at);
     }
-    if (tab === 'tasks') return page('tasks', <TasksPage />);
-    if (tab === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />);
-    const soon = COMING_SOON[tab];
-    return page(`tab/${tab}`, <ComingSoon Icon={soon.Icon} title={soon.title} />);
+    if (at === 'tasks') return page('tasks', <TasksPage />, at);
+    if (at === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />, at);
+    const soon = COMING_SOON[at];
+    return page(`tab/${at}`, <ComingSoon Icon={soon.Icon} title={soon.title} />, at);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой
   // (чат под результатом, список под чатом) не работает вхолостую при каждой смене адреса
   const built = useRef(new Map<string, ReactNode>());
   const used = new Set<string>();
-  const screenFor = (path: string): Screen => {
-    const { key, build } = resolve(path);
-    const id = `${tab}|${key}`;
+  const screenFor = (path: string, at: TabId = tab): Screen => {
+    const { key, build } = resolve(path, at);
+    const id = `${at}|${key}`;
     used.add(id);
     let node = built.current.get(id);
     if (node === undefined) {
@@ -179,11 +188,27 @@ export default function App() {
     return { key, node };
   };
 
-  const top = screenFor(route);
+  // Пока чат только открывается или уже закрылся, корень — это вкладка, откуда пришли: ее экран остается на месте и не пересоздается
+  const topTab = origin && tab === 'messages' && route === '/' ? origin : tab;
+  const top = screenFor(route, topTab);
   // Под экраном лежит тот, откуда пришли (а при прямой ссылке — тот, куда вёл бы «назад»). У корня «назад» нет
   const underPath = route === '/' ? null : prev ?? parentOf(route);
-  let under = underPath !== null && underPath !== route ? screenFor(underPath) : null;
+  // Чат открыт из другой вкладки: под ним лежит она (то же, что было на экране), а не список чатов
+  const underTab = origin && underPath === '/' && tab === 'messages' ? origin : tab;
+  let under = underPath !== null && underPath !== route ? screenFor(underPath, underTab) : null;
   if (under?.key === top.key) under = null;
+
+  // Вернулись из чата на корень: открывается вкладка, с которой пришли; ее экран уже нарисован под чатом и остается как был
+  useLayoutEffect(() => {
+    if (origin === null) return;
+    if (route !== '/') {
+      away.current = true;
+    } else if (away.current) {
+      away.current = false;
+      setTab(origin);
+      setOrigin(null);
+    }
+  }, [route, origin]);
 
   useEdgeBack(appRef, {
     enabled: under !== null,

@@ -222,7 +222,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   useBackHandler(Boolean(resultId) || view !== 'settings', () =>
     resultId ? transition(() => setResultId(null), 'back') : openView('settings'),
   );
-  // Свайп влево на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
+  // Свайп вправо на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
   useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion'), () =>
     view === 'settings' ? onBack() : openView('settings'),
   );
