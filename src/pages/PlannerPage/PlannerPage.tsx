@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { buildAgenda, flagsOf, type AgendaItem, type Visit } from '../../data/agenda';
 import { proposeTime, useBooking, type Outcome } from '../../data/appointments';
 import { paragraphsToText } from '../../data/case';
+import type { ChatSection } from '../../data/chatIntent';
 import { CHATS } from '../../data/chats';
 import { sessionRecords, useClientData } from '../../data/clientStore';
 import {
@@ -43,7 +44,7 @@ const firstName = (id: string) => chatOf(id)?.name.split(' ')[0] ?? 'Клиен�
  * и заметки дня. Прошедшие приемы отмечаются «состоялся» / «не состоялся»; у состоявшегося сеанса есть комментарий,
  * и это тот же текст, что в «Истории взаимодействия» клиента.
  */
-export function PlannerPage() {
+export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, section: ChatSection) => void }) {
   const now = useNow();
   const today = dateKey(now);
   const { items: appointments } = useBooking();
@@ -143,13 +144,14 @@ export function PlannerPage() {
             onComment={(x) => setSheet({ kind: 'comment', key: x.key })}
             onOffer={(x) => setSheet({ kind: 'offer', key: x.key })}
             onEdit={(x) => setSheet({ kind: 'plan', plan: x.plan })}
+            onOpenChat={onOpenChat}
           />
         );
       }
       case 'offer':
-        return <OfferCard key={item.id} appointment={item.appointment} chat={chatOf(item.appointment.chatId)} />;
+        return <OfferCard key={item.id} appointment={item.appointment} chat={chatOf(item.appointment.chatId)} onOpenChat={onOpenChat} />;
       case 'closed':
-        return <ClosedCard key={item.id} appointment={item.appointment} chat={chatOf(item.appointment.chatId)} now={now} />;
+        return <ClosedCard key={item.id} appointment={item.appointment} chat={chatOf(item.appointment.chatId)} now={now} onOpenChat={onOpenChat} />;
       case 'task':
         return <TaskCard key={item.id} plan={item.plan} onToggle={(p) => toggleDone(p.id)} onEdit={(p) => setSheet({ kind: 'plan', plan: p })} />;
     }

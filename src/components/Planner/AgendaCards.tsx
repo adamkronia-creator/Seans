@@ -1,12 +1,14 @@
 import type { Appointment, Outcome } from '../../data/appointments';
 import type { Visit, VisitState } from '../../data/agenda';
+import type { ChatSection } from '../../data/chatIntent';
+import { CLIENT_CHAT } from '../../data/clientStore';
 import type { Chat } from '../../data/chats';
 import type { Plan } from '../../data/planner';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { dayShort, durationLabel } from '../../utils/ruDate';
 import { Avatar } from '../Avatar/Avatar';
 import { slotTime } from '../ChatBooking/bookingText';
-import { IconCaseEdit, IconTestChevronDown } from '../icons';
+import { IconBack, IconCaseEdit, IconTestChevronDown } from '../icons';
 import './AgendaCards.css';
 
 type Tone = 'green' | 'yellow' | 'red' | 'accent' | 'gray';
@@ -21,6 +23,26 @@ const TAGS: Record<VisitState, { label: string; tone: Tone }> = {
   held: { label: 'Состоялся', tone: 'green' },
   missed: { label: 'Не состоялся', tone: 'red' },
 };
+
+/** Открыть чат клиента на нужном разделе */
+type OpenChat = (chatId: string, section: ChatSection) => void;
+
+/** Ссылка внизу карточки: ведет в чат клиента */
+function OpenLink({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button type="button" className="pl-open" onClick={onClick}>
+      {label}
+      <IconBack className="pl-open__arrow" />
+    </button>
+  );
+}
+
+/** Куда вести из карточки сеанса: в историю, если сеанс записан в ней, иначе в запись на прием; у запланированного сеанса чата еще нет */
+function openTarget(v: Visit): { section: ChatSection; label: string } | null {
+  if (v.sessionId && v.chatId === CLIENT_CHAT) return { section: 'library', label: 'Открыть историю взаимодействия' };
+  if (v.source === 'appointment') return { section: 'booking', label: 'Открыть запись на прием' };
+  return null;
+}
 
 // ---------------------------------------------------------------- сеанс
 
@@ -40,16 +62,18 @@ interface VisitCardProps {
   onOffer: (visit: Visit) => void;
   /** Изменить запланированный сеанс */
   onEdit: (visit: Visit) => void;
+  onOpenChat: OpenChat;
 }
 
 /** Сеанс на день: время, клиент, состояние и то, что с ним можно сделать сейчас */
-export function VisitCard({ visit, chat, number, comment, onMark, onOutcome, onComment, onOffer, onEdit }: VisitCardProps) {
+export function VisitCard({ visit, chat, number, comment, onMark, onOutcome, onComment, onOffer, onEdit, onOpenChat }: VisitCardProps) {
   const { state, source } = visit;
   const tag = TAGS[state];
   const duration = visit.appointment?.duration ?? visit.plan?.duration;
   const kind = number ? `Сеанс №${number}` : source === 'appointment' ? 'Прием' : 'Сеанс';
   const sub = duration ? `${kind} · ${durationLabel(duration)}` : kind;
   const marked = state === 'held' || state === 'missed';
+  const open = openTarget(visit);
   // Запланированный сеанс правится, пока на нем нет отметки: отметку сначала снимают
   const editable = source === 'plan' && !marked;
   const who = (
@@ -130,6 +154,8 @@ export function VisitCard({ visit, chat, number, comment, onMark, onOutcome, onC
           )}
         </div>
       )}
+
+      {open && <OpenLink label={open.label} onClick={() => onOpenChat(visit.chatId, open.section)} />}
     </li>
   );
 }
@@ -137,7 +163,7 @@ export function VisitCard({ visit, chat, number, comment, onMark, onOutcome, onC
 // ---------------------------------------------------------------- предложение времени
 
 /** Предложение времени, на которое ещё нет ответа: ваше или клиента */
-export function OfferCard({ appointment: a, chat }: { appointment: Appointment; chat?: Chat }) {
+export function OfferCard({ appointment: a, chat, onOpenChat }: { appointment: Appointment; chat?: Chat; onOpenChat: OpenChat }) {
   const mine = a.by === 'me';
   // Имя клиента уже в заголовке карточки, поэтому в подписи его нет
   const text = mine
@@ -168,14 +194,22 @@ export function OfferCard({ appointment: a, chat }: { appointment: Appointment; 
           </span>
         </span>
       </div>
-      {!mine && <p className="pl-visit__hint">Ответить можно в чате, во вкладке «Запись на прием»</p>}
+      {mine ? (
+        <OpenLink label="Открыть запись на прием" onClick={() => onOpenChat(a.chatId, 'booking')} />
+      ) : (
+        <div className="pl-actions">
+          <button type="button" className="pl-button pl-button--primary" onClick={() => onOpenChat(a.chatId, 'booking')}>
+            Ответить в чате
+          </button>
+        </div>
+      )}
     </li>
   );
 }
 
 // ---------------------------------------------------------------- отмененный и перенесенный прием
 
-export function ClosedCard({ appointment: a, chat, now }: { appointment: Appointment; chat?: Chat; now: Date }) {
+export function ClosedCard({ appointment: a, chat, now, onOpenChat }: { appointment: Appointment; chat?: Chat; now: Date; onOpenChat: OpenChat }) {
   const cancelled = a.status === 'cancelled';
   const who = a.closedBy === 'me' ? 'вы' : firstName(chat);
   const sub = cancelled
@@ -196,6 +230,7 @@ export function ClosedCard({ appointment: a, chat, now }: { appointment: Appoint
           <span className="pl-visit__sub">{sub}</span>
         </span>
       </div>
+      <OpenLink label="Открыть запись на прием" onClick={() => onOpenChat(a.chatId, 'booking')} />
     </li>
   );
 }

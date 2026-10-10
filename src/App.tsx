@@ -9,6 +9,7 @@ import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TestSettings } from './components/TestSettings/TestSettings';
+import { wantSection, type ChatSection } from './data/chatIntent';
 import { CHATS } from './data/chats';
 import { LIBRARY } from './data/library';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
@@ -90,6 +91,15 @@ export default function App() {
     }, id === active ? 'back' : 'fade');
   }, []);
 
+  /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад ведет к списку чатов */
+  const openChat = useCallback((chatId: string, section: ChatSection) => {
+    wantSection(chatId, section);
+    transition(() => {
+      setTab('messages');
+      navigate(`/chat/${chatId}`, 'none');
+    }, 'forward');
+  }, []);
+
   /** Обычный экран приложения: содержимое и нижняя панель разделов */
   const page = (key: string, node: ReactNode): Resolved => ({
     key,
@@ -148,7 +158,7 @@ export default function App() {
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />) : page('tests', <TestsPage />);
     }
     if (tab === 'tasks') return page('tasks', <TasksPage />);
-    if (tab === 'planner') return page('planner', <PlannerPage />);
+    if (tab === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />);
     const soon = COMING_SOON[tab];
     return page(`tab/${tab}`, <ComingSoon Icon={soon.Icon} title={soon.title} />);
   };

@@ -26,6 +26,7 @@ import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '..
 import type { Message } from '../../data/messages';
 import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
+import { clearWanted, wantedSection, type ChatSection } from '../../data/chatIntent';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
@@ -33,7 +34,7 @@ import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
 // Разделы карточки собеседника; при открытии чата виден «Сообщения»
-type SectionId = 'booking' | 'messages' | 'tests' | 'tasks' | 'notes' | 'library';
+type SectionId = ChatSection;
 
 const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabBooking }[] = [
   { id: 'booking', label: 'Запись на прием', Icon: IconTabBooking },
@@ -157,7 +158,11 @@ interface ChatPageProps {
 
 /** Чат с собеседником. Настройка теста и результат открываются поверх него отдельными экранами (ChatScreens.tsx) */
 export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
-  const [picked, setSection] = useState<SectionId>('messages');
+  // Из «Ежедневника» чат может открываться сразу на нужном разделе; записка стирается, когда чат открылся
+  const [picked, setSection] = useState<SectionId>(() => wantedSection(chatId) ?? 'messages');
+  useEffect(() => {
+    clearWanted();
+  }, []);
   // Тесты, задания и кейс пока есть только у Максима
   const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);

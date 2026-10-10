@@ -67,12 +67,6 @@
   line-height: var(--line-height-sm);
 }
 
-.pl-visit__hint {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
 /* Отмененный прием приглушен: он уже не занимает время */
 .pl-visit--closed .pl-visit__time,
 .pl-visit--closed .pl-visit__name {
@@ -154,6 +148,26 @@
 .pl-button--primary {
   background: var(--color-accent);
   color: var(--color-accent-on);
+}
+
+/* Ссылка в чат клиента: внизу карточки, текстом с шевроном */
+.pl-open {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 2px;
+  height: 32px;
+  margin: calc(var(--space-1) * -1) 0;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.pl-open__arrow {
+  flex-shrink: 0;
+  font-size: var(--size-icon-sm);
+  transform: scaleX(-1);
 }
 
 /* ——— Комментарий к сеансу ——— */
