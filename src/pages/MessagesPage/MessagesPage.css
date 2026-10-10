@@ -24,6 +24,14 @@
   background: var(--color-bg-row);
 }
 
+.messages__empty {
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
+}
+
 .messages__fab {
   position: absolute;
   right: var(--space-4);

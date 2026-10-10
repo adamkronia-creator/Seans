@@ -1,5 +1,4 @@
 import { Badge } from '../Badge/Badge';
-import { EmptyState } from '../EmptyState/EmptyState';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SwipePager } from '../SwipePager/SwipePager';
@@ -223,9 +222,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             Добавить сведения
           </button>
 
-          {!hasData && (
-            <EmptyState compact art="levels" title="Сведений пока нет" text="Запишите запрос клиента, историю обращения и важные детали, чтобы вернуться к ним перед сеансом." />
-          )}
           <ul className="case-cards" hidden={!hasData}>
             {(hasData ? caseSections : []).map((section) => (
               <CaseCard
@@ -251,9 +247,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             Добавить заметку
           </button>
 
-          {!hasData && (
-            <EmptyState compact art="triangle" title="Заметок пока нет" text="Фиксируйте наблюдения после сеансов и мысли о следующей встрече." />
-          )}
           <ul className="case-cards" hidden={!hasData}>
             {notes.map((note) => (
               <NoteCard key={note.id} note={note} onEdit={() => setEditing({ kind: 'note', id: note.id })} />
@@ -287,9 +280,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             }}
           />
 
-          {files.length === 0 && (
-            <EmptyState compact art="record" title="Файлов пока нет" text="Прикрепите анкеты, фотографии или документы, которые относятся к работе с клиентом." />
-          )}
           <ul className="case-cards" hidden={files.length === 0}>
             {files.map((file) => (
               <FileCard key={file.id} file={file} />

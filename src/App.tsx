@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { ComingSoon } from './components/ComingSoon/ComingSoon';
+import { IconReading } from './components/icons';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
@@ -18,9 +19,9 @@ import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition } from './utils/transition';
 
-/** Разделы нижней панели, которых еще нет: название и что в них появится */
+/** Разделы нижней панели, которых еще нет: значок и название на пустом экране */
 const COMING_SOON = {
-  reading: { title: 'Материалы для чтения', text: 'Здесь появятся статьи, книги и памятки для работы с клиентами.' },
+  reading: { title: 'Материалы для чтения', Icon: IconReading },
 } as const;
 
 /** Что показывает адрес: key один и тот же, пока на экране тот же экран, поэтому при смене слоёв он не рисуется заново */
@@ -174,7 +175,7 @@ export default function App() {
     }
     if (at === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />, at);
     const soon = COMING_SOON[at];
-    return page(`tab/${at}`, <ComingSoon title={soon.title} text={soon.text} />, at);
+    return page(`tab/${at}`, <ComingSoon Icon={soon.Icon} title={soon.title} />, at);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой

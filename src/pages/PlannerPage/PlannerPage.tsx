@@ -23,7 +23,6 @@ import { MonthGrid } from '../../components/Planner/MonthGrid';
 import { OutcomeSheet, PlanSheet } from '../../components/Planner/PlannerSheets';
 import { ProposeSheet } from '../../components/ChatBooking/BookingSheets';
 import { EditSheet } from '../../components/EditSheet/EditSheet';
-import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { IconBack, IconPlus } from '../../components/icons';
 import { Toast } from '../../components/Toast/Toast';
 import { addDays, dateKey, dayLong, dayRelative, dayShort, monthTitle, parseDate, startOfMonth } from '../../utils/ruDate';
@@ -216,9 +215,7 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
         {agenda.length > 0 ? (
           <ul className="planner__list">{agenda.map(renderItem)}</ul>
         ) : (
-          <div className="planner__empty">
-            <EmptyState compact art="window" title="День свободен" text="Нажмите «+», чтобы добавить сеанс, дело или заметку." />
-          </div>
+          <p className="planner__empty">На этот день ничего не запланировано</p>
         )}
 
         <NoteCard text={planner.notes[selected] ?? ''} onEdit={() => setSheet({ kind: 'note' })} />

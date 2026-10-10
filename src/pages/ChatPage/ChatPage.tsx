@@ -130,16 +130,15 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName,
     <>
       {id === 'tests' &&
         (favorites ? (
-          <SelfTests onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} onOpenLibrary={() => onAppTabChange('tests')} />
+          <SelfTests onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
         ) : (
           <ChatTests
             hasData={hasClientData}
             onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
             onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
-            onOpenLibrary={() => onAppTabChange('tests')}
           />
         ))}
-      {id === 'tasks' && <ChatTasks hasData={hasClientData} onOpenLibrary={() => onAppTabChange('tasks')} />}
+      {id === 'tasks' && <ChatTasks hasData={hasClientData} />}
       {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
       {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} />}

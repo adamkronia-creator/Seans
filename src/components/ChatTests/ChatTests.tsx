@@ -1,6 +1,4 @@
-import type { DiagramKind } from '../Diagram/Diagram';
 import { Badge } from '../Badge/Badge';
-import { EmptyState } from '../EmptyState/EmptyState';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
 import { LIBRARY } from '../../data/library';
@@ -30,17 +28,16 @@ const TASK_SECTIONS: SectionConfig[] = [
 function SectionedList({
   items,
   sections,
-  empty,
+  emptyText,
   onOpen,
 }: {
   items: PsyTest[];
   sections: SectionConfig[];
-  /** Что показать, когда список пуст: название, пояснение и кнопка (если есть куда идти) */
-  empty: { art: DiagramKind; title: string; text: string; action?: { label: string; onClick: () => void } };
+  emptyText: string;
   /** Нажатие на карточку; у заданий пока не задано */
   onOpen?: (item: PsyTest) => void;
 }) {
-  if (items.length === 0) return <EmptyState art={empty.art} title={empty.title} text={empty.text} action={empty.action} />;
+  if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
   return (
     <div className="chat-tests">
       {sections.map(({ status, title, remind }) => {
@@ -74,32 +71,24 @@ export function ChatTests({
   hasData,
   onOpenTest,
   onOpenResult,
-  onOpenLibrary,
 }: {
   hasData: boolean;
   onOpenTest?: (id: string) => void;
   onOpenResult?: (id: string) => void;
-  /** Перейти в раздел «Диагностика» за новым тестом */
-  onOpenLibrary?: () => void;
 }) {
   const data = useClientData();
   return (
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
-      empty={{
-        art: 'bell',
-        title: 'Тестов пока нет',
-        text: 'Отправьте клиенту тест из раздела «Диагностика»: он придет в диалог, а результат сохранится здесь.',
-        action: onOpenLibrary && { label: 'Выбрать тест', onClick: onOpenLibrary },
-      }}
+      emptyText="Тесты ещё не отправлялись"
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTest?.(t.id))}
     />
   );
 }
 
 /** Вкладка «Тесты» в чате «Избранное»: тесты, которые психолог прошёл сам, новые сверху */
-export function SelfTests({ onOpen, onOpenLibrary }: { onOpen: (resultId: string) => void; onOpenLibrary?: () => void }) {
+export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
   const results = useSelfResults();
   const items = results.flatMap<PsyTest>((r) => {
     const test = LIBRARY.find((t) => t.id === r.testId);
@@ -110,30 +99,20 @@ export function SelfTests({ onOpen, onOpenLibrary }: { onOpen: (resultId: string
     <SectionedList
       items={items}
       sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
-      empty={{
-        art: 'bell',
-        title: 'Пройденных тестов пока нет',
-        text: 'Пройдите тест сами: заключение и бланк сохранятся здесь, и вы сможете вернуться к ним.',
-        action: onOpenLibrary && { label: 'Открыть диагностику', onClick: onOpenLibrary },
-      }}
+      emptyText="Пройденных тестов пока нет"
       onOpen={(t) => onOpen(t.id)}
     />
   );
 }
 
 /** Вкладка «Задания» в открытом чате */
-export function ChatTasks({ hasData, onOpenLibrary }: { hasData: boolean; onOpenLibrary?: () => void }) {
+export function ChatTasks({ hasData }: { hasData: boolean }) {
   const data = useClientData();
   return (
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'task') : []}
       sections={TASK_SECTIONS}
-      empty={{
-        art: 'abc',
-        title: 'Заданий пока нет',
-        text: 'Назначьте задание из раздела «Задания»: оно придет клиенту в диалог, а выполненное появится здесь.',
-        action: onOpenLibrary && { label: 'Выбрать задание', onClick: onOpenLibrary },
-      }}
+      emptyText="Заданий пока нет"
     />
   );
 }

@@ -121,9 +121,13 @@
 }
 
 .planner__empty {
-  display: flex;
+  padding: var(--space-6) var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
 }
 
 .planner__scroll > .pl-note {

@@ -21,7 +21,6 @@ import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
-import { EmptyState } from '../EmptyState/EmptyState';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -62,19 +61,17 @@ function Stats({ hasData }: { hasData: boolean }) {
     { label: 'Заметки', value: n(countOf(d, 'note')) },
   ];
   return (
-    <div className="hist-stats-wrap">
-      <ul className="hist-stats">
-        {items.map(({ label, value, total }) => (
-          <li key={label} className="hist-stats__item" title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
-            <span className="hist-stats__value">
-              {value}
-              {total !== undefined && <span className="hist-stats__total">/{total}</span>}
-            </span>
-            <span className="hist-stats__label">{label}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="hist-stats">
+      {items.map(({ label, value, total }) => (
+        <li key={label} className="hist-stats__item" title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
+          <span className="hist-stats__value">
+            {value}
+            {total !== undefined && <span className="hist-stats__total">/{total}</span>}
+          </span>
+          <span className="hist-stats__label">{label}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -239,12 +236,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
           })}
         </ol>
       ) : (
-        <EmptyState
-          art="chain"
-         
-          title="История пока пуста"
-          text="Сеансы, тесты, задания и заметки появятся здесь по мере работы с клиентом — от новых к старым."
-        />
+        <p className="hist-empty">Событий пока нет</p>
       )}
     </div>
   );

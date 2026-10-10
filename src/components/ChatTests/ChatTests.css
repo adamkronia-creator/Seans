@@ -44,3 +44,11 @@
   gap: var(--space-2);
 }
 
+.chat-tests__empty {
+  flex: 1;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
+}

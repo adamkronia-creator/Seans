@@ -3,7 +3,6 @@ import { markRead, useChats } from '../../data/chatStore';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
-import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
@@ -24,7 +23,7 @@ type Filter = 'all' | ChatCategory;
 const FILTERS: Filter[] = ['all', ...CATEGORIES.map(({ id }) => id)];
 
 /** Чаты одного фильтра: страница пейджера, у каждой своя прокрутка */
-const ChatList = memo(function ChatList({ chats, searching, onOpen }: { chats: Chat[]; searching: boolean; onOpen: (chat: Chat) => void }) {
+const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOpen: (chat: Chat) => void }) {
   return chats.length > 0 ? (
     <ul className="messages__list">
       {chats.map((chat) => (
@@ -32,11 +31,7 @@ const ChatList = memo(function ChatList({ chats, searching, onOpen }: { chats: C
       ))}
     </ul>
   ) : (
-    <EmptyState
-      art={searching ? 'formula' : 'schemaL'}
-      title={searching ? 'Ничего не найдено' : 'Здесь пока нет диалогов'}
-      text={searching ? 'Проверьте написание. Поиск идет по именам и по тексту последних сообщений.' : 'Нажмите «+» внизу, чтобы начать новый диалог.'}
-    />
+    <p className="messages__empty">Ничего не найдено</p>
   );
 });
 
@@ -68,8 +63,8 @@ export function MessagesPage() {
   }, [chats, query]);
 
   const pages = useMemo(
-    () => FILTERS.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} searching={query.trim() !== ''} onOpen={openChat} /> })),
-    [lists, query, openChat],
+    () => FILTERS.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} onOpen={openChat} /> })),
+    [lists, openChat],
   );
 
   const index = FILTERS.indexOf(filter);

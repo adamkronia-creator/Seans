@@ -8,8 +8,6 @@ import {
   IconPlusChip,
 } from '../../components/icons';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
-import type { DiagramKind } from '../../components/Diagram/Diagram';
-import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
@@ -35,25 +33,9 @@ interface LibraryPageProps {
 
 type Filter = string; // 'all' | 'favorites' | 'recent' | id категории
 
-/** Что показывает страница фильтра, когда список пуст: название и что делать дальше */
-function emptyOf(filter: Filter, searching: boolean, recent: string, kind: 'test' | 'task'): { art: DiagramKind; title: string; text: string } {
-  if (searching) {
-    return {
-      art: 'formula',
-      title: 'Ничего не найдено',
-      text: kind === 'test' ? 'Проверьте написание. Тест можно искать и по краткому названию, например «СМОЛ» или «BDI».' : 'Проверьте написание или очистите поиск.',
-    };
-  }
-  if (filter === 'favorites') return { art: 'object', title: 'Избранное пусто', text: 'Нажмите на сердечко у карточки, чтобы закрепить ее здесь.' };
-  if (filter === 'recent') {
-    return {
-      art: kind === 'test' ? 'bell' : 'abc',
-      title: recent,
-      text: kind === 'test' ? 'Тесты, которые вы отправляли клиентам, соберутся здесь, чтобы их было легко найти снова.' : 'Задания, которые вы назначали клиентам, соберутся здесь, чтобы их было легко найти снова.',
-    };
-  }
-  return { art: 'rings', title: 'В этой категории пока пусто', text: 'Добавленные сюда элементы появятся в списке.' };
-}
+/** Что показывает страница фильтра, когда список пуст */
+const emptyText = (filter: Filter, recent: string) =>
+  filter === 'favorites' ? 'В избранном пока ничего нет' : filter === 'recent' ? recent : 'Ничего не найдено';
 
 /** Карточки одного фильтра: страница пейджера, у каждой своя прокрутка */
 const LibraryList = memo(function LibraryList({
@@ -64,7 +46,7 @@ const LibraryList = memo(function LibraryList({
   onOpen,
 }: {
   items: LibraryItem[];
-  empty: { art: DiagramKind; title: string; text: string };
+  empty: string;
   favorites: ReadonlySet<string>;
   onToggleFavorite: (id: string) => void;
   onOpen?: (item: LibraryItem) => void;
@@ -76,7 +58,7 @@ const LibraryList = memo(function LibraryList({
       ))}
     </ul>
   ) : (
-    <EmptyState art={empty.art} title={empty.title} text={empty.text} />
+    <p className="library-page__empty">{empty}</p>
   );
 });
 
@@ -126,9 +108,9 @@ export function LibraryPage({
     () =>
       filters.map((id, i) => ({
         key: id,
-        node: <LibraryList items={lists[i]} empty={emptyOf(id, query.trim() !== '', labels.emptyRecent, kind)} favorites={favorites} onToggleFavorite={onToggleFavorite} onOpen={onOpen} />,
+        node: <LibraryList items={lists[i]} empty={emptyText(id, labels.emptyRecent)} favorites={favorites} onToggleFavorite={onToggleFavorite} onOpen={onOpen} />,
       })),
-    [filters, lists, query, kind, labels.emptyRecent, favorites, onToggleFavorite, onOpen],
+    [filters, lists, labels.emptyRecent, favorites, onToggleFavorite, onOpen],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
