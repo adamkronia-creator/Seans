@@ -252,9 +252,12 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
   if (!data) return null;
   const options: Options = { comment, state };
 
+  // Сообщение клиенту и, если выбран, срок: клиент видит его в карточке задания
+  const outgoing = [messageOn ? message.trim() : '', deadline !== TASK_DEADLINES[0] ? `Срок выполнения: ${deadline.toLowerCase()}.` : ''].filter(Boolean).join('\n\n');
+
   const send = (ids: string[]) => {
     ids.forEach((id) => {
-      sendMessage(id, messageOn ? message : '', undefined, { task: task.id });
+      sendMessage(id, outgoing, undefined, { task: task.id });
       // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
       if (id === 'maxim') logStep('task', task.id, 'sent');
     });
@@ -356,19 +359,22 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
 
             <CollapseCard title="Особенности задания">
               <ul className="ts-rows">
-                <Row label="Разрешить комментарий клиента">
+                <Row label="Разрешить комментарий клиента" hint="Клиент сможет дописать свои мысли после выполнения.">
                   <Switch checked={comment} onChange={setComment} label="Разрешить комментарий клиента" />
                 </Row>
-                <Row label="Оценить психоэмоциональное состояние">
+                <Row label="Оценить психоэмоциональное состояние" hint="Клиент отметит самочувствие по шкале, чтобы вы видели динамику.">
                   <Switch checked={state} onChange={setState} label="Оценить психоэмоциональное состояние" />
                 </Row>
-                <Row label="Сохранить бланк">
+                <Row label="Сохранить бланк" hint="Выполненное задание сохранится в истории клиента.">
                   <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
                 </Row>
-                <Row label="Срок выполнения" info>
+                <Row label="Срок выполнения" info hint="Срок будет указан в сообщении с заданием.">
                   {select('Срок выполнения', deadline, TASK_DEADLINES, setDeadline)}
                 </Row>
-                <Row label="Напомнить, если не выполнено">
+                <Row
+                  label="Напомнить, если не выполнено"
+                  hint={deadline === TASK_DEADLINES[0] ? 'Заработает, когда выберете срок выполнения.' : 'Клиент получит напоминание, когда срок подойдет к концу.'}
+                >
                   <Switch checked={remind} onChange={setRemind} label="Напомнить, если не выполнено" />
                 </Row>
               </ul>
@@ -376,7 +382,7 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
 
             <section className="ts-card ts-message-card">
               <ul className="ts-rows">
-                <Row label="Сообщение для клиента">
+                <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с заданием.">
                   <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
                 </Row>
               </ul>

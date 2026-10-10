@@ -21,6 +21,7 @@ import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
+import { EmptyState } from '../EmptyState/EmptyState';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -61,17 +62,20 @@ function Stats({ hasData }: { hasData: boolean }) {
     { label: 'Заметки', value: n(countOf(d, 'note')) },
   ];
   return (
-    <ul className="hist-stats">
-      {items.map(({ label, value, total }) => (
-        <li key={label} className="hist-stats__item">
-          <span className="hist-stats__value">
-            {value}
-            {total !== undefined && <span className="hist-stats__total">/{total}</span>}
-          </span>
-          <span className="hist-stats__label">{label}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="hist-stats-wrap">
+      <ul className="hist-stats">
+        {items.map(({ label, value, total }) => (
+          <li key={label} className="hist-stats__item" title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
+            <span className="hist-stats__value">
+              {value}
+              {total !== undefined && <span className="hist-stats__total">/{total}</span>}
+            </span>
+            <span className="hist-stats__label">{label}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="hist-stats__note">Тесты и задания: выполнено из отправленных</p>
+    </div>
   );
 }
 
@@ -236,7 +240,11 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
           })}
         </ol>
       ) : (
-        <p className="hist-empty">Событий пока нет</p>
+        <EmptyState
+          art="wings"
+          title="История пока пуста"
+          text="Сеансы, тесты, задания и заметки появятся здесь по мере работы с клиентом — от новых к старым."
+        />
       )}
     </div>
   );

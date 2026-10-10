@@ -41,7 +41,7 @@
 
 .bk-segments__item--active {
   background: var(--color-bg-panel);
-  box-shadow: 0 1px 2px rgb(16 24 40 / 10%);
+  box-shadow: 0 1px 2px rgb(16 32 42 / 10%);
   color: var(--color-text-primary);
 }
 

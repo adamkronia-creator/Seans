@@ -245,6 +245,27 @@
   line-height: var(--line-height-md);
 }
 
+/* Подпись с пояснением: пояснение тише и мельче, строка при этом не выше, чем нужно */
+.ts-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-block: var(--space-1);
+}
+
+.ts-row__text .ts-row__label {
+  flex: none;
+}
+
+.ts-row__hint {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-wrap: pretty;
+}
+
 /* Сведения о тесте: подпись тише, значение справа основным цветом, как в «Общей информации» кейса */
 .ts-row--info .ts-row__label {
   color: var(--color-text-secondary);

@@ -48,16 +48,19 @@ interface TestSettingsProps {
   onBack: () => void;
 }
 
-/** Строка карточки: подпись и значение или переключатель справа; значок бывает только у способа показа вопросов */
+/** Строка карточки: подпись и значение или переключатель справа; под подписью может стоять пояснение; значок бывает только у способа показа вопросов */
 export function Row({
   Icon,
   label,
+  hint,
   value,
   info,
   children,
 }: {
   Icon?: Svg;
   label: string;
+  /** Пояснение мелким шрифтом под подписью: что делает настройка */
+  hint?: string;
   /** Значение справа от подписи: строка превращается в «сведение» с тихой подписью */
   value?: string | number;
   info?: boolean;
@@ -66,7 +69,14 @@ export function Row({
   return (
     <li className={`ts-row${info || value !== undefined ? ' ts-row--info' : ''}`}>
       {Icon && <Icon className="ts-row__icon" />}
-      <span className="ts-row__label">{label}</span>
+      {hint ? (
+        <span className="ts-row__text">
+          <span className="ts-row__label">{label}</span>
+          <span className="ts-row__hint">{hint}</span>
+        </span>
+      ) : (
+        <span className="ts-row__label">{label}</span>
+      )}
       {value !== undefined && <span className="ts-row__value">{value}</span>}
       {children}
     </li>
@@ -417,13 +427,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <CollapseCard title="Особенности тестирования">
           <ul className="ts-rows">
-            <Row label="Слепое тестирование">
+            <Row label="Слепое тестирование" hint="Клиент не увидит название теста и его цель: так ответы честнее.">
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
-            <Row label="Скрыть заключение">
+            <Row label="Скрыть заключение" hint="После прохождения клиент не увидит результат, заключение останется только у вас.">
               <Switch checked={hideConclusion} onChange={setHideConclusion} label="Скрыть заключение" />
             </Row>
-            <Row label="Сохранить бланк">
+            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится в истории клиента.">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
             </Row>
           </ul>
@@ -431,7 +441,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
-            <Row label="Сообщение для клиента">
+            <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом.">
               <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>

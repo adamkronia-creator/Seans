@@ -17,7 +17,7 @@ import {
 import { useNow } from '../../utils/useNow';
 import { Toast } from '../Toast/Toast';
 import { AppointmentCard, HistoryList, type CardAction } from './AppointmentCard';
-import { IconBookingCalendar } from '../icons';
+import { EmptyState } from '../EmptyState/EmptyState';
 import { InfoSheet, MapsSheet, newDraft, ProposeSheet, RangeSheet, ReasonSheet, rescheduleDraft } from './BookingSheets';
 import { slotShort } from './bookingText';
 import { InfoCard } from './InfoCard';
@@ -121,11 +121,12 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
       <div className="booking__scroll">
         {nothingPlanned && (
           <div className="booking__empty">
-            <span className="booking__empty-icon">
-              <IconBookingCalendar />
-            </span>
-            <p className="booking__empty-title">{view.past.length > 0 ? 'Ближайших приемов нет' : 'Приема пока нет'}</p>
-            <p className="booking__empty-text">Предложите время или дождитесь предложения от собеседника</p>
+            <EmptyState
+              compact
+              art="drop"
+              title={view.past.length > 0 ? 'Ближайших приемов нет' : 'Приема пока нет'}
+              text="Нажмите «Предложить время» внизу или дождитесь предложения от собеседника."
+            />
           </div>
         )}
 

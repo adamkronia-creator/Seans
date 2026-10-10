@@ -1,0 +1,94 @@
+/*
+ * Слой оформления поверх компонентов («тихий кабинет»): подключается после них, поэтому здесь можно менять облик
+ * сразу у многих экранов, не трогая каждый файл. Здесь же — всё, что общее для приложения целиком.
+ */
+
+/* ——— Выделение, курсор и системные элементы в цвет приложения ——— */
+:root {
+  accent-color: var(--color-accent);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+input,
+textarea,
+[contenteditable] {
+  caret-color: var(--color-accent);
+}
+
+/* ——— Заголовки: книжная антиква; остальной текст — Inter ——— */
+.screen-header__title,
+.sheet__heading,
+.hist-stats__value,
+.blank-card__title,
+.booking__title,
+.chat-tests__title,
+.planner__month,
+.planner__day-title,
+.appt__date,
+.pl-note__title {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  font-optical-sizing: auto;
+}
+
+/* Название экрана крупнее: у антиквы тот же кегль выглядит мельче */
+.screen-header__title {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-3xl);
+  letter-spacing: -0.01em;
+}
+
+/* ——— Карточки: тонкая тень вместо плоского белого пятна ——— */
+.test-card,
+.hist-stats,
+.hist-card,
+.ts-card,
+.blank-card,
+.appt,
+.info,
+.history-card,
+.case-card,
+.case-file,
+.pl-card {
+  box-shadow: var(--shadow-card);
+}
+
+/* ——— Нижняя панель: у выбранного раздела мягкая «таблетка» под значком (подписей под значками нет) ——— */
+.tabbar__item {
+  position: relative;
+}
+
+.tabbar__item::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  width: 56px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.18s ease,
+    transform 0.26s var(--ease-ios);
+}
+
+.tabbar__item--active::before {
+  opacity: 1;
+  transform: none;
+}
+
+.tabbar__item > svg {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabbar__item::before {
+    transition: none;
+  }
+}

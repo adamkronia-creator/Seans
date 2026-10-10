@@ -35,6 +35,21 @@
 }
 
 /* Сводка: одна карточка, пять колонок — число крупно, под ним подпись */
+.hist-stats-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Что значит «3/5»: пояснение тихим шрифтом под карточкой */
+.hist-stats__note {
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
 .hist-stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -141,7 +156,7 @@
   min-height: 0;
   margin: var(--space-1) 0;
   border-radius: 1px;
-  background: rgb(94 107 123 / 14%); /* серо-синяя дымка: на фоне приложения даёт спокойную линию, не серую полосу */
+  background: rgb(63 98 110 / 16%); /* серо-синяя дымка: на фоне приложения даёт спокойную линию, не серую полосу */
 }
 
 .hist-marker {
@@ -295,10 +310,3 @@
   font-size: var(--size-icon-sm);
 }
 
-.hist-empty {
-  padding: var(--space-8) 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-  text-align: center;
-}

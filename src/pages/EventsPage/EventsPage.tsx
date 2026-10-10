@@ -1,3 +1,4 @@
+import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { EventItem } from '../../components/EventItem/EventItem';
 import { IconBack } from '../../components/icons';
 import { appEvents, useClientData } from '../../data/clientStore';
@@ -15,11 +16,19 @@ export function EventsPage() {
         <h1 className="events__title">События</h1>
       </header>
 
-      <ul className="events__list">
-        {events.map((event) => (
-          <EventItem key={event.id} event={event} onClick={(e) => e.href && navigate(e.href)} />
-        ))}
-      </ul>
+      {events.length > 0 ? (
+        <ul className="events__list">
+          {events.map((event) => (
+            <EventItem key={event.id} event={event} onClick={(e) => e.href && navigate(e.href)} />
+          ))}
+        </ul>
+      ) : (
+        <EmptyState
+          art="wings"
+          title="Событий пока нет"
+          text="Здесь появятся действия клиентов: принятые приглашения, пройденные тесты и выполненные задания."
+        />
+      )}
     </section>
   );
 }

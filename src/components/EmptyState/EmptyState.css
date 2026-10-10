@@ -1,0 +1,79 @@
+/* Знак: тонкая вода (подложка), густая «клякса» и темная лужица внутри; цвета берутся из токенов */
+.ink {
+  display: block;
+  flex-shrink: 0;
+}
+
+.ink__wash {
+  fill: var(--color-accent);
+  opacity: 0.07;
+}
+
+.ink__body {
+  fill: var(--color-accent);
+  opacity: 0.9;
+}
+
+.ink__pool {
+  fill: var(--color-accent-strong);
+  opacity: 0.55;
+}
+
+.ink__dot {
+  fill: var(--color-accent);
+  opacity: 0.8;
+}
+
+/* Пустое место: по центру, знак → название → пояснение → кнопка */
+.empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.empty--compact {
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-4);
+}
+
+.empty .ink {
+  margin-bottom: var(--space-2);
+}
+
+.empty__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xl);
+}
+
+.empty--compact .empty__title {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
+}
+
+.empty__text {
+  max-width: 300px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-wrap: pretty;
+}
+
+.empty__action {
+  height: 40px;
+  margin-top: var(--space-3);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
