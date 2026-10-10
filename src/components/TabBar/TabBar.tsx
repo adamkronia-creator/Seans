@@ -10,13 +10,13 @@ import './TabBar.css';
 
 export type TabId = 'planner' | 'messages' | 'tests' | 'tasks' | 'reading';
 
-// label — полное название для экранных читалок, short — подпись под значком
-const TABS: { id: TabId; label: string; short: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
-  { id: 'planner', label: 'Ежедневник', short: 'Ежедневник', Icon: IconPlanner },
-  { id: 'messages', label: 'Сообщения', short: 'Сообщения', Icon: IconMessages },
-  { id: 'tests', label: 'Психологические тесты', short: 'Тесты', Icon: IconTests },
-  { id: 'tasks', label: 'Психологические задания', short: 'Задания', Icon: IconTasks },
-  { id: 'reading', label: 'Материалы для чтения', short: 'Материалы', Icon: IconReading },
+// label — название для экранных читалок (подписей под значками нет)
+const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { id: 'planner', label: 'Ежедневник', Icon: IconPlanner },
+  { id: 'messages', label: 'Диалоги', Icon: IconMessages },
+  { id: 'tests', label: 'Диагностика', Icon: IconTests },
+  { id: 'tasks', label: 'Задания', Icon: IconTasks },
+  { id: 'reading', label: 'Материалы для чтения', Icon: IconReading },
 ];
 
 interface TabBarProps {
@@ -27,7 +27,7 @@ interface TabBarProps {
 export function TabBar({ active, onChange }: TabBarProps) {
   return (
     <nav className="tabbar" aria-label="Разделы">
-      {TABS.map(({ id, label, short, Icon }) => (
+      {TABS.map(({ id, label, Icon }) => (
         <button
           key={id}
           type="button"
@@ -37,7 +37,6 @@ export function TabBar({ active, onChange }: TabBarProps) {
           aria-current={id === active ? 'page' : undefined}
         >
           <Icon />
-          <span className="tabbar__label">{short}</span>
         </button>
       ))}
     </nav>

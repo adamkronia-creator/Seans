@@ -17,7 +17,7 @@
   text-align: center;
 }
 
-/* Шапка: строка 56 (кнопки 40, аватар 36), под ней вкладки разделов 44, снизу разделитель */
+/* Шапка: строка 56 (кнопки 40, аватар 36), под ней чипсы разделов, снизу разделитель */
 .chat__header {
   flex-shrink: 0;
   border-bottom: 1px solid var(--color-divider);
@@ -75,48 +75,17 @@
   line-height: var(--line-height-xs);
 }
 
-/* Вкладки равной ширины (шесть, а в «Избранном» четыре: --n); под активной акцентная полоска 3 px внизу, на разделителе шапки.
-   Полоска и цвет значков идут за страницами (--p — положение в разделах, --w — насколько вкладка «выбрана»), их задаёт SwipePager */
-.chat__tabs {
-  position: relative;
+/* Разделы чата — чипсы, как фильтры в «Диалогах»: ряд прокручивается вбок, выбранный — акцентный и идет за страницами */
+.chat__chips {
   display: flex;
-  padding: 0 var(--space-2);
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4) var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.chat__tab {
-  --w: 0;
-  position: relative;
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  height: 44px;
-  color: var(--color-text-caption);
-  font-size: var(--size-icon);
-}
-
-.chat__tab--active {
-  --w: 1;
-  color: var(--color-accent);
-}
-
-@supports (color: color-mix(in srgb, red 50%, blue)) {
-  .chat__tab,
-  .chat__tab--active {
-    color: color-mix(in srgb, var(--color-accent) calc(var(--w) * 100%), var(--color-text-caption));
-  }
-}
-
-/* Полоска 24×3 под значком: слева 8 + (номер раздела + ½) × ширина вкладки ((ширина − 16) / число вкладок) − половина полоски */
-.chat__tab-line {
-  position: absolute;
-  bottom: -1px; /* на разделителе шапки */
-  left: calc(8px + (var(--p, 1) + 0.5) * (100% - 16px) / var(--n, 6) - 12px);
-  width: 24px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--color-accent);
-  pointer-events: none;
+.chat__chips::-webkit-scrollbar {
+  display: none;
 }
 
 /* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 12 */

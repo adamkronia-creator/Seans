@@ -90,7 +90,7 @@ export function MessagesPage() {
   return (
     <section ref={root} className="messages">
       <ScreenHeader
-        title="Сообщения"
+        title="Диалоги"
         trailing={
           <>
             <button

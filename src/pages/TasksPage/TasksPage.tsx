@@ -6,12 +6,12 @@ import {
 } from '../../data/library';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
 
-/** Раздел «Психологические задания»: библиотека всех заданий приложения */
+/** Раздел «Задания»: библиотека всех заданий приложения */
 export function TasksPage() {
   return (
     <LibraryPage
       kind="task"
-      title="Психологические задания"
+      title="Задания"
       searchPlaceholder="Поиск по заданиям"
       items={TASK_LIBRARY}
       categories={TASK_CATEGORIES}

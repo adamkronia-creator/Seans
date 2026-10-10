@@ -59,7 +59,7 @@ export function LibraryPage({
     } else if (filter !== 'all') list = list.filter((t) => t.categories.includes(filter));
     if (!q) return list;
     return list.filter(
-      (t) => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q),
+      (t) => t.title.toLowerCase().includes(q) || (t.abbr?.toLowerCase().includes(q) ?? false) || t.description.toLowerCase().includes(q),
     );
   }, [items, query, filter, favorites, client, kind]);
 

@@ -2,7 +2,7 @@ import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { toggleFavorite, useFavorites, type LibraryTest } from '../../data/library';
 import './TestSettings.css';
 
-/** В шапке название без аббревиатуры: «BDI: Шкала депрессии А. Бека» → «Шкала депрессии А. Бека» */
+/** Название без аббревиатуры (на случай, если она осталась в заголовке): «BDI: Шкала депрессии А. Бека» → «Шкала депрессии А. Бека» */
 export const shortTitle = (title: string) => title.replace(/^[^:]+:\s*/, '');
 
 interface TestHeaderProps {

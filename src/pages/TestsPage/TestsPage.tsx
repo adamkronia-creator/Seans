@@ -7,7 +7,7 @@ export function TestsPage() {
   return (
     <LibraryPage
       kind="test"
-      title="Тестовые материалы"
+      title="Диагностика"
       searchPlaceholder="Поиск по тестам"
       items={LIBRARY}
       categories={TEST_CATEGORIES}

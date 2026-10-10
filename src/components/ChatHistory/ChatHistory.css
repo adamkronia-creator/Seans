@@ -130,11 +130,11 @@
 
 .hist-item__line {
   flex: 1;
-  width: 2px;
+  width: 1.5px;
   min-height: 0;
   margin: var(--space-1) 0;
   border-radius: 1px;
-  background: rgb(94 107 123 / 22%); /* серо-синяя дымка: на фоне приложения даёт спокойную линию, не серую полосу */
+  background: rgb(94 107 123 / 14%); /* серо-синяя дымка: на фоне приложения даёт спокойную линию, не серую полосу */
 }
 
 .hist-marker {

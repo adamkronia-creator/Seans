@@ -2,9 +2,6 @@ import { useRef, useState, type CSSProperties } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import {
-  IconCaseAdd,
-  IconCaseAddNote,
-  IconCaseAttach,
   IconCaseFileDownload,
   IconCaseEdit,
   IconCaseLock,
@@ -233,8 +230,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       {segment === 'info' ? (
         <>
           <button type="button" className="case-add">
-            <IconCaseAdd className="case-add__icon" />
-            <span>Добавить сведения</span>
+            Добавить сведения
           </button>
 
           <ul className="case-cards" hidden={!hasData}>
@@ -255,8 +251,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       ) : segment === 'notes' ? (
         <>
           <button type="button" className="case-add">
-            <IconCaseAddNote className="case-add__icon" />
-            <span>Добавить заметку</span>
+            Добавить заметку
           </button>
 
           <ul className="case-cards" hidden={!hasData}>
@@ -273,8 +268,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
       ) : (
         <>
           <button type="button" className="case-add" onClick={() => fileInput.current?.click()}>
-            <IconCaseAttach className="case-add__icon" />
-            <span>Прикрепить файл</span>
+            Прикрепить файл
           </button>
           {/* Системное окно выбора файлов; можно выбрать несколько */}
           <input

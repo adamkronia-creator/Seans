@@ -345,7 +345,7 @@ export type HistoryFilter = 'all' | 'session' | 'test' | 'task' | 'note';
 const catalog = (kind: 'test' | 'task') => (kind === 'test' ? LIBRARY : TASK_LIBRARY);
 const itemName = (kind: 'test' | 'task', ref: string) =>
   kind === 'test'
-    ? (TEST_META[ref]?.name ?? LIBRARY.find((x) => x.id === ref)!.title.split(':')[0])
+    ? (TEST_META[ref]?.name ?? (({ abbr, title }) => abbr ?? title)(LIBRARY.find((x) => x.id === ref)!))
     : TASK_LIBRARY.find((x) => x.id === ref)!.title;
 
 function activityText(kind: 'test' | 'task', ref: string, state: ActivityState): string {

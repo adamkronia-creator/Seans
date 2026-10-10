@@ -1,4 +1,4 @@
-/* Нижняя панель разделов: пять равных кнопок, значок 24 и подпись 11, выбранный — акцентным цветом, без рамок и кружков */
+/* Нижняя панель разделов: пять равных кнопок со значком 24 без подписей, выбранный — акцентным цветом, без рамок и кружков */
 .tabbar {
   display: flex;
   flex-shrink: 0;
@@ -13,7 +13,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   min-width: 0;
   height: var(--size-tab);
   color: var(--color-text-caption);
@@ -21,29 +20,6 @@
   transition: color 0.15s;
 }
 
-.tabbar__label {
-  max-width: 100%;
-  overflow: hidden;
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-2xs);
-  text-overflow: clip;
-  white-space: nowrap;
-}
-
 .tabbar__item--active {
   color: var(--color-accent);
-}
-
-/* На узком экране (до 360) подписи не помещаются в пять равных кнопок: остаётся подпись выбранной, у остальных место под ней пустое.
-   Подпись выбранной может выйти за свою кнопку: соседи под ней пустые */
-@media (max-width: 359px) {
-  .tabbar__label {
-    max-width: none;
-    overflow: visible;
-  }
-
-  .tabbar__item:not(.tabbar__item--active) .tabbar__label {
-    visibility: hidden;
-  }
 }

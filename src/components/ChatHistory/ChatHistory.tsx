@@ -253,7 +253,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const data = useClientData();
-  const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
+  const events = useMemo(() => (hasData ? historyEvents(data).reverse() : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
 
   const pages = useMemo(

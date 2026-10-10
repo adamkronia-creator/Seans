@@ -1,16 +1,10 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
   IconSearch,
   IconFavorites,
   IconSettings,
-  IconTabBooking,
-  IconTabLibrary,
-  IconTabMessages,
-  IconTabNotes,
-  IconTabPractices,
-  IconTabTests,
 } from '../../components/icons';
 import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
@@ -26,6 +20,9 @@ import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '..
 import type { Message } from '../../data/messages';
 import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
+import { Chip } from '../../components/Chip/Chip';
+import { followChips } from '../../utils/followChips';
+import { revealChip } from '../../utils/revealChip';
 import { clearWanted, wantedSection, type ChatSection } from '../../data/chatIntent';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
@@ -36,13 +33,13 @@ import './ChatPage.css';
 // Разделы карточки собеседника; при открытии чата виден «Сообщения»
 type SectionId = ChatSection;
 
-const SECTIONS: { id: SectionId; label: string; Icon: typeof IconTabBooking }[] = [
-  { id: 'booking', label: 'Запись на прием', Icon: IconTabBooking },
-  { id: 'messages', label: 'Сообщения', Icon: IconTabMessages },
-  { id: 'tests', label: 'Тесты', Icon: IconTabTests },
-  { id: 'tasks', label: 'Задания', Icon: IconTabPractices },
-  { id: 'notes', label: 'Кейс', Icon: IconTabNotes },
-  { id: 'library', label: 'Материалы', Icon: IconTabLibrary },
+const SECTIONS: { id: SectionId; label: string }[] = [
+  { id: 'booking', label: 'Прием' },
+  { id: 'messages', label: 'Диалог' },
+  { id: 'tests', label: 'Тесты' },
+  { id: 'tasks', label: 'Задания' },
+  { id: 'notes', label: 'Кейс' },
+  { id: 'library', label: 'История' },
 ];
 
 /** В «Избранном» нет записи на прием и истории взаимодействия: записываться не к кому, взаимодействовать не с кем */
@@ -267,18 +264,18 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
   const index = sections.findIndex((item) => item.id === section);
 
-  // Шапка идёт за страницами: полоса под вкладкой и цвет значков следуют за положением, а не прыгают на готовый выбор
-  const tabsRef = useRef<HTMLElement>(null);
-  const showPosition = useCallback(
-    (position: number) => {
-      const nav = tabsRef.current;
-      if (!nav) return;
-      const p = Math.min(sections.length - 1, Math.max(0, position));
-      nav.style.setProperty('--p', String(p));
-      for (let i = 0; i < sections.length; i += 1) (nav.children[i] as HTMLElement).style.setProperty('--w', String(Math.max(0, 1 - Math.abs(p - i))));
-    },
-    [sections],
-  );
+  // Чипсы разделов идут за страницами: цвет перетекает вслед за пальцем, а не прыгает на готовый выбор
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const showPosition = useCallback((position: number) => {
+    const row = chipsRef.current;
+    if (row) followChips(row.querySelectorAll<HTMLElement>('.chip'), position);
+  }, []);
+  // Выбранный чипс виден целиком: ряд подъезжает к нему, если он наполовину за краем
+  useEffect(() => {
+    const row = chipsRef.current;
+    const chip = row?.querySelector<HTMLElement>('.chip--active');
+    if (row && chip) revealChip(row, chip);
+  }, [section]);
 
   if (!chat) {
     return (
@@ -443,21 +440,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           </div>
         )}
 
-        <nav className="chat__tabs" aria-label="Разделы" ref={tabsRef} style={{ '--n': sections.length } as CSSProperties}>
-          {sections.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              type="button"
-              className={`chat__tab${id === section ? ' chat__tab--active' : ''}`}
-              aria-label={label}
-              aria-current={id === section ? 'page' : undefined}
-              onClick={() => setSection(id)}
-            >
-              <Icon />
-            </button>
+        <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
+          {sections.map(({ id, label }) => (
+            <Chip key={id} follow active={id === section} onClick={() => setSection(id)}>
+              {label}
+            </Chip>
           ))}
-          <span className="chat__tab-line" aria-hidden="true" />
-        </nav>
+        </div>
       </header>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} onPosition={showPosition} />
