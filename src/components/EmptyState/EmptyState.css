@@ -1,29 +1,3 @@
-/* Знак: тонкая вода (подложка), густая «клякса» и темная лужица внутри; цвета берутся из токенов */
-.ink {
-  display: block;
-  flex-shrink: 0;
-}
-
-.ink__wash {
-  fill: var(--color-accent);
-  opacity: 0.07;
-}
-
-.ink__body {
-  fill: var(--color-accent);
-  opacity: 0.9;
-}
-
-.ink__pool {
-  fill: color-mix(in srgb, var(--color-accent) 70%, #000);
-  opacity: 0.55;
-}
-
-.ink__dot {
-  fill: var(--color-accent);
-  opacity: 0.8;
-}
-
 /* Пустое место: по центру, знак → название → пояснение → кнопка */
 .empty {
   display: flex;
@@ -39,10 +13,6 @@
 .empty--compact {
   gap: var(--space-1);
   padding: var(--space-6) var(--space-4);
-}
-
-.empty .ink {
-  margin-bottom: var(--space-2);
 }
 
 .empty__title {

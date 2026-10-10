@@ -240,7 +240,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
         </ol>
       ) : (
         <EmptyState
-          art="wings"
+         
           title="История пока пуста"
           text="Сеансы, тесты, задания и заметки появятся здесь по мере работы с клиентом — от новых к старым."
         />

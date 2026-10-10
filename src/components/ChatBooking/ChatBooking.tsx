@@ -123,7 +123,7 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
           <div className="booking__empty">
             <EmptyState
               compact
-              art="drop"
+             
               title={view.past.length > 0 ? 'Ближайших приемов нет' : 'Приема пока нет'}
               text="Нажмите «Предложить время» внизу или дождитесь предложения от собеседника."
             />

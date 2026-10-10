@@ -39,7 +39,7 @@ function SectionedList({
   /** Нажатие на карточку; у заданий пока не задано */
   onOpen?: (item: PsyTest) => void;
 }) {
-  if (items.length === 0) return <EmptyState art="blot" title={empty.title} text={empty.text} action={empty.action} />;
+  if (items.length === 0) return <EmptyState title={empty.title} text={empty.text} action={empty.action} />;
   return (
     <div className="chat-tests">
       {sections.map(({ status, title, remind }) => {

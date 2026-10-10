@@ -217,7 +217,7 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
           <ul className="planner__list">{agenda.map(renderItem)}</ul>
         ) : (
           <div className="planner__empty">
-            <EmptyState compact art="drop" title="День свободен" text="Нажмите «+», чтобы добавить сеанс, дело или заметку." />
+            <EmptyState compact title="День свободен" text="Нажмите «+», чтобы добавить сеанс, дело или заметку." />
           </div>
         )}
 

@@ -9,5 +9,5 @@ interface ComingSoonProps {
 
 /** Раздела пока нет: знак «Сеанса», название и пояснение, что здесь будет, по центру экрана над нижней панелью */
 export function ComingSoon({ title, text }: ComingSoonProps) {
-  return <EmptyState art="drop" title={title} text={`Раздел в разработке. ${text}`} />;
+  return <EmptyState title={title} text={`Раздел в разработке. ${text}`} />;
 }

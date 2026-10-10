@@ -73,7 +73,7 @@ const LibraryList = memo(function LibraryList({
       ))}
     </ul>
   ) : (
-    <EmptyState art="blot" title={empty.title} text={empty.text} />
+    <EmptyState title={empty.title} text={empty.text} />
   );
 });
 

@@ -1,9 +1,6 @@
-import { Inkblot, type InkblotKind } from './Inkblot';
 import './EmptyState.css';
 
 interface EmptyStateProps {
-  /** Какая клякса рисуется над текстом */
-  art?: InkblotKind;
   /** Что пусто, коротко: «Заданий пока нет» */
   title: string;
   /** Что с этим делать: одним-двумя предложениями */
@@ -17,10 +14,9 @@ interface EmptyStateProps {
 }
 
 /** Пустой экран или блок: знак «Сеанса», название, пояснение и, если есть куда идти, кнопка. Пустота — это приглашение к действию */
-export function EmptyState({ art = 'blot', title, text, action, compact = false, className = '' }: EmptyStateProps) {
+export function EmptyState({ title, text, action, compact = false, className = '' }: EmptyStateProps) {
   return (
     <div className={`empty${compact ? ' empty--compact' : ''} ${className}`}>
-      <Inkblot kind={art} size={compact ? 72 : 104} />
       <h2 className="empty__title">{title}</h2>
       {text && <p className="empty__text">{text}</p>}
       {action && (
