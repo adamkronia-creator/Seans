@@ -59,6 +59,36 @@ export function dayShort(key: string, now = new Date()): string {
 export const weekdayShort = (d: Date) => WEEKDAYS_SHORT[d.getDay()];
 export const monthShort = (d: Date) => MONTHS_SHORT[d.getMonth()];
 
+/** Дни недели в календаре: неделя начинается с понедельника */
+export const WEEK_HEAD = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+
+/** Номер дня в календарной неделе: понедельник — 0, воскресенье — 6 */
+export const mondayIndex = (d: Date) => (d.getDay() + 6) % 7;
+
+/** Первое число месяца, в котором лежит день */
+export const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1);
+
+const MONTHS_NOMINATIVE = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+/** «Октябрь 2026» — заголовок месяца в календаре */
+export const monthTitle = (d: Date) => `${MONTHS_NOMINATIVE[d.getMonth()]} ${d.getFullYear()}`;
+
+/** Дата прописью для экранных читалок: «10 октября» */
+export function dayMonth(key: string): string {
+  const d = parseDate(key);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+/** Где день относительно сегодняшнего: «Сегодня», «Завтра», «Вчера», «Через 3 дня», «5 дней назад» */
+export function dayRelative(key: string, now = new Date()): string {
+  const n = daysBetween(now, parseDate(key));
+  if (n === 0) return 'Сегодня';
+  if (n === 1) return 'Завтра';
+  if (n === -1) return 'Вчера';
+  if (n > 0) return `Через ${n} ${plural(n, 'день', 'дня', 'дней')}`;
+  return `${-n} ${plural(-n, 'день', 'дня', 'дней')} назад`;
+}
+
 /** Склонение по числу: plural(2, 'день', 'дня', 'дней') → «дня» */
 export function plural(n: number, one: string, few: string, many: string): string {
   const mod100 = Math.abs(n) % 100;

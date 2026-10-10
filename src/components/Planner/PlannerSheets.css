@@ -1,0 +1,70 @@
+/* Окна «Ежедневника». Каркас, строки полей, чипсы и кнопки — в EditSheet.css и BookingSheets.css */
+
+/* Переключатель «Указать время» стоит у правого края строки */
+.pl-switch {
+  display: flex;
+  margin-left: auto;
+}
+
+/* Красная кнопка удаления во всю ширину в белой карточке */
+.pl-remove {
+  width: 100%;
+  height: 48px;
+  color: var(--color-red-text);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Выбор отметки: три строки в одной карточке, у выбранной справа галочка */
+.pl-choices {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.pl-choices li + li {
+  border-top: 1px solid var(--color-divider);
+}
+
+.pl-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  text-align: left;
+}
+
+.pl-choice:disabled {
+  opacity: 0.4;
+}
+
+.pl-choice__icon {
+  flex-shrink: 0;
+  font-size: var(--size-icon);
+}
+
+.pl-choice__icon--green {
+  color: var(--color-green-text);
+}
+
+.pl-choice__icon--red {
+  color: var(--color-red-text);
+}
+
+.pl-choice__icon--gray {
+  color: var(--color-text-caption);
+}
+
+.pl-choice__label {
+  flex: 1;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.pl-choice__check {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}

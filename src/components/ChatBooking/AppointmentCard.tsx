@@ -120,7 +120,10 @@ function historyInfo(a: Appointment, now: Date, peerName: string): HistoryInfo {
   const who = a.closedBy === 'me' ? 'вы' : peerName;
   switch (a.status) {
     case 'confirmed':
-      return { status: 'Состоялся', tone: 'green', Icon: IconBookingDone };
+      // Отметка из «Ежедневника»: без нее прошедший прием считается состоявшимся
+      return a.outcome === 'missed'
+        ? { status: 'Не состоялся', tone: 'red', Icon: IconBookingCancelled }
+        : { status: 'Состоялся', tone: 'green', Icon: IconBookingDone };
     case 'cancelled':
       return { status: `Отменен · ${who}`, tone: 'red', Icon: IconBookingCancelled, sub: a.reason };
     case 'declined':

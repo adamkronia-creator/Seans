@@ -29,7 +29,7 @@ interface FrameProps {
 }
 
 /** Каркас окна: ручка, заголовок, прокручиваемое содержимое и нижние кнопки */
-function Frame({ title, subtitle, footer, onClose, children }: FrameProps) {
+export function Frame({ title, subtitle, footer, onClose, children }: FrameProps) {
   useSheet(onClose);
   return (
     <SheetOverlay onClose={onClose}>

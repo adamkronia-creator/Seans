@@ -1,0 +1,151 @@
+/*
+ * «Ежедневник»: белая шапка с календарем сверху и прокручиваемый распорядок выбранного дня на фоне приложения.
+ * Шапка — общая .screen-header (заголовок 44, поля 16, линия снизу); ниже в ней строка месяца, календарь и ручка.
+ */
+.planner {
+  --toast-bottom: var(--space-4);
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.planner .planner__header {
+  gap: 0;
+  padding-bottom: 0;
+}
+
+/* «Сегодня» появляется, когда открыт другой день; место под ним не пропадает, поэтому заголовок не прыгает */
+.planner__today {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.planner__today--hidden {
+  visibility: hidden;
+}
+
+/* Строка месяца: название слева, стрелки справа; зона нажатия стрелок выходит за поле экрана */
+.planner__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  margin-bottom: var(--space-1);
+}
+
+.planner__month {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
+  line-height: var(--line-height-lg);
+}
+
+.planner__arrows {
+  display: flex;
+  margin-right: calc(var(--space-2) * -1);
+}
+
+.planner__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+  font-size: var(--size-icon);
+}
+
+.planner__arrow--next svg {
+  transform: scaleX(-1);
+}
+
+/* Ручка под календарем: свернуть до недели и развернуть обратно */
+.planner__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 20px;
+}
+
+.planner__handle span {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(112 123 139 / 40%);
+}
+
+/* Распорядок дня: прокручивается под шапкой; снизу запас под кнопку «+» */
+.planner__scroll {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-4) var(--space-4) calc(var(--size-fab) + var(--space-8));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.planner__day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.planner__day-title {
+  min-width: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-title);
+  line-height: var(--line-height-lg);
+}
+
+.planner__day-rel {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.planner__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.planner__empty {
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-align: center;
+}
+
+.planner__scroll > .pl-note {
+  margin-top: var(--space-2);
+}
+
+.planner__fab {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-fab);
+  height: var(--size-fab);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  box-shadow: 0 6px 16px rgb(0 136 255 / 32%), 0 1px 3px rgb(16 24 40 / 12%);
+  color: var(--color-accent-on);
+  font-size: 18px; /* плюс 18×18 */
+}

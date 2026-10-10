@@ -1,10 +1,11 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { ComingSoon } from './components/ComingSoon/ComingSoon';
-import { IconPlanner, IconReading } from './components/icons';
+import { IconReading } from './components/icons';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
+import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TestSettings } from './components/TestSettings/TestSettings';
@@ -18,7 +19,6 @@ import { transition } from './utils/transition';
 
 /** Разделы нижней панели, которых еще нет: значок и название на пустом экране */
 const COMING_SOON = {
-  planner: { title: 'Ежедневник', Icon: IconPlanner },
   reading: { title: 'Материалы для чтения', Icon: IconReading },
 } as const;
 
@@ -148,6 +148,7 @@ export default function App() {
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />) : page('tests', <TestsPage />);
     }
     if (tab === 'tasks') return page('tasks', <TasksPage />);
+    if (tab === 'planner') return page('planner', <PlannerPage />);
     const soon = COMING_SOON[tab];
     return page(`tab/${tab}`, <ComingSoon Icon={soon.Icon} title={soon.title} />);
   };

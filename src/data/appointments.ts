@@ -21,6 +21,9 @@ export type Slot =
 
 export type Status = 'proposed' | 'confirmed' | 'declined' | 'cancelled' | 'moved';
 
+/** Отметка психолога после приема: состоялся или нет. Без отметки прошедший прием считается состоявшимся по часам */
+export type Outcome = 'held' | 'missed';
+
 export interface Appointment {
   id: string;
   chatId: string;
@@ -41,6 +44,10 @@ export interface Appointment {
   reason?: string;
   /** Перенесенный прием: когда он теперь */
   movedTo?: { date: string; start: string };
+  /** Отметка о приеме (ставится в «Ежедневнике» или вручную после приема) */
+  outcome?: Outcome;
+  /** Состоялся: запись о сеансе в истории клиента (id сеанса в данных клиента) */
+  sessionId?: string;
   /** Когда запись менялась в последний раз (порядок в истории) */
   updatedAt: number;
 }
@@ -194,8 +201,29 @@ function seedItems(): Appointment[] {
       comment: 'Хочу отдельно обсудить итоги месяца. Подстроюсь под любое время из промежутка.',
       updatedAt: base - 5 * 3_600_000,
     },
-    { id: 'ap4', chatId, status: 'confirmed', by: 'me', slot: exact('2026-10-08', '18:00'), duration: 50, updatedAt: new Date(2026, 9, 1, 12).getTime() },
-    { id: 'ap5', chatId, status: 'confirmed', by: 'me', slot: exact('2026-10-01', '18:00'), duration: 50, updatedAt: new Date(2026, 8, 24, 12).getTime() },
+    // Два последних приема уже отмечены как состоявшиеся: это сеансы №6 и №5 в истории Максима (s6, s5)
+    {
+      id: 'ap4',
+      chatId,
+      status: 'confirmed',
+      by: 'me',
+      slot: exact('2026-10-08', '18:00'),
+      duration: 50,
+      outcome: 'held',
+      sessionId: 's6',
+      updatedAt: new Date(2026, 9, 1, 12).getTime(),
+    },
+    {
+      id: 'ap5',
+      chatId,
+      status: 'confirmed',
+      by: 'me',
+      slot: exact('2026-10-01', '18:00'),
+      duration: 50,
+      outcome: 'held',
+      sessionId: 's5',
+      updatedAt: new Date(2026, 8, 24, 12).getTime(),
+    },
     {
       id: 'ap6',
       chatId,
@@ -343,6 +371,12 @@ export function cancelAppointment(id: string, reason?: string) {
       return [next];
     }),
   });
+}
+
+/** Отметка о приеме: «состоялся» (с записью о сеансе в истории) или «не состоялся»; undefined снимает отметку.
+ *  Время записи не меняется: от него зависит порядок в истории приемов */
+export function markAppointment(id: string, patch: { outcome?: Outcome; sessionId?: string }) {
+  change(id, (a) => ({ ...a, outcome: patch.outcome, sessionId: patch.sessionId }));
 }
 
 export function saveInfo(info: Info) {

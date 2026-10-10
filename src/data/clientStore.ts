@@ -23,6 +23,14 @@ export interface Session {
   paragraphs: string[];
 }
 
+/** Чат клиента, чьи данные хранятся здесь (пока только Максим) */
+export const CLIENT_CHAT = 'maxim';
+
+/** Сеанс вместе с днём, когда он прошёл: для «Ежедневника» (день — «2026-10-08») */
+export interface SessionRecord extends Session {
+  date: string;
+}
+
 export type Activity =
   | { id: string; kind: 'invite'; date: string }
   | { id: string; kind: 'session'; ref: string; date: string }
@@ -195,6 +203,9 @@ export function useClientData(): ClientData {
   return useSyncExternalStore(subscribe, () => data);
 }
 
+/** Текущие данные без подписки: для действий, которым нужно прочитать значение в момент вызова */
+export const readClientData = (): ClientData => data;
+
 const pad = (v: number) => String(v).padStart(2, '0');
 export function nowStamp() {
   const d = new Date();
@@ -222,13 +233,39 @@ export function addNote(title: string, paragraphs: string[]) {
   });
 }
 
+/** «08.10.2026» ↔ «2026-10-08» */
+const toDayKey = (ru: string) => `${ru.slice(6, 10)}-${ru.slice(3, 5)}-${ru.slice(0, 2)}`;
+const toRuDate = (key: string) => `${key.slice(8, 10)}.${key.slice(5, 7)}.${key.slice(0, 4)}`;
+
+/** Номера сеансов идут по порядку в журнале: сеанс, внесённый задним числом, встаёт на своё место и сдвигает следующие */
+function numbered(sessions: Session[], activity: Activity[]): Session[] {
+  const order = activity.flatMap((a) => (a.kind === 'session' ? [a.ref] : []));
+  return sessions.map((x) => ({ ...x, number: order.indexOf(x.id) + 1 }));
+}
+
+/**
+ * Сеанс состоялся: запись о нём попадает в журнал на место по дате, а не в конец, чтобы лента истории шла по времени.
+ * Возвращает id сеанса. День — «2026-10-08»; без него берётся сегодняшний.
+ */
+export function registerSession(day?: string, paragraphs: string[] = []): string {
+  const date = day ? toRuDate(day) : nowStamp().date;
+  const id = `s${data.sessions.length + 1}-${Date.now()}`;
+  const key = toDayKey(date);
+  let at = data.activity.length;
+  while (at > 0 && toDayKey(data.activity[at - 1].date) > key) at--;
+  const activity = [...data.activity.slice(0, at), { id: nextId(), kind: 'session' as const, ref: id, date }, ...data.activity.slice(at)];
+  update({ sessions: numbered([...data.sessions, { id, number: 0, paragraphs }], activity), activity });
+  return id;
+}
+
+/** Снимает запись о сеансе (отметку «состоялся» отменили); номера следующих пересчитываются */
+export function removeSession(id: string) {
+  const activity = data.activity.filter((a) => !(a.kind === 'session' && a.ref === id));
+  update({ sessions: numbered(data.sessions.filter((x) => x.id !== id), activity), activity });
+}
+
 export function addSession(paragraphs: string[]) {
-  const { date } = nowStamp();
-  const session: Session = { id: `s${data.sessions.length + 1}-${Date.now()}`, number: data.sessions.length + 1, paragraphs };
-  update({
-    sessions: [...data.sessions, session],
-    activity: [...data.activity, { id: nextId(), kind: 'session', ref: session.id, date }],
-  });
+  registerSession(undefined, paragraphs);
 }
 
 /** Меняет сведения кейса; у текстовых разделов обновляется дата */
@@ -322,6 +359,17 @@ function activityText(kind: 'test' | 'task', ref: string, state: ActivityState):
   if (state === 'done') return `Максим выполнил психологическое задание «${name}»`;
   if (state === 'sent') return `Вы отправили психологическое задание «${name}»`;
   return `Вы назначили психологическое задание «${name}»`;
+}
+
+/** Сеансы с днями, когда они прошли (день берётся из журнала) */
+export function sessionRecords(d: ClientData): SessionRecord[] {
+  const out: SessionRecord[] = [];
+  d.activity.forEach((a) => {
+    if (a.kind !== 'session') return;
+    const session = d.sessions.find((x) => x.id === a.ref);
+    if (session) out.push({ ...session, date: toDayKey(a.date) });
+  });
+  return out;
 }
 
 export function historyEvents(d: ClientData): HistoryEvent[] {
