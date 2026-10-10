@@ -427,13 +427,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <CollapseCard title="Особенности тестирования">
           <ul className="ts-rows">
-            <Row label="Слепое тестирование" hint="Клиент не увидит название теста и его цель: так ответы честнее.">
+            <Row label="Слепое тестирование" hint="Клиент не увидит название теста и его цель: так ответы честнее">
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
-            <Row label="Скрыть заключение" hint="После прохождения клиент не увидит результат, заключение останется только у вас.">
+            <Row label="Скрыть заключение" hint="После прохождения клиент не увидит результат, заключение останется только у вас">
               <Switch checked={hideConclusion} onChange={setHideConclusion} label="Скрыть заключение" />
             </Row>
-            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится в истории клиента.">
+            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится в истории клиента">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
             </Row>
           </ul>
@@ -441,7 +441,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
-            <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом.">
+            <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом">
               <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>

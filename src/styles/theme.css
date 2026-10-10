@@ -18,45 +18,6 @@ textarea,
   caret-color: var(--color-accent);
 }
 
-/* ——— Заголовки: книжная антиква; остальной текст — Inter ——— */
-.screen-header__title,
-.sheet__heading,
-.hist-stats__value,
-.blank-card__title,
-.booking__title,
-.chat-tests__title,
-.planner__month,
-.planner__day-title,
-.appt__date,
-.pl-note__title {
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0;
-  font-optical-sizing: auto;
-}
-
-/* Название экрана крупнее: у антиквы тот же кегль выглядит мельче */
-.screen-header__title {
-  font-size: var(--font-size-3xl);
-  line-height: var(--line-height-3xl);
-  letter-spacing: -0.01em;
-}
-
-/* ——— Карточки: тонкая тень вместо плоского белого пятна ——— */
-.test-card,
-.hist-stats,
-.hist-card,
-.ts-card,
-.blank-card,
-.appt,
-.info,
-.history-card,
-.case-card,
-.case-file,
-.pl-card {
-  box-shadow: var(--shadow-card);
-}
-
 /* ——— Нижняя панель: у выбранного раздела мягкая «таблетка» под значком (подписей под значками нет) ——— */
 .tabbar__item {
   position: relative;

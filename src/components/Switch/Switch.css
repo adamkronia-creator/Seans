@@ -4,7 +4,7 @@
   width: 44px;
   height: 26px;
   border-radius: 13px;
-  background: var(--color-bg-fill-strong);
+  background: #CDD3DB;
   transition: background 0.15s;
 }
 
@@ -17,7 +17,7 @@
   height: 22px;
   border-radius: var(--radius-full);
   background: #fff;
-  box-shadow: 0 1px 3px rgb(16 32 42 / 25%);
+  box-shadow: 0 1px 3px rgb(16 24 40 / 25%);
   transition: transform 0.15s;
 }
 

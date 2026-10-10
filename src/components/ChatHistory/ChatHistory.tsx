@@ -74,7 +74,6 @@ function Stats({ hasData }: { hasData: boolean }) {
           </li>
         ))}
       </ul>
-      <p className="hist-stats__note">Тесты и задания: выполнено из отправленных</p>
     </div>
   );
 }

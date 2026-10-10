@@ -15,7 +15,7 @@
 }
 
 .ink__pool {
-  fill: var(--color-accent-strong);
+  fill: color-mix(in srgb, var(--color-accent) 70%, #000);
   opacity: 0.55;
 }
 
@@ -47,7 +47,6 @@
 
 .empty__title {
   margin: 0;
-  font-family: var(--font-display);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-xl);
