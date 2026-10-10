@@ -130,13 +130,17 @@ function TaskBlank({ data, form, options }: { data: TaskSettingsData; form: stri
       </CollapseCard>
       {options.comment && (
         <CollapseCard title="Комментарий">
-          <p className="task-hint">{data.blank.commentHint}</p>
-          <AnswerField label="Комментарий" placeholder="Ваш комментарий" />
+          <div className="task-pad">
+            <p className="task-hint">{data.blank.commentHint}</p>
+            <AnswerField label="Комментарий" placeholder="Ваш комментарий" />
+          </div>
         </CollapseCard>
       )}
       {options.state && (
         <CollapseCard title="Как вы себя чувствуете?">
-          <StateScale data={data} />
+          <div className="task-pad">
+            <StateScale data={data} />
+          </div>
         </CollapseCard>
       )}
     </>
@@ -163,24 +167,30 @@ function TaskExample({ data, form, options }: { data: TaskSettingsData; form: st
       </CollapseCard>
       {options.comment && (
         <CollapseCard title="Комментарий">
-          <p className="task-answer">{data.example.comment[form] ?? Object.values(data.example.comment)[0]}</p>
+          <div className="task-pad">
+            <p className="task-answer">{data.example.comment[form] ?? Object.values(data.example.comment)[0]}</p>
+          </div>
         </CollapseCard>
       )}
       {options.state && (
         <CollapseCard title="Как вы себя чувствуете?">
-          <StateScale data={data} selected={data.example.state} locked />
+          <div className="task-pad">
+            <StateScale data={data} selected={data.example.state} locked />
+          </div>
         </CollapseCard>
       )}
       <CollapseCard title="Что можно отметить">
-        <ul className="ts-scale__list task-notes">
-          {data.example.notes.map((note) => (
-            <li key={note}>
-              <span className="ts-dot ts-dot--text" />
-              {note}
-            </li>
-          ))}
-        </ul>
-        <p className="task-hint">Пример учебный: выводы по реальному заданию делайте вместе с клиентом.</p>
+        <div className="task-pad">
+          <ul className="ts-scale__list task-notes">
+            {data.example.notes.map((note) => (
+              <li key={note}>
+                <span className="ts-dot ts-dot--text" />
+                {note}
+              </li>
+            ))}
+          </ul>
+          <p className="task-hint">Пример учебный: выводы по реальному заданию делайте вместе с клиентом.</p>
+        </div>
       </CollapseCard>
     </>
   );
@@ -333,11 +343,15 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
             </CollapseCard>
 
             <CollapseCard title="Цель задания">
-              <Paragraphs text={data.goal} />
+              <div className="task-pad">
+                <Paragraphs text={data.goal} />
+              </div>
             </CollapseCard>
 
             <CollapseCard title="Анализ материалов">
-              <Paragraphs text={data.analysis} />
+              <div className="task-pad">
+                <Paragraphs text={data.analysis} />
+              </div>
             </CollapseCard>
 
             <CollapseCard title="Особенности задания">

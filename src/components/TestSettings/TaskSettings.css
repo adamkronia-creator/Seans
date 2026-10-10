@@ -5,9 +5,12 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin-top: var(--space-2);
+  margin: 0;
   padding: var(--space-2) var(--space-3);
+  border: 0;
   border-radius: var(--radius-md);
+  outline: 0;
+  font-family: inherit;
   background: var(--color-bg-fill);
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
@@ -21,21 +24,28 @@
 
 /* Ответ в примере выполнения: текст клиента, выделен акцентным цветом */
 .task-answer {
-  margin: var(--space-1) 0 0;
+  margin: 0;
   color: var(--color-accent);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
 }
 
+.task-pad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
 .task-hint {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
 }
 
-.task-notes + .task-hint {
-  margin: var(--space-3) 0 0;
+.task-notes {
+  gap: var(--space-2);
 }
 
 .task-state__text {
@@ -48,4 +58,9 @@
   flex-shrink: 0;
   color: var(--color-text-secondary);
   font-size: 22px;
+}
+
+/* Абзацы внутри блока с полями: промежуток 12 задает сам блок, а не абзац */
+.task-pad .ts-card__paragraph + .ts-card__paragraph {
+  margin-top: 0;
 }
