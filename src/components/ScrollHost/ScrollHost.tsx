@@ -40,16 +40,16 @@ export function ScrollHost({ className, children }: { className: string; childre
       <div ref={scroller} className={className}>
         {children}
       </div>
-      {far && (
-        <button
-          type="button"
-          className="scroll-host__down"
-          aria-label="В конец страницы"
-          onClick={() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: reducedMotion() ? 'auto' : 'smooth' })}
-        >
-          <IconChevronDown />
-        </button>
-      )}
+      <button
+        type="button"
+        className={`scroll-host__down${far ? ' is-shown' : ''}`}
+        aria-label="В конец страницы"
+        aria-hidden={!far}
+        tabIndex={far ? 0 : -1}
+        onClick={() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: reducedMotion() ? 'auto' : 'smooth' })}
+      >
+        <IconChevronDown />
+      </button>
     </div>
   );
 }

@@ -1,0 +1,37 @@
+/*
+ * Мелкие движения: появление новых сообщений и карточек. Все короткие (до 0,25 с), без «уменьшения движения» отключаются.
+ * Заливка backwards, а не both: после показа элемент снова подчиняется своему transform (жест «ответить» на пузыре).
+ */
+
+/* Новое сообщение в открытой переписке: ChatPage ставит data-live после первого показа, поэтому старые не мигают */
+.chat__messages[data-live] .chat__group > li:not(.chat__day) {
+  animation: msg-in 0.24s var(--ease-ios) backwards;
+}
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+/* Карточки приема и распорядка */
+.appt,
+.pl-card {
+  animation: card-in 0.22s var(--ease-ios) backwards;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat__messages[data-live] .chat__group > li:not(.chat__day),
+  .appt,
+  .pl-card {
+    animation: none;
+  }
+}

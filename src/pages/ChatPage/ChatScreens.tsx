@@ -1,6 +1,6 @@
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { TestResult } from '../../components/TestSettings/TestResult';
-import { TestSettings } from '../../components/TestSettings/TestSettings';
+import { TestSettings } from '../../components/TestSettings/TestSettingsLazy';
 import type { LibraryTest } from '../../data/library';
 import { goBack } from '../../router';
 import './ChatPage.css';

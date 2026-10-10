@@ -19,7 +19,7 @@
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  line-height: 20px;
+  line-height: var(--line-height-sm);
   text-align: center;
 }
 

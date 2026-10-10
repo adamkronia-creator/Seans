@@ -6,6 +6,7 @@ import '@fontsource-variable/inter/opsz-italic.css';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/motion.css';
+import './styles/micro.css';
 import './styles/press.css';
 import App from './App';
 import { installInertiaScroll } from './utils/inertiaScroll';

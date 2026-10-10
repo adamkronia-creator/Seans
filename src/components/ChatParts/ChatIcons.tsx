@@ -6,7 +6,7 @@ const base = (p: SVGProps<SVGSVGElement>): SVGProps<SVGSVGElement> => ({
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 2,
+  strokeWidth: 1.5, // как у всех значков набора (1,5 при размере 24)
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
   'aria-hidden': true,

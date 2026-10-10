@@ -23,4 +23,22 @@
   box-shadow: var(--shadow-float);
   color: var(--color-text-secondary);
   font-size: var(--size-icon);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.8);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s var(--ease-ios);
+}
+
+.scroll-host__down.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-host__down {
+    transition: none;
+  }
 }

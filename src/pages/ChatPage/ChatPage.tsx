@@ -157,6 +157,11 @@ interface ChatPageProps {
 export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Из «Ежедневника» чат может открываться сразу на нужном разделе; записка стирается, когда чат открылся
   const [picked, setSection] = useState<SectionId>(() => wantedSection(chatId) ?? 'messages');
+  // После первого показа новые сообщения появляются с движением, а уже лежавшие в ленте — нет (см. styles/micro.css)
+  useEffect(() => {
+    listRef.current?.setAttribute('data-live', '');
+  }, []);
+
   useEffect(() => {
     clearWanted();
   }, []);

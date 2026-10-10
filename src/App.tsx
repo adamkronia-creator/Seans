@@ -8,7 +8,7 @@ import { EventsPage } from './pages/EventsPage/EventsPage';
 import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
-import { TestSettings } from './components/TestSettings/TestSettings';
+import { TestSettings } from './components/TestSettings/TestSettingsLazy';
 import { wantSection, type ChatSection } from './data/chatIntent';
 import { CHATS } from './data/chats';
 import { LIBRARY } from './data/library';

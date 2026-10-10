@@ -7,6 +7,50 @@
   background: var(--color-bg-panel);
 }
 
+/* Цветная полоса слева по виду записи: сразу видно, что в дне сеанс, что дело, что заметка. Тень внутри повторяет скругление карточки */
+.pl-card {
+  --stripe: var(--color-text-placeholder);
+  box-shadow: inset 4px 0 0 var(--stripe);
+}
+
+.pl-visit--planned {
+  --stripe: var(--color-text-placeholder);
+}
+
+.pl-visit--upcoming,
+.pl-visit--held {
+  --stripe: var(--color-green);
+}
+
+.pl-visit--now {
+  --stripe: var(--color-accent);
+}
+
+.pl-visit--await,
+.pl-visit--offer {
+  --stripe: var(--color-yellow);
+}
+
+.pl-visit--missed {
+  --stripe: var(--color-red);
+}
+
+.pl-visit--closed {
+  --stripe: var(--color-bg-fill-strong);
+}
+
+.pl-task {
+  --stripe: var(--color-accent);
+}
+
+.pl-task--done {
+  --stripe: var(--color-green);
+}
+
+.pl-note {
+  --stripe: var(--color-yellow);
+}
+
 /* ——— Сеанс ——— */
 .pl-visit {
   display: flex;

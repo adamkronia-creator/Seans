@@ -175,7 +175,7 @@
   color: var(--color-accent-on);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  line-height: 20px;
+  line-height: var(--line-height-sm);
   text-align: center;
 }
 

@@ -58,6 +58,18 @@ p {
   margin: 0;
 }
 
+/* Перенос строк: в заголовках строки ровные, в тексте не остается одинокого слова на последней строке */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+blockquote {
+  text-wrap: pretty;
+}
+
 img {
   display: block;
 }
