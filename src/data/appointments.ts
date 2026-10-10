@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { noticeCancel, noticeDecline, noticeProposal } from './bookingMessages';
+import { noticeAccept, noticeCancel, noticeDecline, noticeProposal, noticeReminder, noticeWithdraw } from './bookingMessages';
 import { addDays, at, dateKey, durationLabel, fromMinutes, startOfDay, toMinutes } from '../utils/ruDate';
 
 /*
@@ -259,6 +259,7 @@ const listeners = new Set<() => void>();
 
 function commit(next: BookingState) {
   state = next;
+  scheduleReminders();
   listeners.forEach((l) => l());
 }
 
@@ -325,6 +326,8 @@ export function counterProposal(id: string, input: ProposalInput) {
 
 /** Отозвать свое предложение */
 export function withdrawProposal(id: string) {
+  const withdrawn = state.items.find((x) => x.id === id);
+  if (withdrawn && withdrawn.by === 'me') noticeWithdraw(withdrawn);
   change(id, () => null);
 }
 
@@ -335,6 +338,7 @@ export function acceptProposal(id: string, start?: string) {
   const chosen = a.slot.kind === 'exact' ? a.slot.start : (start ?? a.slot.from);
   const slot = exact(a.slot.date, chosen);
   const now = Date.now();
+  if (a.by === 'them') noticeAccept(a, slot);
   commit({
     ...state,
     items: state.items.flatMap((x) => {
@@ -393,3 +397,55 @@ export function saveInfo(info: Info) {
     info: { address: info.address.trim(), howTo: info.howTo.trim(), bring: info.bring.trim(), payment: info.payment.trim() },
   });
 }
+
+// ---------------------------------------------------------------- напоминания
+
+/** За сколько до начала клиенту уходит напоминание */
+export const REMIND_BEFORE = 60 * 60_000;
+
+/** Уже отправленные напоминания: «прием|дата|время», чтобы одно и то же не уходило дважды */
+const reminded = new Set<string>();
+const reminders = new Map<string, number>();
+const remindKey = (a: Appointment) => `${a.id}|${bounds(a).start.getTime()}`;
+
+function sendReminder(a: Appointment) {
+  reminded.add(remindKey(a));
+  noticeReminder(a, state.info.address);
+}
+
+/** Отправить напоминание сейчас, не дожидаясь срока (кнопка в карточке приема) */
+export function remindNow(id: string) {
+  const a = state.items.find((x) => x.id === id);
+  if (a && a.status === 'confirmed') sendReminder(a);
+}
+
+/** Для каждого будущего подтвержденного приема заводится таймер на «за час до начала»; перенесенным и отмененным он снимается */
+function scheduleReminders() {
+  const now = Date.now();
+  const wanted = new Map<string, Appointment>();
+  state.items.forEach((a) => {
+    if (a.status !== 'confirmed' || a.slot.kind !== 'exact') return;
+    const at = bounds(a).start.getTime() - REMIND_BEFORE;
+    if (at > now && at - now < 2 ** 31 - 1 && !reminded.has(remindKey(a))) wanted.set(remindKey(a), a);
+  });
+  reminders.forEach((timer, key) => {
+    if (!wanted.has(key)) {
+      window.clearTimeout(timer);
+      reminders.delete(key);
+    }
+  });
+  wanted.forEach((a, key) => {
+    if (reminders.has(key)) return;
+    const id = a.id;
+    reminders.set(
+      key,
+      window.setTimeout(() => {
+        reminders.delete(key);
+        const current = state.items.find((x) => x.id === id);
+        if (current && current.status === 'confirmed' && remindKey(current) === key) sendReminder(current);
+      }, bounds(a).start.getTime() - REMIND_BEFORE - now),
+    );
+  });
+}
+
+scheduleReminders();

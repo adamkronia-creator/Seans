@@ -10,6 +10,7 @@ import {
   saveInfo,
   useBooking,
   viewOf,
+  remindNow,
   withdrawProposal,
   type Appointment,
 } from '../../data/appointments';
@@ -89,7 +90,10 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
   const history = allHistory ? view.past : view.past.slice(0, HISTORY_SHOWN);
 
   const onAction = (action: CardAction, a: Appointment) => {
-    if (action === 'withdraw') {
+    if (action === 'remind') {
+      remindNow(a.id);
+      say('Напоминание отправлено');
+    } else if (action === 'withdraw') {
       withdrawProposal(a.id);
       say('Предложение отозвано');
     } else if (action === 'accept' && a.slot.kind === 'exact') {

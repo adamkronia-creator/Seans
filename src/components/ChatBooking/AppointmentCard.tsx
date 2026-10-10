@@ -4,7 +4,7 @@ import { dayLong, dayShort, untilDay } from '../../utils/ruDate';
 import { IconBookingCancelled, IconBookingDone, IconBookingMoved, IconBookingPending } from '../icons';
 import { slotDetail, slotShort, slotTime } from './bookingText';
 
-export type CardAction = 'reschedule' | 'cancel' | 'accept' | 'counter' | 'decline' | 'edit' | 'withdraw';
+export type CardAction = 'reschedule' | 'cancel' | 'accept' | 'counter' | 'decline' | 'edit' | 'withdraw' | 'remind';
 
 interface CardProps {
   a: Appointment;
@@ -62,7 +62,16 @@ export function AppointmentCard({ a, peerName, now, replaced, moving, nearest, o
         {!incoming && !confirmed && <p className="appt__note">Ждем ответа · {peerName}</p>}
         {moving && <p className="appt__note">Идет согласование переноса: ответьте в предложениях ниже</p>}
 
+        {confirmed && (
+          <p className="appt__note">Напоминание клиенту уйдет за час до начала</p>
+        )}
+
         <div className="bk-actions">
+          {confirmed && (
+            <button type="button" className="bk-button" onClick={run('remind')}>
+              Напомнить
+            </button>
+          )}
           {confirmed && !moving && (
             <button type="button" className="bk-button" onClick={run('reschedule')}>
               Перенести

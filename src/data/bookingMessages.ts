@@ -60,3 +60,28 @@ export function noticeCancel(a: Appointment, reason?: string) {
   const now = new Date();
   notice(a.chatId, 'Отмена приема', withReason(`Отменяю прием ${day(a.slot, now)}, ${when(a.slot, a.duration)}.`, reason));
 }
+
+/** Вы приняли предложение клиента: прием подтвержден (или перенесен) */
+export function noticeAccept(a: Appointment, slot: Slot) {
+  const now = new Date();
+  const text = `${day(slot, now)}, ${when(slot, a.duration)} (${durationLabel(a.duration)})`;
+  notice(
+    a.chatId,
+    a.replaces ? 'Перенос подтвержден' : 'Прием подтвержден',
+    a.replaces ? `Принимаю перенос. Ждем вас: ${text}.` : `Подтверждаю прием: ${text}.`,
+  );
+}
+
+/** Вы отозвали свое предложение */
+export function noticeWithdraw(a: Appointment) {
+  const now = new Date();
+  const what = a.replaces ? 'перенос приема на' : 'время';
+  notice(a.chatId, 'Предложение отозвано', `Отзываю свое предложение: ${what} ${day(a.slot, now)}, ${when(a.slot, a.duration)}. Прошу не учитывать его.`);
+}
+
+/** Напоминание о подтвержденном приеме: кто и когда ждет, адрес */
+export function noticeReminder(a: Appointment, address: string) {
+  const now = new Date();
+  const where = address.trim() ? ` Адрес: ${address.trim()}.` : '';
+  notice(a.chatId, 'Напоминание о приеме', `Напоминаю о приеме: ${day(a.slot, now)}, ${when(a.slot, a.duration)}.${where}`);
+}
