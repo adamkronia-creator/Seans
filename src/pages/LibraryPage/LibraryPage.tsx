@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chip } from '../../components/Chip/Chip';
 import {
   IconFilterAll,
@@ -9,8 +9,11 @@ import {
 } from '../../components/icons';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
+import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
 import type { LibraryItem } from '../../data/library';
+import { followChips } from '../../utils/followChips';
+import { revealChip } from '../../utils/revealChip';
 import './LibraryPage.css';
 
 interface LibraryPageProps {
@@ -30,9 +33,39 @@ interface LibraryPageProps {
 
 type Filter = string; // 'all' | 'favorites' | 'recent' | id категории
 
+/** Что показывает страница фильтра, когда список пуст */
+const emptyText = (filter: Filter, recent: string) =>
+  filter === 'favorites' ? 'В избранном пока ничего нет' : filter === 'recent' ? recent : 'Ничего не найдено';
+
+/** Карточки одного фильтра: страница пейджера, у каждой своя прокрутка */
+const LibraryList = memo(function LibraryList({
+  items,
+  empty,
+  favorites,
+  onToggleFavorite,
+  onOpen,
+}: {
+  items: LibraryItem[];
+  empty: string;
+  favorites: ReadonlySet<string>;
+  onToggleFavorite: (id: string) => void;
+  onOpen?: (item: LibraryItem) => void;
+}) {
+  return items.length > 0 ? (
+    <ul className="library-page__list">
+      {items.map((item) => (
+        <LibraryCard key={item.id} test={item} favorite={favorites.has(item.id)} onToggleFavorite={onToggleFavorite} onClick={onOpen} />
+      ))}
+    </ul>
+  ) : (
+    <p className="library-page__empty">{empty}</p>
+  );
+});
+
 /**
  * Библиотека для психолога: все тесты (или задания) приложения. Интерфейс общий,
- * потому что разделы «Психологические тесты» и «Психологические задания» устроены одинаково.
+ * потому что разделы «Диагностика» и «Задания» устроены одинаково.
+ * Фильтры — страницы пейджера: список можно листать пальцем, а чипсы идут следом.
  */
 export function LibraryPage({
   kind,
@@ -47,24 +80,66 @@ export function LibraryPage({
 }: LibraryPageProps) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const client = useClientData();
+  const root = useRef<HTMLElement>(null);
 
-  const visible = useMemo(() => {
+  /** Фильтры по порядку чипсов: по ним же идут страницы */
+  const filters = useMemo<Filter[]>(() => ['all', 'favorites', 'recent', ...categories.map((c) => c.id)], [categories]);
+
+  const lists = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = items;
-    if (filter === 'favorites') list = list.filter((t) => favorites.has(t.id));
-    else if (filter === 'recent') {
-      // Недавние идут в порядке свежести, а не в порядке библиотеки
-      list = recentIds(client, kind).flatMap((id) => items.filter((t) => t.id === id));
-    } else if (filter !== 'all') list = list.filter((t) => t.categories.includes(filter));
-    if (!q) return list;
-    return list.filter(
-      (t) => t.title.toLowerCase().includes(q) || (t.abbr?.toLowerCase().includes(q) ?? false) || t.description.toLowerCase().includes(q),
-    );
-  }, [items, query, filter, favorites, client, kind]);
+    return filters.map((id) => {
+      let list = items;
+      if (id === 'favorites') list = list.filter((t) => favorites.has(t.id));
+      else if (id === 'recent') {
+        // Недавние идут в порядке свежести, а не в порядке библиотеки
+        list = recentIds(client, kind).flatMap((rid) => items.filter((t) => t.id === rid));
+      } else if (id !== 'all') list = list.filter((t) => t.categories.includes(id));
+      if (!q) return list;
+      return list.filter(
+        (t) => t.title.toLowerCase().includes(q) || (t.abbr?.toLowerCase().includes(q) ?? false) || t.description.toLowerCase().includes(q),
+      );
+    });
+  }, [items, query, filters, favorites, client, kind]);
+
+  const pages = useMemo(
+    () =>
+      filters.map((id, i) => ({
+        key: id,
+        node: <LibraryList items={lists[i]} empty={emptyText(id, labels.emptyRecent)} favorites={favorites} onToggleFavorite={onToggleFavorite} onOpen={onOpen} />,
+      })),
+    [filters, lists, labels.emptyRecent, favorites, onToggleFavorite, onOpen],
+  );
+
+  const index = Math.max(0, filters.indexOf(filter));
+  const shown = dragIndex ?? index;
+
+  const onDrag = useCallback(
+    (position: number | null) => {
+      setDragIndex(position === null ? null : Math.round(Math.min(filters.length - 1, Math.max(0, position))));
+    },
+    [filters.length],
+  );
+
+  // Цвет чипсов идёт за положением страниц (чипс «+» не фильтр: он вне страниц)
+  const onPosition = useCallback((position: number) => {
+    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--plus)');
+    if (chips) followChips(chips, position);
+  }, []);
+
+  // Выбранный чипс виден целиком, даже если до него пролистали пальцем или он был за краем
+  useEffect(() => {
+    const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
+    const chip = row?.querySelector<HTMLElement>('.chip--active');
+    if (row && chip) revealChip(row, chip);
+  }, [shown]);
+
+  const chip = (id: Filter) => ({ follow: true, active: shown === filters.indexOf(id), onClick: () => setFilter(id) });
 
   return (
-    <section className="library-page">
+    <section ref={root} className="library-page">
       <ScreenHeader
         title={title}
         searchValue={query}
@@ -81,17 +156,17 @@ export function LibraryPage({
             <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
               <IconPlusChip />
             </Chip>
-            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel={labels.all} active={filter === 'all'} onClick={() => setFilter('all')}>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel={labels.all} {...chip('all')}>
               <IconFilterAll />
             </Chip>
-            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Избранное" active={filter === 'favorites'} onClick={() => setFilter('favorites')}>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Избранное" {...chip('favorites')}>
               <IconFilterFavorites />
             </Chip>
-            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Недавние" active={filter === 'recent'} onClick={() => setFilter('recent')}>
+            <Chip iconOnly toggle className="chip--glyph-lg" ariaLabel="Недавние" {...chip('recent')}>
               <IconFilterRecent />
             </Chip>
             {categories.map(({ id, label }) => (
-              <Chip key={id} active={filter === id} onClick={() => setFilter(id)}>
+              <Chip key={id} {...chip(id)}>
                 {label}
               </Chip>
             ))}
@@ -99,27 +174,7 @@ export function LibraryPage({
         }
       />
 
-      {visible.length > 0 ? (
-        <ul className="library-page__list">
-          {visible.map((item) => (
-            <LibraryCard
-              key={item.id}
-              test={item}
-              favorite={favorites.has(item.id)}
-              onToggleFavorite={onToggleFavorite}
-              onClick={onOpen}
-            />
-          ))}
-        </ul>
-      ) : (
-        <p className="library-page__empty">
-          {filter === 'favorites'
-            ? 'В избранном пока ничего нет'
-            : filter === 'recent'
-              ? labels.emptyRecent
-              : 'Ничего не найдено'}
-        </p>
-      )}
+      <SwipePager index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} />
     </section>
   );
 }

@@ -1,15 +1,30 @@
-/* Лента вкладки «Кейс»: поля 16, 12 от разделителя шапки, расстояния между блоками 12 */
+/* Вкладка «Кейс»: переключатель сверху, под ним пейджер страниц (сведения, заметки, файлы) во всю ширину.
+   Поля 16 у переключателя и у самих страниц свои, чтобы страница при листании уходила к краю экрана, а не обрезалась у поля */
 .chat-case {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-3);
   min-height: 0;
-  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
 .chat-case > * {
+  flex-shrink: 0;
+}
+
+.chat-case .swipe-pager__head {
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+/* Одна страница: 12 от переключателя, поля 16, расстояния между блоками 12 */
+.case-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.case-page > * {
   flex-shrink: 0;
 }
 

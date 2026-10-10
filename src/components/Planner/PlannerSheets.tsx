@@ -61,6 +61,7 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
     <Frame
       title={heading}
       onClose={onClose}
+      swipe={plan ? undefined : { index: kind === 'task' ? 0 : 1, count: 2, onIndex: (i) => setKind(i === 0 ? 'task' : 'session') }}
       footer={
         <>
           <button type="button" className="sheet__button" onClick={onClose}>

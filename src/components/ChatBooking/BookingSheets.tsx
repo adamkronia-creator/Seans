@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import {
   DEFAULT_DURATION,
   DURATIONS,
@@ -10,6 +10,7 @@ import {
   type ProposalInput,
   type Slot,
 } from '../../data/appointments';
+import { useSwipeSegments, type SegmentSwipe } from '../../utils/swipeSegments';
 import { addDays, dateKey, dayLong, durationLabel, parseDate } from '../../utils/ruDate';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
@@ -25,12 +26,16 @@ interface FrameProps {
   subtitle?: string;
   footer: ReactNode;
   onClose: () => void;
+  /** Содержимое переключается сегментами: свайп по нему листает их */
+  swipe?: SegmentSwipe;
   children: ReactNode;
 }
 
 /** Каркас окна: ручка, заголовок, прокручиваемое содержимое и нижние кнопки */
-export function Frame({ title, subtitle, footer, onClose, children }: FrameProps) {
+export function Frame({ title, subtitle, footer, onClose, swipe, children }: FrameProps) {
   useSheet(onClose);
+  const body = useRef<HTMLDivElement>(null);
+  useSwipeSegments(body, swipe);
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
@@ -39,7 +44,9 @@ export function Frame({ title, subtitle, footer, onClose, children }: FrameProps
           <h2 className="sheet__heading">{title}</h2>
           {subtitle && <p className="bk-subtitle">{subtitle}</p>}
         </div>
-        <div className="sheet__body">{children}</div>
+        <div className="sheet__body" ref={body}>
+          {children}
+        </div>
         <div className="sheet__footer">{footer}</div>
       </div>
     </SheetOverlay>
@@ -117,6 +124,7 @@ export function ProposeSheet({ mode, peerName, now, initial, subtitle, onSubmit,
       title={TITLES[mode]}
       subtitle={subtitle}
       onClose={onClose}
+      swipe={{ index: kind === 'exact' ? 0 : 1, count: 2, onIndex: (i) => setKind(i === 0 ? 'exact' : 'range') }}
       footer={
         <>
           <button type="button" className="sheet__button" onClick={onClose}>

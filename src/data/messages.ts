@@ -24,14 +24,12 @@ export interface SentTestOptions {
   blind: boolean;
   hideConclusion: boolean;
   saveBlank: boolean;
-  /** Как показывать вопросы при прохождении: все списком или по одному */
-  questionView: 'list' | 'single';
   /** Форма бланка, если у теста их несколько */
   form?: string;
 }
 
 /** Настройки по умолчанию: как на экране «Настройка теста» до того, как их тронули */
-export const DEFAULT_SENT_OPTIONS: SentTestOptions = { blind: true, hideConclusion: true, saveBlank: true, questionView: 'list' };
+export const DEFAULT_SENT_OPTIONS: SentTestOptions = { blind: true, hideConclusion: true, saveBlank: true };
 
 export interface MessageButton {
   label: string;

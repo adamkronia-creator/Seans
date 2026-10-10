@@ -3,8 +3,6 @@ import {
   IconTestChevron,
   IconTestChevronDown,
   IconTestMic,
-  IconTestViewList,
-  IconTestViewSingle,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
@@ -17,12 +15,13 @@ import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { TestHeader } from './TestHeader';
-import { TestPass, type QuestionView } from './TestPass';
+import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { canPassSelf } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
+import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
 
@@ -117,8 +116,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [blind, setBlind] = useState(true);
   const [hideConclusion, setHideConclusion] = useState(true);
   const [saveBlank, setSaveBlank] = useState(true);
-  // Как показывать вопросы при прохождении: все списком или по одному; по умолчанию списком
-  const [questionView, setQuestionView] = useState<QuestionView>('list');
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
@@ -147,7 +144,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       sendMessage(id, messageOn ? message : '', undefined, {
         test: test.id,
         testKind: 'sent',
-        testOptions: { blind, hideConclusion, saveBlank, questionView, ...(data.forms ? { form } : {}) },
+        testOptions: { blind, hideConclusion, saveBlank, ...(data.forms ? { form } : {}) },
       });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
       if (id === 'maxim') logStep('test', test.id, 'sent');
@@ -225,6 +222,10 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   useBackHandler(Boolean(resultId) || view !== 'settings', () =>
     resultId ? transition(() => setResultId(null), 'back') : openView('settings'),
   );
+  // Свайп влево на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
+  useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion'), () =>
+    view === 'settings' ? onBack() : openView('settings'),
+  );
 
   if (resultId) {
     return (
@@ -246,7 +247,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           forms={data.forms}
           form={form}
           saveBlank={saveBlank}
-          view={questionView}
           onFormChange={setForm}
           onDone={(id) => {
             // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
@@ -424,26 +424,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             </Row>
             <Row label="Сохранить бланк">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
-            </Row>
-          </ul>
-        </CollapseCard>
-
-        {/* Способ выбирают один из двух: включение одного переключателя выключает другой, а выключение единственного включённого включает второй */}
-        <CollapseCard title="Как показывать вопросы?">
-          <ul className="ts-rows">
-            <Row Icon={IconTestViewList} label="Списком">
-              <Switch
-                checked={questionView === 'list'}
-                onChange={(on) => setQuestionView(on ? 'list' : 'single')}
-                label="Показывать вопросы списком"
-              />
-            </Row>
-            <Row Icon={IconTestViewSingle} label="Отдельно">
-              <Switch
-                checked={questionView === 'single'}
-                onChange={(on) => setQuestionView(on ? 'single' : 'list')}
-                label="Показывать вопросы по одному"
-              />
             </Row>
           </ul>
         </CollapseCard>

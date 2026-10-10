@@ -4,7 +4,6 @@ import type { LibraryTest } from '../../data/library';
 import { testSettings } from '../../data/testSettings';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
-import { IconTestViewList, IconTestViewSingle } from '../icons';
 import './SentTestSheet.css';
 
 interface SentTestSheetProps {
@@ -41,9 +40,6 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
     { label: 'Слепое тестирование', ...onOff(options.blind) },
     { label: 'Скрыть заключение', ...onOff(options.hideConclusion) },
     { label: 'Сохранить бланк', ...onOff(options.saveBlank) },
-    options.questionView === 'list'
-      ? { label: 'Показ вопросов', value: 'Списком', Icon: IconTestViewList }
-      : { label: 'Показ вопросов', value: 'Отдельно', Icon: IconTestViewSingle },
     { label: 'Сообщение для клиента', ...onOff(message.text.trim() !== '') },
   ];
 

@@ -3,14 +3,11 @@ import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSel
 import type { TestBlankData } from '../../data/testBlank';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
-import { BlankRules, CollapseCard, TestBlank } from './TestBlank';
+import { BlankRules, CollapseCard } from './TestBlank';
 import { JumpSheet, PassQuestion } from './TestPassSingle';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestPass.css';
-
-/** Как показывать вопросы при прохождении: все списком или по одному */
-export type QuestionView = 'list' | 'single';
 
 /** Пауза после ответа, прежде чем открыть следующий вопрос: выбранный вариант успевает подсветиться */
 const ADVANCE_MS = 280;
@@ -23,8 +20,6 @@ interface TestPassProps {
   form: string;
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
   saveBlank: boolean;
-  /** Настройка «Как показывать вопросы?»: весь бланк списком или по одному вопросу на экране */
-  view: QuestionView;
   onFormChange: (form: string) => void;
   /** Результат посчитан и сохранён: id результата */
   onDone: (resultId: string) => void;
@@ -56,14 +51,12 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
 
 /**
  * Прохождение теста самому: внизу счётчик и кнопки, ответы отмечаются в бланке.
- * Списком — весь бланк на одном экране, кнопка «Завершить тест» ведёт к первому вопросу без ответа.
- * По одному — сначала правила (и форма бланка), затем вопрос за вопросом с кнопками «Назад» и «Далее».
+ * Вопросы идут по одному: сначала правила (и форма бланка), затем вопрос за вопросом с кнопками «Назад» и «Далее».
  */
-export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormChange, onDone }: TestPassProps) {
+export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, onDone }: TestPassProps) {
   const run = useSelfRun(testId);
   const total = blank.questions.length;
   const answered = Object.keys(run.answers).length;
-  const single = view === 'single';
   // Первый вопрос без ответа (с 0), −1 если ответили на всё
   const firstOpen = blank.questions.findIndex((_, i) => run.answers[i] === undefined);
   const [missing, setMissing] = useState<number | null>(null);
@@ -116,8 +109,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
     if (firstOpen >= 0) {
       setMissing(firstOpen);
       setToast(`Осталось ответить: ${total - answered}`);
-      if (single) goTo(firstOpen);
-      else document.getElementById(`blank-q-${firstOpen + 1}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      goTo(firstOpen);
       later(() => setToast(null), 2600);
       later(() => setMissing((m) => (m === firstOpen ? null : m)), 3000);
       return;
@@ -174,10 +166,8 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
     <>
       <div className="test-settings__scroll" key="pass" ref={scrollRef}>
         {/* По одному форма бланка выбирается на стартовом экране вместе с правилами, дальше она не мешает */}
-        {(!single || step < 0) && formCard}
-        {!single ? (
-          <TestBlank data={blank} fill={{ answers: run.answers, onAnswer, missing }} />
-        ) : step < 0 ? (
+        {step < 0 && formCard}
+        {step < 0 ? (
           <CollapseCard title="Правила тестирования" id="blank-rules">
             <BlankRules rules={blank.rules} />
           </CollapseCard>
@@ -209,37 +199,32 @@ export function TestPass({ testId, blank, forms, form, saveBlank, view, onFormCh
         <div className="test-pass__bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered}>
           <span style={{ width: `${(answered / total) * 100}%` }} />
         </div>
-        {single ? (
-          <div className="test-pass__buttons">
-            {step >= 0 && (
-              <button type="button" className="test-pass__back" onClick={() => goTo(step - 1)}>
-                Назад
-              </button>
-            )}
-            {step < 0 ? (
-              <button type="button" className="test-settings__cta-button" onClick={start}>
-                {answered > 0 || returnTo !== null ? 'Продолжить' : 'Начать'}
-              </button>
-            ) : step < total - 1 ? (
-              <button
-                type="button"
-                className="test-settings__cta-button"
-                disabled={run.answers[step] === undefined}
-                onClick={() => goTo(step + 1)}
-              >
-                Далее
-              </button>
-            ) : (
-              <button type="button" className="test-settings__cta-button" onClick={finish}>
-                Завершить тест
-              </button>
-            )}
-          </div>
-        ) : (
-          <button type="button" className="test-settings__cta-button" onClick={finish}>
-            Завершить тест
-          </button>
-        )}
+        <div className="test-pass__buttons">
+          {step >= 0 && (
+            <button type="button" className="test-pass__back" onClick={() => goTo(step - 1)}>
+              Назад
+            </button>
+          )}
+          {step < 0 ? (
+            <button type="button" className="test-settings__cta-button" onClick={start}>
+              {answered > 0 || returnTo !== null ? 'Продолжить' : 'Начать'}
+            </button>
+          ) : step < total - 1 ? (
+            <button
+              type="button"
+              className="test-settings__cta-button"
+              disabled={run.answers[step] === undefined}
+              onClick={() => goTo(step + 1)}
+            >
+              Далее
+            </button>
+          ) : (
+            <button type="button" className="test-settings__cta-button" onClick={finish}>
+              Завершить тест
+            </button>
+          )}
+        </div>
+
         {toast && <Toast text={toast} className="test-pass__toast" />}
       </div>
 

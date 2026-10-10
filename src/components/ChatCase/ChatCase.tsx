@@ -1,4 +1,5 @@
-import { useRef, useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { SwipePager } from '../SwipePager/SwipePager';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import {
@@ -206,28 +207,14 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
   const segments: { id: SegmentId; label: string; count: number }[] = [
     { id: 'info', label: 'Сведения', count: hasData ? caseSections.length : 0 },
     { id: 'notes', label: 'Заметки', count: hasData ? notes.length : 0 },
-    { id: 'materials', label: 'Материалы', count: files.length },
+    { id: 'materials', label: 'Файлы', count: files.length },
   ];
 
-  return (
-    <div className="chat-case">
-      <div className="case-segments" role="tablist" aria-label="Разделы кейса">
-        {segments.map(({ id, label, count }) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={segment === id}
-            className={`case-segments__item${segment === id ? ' case-segments__item--active' : ''}`}
-            onClick={() => setSegment(id)}
-          >
-            <span>{label}</span>
-            {count > 0 && <span className="case-segments__count">{count}</span>}
-          </button>
-        ))}
-      </div>
-
-      {segment === 'info' ? (
+  const page = (children: ReactNode) => <div className="case-page">{children}</div>;
+  const pages = [
+    {
+      key: 'info',
+      node: page(
         <>
           <button type="button" className="case-add">
             Добавить сведения
@@ -247,8 +234,12 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             <IconCaseLock className="case-note__icon" />
             <span>Психологический кейс виден только вам</span>
           </p>
-        </>
-      ) : segment === 'notes' ? (
+        </>,
+      ),
+    },
+    {
+      key: 'notes',
+      node: page(
         <>
           <button type="button" className="case-add">
             Добавить заметку
@@ -264,8 +255,12 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             <IconCaseLock className="case-note__icon" />
             <span>Заметки видны только вам</span>
           </p>
-        </>
-      ) : (
+        </>,
+      ),
+    },
+    {
+      key: 'materials',
+      node: page(
         <>
           <button type="button" className="case-add" onClick={() => fileInput.current?.click()}>
             Прикрепить файл
@@ -293,8 +288,41 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
             <IconCaseLock className="case-note__icon" />
             <span>Файлы видны только вам</span>
           </p>
-        </>
-      )}
+        </>,
+      ),
+    },
+  ];
+
+  // Сегменты стоят над страницами и не едут за ними; листать можно и за них
+  const header = (
+  <div className="case-segments" role="tablist" aria-label="Разделы кейса">
+    {segments.map(({ id, label, count }) => (
+      <button
+        key={id}
+        type="button"
+        role="tab"
+        aria-selected={segment === id}
+        className={`case-segments__item${segment === id ? ' case-segments__item--active' : ''}`}
+        onClick={() => setSegment(id)}
+      >
+        <span>{label}</span>
+        {count > 0 && <span className="case-segments__count">{count}</span>}
+      </button>
+    ))}
+  </div>
+  );
+
+  return (
+    <div className="chat-case">
+      <SwipePager
+        className="chat-case__pager"
+        autoHeight
+        nested
+        index={segments.findIndex((x) => x.id === segment)}
+        pages={pages}
+        header={header}
+        onIndexChange={(i) => setSegment(segments[i].id)}
+      />
 
       {editSection && (
         <EditSheet
