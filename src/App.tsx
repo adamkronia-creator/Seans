@@ -8,10 +8,11 @@ import { EventsPage } from './pages/EventsPage/EventsPage';
 import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
+import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
 import { wantSection, type ChatSection } from './data/chatIntent';
 import { CHATS } from './data/chats';
-import { LIBRARY } from './data/library';
+import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { goBack, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
@@ -88,7 +89,7 @@ export default function App() {
     // Вкладку выбрали сами: возвращаться на ту, откуда открыли чат, уже не нужно
     setOrigin(null);
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
-    const toRoot = (id === 'messages' || current.startsWith('/tests/')) && current !== '/';
+    const toRoot = (id === 'messages' || current.startsWith('/tests/') || current.startsWith('/tasks/')) && current !== '/';
     if (id === active && !toRoot) return;
     // Другая вкладка — мягкая смена содержимого; та же вкладка — возврат к её списку: открытый экран уезжает вправо
     transition(() => {
@@ -166,7 +167,12 @@ export default function App() {
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at) : page('tests', <TestsPage />, at);
     }
-    if (at === 'tasks') return page('tasks', <TasksPage />, at);
+    if (at === 'tasks') {
+      // /tasks/<задание>: настройка задания из раздела «Задания»
+      const taskId = path.match(/^\/tasks\/([^/]+)/)?.[1];
+      const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
+      return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at) : page('tasks', <TasksPage />, at);
+    }
     if (at === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />, at);
     const soon = COMING_SOON[at];
     return page(`tab/${at}`, <ComingSoon Icon={soon.Icon} title={soon.title} />, at);

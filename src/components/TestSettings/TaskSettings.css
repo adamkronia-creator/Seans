@@ -1,0 +1,51 @@
+/* Экран настройки задания: поверх стилей экрана теста (TestSettings.css) только то, чего у теста нет */
+
+/* Поле ответа в бланке: растет по тексту, как поле сообщения */
+.task-field {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  resize: none;
+}
+
+.task-field::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Ответ в примере выполнения: текст клиента, выделен акцентным цветом */
+.task-answer {
+  margin: var(--space-1) 0 0;
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.task-hint {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.task-notes + .task-hint {
+  margin: var(--space-3) 0 0;
+}
+
+.task-state__text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.task-state__icon {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  font-size: 22px;
+}

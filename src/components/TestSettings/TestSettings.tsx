@@ -49,7 +49,7 @@ interface TestSettingsProps {
 }
 
 /** Строка карточки: подпись и значение или переключатель справа; значок бывает только у способа показа вопросов */
-function Row({
+export function Row({
   Icon,
   label,
   value,
@@ -74,7 +74,7 @@ function Row({
 }
 
 /** Поле, которое растёт по тексту */
-function MessageField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value: string; onChange: (v: string) => void; limit?: number }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fit = () => {
     const el = ref.current;
@@ -97,7 +97,7 @@ function MessageField({ value, onChange }: { value: string; onChange: (v: string
       id="ts-message"
       className="ts-message__input"
       rows={1}
-      maxLength={MESSAGE_LIMIT}
+      maxLength={limit}
       value={value}
       aria-label="Сообщение для клиента"
       onChange={(e) => onChange(e.target.value)}

@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
-import type { LibraryTest } from '../../data/library';
+import type { LibraryItem } from '../../data/library';
 import { IconReadTicks, IconTabBooking } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import './MessageBubble.css';
@@ -56,7 +56,7 @@ interface MessageBubbleProps {
   joinPrev: boolean;
   query?: string;
   activeMatch?: boolean;
-  test?: LibraryTest;
+  test?: LibraryItem;
   onReply: (m: Message) => void;
   onMenu: (m: Message, rect: DOMRect) => void;
   onQuoteClick: (id: string) => void;
@@ -195,7 +195,8 @@ export function MessageBubble({
   }
 
   // Карточка теста: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
-  if (message.test) {
+  if (message.test || message.task) {
+    const isTask = Boolean(message.task);
     const passed = message.testKind === 'passed';
     const link = passed ? message.buttons?.[0] : undefined;
     // Тест, который прислали вы, клиенту уже ушел: пройти его тут нечего, кнопка показывает настройки, с какими он отправлен
@@ -211,8 +212,8 @@ export function MessageBubble({
               </span>
             )}
             <span className="tcard__text">
-              <span className="tcard__label">{passed ? 'Пройденный тест' : 'Присланный тест'}</span>
-              <span className="tcard__title">{test?.title ?? 'Тест'}</span>
+              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
+              <span className="tcard__title">{test?.title ?? (isTask ? 'Задание' : 'Тест')}</span>
             </span>
           </div>
           {message.text ? (
@@ -227,6 +228,7 @@ export function MessageBubble({
             <Meta message={message} />
           </span>
         </div>
+        {!isTask && (
         <ul className="bubble-buttons">
           <li>
             <button
@@ -238,6 +240,7 @@ export function MessageBubble({
             </button>
           </li>
         </ul>
+        )}
       </li>
     );
   }

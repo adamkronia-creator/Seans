@@ -18,7 +18,7 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
-import { LIBRARY } from '../../data/library';
+import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { Chip } from '../../components/Chip/Chip';
 import { followChips } from '../../utils/followChips';
@@ -48,7 +48,7 @@ const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.include
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
-  if (!a || !b || a.from !== b.from || a.test || b.test || a.buttons || b.buttons) return false;
+  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons) return false;
   const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
@@ -315,7 +315,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     joinPrev={sameRun(prev, m)}
                     query={q}
                     activeMatch={m.id === activeId}
-                    test={m.test ? LIBRARY.find((t) => t.id === m.test) : undefined}
+                    test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}
                     onReply={setReplyTo}
                     onMenu={(message, rect) => setMenu({ message, rect })}
                     onQuoteClick={jumpTo}
@@ -352,7 +352,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           setReplyTo(null);
         }}
         onLayoutChange={() => atBottom.current && scrollToBottom()}
-        reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
+        reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.task ? 'Задание' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
         onCancelReply={() => setReplyTo(null)}
       />
     </>

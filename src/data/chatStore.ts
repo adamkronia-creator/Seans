@@ -13,7 +13,7 @@ function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage'
   const lastGroup = groups?.[groups.length - 1];
   const last = lastGroup?.messages[lastGroup.messages.length - 1];
   if (!last) return undefined;
-  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.test ? 'Тест' : '');
+  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.test ? 'Тест' : last.task ? 'Задание' : '');
   return { lastMessage: last.from === 'me' ? `Вы: ${text}` : text, time: last.time };
 }
 
@@ -96,7 +96,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'booking' | 'buttons'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'task' | 'booking' | 'buttons'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 

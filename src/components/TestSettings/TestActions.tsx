@@ -12,16 +12,18 @@ export type TestAction = 'self' | 'one' | 'many';
 interface ActionSheetProps {
   onPick: (action: TestAction) => void;
   onClose: () => void;
+  /** Какие действия показать (по умолчанию все): у задания нельзя «пройти» */
+  actions?: TestAction[];
 }
 
 /** Что сделать с тестом: пройти самому, отправить клиенту или нескольким */
-export function ActionSheet({ onPick, onClose }: ActionSheetProps) {
+export function ActionSheet({ onPick, onClose, actions }: ActionSheetProps) {
   useSheet(onClose);
   const options = [
     { id: 'self' as const, title: 'Пройти', Icon: IconTestPass },
     { id: 'one' as const, title: 'Отправить', Icon: IconTestSend },
     { id: 'many' as const, title: 'Отправить нескольким', Icon: IconTestSendMany },
-  ];
+  ].filter((o) => !actions || actions.includes(o.id));
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
