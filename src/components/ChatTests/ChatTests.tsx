@@ -1,3 +1,4 @@
+import type { DiagramKind } from '../Diagram/Diagram';
 import { Badge } from '../Badge/Badge';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { TestCard } from '../TestCard/TestCard';
@@ -35,11 +36,11 @@ function SectionedList({
   items: PsyTest[];
   sections: SectionConfig[];
   /** Что показать, когда список пуст: название, пояснение и кнопка (если есть куда идти) */
-  empty: { title: string; text: string; action?: { label: string; onClick: () => void } };
+  empty: { art: DiagramKind; title: string; text: string; action?: { label: string; onClick: () => void } };
   /** Нажатие на карточку; у заданий пока не задано */
   onOpen?: (item: PsyTest) => void;
 }) {
-  if (items.length === 0) return <EmptyState title={empty.title} text={empty.text} action={empty.action} />;
+  if (items.length === 0) return <EmptyState art={empty.art} title={empty.title} text={empty.text} action={empty.action} />;
   return (
     <div className="chat-tests">
       {sections.map(({ status, title, remind }) => {
@@ -87,6 +88,7 @@ export function ChatTests({
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       empty={{
+        art: 'bell',
         title: 'Тестов пока нет',
         text: 'Отправьте клиенту тест из раздела «Диагностика»: он придет в диалог, а результат сохранится здесь.',
         action: onOpenLibrary && { label: 'Выбрать тест', onClick: onOpenLibrary },
@@ -109,6 +111,7 @@ export function SelfTests({ onOpen, onOpenLibrary }: { onOpen: (resultId: string
       items={items}
       sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
       empty={{
+        art: 'bell',
         title: 'Пройденных тестов пока нет',
         text: 'Пройдите тест сами: заключение и бланк сохранятся здесь, и вы сможете вернуться к ним.',
         action: onOpenLibrary && { label: 'Открыть диагностику', onClick: onOpenLibrary },
@@ -126,6 +129,7 @@ export function ChatTasks({ hasData, onOpenLibrary }: { hasData: boolean; onOpen
       items={hasData ? itemsWithStatus(data, 'task') : []}
       sections={TASK_SECTIONS}
       empty={{
+        art: 'abc',
         title: 'Заданий пока нет',
         text: 'Назначьте задание из раздела «Задания»: оно придет клиенту в диалог, а выполненное появится здесь.',
         action: onOpenLibrary && { label: 'Выбрать задание', onClick: onOpenLibrary },

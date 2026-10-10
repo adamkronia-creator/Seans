@@ -1,6 +1,9 @@
+import { Diagram, type DiagramKind } from '../Diagram/Diagram';
 import './EmptyState.css';
 
 interface EmptyStateProps {
+  /** Схема над текстом: какая подходит по смыслу экрана (см. Diagram) */
+  art?: DiagramKind;
   /** Что пусто, коротко: «Заданий пока нет» */
   title: string;
   /** Что с этим делать: одним-двумя предложениями */
@@ -13,10 +16,11 @@ interface EmptyStateProps {
   className?: string;
 }
 
-/** Пустой экран или блок: знак «Сеанса», название, пояснение и, если есть куда идти, кнопка. Пустота — это приглашение к действию */
-export function EmptyState({ title, text, action, compact = false, className = '' }: EmptyStateProps) {
+/** Пустой экран или блок: схема из психологии, название, пояснение и, если есть куда идти, кнопка. Пустота — это приглашение к действию */
+export function EmptyState({ art, title, text, action, compact = false, className = '' }: EmptyStateProps) {
   return (
     <div className={`empty${compact ? ' empty--compact' : ''} ${className}`}>
+      {art && <Diagram kind={art} width={compact ? 140 : 176} className="empty__art" />}
       <h2 className="empty__title">{title}</h2>
       {text && <p className="empty__text">{text}</p>}
       {action && (

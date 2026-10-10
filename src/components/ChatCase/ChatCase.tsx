@@ -224,7 +224,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
           </button>
 
           {!hasData && (
-            <EmptyState compact title="Сведений пока нет" text="Запишите запрос клиента, историю обращения и важные детали, чтобы вернуться к ним перед сеансом." />
+            <EmptyState compact art="levels" title="Сведений пока нет" text="Запишите запрос клиента, историю обращения и важные детали, чтобы вернуться к ним перед сеансом." />
           )}
           <ul className="case-cards" hidden={!hasData}>
             {(hasData ? caseSections : []).map((section) => (
@@ -252,7 +252,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
           </button>
 
           {!hasData && (
-            <EmptyState compact title="Заметок пока нет" text="Фиксируйте наблюдения после сеансов и мысли о следующей встрече." />
+            <EmptyState compact art="triangle" title="Заметок пока нет" text="Фиксируйте наблюдения после сеансов и мысли о следующей встрече." />
           )}
           <ul className="case-cards" hidden={!hasData}>
             {notes.map((note) => (
@@ -288,7 +288,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
           />
 
           {files.length === 0 && (
-            <EmptyState compact title="Файлов пока нет" text="Прикрепите анкеты, фотографии или документы, которые относятся к работе с клиентом." />
+            <EmptyState compact art="record" title="Файлов пока нет" text="Прикрепите анкеты, фотографии или документы, которые относятся к работе с клиентом." />
           )}
           <ul className="case-cards" hidden={files.length === 0}>
             {files.map((file) => (

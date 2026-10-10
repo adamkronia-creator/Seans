@@ -8,6 +8,7 @@ import {
   IconPlusChip,
 } from '../../components/icons';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
+import type { DiagramKind } from '../../components/Diagram/Diagram';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
@@ -35,21 +36,23 @@ interface LibraryPageProps {
 type Filter = string; // 'all' | 'favorites' | 'recent' | id категории
 
 /** Что показывает страница фильтра, когда список пуст: название и что делать дальше */
-function emptyOf(filter: Filter, searching: boolean, recent: string, kind: 'test' | 'task') {
+function emptyOf(filter: Filter, searching: boolean, recent: string, kind: 'test' | 'task'): { art: DiagramKind; title: string; text: string } {
   if (searching) {
     return {
+      art: 'formula',
       title: 'Ничего не найдено',
       text: kind === 'test' ? 'Проверьте написание. Тест можно искать и по краткому названию, например «СМОЛ» или «BDI».' : 'Проверьте написание или очистите поиск.',
     };
   }
-  if (filter === 'favorites') return { title: 'Избранное пусто', text: 'Нажмите на сердечко у карточки, чтобы закрепить ее здесь.' };
+  if (filter === 'favorites') return { art: 'object', title: 'Избранное пусто', text: 'Нажмите на сердечко у карточки, чтобы закрепить ее здесь.' };
   if (filter === 'recent') {
     return {
+      art: kind === 'test' ? 'bell' : 'abc',
       title: recent,
       text: kind === 'test' ? 'Тесты, которые вы отправляли клиентам, соберутся здесь, чтобы их было легко найти снова.' : 'Задания, которые вы назначали клиентам, соберутся здесь, чтобы их было легко найти снова.',
     };
   }
-  return { title: 'В этой категории пока пусто', text: 'Добавленные сюда элементы появятся в списке.' };
+  return { art: 'rings', title: 'В этой категории пока пусто', text: 'Добавленные сюда элементы появятся в списке.' };
 }
 
 /** Карточки одного фильтра: страница пейджера, у каждой своя прокрутка */
@@ -61,7 +64,7 @@ const LibraryList = memo(function LibraryList({
   onOpen,
 }: {
   items: LibraryItem[];
-  empty: { title: string; text: string };
+  empty: { art: DiagramKind; title: string; text: string };
   favorites: ReadonlySet<string>;
   onToggleFavorite: (id: string) => void;
   onOpen?: (item: LibraryItem) => void;
@@ -73,7 +76,7 @@ const LibraryList = memo(function LibraryList({
       ))}
     </ul>
   ) : (
-    <EmptyState title={empty.title} text={empty.text} />
+    <EmptyState art={empty.art} title={empty.title} text={empty.text} />
   );
 });
 

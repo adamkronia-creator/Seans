@@ -1,0 +1,72 @@
+/* Линия схемы: тонкая, с круглыми концами; цвет и пунктир задают модификаторы */
+.dg {
+  display: block;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.dg__ln {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dg__ln--ink {
+  stroke: var(--color-text-caption);
+}
+
+.dg__ln--faint {
+  stroke: var(--color-text-placeholder);
+}
+
+.dg__ln--acc {
+  stroke: var(--color-accent);
+}
+
+/* Пунктир: то, чего пока нет. Рисуется точками с круглыми концами; для окружностей шаг считает компонент */
+.dg__ln--dot {
+  stroke-dasharray: 0.01 5.4;
+  stroke-width: 2;
+}
+
+.dg__soft {
+  fill: var(--color-accent-soft);
+  stroke: none;
+}
+
+.dg__soft--weak {
+  opacity: 0.55;
+}
+
+.dg__fill-acc {
+  fill: var(--color-accent);
+  stroke: none;
+}
+
+.dg__fill-ink {
+  fill: var(--color-text-caption);
+  stroke: none;
+}
+
+/* Буквы формул: курсив, как в текстах по психоанализу и КПТ */
+.dg__t {
+  font-style: italic;
+  font-weight: 500;
+}
+
+.dg__t--lg {
+  font-weight: 400;
+}
+
+.dg__t--ink {
+  fill: var(--color-text-caption);
+}
+
+.dg__t--faint {
+  fill: var(--color-text-placeholder);
+}
+
+.dg__t--acc {
+  fill: var(--color-accent);
+}

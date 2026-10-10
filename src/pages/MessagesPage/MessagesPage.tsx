@@ -33,7 +33,7 @@ const ChatList = memo(function ChatList({ chats, searching, onOpen }: { chats: C
     </ul>
   ) : (
     <EmptyState
-     
+      art={searching ? 'formula' : 'schemaL'}
       title={searching ? 'Ничего не найдено' : 'Здесь пока нет диалогов'}
       text={searching ? 'Проверьте написание. Поиск идет по именам и по тексту последних сообщений.' : 'Нажмите «+» внизу, чтобы начать новый диалог.'}
     />

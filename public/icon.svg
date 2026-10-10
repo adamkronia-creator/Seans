@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="28" fill="#0088FF"/>
+  <g transform="translate(60 60) scale(1.0) translate(-60 -60)" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="butt"><path d="M30.58 41.31A30 30 0 1 1 79.81 69.73M70.21 75.41A30 30 0 0 1 30.47 52.47"/><path d="M94.53 50.17A30 30 0 1 1 45.31 78.59M45.19 67.43A30 30 0 0 1 84.93 44.49"/><path d="M64.61 49.76A30 30 0 0 1 64.61 95.64M54.88 101.12A30 30 0 1 1 54.88 44.28"/></g>
+</svg>
