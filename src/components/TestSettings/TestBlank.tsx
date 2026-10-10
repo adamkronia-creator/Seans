@@ -1,24 +1,16 @@
 import { Fragment, useState, type ReactNode } from 'react';
-import { IconTestChevronUp } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
-/** Карточка бланка: заголовок с кнопкой «свернуть», содержимое плавно сворачивается */
+/** Карточка бланка, настройки или заключения: заголовок и содержимое; сворачивать ее не нужно, всё всегда раскрыто */
 export function CollapseCard({ title, badge, id, children }: { title: string; badge?: ReactNode; id?: string; children: ReactNode }) {
-  const [open, setOpen] = useState(true);
   return (
     <section className="blank-card" id={id}>
-      <button
-        type="button"
-        className="blank-card__head"
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-      >
+      <div className="blank-card__head">
         <span className="blank-card__title">{title}</span>
         {badge}
-        <IconTestChevronUp className={`blank-card__chevron${open ? '' : ' blank-card__chevron--closed'}`} />
-      </button>
-      <div className={`blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`} aria-hidden={!open}>
+      </div>
+      <div className="blank-card__collapse blank-card__collapse--open">
         <div className="blank-card__inner">
           <div className="blank-card__body">{children}</div>
         </div>

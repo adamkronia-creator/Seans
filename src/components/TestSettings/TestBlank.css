@@ -1,4 +1,4 @@
-/* Карточка бланка: заголовок 52 с кнопкой «свернуть», разделитель 1, содержимое с полями 16 */
+/* Карточка бланка: заголовок 52, разделитель 1, содержимое с полями 16 */
 .blank-card {
   flex-shrink: 0;
   overflow: hidden;
@@ -24,17 +24,6 @@
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-lg);
   letter-spacing: var(--letter-spacing-title);
-}
-
-.blank-card__chevron {
-  flex-shrink: 0;
-  color: var(--color-text-caption);
-  font-size: var(--size-icon-sm);
-  transition: transform 0.25s ease;
-}
-
-.blank-card__chevron--closed {
-  transform: rotate(180deg);
 }
 
 /* Сворачивание: строка 0fr → 1fr даёт плавную высоту */
@@ -64,7 +53,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .blank-card__chevron,
   .blank-card__collapse,
   .blank-card__collapse--open {
     transition: none;

@@ -27,6 +27,7 @@ import { IconBack, IconPlus } from '../../components/icons';
 import { Toast } from '../../components/Toast/Toast';
 import { addDays, dateKey, dayLong, dayRelative, dayShort, monthTitle, parseDate, startOfMonth } from '../../utils/ruDate';
 import { useNow } from '../../utils/useNow';
+import { useSwipeSegments } from '../../utils/swipeSegments';
 import './PlannerPage.css';
 
 type SheetState =
@@ -57,6 +58,8 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number>();
   const scroller = useRef<HTMLDivElement>(null);
+  // Свайп по распорядку листает дни: влево — следующий, вправо — предыдущий
+  useSwipeSegments(scroller, { index: 1, count: 3, onIndex: (i) => setSelected((day) => dateKey(addDays(parseDate(day), i - 1))) });
 
   const say = useCallback((text: string) => {
     setToast(text);

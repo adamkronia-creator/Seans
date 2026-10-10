@@ -22,7 +22,7 @@ import { LIBRARY } from '../../data/library';
 import { clientResultPath } from '../../data/resultLinks';
 import { Chip } from '../../components/Chip/Chip';
 import { followChips } from '../../utils/followChips';
-import { revealChip } from '../../utils/revealChip';
+import { centerChips } from '../../utils/centerChips';
 import { clearWanted, wantedSection, type ChatSection } from '../../data/chatIntent';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
@@ -264,18 +264,20 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
   const index = sections.findIndex((item) => item.id === section);
 
-  // Чипсы разделов идут за страницами: цвет перетекает вслед за пальцем, а не прыгает на готовый выбор
+  // Чипсы разделов идут за страницами: цвет перетекает вслед за пальцем, а не прыгает на готовый выбор,
+  // а ряд едет так, чтобы выбранный чипс оставался посередине (видно больше соседей)
   const chipsRef = useRef<HTMLDivElement>(null);
   const showPosition = useCallback((position: number) => {
     const row = chipsRef.current;
-    if (row) followChips(row.querySelectorAll<HTMLElement>('.chip'), position);
+    if (!row) return;
+    followChips(row.querySelectorAll<HTMLElement>('.chip'), position);
+    centerChips(row, position);
   }, []);
-  // Выбранный чипс виден целиком: ряд подъезжает к нему, если он наполовину за краем
+  // Чат открыт сразу на нужном разделе: ряд уже стоит на нем
   useEffect(() => {
-    const row = chipsRef.current;
-    const chip = row?.querySelector<HTMLElement>('.chip--active');
-    if (row && chip) revealChip(row, chip);
-  }, [section]);
+    if (chipsRef.current) centerChips(chipsRef.current, index);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!chat) {
     return (
