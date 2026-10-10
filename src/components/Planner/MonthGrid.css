@@ -110,6 +110,25 @@
   background: var(--color-orange);
 }
 
+/* Что значат точки: одна строка под календарем (в свернутом виде ее нет) */
+.cal__legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  list-style: none;
+}
+
+.cal__legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cal__viewport,
   .cal__weeks {

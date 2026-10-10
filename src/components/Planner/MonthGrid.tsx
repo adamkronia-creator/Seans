@@ -100,6 +100,19 @@ export function MonthGrid({ month, selected, today, compact, flags, onSelect }: 
           })}
         </div>
       </div>
+      {!compact && (
+        <ul className="cal__legend">
+          <li>
+            <i className="cal__dot cal__dot--visit" /> сеанс
+          </li>
+          <li>
+            <i className="cal__dot cal__dot--task" /> дело
+          </li>
+          <li>
+            <i className="cal__dot cal__dot--note" /> заметка
+          </li>
+        </ul>
+      )}
     </div>
   );
 }
