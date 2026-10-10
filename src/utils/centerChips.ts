@@ -1,10 +1,10 @@
 /**
  * Ряд чипсов (разделы чата) прокручивается так, чтобы выбранный чипс стоял посередине, а остальные ушли в стороны:
  * при листании страниц ряд едет вместе с ними, и видно больше соседей. `position` — положение в страницах (дробное:
- * 1,4 — между вторым чипсом и третьим), порядок чипсов — порядок страниц. У краев ряд упирается в начало и конец.
+ * 1,4 — между вторым чипсом и третьим), порядок чипсов — порядок страниц; `selector` отбирает чипсы-страницы (без «+»). У краев ряд упирается в начало и конец.
  */
-export function centerChips(row: HTMLElement, position: number) {
-  const chips = Array.from(row.querySelectorAll<HTMLElement>('.chip'));
+export function centerChips(row: HTMLElement, position: number, selector = '.chip') {
+  const chips = Array.from(row.querySelectorAll<HTMLElement>(selector));
   const room = row.scrollWidth - row.clientWidth;
   if (chips.length === 0 || room <= 1) return;
   const rowLeft = row.getBoundingClientRect().left;

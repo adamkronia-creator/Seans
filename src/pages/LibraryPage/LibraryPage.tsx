@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Chip } from '../../components/Chip/Chip';
 import {
   IconFilterAll,
@@ -13,7 +13,7 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
 import type { LibraryItem } from '../../data/library';
 import { followChips } from '../../utils/followChips';
-import { revealChip } from '../../utils/revealChip';
+import { centerChips } from '../../utils/centerChips';
 import './LibraryPage.css';
 
 interface LibraryPageProps {
@@ -127,14 +127,9 @@ export function LibraryPage({
   const onPosition = useCallback((position: number) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--plus)');
     if (chips) followChips(chips, position);
-  }, []);
-
-  // Выбранный чипс виден целиком, даже если до него пролистали пальцем или он был за краем
-  useEffect(() => {
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    const chip = row?.querySelector<HTMLElement>('.chip--active');
-    if (row && chip) revealChip(row, chip);
-  }, [shown]);
+    if (row) centerChips(row, position, '.chip:not(.chip--plus)');
+  }, []);
 
   const chip = (id: Filter) => ({ follow: true, active: shown === filters.indexOf(id), onClick: () => setFilter(id) });
 

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
@@ -14,7 +14,7 @@ import {
 } from '../../data/chats';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
-import { revealChip } from '../../utils/revealChip';
+import { centerChips } from '../../utils/centerChips';
 import './MessagesPage.css';
 
 type Filter = 'all' | ChatCategory;
@@ -78,14 +78,9 @@ export function MessagesPage() {
   const onPosition = useCallback((position: number) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--icon)');
     if (chips) followChips(chips, position);
-  }, []);
-
-  // Выбранный чипс виден целиком, даже если до него пролистали пальцем или он был за краем
-  useEffect(() => {
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    const chip = row?.querySelector<HTMLElement>('.chip--active');
-    if (row && chip) revealChip(row, chip);
-  }, [shown]);
+    if (row) centerChips(row, position, '.chip:not(.chip--icon)');
+  }, []);
 
   return (
     <section ref={root} className="messages">

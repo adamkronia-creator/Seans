@@ -58,12 +58,6 @@
   color: var(--color-text-primary);
 }
 
-.case-segments__count {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  font-variant-numeric: tabular-nums;
-}
-
 @media (max-width: 359px) {
   .case-segments__item {
     gap: var(--space-1);

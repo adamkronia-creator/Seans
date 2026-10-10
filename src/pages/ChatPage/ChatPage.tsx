@@ -316,7 +316,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
                     onTestSettings={setSettingsOf}
-                    onOpenLink={navigate}
+                    onOpenLink={(href) => (href.startsWith('section:') ? setSection(href.slice('section:'.length) as SectionId) : navigate(href))}
                   />
                 );
               })}

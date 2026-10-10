@@ -1,3 +1,5 @@
+import { Badge } from '../Badge/Badge';
+import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SwipePager } from '../SwipePager/SwipePager';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
@@ -306,14 +308,14 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
         onClick={() => setSegment(id)}
       >
         <span>{label}</span>
-        {count > 0 && <span className="case-segments__count">{count}</span>}
+        <Badge count={count} variant="neutral" />
       </button>
     ))}
   </div>
   );
 
   return (
-    <div className="chat-case">
+    <ScrollHost className="chat-case">
       <SwipePager
         className="chat-case__pager"
         autoHeight
@@ -376,6 +378,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
           }}
         />
       )}
-    </div>
+    </ScrollHost>
   );
 }

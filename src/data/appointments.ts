@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { noticeCancel, noticeDecline, noticeProposal } from './bookingMessages';
 import { addDays, at, dateKey, durationLabel, fromMinutes, startOfDay, toMinutes } from '../utils/ruDate';
 
 /*
@@ -294,6 +295,7 @@ export function proposeTime(chatId: string, input: ProposalInput): string {
     updatedAt: Date.now(),
   };
   commit({ ...state, items: [...state.items, item] });
+  noticeProposal(chatId, input, 'new', input.replaces ? state.items.find((x) => x.id === input.replaces) : undefined);
   return id;
 }
 
@@ -310,6 +312,8 @@ export function editProposal(id: string, input: ProposalInput) {
 
 /** Ответить своим временем: предложение переходит к другой стороне */
 export function counterProposal(id: string, input: ProposalInput) {
+  const chatId = state.items.find((x) => x.id === id)?.chatId;
+  if (chatId) noticeProposal(chatId, input, 'counter');
   change(id, (a) => {
     const next: Appointment = { ...a, by: 'me', countered: true, slot: input.slot, duration: input.duration, updatedAt: Date.now() };
     const comment = clean(input.comment);
@@ -350,6 +354,8 @@ export function acceptProposal(id: string, start?: string) {
 
 /** Отказаться от предложения (причина по желанию) */
 export function declineProposal(id: string, reason?: string) {
+  const declined = state.items.find((x) => x.id === id);
+  if (declined) noticeDecline(declined, reason);
   change(id, (a) => {
     const next: Appointment = { ...a, status: 'declined', closedBy: 'me', updatedAt: Date.now() };
     const text = clean(reason);
@@ -360,6 +366,8 @@ export function declineProposal(id: string, reason?: string) {
 
 /** Отменить подтвержденный прием. Предложения о его переносе снимаются */
 export function cancelAppointment(id: string, reason?: string) {
+  const cancelled = state.items.find((x) => x.id === id);
+  if (cancelled) noticeCancel(cancelled, reason);
   commit({
     ...state,
     items: state.items.flatMap((a) => {

@@ -18,7 +18,7 @@
 /* Заголовок раздела: название и число рядом; «Напомнить» прижато вправо */
 .chat-tests__heading {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-2);
   padding: 0 var(--space-1);
 }
@@ -28,13 +28,6 @@
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-lg);
   letter-spacing: var(--letter-spacing-title);
-}
-
-.chat-tests__count {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-sm);
 }
 
 .chat-tests__remind {

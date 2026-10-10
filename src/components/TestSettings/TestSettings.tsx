@@ -15,6 +15,7 @@ import { testBlank } from '../../data/testBlank';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { TestHeader } from './TestHeader';
+import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
@@ -259,14 +260,14 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
-          <div className="test-settings__scroll">
+          <ScrollHost className="test-settings__scroll">
             <TestConclusion data={conclusion} form={form} />
-          </div>
+          </ScrollHost>
         </div>
       ) : view === 'blank' && blank ? (
-        <div className="test-settings__scroll" key="blank">
+        <ScrollHost className="test-settings__scroll" key="blank">
           <TestBlank data={blank} />
-        </div>
+        </ScrollHost>
       ) : (
       <>
       <div className="test-settings__scroll">

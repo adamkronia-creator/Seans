@@ -1,0 +1,26 @@
+/* Обертка прокручиваемого блока: сам блок занимает всё место, кнопка «вниз» лежит поверх справа внизу */
+.scroll-host {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Круглая кнопка 40, как «к последним сообщениям» в переписке */
+.scroll-host__down {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-float);
+  color: var(--color-text-secondary);
+  font-size: var(--size-icon);
+}

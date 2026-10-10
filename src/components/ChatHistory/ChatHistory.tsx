@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
@@ -19,7 +19,8 @@ import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultPath } from '../../data/resultLinks';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
-import { revealChip } from '../../utils/revealChip';
+import { centerChips } from '../../utils/centerChips';
+import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
   countOf,
@@ -276,14 +277,10 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const onPosition = useCallback((position: number) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.hist-chips .chip');
     if (chips) followChips(chips, position);
-  }, []);
-
-  // Выбранный чипс виден целиком, даже если до него пролистали пальцем
-  useEffect(() => {
+    // Ряд чипсов едет за страницами: активный остаётся посередине
     const row = root.current?.querySelector<HTMLElement>('.hist-chips');
-    const chip = row?.querySelector<HTMLElement>('.chip--active');
-    if (row && chip) revealChip(row, chip);
-  }, [shown]);
+    if (row) centerChips(row, position);
+  }, []);
 
   // Статистика и чипсы стоят над лентами: не едут вместе с ними, но за них тоже можно листать
   const header = (
@@ -307,7 +304,8 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   );
 
   return (
-    <div ref={root} className="chat-history">
+    <div ref={root} className="hist-host">
+      <ScrollHost className="chat-history">
       <SwipePager
         className="chat-history__pager"
         autoHeight
@@ -319,6 +317,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
         onPosition={onPosition}
         onDrag={onDrag}
       />
+      </ScrollHost>
 
       {editing && (
         <EditSheet

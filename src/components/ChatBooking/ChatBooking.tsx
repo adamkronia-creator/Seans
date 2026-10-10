@@ -1,3 +1,4 @@
+import { Badge } from '../Badge/Badge';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   acceptProposal,
@@ -43,11 +44,7 @@ function Section({
     <section className="booking__section">
       <div className="booking__heading">
         <h2 className="booking__title">{title}</h2>
-        {count !== undefined && (
-          <span className="booking__count" aria-label={`Всего: ${count}`}>
-            {count}
-          </span>
-        )}
+        {count !== undefined && <Badge count={count} variant="neutral" showZero ariaLabel={`Всего: ${count}`} />}
         {action && (
           <button type="button" className="booking__link" onClick={action.onClick}>
             {action.label}

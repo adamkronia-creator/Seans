@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryTest } from '../../data/library';
-import { IconReadTicks } from '../icons';
+import { IconReadTicks, IconTabBooking } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import './MessageBubble.css';
 
@@ -154,6 +154,45 @@ export function MessageBubble({
       <IconReply />
     </span>
   );
+
+  // Оповещение о записи на прием: пузырь в стиле карточки теста (значок, подпись, заголовок, текст), под ним кнопка
+  if (message.booking) {
+    const button = message.buttons?.[0];
+    return (
+      <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
+        {swipeHint}
+        <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons bubble--tcard${activeMatch ? ' bubble--match' : ''}`}>
+          <div className="tcard">
+            <span className="tcard__icon tcard__icon--booking">
+              <IconTabBooking />
+            </span>
+            <span className="tcard__text">
+              <span className="tcard__label">Запись на прием</span>
+              <span className="tcard__title">{message.booking.title}</span>
+            </span>
+          </div>
+          <p className="tcard__body">
+            <Highlighted text={message.text} query={query} active={activeMatch} />
+            <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">
+              <Meta message={message} />
+            </span>
+          </p>
+          <span className="bubble__meta">
+            <Meta message={message} />
+          </span>
+        </div>
+        {button && (
+          <ul className="bubble-buttons">
+            <li>
+              <button type="button" className="bubble-button" onClick={() => onOpenLink(button.href)}>
+                {button.label}
+              </button>
+            </li>
+          </ul>
+        )}
+      </li>
+    );
+  }
 
   // Карточка теста: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
   if (message.test) {

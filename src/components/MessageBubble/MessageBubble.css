@@ -221,6 +221,16 @@
   border-radius: var(--radius-md);
 }
 
+.tcard__icon--booking {
+  background: var(--color-accent-on);
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.bubble--in .tcard__icon--booking {
+  background: var(--color-accent-soft);
+}
+
 .tcard__icon img {
   width: 32px;
   height: 32px;

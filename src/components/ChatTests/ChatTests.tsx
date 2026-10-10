@@ -1,3 +1,4 @@
+import { Badge } from '../Badge/Badge';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
 import { LIBRARY } from '../../data/library';
@@ -46,7 +47,7 @@ function SectionedList({
           <section key={status} className="chat-tests__section">
             <div className="chat-tests__heading">
               <h2 className="chat-tests__title">{title}</h2>
-              <span className="chat-tests__count" aria-label={`Всего: ${list.length}`}>{list.length}</span>
+              <Badge count={list.length} variant="neutral" ariaLabel={`Всего: ${list.length}`} />
               {remind && (
                 <button type="button" className="chat-tests__remind">
                   Напомнить
