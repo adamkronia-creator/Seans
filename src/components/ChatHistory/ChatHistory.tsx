@@ -16,7 +16,9 @@ import {
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
-import { clientResultPath } from '../../data/resultLinks';
+import { clientResultId, clientResultPath } from '../../data/resultLinks';
+import { findClientResult } from '../../data/clientResults';
+import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
@@ -120,6 +122,64 @@ function Marker({ event }: { event: HistoryEvent }) {
   );
 }
 
+/** Сколько шкал видно, пока список свернут */
+const SCALES_SHOWN = 3;
+
+const fmtScore = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
+
+/** Одна шкала: название, значение и полоса цвета диапазона; у шкалы с диапазонами под названием подпись диапазона */
+function ScaleRow({ data, scale }: { data: ConclusionData; scale: ConclusionScale }) {
+  const level = scale.leveled ? levelOf(data, scale.score, scale) : undefined;
+  const tone = level?.tone ?? 'accent';
+  const pct = Math.min(100, Math.max(0, (scale.score / scale.max) * 100));
+  return (
+    <li className="hist-scale">
+      <span className="hist-scale__head">
+        <span className="hist-scale__name">
+          {scale.name} <span className="hist-scale__code">({scale.code})</span>
+          {level && <span className="hist-scale__code"> · {level.chip.toLowerCase()}</span>}
+        </span>
+        <span className="hist-scale__value">{fmtScore(scale.score)}</span>
+      </span>
+      <span className="hist-scale__track" aria-hidden="true">
+        <span className={`hist-scale__fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
+      </span>
+    </li>
+  );
+}
+
+/**
+ * Шкалы пройденного клиентом теста в карточке истории. Нажатие на шкалы открывает результат тестирования;
+ * если шкал больше трех, остальные прячутся за «Читать далее» (кнопка стоит рядом со списком, чтобы не открывать результат).
+ */
+function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: string }) {
+  const [open, setOpen] = useState(false);
+  const { scales } = data;
+  const long = scales.length > SCALES_SHOWN;
+  const shown = long && !open ? scales.slice(0, SCALES_SHOWN) : scales;
+  return (
+    <div className="hist-scales">
+      <ul
+        className="hist-scales__list"
+        role="link"
+        tabIndex={0}
+        aria-label="Открыть результат тестирования"
+        onClick={() => navigate(resultPath)}
+        onKeyDown={(e) => e.key === 'Enter' && navigate(resultPath)}
+      >
+        {shown.map((scale) => (
+          <ScaleRow key={scale.code} data={data} scale={scale} />
+        ))}
+      </ul>
+      {long && (
+        <button type="button" className="hist-scales__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
+          {open ? 'Скрыть' : `Читать далее (еще ${scales.length - SCALES_SHOWN})`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
@@ -143,6 +203,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   };
   // Выполненный клиентом тест открывает его результат
   const resultPath = event.kind === 'test' && event.state === 'done' ? clientResultPath('maxim', event.ref) : undefined;
+  const scaleData = resultPath && event.kind === 'test' ? findClientResult(clientResultId('maxim', event.ref))?.data : undefined;
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
@@ -175,6 +236,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
             <p className="hist-card__text">{event.text}</p>
             {editable && <IconChevron className="hist-card__chevron" />}
           </div>
+          {resultPath && scaleData && scaleData.scales.length > 0 && <ScaleList data={scaleData} resultPath={resultPath} />}
           {editable && (
             <QuickEdit
               editing={quick}
