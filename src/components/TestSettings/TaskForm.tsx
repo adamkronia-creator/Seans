@@ -1,11 +1,18 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { IconClose } from '../ChatParts/ChatIcons';
 import { IconPlus, IconTestChevronDown } from '../icons';
 import { IconTaskState } from './TaskIcons';
 import { BlankRules, CollapseCard } from './TestBlank';
 import {
+  emptyValues,
+  entriesOf,
+  filledEntries,
+  listOf,
   ownShare,
   starterOf,
+  type ChoiceField,
+  type EntriesField,
+  type ListField,
   type PieFactor,
   type TaskField,
   type TaskSection,
@@ -64,26 +71,49 @@ function Answer({ text }: { text?: string }) {
   return text?.trim() ? <p className="task-answer">{text}</p> : <p className="tf-empty">Не заполнено</p>;
 }
 
-/** Ползунок процентов; у ответа без выбора вместо числа подсказка */
-export function PercentSlider({ value, onChange, label, max = 100 }: { value: number | undefined; onChange: (v: number) => void; label: string; max?: number }) {
-  const shown = value === undefined ? 0 : Math.min(value, max);
+/** Ползунок оценки: `top` — верхний край шкалы, `cap` — выше чего поднять бегунок нельзя; у ответа без выбора вместо числа тире */
+function Slider({
+  value,
+  onChange,
+  label,
+  top,
+  step,
+  cap = top,
+  text,
+}: {
+  value: number | undefined;
+  onChange: (v: number) => void;
+  label: string;
+  top: number;
+  step: number;
+  cap?: number;
+  text: (v: number) => string;
+}) {
+  const shown = value === undefined ? 0 : Math.min(value, cap);
   return (
     <div className={`tf-percent${value === undefined ? ' tf-percent--unset' : ''}`}>
       <input
         type="range"
         className="tf-percent__range"
         min={0}
-        max={100}
-        step={5}
+        max={top}
+        step={step}
         value={shown}
         aria-label={label}
-        aria-valuetext={value === undefined ? 'Не выбрано' : `${shown}%`}
-        style={{ '--fill': shown } as React.CSSProperties}
-        onChange={(e) => onChange(Math.min(Number(e.target.value), max))}
+        aria-valuetext={value === undefined ? 'Не выбрано' : text(shown)}
+        style={{ '--fill': (shown / top) * 100 } as CSSProperties}
+        onChange={(e) => onChange(Math.min(Number(e.target.value), cap))}
+        // Пока оценку не выбрали, бегунок стоит на нуле, и нажатие на него ничего не меняет: засчитываем «0», когда палец отпустили
+        onPointerUp={(e) => value === undefined && onChange(Math.min(Number(e.currentTarget.value), cap))}
       />
-      <output className="tf-percent__value">{value === undefined ? '—' : `${shown}%`}</output>
+      <output className="tf-percent__value">{value === undefined ? '—' : text(shown)}</output>
     </div>
   );
+}
+
+/** Ползунок процентов (0–100, шаг 5) */
+export function PercentSlider({ value, onChange, label, max = 100 }: { value: number | undefined; onChange: (v: number) => void; label: string; max?: number }) {
+  return <Slider value={value} onChange={onChange} label={label} top={100} step={5} cap={max} text={(v) => `${v}%`} />;
 }
 
 /** Кольцо долей: доли факторов серо-голубым, остаток — доля самого клиента акцентным */
@@ -199,6 +229,156 @@ function Factors({ field, list, onChange }: { field: Extract<TaskField, { kind: 
   );
 }
 
+/** Подпись для программы чтения: у полей записи впереди номер записи, иначе у трёх записей были бы три одинаковых «Ситуация» */
+const named = (scope: string | undefined, label: string) => (scope ? `${scope}: ${label}` : label);
+
+/** Выбор из вариантов: один — список с кружками, несколько — чипсы; в просмотре показан только выбранный */
+function Choice({ field, picked, onChange, scope }: { field: ChoiceField; picked: number[]; onChange?: (next: number[]) => void; scope?: string }) {
+  const group = useId();
+  const label = named(scope, field.label);
+  if (!onChange) {
+    if (picked.length === 0) return <p className="tf-empty">Не заполнено</p>;
+    return field.multiple ? (
+      <ul className="tf-chips" aria-label={label}>
+        {picked.map((i) => (
+          <li key={i} className="tf-chip tf-chip--static">
+            {field.options[i]}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="task-answer">{field.options[picked[0]]}</p>
+    );
+  }
+  if (field.multiple) {
+    return (
+      <ul className="tf-chips" aria-label={label}>
+        {field.options.map((option, i) => {
+          const on = picked.includes(i);
+          return (
+            <li key={option}>
+              <button
+                type="button"
+                className={`tf-chip${on ? ' tf-chip--on' : ''}`}
+                aria-pressed={on}
+                onClick={() => onChange(on ? picked.filter((p) => p !== i) : [...picked, i].sort((a, b) => a - b))}
+              >
+                {option}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+  return (
+    <ul className="blank-answers" role="radiogroup" aria-label={label}>
+      {field.options.map((option, i) => (
+        <li key={option}>
+          <label className="blank-answer">
+            <input type="radio" className="blank-answer__input" name={group} checked={picked[0] === i} onChange={() => onChange([i])} />
+            <span className="blank-answer__radio" aria-hidden="true" />
+            <span className="blank-answer__text">{option}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Список строк: доказательства «за» или «против». Строки можно добавлять и убирать (одна остаётся всегда) */
+function List({ field, rows, onChange, scope }: { field: ListField; rows: string[]; onChange?: (next: string[]) => void; scope?: string }) {
+  if (!onChange) {
+    const filled = rows.filter((line) => line.trim() !== '');
+    return filled.length > 0 ? (
+      <ul className="tf-bullets">
+        {filled.map((line, i) => (
+          <li key={i}>{line}</li>
+        ))}
+      </ul>
+    ) : (
+      <p className="tf-empty">Не заполнено</p>
+    );
+  }
+  return (
+    <div className="tf-list">
+      <ul className="tf-list__rows">
+        {rows.map((line, i) => (
+          <li key={i} className="tf-list__row">
+            <AnswerField
+              value={line}
+              onChange={(value) => onChange(rows.map((r, j) => (j === i ? value : r)))}
+              label={named(scope, `${field.label} ${i + 1}`)}
+              placeholder={field.placeholder}
+            />
+            {rows.length > 1 && (
+              <button type="button" className="tf-factor__remove" aria-label={`Удалить строку ${i + 1}`} onClick={() => onChange(rows.filter((_, j) => j !== i))}>
+                <IconClose />
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      {rows.length < field.max && (
+        <button type="button" className="tf-add" onClick={() => onChange([...rows, ''])}>
+          <IconPlus />
+          {field.addLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Записи: страницы дневника, дела плана, беспокойства. У каждой те же поля, разложенные по группам («До дела», «После дела»).
+ * Лишнюю запись можно убрать (одна остаётся), добавить — до предела. В просмотре пустые записи не показаны.
+ */
+function Entries({ field, values, onChange }: { field: EntriesField; values: TaskValues; onChange?: (next: TaskValues) => void }) {
+  const list = entriesOf(field, values);
+  const shown = onChange ? list : filledEntries(field, values);
+  const set = (next: TaskValues[]) => onChange?.({ ...values, entries: { ...values.entries, [field.id]: next } });
+  if (shown.length === 0) return <p className="tf-empty tf-entries__empty">Не заполнено</p>;
+  return (
+    <>
+      <ol className="tf-entries">
+        {shown.map((entry, i) => {
+          const title = `${field.title} ${i + 1}`;
+          return (
+            <li key={i} className="tf-entry">
+              <div className="tf-entry__head">
+                <h5 className="tf-entry__title">{title}</h5>
+                {onChange && list.length > 1 && (
+                  <button type="button" className="tf-factor__remove" aria-label={`Удалить: ${title}`} onClick={() => set(list.filter((_, j) => j !== i))}>
+                    <IconClose />
+                  </button>
+                )}
+              </div>
+              {field.groups.map((group, g) => (
+                <div key={g} className="tf-entry__group">
+                  {group.title && <p className="tf-entry__group-title">{group.title}</p>}
+                  {group.fields.map((inner) => (
+                    <div key={inner.id} className="tf-entry__field">
+                      <FieldBody field={inner} number={0} values={entry} scope={title} onChange={onChange && ((next) => set(list.map((e, j) => (j === i ? next : e))))} />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </li>
+          );
+        })}
+      </ol>
+      {onChange && list.length < field.max && (
+        <div className="tf-entries__add">
+          <button type="button" className="tf-add" onClick={() => set([...list, emptyValues()])}>
+            <IconPlus />
+            {field.addLabel}
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
 /** Шкала «Как вы себя чувствуете?» */
 export function StateScale({ labels, value, onChange }: { labels: string[]; value?: number; onChange?: (i: number) => void }) {
   return (
@@ -227,9 +407,11 @@ interface FieldProps {
   number: number;
   values: TaskValues;
   onChange?: (next: TaskValues) => void;
+  /** Запись, в которой лежит поле («Запись 2»): входит в подпись поля для программы чтения */
+  scope?: string;
 }
 
-function FieldBody({ field, number, values, onChange }: FieldProps) {
+function FieldBody({ field, number, values, onChange, scope }: FieldProps) {
   const text = values.text[field.id] ?? '';
   const setText = (value: string) => onChange?.({ ...values, text: { ...values.text, [field.id]: value } });
 
@@ -260,7 +442,7 @@ function FieldBody({ field, number, values, onChange }: FieldProps) {
                   </select>
                 </label>
               </div>
-              <AnswerField value={text} onChange={setText} label={`Предложение ${number}`} placeholder="Продолжите предложение" />
+              <AnswerField value={text} onChange={setText} label={named(scope, `Предложение ${number}`)} placeholder="Продолжите предложение" />
             </>
           ) : (
             <>
@@ -278,7 +460,7 @@ function FieldBody({ field, number, values, onChange }: FieldProps) {
         <>
           {field.label && <p className="blank-question__prompt">{field.label}</p>}
           {field.hint && <p className="task-hint">{field.hint}</p>}
-          {onChange ? <AnswerField value={text} onChange={setText} label={field.label ?? 'Ответ'} placeholder={field.placeholder} rows={field.rows} /> : <Answer text={text} />}
+          {onChange ? <AnswerField value={text} onChange={setText} label={named(scope, field.label ?? 'Ответ')} placeholder={field.placeholder} rows={field.rows} /> : <Answer text={text} />}
         </>
       );
     case 'percent': {
@@ -288,7 +470,7 @@ function FieldBody({ field, number, values, onChange }: FieldProps) {
           <p className="blank-question__prompt">{field.label}</p>
           {field.hint && <p className="task-hint">{field.hint}</p>}
           {onChange ? (
-            <PercentSlider value={value} label={field.label} onChange={(v) => onChange({ ...values, percent: { ...values.percent, [field.id]: v } })} />
+            <PercentSlider value={value} label={named(scope, field.label)} onChange={(v) => onChange({ ...values, percent: { ...values.percent, [field.id]: v } })} />
           ) : value === undefined ? (
             <p className="tf-empty">Не заполнено</p>
           ) : (
@@ -307,6 +489,53 @@ function FieldBody({ field, number, values, onChange }: FieldProps) {
         </>
       );
     }
+    case 'scale': {
+      const value = values.scale[field.id];
+      return (
+        <>
+          <p className="blank-question__prompt">{field.label}</p>
+          {field.hint && <p className="task-hint">{field.hint}</p>}
+          {onChange ? (
+            <div className="tf-scale">
+              <Slider
+                value={value}
+                top={10}
+                step={1}
+                text={String}
+                label={named(scope, field.label)}
+                onChange={(v) => onChange({ ...values, scale: { ...values.scale, [field.id]: v } })}
+              />
+              <div className="tf-scale__ends" aria-hidden="true">
+                <span>{field.low}</span>
+                <span>{field.high}</span>
+              </div>
+            </div>
+          ) : value === undefined ? (
+            <p className="tf-empty">Не заполнено</p>
+          ) : (
+            <p className="task-answer">{value} из 10</p>
+          )}
+        </>
+      );
+    }
+    case 'choice':
+      return (
+        <>
+          <p className="blank-question__prompt">{field.label}</p>
+          {field.hint && <p className="task-hint">{field.hint}</p>}
+          <Choice field={field} picked={values.choice[field.id] ?? []} scope={scope} onChange={onChange && ((next) => onChange({ ...values, choice: { ...values.choice, [field.id]: next } }))} />
+        </>
+      );
+    case 'list':
+      return (
+        <>
+          <p className="blank-question__prompt">{field.label}</p>
+          {field.hint && <p className="task-hint">{field.hint}</p>}
+          <List field={field} rows={listOf(field, values)} scope={scope} onChange={onChange && ((next) => onChange({ ...values, list: { ...values.list, [field.id]: next } }))} />
+        </>
+      );
+    case 'entries':
+      return <Entries field={field} values={values} onChange={onChange} />;
   }
 }
 
@@ -330,7 +559,7 @@ export function TaskSectionCard({ section, values, onChange, flat = false }: { s
       {section.hint && <p className={`task-hint${flat ? '' : ' tf-section-hint'}`}>{section.hint}</p>}
       <ol className="blank-questions">
         {section.fields.map((field) => (
-          <li key={field.id} className="blank-question">
+          <li key={field.id} className={`blank-question${field.kind === 'entries' ? ' tf-q--entries' : ''}`}>
             <FieldBody field={field} number={field.kind === 'sentence' ? ++sentence : 0} values={values} onChange={onChange} />
           </li>
         ))}

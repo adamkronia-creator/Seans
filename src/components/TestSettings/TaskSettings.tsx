@@ -17,7 +17,7 @@ import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTask } from '../../data/library';
-import { emptyValues, exampleValues, TASK_DEADLINES, TASK_MESSAGE_LIMIT, taskSettings, type TaskValues } from '../../data/taskSettings';
+import { emptyValues, exampleValues, formText, TASK_DEADLINES, TASK_MESSAGE_LIMIT, taskSettings, type TaskValues } from '../../data/taskSettings';
 import { takeTaskPass } from '../../data/selfTask';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -92,7 +92,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const data = taskSettings(task);
   // Задание, отправленное себе, открывается сразу выполнением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takeTaskPass(task.id));
-  const [form, setForm] = useState(passRequest?.form || (data?.forms?.[0] ?? ''));
+  const [form, setForm] = useState(passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? ''));
   const [comment, setComment] = useState(passRequest?.comment ?? true);
   const [state, setState] = useState(passRequest?.state ?? true);
   const [saveBlank, setSaveBlank] = useState(passRequest?.saveBlank ?? true);
@@ -141,6 +141,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
 
   if (!data) return null;
   const options = { comment, state };
+  const formLabel = data.formLabel ?? 'Форма бланка';
 
   // Сообщение клиенту и, если выбран, срок: клиент видит их в карточке задания
   const note = messageOn ? message.trim() : '';
@@ -152,7 +153,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
       sendMessage(id, outgoing, undefined, {
         task: task.id,
         ...(id === SELF_ID ? { toSelf: true } : {}),
-        taskOptions: { ...(data.forms ? { form } : {}), comment, state, saveBlank, deadline, remind, note },
+        taskOptions: { ...(data.forms ? { form, ...(data.formLabel ? { formLabel: data.formLabel } : {}) } : {}), comment, state, saveBlank, deadline, remind, note },
       });
       // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
       if (id === 'maxim') logStep('task', task.id, 'sent');
@@ -268,13 +269,20 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
 
             <CollapseCard title="Информация о задании">
               <ul className="ts-rows">
-                <Row label={data.volume.label} value={data.volume.value} />
+                {/* У заданий с записями объём задан выбором формы («Количество записей»): он стоит на месте объёма */}
+                {data.formCount && data.forms ? (
+                  <Row label={formLabel} info>
+                    <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />
+                  </Row>
+                ) : (
+                  <Row label={data.volume.label} value={data.volume.value} />
+                )}
                 <Row label="Время выполнения" value={data.duration} />
                 <Row label="Время обсуждения" value={data.discussion} />
                 <Row label="Возраст" value={data.age} />
-                {data.forms && (
-                  <Row label="Форма бланка" info value={data.forms.length === 1 ? data.forms[0] : undefined}>
-                    {data.forms.length > 1 && <FormMenu forms={data.forms} value={form} onChange={setForm} />}
+                {data.forms && !data.formCount && (
+                  <Row label={formLabel} info value={data.forms.length === 1 ? data.forms[0] : undefined}>
+                    {data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
                   </Row>
                 )}
               </ul>

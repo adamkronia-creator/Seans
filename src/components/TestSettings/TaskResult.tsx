@@ -2,7 +2,7 @@ import { IconBack } from '../icons';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
-import { fullValues, progressOf, taskSettings } from '../../data/taskSettings';
+import { formText, fullValues, progressOf, taskSettings } from '../../data/taskSettings';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
 import { CollapseCard } from './TestBlank';
@@ -51,7 +51,7 @@ export function TaskResult({ resultId, onBack }: TaskResultProps) {
     { label: 'Время выполнения', value: info.time },
     { label: 'Длительность', value: info.duration },
     ...(info.age ? [{ label: 'Возраст', value: info.age }] : []),
-    ...(form ? [{ label: 'Форма бланка', value: form }] : []),
+    ...(form ? [{ label: data.formLabel ?? 'Форма бланка', value: formText(data, form) }] : []),
     ...(progress ? [{ label: 'Заполнено полей', value: `${progress.done} из ${progress.total}` }] : []),
     ...summary,
   ];

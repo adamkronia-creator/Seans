@@ -166,7 +166,7 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
                 <li>
                   <IconClock />
                   <span>
-                    {volumeText(data)} · {data.duration}
+                    {volumeText(data, form)} · {data.duration}
                   </span>
                 </li>
                 {hasDeadline && (

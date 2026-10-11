@@ -34,7 +34,7 @@ export function SentTaskSheet({ message, task, onClose }: SentTaskSheetProps) {
 
   // Порядок и подписи те же, что на экране «Настройка задания»
   const rows: Row[] = [
-    ...(options.form ? [{ label: 'Форма бланка', value: options.form }] : []),
+    ...(options.form ? [{ label: options.formLabel ?? 'Форма бланка', value: options.form }] : []),
     { label: 'Комментарий клиента', ...onOff(options.comment) },
     { label: 'Оценка состояния', ...onOff(options.state) },
     { label: 'Сохранить бланк', ...onOff(options.saveBlank) },
