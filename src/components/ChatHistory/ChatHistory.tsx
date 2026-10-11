@@ -136,7 +136,7 @@ function ScaleRow({ data, scale }: { data: ConclusionData; scale: ConclusionScal
     <li className="hist-scale">
       <span className="hist-scale__head">
         <span className="hist-scale__name">
-          {scale.name} <span className="hist-scale__code">({scale.code})</span>
+          {scale.name}
           {level && <span className="hist-scale__code"> · {level.chip.toLowerCase()}</span>}
         </span>
         <span className="hist-scale__value">{fmtScore(scale.score)}</span>
@@ -171,6 +171,7 @@ function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: str
           <ScaleRow key={scale.code} data={data} scale={scale} />
         ))}
       </ul>
+      {long && <hr className="hist-scales__rule" />}
       {long && (
         <button type="button" className="hist-scales__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? 'Скрыть' : `Читать далее (еще ${scales.length - SCALES_SHOWN})`}
