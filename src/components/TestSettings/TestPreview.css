@@ -330,3 +330,19 @@
   margin: var(--space-2) var(--space-2) 0;
   color: var(--color-text-primary);
 }
+
+/* Бланк задания на экране телефона: разделы друг под другом через 24 */
+.tp__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Подсказка стоит прямо над полосой с кнопками */
+.tp__footer {
+  position: relative;
+}
+
+.tp__footer .test-pass__toast {
+  bottom: calc(100% + var(--space-2));
+}

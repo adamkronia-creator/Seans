@@ -5,7 +5,8 @@ import { CASE_NOTES, type CaseNote } from './notes';
 import { LIBRARY, TASK_LIBRARY } from './library';
 import type { PsyTest } from './tests';
 import type { AppEvent } from './events';
-import { clientResultPath } from './resultLinks';
+import { findClientTaskResult } from './clientTaskResults';
+import { clientResultId, clientResultPath } from './resultLinks';
 import avatar1 from '../assets/avatars/avatar-1.png';
 
 /*
@@ -480,8 +481,8 @@ export function appEvents(d: ClientData): AppEvent[] {
             : `Выполнил задание «${itemName('task', a.ref)}»`,
         date: a.date.slice(0, 5),
         link: true,
-        // Пройденный тест ведёт к результату клиента; у заданий экрана результата пока нет
-        ...(a.kind === 'test' ? { href: clientResultPath('maxim', a.ref) } : {}),
+        // Пройденный тест или выполненное задание ведёт к результату клиента (у задания он есть не у всех)
+        ...(a.kind === 'test' || findClientTaskResult(clientResultId('maxim', a.ref)) ? { href: clientResultPath('maxim', a.ref) } : {}),
       });
     }
   });

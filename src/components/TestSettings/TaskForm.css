@@ -1,0 +1,429 @@
+/* Бланк задания: поля ответа, выбор начала фразы, ползунки процентов, «пирог» долей, шкала состояния.
+   Те же стили в бланке задания, примере выполнения, прохождении, предпросмотре и результате */
+
+/* Поле ответа: растёт по тексту, как поле сообщения */
+.task-field {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  outline: 0;
+  font-family: inherit;
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  resize: none;
+}
+
+.task-field::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Ответ в просмотре: текст клиента, выделен акцентным цветом; абзацы и переносы строк сохраняются */
+.task-answer {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* Поле, которое клиент оставил пустым: тихая подпись */
+.tf-empty {
+  margin: 0;
+  color: var(--color-text-placeholder);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.task-pad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.task-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+/* Абзацы внутри блока с полями: промежуток 12 задает сам блок, а не абзац */
+.task-pad .ts-card__paragraph + .ts-card__paragraph {
+  margin-top: 0;
+}
+
+/* Пояснение к разделу: стоит над полями и отделено от них линией */
+.tf-section-hint {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+/* Шкала «Как вы себя чувствуете?»: значок слева от подписи */
+.task-state__text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.task-state__icon {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  font-size: 22px;
+}
+
+/* ——— «Плоский» вид: экран телефона клиента, без карточек — заголовок, под ним поля ——— */
+
+.tf-flat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tf-flat .blank-questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.tf-flat .blank-question,
+.tf-flat .blank-question + .blank-question {
+  padding: 0;
+  border-top: 0;
+}
+
+.tf-flat .task-pad {
+  padding: 0;
+}
+
+/* ——— Предложение: номер и выбор начала фразы в одной строке, под ними поле ——— */
+
+.tf-sentence {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.tf-sentence__number {
+  flex-shrink: 0;
+  min-width: 22px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+}
+
+/* Выбор начала: тот же список, что у «Срока выполнения», но крупнее — в бланке по нему попадают пальцем */
+.tf-starter {
+  height: 36px;
+  min-width: 0;
+}
+
+/* ——— Ползунок процентов ——— */
+
+.tf-percent {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.tf-percent__range {
+  --thumb: 28px;
+  --pos: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--fill, 0) / 100);
+
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tf-percent__range:focus {
+  outline: 0;
+}
+
+/* Дорожка 6: слева от бегунка акцентная, справа серая */
+.tf-percent__range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
+}
+
+.tf-percent__range::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
+}
+
+/* Бегунок 28: достаточно крупный для пальца */
+.tf-percent__range::-webkit-slider-thumb {
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: -11px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 4px rgb(16 24 40 / 30%),
+    0 0 0 1px rgb(16 24 40 / 6%);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tf-percent__range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 4px rgb(16 24 40 / 30%),
+    0 0 0 1px rgb(16 24 40 / 6%);
+}
+
+.tf-percent__range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.tf-percent__range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+/* Пока оценку не выбрали: бегунок серый, вместо числа тире */
+.tf-percent--unset .tf-percent__range::-webkit-slider-thumb {
+  background: var(--color-bg-fill);
+  box-shadow: inset 0 0 0 2px var(--color-text-placeholder);
+}
+
+.tf-percent--unset .tf-percent__range::-moz-range-thumb {
+  background: var(--color-bg-fill);
+  box-shadow: inset 0 0 0 2px var(--color-text-placeholder);
+}
+
+.tf-percent__value {
+  display: block;
+  flex-shrink: 0;
+  min-width: 44px;
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  text-align: right;
+}
+
+.tf-percent--unset .tf-percent__value {
+  color: var(--color-text-placeholder);
+  font-weight: var(--font-weight-regular);
+}
+
+/* ——— Доли ответственности ——— */
+
+.tf-factors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tf-factor-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tf-factor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tf-factor__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.tf-dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.tf-dot--own {
+  background: var(--color-accent);
+}
+
+.tf-factor__name {
+  flex: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  outline: 0;
+  font-family: inherit;
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tf-factor__name::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Кнопка 40, внутри значок 18; правый край значка выровнен по краю поля */
+.tf-factor__remove {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: -10px;
+  color: var(--color-text-caption);
+}
+
+.tf-factor__remove svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tf-add {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.tf-add svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Доля самого клиента: остаток до 100, считается сама */
+.tf-own {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-app);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tf-own__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.tf-own__value {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Кольцо: 168, в центре доля клиента */
+.tf-pie {
+  position: relative;
+  align-self: center;
+  width: 168px;
+  height: 168px;
+  margin: 0;
+}
+
+.tf-pie__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tf-pie__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-8);
+  text-align: center;
+}
+
+.tf-pie__center strong {
+  color: var(--color-accent);
+  font-size: var(--font-size-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-2xl);
+}
+
+.tf-pie__center span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+/* Подписи долей в просмотре: цвет, название, процент */
+.tf-legend {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tf-legend li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 40px;
+  padding: var(--space-2) 0;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tf-legend li + li {
+  border-top: 1px solid var(--color-divider);
+}
+
+.tf-legend__name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tf-legend__value {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-medium);
+}
+
+.tf-legend__own .tf-legend__name,
+.tf-legend__own .tf-legend__value {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}

@@ -1,7 +1,8 @@
 import { Badge } from '../Badge/Badge';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
-import { LIBRARY } from '../../data/library';
+import { LIBRARY, TASK_LIBRARY } from '../../data/library';
+import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import type { PsyTest, TestStatus } from '../../data/tests';
 import './ChatTests.css';
@@ -34,7 +35,7 @@ function SectionedList({
   items: PsyTest[];
   sections: SectionConfig[];
   emptyText: string;
-  /** Нажатие на карточку; у заданий пока не задано */
+  /** Нажатие на карточку */
   onOpen?: (item: PsyTest) => void;
 }) {
   if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
@@ -105,14 +106,41 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
   );
 }
 
-/** Вкладка «Задания» в открытом чате */
-export function ChatTasks({ hasData }: { hasData: boolean }) {
+/** Вкладка «Задания» в открытом чате: отправленное задание открывает его настройку, выполненное — результат клиента */
+export function ChatTasks({
+  hasData,
+  onOpenTask,
+  onOpenResult,
+}: {
+  hasData: boolean;
+  onOpenTask?: (id: string) => void;
+  onOpenResult?: (id: string) => void;
+}) {
   const data = useClientData();
   return (
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'task') : []}
       sections={TASK_SECTIONS}
       emptyText="Заданий пока нет"
+      onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTask?.(t.id))}
+    />
+  );
+}
+
+/** Вкладка «Задания» в чате «Избранное»: задания, которые психолог выполнил сам, новые сверху */
+export function SelfTasks({ onOpen }: { onOpen: (resultId: string) => void }) {
+  const results = useTaskResults();
+  const items = results.flatMap<PsyTest>((r) => {
+    const task = TASK_LIBRARY.find((t) => t.id === r.taskId);
+    // id карточки — id результата: по нему открывается экран результата
+    return task ? [{ id: r.id, title: task.title, description: task.description, date: r.date, status: 'done', icon: task.icon, tint: task.tint }] : [];
+  });
+  return (
+    <SectionedList
+      items={items}
+      sections={TASK_SECTIONS.filter((s) => s.status === 'done')}
+      emptyText="Выполненных заданий пока нет"
+      onOpen={(t) => onOpen(t.id)}
     />
   );
 }

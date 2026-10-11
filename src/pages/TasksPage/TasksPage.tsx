@@ -4,7 +4,7 @@ import {
   toggleTaskFavorite,
   useTaskFavorites,
 } from '../../data/library';
-import { taskSettings } from '../../data/taskSettings';
+import { hasTaskSettings } from '../../data/taskValues';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
 
@@ -20,7 +20,7 @@ export function TasksPage() {
       favorites={useTaskFavorites()}
       onToggleFavorite={toggleTaskFavorite}
       // Настройки пока есть не у всех заданий: остальные карточки без перехода
-      onOpen={(t) => taskSettings(t) && navigate(`/tasks/${t.id}`)}
+      onOpen={(t) => hasTaskSettings(t.id) && navigate(`/tasks/${t.id}`)}
       labels={{ all: 'Все задания', filters: 'Фильтр заданий', emptyRecent: 'Вы ещё не присылали задания' }}
     />
   );

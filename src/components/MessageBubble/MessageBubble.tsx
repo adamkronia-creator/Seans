@@ -1,4 +1,6 @@
 import { requestPass } from '../../data/selfTest';
+import { requestTaskPass } from '../../data/selfTask';
+import { TASK_DEADLINES } from '../../data/taskValues';
 import { BLIND_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
@@ -63,7 +65,8 @@ interface MessageBubbleProps {
   onMenu: (m: Message, rect: DOMRect) => void;
   onQuoteClick: (id: string) => void;
   onOpenTest: (id: string) => void;
-  /** Кнопка «Настройки теста» под карточкой теста, отправленного вами */
+  onOpenTask: (id: string) => void;
+  /** Кнопка «Настройки теста» или «Настройки задания» под карточкой, отправленной вами */
   onTestSettings: (m: Message) => void;
   /** Нажатие на кнопку под сообщением: переход по адресу кнопки */
   onOpenLink: (href: string) => void;
@@ -82,6 +85,7 @@ export function MessageBubble({
   onMenu,
   onQuoteClick,
   onOpenTest,
+  onOpenTask,
   onTestSettings,
   onOpenLink,
 }: MessageBubbleProps) {
@@ -196,15 +200,15 @@ export function MessageBubble({
     );
   }
 
-  // Карточка теста: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
+  // Карточка теста или задания: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
   if (message.test || message.task) {
     const isTask = Boolean(message.task);
     const passed = message.testKind === 'passed';
     const link = passed ? message.buttons?.[0] : undefined;
-    // Тест, который прислали вы, клиенту уже ушел: пройти его тут нечего, кнопка показывает настройки, с какими он отправлен
+    // Тест или задание, которое прислали вы, клиенту уже ушло: пройти его тут нечего, кнопка показывает настройки, с какими оно отправлено
     const settings = out && !passed && !message.toSelf;
     // Слепой тест, отправленный себе, выглядит так же, как у клиента: без названия и значка методики
-    const hiddenTest = Boolean(message.toSelf && message.testOptions?.blind);
+    const hiddenTest = Boolean(!isTask && message.toSelf && message.testOptions?.blind);
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
@@ -216,7 +220,9 @@ export function MessageBubble({
               </span>
             )}
             <span className="tcard__text">
-              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
+              <span className="tcard__label">
+                {isTask ? (passed ? 'Выполненное задание' : settings ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}
+              </span>
               <span className="tcard__title">{hiddenTest ? BLIND_TITLE : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
             </span>
@@ -233,7 +239,6 @@ export function MessageBubble({
             <Meta message={message} />
           </span>
         </div>
-        {!isTask && (
         <ul className="bubble-buttons">
           <li>
             <button
@@ -242,6 +247,22 @@ export function MessageBubble({
               onClick={() => {
                 if (settings) return onTestSettings(message);
                 if (link) return onOpenLink(link.href);
+                if (isTask) {
+                  // Задание, отправленное себе, откроется выполнением с теми настройками, с какими оно ушло
+                  if (message.toSelf) {
+                    const o = message.taskOptions;
+                    requestTaskPass({
+                      taskId: message.task!,
+                      form: o?.form ?? '',
+                      comment: o?.comment ?? true,
+                      state: o?.state ?? true,
+                      saveBlank: o?.saveBlank ?? true,
+                      deadline: o?.deadline ?? TASK_DEADLINES[0],
+                      message: o?.note ?? '',
+                    });
+                  }
+                  return onOpenTask(message.task!);
+                }
                 if (message.toSelf) {
                   const o = message.testOptions;
                   requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, blind: o?.blind ?? true, result: o?.result ?? 'thanks', message: message.text });
@@ -249,11 +270,10 @@ export function MessageBubble({
                 onOpenTest(message.test!);
               }}
             >
-              {settings ? 'Настройки теста' : passed ? 'Посмотреть' : 'Пройти'}
+              {settings ? (isTask ? 'Настройки задания' : 'Настройки теста') : passed ? 'Посмотреть' : 'Пройти'}
             </button>
           </li>
         </ul>
-        )}
       </li>
     );
   }

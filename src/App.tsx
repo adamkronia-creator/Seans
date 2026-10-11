@@ -3,7 +3,7 @@ import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { ComingSoon } from './components/ComingSoon/ComingSoon';
 import { IconReading } from './components/icons';
 import { ChatPage } from './pages/ChatPage/ChatPage';
-import { ChatResultScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
+import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
@@ -37,14 +37,14 @@ interface Resolved {
 }
 
 /**
- * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата)
- * и /chat/<чат>/result/<результат> (результат самостоятельного прохождения)
+ * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата), /chat/<чат>/tasks/<задание> (настройка задания)
+ * и /chat/<чат>/result/<результат> (результат теста или задания)
  */
-const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|result)\/([^/]+))?/;
+const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+))?/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
-  const nested = path.match(/^(\/chat\/[^/]+)\/(?:tests|result)\//);
+  const nested = path.match(/^(\/chat\/[^/]+)\/(?:tests|tasks|result)\//);
   if (nested) return nested[1];
   return path === '/' ? null : '/';
 }
@@ -129,12 +129,23 @@ export default function App() {
       const [, chatId, kind, id] = chatRoute;
       if (CHATS.some((chat) => chat.id === chatId)) {
         const test = kind === 'tests' ? LIBRARY.find((t) => t.id === id) : undefined;
+        const task = kind === 'tasks' ? TASK_LIBRARY.find((t) => t.id === id) : undefined;
         if (kind === 'result') {
           return {
             key: `chat/${chatId}/result/${id}`,
             build: () => (
               <main className="app__content">
                 <ChatResultScreen chatId={chatId} resultId={id} onAppTabChange={handleTabChange} />
+              </main>
+            ),
+          };
+        }
+        if (task) {
+          return {
+            key: `chat/${chatId}/tasks/${id}`,
+            build: () => (
+              <main className="app__content">
+                <ChatTaskScreen chatId={chatId} task={task} onAppTabChange={handleTabChange} />
               </main>
             ),
           };

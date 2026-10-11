@@ -9,9 +9,10 @@ import {
 import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChatCase } from '../../components/ChatCase/ChatCase';
-import { ChatTasks, ChatTests, SelfTests } from '../../components/ChatTests/ChatTests';
+import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
+import { SentTaskSheet } from '../../components/MessageBubble/SentTaskSheet';
 import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
@@ -19,7 +20,9 @@ import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
-import { clientResultPath } from '../../data/resultLinks';
+import { findClientTaskResult } from '../../data/clientTaskResults';
+import { clientResultId, clientResultPath } from '../../data/resultLinks';
+import { hasTaskSettings } from '../../data/taskValues';
 import { Chip } from '../../components/Chip/Chip';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
@@ -138,7 +141,16 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName,
             onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
           />
         ))}
-      {id === 'tasks' && <ChatTasks hasData={hasClientData} />}
+      {id === 'tasks' &&
+        (favorites ? (
+          <SelfTasks onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
+        ) : (
+          <ChatTasks
+            hasData={hasClientData}
+            onOpenTask={(taskId) => hasTaskSettings(taskId) && navigate(`/chat/${chatId}/tasks/${taskId}`)}
+            onOpenResult={(taskId) => findClientTaskResult(clientResultId(chatId, taskId)) && navigate(clientResultPath(chatId, taskId))}
+          />
+        ))}
       {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
       {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} />}
@@ -320,6 +332,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onMenu={(message, rect) => setMenu({ message, rect })}
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
+                    onOpenTask={(id) => navigate(`/chat/${chatId}/tasks/${id}`)}
                     onTestSettings={setSettingsOf}
                     onOpenLink={(href) => (href.startsWith('section:') ? setSection(href.slice('section:'.length) as SectionId) : navigate(href))}
                   />
@@ -472,7 +485,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         />
       )}
 
-      {settingsOf && <SentTestSheet message={settingsOf} test={LIBRARY.find((t) => t.id === settingsOf.test)} onClose={() => setSettingsOf(null)} />}
+      {settingsOf &&
+        (settingsOf.task ? (
+          <SentTaskSheet message={settingsOf} task={TASK_LIBRARY.find((t) => t.id === settingsOf.task)} onClose={() => setSettingsOf(null)} />
+        ) : (
+          <SentTestSheet message={settingsOf} test={LIBRARY.find((t) => t.id === settingsOf.test)} onClose={() => setSettingsOf(null)} />
+        ))}
     </section>
   );
 }

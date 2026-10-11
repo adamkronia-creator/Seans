@@ -27,38 +27,38 @@ function questionsWord(n: number) {
   return last >= 2 && last <= 4 ? 'вопроса' : 'вопросов';
 }
 
-const Icon = ({ children }: { children: ReactNode }) => (
+export const Icon = ({ children }: { children: ReactNode }) => (
   <svg className="tp__fact-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {children}
   </svg>
 );
 
-const IconClock = () => (
+export const IconClock = () => (
   <Icon>
     <circle cx="12" cy="12" r="9" />
     <path d="M12 7v5l3 2" />
   </Icon>
 );
-const IconUndo = () => (
+export const IconUndo = () => (
   <Icon>
     <path d="M4 12a8 8 0 1 1 2.6 5.9" />
     <path d="M4 5v5h5" />
   </Icon>
 );
-const IconLock = () => (
+export const IconLock = () => (
   <Icon>
     <rect x="5" y="11" width="14" height="9" rx="2" />
     <path d="M8 11V8a4 4 0 0 1 8 0v3" />
   </Icon>
 );
-const IconEyeOff = () => (
+export const IconEyeOff = () => (
   <Icon>
     <path d="M3 3l18 18" />
     <path d="M10.6 5.7A9.5 9.5 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.9 3.6M6.4 7.2A15.6 15.6 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4-.9" />
     <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
   </Icon>
 );
-const IconEye = () => (
+export const IconEye = () => (
   <Icon>
     <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
     <circle cx="12" cy="12" r="2.8" />

@@ -18,6 +18,7 @@ import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { findClientResult } from '../../data/clientResults';
+import { findClientTaskResult } from '../../data/clientTaskResults';
 import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
@@ -202,8 +203,11 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
       if (text !== (event.comment ?? '')) setComment(event.id, text);
     }
   };
-  // Выполненный клиентом тест открывает его результат
-  const resultPath = event.kind === 'test' && event.state === 'done' ? clientResultPath('maxim', event.ref) : undefined;
+  // Выполненный клиентом тест или задание открывает его результат (у заданий он есть не у всех)
+  const resultPath =
+    (event.kind === 'test' || (event.kind === 'task' && findClientTaskResult(clientResultId('maxim', event.ref)))) && event.state === 'done'
+      ? clientResultPath('maxim', event.ref)
+      : undefined;
   const scaleData = resultPath && event.kind === 'test' ? findClientResult(clientResultId('maxim', event.ref))?.data : undefined;
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>

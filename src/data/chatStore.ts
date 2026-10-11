@@ -82,7 +82,7 @@ function appendToday(chatId: string, message: Message) {
  * Входящее сообщение (от собеседника или от самого приложения, как от бота): попадает в переписку
  * и в превью чата, счётчик непрочитанных растёт.
  */
-export function receiveMessage(chatId: string, content: Pick<Message, 'text' | 'buttons' | 'test' | 'testKind'>) {
+export function receiveMessage(chatId: string, content: Pick<Message, 'text' | 'buttons' | 'test' | 'task' | 'testKind'>) {
   appendToday(chatId, { id: String(nextId++), from: 'them', time: clock(), ...content });
   chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
   setPreview(chatId);
@@ -96,7 +96,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'booking' | 'buttons'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'booking' | 'buttons'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 
