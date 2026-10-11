@@ -139,15 +139,23 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
   // Свайпы: влево — дальше (начало → вопросы → следующий вопрос → конец), вправо — назад, с первого экрана — к настройкам
   const touch = useRef<{ x: number; y: number } | null>(null);
   const step = (dir: 1 | -1) => {
+    // Предпросмотр: свайп переключает этапы целиком, как вкладки «Начало / В процессе / Конец»
+    if (!live) {
+      const order: Stage[] = ['start', 'progress', 'end'];
+      const next = order.indexOf(stage) + dir;
+      if (next < 0) return onExit();
+      if (next < order.length) setStage(order[next]);
+      return;
+    }
+    // Свой тест: листаются вопросы, дальше нельзя без ответа
     if (stage === 'start') return dir > 0 ? setStage('progress') : onExit();
     if (stage === 'progress') {
       if (dir > 0) {
-        if (live && picked[index] === undefined) return;
+        if (picked[index] === undefined) return;
         return last ? finish() : setIndex(index + 1);
       }
       return index === 0 ? setStage('start') : setIndex(index - 1);
     }
-    if (dir < 0) return live ? onExit() : setStage('progress');
   };
   const onTouchStart = (e: TouchEvent) => {
     touch.current = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
@@ -275,7 +283,7 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
           )}
         </div>
 
-        {stage !== 'end' && (
+        {(stage !== 'end' || live) && (
           <div className="tp__footer">
             {stage === 'progress' && (
               <>
@@ -290,12 +298,17 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
               </>
             )}
             <div className="test-pass__buttons">
+              {stage === 'end' && (
+                <button type="button" className="test-settings__cta-button" onClick={onExit}>
+                  Завершить
+                </button>
+              )}
               {stage === 'progress' && (
                 <button type="button" className="test-pass__back" onClick={() => (index === 0 ? setStage('start') : setIndex(index - 1))}>
                   Назад
                 </button>
               )}
-              {stage === 'start' ? (
+              {stage === 'end' ? null : stage === 'start' ? (
                 <button type="button" className="test-settings__cta-button" onClick={() => setStage('progress')}>
                   Начать
                 </button>

@@ -20,14 +20,20 @@ interface PlanSheetProps {
   now: Date;
   clients: Chat[];
   onSave: (input: PlanInput) => void;
+  /** Заметка дня из новой записи: дата и текст */
+  onSaveNote?: (date: string, text: string) => void;
   onRemove?: () => void;
   onClose: () => void;
 }
 
 /** Дело или запланированный сеанс: что, когда и (для сеанса) с кем. Сеанс потом можно предложить клиенту */
-export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }: PlanSheetProps) {
+type NewKind = 'note' | PlanKind;
+const NEW_KINDS: NewKind[] = ['note', 'task', 'session'];
+
+export function PlanSheet({ plan, day, now, clients, onSave, onSaveNote, onRemove, onClose }: PlanSheetProps) {
   const uid = useId();
-  const [kind, setKind] = useState<PlanKind>(plan?.kind ?? 'task');
+  const [kind, setKind] = useState<NewKind>(plan?.kind ?? 'task');
+  const [note, setNote] = useState('');
   const [title, setTitle] = useState(plan?.title ?? '');
   const [date, setDate] = useState(plan?.date ?? day);
   const [withTime, setWithTime] = useState(Boolean(plan?.time));
@@ -36,20 +42,23 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
   const [duration, setDuration] = useState(plan?.duration ?? DEFAULT_DURATION);
 
   const isSession = kind === 'session';
+  const isNote = kind === 'note';
   let problem: string | null = null;
   if (!date) problem = 'Выберите дату';
   else if (isSession && !time) problem = 'Укажите время начала';
   else if (isSession && toMinutes(time) + duration > 24 * 60 - 1) problem = 'Сеанс должен закончиться до полуночи';
-  else if (!isSession && !title.trim()) problem = 'Напишите, что нужно сделать';
+  else if (isNote && !note.trim()) problem = 'Напишите заметку';
+  else if (!isSession && !isNote && !title.trim()) problem = 'Напишите, что нужно сделать';
   else if (isSession && !chatId) problem = 'Выберите клиента';
 
   // Пустое название дела не ругается красным: кнопка просто не нажимается, пока не напишешь
-  const complaint = problem !== null && (isSession || title.trim() !== '') ? problem : null;
+  const complaint = problem !== null && (isSession || (isNote ? note.trim() !== '' : title.trim() !== '')) ? problem : null;
   const hint = isSession && !problem ? `${dayLong(date, now)} · ${time}–${endTime(time, duration)}` : null;
   const heading = plan ? (plan.kind === 'task' ? 'Дело' : 'Сеанс') : 'Новая запись';
 
   const save = () => {
     if (problem) return;
+    if (kind === 'note') return onSaveNote?.(date, note.trim());
     onSave(
       isSession
         ? { kind, date, title: '', time, chatId, duration }
@@ -61,7 +70,7 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
     <Frame
       title={heading}
       onClose={onClose}
-      swipe={plan ? undefined : { index: kind === 'task' ? 0 : 1, count: 2, onIndex: (i) => setKind(i === 0 ? 'task' : 'session') }}
+      swipe={plan ? undefined : { index: NEW_KINDS.indexOf(kind), count: 3, onIndex: (i) => setKind(NEW_KINDS[i]) }}
       footer={
         <>
           <button type="button" className="sheet__button" onClick={onClose}>
@@ -77,6 +86,7 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
         <div className="bk-segments" role="radiogroup" aria-label="Что добавить">
           {(
             [
+              ['note', 'Заметка'],
               ['task', 'Дело'],
               ['session', 'Сеанс'],
             ] as const
@@ -113,6 +123,18 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
             ))}
           </div>
         </section>
+      ) : isNote ? (
+        <section className="sheet__card bk-card">
+          <AutoTextarea
+            className="bk-textarea"
+            rows={4}
+            value={note}
+            onChange={setNote}
+            placeholder="Заметка к этому дню"
+            aria-label="Заметка"
+            maxLength={2000}
+          />
+        </section>
       ) : (
         <section className="sheet__card bk-card">
           <AutoTextarea
@@ -135,7 +157,7 @@ export function PlanSheet({ plan, day, now, clients, onSave, onRemove, onClose }
             </label>
             <input id={`${uid}-date`} className="sheet__row-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </li>
-          {isSession ? (
+          {isNote ? null : isSession ? (
             <li className="sheet__row">
               <label className="sheet__row-label" htmlFor={`${uid}-time`}>
                 Начало

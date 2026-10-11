@@ -1,10 +1,15 @@
-/* Панель форматирования внизу окна, над кнопками и клавиатурой: 9 иконок 24 с равным промежутком по ширине */
+/* Панель форматирования под текстом внутри карточки. Пока низ карточки за краем видимой области, панель держится у нижнего края
+   (над клавиатурой); когда низ карточки на виду, она встаёт на свое место. Так же держатся даты в ленте чата */
 .rich-toolbar {
+  position: sticky;
+  /* Окно листается с нижним полем 16: панель встаёт вплотную к нижнему краю, а не на 16 выше */
+  bottom: calc(var(--space-4) * -1);
+  z-index: 1;
   display: flex;
-  flex-shrink: 0;
   justify-content: space-between;
   padding: var(--space-2) var(--space-4);
   border-top: 1px solid var(--color-divider);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   background: var(--color-bg-panel);
 }
 

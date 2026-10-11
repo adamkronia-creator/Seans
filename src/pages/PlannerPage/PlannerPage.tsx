@@ -235,6 +235,14 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
           now={now}
           clients={CLIENTS}
           onSave={(input) => savePlan(sheet.plan, input)}
+          onSaveNote={(date, text) => {
+            // У дня одна заметка: новый текст дописывается к прежнему
+            const old = planner.notes[date];
+            saveDayNote(date, old ? `${old}\n\n${text}` : text);
+            closeSheet();
+            if (date !== selected) setSelected(date);
+            say('Заметка добавлена');
+          }}
           onRemove={
             sheet.plan
               ? () => {

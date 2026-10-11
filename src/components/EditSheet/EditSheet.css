@@ -57,7 +57,9 @@
   overflow-y: auto;
   /* Прокручиваемое плавно уходит под верхний край панели, а не обрезается резко */
   mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
-  scroll-padding-block: var(--space-4);
+  scroll-padding-top: var(--space-4);
+  /* Под текстом панель форматирования 49: каретка при вводе не уходит под нее */
+  scroll-padding-bottom: 65px;
   scrollbar-width: none; /* полоса прокрутки не сдвигает края: слева и справа ровно 16 */
 }
 
@@ -297,9 +299,4 @@
 
 .sheet__button:disabled {
   opacity: 0.4;
-}
-
-/* Панель форматирования над кнопками: линия только одна */
-.sheet__tools + .sheet__footer {
-  border-top: 0;
 }
