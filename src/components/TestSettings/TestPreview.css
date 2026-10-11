@@ -1,8 +1,54 @@
-/* Предпросмотр теста: этапы чипсами, затем то, что видит клиент */
-.tp__tabs {
+/* Предпросмотр теста: заголовок, этапы, пояснение и рамка телефона с экраном клиента */
+.tp {
+  gap: var(--space-3);
+}
+
+.tp__head {
   display: flex;
   flex-shrink: 0;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 var(--space-1);
+}
+
+.tp__heading {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+}
+
+.tp__sub {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+/* Три этапа в одной плашке: выбранный белый на сером */
+.tp__tabs {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill-strong);
+}
+
+.tp__tab {
+  height: 36px;
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.tp__tab--on {
+  background: var(--color-bg-panel);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
 }
 
 .tp__note {
@@ -13,77 +59,104 @@
   line-height: var(--line-height-sm);
 }
 
-.tp__who {
+/* Корпус телефона: темная рамка с большим скруглением, внутри экран клиента и нижняя панель с кнопками */
+.tp__phone {
   display: flex;
-  gap: var(--space-3);
-  align-items: center;
-  padding: var(--space-3) var(--space-4);
-}
-
-.tp__avatar {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-fill);
-}
-
-.tp__avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.tp__avatar--blind {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  font-size: 24px;
-}
-
-.tp__who-text {
-  display: flex;
+  flex: 1 0 auto;
   flex-direction: column;
-  min-width: 0;
+  min-height: 480px;
+  overflow: hidden;
+  border: 9px solid #1c2128;
+  border-radius: 40px;
+  background: var(--color-bg-panel);
 }
 
-.tp__who-label {
+.tp__screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5) var(--space-4);
+}
+
+.tp__eyebrow {
+  margin: 0;
   color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
 }
 
-.tp__who-title {
-  font-size: var(--font-size-md);
+.tp__title {
+  margin: 0;
+  font-size: 26px;
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-md);
+  line-height: 32px;
 }
 
 .tp__message {
-  padding: var(--space-3) var(--space-4);
-}
-
-.tp__message-label {
-  margin: 0 0 var(--space-1);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
-.tp__message-text {
   margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-app);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
+}
+
+.tp__rules .blank-rules {
+  padding: 0;
+  color: var(--color-text-secondary);
+}
+
+.tp__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tp__facts li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.tp__fact-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-accent);
+}
+
+.tp__heading-pill {
+  margin: 0 calc(var(--space-5) * -1);
+  border-top: 0;
+}
+
+.tp__question .blank-question {
+  padding: 0;
+  border: 0;
+}
+
+.tp__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--color-divider);
 }
 
 .tp__done {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-2);
   align-items: center;
-  padding: var(--space-6) var(--space-4);
+  justify-content: center;
+  padding: var(--space-6) 0;
   text-align: center;
 }
 
@@ -108,4 +181,65 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
+}
+
+.tp__sample {
+  align-self: stretch;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-app);
+  text-align: left;
+}
+
+.tp__sample-label {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.tp__sample-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp__sample-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tp__sample-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.tp__sample-level {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.tp__sample-score {
+  flex-shrink: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.tp__sample-max {
+  color: var(--color-text-caption);
+  font-weight: var(--font-weight-regular);
+}
+
+.tp__sample-more {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }

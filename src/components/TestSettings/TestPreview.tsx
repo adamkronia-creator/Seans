@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { IconTlDoc } from '../icons';
+import { useState, type ReactNode } from 'react';
+import { conclusionFor, levelOf, type ConclusionScale } from '../../data/conclusions';
 import type { LibraryTest } from '../../data/library';
+import { RESULT_LINE, type ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
-import { BlankQuestionBody, BlankRules, CollapseCard } from './TestBlank';
+import { BlankQuestionBody, BlankRules } from './TestBlank';
 import { shortTitle } from './TestHeader';
 import './TestPreview.css';
 
@@ -14,6 +15,77 @@ const STAGES: { id: Stage; label: string }[] = [
   { id: 'end', label: 'Конец' },
 ];
 
+/** Название слепого теста для клиента: ничего не говорит о методике */
+const BLIND_TITLE = 'Как вы себя чувствуете?';
+
+const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
+
+/** «1 вопрос», «2 вопроса», «5 вопросов» */
+function questionsWord(n: number) {
+  const last = n % 10;
+  if (n % 100 >= 11 && n % 100 <= 14) return 'вопросов';
+  if (last === 1) return 'вопрос';
+  return last >= 2 && last <= 4 ? 'вопроса' : 'вопросов';
+}
+
+const Icon = ({ children }: { children: ReactNode }) => (
+  <svg className="tp__fact-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+
+const IconClock = () => (
+  <Icon>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Icon>
+);
+const IconUndo = () => (
+  <Icon>
+    <path d="M4 12a8 8 0 1 1 2.6 5.9" />
+    <path d="M4 5v5h5" />
+  </Icon>
+);
+const IconLock = () => (
+  <Icon>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </Icon>
+);
+const IconEye = () => (
+  <Icon>
+    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+    <circle cx="12" cy="12" r="2.8" />
+  </Icon>
+);
+
+/** Пример итога на экране завершения: баллы или баллы с уровнями (по образцу заключения теста) */
+function SampleResult({ testId, mode }: { testId: string; mode: Exclude<ResultMode, 'thanks'> }) {
+  const data = conclusionFor(testId);
+  if (!data) return null;
+  const main = data.scales.filter((s) => s.group === 'main');
+  const shown: ConclusionScale[] = (main.length > 0 ? main : data.scales).slice(0, 3);
+  return (
+    <div className="tp__sample">
+      <p className="tp__sample-label">Пример результата</p>
+      <ul className="tp__sample-list">
+        {shown.map((scale) => (
+          <li key={scale.code} className="tp__sample-row">
+            <span className="tp__sample-name">
+              {scale.name}
+              {mode === 'full' && scale.leveled && <span className="tp__sample-level">{levelOf(data, scale.score, scale).chip}</span>}
+            </span>
+            <span className="tp__sample-score">
+              {fmt(scale.score)} <span className="tp__sample-max">из {fmt(scale.max)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {mode === 'full' && <p className="tp__sample-more">Ниже клиент увидит расшифровку каждой шкалы</p>}
+    </div>
+  );
+}
+
 interface TestPreviewProps {
   test: LibraryTest;
   blank: TestBlankData;
@@ -21,78 +93,91 @@ interface TestPreviewProps {
   blind: boolean;
   /** Сообщение клиенту; пустая строка, если оно выключено */
   message: string;
-  hideConclusion: boolean;
+  /** Что клиент увидит после теста */
+  result: ResultMode;
+  /** Время выполнения из описания теста («15–20 мин.») */
+  duration?: string;
 }
 
 /**
- * Предпросмотр теста глазами клиента: начало (сообщение и инструкция), прохождение (вопросы с ответами) и завершение.
- * Ответы здесь никуда не сохраняются. При слепом тестировании название, значок и описание теста скрыты.
+ * Предпросмотр теста в рамке телефона: начало (инструкция, число вопросов, время, кто увидит результат),
+ * вопрос с ответами и завершение. Ответы здесь никуда не сохраняются. При слепом тестировании название теста скрыто.
  */
-export function TestPreview({ test, blank, blind, message, hideConclusion }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, message, result, duration }: TestPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<Record<number, number>>({});
   const total = blank.questions.length;
   const answered = Object.keys(picked).length;
   const last = index >= total - 1;
+  const title = blind ? BLIND_TITLE : shortTitle(test.title);
 
   return (
-    <>
-      <div className="test-settings__scroll" key={stage}>
-        <div className="tp__tabs" role="group" aria-label="Этап прохождения">
-          {STAGES.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              className={`chip${stage === id ? ' chip--active' : ''}`}
-              aria-pressed={stage === id}
-              onClick={() => setStage(id)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+    <div className="test-settings__scroll tp">
+      <div className="tp__head">
+        <h2 className="tp__heading">Предпросмотр</h2>
+        <p className="tp__sub">Так тест увидит клиент</p>
+      </div>
 
-        <p className="tp__note">
-          {blind
-            ? 'Слепое тестирование: клиент не увидит название теста и его цель'
-            : 'Так клиент увидит тест. Название теста ему показано'}
-        </p>
+      <div className="tp__tabs" role="group" aria-label="Этап прохождения">
+        {STAGES.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`}
+            aria-pressed={stage === id}
+            onClick={() => setStage(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
-        <section className="ts-card tp__who">
-          <span className={`tp__avatar${blind ? ' tp__avatar--blind' : ''}`}>
-            {blind ? <IconTlDoc aria-hidden="true" /> : <img src={test.icon} alt="" />}
-          </span>
-          <span className="tp__who-text">
-            <span className="tp__who-label">Присланный тест</span>
-            <span className="tp__who-title">{blind ? 'Тест' : shortTitle(test.title)}</span>
-          </span>
-        </section>
+      <p className="tp__note">
+        {blind ? 'Слепое тестирование включено: клиент не увидит название теста и его цель' : 'Слепое тестирование выключено: клиент увидит название теста'}
+      </p>
 
-        {stage === 'start' && (
-          <>
-            {message.trim() !== '' && (
-              <section className="ts-card tp__message">
-                <p className="tp__message-label">Сообщение психолога</p>
-                <p className="tp__message-text">{message}</p>
-              </section>
-            )}
-            <CollapseCard title="Инструкция" id="blank-rules">
-              <BlankRules rules={blank.rules} />
-            </CollapseCard>
-          </>
-        )}
+      <div className="tp__phone">
+        <div className="tp__screen" key={stage}>
+          {stage === 'start' && (
+            <>
+              <p className="tp__eyebrow">Тест от вашего специалиста</p>
+              <h3 className="tp__title">{title}</h3>
+              {message.trim() !== '' && <p className="tp__message">{message}</p>}
+              <div className="tp__rules">
+                <BlankRules rules={blank.rules} />
+              </div>
+              <ul className="tp__facts">
+                <li>
+                  <IconClock />
+                  <span>
+                    {total} {questionsWord(total)}
+                    {duration ? ` · ${duration.replace(/\.$/, '')}` : ''}
+                  </span>
+                </li>
+                <li>
+                  <IconUndo />
+                  <span>Ответ можно изменить до завершения теста</span>
+                </li>
+                <li>
+                  <IconLock />
+                  <span>Ответы видит только ваш специалист</span>
+                </li>
+                <li>
+                  <IconEye />
+                  <span>{RESULT_LINE[result]}</span>
+                </li>
+              </ul>
+            </>
+          )}
 
-        {stage === 'progress' && (
-          <section className="blank-card pass-q">
-            <div className="blank-card__head pass-q__head">
-              <h2 className="blank-card__title">
+          {stage === 'progress' && (
+            <>
+              <p className="tp__eyebrow">
                 Вопрос {index + 1} из {total}
-              </h2>
-            </div>
-            <div className="pass-q__body" key={index}>
-              {blank.questions[index].heading && <p className="blank-heading">{blank.questions[index].heading}</p>}
-              <div className="blank-question">
+              </p>
+              {blank.questions[index].heading && <p className="blank-heading tp__heading-pill">{blank.questions[index].heading}</p>}
+              <div className="tp__question">
                 <BlankQuestionBody
                   data={blank}
                   index={index}
@@ -102,69 +187,69 @@ export function TestPreview({ test, blank, blind, message, hideConclusion }: Tes
                   onChoose={(answer) => setPicked({ ...picked, [index]: answer })}
                 />
               </div>
-            </div>
-          </section>
-        )}
-
-        {stage === 'end' && (
-          <section className="ts-card tp__done">
-            <span className="tp__done-mark" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12.5l4.5 4.5L19 7.5" />
-              </svg>
-            </span>
-            <h2 className="tp__done-title">Тест завершен</h2>
-            <p className="tp__done-text">Спасибо, ответы переданы психологу.</p>
-            <p className="tp__done-text">
-              {hideConclusion
-                ? 'Результат вам не покажут: заключение останется у психолога.'
-                : 'Заключение теста будет доступно вам в результате.'}
-            </p>
-          </section>
-        )}
-      </div>
-
-      {stage !== 'end' && (
-        <div className="test-settings__cta test-pass__cta">
-          {stage === 'progress' && (
-            <>
-              <div className="test-pass__meta">
-                <span>
-                  Отвечено: {answered} из {total}
-                </span>
-              </div>
-              <div className="test-pass__bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered}>
-                <span style={{ width: `${(answered / total) * 100}%` }} />
-              </div>
             </>
           )}
-          <div className="test-pass__buttons">
-            {stage === 'progress' && (
-              <button type="button" className="test-pass__back" disabled={index === 0} onClick={() => setIndex(index - 1)}>
-                Назад
-              </button>
-            )}
-            {stage === 'start' ? (
-              <button type="button" className="test-settings__cta-button" onClick={() => setStage('progress')}>
-                Начать
-              </button>
-            ) : last ? (
-              <button type="button" className="test-settings__cta-button" onClick={() => setStage('end')}>
-                Завершить тест
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="test-settings__cta-button"
-                disabled={picked[index] === undefined}
-                onClick={() => setIndex(index + 1)}
-              >
-                Далее
-              </button>
-            )}
-          </div>
+
+          {stage === 'end' && (
+            <div className="tp__done">
+              <span className="tp__done-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              </span>
+              <h3 className="tp__done-title">Спасибо, тест завершен</h3>
+              <p className="tp__done-text">Ответы переданы вашему специалисту.</p>
+              {result === 'thanks' ? (
+                <p className="tp__done-text">{RESULT_LINE.thanks}.</p>
+              ) : (
+                <SampleResult testId={test.id} mode={result} />
+              )}
+            </div>
+          )}
         </div>
-      )}
-    </>
+
+        {stage !== 'end' && (
+          <div className="tp__footer">
+            {stage === 'progress' && (
+              <>
+                <div className="test-pass__meta">
+                  <span>
+                    Отвечено: {answered} из {total}
+                  </span>
+                </div>
+                <div className="test-pass__bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered}>
+                  <span style={{ width: `${(answered / total) * 100}%` }} />
+                </div>
+              </>
+            )}
+            <div className="test-pass__buttons">
+              {stage === 'progress' && (
+                <button type="button" className="test-pass__back" disabled={index === 0} onClick={() => setIndex(index - 1)}>
+                  Назад
+                </button>
+              )}
+              {stage === 'start' ? (
+                <button type="button" className="test-settings__cta-button" onClick={() => setStage('progress')}>
+                  Начать
+                </button>
+              ) : last ? (
+                <button type="button" className="test-settings__cta-button" onClick={() => setStage('end')}>
+                  Завершить тест
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="test-settings__cta-button"
+                  disabled={picked[index] === undefined}
+                  onClick={() => setIndex(index + 1)}
+                >
+                  Далее
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

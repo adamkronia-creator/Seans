@@ -1,3 +1,4 @@
+import type { ResultMode } from './resultMode';
 import { clientResultPath } from './resultLinks';
 
 export interface Message {
@@ -26,14 +27,15 @@ export interface Message {
 /** Настройки, с которыми тест ушел клиенту (то, что стояло на экране «Настройка теста» в момент отправки) */
 export interface SentTestOptions {
   blind: boolean;
-  hideConclusion: boolean;
+  /** Что клиент увидит после теста: благодарность, баллы или полное заключение */
+  result: ResultMode;
   saveBlank: boolean;
   /** Форма бланка, если у теста их несколько */
   form?: string;
 }
 
 /** Настройки по умолчанию: как на экране «Настройка теста» до того, как их тронули */
-export const DEFAULT_SENT_OPTIONS: SentTestOptions = { blind: true, hideConclusion: true, saveBlank: true };
+export const DEFAULT_SENT_OPTIONS: SentTestOptions = { blind: true, result: 'thanks', saveBlank: true };
 
 export interface MessageButton {
   label: string;

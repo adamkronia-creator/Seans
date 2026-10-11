@@ -15,6 +15,8 @@ import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { FormMenu } from './FormMenu';
+import { ResultChoice } from './ResultChoice';
+import type { ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
@@ -145,7 +147,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const [message, setMessage] = useState(data.message);
   const [messageOn, setMessageOn] = useState(true);
   const [blind, setBlind] = useState(true);
-  const [hideConclusion, setHideConclusion] = useState(true);
+  const [result, setResult] = useState<ResultMode>('thanks');
   const [saveBlank, setSaveBlank] = useState(true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -175,7 +177,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       sendMessage(id, messageOn ? message : '', undefined, {
         test: test.id,
         testKind: 'sent',
-        testOptions: { blind, hideConclusion, saveBlank, ...(data.forms ? { form } : {}) },
+        testOptions: { blind, result, saveBlank, ...(data.forms ? { form } : {}) },
       });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
       if (id === 'maxim') logStep('test', test.id, 'sent');
@@ -287,7 +289,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           }}
         />
       ) : view === 'preview' && blank ? (
-        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} hideConclusion={hideConclusion} />
+        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <ScrollHost className="test-settings__scroll">
@@ -449,14 +451,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             <Row label="Слепое тестирование" hint="Клиент не увидит название теста и его цель: так ответы честнее">
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
-            <Row label="Скрыть заключение" hint="После прохождения клиент не увидит результат, заключение останется только у вас">
-              <Switch checked={hideConclusion} onChange={setHideConclusion} label="Скрыть заключение" />
-            </Row>
             <Row label="Сохранить бланк" hint="Заполненный бланк сохранится и будет доступен для просмотра в результате теста">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
             </Row>
           </ul>
         </CollapseCard>
+
+        {conclusion && <ResultChoice value={result} onChange={setResult} />}
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">

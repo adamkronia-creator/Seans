@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from 'react';
 import { DEFAULT_SENT_OPTIONS, type Message } from '../../data/messages';
 import type { LibraryTest } from '../../data/library';
+import { RESULT_MODES } from '../../data/resultMode';
 import { testSettings } from '../../data/testSettings';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
@@ -38,7 +39,7 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
   const rows: Row[] = [
     ...(forms && form ? [{ label: 'Форма бланка', value: form }] : []),
     { label: 'Слепое тестирование', ...onOff(options.blind) },
-    { label: 'Скрыть заключение', ...onOff(options.hideConclusion) },
+    { label: 'Итог для клиента', value: RESULT_MODES.find((m) => m.id === options.result)?.value ?? '' },
     { label: 'Сохранить бланк', ...onOff(options.saveBlank) },
     { label: 'Сообщение для клиента', ...onOff(message.text.trim() !== '') },
   ];
