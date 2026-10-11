@@ -289,7 +289,7 @@ export function NoteCard({ text, onEdit }: { text: string; onEdit: () => void })
         </div>
       ) : (
         <button type="button" className="pl-comment__add" onClick={onEdit}>
-          Записать заметку
+          Добавь
         </button>
       )}
     </section>

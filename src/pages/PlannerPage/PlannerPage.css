@@ -32,25 +32,21 @@
   visibility: hidden;
 }
 
-/* Строка месяца: название слева, стрелки справа; зона нажатия стрелок выходит за поле экрана */
+/* Строка месяца: название по центру, стрелки по краям (слева прошлый месяц, справа следующий); зона нажатия выходит за поле экрана */
 .planner__nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  justify-content: space-between;
   height: 36px;
-  margin-bottom: var(--space-1);
+  margin: 0 calc(var(--space-2) * -1) var(--space-1);
 }
 
 .planner__month {
+  text-align: center;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-title);
   line-height: var(--line-height-lg);
-}
-
-.planner__arrows {
-  display: flex;
-  margin-right: calc(var(--space-2) * -1);
 }
 
 .planner__arrow {

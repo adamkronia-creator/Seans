@@ -58,8 +58,40 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number>();
   const scroller = useRef<HTMLDivElement>(null);
+  const header = useRef<HTMLElement>(null);
   // Свайп по распорядку листает дни: влево — следующий, вправо — предыдущий
   useSwipeSegments(scroller, { index: 1, count: 3, onIndex: (i) => setSelected((day) => dateKey(addDays(parseDate(day), i - 1))) });
+
+  // Свайп вверх по календарю сворачивает его до недели, вниз — разворачивает; вниз от начала списка тоже разворачивает
+  useEffect(() => {
+    const els = [header.current, scroller.current];
+    let from: { x: number; y: number; t: number; top: boolean; head: boolean } | null = null;
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      const head = !!header.current?.contains(e.target as Node);
+      from = e.touches.length === 1 ? { x: t.clientX, y: t.clientY, t: performance.now(), top: (scroller.current?.scrollTop ?? 0) <= 0, head } : null;
+    };
+    const onEnd = (e: TouchEvent) => {
+      const f = from;
+      from = null;
+      if (!f) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - f.x;
+      const dy = t.clientY - f.y;
+      if (Math.abs(dy) < 40 || Math.abs(dy) < Math.abs(dx) * 1.5 || performance.now() - f.t > 900) return;
+      if (dy < 0 && f.head) setCompact(true);
+      else if (dy > 0 && (f.head || f.top)) setCompact(false);
+    };
+    els.forEach((el) => {
+      el?.addEventListener('touchstart', onStart, { passive: true });
+      el?.addEventListener('touchend', onEnd, { passive: true });
+    });
+    return () =>
+      els.forEach((el) => {
+        el?.removeEventListener('touchstart', onStart);
+        el?.removeEventListener('touchend', onEnd);
+      });
+  }, []);
 
   const say = useCallback((text: string) => {
     setToast(text);
@@ -166,7 +198,7 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
 
   return (
     <section className="planner">
-      <header className="screen-header planner__header">
+      <header ref={header} className="screen-header planner__header">
         <div className="screen-header__top">
           <h1 className="screen-header__title">Ежедневник</h1>
           <div className="screen-header__side">
@@ -182,15 +214,13 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
         </div>
 
         <div className="planner__nav">
+          <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
+            <IconBack />
+          </button>
           <h2 className="planner__month">{monthTitle(month)}</h2>
-          <div className="planner__arrows">
-            <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
-              <IconBack />
-            </button>
-            <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
-              <IconBack />
-            </button>
-          </div>
+          <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
+            <IconBack />
+          </button>
         </div>
 
         <MonthGrid month={month} selected={selected} today={today} compact={compact} flags={flags} onSelect={setSelected} />
