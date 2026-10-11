@@ -5,7 +5,8 @@ import type { Plan, PlanInput, PlanKind } from '../../data/planner';
 import { dayLong, toMinutes } from '../../utils/ruDate';
 import { Frame } from '../ChatBooking/BookingSheets';
 import '../ChatBooking/BookingSheets.css';
-import { AutoTextarea } from '../EditSheet/AutoTextarea';
+import { RichEditor } from '../RichEditor/RichEditor';
+import '../EditSheet/EditSheet.css';
 import { IconBookingCancelled, IconBookingDone, IconBookingPending } from '../icons';
 import { Switch } from '../Switch/Switch';
 import './PlannerSheets.css';
@@ -123,28 +124,14 @@ export function PlanSheet({ plan, day, now, clients, onSave, onSaveNote, onRemov
             ))}
           </div>
         </section>
-      ) : isNote ? (
-        <section className="sheet__card bk-card">
-          <AutoTextarea
-            className="bk-textarea"
-            rows={4}
-            value={note}
-            onChange={setNote}
-            placeholder="Заметка к этому дню"
-            aria-label="Заметка"
-            maxLength={2000}
-          />
-        </section>
       ) : (
-        <section className="sheet__card bk-card">
-          <AutoTextarea
-            className="bk-textarea"
-            rows={2}
-            value={title}
-            onChange={(v) => setTitle(v.replace(/\n/g, ' '))}
-            placeholder="Что нужно сделать"
-            aria-label="Что нужно сделать"
-            maxLength={200}
+        <section className="sheet__card sheet__text">
+          <RichEditor
+            key={isNote ? 'note' : 'task'}
+            initial={isNote ? note : title}
+            onChange={isNote ? setNote : setTitle}
+            placeholder={isNote ? 'Заметка к этому дню' : 'Что нужно сделать'}
+            ariaLabel={isNote ? 'Заметка' : 'Что нужно сделать'}
           />
         </section>
       )}

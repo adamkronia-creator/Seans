@@ -251,7 +251,7 @@ export function TaskCard({ plan, onToggle, onEdit }: TaskCardProps) {
         type="button"
         role="checkbox"
         aria-checked={plan.done}
-        aria-label={`Выполнено: ${plan.title}`}
+        aria-label={`Выполнено: ${plan.title.replace(/[*_~]/g, '').replace(/\s+/g, ' ').slice(0, 80)}`}
         className="pl-check"
         onClick={() => onToggle(plan)}
       >
@@ -260,7 +260,9 @@ export function TaskCard({ plan, onToggle, onEdit }: TaskCardProps) {
         </svg>
       </button>
       <button type="button" className="pl-task__body" onClick={() => onEdit(plan)}>
-        <span className="pl-task__title">{plan.title}</span>
+        <div className="pl-task__title">
+          <RichBlocks blocks={parseBlocks(plan.title)} textClass="pl-text" listClass="pl-list" />
+        </div>
         {plan.time && <span className="pl-task__time">{plan.time}</span>}
       </button>
     </li>
