@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Avatar } from '../Avatar/Avatar';
-import { CHATS } from '../../data/chats';
+import { CHATS, CURRENT_USER } from '../../data/chats';
 import { IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
@@ -56,9 +56,14 @@ interface RecipientSheetProps {
   onClose: () => void;
 }
 
-const CLIENTS = CHATS.filter((c) => c.category === 'clients');
+/** Получатели: сначала вы сами (тест придет в «Избранное»), затем клиенты */
+export const SELF_ID = 'favorites';
+const RECIPIENTS = [
+  { id: SELF_ID, name: 'Себе', avatar: CURRENT_USER.avatar },
+  ...CHATS.filter((c) => c.category === 'clients'),
+];
 
-/** Выбор клиентов: одного (нажатие заменяет выбор) или нескольких */
+/** Выбор получателей (вы сами и клиенты): одного (нажатие заменяет выбор) или нескольких */
 export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
   useSheet(onClose);
   const [picked, setPicked] = useState<string[]>([]);
@@ -68,11 +73,11 @@ export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Кому отправить">
         <div className="sheet__header">
-          <h2 className="sheet__heading">{mode === 'one' ? 'Кому отправить?' : 'Выберите клиентов'}</h2>
+          <h2 className="sheet__heading">{mode === 'one' ? 'Кому отправить?' : 'Выберите получателей'}</h2>
         </div>
         <div className="sheet__body">
           <ul className="test-actions" role={mode === 'one' ? 'radiogroup' : 'group'}>
-            {CLIENTS.map((c) => {
+            {RECIPIENTS.map((c) => {
               const on = picked.includes(c.id);
               return (
                 <li key={c.id}>

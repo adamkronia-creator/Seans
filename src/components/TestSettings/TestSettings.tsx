@@ -4,7 +4,7 @@ import {
   IconTestMic,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
-import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
+import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
@@ -174,9 +174,10 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     ids.forEach((id) => {
       // В чат уходит карточка теста: сообщение клиенту, если оно включено, стоит в ней текстом, а настройки,
       // с которыми тест ушел, лежат в ней же (их показывает кнопка «Настройки теста»)
-      sendMessage(id, messageOn ? message : '', undefined, {
+      sendMessage(id, messageOn && id !== SELF_ID ? message : '', undefined, {
         test: test.id,
         testKind: 'sent',
+        ...(id === SELF_ID ? { toSelf: true } : {}),
         testOptions: { blind, result, saveBlank, ...(data.forms ? { form } : {}) },
       });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
@@ -184,7 +185,13 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     });
     setSheet(null);
     const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
-    notify(ids.length === 1 ? `Тест отправлен: ${names[0]}` : `Тест отправлен: ${ids.length} клиентам`);
+    notify(
+      ids.length === 1
+        ? ids[0] === SELF_ID
+          ? 'Тест отправлен вам: он в «Избранном»'
+          : `Тест отправлен: ${names[0]}`
+        : `Тест отправлен: ${ids.length} получателям`,
+    );
   };
 
   const pick = (action: TestAction) => {

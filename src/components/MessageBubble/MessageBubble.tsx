@@ -200,7 +200,7 @@ export function MessageBubble({
     const passed = message.testKind === 'passed';
     const link = passed ? message.buttons?.[0] : undefined;
     // Тест, который прислали вы, клиенту уже ушел: пройти его тут нечего, кнопка показывает настройки, с какими он отправлен
-    const settings = out && !passed;
+    const settings = out && !passed && !message.toSelf;
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
@@ -212,7 +212,7 @@ export function MessageBubble({
               </span>
             )}
             <span className="tcard__text">
-              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
+              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : message.toSelf ? 'Тест для себя' : 'Присланный тест'}</span>
               <span className="tcard__title">{test?.title ?? (isTask ? 'Задание' : 'Тест')}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
             </span>
