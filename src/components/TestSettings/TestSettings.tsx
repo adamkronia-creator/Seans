@@ -12,6 +12,7 @@ import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
+import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { TestHeader } from './TestHeader';
@@ -46,6 +47,23 @@ interface TestSettingsProps {
   /** Чат клиента, из которого открыт тест; без него тест открыт из библиотеки */
   chatId?: string;
   onBack: () => void;
+}
+
+/** Темы материала: теги в конце настроек, только для просмотра */
+export function TopicTags({ id }: { id: string }) {
+  const topics = topicsOf(id);
+  if (topics.length === 0) return null;
+  return (
+    <section className="ts-topics" aria-label="Темы материала">
+      <ul className="ts-topics__list">
+        {topics.map((topic) => (
+          <li key={topic} className="ts-topics__tag">
+            {topic}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 /** Строка карточки: подпись и значение или переключатель справа; под подписью может стоять пояснение; значок бывает только у способа показа вопросов */
@@ -461,6 +479,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             </div>
           </div>
         </section>
+
+        <TopicTags id={test.id} />
       </div>
 
       <div className="test-settings__cta">

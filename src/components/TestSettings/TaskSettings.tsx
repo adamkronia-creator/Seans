@@ -6,7 +6,7 @@ import { Toast } from '../Toast/Toast';
 import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
 import { BlankRules, CollapseCard } from './TestBlank';
 import { IconTaskState } from './TaskIcons';
-import { MessageField, Row } from './TestSettings';
+import { MessageField, Row, TopicTags } from './TestSettings';
 import { TestHeader } from './TestHeader';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
@@ -399,6 +399,8 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
                 </div>
               </div>
             </section>
+
+            <TopicTags id={task.id} />
           </div>
 
           <div className="test-settings__cta">

@@ -457,3 +457,31 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
 }
+
+/* Темы материала: теги переносятся на следующие строки, как чипсы, но без нажатия */
+.ts-topics {
+  flex-shrink: 0;
+  padding: 0 4px 4px;
+}
+
+.ts-topics__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ts-topics__tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-chip-h);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+}
