@@ -58,9 +58,9 @@ export const LIBRARY: LibraryTest[] = [
   { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E8EDF2', categories: ['hospital'] },
   { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFCEBF', categories: ['hospital', 'practice'] },
   { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFCEBF', categories: ['practice', 'hospital'] },
-  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: '#FFD782', categories: ['project'] },
-  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: pfqIcon, tint: '#F7EADC', categories: ['project', 'practice'] },
-  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: '#F9F6F6', categories: ['hospital'] },
+  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: 'rgb(153 230 252 / 25%)', categories: ['project'] },
+  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: pfqIcon, tint: 'rgb(254 153 160 / 25%)', categories: ['project', 'practice'] },
+  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: 'rgb(255 95 122 / 25%)', categories: ['hospital'] },
 ];
 
 // ——— Избранное: сердечко на карточке включает и выключает элемент ———
