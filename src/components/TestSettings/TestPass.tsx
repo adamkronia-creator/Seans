@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { answerQuestion, finishRun, formAffectsScore, formHint, resetRun, useSelfRun } from '../../data/selfTest';
+import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
@@ -15,12 +15,10 @@ const ADVANCE_MS = 280;
 interface TestPassProps {
   testId: string;
   blank: TestBlankData;
-  /** Формы бланка; выбор показан в начале, только если от формы зависит подсчёт (нормы), иначе форма берётся из настроек */
-  forms?: string[];
+  /** Форма бланка выбрана заранее в настройках теста: при прохождении ее не спрашивают */
   form: string;
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
   saveBlank: boolean;
-  onFormChange: (form: string) => void;
   /** Результат посчитан и сохранён: id результата */
   onDone: (resultId: string) => void;
 }
@@ -51,9 +49,9 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
 
 /**
  * Прохождение теста самому: внизу счётчик и кнопки, ответы отмечаются в бланке.
- * Вопросы идут по одному: сначала правила (и форма бланка), затем вопрос за вопросом с кнопками «Назад» и «Далее».
+ * Вопросы идут по одному: сначала инструкция, затем вопрос за вопросом с кнопками «Назад» и «Далее».
  */
-export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, onDone }: TestPassProps) {
+export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassProps) {
   const run = useSelfRun(testId);
   const total = blank.questions.length;
   const answered = Object.keys(run.answers).length;
@@ -64,7 +62,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
   const [resetOpen, setResetOpen] = useState(false);
   const timers = useRef<number[]>([]);
 
-  // По одному: −1 — правила и форма бланка, дальше номер открытого вопроса (с 0).
+  // По одному: −1 — инструкция, дальше номер открытого вопроса (с 0).
   // Если ответы уже есть (вышли из теста и вернулись), продолжаем с первого вопроса без ответа
   const [step, setStep] = useState(() => (answered === 0 ? -1 : firstOpen >= 0 ? firstOpen : total - 1));
   const [dir, setDir] = useState<'next' | 'prev'>('next');
@@ -135,40 +133,11 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
     setJumpOpen(true);
   };
 
-  const showForms = forms !== undefined && forms.length > 1 && formAffectsScore(testId);
-
-  const formCard = showForms && (
-    <CollapseCard title="Форма бланка" id="pass-form">
-      <div className="test-pass__form">
-        <ul className="blank-answers" role="radiogroup" aria-label="Форма бланка">
-          {forms.map((f) => (
-            <li key={f}>
-              <label className="blank-answer">
-                <input
-                  type="radio"
-                  className="blank-answer__input"
-                  name="pass-form"
-                  checked={form === f}
-                  onChange={() => onFormChange(f)}
-                />
-                <span className="blank-answer__radio" aria-hidden="true" />
-                <span className="blank-answer__text">{f}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-        <p className="test-pass__hint">{formHint(testId)}</p>
-      </div>
-    </CollapseCard>
-  );
-
   return (
     <>
       <div className="test-settings__scroll" key="pass" ref={scrollRef}>
-        {/* По одному форма бланка выбирается на стартовом экране вместе с правилами, дальше она не мешает */}
-        {step < 0 && formCard}
         {step < 0 ? (
-          <CollapseCard title="Правила тестирования" id="blank-rules">
+          <CollapseCard title="Инструкция" id="blank-rules">
             <BlankRules rules={blank.rules} />
           </CollapseCard>
         ) : (
@@ -233,7 +202,7 @@ export function TestPass({ testId, blank, forms, form, saveBlank, onFormChange, 
           total={total}
           answers={run.answers}
           current={step}
-          rulesLabel={showForms ? 'Правила и форма бланка' : 'Правила тестирования'}
+          rulesLabel="Инструкция"
           onClose={() => setJumpOpen(false)}
           onPick={(index) => {
             setJumpOpen(false);

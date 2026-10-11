@@ -82,14 +82,14 @@ interface JumpSheetProps {
   answers: Record<number, number>;
   /** Открытый сейчас вопрос (с 0) */
   current: number;
-  /** Подпись строки с правилами: если в начале выбирают форму бланка, она упомянута здесь же */
+  /** Подпись строки с инструкцией */
   rulesLabel: string;
   onPick: (index: number) => void;
   onRules: () => void;
   onClose: () => void;
 }
 
-/** Окно «Все вопросы»: строка «Правила» и сетка номеров; с ответом — синие, открытый обведён */
+/** Окно «Все вопросы»: строка «Инструкция» и сетка номеров; с ответом — синие, открытый обведён */
 export function JumpSheet({ total, answers, current, rulesLabel, onPick, onRules, onClose }: JumpSheetProps) {
   useSheet(onClose);
   const answered = Object.keys(answers).length;

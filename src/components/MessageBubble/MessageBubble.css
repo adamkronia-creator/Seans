@@ -396,3 +396,10 @@
     transition: none;
   }
 }
+
+/* Отправленный слепой тест: вам название видно, клиенту — нет */
+.tcard__note {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}

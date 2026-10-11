@@ -485,3 +485,21 @@
   font-weight: var(--font-weight-medium);
   line-height: 1.2;
 }
+
+/* Меню формы бланка: варианты в карточке окна, пояснение под ней */
+.ts-select {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-menu__card {
+  padding: var(--space-1) var(--space-4);
+}
+
+.form-menu__hint {
+  margin: var(--space-3) var(--space-1) 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}

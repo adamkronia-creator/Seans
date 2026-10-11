@@ -214,6 +214,7 @@ export function MessageBubble({
             <span className="tcard__text">
               <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
               <span className="tcard__title">{test?.title ?? (isTask ? 'Задание' : 'Тест')}</span>
+              {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
             </span>
           </div>
           {message.text ? (

@@ -6,6 +6,7 @@ import { Toast } from '../Toast/Toast';
 import { ActionSheet, RecipientSheet, type TestAction } from './TestActions';
 import { BlankRules, CollapseCard } from './TestBlank';
 import { IconTaskState } from './TaskIcons';
+import { FormMenu } from './FormMenu';
 import { MessageField, Row, TopicTags } from './TestSettings';
 import { TestHeader } from './TestHeader';
 import { CHATS } from '../../data/chats';
@@ -340,7 +341,7 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
                 <Row label="Время выполнения" value={data.duration} />
                 <Row label="Возраст" value={data.age} />
                 <Row label="Форма бланка" info>
-                  {select('Форма бланка', form, data.forms, setForm)}
+                  <FormMenu forms={data.forms} value={form} onChange={setForm} />
                 </Row>
               </ul>
             </CollapseCard>

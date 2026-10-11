@@ -33,7 +33,7 @@ function ruleText(rule: string) {
   return rule.split(/(«[^»]*»)/).map((part, i) => (part.startsWith('«') ? <em key={i}>{part}</em> : part));
 }
 
-/** Правила бланка: одно правило — обычный абзац, несколько — нумерованный список */
+/** Инструкция бланка: одно правило — обычный абзац, несколько — нумерованный список */
 export function BlankRules({ rules }: { rules: string[] }) {
   if (rules.length === 1) {
     // Одно правило не нумеруем: «1.» перед единственным пунктом лишнее
@@ -129,7 +129,7 @@ export function BlankQuestionBody({ data, index, answer, locked, numberedPrompt 
 }
 
 /**
- * Бланк тестирования: правила и все вопросы с вариантами ответов (как их увидит клиент).
+ * Бланк тестирования: инструкция и все вопросы с вариантами ответов (как их увидит клиент).
  * Без `fill` бланк только для просмотра: отметка никуда не сохраняется.
  */
 export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFill }) {
@@ -140,7 +140,7 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
     fill ? fill.onAnswer?.(question, answer) : setPicked({ ...picked, [question]: answer });
   return (
     <>
-      <CollapseCard title="Правила тестирования" id="blank-rules">
+      <CollapseCard title="Инструкция" id="blank-rules">
         <BlankRules rules={data.rules} />
       </CollapseCard>
 

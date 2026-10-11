@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
   IconTestChevron,
-  IconTestChevronDown,
   IconTestMic,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
@@ -15,12 +14,14 @@ import { testBlank } from '../../data/testBlank';
 import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
+import { FormMenu } from './FormMenu';
 import { TestHeader } from './TestHeader';
+import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
-import { canPassSelf } from '../../data/selfTest';
+import { canPassSelf, formHint } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -33,13 +34,14 @@ const DESC_COLLAPSED = 6 * 22 + 12;
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
-type View = 'settings' | 'blank' | 'conclusion' | 'pass';
+type View = 'settings' | 'blank' | 'conclusion' | 'pass' | 'preview';
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка теста',
   blank: 'Бланк тестирования',
   conclusion: 'Пример заключения',
   pass: 'Прохождение теста',
+  preview: 'Предпросмотр теста',
 };
 
 interface TestSettingsProps {
@@ -252,7 +254,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     resultId ? transition(() => setResultId(null), 'back') : openView('settings'),
   );
   // Свайп вправо на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
-  useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion'), () =>
+  useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion' || view === 'preview'), () =>
     view === 'settings' ? onBack() : openView('settings'),
   );
 
@@ -273,10 +275,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         <TestPass
           testId={test.id}
           blank={blank}
-          forms={data.forms}
           form={form}
           saveBlank={saveBlank}
-          onFormChange={setForm}
           onDone={(id) => {
             // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
             transition(() => {
@@ -286,6 +286,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             }, 'forward');
           }}
         />
+      ) : view === 'preview' && blank ? (
+        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} hideConclusion={hideConclusion} />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <ScrollHost className="test-settings__scroll">
@@ -334,6 +336,18 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               <span className="ts-row__link">Бланк тестирования</span>
               <IconTestChevron className="ts-row__chevron" />
             </li>
+            {blank && (
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={() => openView('preview')}
+                onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
+              >
+                <span className="ts-row__link">Предпросмотр теста</span>
+                <IconTestChevron className="ts-row__chevron" />
+              </li>
+            )}
             {data.scales && (
               <li
                 className="ts-row ts-row--link"
@@ -364,20 +378,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               {data.forms && (
                 <Row label="Форма бланка" info value={data.forms.length === 1 ? data.forms[0] : undefined}>
                   {data.forms.length > 1 && (
-                    <label className="ts-select">
-                      <span className="ts-select__value">{form}</span>
-                      <IconTestChevronDown className="ts-select__chevron" />
-                      <select
-                        className="ts-select__native"
-                        aria-label="Форма бланка"
-                        value={form}
-                        onChange={(e) => setForm(e.target.value)}
-                      >
-                        {data.forms.map((f) => (
-                          <option key={f}>{f}</option>
-                        ))}
-                      </select>
-                    </label>
+                    <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={setForm} />
                   )}
                 </Row>
               )}
@@ -451,7 +452,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             <Row label="Скрыть заключение" hint="После прохождения клиент не увидит результат, заключение останется только у вас">
               <Switch checked={hideConclusion} onChange={setHideConclusion} label="Скрыть заключение" />
             </Row>
-            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится в истории клиента">
+            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится и будет доступен для просмотра в результате теста">
               <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
             </Row>
           </ul>
