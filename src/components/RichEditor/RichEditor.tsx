@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type ComponentType, type SVGProps } from 'react';
 import {
   IconFmtBold,
@@ -71,12 +72,14 @@ interface Props {
   onChange: (text: string) => void;
   placeholder?: string;
   ariaLabel: string;
+  /** Куда вынести панель форматирования (внизу окна, над клавиатурой); без него она стоит над полем */
+  toolbarHost?: HTMLElement | null;
 }
 
 type ToolState = Partial<Record<Tool, boolean>>;
 
 /** Редактор текста с панелью форматирования: строка иконок сверху и поле ввода под ней */
-export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props) {
+export function RichEditor({ initial, onChange, placeholder, ariaLabel, toolbarHost }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [empty, setEmpty] = useState(initial.trim() === '');
   const [state, setState] = useState<ToolState>({});
@@ -168,8 +171,7 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
     }
   };
 
-  return (
-    <>
+  const toolbar = (
       <div className="rich-toolbar" role="toolbar" aria-label="Форматирование текста">
         {TOOLS.map((tool) => {
           const { id, label, Icon } = tool;
@@ -193,6 +195,11 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
           );
         })}
       </div>
+  );
+
+  return (
+    <>
+      {toolbarHost ? createPortal(toolbar, toolbarHost) : toolbar}
       <div
         ref={ref}
         className="rich-editor"

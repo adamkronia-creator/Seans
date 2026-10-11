@@ -504,13 +504,7 @@
   cursor: pointer;
 }
 
+/* Карточка меню формы: строки как у «Итога для клиента», подпись внутри под линией */
 .form-menu__card {
-  padding: var(--space-3) var(--space-4);
-}
-
-.form-menu__hint {
-  margin: var(--space-3) var(--space-1) 0;
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  overflow: hidden;
 }

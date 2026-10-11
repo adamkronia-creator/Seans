@@ -146,7 +146,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
-  const [form, setForm] = useState(passRequest?.form ?? data.forms?.[0] ?? '');
+  const [form, setForm] = useState(passRequest?.form || (data.forms?.[0] ?? ''));
   const [message, setMessage] = useState(data.message);
   const [messageOn, setMessageOn] = useState(true);
   const [blind, setBlind] = useState(true);
@@ -177,7 +177,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     ids.forEach((id) => {
       // В чат уходит карточка теста: сообщение клиенту, если оно включено, стоит в ней текстом, а настройки,
       // с которыми тест ушел, лежат в ней же (их показывает кнопка «Настройки теста»)
-      sendMessage(id, messageOn && id !== SELF_ID ? message : '', undefined, {
+      sendMessage(id, messageOn ? message : '', undefined, {
         test: test.id,
         testKind: 'sent',
         ...(id === SELF_ID ? { toSelf: true } : {}),
@@ -267,7 +267,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     resultId ? transition(() => setResultId(null), 'back') : stepBack(),
   );
   // Свайп вправо на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
-  useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion' || view === 'preview'), () =>
+  useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion'), () =>
     view === 'settings' ? onBack() : openView('settings'),
   );
 
@@ -282,9 +282,9 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   return (
     <section className="test-settings">
-      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : stepBack} />
+      {!(passRequest && view === 'pass') && <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : stepBack} />}
 
-      {view === 'pass' && blank ? (
+      {view === 'pass' && blank && !passRequest ? (
         <TestPass
           testId={test.id}
           blank={blank}
@@ -299,8 +299,19 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             }, 'forward');
           }}
         />
+      ) : passRequest && view === 'pass' && blank ? (
+        <TestPreview
+          test={test}
+          blank={blank}
+          blind={passRequest.blind}
+          message={passRequest.message}
+          result={passRequest.result}
+          duration={data.duration}
+          onExit={onBack}
+          live={{ form: passRequest.form || form, saveBlank: passRequest.saveBlank }}
+        />
       ) : view === 'preview' && blank ? (
-        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} />
+        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} onExit={() => openView('settings')} />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <ScrollHost className="test-settings__scroll">
@@ -369,7 +380,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 onClick={() => openView('preview')}
                 onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
               >
-                <span className="ts-row__link">Предпросмотр теста</span>
+                <span className="ts-row__link">Предпросмотр</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
             )}

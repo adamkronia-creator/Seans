@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import { useSheetDrag } from './useSheetDrag';
@@ -12,6 +12,24 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
   const ref = useRef<HTMLDivElement>(null);
   useExitAnimation(ref);
   useSheetDrag(ref, onClose);
+  // Экранная клавиатура: окно и панель форматирования поднимаются над ней и остаются на виду
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const el = ref.current;
+    if (!vv || !el) return;
+    const fit = () => {
+      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      el.style.bottom = covered > 80 ? `${covered}px` : '';
+      el.style.setProperty('--sheet-max', covered > 80 ? `${vv.height - 8}px` : '');
+    };
+    fit();
+    vv.addEventListener('resize', fit);
+    vv.addEventListener('scroll', fit);
+    return () => {
+      vv.removeEventListener('resize', fit);
+      vv.removeEventListener('scroll', fit);
+    };
+  }, []);
   return createPortal(
     <div ref={ref} className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       {children}

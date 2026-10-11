@@ -3,6 +3,7 @@ import { IconTestChevronDown } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
+import './ResultChoice.css';
 
 interface FormSheetProps {
   forms: string[];
@@ -25,25 +26,21 @@ function FormSheet({ forms, value, hint, onPick, onClose }: FormSheetProps) {
         </div>
         <div className="sheet__body">
           <section className="sheet__card form-menu__card">
-            <ul className="blank-answers" role="radiogroup" aria-label="Форма бланка">
+            <ul className="ts-rows" role="radiogroup" aria-label="Форма бланка">
               {forms.map((f) => (
-                <li key={f}>
-                  <label className="blank-answer">
-                    <input
-                      type="radio"
-                      className="blank-answer__input"
-                      name="form-menu"
-                      checked={value === f}
-                      onChange={() => onPick(f)}
-                    />
+                <li key={f} className={`ts-row result-choice__row${value === f ? ' result-choice__row--on' : ''}`}>
+                  <label className="result-choice__label">
+                    <input type="radio" className="blank-answer__input" name="form-menu" checked={value === f} onChange={() => onPick(f)} />
                     <span className="blank-answer__radio" aria-hidden="true" />
-                    <span className="blank-answer__text">{f}</span>
+                    <span className="ts-row__text">
+                      <span className="ts-row__label">{f}</span>
+                    </span>
                   </label>
                 </li>
               ))}
             </ul>
+            {hint && <p className="result-choice__note">{hint}</p>}
           </section>
-          {hint && <p className="form-menu__hint">{hint}</p>}
         </div>
         <div className="sheet__footer">
           <button type="button" className="sheet__button" onClick={onClose}>

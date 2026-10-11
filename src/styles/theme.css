@@ -18,38 +18,3 @@ textarea,
   caret-color: var(--color-accent);
 }
 
-/* ——— Нижняя панель: у выбранного раздела мягкая «таблетка» под значком (подписей под значками нет) ——— */
-.tabbar__item {
-  position: relative;
-}
-
-.tabbar__item::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  width: 56px;
-  height: 32px;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  opacity: 0;
-  transform: scale(0.6);
-  transition:
-    opacity 0.18s ease,
-    transform 0.26s var(--ease-ios);
-}
-
-.tabbar__item--active::before {
-  opacity: 1;
-  transform: none;
-}
-
-.tabbar__item > svg {
-  position: relative;
-  z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tabbar__item::before {
-    transition: none;
-  }
-}

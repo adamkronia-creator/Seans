@@ -63,6 +63,7 @@ export function EditSheet({
   const [toneOn, setToneOn] = useState(initial.tone !== null);
   const [rows, setRows] = useState(initial.rows ?? []);
   const uid = useId();
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -206,10 +207,13 @@ export function EditSheet({
                 onChange={setText}
                 placeholder={textPlaceholder}
                 ariaLabel={heading}
+                toolbarHost={toolbarHost}
               />
             </section>
           )}
         </div>
+
+        {hasText && <div ref={setToolbarHost} className="sheet__tools" />}
 
         <div className="sheet__footer">
           <button type="button" className="sheet__button" onClick={onClose}>

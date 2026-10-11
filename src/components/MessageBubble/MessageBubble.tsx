@@ -1,4 +1,5 @@
 import { requestPass } from '../../data/selfTest';
+import { BLIND_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
@@ -202,19 +203,21 @@ export function MessageBubble({
     const link = passed ? message.buttons?.[0] : undefined;
     // Тест, который прислали вы, клиенту уже ушел: пройти его тут нечего, кнопка показывает настройки, с какими он отправлен
     const settings = out && !passed && !message.toSelf;
+    // Слепой тест, отправленный себе, выглядит так же, как у клиента: без названия и значка методики
+    const hiddenTest = Boolean(message.toSelf && message.testOptions?.blind);
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
         <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons bubble--tcard${message.text ? '' : ' bubble--tcard-bare'}${activeMatch ? ' bubble--match' : ''}`}>
           <div className="tcard">
-            {test && (
+            {test && !hiddenTest && (
               <span className="tcard__icon" style={{ background: test.tint }}>
                 <img src={test.icon} alt="" />
               </span>
             )}
             <span className="tcard__text">
               <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
-              <span className="tcard__title">{test?.title ?? (isTask ? 'Задание' : 'Тест')}</span>
+              <span className="tcard__title">{hiddenTest ? BLIND_TITLE : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
             </span>
           </div>
@@ -239,7 +242,10 @@ export function MessageBubble({
               onClick={() => {
                 if (settings) return onTestSettings(message);
                 if (link) return onOpenLink(link.href);
-                if (message.toSelf) requestPass(message.test!, message.testOptions?.form, message.testOptions?.saveBlank ?? true);
+                if (message.toSelf) {
+                  const o = message.testOptions;
+                  requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, blind: o?.blind ?? true, result: o?.result ?? 'thanks', message: message.text });
+                }
                 onOpenTest(message.test!);
               }}
             >

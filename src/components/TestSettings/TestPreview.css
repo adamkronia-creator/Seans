@@ -296,3 +296,37 @@
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
 }
+
+/* Тест, отправленный себе: экран клиента без рамки телефона, на всю ширину и высоту */
+.tp--live {
+  padding: 0;
+  gap: 0;
+  background: var(--color-bg-panel);
+}
+
+.tp--live .tp__phone {
+  flex: 1 1 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.tp--live .tp__screen {
+  mask-image: none;
+  padding-top: var(--space-2);
+}
+
+.tp__exit {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: var(--space-2) var(--space-2) 0;
+  color: var(--color-text-primary);
+}

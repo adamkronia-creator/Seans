@@ -1,14 +1,10 @@
-/* Панель форматирования: 9 иконок 24 с равным промежутком по ширине, как сетки иконок и цветов */
+/* Панель форматирования внизу окна, над кнопками и клавиатурой: 9 иконок 24 с равным промежутком по ширине */
 .rich-toolbar {
   display: flex;
+  flex-shrink: 0;
   justify-content: space-between;
-  padding: 8px;
-  border-bottom: 1px solid var(--color-divider);
-  /* При прокрутке длинного текста панель остаётся под рукой */
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

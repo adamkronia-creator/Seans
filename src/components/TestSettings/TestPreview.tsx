@@ -1,7 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from 'react';
 import { conclusionFor, levelOf, type ConclusionScale } from '../../data/conclusions';
 import type { LibraryTest } from '../../data/library';
-import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
+import { BLIND_TITLE, RESULT_FACT, type ResultMode } from '../../data/resultMode';
+import { answerQuestion, finishRun, resetRun } from '../../data/selfTest';
+import { IconBack } from '../icons';
 import type { TestBlankData } from '../../data/testBlank';
 import { BlankQuestionBody, BlankRules } from './TestBlank';
 import { shortTitle } from './TestHeader';
@@ -14,9 +16,6 @@ const STAGES: { id: Stage; label: string }[] = [
   { id: 'progress', label: 'В процессе' },
   { id: 'end', label: 'Конец' },
 ];
-
-/** Название слепого теста для клиента: ничего не говорит о методике */
-const BLIND_TITLE = 'Как вы себя чувствуете?';
 
 const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
@@ -104,13 +103,17 @@ interface TestPreviewProps {
   result: ResultMode;
   /** Время выполнения из описания теста («15–20 мин.») */
   duration?: string;
+  /** Свайп вправо на первом экране и стрелка «назад» */
+  onExit: () => void;
+  /** Тест, отправленный себе: экран без рамки и подписей специалиста, как у клиента; ответы считаются и сохраняются */
+  live?: { form: string; saveBlank: boolean };
 }
 
 /**
  * Предпросмотр теста в рамке телефона: начало (инструкция, число вопросов, время, кто увидит результат),
  * вопрос с ответами и завершение. Ответы здесь никуда не сохраняются. При слепом тестировании название теста скрыто.
  */
-export function TestPreview({ test, blank, blind, message, result, duration }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, message, result, duration, onExit, live }: TestPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<Record<number, number>>({});
@@ -119,8 +122,54 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
   const last = index >= total - 1;
   const title = blind ? BLIND_TITLE : shortTitle(test.title);
 
+  useEffect(() => {
+    if (live) resetRun(test.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const choose = (answer: number) => {
+    setPicked({ ...picked, [index]: answer });
+    if (live) answerQuestion(test.id, index, answer);
+  };
+  const finish = () => {
+    if (live) finishRun(test.id, total, live.form, live.saveBlank);
+    setStage('end');
+  };
+
+  // Свайпы: влево — дальше (начало → вопросы → следующий вопрос → конец), вправо — назад, с первого экрана — к настройкам
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const step = (dir: 1 | -1) => {
+    if (stage === 'start') return dir > 0 ? setStage('progress') : onExit();
+    if (stage === 'progress') {
+      if (dir > 0) {
+        if (live && picked[index] === undefined) return;
+        return last ? finish() : setIndex(index + 1);
+      }
+      return index === 0 ? setStage('start') : setIndex(index - 1);
+    }
+    if (dir < 0) return live ? onExit() : setStage('progress');
+  };
+  const onTouchStart = (e: TouchEvent) => {
+    touch.current = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    const s = touch.current;
+    touch.current = null;
+    if (!s) return;
+    const dx = e.changedTouches[0].clientX - s.x;
+    const dy = e.changedTouches[0].clientY - s.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    step(dx < 0 ? 1 : -1);
+  };
+
   return (
-    <div className="test-settings__scroll tp">
+    <div className={`test-settings__scroll tp${live ? ' tp--live' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      {live && (
+        <button type="button" className="tp__exit" aria-label="Назад" onClick={onExit}>
+          <IconBack />
+        </button>
+      )}
+      {!live && (
       <div className="tp__tabs" role="group" aria-label="Этап прохождения">
         {STAGES.map(({ id, label }) => (
           <button
@@ -134,16 +183,21 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
           </button>
         ))}
       </div>
+      )}
 
+      {!live && (
       <p className={`tp__badge${blind ? ' tp__badge--blind' : ''}`}>
         {blind ? <IconEyeOff /> : <IconEye />}
         <span>{blind ? 'Слепое тестирование: название скрыто' : 'Клиент увидит название теста'}</span>
       </p>
+      )}
 
       <div className="tp__phone">
-        <div className="tp__status" aria-hidden="true">
-          <span className="tp__notch" />
-        </div>
+        {!live && (
+          <div className="tp__status" aria-hidden="true">
+            <span className="tp__notch" />
+          </div>
+        )}
         <div className="tp__screen" key={stage}>
           {stage === 'start' && (
             <>
@@ -197,7 +251,7 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
                   answer={picked[index]}
                   locked={false}
                   numberedPrompt={false}
-                  onChoose={(answer) => setPicked({ ...picked, [index]: answer })}
+                  onChoose={choose}
                 />
               </div>
             </>
@@ -246,7 +300,7 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
                   Начать
                 </button>
               ) : last ? (
-                <button type="button" className="test-settings__cta-button" onClick={() => setStage('end')}>
+                <button type="button" className="test-settings__cta-button" onClick={finish}>
                   Завершить тест
                 </button>
               ) : (
