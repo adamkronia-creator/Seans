@@ -62,7 +62,7 @@ const BDI: TestSettingsData = {
   scoring: [
     { range: '0–9', label: 'нет симптомов', tone: 'green' },
     { range: '10–18', label: 'легкая депрессия', tone: 'yellow' },
-    { range: '19 – 29', label: 'средняя депрессия', tone: 'orange' },
+    { range: '19–29', label: 'средняя депрессия', tone: 'orange' },
     { range: '30–63', label: 'тяжелая депрессия', tone: 'red' },
   ],
   questions: 21,

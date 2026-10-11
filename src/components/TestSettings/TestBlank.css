@@ -59,11 +59,23 @@
   }
 }
 
-/* Инструкция: абзацы текста 15/22, поля 16, между абзацами 8 */
+/* Число рядом с названием карточки («Вопросы и ответы 21») */
+.blank-card__badge {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+}
+
+/* Инструкция: абзацы текста 15/22, поля 16, между абзацами 12 */
 .blank-rules {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding: var(--space-4);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);

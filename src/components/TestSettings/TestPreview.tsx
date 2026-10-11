@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { conclusionFor, levelOf, type ConclusionScale } from '../../data/conclusions';
 import type { LibraryTest } from '../../data/library';
-import { RESULT_LINE, type ResultMode } from '../../data/resultMode';
+import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
 import { BlankQuestionBody, BlankRules } from './TestBlank';
 import { shortTitle } from './TestHeader';
@@ -52,6 +52,13 @@ const IconLock = () => (
     <path d="M8 11V8a4 4 0 0 1 8 0v3" />
   </Icon>
 );
+const IconEyeOff = () => (
+  <Icon>
+    <path d="M3 3l18 18" />
+    <path d="M10.6 5.7A9.5 9.5 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.9 3.6M6.4 7.2A15.6 15.6 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4-.9" />
+    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+  </Icon>
+);
 const IconEye = () => (
   <Icon>
     <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
@@ -81,7 +88,7 @@ function SampleResult({ testId, mode }: { testId: string; mode: Exclude<ResultMo
           </li>
         ))}
       </ul>
-      {mode === 'full' && <p className="tp__sample-more">Ниже клиент увидит расшифровку каждой шкалы</p>}
+      {mode === 'full' && <p className="tp__sample-more">Ниже — расшифровка каждой шкалы</p>}
     </div>
   );
 }
@@ -114,11 +121,6 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
 
   return (
     <div className="test-settings__scroll tp">
-      <div className="tp__head">
-        <h2 className="tp__heading">Предпросмотр</h2>
-        <p className="tp__sub">Так тест увидит клиент</p>
-      </div>
-
       <div className="tp__tabs" role="group" aria-label="Этап прохождения">
         {STAGES.map(({ id, label }) => (
           <button
@@ -133,20 +135,31 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
         ))}
       </div>
 
-      <p className="tp__note">
-        {blind ? 'Слепое тестирование включено: клиент не увидит название теста и его цель' : 'Слепое тестирование выключено: клиент увидит название теста'}
+      <p className={`tp__badge${blind ? ' tp__badge--blind' : ''}`}>
+        {blind ? <IconEyeOff /> : <IconEye />}
+        <span>{blind ? 'Слепое тестирование: название скрыто' : 'Клиент увидит название теста'}</span>
       </p>
 
       <div className="tp__phone">
+        <div className="tp__status" aria-hidden="true">
+          <span className="tp__notch" />
+        </div>
         <div className="tp__screen" key={stage}>
           {stage === 'start' && (
             <>
               <p className="tp__eyebrow">Тест от вашего специалиста</p>
               <h3 className="tp__title">{title}</h3>
-              {message.trim() !== '' && <p className="tp__message">{message}</p>}
-              <div className="tp__rules">
-                <BlankRules rules={blank.rules} />
-              </div>
+              {message.trim() !== '' && (
+                <div className="tp__bubble">
+                  <p className="tp__bubble-text">{message}</p>
+                </div>
+              )}
+              <section className="tp__section">
+                <h4 className="tp__label">Инструкция</h4>
+                <div className="tp__rules">
+                  <BlankRules rules={blank.rules} />
+                </div>
+              </section>
               <ul className="tp__facts">
                 <li>
                   <IconClock />
@@ -157,15 +170,15 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
                 </li>
                 <li>
                   <IconUndo />
-                  <span>Ответ можно изменить до завершения теста</span>
+                  <span>Ответы можно менять до конца</span>
                 </li>
                 <li>
                   <IconLock />
-                  <span>Ответы видит только ваш специалист</span>
+                  <span>Ответы увидит только специалист</span>
                 </li>
                 <li>
                   <IconEye />
-                  <span>{RESULT_LINE[result]}</span>
+                  <span>{RESULT_FACT[result]}</span>
                 </li>
               </ul>
             </>
@@ -177,7 +190,7 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
                 Вопрос {index + 1} из {total}
               </p>
               {blank.questions[index].heading && <p className="blank-heading tp__heading-pill">{blank.questions[index].heading}</p>}
-              <div className="tp__question">
+              <div className="blank-question tp__question">
                 <BlankQuestionBody
                   data={blank}
                   index={index}
@@ -198,9 +211,9 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
                 </svg>
               </span>
               <h3 className="tp__done-title">Спасибо, тест завершен</h3>
-              <p className="tp__done-text">Ответы переданы вашему специалисту.</p>
+              <p className="tp__done-text">Ответы переданы вашему специалисту</p>
               {result === 'thanks' ? (
-                <p className="tp__done-text">{RESULT_LINE.thanks}.</p>
+                <p className="tp__done-text">{RESULT_FACT.thanks}</p>
               ) : (
                 <SampleResult testId={test.id} mode={result} />
               )}
@@ -224,7 +237,7 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
             )}
             <div className="test-pass__buttons">
               {stage === 'progress' && (
-                <button type="button" className="test-pass__back" disabled={index === 0} onClick={() => setIndex(index - 1)}>
+                <button type="button" className="test-pass__back" onClick={() => (index === 0 ? setStage('start') : setIndex(index - 1))}>
                   Назад
                 </button>
               )}

@@ -1,29 +1,6 @@
-/* Предпросмотр теста: заголовок, этапы, пояснение и рамка телефона с экраном клиента */
+/* Предпросмотр теста: этапы, плашка про слепое тестирование и рамка телефона с экраном клиента */
 .tp {
   gap: var(--space-3);
-}
-
-.tp__head {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--space-3);
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0 var(--space-1);
-}
-
-.tp__heading {
-  margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
-}
-
-.tp__sub {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
 }
 
 /* Три этапа в одной плашке: выбранный белый на сером */
@@ -43,6 +20,9 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .tp__tab--on {
@@ -51,55 +31,118 @@
   box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
 }
 
-.tp__note {
+/* Слепое тестирование включено или выключено: одна строка с глазом, цветом отличается включенное */
+.tp__badge {
+  display: flex;
   flex-shrink: 0;
-  margin: 0 var(--space-1);
-  color: var(--color-text-caption);
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
 }
 
-/* Корпус телефона: темная рамка с большим скруглением, внутри экран клиента и нижняя панель с кнопками */
+.tp__badge--blind {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.tp__badge svg {
+  flex-shrink: 0;
+}
+
+/* Корпус телефона: темная рамка; высота — всё свободное место экрана (не ниже 420), экран внутри прокручивается, кнопки внизу всегда на виду */
 .tp__phone {
+  position: relative;
   display: flex;
-  flex: 1 0 auto;
+  flex: 1 0 420px;
   flex-direction: column;
-  min-height: 480px;
+  width: 100%;
+  max-width: 360px;
+  max-height: 720px;
+  margin: var(--space-1) auto 0;
   overflow: hidden;
-  border: 9px solid #1c2128;
+  border: 8px solid #1c2128;
   border-radius: 40px;
   background: var(--color-bg-panel);
+  box-shadow: 0 4px 20px rgb(15 23 42 / 16%);
+}
+
+/* Неподвижная шторка с «островком»: текст при прокрутке уходит под нее, а не под чёлку */
+.tp__status {
+  position: relative;
+  flex-shrink: 0;
+  height: 32px;
+}
+
+.tp__notch {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 72px;
+  height: 20px;
+  border-radius: 10px;
+  background: #1c2128;
+  transform: translateX(-50%);
 }
 
 .tp__screen {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-6) var(--space-5) var(--space-4);
+  gap: var(--space-4);
+  min-height: 0;
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(to bottom, transparent, #000 12px);
 }
 
 .tp__eyebrow {
   margin: 0;
-  color: var(--color-text-caption);
+  color: var(--color-accent);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-sm);
 }
 
 .tp__title {
-  margin: 0;
-  font-size: 26px;
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-size: 24px;
   font-weight: var(--font-weight-semibold);
-  line-height: 32px;
+  line-height: 30px;
+  letter-spacing: var(--letter-spacing-title);
 }
 
-.tp__message {
-  margin: 0;
+/* Сообщение специалиста: пузырь, как в чате */
+.tp__bubble {
+  align-self: flex-start;
+  max-width: 100%;
   padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-app);
+  border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg);
+  background: var(--color-accent-soft);
+}
+
+.tp__bubble-text {
+  margin: 0;
   font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tp__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tp__label {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-md);
 }
 
@@ -108,26 +151,33 @@
   color: var(--color-text-secondary);
 }
 
+/* Что нужно знать перед началом: плашка со строками и значками */
 .tp__facts {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin: var(--space-1) 0 0;
-  padding: 0;
+  margin: 0;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-app);
   list-style: none;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }
 
 .tp__facts li {
   display: flex;
   gap: var(--space-3);
-  align-items: flex-start;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) 0;
+}
+
+.tp__facts li + li {
+  border-top: 1px solid var(--color-divider);
 }
 
 .tp__fact-icon {
   flex-shrink: 0;
-  margin-top: 1px;
   color: var(--color-accent);
 }
 
@@ -136,7 +186,7 @@
   border-top: 0;
 }
 
-.tp__question .blank-question {
+.tp__question {
   padding: 0;
   border: 0;
 }
@@ -147,6 +197,7 @@
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4) var(--space-4);
   border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .tp__done {
@@ -156,7 +207,6 @@
   gap: var(--space-2);
   align-items: center;
   justify-content: center;
-  padding: var(--space-6) 0;
   text-align: center;
 }
 
@@ -171,23 +221,26 @@
 }
 
 .tp__done-title {
-  margin: var(--space-1) 0 0;
+  margin: var(--space-2) 0 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
 }
 
 .tp__done-text {
+  max-width: 260px;
   margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
+  text-wrap: balance;
 }
 
 .tp__sample {
   align-self: stretch;
   margin-top: var(--space-3);
   padding: var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-app);
   text-align: left;
 }

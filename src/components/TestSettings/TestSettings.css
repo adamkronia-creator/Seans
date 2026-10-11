@@ -458,10 +458,21 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Темы материала: теги переносятся на следующие строки, как чипсы, но без нажатия */
+/* Темы материала: подпись и теги, которые переносятся на следующие строки, как чипсы, но без нажатия */
 .ts-topics {
+  display: flex;
   flex-shrink: 0;
-  padding: 0 4px 4px;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-1) 0 var(--space-2);
+}
+
+.ts-topics__label {
+  margin: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
 }
 
 .ts-topics__list {
@@ -502,4 +513,5 @@
   color: var(--color-text-caption);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
+  text-wrap: balance;
 }

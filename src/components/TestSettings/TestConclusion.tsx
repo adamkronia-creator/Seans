@@ -51,6 +51,12 @@ function RowName({ data, scale, index }: { data: ConclusionData; scale: Conclusi
   );
 }
 
+/** Диапазон баллов через короткое тире без пробелов: «40 — 69» → «40–69» */
+const rangeText = (range: string) => range.replace(/\s+—\s+/g, '–');
+
+/** Описание шкалы с большой буквы: в данных оно записано продолжением («— оценивает …»), а на экране стоит отдельным абзацем */
+const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
 export function pointsWord(n: number) {
   if (!Number.isInteger(n)) return 'балла'; // 3,2 балла
@@ -239,7 +245,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
     <section key={l.key} className={`cc-level${flat ? ' cc-level--flat' : ''}`}>
       <h3 className={`cc-level__head cc-tone--${l.tone}`}>
         <span className="cc-level__dot" />
-        {flat ? `${l.range}: ${l.heading ?? (data.overview ? `${l.chip} показатель` : l.chip)}` : l.range}
+        {flat ? `${rangeText(l.range)}: ${l.heading ?? (data.overview ? `${l.chip} показатель` : l.chip)}` : rangeText(l.range)}
         {!flat && <span className={`cc-level__chip cc-chip--${l.tone}`}>{l.chip}</span>}
       </h3>
       {(texts[l.key] ?? []).map((paragraph) => (
@@ -254,7 +260,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
       badge={data.overview || data.blocks ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
     >
       <div className="cc-scale">
-        <p className="cc-scale__text">— {scale.about}</p>
+        <p className="cc-scale__text">{sentence(scale.about)}</p>
         <p className="cc-scale__text">
           Шкала имеет{' '}
           <strong className={level ? `cc-tone--${level.tone}` : 'cc-tone--accent'}>

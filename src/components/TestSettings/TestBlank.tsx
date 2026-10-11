@@ -140,7 +140,7 @@ export function TestBlank({ data, fill }: { data: TestBlankData; fill?: BlankFil
         <BlankRules rules={data.rules} />
       </CollapseCard>
 
-      <CollapseCard title="Вопросы и ответы" id="blank-qa">
+      <CollapseCard title="Вопросы и ответы" id="blank-qa" badge={<span className="blank-card__badge">{data.questions.length}</span>}>
         <ol className="blank-questions">
           {data.questions.map((q, i) => (
             <Fragment key={i}>

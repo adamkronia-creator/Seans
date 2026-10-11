@@ -59,6 +59,7 @@ export function TopicTags({ id }: { id: string }) {
   if (topics.length === 0) return null;
   return (
     <section className="ts-topics" aria-label="Темы материала">
+      <p className="ts-topics__label">Темы материала</p>
       <ul className="ts-topics__list">
         {topics.map((topic) => (
           <li key={topic} className="ts-topics__tag">
