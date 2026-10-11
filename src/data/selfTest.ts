@@ -198,3 +198,14 @@ export function finishRun(testId: string, total: number, form: string, saveBlank
   });
   return result;
 }
+
+/** Тест, отправленный себе: кнопка «Пройти» в чате открывает прохождение с теми настройками, с какими он ушел */
+let pendingPass: { testId: string; form?: string; saveBlank: boolean } | null = null;
+export const requestPass = (testId: string, form: string | undefined, saveBlank: boolean) => {
+  pendingPass = { testId, form, saveBlank };
+};
+export function takePass(testId: string) {
+  const request = pendingPass?.testId === testId ? pendingPass : null;
+  pendingPass = null;
+  return request;
+}

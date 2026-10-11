@@ -1,3 +1,4 @@
+import { requestPass } from '../../data/selfTest';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
@@ -212,7 +213,7 @@ export function MessageBubble({
               </span>
             )}
             <span className="tcard__text">
-              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : message.toSelf ? 'Тест для себя' : 'Присланный тест'}</span>
+              <span className="tcard__label">{isTask ? (out ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}</span>
               <span className="tcard__title">{test?.title ?? (isTask ? 'Задание' : 'Тест')}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
             </span>
@@ -235,7 +236,12 @@ export function MessageBubble({
             <button
               type="button"
               className="bubble-button"
-              onClick={() => (settings ? onTestSettings(message) : link ? onOpenLink(link.href) : onOpenTest(message.test!))}
+              onClick={() => {
+                if (settings) return onTestSettings(message);
+                if (link) return onOpenLink(link.href);
+                if (message.toSelf) requestPass(message.test!, message.testOptions?.form, message.testOptions?.saveBlank ?? true);
+                onOpenTest(message.test!);
+              }}
             >
               {settings ? 'Настройки теста' : passed ? 'Посмотреть' : 'Пройти'}
             </button>

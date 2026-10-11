@@ -23,7 +23,7 @@ import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
-import { canPassSelf, formHint } from '../../data/selfTest';
+import { canPassSelf, formHint, takePass } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -144,16 +144,18 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value
  */
 export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
-  const [form, setForm] = useState(data.forms?.[0] ?? '');
+  // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
+  const [passRequest] = useState(() => takePass(test.id));
+  const [form, setForm] = useState(passRequest?.form ?? data.forms?.[0] ?? '');
   const [message, setMessage] = useState(data.message);
   const [messageOn, setMessageOn] = useState(true);
   const [blind, setBlind] = useState(true);
   const [result, setResult] = useState<ResultMode>('thanks');
-  const [saveBlank, setSaveBlank] = useState(true);
+  const [saveBlank, setSaveBlank] = useState(passRequest?.saveBlank ?? true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
-  const [view, setView] = useState<View>('settings');
+  const [view, setView] = useState<View>(passRequest && testBlank(test.id) ? 'pass' : 'settings');
   // Результат только что пройденного теста: открывается вместо настроек, «назад» возвращает к ним
   const [resultId, setResultId] = useState<string | null>(null);
   // Длинное описание свёрнуто до шести строк, пока его не раскроют
@@ -260,8 +262,9 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
   const openBlank = () => (blank ? openView('blank') : notify('Бланк этого теста пока недоступен'));
   // Жест «назад» из результата, бланка, заключения или прохождения ведёт к настройкам, как кнопка в шапке
+  const stepBack = () => (passRequest && view === 'pass' ? onBack() : openView('settings'));
   useBackHandler(Boolean(resultId) || view !== 'settings', () =>
-    resultId ? transition(() => setResultId(null), 'back') : openView('settings'),
+    resultId ? transition(() => setResultId(null), 'back') : stepBack(),
   );
   // Свайп вправо на настройке, бланке и примере заключения — тот же «назад», что стрелка в шапке
   useSwipeBack('.test-settings', !resultId && (view === 'settings' || view === 'blank' || view === 'conclusion' || view === 'preview'), () =>
@@ -279,7 +282,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   return (
     <section className="test-settings">
-      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : () => openView('settings')} />
+      <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : stepBack} />
 
       {view === 'pass' && blank ? (
         <TestPass
@@ -346,18 +349,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               <span className="ts-row__link">Бланк тестирования</span>
               <IconTestChevron className="ts-row__chevron" />
             </li>
-            {blank && (
-              <li
-                className="ts-row ts-row--link"
-                role="button"
-                tabIndex={0}
-                onClick={() => openView('preview')}
-                onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
-              >
-                <span className="ts-row__link">Предпросмотр теста</span>
-                <IconTestChevron className="ts-row__chevron" />
-              </li>
-            )}
             {data.scales && (
               <li
                 className="ts-row ts-row--link"
@@ -367,6 +358,18 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
               >
                 <span className="ts-row__link">Пример заключения</span>
+                <IconTestChevron className="ts-row__chevron" />
+              </li>
+            )}
+            {blank && (
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={() => openView('preview')}
+                onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
+              >
+                <span className="ts-row__link">Предпросмотр теста</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
             )}
