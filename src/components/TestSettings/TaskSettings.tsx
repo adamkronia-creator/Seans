@@ -346,16 +346,25 @@ export function TaskSettings({ task, onBack }: TaskSettingsProps) {
               </ul>
             </CollapseCard>
 
-            <CollapseCard title="Цель задания">
-              <div className="task-pad">
-                <Paragraphs text={data.goal} />
-              </div>
-            </CollapseCard>
-
-            <CollapseCard title="Анализ материалов">
-              <div className="task-pad">
-                <Paragraphs text={data.analysis} />
-              </div>
+            <CollapseCard title="Интерпретация задания">
+              <ul className="ts-rows">
+                <li className="ts-row ts-row--top">
+                  <div className="ts-scale">
+                    <p className="ts-scale__title">Цель задания:</p>
+                    <div className="task-pad task-pad--inline">
+                      <Paragraphs text={data.goal} />
+                    </div>
+                  </div>
+                </li>
+                <li className="ts-row ts-row--top">
+                  <div className="ts-scale">
+                    <p className="ts-scale__title">Анализ материалов:</p>
+                    <div className="task-pad task-pad--inline">
+                      <Paragraphs text={data.analysis} />
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </CollapseCard>
 
             <CollapseCard title="Особенности задания">

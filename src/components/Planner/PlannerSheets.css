@@ -68,3 +68,11 @@
   flex-shrink: 0;
   color: var(--color-accent);
 }
+
+/* Длительность сеанса: кнопка-меню справа в строке */
+.pl-duration {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  padding: var(--space-2) 0;
+}

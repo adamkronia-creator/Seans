@@ -8,7 +8,7 @@ import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { dayShort, durationLabel } from '../../utils/ruDate';
 import { Avatar } from '../Avatar/Avatar';
 import { slotTime } from '../ChatBooking/bookingText';
-import { IconBack, IconCaseEdit, IconTestChevronDown } from '../icons';
+import { IconCaseEdit, IconTestChevronDown } from '../icons';
 import './AgendaCards.css';
 
 type Tone = 'green' | 'yellow' | 'red' | 'accent' | 'gray';
@@ -32,7 +32,6 @@ function OpenLink({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button type="button" className="pl-open" onClick={onClick}>
       {label}
-      <IconBack className="pl-open__arrow" />
     </button>
   );
 }

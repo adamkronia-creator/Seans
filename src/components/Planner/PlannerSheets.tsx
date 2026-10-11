@@ -5,6 +5,7 @@ import type { Plan, PlanInput, PlanKind } from '../../data/planner';
 import { dayLong, toMinutes } from '../../utils/ruDate';
 import { Frame } from '../ChatBooking/BookingSheets';
 import '../ChatBooking/BookingSheets.css';
+import { FormMenu } from '../TestSettings/FormMenu';
 import { RichEditor } from '../RichEditor/RichEditor';
 import '../EditSheet/EditSheet.css';
 import { IconBookingCancelled, IconBookingDone, IconBookingPending } from '../icons';
@@ -145,12 +146,26 @@ export function PlanSheet({ plan, day, now, clients, onSave, onSaveNote, onRemov
             <input id={`${uid}-date`} className="sheet__row-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </li>
           {isNote ? null : isSession ? (
+            <>
             <li className="sheet__row">
               <label className="sheet__row-label" htmlFor={`${uid}-time`}>
                 Начало
               </label>
               <input id={`${uid}-time`} className="sheet__row-input" type="time" step={300} value={time} onChange={(e) => setTime(e.target.value)} />
             </li>
+            <li className="sheet__row">
+              <span className="sheet__row-label">Длительность</span>
+              <span className="pl-duration">
+                <FormMenu
+                  title="Длительность"
+                  forms={DURATIONS.map(String)}
+                  value={String(duration)}
+                  format={(v) => `${v} мин`}
+                  onChange={(v) => setDuration(Number(v))}
+                />
+              </span>
+            </li>
+            </>
           ) : (
             <>
               <li className="sheet__row">
@@ -176,26 +191,6 @@ export function PlanSheet({ plan, day, now, clients, onSave, onSaveNote, onRemov
           </p>
         )}
       </div>
-
-      {isSession && (
-        <section className="sheet__card bk-card" aria-label="Длительность сеанса">
-          <h3 className="bk-label">Длительность</h3>
-          <div className="bk-chips" role="radiogroup" aria-label="Длительность сеанса">
-            {DURATIONS.map((d) => (
-              <button
-                key={d}
-                type="button"
-                role="radio"
-                aria-checked={duration === d}
-                className={`bk-chip${duration === d ? ' bk-chip--active' : ''}`}
-                onClick={() => setDuration(d)}
-              >
-                {d} мин
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
 
       {plan && onRemove && (
         <button type="button" className="sheet__card pl-remove" onClick={onRemove}>

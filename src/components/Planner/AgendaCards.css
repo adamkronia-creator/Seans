@@ -166,12 +166,6 @@
   line-height: var(--line-height-sm);
 }
 
-.pl-open__arrow {
-  flex-shrink: 0;
-  font-size: var(--size-icon-sm);
-  transform: scaleX(-1);
-}
-
 /* ——— Комментарий к сеансу ——— */
 .pl-comment {
   display: flex;

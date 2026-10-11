@@ -64,3 +64,9 @@
 .task-pad .ts-card__paragraph + .ts-card__paragraph {
   margin-top: 0;
 }
+
+/* Абзацы внутри строки карточки: без своих полей, строка уже даёт отступы */
+.task-pad--inline {
+  padding: 0;
+  gap: var(--space-2);
+}
