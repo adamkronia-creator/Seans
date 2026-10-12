@@ -169,7 +169,7 @@ const collator = new Intl.Collator('ru');
 const minutesOf = (e: Entry, i: 0 | 1) => e.d.minutes?.[i];
 
 /**
- * Материалы раздела (scope — их идентификаторы в порядке раздела: все или категория, уже с учётом отметок)
+ * Материалы раздела (scope — их идентификаторы в порядке раздела: все или папка, уже с учётом отметок)
  * после запроса, фильтров и сортировки.
  */
 export function listIds(catalog: Catalog, view: ViewQuery, scope: string[], favorites: ReadonlySet<string>): Listing {

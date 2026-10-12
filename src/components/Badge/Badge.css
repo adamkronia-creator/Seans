@@ -61,3 +61,16 @@
   background: var(--color-text-placeholder);
   color: var(--color-accent-on);
 }
+
+/* Уведомления папки выключены: то же число, но в тонком кольце без заливки, тише обычного кружка */
+.badge--quiet {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px rgb(112 123 139 / 40%);
+  color: var(--color-text-secondary);
+}
+
+.badge--quiet-inverse {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 60%);
+  color: rgb(255 255 255 / 88%);
+}

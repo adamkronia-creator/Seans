@@ -1,26 +1,15 @@
-/* Строка чата: аватар 48, отступы 12 и 16, разделитель от текста до правого края */
+/* Строка чата: аватар 48, отступы 12 и 16; между чатами разделителя нет */
 .chat-item {
   background: var(--color-bg-row);
 }
 
 .chat-item__button {
-  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-3) var(--space-4);
   text-align: left;
-}
-
-.chat-item + .chat-item .chat-item__button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: calc(var(--space-4) + var(--size-avatar-lg) + var(--space-3));
-  height: 1px;
-  background: var(--color-divider);
 }
 
 .chat-item__button:active,

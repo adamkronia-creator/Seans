@@ -1,20 +1,20 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
-import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
+import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
+import { IconBell, IconPlus } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import { CATEGORIES, type Chat, type ChatCategory } from '../../data/chats';
+import type { Chat } from '../../data/chats';
+import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import './MessagesPage.css';
 
-type Filter = 'all' | ChatCategory;
-
-/** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
-const FILTERS: Filter[] = ['all', ...CATEGORIES.map(({ id }) => id)];
+/** 'all' или номер папки */
+type Filter = string;
 
 /** Чаты одного фильтра: страница пейджера, у каждой своя прокрутка */
 const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOpen: (chat: Chat) => void }) {
@@ -35,13 +35,26 @@ export function MessagesPage() {
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const chats = useChats();
+  const folders = useFolders('chats');
+  const folderMenu = useFolderMenu('chats');
   const root = useRef<HTMLElement>(null);
 
+  /** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
+  const filters = useMemo<Filter[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
+  /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
+  const order = filters.join('|');
+
+  // Открытую папку удалили: остаёмся на «Все»
+  useEffect(() => {
+    if (!filters.includes(filter)) setFilter('all');
+  }, [filters, filter]);
+
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
-  // «Все» считает и «Избранное»; категории — только свои чаты. При нуле кружок скрыт.
-  const countOf = (id: Filter) =>
-    chats.filter((c) => c.unread > 0 && (id === 'all' || (!c.favorites && c.category === id)))
-      .length;
+  // «Все» считает и «Избранное»; папки — только свои чаты. При нуле кружок скрыт.
+  const countOf = (id: Filter) => {
+    const members = id === 'all' ? null : new Set(folders.find((f) => f.id === id)?.ids);
+    return chats.filter((c) => c.unread > 0 && (members === null || (!c.favorites && members.has(c.id)))).length;
+  };
 
   // Открытие чата помечает его прочитанным и ведёт в переписку
   const openChat = useCallback((chat: Chat) => {
@@ -53,27 +66,33 @@ export function MessagesPage() {
   const lists = useMemo(() => {
     const q = query.trim().toLowerCase();
     const matches = (chat: Chat) => !q || chat.name.toLowerCase().includes(q) || chat.lastMessage.toLowerCase().includes(q);
-    return FILTERS.map((id) => chats.filter((chat) => (id === 'all' || (!chat.favorites && chat.category === id)) && matches(chat)));
-  }, [chats, query]);
+    return filters.map((id) => {
+      const members = id === 'all' ? null : new Set(folders.find((f) => f.id === id)?.ids);
+      return chats.filter((chat) => (members === null || (!chat.favorites && members.has(chat.id))) && matches(chat));
+    });
+  }, [chats, folders, filters, query]);
 
   const pages = useMemo(
-    () => FILTERS.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} onOpen={openChat} /> })),
-    [lists, openChat],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} onOpen={openChat} /> })),
+    [filters, lists, openChat],
   );
 
-  const index = FILTERS.indexOf(filter);
+  const index = Math.max(0, filters.indexOf(filter));
   const shown = dragIndex ?? index;
 
-  const onDrag = useCallback((position: number | null) => {
-    setDragIndex(position === null ? null : Math.round(Math.min(FILTERS.length - 1, Math.max(0, position))));
-  }, []);
+  const onDrag = useCallback(
+    (position: number | null) => {
+      setDragIndex(position === null ? null : Math.round(Math.min(filters.length - 1, Math.max(0, position))));
+    },
+    [filters.length],
+  );
 
-  // Цвет чипсов идёт за положением страниц, а не прыгает на середине (чипс «+» не фильтр: он вне страниц)
+  // Цвет чипсов идёт за положением страниц, а не прыгает на середине
   const onPosition = useCallback((position: number) => {
-    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--icon)');
+    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip');
     if (chips) followChips(chips, position);
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    if (row) centerChips(row, position, '.chip:not(.chip--icon)');
+    if (row) centerChips(row, position);
   }, []);
 
   return (
@@ -91,32 +110,33 @@ export function MessagesPage() {
         chipsLabel="Фильтр диалогов"
         chips={
           <>
-            <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
-              <IconPlusChip />
-            </Chip>
-            <Chip follow active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')}>
+            <Chip follow active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
-            {CATEGORIES.map(({ id, label }, i) => (
+            {folders.map(({ id, name, muted }, i) => (
               <Chip
                 key={id}
                 follow
                 active={shown === i + 1}
                 count={countOf(id)}
+                muted={muted}
                 onClick={() => setFilter(id)}
+                onLongPress={(chip) => folderMenu.open(id, chip)}
               >
-                {label}
+                {name}
               </Chip>
             ))}
           </>
         }
       />
 
-      <SwipePager index={index} pages={pages} onIndexChange={(i) => setFilter(FILTERS[i])} onPosition={onPosition} onDrag={onDrag} />
+      <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} />
 
       <button type="button" className="messages__fab" aria-label="Новый диалог">
         <IconPlus />
       </button>
+
+      {folderMenu.node}
     </section>
   );
 }

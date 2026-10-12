@@ -1,4 +1,6 @@
 .messages {
+  /* Подсказка (уведомления папки, папка удалена) стоит над кнопкой «Новый диалог»: 16 + 52 + 12 */
+  --toast-bottom: calc(var(--space-4) + var(--size-fab) + var(--space-3));
   position: relative;
   display: flex;
   flex: 1;

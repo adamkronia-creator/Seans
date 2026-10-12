@@ -3,6 +3,7 @@ import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
+import { FolderPage } from './pages/FolderPage/FolderPage';
 import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
@@ -12,6 +13,7 @@ import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
 import { wantSection, type ChatSection } from './data/chatIntent';
 import { CHATS } from './data/chats';
+import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { goBack, navigate, useRoute } from './router';
@@ -36,6 +38,9 @@ interface Resolved {
  * и /chat/<чат>/result/<результат> (результат теста или задания)
  */
 const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+))?/;
+
+/** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
+const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
@@ -105,6 +110,20 @@ export default function App() {
     }, 'forward');
   }, []);
 
+  /** Настройки папки на весь экран, без нижней панели (как редактирование профиля); если такой папки нет, экран не строится */
+  const folderScreen = (path: string, scope: FolderScope): Resolved | null => {
+    const id = path.match(FOLDER_ROUTE)?.[1];
+    if (!id || !getFolder(scope, id)) return null;
+    return {
+      key: `folder/${id}`,
+      build: () => (
+        <main className="app__content">
+          <FolderPage scope={scope} id={id} />
+        </main>
+      ),
+    };
+  };
+
   /** Обычный экран приложения: содержимое и нижняя панель разделов */
   const page = (key: string, node: ReactNode, at: TabId): Resolved => ({
     key,
@@ -167,15 +186,21 @@ export default function App() {
     }
 
     if (at === 'messages') {
+      const folder = folderScreen(path, 'chats');
+      if (folder) return folder;
       return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at);
     }
     if (at === 'tests') {
+      const folder = folderScreen(path, 'tests');
+      if (folder) return folder;
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at) : page('tests', <TestsPage />, at);
     }
     if (at === 'tasks') {
+      const folder = folderScreen(path, 'tasks');
+      if (folder) return folder;
       // /tasks/<задание>: настройка задания из раздела «Задания»
       const taskId = path.match(/^\/tasks\/([^/]+)/)?.[1];
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;

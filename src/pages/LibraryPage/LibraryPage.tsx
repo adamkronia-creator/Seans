@@ -1,7 +1,7 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
-import { IconFilterAll, IconPlusChip } from '../../components/icons';
+import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/EmptyResults';
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
 import { FilterSheet } from '../../components/LibraryFilters/FilterSheet';
@@ -12,6 +12,7 @@ import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
+import { useFolders } from '../../data/folders';
 import type { LibraryItem } from '../../data/library';
 import type { Kind } from '../../data/libraryMeta';
 import {
@@ -44,7 +45,6 @@ interface LibraryPageProps {
   title: string;
   searchPlaceholder: string;
   items: LibraryItem[];
-  categories: { id: string; label: string }[];
   favorites: ReadonlySet<string>;
   onToggleFavorite: (id: string) => void;
   /** Нажатие на карточку (открыть настройку) */
@@ -53,14 +53,14 @@ interface LibraryPageProps {
   labels: { all: string; filters: string; emptyRecent: string; noun: Noun; everywhere: string };
 }
 
-type Section = string; // 'all' | id категории
+type Section = string; // 'all' | номер папки
 
 /** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от включённых «Избранное» и «Недавние» и от того, весь ли это каталог */
 function emptyText(marks: Marks, wholeCatalog: boolean, recent: string): string {
-  if (marks.favorites && marks.recent) return wholeCatalog ? 'Среди недавних нет избранного.' : 'В этом разделе среди недавних нет избранного.';
-  if (marks.favorites) return wholeCatalog ? 'В избранном пока ничего нет.' : 'В этом разделе нет избранного.';
-  if (marks.recent) return wholeCatalog ? `${recent}.` : 'В этом разделе нет недавних.';
-  return 'Здесь пока ничего нет.';
+  if (marks.favorites && marks.recent) return wholeCatalog ? 'Среди недавних нет избранного.' : 'В этой папке среди недавних нет избранного.';
+  if (marks.favorites) return wholeCatalog ? 'В избранном пока ничего нет.' : 'В этой папке нет избранного.';
+  if (marks.recent) return wholeCatalog ? `${recent}.` : 'В этой папке нет недавних.';
+  return wholeCatalog ? 'Здесь пока ничего нет.' : 'В этой папке пока ничего нет. Чтобы добавить, удерживайте её название и выберите «Настроить папку».';
 }
 
 /** Где искали, когда включены «Избранное» и «Недавние»: «Среди избранного по запросу «…» ничего нет» */
@@ -215,12 +215,12 @@ function LibraryList(p: ListProps) {
  * Библиотека для психолога: все тесты (или задания) приложения. Интерфейс общий,
  * потому что разделы «Диагностика» и «Задания» устроены одинаково.
  *
- * Разделы (все и свои категории) — страницы пейджера: список можно листать пальцем, а чипсы идут следом.
+ * Разделы («Все» и папки) — страницы пейджера: список можно листать пальцем, а чипсы идут следом. Долгое нажатие на чипс открывает меню папки (useFolderMenu).
  * Поверх любого раздела работают поиск по словам, фильтры (лист «Фильтры») и порядок; в строке над списком
  * кнопки «Избранное» и «Недавние» оставляют только их. Состояние лежит в libraryView.ts,
  * поэтому после открытия теста запрос, фильтры и кнопки на месте.
  */
-export function LibraryPage({ kind, title, searchPlaceholder, items, categories, favorites, onToggleFavorite, onOpen, labels }: LibraryPageProps) {
+export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, onOpen, labels }: LibraryPageProps) {
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -228,6 +228,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
   const [focused, setFocused] = useState(false);
   const client = useClientData();
   const view = useLibraryView(kind);
+  const scope = kind === 'test' ? 'tests' : 'tasks';
+  const folders = useFolders(scope);
+  const folderMenu = useFolderMenu(scope);
   const root = useRef<HTMLElement>(null);
   const input = useRef<HTMLInputElement>(null);
 
@@ -235,13 +238,28 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
   /** Разделы по порядку чипсов: по ним же идут страницы */
-  const sections = useMemo<Section[]>(() => ['all', ...categories.map((c) => c.id)], [categories]);
+  const sections = useMemo<Section[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
+  /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
+  const order = sections.join('|');
+
+  // Открытую папку удалили: остаёмся на «Все»
+  useEffect(() => {
+    if (!sections.includes(section)) setSection('all');
+  }, [sections, section]);
   const everything = useMemo(() => items.map((t) => t.id), [items]);
   /** Недавние от самых свежих */
   const recent = useMemo(() => recentIds(client, kind).filter((id) => catalog.byId.has(id)), [client, kind, catalog]);
 
-  /** Материалы каждого раздела: идентификаторы в порядке раздела */
-  const bases = useMemo(() => sections.map((id) => (id === 'all' ? everything : items.filter((t) => t.categories.includes(id)).map((t) => t.id))), [sections, everything, items]);
+  /** Материалы каждого раздела: идентификаторы в порядке раздела (в папке — те, что в неё выбраны) */
+  const bases = useMemo(
+    () =>
+      sections.map((id) => {
+        if (id === 'all') return everything;
+        const members = new Set(folders.find((f) => f.id === id)?.ids);
+        return items.filter((t) => members.has(t.id)).map((t) => t.id);
+      }),
+    [sections, everything, items, folders],
+  );
   /** Они же с учётом кнопок «Избранное» и «Недавние» */
   const scopes = useMemo(() => bases.map((base) => markedScope(base, view.marks, favorites, recent)), [bases, view.marks, favorites, recent]);
 
@@ -329,26 +347,28 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
     [sections.length],
   );
 
-  // Цвет чипсов идёт за положением страниц (чипс «+» не раздел: он вне страниц)
+  // Цвет чипсов идёт за положением страниц
   const onPosition = useCallback((position: number) => {
-    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--plus)');
+    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip');
     if (chips) followChips(chips, position);
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    if (row) centerChips(row, position, '.chip:not(.chip--plus)');
+    if (row) centerChips(row, position);
   }, []);
 
-  // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи
-  const chip = (id: Section, label: string, icon = false) => {
+  // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи.
+  // Долгое нажатие открывает меню папки; у «Все» на экране одно слово, а читалке нужно знать, чего «все»: «Все тесты»
+  const chip = (id: Section, label: string) => {
     const i = sections.indexOf(id);
     const count = listings[i]?.ids.length ?? 0;
     return {
       follow: true,
       active: shown === i,
       onClick: () => setSection(id),
-      ariaLabel: narrowed ? `${label}: найдено ${count}` : icon ? label : undefined,
+      onLongPress: (el: HTMLElement) => folderMenu.open(id, el),
+      ariaLabel: narrowed ? `${label}: найдено ${count}` : id === 'all' ? label : undefined,
+      className: narrowed && count === 0 ? 'chip--dim' : undefined,
     };
   };
-  const chipClass = (id: Section, extra?: string) => [extra, narrowed && (listings[sections.indexOf(id)]?.ids.length ?? 0) === 0 && 'chip--dim'].filter(Boolean).join(' ') || undefined;
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -397,15 +417,10 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
         chipsLabel={labels.filters}
         chips={
           <>
-            <Chip iconOnly className="chip--plus" ariaLabel="Добавить категорию">
-              <IconPlusChip />
-            </Chip>
-            <Chip iconOnly toggle className={chipClass('all', 'chip--glyph-lg')} {...chip('all', labels.all, true)}>
-              <IconFilterAll />
-            </Chip>
-            {categories.map(({ id, label }) => (
-              <Chip key={id} className={chipClass(id)} {...chip(id, label)}>
-                {label}
+            <Chip {...chip('all', labels.all)}>Все</Chip>
+            {folders.map(({ id, name }) => (
+              <Chip key={id} {...chip(id, name)}>
+                {name}
               </Chip>
             ))}
           </>
@@ -413,7 +428,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
       />
 
       <div className="library-page__body">
-        <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} />
+        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} />
         {showSuggest && (
           <SuggestPanel
             history={view.history}
@@ -452,6 +467,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
           onClose={() => setSheet(null)}
         />
       )}
+      {folderMenu.node}
     </section>
   );
 }

@@ -288,7 +288,6 @@
 .pe__chip {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
   height: 36px;
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
@@ -301,8 +300,4 @@
 .pe__chip--own {
   background: var(--color-accent-soft);
   color: var(--color-accent);
-}
-
-.pe__chip svg {
-  font-size: 16px;
 }

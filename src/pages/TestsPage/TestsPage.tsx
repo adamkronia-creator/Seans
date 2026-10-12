@@ -1,4 +1,4 @@
-import { LIBRARY, TEST_CATEGORIES, toggleFavorite, useFavorites } from '../../data/library';
+import { LIBRARY, toggleFavorite, useFavorites } from '../../data/library';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
 
@@ -10,7 +10,6 @@ export function TestsPage() {
       title="Диагностика"
       searchPlaceholder="Поиск по тестам"
       items={LIBRARY}
-      categories={TEST_CATEGORIES}
       favorites={useFavorites()}
       onToggleFavorite={toggleFavorite}
       onOpen={(t) => navigate(`/tests/${t.id}`)}

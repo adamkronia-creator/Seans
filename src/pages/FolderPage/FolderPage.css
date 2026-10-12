@@ -1,0 +1,312 @@
+/* «Настроить папку»: экран без нижней панели разделов, устроен как «Редактирование» профиля. Подсказки на нём нет */
+.fp {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Верхняя панель: «назад», название папки, справа «Готово» */
+.fp__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-bar-h);
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.fp__back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: var(--size-icon);
+}
+
+.fp__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp__done {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+}
+
+.fp__scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-3) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.fp__card {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+}
+
+/* Заголовки карточек акцентные, как в Telegram */
+.fp__heading {
+  display: block;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+.fp__heading--pad {
+  padding: var(--space-3) var(--space-4) var(--space-1);
+}
+
+/* ---------- Название ---------- */
+
+.fp__field {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+}
+
+.fp__input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.fp__input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
+}
+
+.fp__input::placeholder {
+  color: var(--color-text-caption);
+}
+
+/* Сколько букв ещё можно ввести */
+.fp__counter {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-sm);
+}
+
+/* ---------- Выбранные ---------- */
+
+.fp__add {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md);
+  text-align: left;
+}
+
+.fp__add[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+/* Значок стоит в колонке аватаров (40) и по центру с ними */
+.fp__add-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  font-size: var(--size-icon);
+}
+
+.fp__list {
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  list-style: none;
+}
+
+.fp__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 60px;
+  padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
+}
+
+.fp-row__text,
+.fp-pick__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* Название — до двух строк: у тестов оно длинное, и по «Опросник депресси…» на узком экране их не отличить */
+.fp-row__title,
+.fp-pick__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md);
+  overflow-wrap: anywhere;
+}
+
+.fp-row__note,
+.fp-pick__note {
+  overflow: hidden;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Убрать из папки: крестик с большой областью нажатия */
+.fp__remove {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-text-caption);
+  font-size: var(--size-icon-sm);
+}
+
+.fp__hint {
+  padding: 0 var(--space-1);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-wrap: pretty;
+}
+
+/* ---------- Удалить ---------- */
+
+.fp__delete {
+  --press-scale: 1;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  color: var(--color-red-text);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md);
+  text-align: left;
+}
+
+.fp__delete[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+/* ---------- Значок теста и задания: плитка цвета материала, как в карточках библиотеки ---------- */
+
+.fp-icon {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  isolation: isolate;
+}
+
+.fp-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint);
+  opacity: 0.75;
+}
+
+.fp-icon img {
+  width: 30px;
+  height: 30px;
+}
+
+/* ---------- Окно «Добавить …»: как и в списке чатов, строки без разделителей ---------- */
+
+.fp-pick {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fp-pick__row {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 60px;
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+}
+
+.fp-pick__row[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+/* Круглая отметка слева: пустая серая, выбранная — акцентная с галочкой */
+.fp-pick__box {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--color-text-placeholder);
+  border-radius: var(--radius-full);
+  color: var(--color-accent-on);
+  font-size: 16px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.fp-pick__box--on {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}

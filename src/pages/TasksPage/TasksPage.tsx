@@ -1,9 +1,4 @@
-import {
-  TASK_CATEGORIES,
-  TASK_LIBRARY,
-  toggleTaskFavorite,
-  useTaskFavorites,
-} from '../../data/library';
+import { TASK_LIBRARY, toggleTaskFavorite, useTaskFavorites } from '../../data/library';
 import { hasTaskSettings } from '../../data/taskValues';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
@@ -16,7 +11,6 @@ export function TasksPage() {
       title="Задания"
       searchPlaceholder="Поиск по заданиям"
       items={TASK_LIBRARY}
-      categories={TASK_CATEGORIES}
       favorites={useTaskFavorites()}
       onToggleFavorite={toggleTaskFavorite}
       // Настройки пока есть не у всех заданий: остальные карточки без перехода

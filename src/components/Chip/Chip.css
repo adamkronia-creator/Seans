@@ -14,6 +14,10 @@
   font-weight: var(--font-weight-medium);
   line-height: 1;
   white-space: nowrap;
+  /* Удержание открывает меню папки: подпись не выделяется и системное меню касания не всплывает */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 6, как от верха и низа */
@@ -24,18 +28,6 @@
 .chip--active {
   background: var(--color-accent);
   color: var(--color-accent-on);
-}
-
-/* Чипс с иконкой: круг 32×32 */
-.chip--icon {
-  justify-content: center;
-  width: var(--size-chip-h);
-  padding: 0;
-}
-
-/* Плюс 14×14 */
-.chip--plus {
-  font-size: 14px;
 }
 
 /*

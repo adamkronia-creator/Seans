@@ -1,4 +1,7 @@
 .library-page {
+  /* Подсказка (папка удалена) стоит у низа страницы: нижняя панель разделов уже под ней */
+  --toast-bottom: var(--space-4);
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -30,11 +33,6 @@
   right: calc(var(--space-2) * -1);
   display: flex;
   pointer-events: none;
-}
-
-/* Чипсы с иконкой: плюс 14, остальные 18 */
-.chip--glyph-lg {
-  font-size: 18px;
 }
 
 /* Раздел, где по запросу ничего нет: бледнее остальных, но нажимается */

@@ -3,7 +3,7 @@ import { Avatar } from '../../components/Avatar/Avatar';
 import { IconChevronDown, IconChevronUp, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { AutoTextarea } from '../../components/EditSheet/AutoTextarea';
 import { IconBack } from '../../components/icons';
-import { IconImage, IconPlusLine } from '../../components/Profile/ProfileIcons';
+import { IconImage } from '../../components/Profile/ProfileIcons';
 import { PhotoPickSheet, RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -249,7 +249,6 @@ export function ProfileEditPage() {
           <p className="pe__hint pe__hint--inside">Выберите подсказку или создайте своё, например «Личный анализ».</p>
           <div className="pe__chips">
             <button type="button" className="pe__chip pe__chip--own" onClick={() => add('')}>
-              <IconPlusLine />
               Своё поле
             </button>
             {suggestions.map((label) => (

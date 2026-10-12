@@ -2,11 +2,11 @@ import { useEffect, useRef } from 'react';
 import { reducedMotion } from '../../utils/swipe';
 import './Badge.css';
 
-type BadgeVariant = 'accent' | 'neutral' | 'inverse' | 'yellow' | 'green' | 'muted';
+type BadgeVariant = 'accent' | 'neutral' | 'inverse' | 'yellow' | 'green' | 'muted' | 'quiet' | 'quiet-inverse';
 
 interface BadgeProps {
   count: number;
-  /** accent: синий (непрочитанные); neutral: серый (чипс); inverse: белый (активный чипс); yellow/green: вкладка «Тесты» */
+  /** accent: синий (непрочитанные); neutral: серый (чипс); inverse: белый (активный чипс); quiet и quiet-inverse: то же в тонком кольце, уведомления папки выключены; yellow/green: вкладка «Тесты» */
   variant?: BadgeVariant;
   /** Показывать кружок с нулём (для чипсов) */
   showZero?: boolean;

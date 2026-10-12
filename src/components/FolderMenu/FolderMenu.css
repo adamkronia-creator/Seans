@@ -1,0 +1,148 @@
+/* Меню чипса по долгому нажатию: затемнение на весь экран и плашка под чипсом (положение задаёт ChipMenu) */
+.chip-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(16 24 40 / 28%);
+  animation: chip-dim-in 0.18s ease-out both;
+}
+
+.chip-menu__backdrop.is-leaving {
+  pointer-events: none;
+  animation: chip-dim-out 0.12s ease-in both;
+}
+
+.chip-menu {
+  position: fixed;
+  margin: 0;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-float);
+  list-style: none;
+  /* Вырастает из-под чипса; движение то же, что у меню сообщения (motion.css) */
+  animation: menu-in 0.2s var(--ease-ios) both;
+}
+
+.chip-menu__backdrop.is-leaving .chip-menu {
+  animation: menu-out 0.12s ease-in both;
+}
+
+.chip-menu__item {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.chip-menu__item[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+.chip-menu__item svg {
+  flex-shrink: 0;
+  color: var(--color-text-caption);
+  font-size: var(--size-icon);
+}
+
+.chip-menu__item--danger,
+.chip-menu__item--danger svg {
+  color: var(--color-red-text);
+}
+
+@keyframes chip-dim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes chip-dim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-menu__backdrop,
+  .chip-menu {
+    animation: none;
+  }
+}
+
+/* ——— Окно «Порядок папок» ——— */
+
+.fo-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fo-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+.fo-row + .fo-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.fo-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fo-row__name {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fo-row__count {
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.fo-row__tool {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 52px;
+  color: var(--color-text-secondary);
+  font-size: var(--size-icon);
+}
+
+.fo-row__tool:disabled {
+  opacity: 0.3;
+}
+
+.fo-hint {
+  padding: 0 var(--space-1);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-wrap: pretty;
+}
