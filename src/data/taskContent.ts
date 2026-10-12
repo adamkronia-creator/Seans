@@ -501,7 +501,7 @@ const smerSections = (form: string): TaskSection[] => [
             fields: [
               text('situation', 'Ситуация', { hint: 'Что произошло? Где вы были, с кем, чем занимались?', placeholder: 'Опишите кратко, без оценок', rows: 3 }),
               text('thought', 'Мысль', { hint: 'Что вы подумали в этот момент?', placeholder: 'Первая мысль, которая пришла в голову', rows: 2 }),
-              text('emotion', 'Эмоция', { hint: 'Что вы почувствовали?', placeholder: 'Например: тревога, обида, стыд', rows: 1 }),
+              { kind: 'list', id: 'emotions', label: 'Эмоция', hint: 'Что вы почувствовали?', placeholder: 'Например: тревога, обида, стыд', addLabel: 'Добавить эмоцию', count: 1, max: 5 },
               { kind: 'percent', id: 'power', label: 'Насколько сильной была эмоция?', hint: 'Если эмоций несколько, оцените самую сильную' },
               text('reaction', 'Реакция', { hint: 'Что вы сделали и что почувствовали в теле?', placeholder: 'Действия и телесные ощущения', rows: 3 }),
             ],
@@ -513,7 +513,7 @@ const smerSections = (form: string): TaskSection[] => [
 ];
 
 const smerEntry = (situation: string, thought: string, emotion: string, power: number, reaction: string): TaskValues =>
-  fullValues({ text: { situation, thought, emotion, reaction }, percent: { power } });
+  fullValues({ text: { situation, thought, reaction }, list: { emotions: emotion.split(/,\s*/) }, percent: { power } });
 
 /** Записи для примера: от первой до седьмой, дневник ведётся в настоящем времени, как по горячим следам */
 const SMER_POOL: TaskValues[] = [
@@ -727,6 +727,8 @@ const WORRY: TaskSettingsData = {
       ];
     },
     sections: worrySections,
+    pages: [['plan'], ['each:worries'], ['late:worries', 'comment']],
+    late: ['after'],
     state: STATE,
     commentHint: 'Что вы заметили, пока откладывали беспокойство? Стало ли легче?',
   },
@@ -942,8 +944,12 @@ const evidenceSections = (): TaskSection[] => [
         placeholder: 'Запишите вывод судьи',
         rows: 3,
       }),
-      { kind: 'percent', id: 'after', label: 'Насколько вы верите в исходную мысль теперь?', hint: 'Оцените ещё раз' },
     ],
+  },
+  {
+    id: 'after',
+    title: 'Вера в мысль после суда',
+    fields: [{ kind: 'percent', id: 'after', label: 'Насколько вы верите в исходную мысль теперь?', hint: 'Оцените ещё раз' }],
   },
 ];
 
@@ -987,7 +993,7 @@ const EVIDENCE: TaskSettingsData = {
       'В конце вы — судья. Взвесьте оба списка и сформулируйте более точную мысль, которая учитывает факты обеих сторон. Она не обязана быть приятной: главное, чтобы она была справедливой. Затем ещё раз оцените, насколько вы верите в исходную мысль.',
     ],
     sections: evidenceSections,
-    pages: [['thought'], ['for'], ['against'], ['verdict'], ['comment']],
+    pages: [['thought'], ['for'], ['against'], ['verdict'], ['after', 'comment']],
     state: STATE,
     commentHint: 'Что вы заметили, пока проводили «суд»? Что было сложнее всего?',
   },

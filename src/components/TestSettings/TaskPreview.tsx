@@ -37,10 +37,12 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
-  const parts = taskSteps(options, data.blank.pages).slice(1);
-  const [partAt, setPartAt] = useState(0);
-  const part = Math.min(partAt, parts.length - 1);
-  const { done, total } = progressOf(data.blank.sections(form), values);
+  const sections = data.blank.sections(form);
+  const parts = taskSteps(options, data.blank.pages, sections, values).slice(1);
+  const [partId, setPartId] = useState('');
+  const part = Math.max(0, parts.indexOf(partId));
+  const setPartAt = (n: number) => setPartId(parts[n]);
+  const { done, total } = progressOf(sections, values);
   const screenRef = useRef<HTMLDivElement>(null);
 
   // Новый этап открывается с начала экрана
@@ -93,7 +95,7 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
         <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" onBack={onExit} />
         <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
           {stage === 'start' && <ClientIntro message={message} rules={data.blank.rules(form)} facts={taskFacts(data, form, deadline)} />}
-          {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} />}
+          {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} onEntryStep={(sectionId, index) => setPartId(`each:${sectionId}:${index}`)} />}
           {stage === 'end' && <TaskDone />}
         </div>
 

@@ -1,3 +1,4 @@
+import { entriesOf, type EntriesField, type TaskSection, type TaskValues } from '../../data/taskValues';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
@@ -68,11 +69,22 @@ export const unfilledText = (done: number, total: number) => `Заполнено
 
 /** Страницы выполнения задания: инструкция, поля, затем комментарий и «Как вы себя чувствуете?», если они включены в настройках */
 export type TaskStep = string;
-/** Страницы: 'rules', затем 'form' (всё сразу, комментарий отдельно) или группы разделов из `pages` (через «+»), затем 'state' */
-export const taskSteps = (options: { comment: boolean; state: boolean }, pages?: string[][]): TaskStep[] => [
+/**
+ * Страницы: 'rules', затем 'form' (всё сразу, комментарий отдельно) или группы из `pages` (через «+»), затем 'state'.
+ * 'each:<раздел>' — по странице на каждую запись раздела ('each:worries:2'), поэтому страниц столько, сколько записей.
+ */
+export const taskSteps = (options: { comment: boolean; state: boolean }, pages: string[][] | undefined, sections: TaskSection[], values: TaskValues): TaskStep[] => [
   'rules',
   ...(pages
-    ? pages.map((group) => group.filter((id) => id !== 'comment' || options.comment).join('+')).filter(Boolean)
+    ? pages.flatMap((group) => {
+        const each = /^each:(.+)$/.exec(group[0]);
+        if (each) {
+          const field = sections.find((section) => section.id === each[1])?.fields.find((f): f is EntriesField => f.kind === 'entries');
+          return Array.from({ length: field ? entriesOf(field, values).length : 1 }, (_, i) => `${group[0]}:${i}`);
+        }
+        const ids = group.filter((id) => id !== 'comment' || options.comment).join('+');
+        return ids ? [ids] : [];
+      })
     : ['form', ...(options.comment ? ['comment'] : [])]),
   ...(options.state ? ['state'] : []),
 ];

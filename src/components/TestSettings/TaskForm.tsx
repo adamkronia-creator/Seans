@@ -6,6 +6,7 @@ import { BlankRules, CollapseCard } from './TestBlank';
 import {
   emptyValues,
   entriesOf,
+  entryFields,
   filledEntries,
   listOf,
   ownShare,
@@ -556,6 +557,113 @@ export function TaskSectionCard({ section, values, onChange }: { section: TaskSe
   );
 }
 
+/** Страница одной записи при выполнении («Беспокойство 2»): её поля без вынесенных на последнюю страницу; запись можно убрать, а новая открывается следующей страницей */
+function EntryPage({
+  section,
+  field,
+  late,
+  index,
+  values,
+  onChange,
+  onStep,
+}: {
+  section: TaskSection;
+  field: EntriesField;
+  late: string[];
+  index: number;
+  values: TaskValues;
+  onChange: (next: TaskValues) => void;
+  onStep?: (sectionId: string, index: number) => void;
+}) {
+  const list = entriesOf(field, values);
+  const entry = list[Math.min(index, list.length - 1)];
+  const at = list.indexOf(entry);
+  const title = `${field.title} ${at + 1}`;
+  const set = (next: TaskValues[]) => onChange({ ...values, entries: { ...values.entries, [field.id]: next } });
+  return (
+    <CollapseCard
+      title={title}
+      badge={
+        list.length > 1 ? (
+          <button
+            type="button"
+            className="tf-factor__remove"
+            aria-label={`Удалить: ${title}`}
+            onClick={() => {
+              set(list.filter((_, j) => j !== at));
+              onStep?.(section.id, Math.min(at, list.length - 2));
+            }}
+          >
+            <IconClose />
+          </button>
+        ) : undefined
+      }
+    >
+      {section.hint && <p className="task-hint tf-section-hint">{section.hint}</p>}
+      <div className="blank-question">
+        {field.groups.map((group, g) => (
+          <div key={g} className="tf-entry__group">
+            {group.title && <p className="tf-entry__group-title">{group.title}</p>}
+            {group.fields
+              .filter((inner) => !late.includes(inner.id))
+              .map((inner) => (
+                <div key={inner.id} className="tf-entry__field">
+                  <FieldBody field={inner} number={0} values={entry} scope={title} onChange={(next) => set(list.map((e, j) => (j === at ? next : e)))} />
+                </div>
+              ))}
+          </div>
+        ))}
+        {list.length < field.max && (
+          <div className="tf-entries__add">
+            <button
+              type="button"
+              className="tf-add"
+              onClick={() => {
+                set([...list, emptyValues()]);
+                onStep?.(section.id, list.length);
+              }}
+            >
+              <IconPlus />
+              {field.addLabel}
+            </button>
+          </div>
+        )}
+      </div>
+    </CollapseCard>
+  );
+}
+
+/** Последняя страница записей: поля, вынесенные из записей («Насколько оно тревожит теперь?»), по одному блоку на запись */
+function LateCard({ field, late, values, onChange }: { field: EntriesField; late: string[]; values: TaskValues; onChange?: (next: TaskValues) => void }) {
+  const list = entriesOf(field, values);
+  const set = (next: TaskValues[]) => onChange?.({ ...values, entries: { ...values.entries, [field.id]: next } });
+  const lateFields = entryFields(field).filter((inner) => late.includes(inner.id));
+  const first = entryFields(field).find((inner) => inner.kind === 'text');
+  return (
+    <CollapseCard title="После разбора">
+      <div className="blank-question">
+        <ol className="tf-entries">
+          {list.map((entry, i) => {
+            const title = `${field.title} ${i + 1}`;
+            const said = first ? (entry.text[first.id] ?? '').trim() : '';
+            return (
+              <li key={i} className="tf-entry">
+                <h5 className="tf-entry__title">{title}</h5>
+                {said && <p className="task-hint">{said}</p>}
+                {lateFields.map((inner) => (
+                  <div key={inner.id} className="tf-entry__field">
+                    <FieldBody field={inner} number={0} values={entry} scope={title} onChange={onChange && ((next) => set(list.map((e, j) => (j === i ? next : e))))} />
+                  </div>
+                ))}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </CollapseCard>
+  );
+}
+
 interface TaskFormProps {
   data: TaskSettingsData;
   form: string;
@@ -570,12 +678,14 @@ interface TaskFormProps {
   after?: ReactNode;
   /** При выполнении бланк идёт страницами: сами поля, комментарий и состояние по отдельности. Без значения показано всё сразу */
   only?: string;
+  /** Страница записи добавила или убрала запись: открыть запись с этим номером */
+  onEntryStep?: (sectionId: string, index: number) => void;
 }
 
 
 
 /** Бланк задания целиком: инструкция (по желанию), разделы с полями, комментарий и шкала состояния, если они включены */
-export function TaskForm({ data, form, options, values, onChange, rules = false, after, only }: TaskFormProps) {
+export function TaskForm({ data, form, options, values, onChange, rules = false, after, only, onEntryStep }: TaskFormProps) {
   const sections = data.blank.sections(form);
   const ids = (only ?? '').split('+');
   return (
@@ -585,11 +695,18 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           <BlankRules rules={data.blank.rules(form)} />
         </CollapseCard>
       )}
-      {sections
-        .filter((section) => !only || only === 'form' || ids.includes(section.id))
-        .map((section) => (
-          <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />
-        ))}
+      {sections.map((section) => {
+        const entries = section.fields.find((f): f is EntriesField => f.kind === 'entries');
+        const each = entries && ids.map((id) => new RegExp(`^each:${section.id}:(\\d+)$`).exec(id)).find(Boolean);
+        if (entries && each && onChange) {
+          return <EntryPage key={section.id} section={section} field={entries} late={data.blank.late ?? []} index={Number(each[1])} values={values} onChange={onChange} onStep={onEntryStep} />;
+        }
+        if (entries && ids.includes(`late:${section.id}`)) {
+          return <LateCard key={section.id} field={entries} late={data.blank.late ?? []} values={values} onChange={onChange} />;
+        }
+        if (only && only !== 'form' && !ids.includes(section.id)) return null;
+        return <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />;
+      })}
       {options.comment && (!only || ids.includes('comment')) && (
         <CollapseCard title="Комментарий">
           <div className="task-pad">

@@ -43,7 +43,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
   const { done, total } = progressOf(sections, run.values);
   const started = run.startedAt !== undefined;
   // Если что-то уже написано (вышли и вернулись), открываем бланк, а не инструкцию
-  const steps = taskSteps(options, data.blank.pages);
+  const steps = taskSteps(options, data.blank.pages, sections, run.values);
   const [step, setStep] = useState<TaskStep>(started ? steps[1] : 'rules');
   const at = steps.indexOf(step);
   const lastStep = at === steps.length - 1;
@@ -94,7 +94,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
             </CollapseCard>
           )
         ) : (
-          <TaskForm data={data} form={form} options={options} only={step} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
+          <TaskForm data={data} form={form} options={options} only={step} onEntryStep={(sectionId, index) => setStep(`each:${sectionId}:${index}`)} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
         )}
       </div>
 
