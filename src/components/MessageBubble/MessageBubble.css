@@ -86,7 +86,7 @@
 
 .bubble__ticks {
   flex-shrink: 0;
-  font-size: 13px; /* галочки Lucide занимают 20×11 из поля 24: при кегле 13 это примерно 11×6 */
+  font-size: 11px; /* галочки 11×6 */
   transform: translate(1.5px, -0.5px);
 }
 
@@ -219,20 +219,22 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  color: var(--color-tile-ink);
-  font-size: var(--size-icon-lg);
-  stroke-width: 1.5; /* при 28 это те же 1.75 px линии, что у значков 24 */
 }
 
 .tcard__icon--booking {
   background: var(--color-accent-on);
   color: var(--color-accent);
   font-size: var(--size-icon);
-  stroke-width: 1.75;
 }
 
 .bubble--in .tcard__icon--booking {
   background: var(--color-accent-soft);
+}
+
+.tcard__icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .tcard__text {

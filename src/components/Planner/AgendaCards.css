@@ -242,7 +242,6 @@
   border: 1.5px solid var(--color-text-placeholder);
   border-radius: var(--radius-full);
   color: transparent;
-  font-size: 14px;
 }
 
 .pl-task--done .pl-check {

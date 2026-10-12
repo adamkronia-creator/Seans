@@ -1,5 +1,3 @@
-import type { IconComponent } from '../components/icons';
-
 // Вид теста или задания в карточке чата: статус и дата берутся из журнала клиента (clientStore),
 // название, описание, иконка и цвет — из библиотеки (library.ts)
 
@@ -14,8 +12,7 @@ export interface PsyTest {
   /** Дата назначения, отправки или завершения — по разделу */
   date: string;
   status: TestStatus;
-  /** Значок методики: рисуется на плитке цвета `tint` */
-  icon: IconComponent;
+  icon: string;
   /** Цвет фона аватарки, накладывается с прозрачностью 75% */
   tint: string;
 }

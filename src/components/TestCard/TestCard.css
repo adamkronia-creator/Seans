@@ -10,7 +10,7 @@
   text-align: left;
 }
 
-/* Значок 48×48, радиус 12; фон — цвет теста с прозрачностью 75%; значок Lucide 28 затемнённым тоном */
+/* Значок 48×48, радиус 12; фон — цвет теста с прозрачностью 75%; картинка 36×36 */
 .test-card__avatar {
   position: relative;
   display: flex;
@@ -34,9 +34,8 @@
 }
 
 .test-card__icon {
-  color: var(--color-tile-ink);
-  font-size: var(--size-icon-lg);
-  stroke-width: 1.5; /* при 28 это те же 1.75 px линии, что у значков 24 */
+  width: 36px;
+  height: 36px;
 }
 
 .test-card__body {

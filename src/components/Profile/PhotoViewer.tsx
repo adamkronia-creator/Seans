@@ -3,9 +3,11 @@ import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, useProfile } from '../../data/profile';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import { reducedMotion } from '../../utils/swipe';
-import { IconBack, IconCaption, IconClose, IconCover, IconProfile, IconTrash } from '../icons';
+import { IconClose, IconTrash } from '../ChatParts/ChatIcons';
+import { IconBack, IconProfile } from '../icons';
 import { Toast } from '../Toast/Toast';
 import { useToast } from '../Toast/useToast';
+import { IconCaption, IconCover } from './ProfileIcons';
 import { CaptionSheet, RemoveSheet } from './ProfileSheets';
 import './PhotoViewer.css';
 

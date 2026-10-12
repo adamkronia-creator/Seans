@@ -2,14 +2,9 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
-  IconChevronDown,
-  IconChevronUp,
-  IconCopy,
-  IconFavorites,
-  IconReply,
   IconSearch,
+  IconFavorites,
   IconSettings,
-  IconTrash,
 } from '../../components/icons';
 import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
@@ -21,6 +16,7 @@ import { SentTaskSheet } from '../../components/MessageBubble/SentTaskSheet';
 import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
+import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';

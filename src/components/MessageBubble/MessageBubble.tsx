@@ -5,7 +5,8 @@ import { BLIND_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
-import { IconClock, IconReadTicks, IconReply, IconTabBooking, IconTickSingle } from '../icons';
+import { IconReadTicks, IconTabBooking } from '../icons';
+import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -208,15 +209,14 @@ export function MessageBubble({
     const settings = out && !passed && !message.toSelf;
     // Слепой тест, отправленный себе, выглядит так же, как у клиента: без названия и значка методики
     const hiddenTest = Boolean(!isTask && message.toSelf && message.testOptions?.blind);
-    const Glyph = test?.icon;
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
         <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons bubble--tcard${message.text ? '' : ' bubble--tcard-bare'}${activeMatch ? ' bubble--match' : ''}`}>
           <div className="tcard">
-            {test && Glyph && !hiddenTest && (
+            {test && !hiddenTest && (
               <span className="tcard__icon" style={{ background: test.tint }}>
-                <Glyph />
+                <img src={test.icon} alt="" />
               </span>
             )}
             <span className="tcard__text">

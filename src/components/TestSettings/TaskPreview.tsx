@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
 import { emptyValues, progressOf, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
-import { IconEye } from '../icons';
-import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
+import { ClientIntro, IconEye, TaskDone, taskFacts } from './ClientParts';
 import { FillMeter, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { TestHeader } from './TestHeader';
@@ -85,7 +84,7 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
       </div>
 
       <p className="tp__badge">
-        <IconEye className="tp__fact-icon" />
+        <IconEye />
         <span>Ответы в предпросмотре не сохраняются</span>
       </p>
 

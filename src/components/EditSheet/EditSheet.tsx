@@ -92,6 +92,7 @@ export function EditSheet({
 
   const current = toneOf(toneOn ? tone : null);
   const PreviewIcon = iconOn ? HEAD_ICONS[icon].Icon : undefined;
+  const previewSize = iconOn ? HEAD_ICONS[icon].size : 22;
 
   return (
     <SheetOverlay onClose={onClose}>
@@ -105,7 +106,7 @@ export function EditSheet({
               style={{ '--head-bg': current.bg, '--head-fg': current.fg } as CSSProperties}
             >
               {PreviewIcon && (
-                <span className="sheet__preview-icon">
+                <span className="sheet__preview-icon" style={{ fontSize: previewSize }}>
                   <PreviewIcon />
                 </span>
               )}
@@ -132,7 +133,7 @@ export function EditSheet({
                 <Collapse open={iconOn}>
                   <div className="sheet__icons" role="radiogroup" aria-labelledby={`${uid}-icon`}>
                     {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
-                      const { Icon, label } = HEAD_ICONS[id];
+                      const { Icon, label, size } = HEAD_ICONS[id];
                       const active = id === icon;
                       return (
                         <button
@@ -142,6 +143,7 @@ export function EditSheet({
                           aria-checked={active}
                           aria-label={label}
                           className={`sheet__icon${active ? ' sheet__icon--active' : ''}`}
+                          style={{ fontSize: size }}
                           onClick={() => setIcon(id)}
                         >
                           <Icon />

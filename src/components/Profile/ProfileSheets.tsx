@@ -2,7 +2,7 @@ import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react
 import { setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
 import { Frame } from '../ChatBooking/BookingSheets';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
-import { IconCamera, IconCheck } from '../icons';
+import { IconCamera, IconCheck } from './ProfileIcons';
 import { filesOf, uploadPhotos } from './upload';
 import './ProfileSheets.css';
 

@@ -153,40 +153,17 @@
   height: 20px;
 }
 
-/* Значок события: цветная плашка 20×20 с белым значком Lucide; у заметки плашка белая, значок цветной */
-.hist-badge {
-  display: flex;
+.hist-marker svg {
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: var(--radius-full);
-  background: var(--badge-bg);
-  color: var(--color-accent-on);
-  font-size: var(--font-size-xs);
 }
 
-.hist-badge svg {
-  stroke-width: 2.5; /* на кегле 12 линия 1,25: на цветной плашке тонкая терялась бы */
-}
-
-.hist-badge--square {
-  border-radius: 6px;
-}
-
-.hist-badge--green {
-  --badge-bg: var(--color-green);
-}
-
-.hist-badge--yellow {
-  --badge-bg: var(--color-yellow);
-}
-
-.hist-badge--note {
-  --badge-bg: var(--color-bg-panel);
-
-  color: var(--color-purple);
+/* Жёлтые часы нарисованы 28×28 с запасом 4 вокруг: выступают за слот */
+.hist-marker--clock svg {
+  width: 28px;
+  height: 28px;
+  margin: -4px;
 }
 
 .hist-marker__number {

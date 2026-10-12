@@ -41,28 +41,9 @@
 }
 
 .test-settings__icon {
-  position: relative;
-  display: flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
-  color: var(--color-tile-ink);
-  font-size: var(--size-icon-sm);
-  isolation: isolate;
-}
-
-/* Плитка цвета методики: как у карточки в списке, прозрачность 75% */
-.test-settings__icon::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--tint);
-  opacity: 0.75;
 }
 
 .test-settings__who {

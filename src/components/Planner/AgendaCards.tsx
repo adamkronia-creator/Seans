@@ -8,7 +8,7 @@ import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { dayShort, durationLabel } from '../../utils/ruDate';
 import { Avatar } from '../Avatar/Avatar';
 import { slotTime } from '../ChatBooking/bookingText';
-import { IconCaseEdit, IconCheck, IconTestChevronDown } from '../icons';
+import { IconCaseEdit, IconTestChevronDown } from '../icons';
 import './AgendaCards.css';
 
 type Tone = 'green' | 'yellow' | 'red' | 'accent' | 'gray';
@@ -254,7 +254,9 @@ export function TaskCard({ plan, onToggle, onEdit }: TaskCardProps) {
         className="pl-check"
         onClick={() => onToggle(plan)}
       >
-        <IconCheck strokeWidth={3} />
+        <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M2.5 6.4l2.3 2.3 4.7-4.9" />
+        </svg>
       </button>
       <button type="button" className="pl-task__body" onClick={() => onEdit(plan)}>
         <div className="pl-task__title">

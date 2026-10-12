@@ -8,7 +8,7 @@ import '../ChatBooking/BookingSheets.css';
 import { FormMenu } from '../TestSettings/FormMenu';
 import { RichEditor } from '../RichEditor/RichEditor';
 import '../EditSheet/EditSheet.css';
-import { IconBookingCancelled, IconBookingDone, IconBookingPending, IconCheck } from '../icons';
+import { IconBookingCancelled, IconBookingDone, IconBookingPending } from '../icons';
 import { Switch } from '../Switch/Switch';
 import './PlannerSheets.css';
 
@@ -249,7 +249,9 @@ export function OutcomeSheet({ subtitle, current, canChange, onPick, onClose }: 
                   <Icon className={`pl-choice__icon pl-choice__icon--${tone}`} aria-hidden="true" />
                   <span className="pl-choice__label">{label}</span>
                   {active && (
-                    <IconCheck className="pl-choice__check" strokeWidth={2.25} />
+                    <svg className="pl-choice__check" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+                    </svg>
                   )}
                 </button>
               </li>

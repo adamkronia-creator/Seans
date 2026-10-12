@@ -89,14 +89,12 @@ function authorOf(event: HistoryEvent) {
   return event.state === 'done' ? client : 'Вы';
 }
 
-/** Значок события на рейке: номер сеанса или значок типа на цветной плашке */
+/** Значок события на рейке: номер сеанса или значок типа */
 function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'invite') {
     return (
       <div className="hist-marker">
-        <span className="hist-badge hist-badge--green">
-          <IconEventInvite />
-        </span>
+        <IconEventInvite />
       </div>
     );
   }
@@ -112,27 +110,15 @@ function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'note') {
     return (
       <div className="hist-marker">
-        <span className="hist-badge hist-badge--note">
-          <IconTlNote />
-        </span>
+        <IconTlNote />
       </div>
     );
   }
-  if (event.state !== 'done') {
-    return (
-      <div className="hist-marker">
-        <span className="hist-badge hist-badge--yellow">
-          <IconTlClock />
-        </span>
-      </div>
-    );
-  }
-  const StateIcon = event.kind === 'test' ? IconTlDoc : IconTlFlame;
+  const done = event.state === 'done';
+  const StateIcon = done ? (event.kind === 'test' ? IconTlDoc : IconTlFlame) : IconTlClock;
   return (
-    <div className="hist-marker">
-      <span className="hist-badge hist-badge--green hist-badge--square">
-        <StateIcon />
-      </span>
+    <div className={`hist-marker${done ? '' : ' hist-marker--clock'}`}>
+      <StateIcon />
     </div>
   );
 }
