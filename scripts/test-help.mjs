@@ -51,7 +51,7 @@ function webpSize(buffer) {
 const topics = Object.entries(OPTION_HELP);
 
 test('у каждой подсказки три скриншота с подписями', () => {
-  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind']);
+  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind', 'result']);
   for (const [id, help] of topics) {
     assert.ok(help.title.length > 0, `${id}: нет названия окна`);
     assert.equal(help.slides.length, 3, `${id}: должно быть три скриншота`);

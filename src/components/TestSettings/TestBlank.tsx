@@ -3,11 +3,14 @@ import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
 /** Карточка бланка, настройки или заключения: заголовок и содержимое; сворачивать ее не нужно, всё всегда раскрыто */
-export function CollapseCard({ title, badge, id, children }: { title: string; badge?: ReactNode; id?: string; children: ReactNode }) {
+export function CollapseCard({ title, badge, help, id, children }: { title: string; badge?: ReactNode; /** «?» сразу за названием */ help?: ReactNode; id?: string; children: ReactNode }) {
   return (
     <section className="blank-card" id={id}>
       <div className="blank-card__head">
-        <span className="blank-card__title">{title}</span>
+        <span className="blank-card__title">
+          {title}
+          {help}
+        </span>
         {badge}
       </div>
       <div className="blank-card__collapse blank-card__collapse--open">

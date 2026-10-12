@@ -4,13 +4,16 @@ import blindChat from '../assets/help/blind-chat.webp';
 import blankOff from '../assets/help/blank-off.webp';
 import blankOn from '../assets/help/blank-on.webp';
 import blankView from '../assets/help/blank-view.webp';
+import resultThanks from '../assets/help/result-thanks.webp';
+import resultScore from '../assets/help/result-score.webp';
+import resultFull from '../assets/help/result-full.webp';
 
 /**
  * Подсказки к настройкам теста («?» справа от названия): окно с каруселью из трёх скриншотов, под ними меняются подписи.
  * Скриншоты снимает скрипт scripts/help-shots.py (см. README), поэтому все они одного размера и снимают одно и то же место экрана.
  */
 
-export type OptionHelpId = 'blind' | 'blank';
+export type OptionHelpId = 'blind' | 'blank' | 'result';
 
 /** Рамка вокруг того, что изменилось на скриншоте: левый верхний угол и размер в процентах от скриншота */
 export interface HelpMark {
@@ -87,6 +90,29 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
         alt: 'Бланк тестирования с отмеченными ответами клиента',
         title: 'Ответы клиента',
         text: 'Бланк открывается с теми ответами, которые отметил клиент. Их можно сверить с баллами в любой момент.',
+      },
+    ],
+  },
+  result: {
+    title: 'Итог для клиента',
+    slides: [
+      {
+        src: resultThanks,
+        alt: 'Экран клиента после теста: «Спасибо за прохождение теста!» и больше ничего',
+        title: 'Только благодарность',
+        text: 'Клиент видит только «Спасибо за прохождение теста!». Результат вы обсудите на встрече: баллы без контекста легко прочитать неверно.',
+      },
+      {
+        src: resultScore,
+        alt: 'Экран клиента после теста: под благодарностью баллы по трём шкалам',
+        title: 'Только баллы',
+        text: 'Под благодарностью клиент видит баллы по шкалам, без расшифровки.',
+      },
+      {
+        src: resultFull,
+        alt: 'Экран клиента после теста: баллы по шкалам с уровнями',
+        title: 'Полное заключение',
+        text: 'К баллам добавляются уровни, а ниже расшифровка по каждой шкале.',
       },
     ],
   },

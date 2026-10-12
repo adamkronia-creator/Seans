@@ -143,7 +143,7 @@ export function ClientIntro({ message, rules, facts }: { message: string; rules:
 }
 
 /** Экран клиента после выполнения: блок с благодарностью; под ним то, что клиент увидит дальше */
-export function ClientDone({ title, children }: { title: string; children?: ReactNode }) {
+export function ClientDone({ title, handover = true, children }: { title: string; /** Строка «Ответы переданы вашему специалисту» под названием */ handover?: boolean; children?: ReactNode }) {
   return (
     <section className="blank-card tp__done">
       <span className="tp__done-mark" aria-hidden="true">
@@ -152,7 +152,7 @@ export function ClientDone({ title, children }: { title: string; children?: Reac
         </svg>
       </span>
       <h2 className="tp__done-title">{title}</h2>
-      <p className="tp__done-text">Ответы переданы вашему специалисту</p>
+      {handover && <p className="tp__done-text">Ответы переданы вашему специалисту</p>}
       {children}
     </section>
   );

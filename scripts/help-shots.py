@@ -4,7 +4,8 @@
 
 Снимает приложение в рамке телефона 393 px при плотности 2 и вырезает кадр 393×340 (786×680 пикселей):
   blind-off, blind-on, blind-chat — «Слепое тестирование»: предпросмотр без слепого режима и с ним, пометка в чате;
-  blank-off, blank-on, blank-view — «Сохранить заполненный бланк»: результат без бланка и с ним, сам бланк.
+  blank-off, blank-on, blank-view — «Сохранить заполненный бланк»: результат без бланка и с ним, сам бланк;
+  result-thanks, result-score, result-full — «Итог для клиента»: экран завершения у клиента при каждом из трёх вариантов.
 Кроме картинок печатает рамки (x, y, w, h в процентах кадра): их нужно перенести в `mark` слайдов в optionHelp.ts.
 
 Запуск (нужны Python-пакеты playwright и pillow, у playwright — Chromium):
@@ -125,57 +126,79 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--base', default='http://localhost:4179/', help='адрес запущенного приложения (npm run preview)')
     parser.add_argument('--out', default=os.path.join(os.path.dirname(__file__), '..', 'src', 'assets', 'help'))
+    parser.add_argument('--only', choices=['blind', 'blank', 'result'], help='снять только одну подсказку (по умолчанию все)')
     args = parser.parse_args()
+    want = lambda name: args.only in (None, name)
     shots = Shots(os.path.normpath(args.out))
 
     with sync_playwright() as p:
-        # Слепое тестирование: предпросмотр клиентского экрана без слепого режима и с ним (кадр под шапкой, с y = 56)
-        for blind in (False, True):
+        if want('blind'):
+            # Слепое тестирование: предпросмотр клиентского экрана без слепого режима и с ним (кадр под шапкой, с y = 56)
+            for blind in (False, True):
+                phone = Phone(p, args.base)
+                phone.open_smol()
+                if not blind:
+                    phone.page.get_by_role('switch', name='Слепое тестирование').click()
+                    phone.wait(300)
+                phone.page.locator(TOP).get_by_text('Предпросмотр', exact=True).first.click()
+                phone.wait(1000)
+                title = phone.rect(f'{TOP} .tp__phone .test-settings__peer', pad=4)
+                shots.take(phone, 'blind-on' if blind else 'blind-off', 56, title)
+                phone.close()
+
+            # Пометка «Слепой тест» в переписке с клиентом (без сообщения клиенту карточка короче)
             phone = Phone(p, args.base)
             phone.open_smol()
-            if not blind:
-                phone.page.get_by_role('switch', name='Слепое тестирование').click()
-                phone.wait(300)
-            phone.page.locator(TOP).get_by_text('Предпросмотр', exact=True).first.click()
-            phone.wait(1000)
-            title = phone.rect(f'{TOP} .tp__phone .test-settings__peer', pad=4)
-            shots.take(phone, 'blind-on' if blind else 'blind-off', 56, title)
-            phone.close()
-
-        # Пометка «Слепой тест» в переписке с клиентом (без сообщения клиенту карточка короче)
-        phone = Phone(p, args.base)
-        phone.open_smol()
-        phone.page.get_by_role('switch', name='Сообщение для клиента').click()
-        phone.wait(300)
-        phone.send('Максим Мартынов')
-        phone.back()
-        phone.open_chat('Максим Мартынов')
-        note = phone.rect(f'{TOP} .tcard__note')
-        note = {'x': note['x'] - 6, 'y': note['y'] - 4, 'width': note['width'] + 12, 'height': note['height'] + 8}
-        shots.take(phone, 'blind-chat', 456, note)
-        phone.close()
-
-        # Сохранить бланк: результат без бланка и с ним, затем сам бланк (прокручен к первым вопросам)
-        for save in (False, True):
-            phone = Phone(p, args.base)
-            phone.open_smol()
-            if not save:
-                phone.page.get_by_role('switch', name='Сохранить заполненный бланк').click()
-                phone.wait(300)
-            phone.send('Себе')
+            phone.page.get_by_role('switch', name='Сообщение для клиента').click()
+            phone.wait(300)
+            phone.send('Максим Мартынов')
             phone.back()
-            phone.open_chat('Избранное')
-            phone.pass_test()
-            if not save:
-                shots.take(phone, 'blank-off', 56)
-            else:
-                row = phone.rect(f'{TOP} .ts-row--link', pad=4)
-                shots.take(phone, 'blank-on', 56, row)
-                phone.page.locator(TOP).get_by_text('Посмотреть бланк тестирования', exact=True).first.click()
-                phone.wait(1200)
-                phone.page.evaluate("document.querySelector('.screen[data-layer=top] .test-settings__scroll').scrollTop = 304")
-                shots.take(phone, 'blank-view', 56)
+            phone.open_chat('Максим Мартынов')
+            note = phone.rect(f'{TOP} .tcard__note')
+            note = {'x': note['x'] - 6, 'y': note['y'] - 4, 'width': note['width'] + 12, 'height': note['height'] + 8}
+            shots.take(phone, 'blind-chat', 456, note)
             phone.close()
+
+        if want('blank'):
+            # Сохранить бланк: результат без бланка и с ним, затем сам бланк (прокручен к первым вопросам)
+            for save in (False, True):
+                phone = Phone(p, args.base)
+                phone.open_smol()
+                if not save:
+                    phone.page.get_by_role('switch', name='Сохранить заполненный бланк').click()
+                    phone.wait(300)
+                phone.send('Себе')
+                phone.back()
+                phone.open_chat('Избранное')
+                phone.pass_test()
+                if not save:
+                    shots.take(phone, 'blank-off', 56)
+                else:
+                    row = phone.rect(f'{TOP} .ts-row--link', pad=4)
+                    shots.take(phone, 'blank-on', 56, row)
+                    phone.page.locator(TOP).get_by_text('Посмотреть бланк тестирования', exact=True).first.click()
+                    phone.wait(1200)
+                    phone.page.evaluate("document.querySelector('.screen[data-layer=top] .test-settings__scroll').scrollTop = 304")
+                    shots.take(phone, 'blank-view', 56)
+                phone.close()
+
+        if want('result'):
+            # Итог для клиента: предпросмотр, этап «Конец» (кадр с карточки «Спасибо», с y = 270; рамок нет)
+            for name, mode in (('result-thanks', 'Только благодарность'), ('result-score', 'Только баллы'), ('result-full', 'Полное заключение')):
+                phone = Phone(p, args.base)
+                phone.open_smol()
+                row = phone.page.locator('.result-choice__row', has_text=mode)
+                row.scroll_into_view_if_needed()
+                row.click()
+                phone.wait(300)
+                preview = phone.page.locator(TOP).get_by_text('Предпросмотр', exact=True).first
+                preview.scroll_into_view_if_needed()
+                preview.click()
+                phone.wait(900)
+                phone.page.get_by_role('button', name='Конец').click()
+                phone.wait(900)
+                shots.take(phone, name, 270)
+                phone.close()
 
     print('Рамки для optionHelp.ts (mark):')
     print(json.dumps(shots.marks, indent=2, ensure_ascii=False))

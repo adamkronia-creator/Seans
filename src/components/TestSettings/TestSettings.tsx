@@ -510,7 +510,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           </ul>
         </CollapseCard>
 
-        {conclusion && <ResultChoice value={result} onChange={setResult} />}
+        {conclusion && <ResultChoice value={result} onChange={setResult} compact={newFeatures} />}
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">

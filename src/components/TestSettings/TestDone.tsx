@@ -1,5 +1,5 @@
 import { conclusionFor, levelOf, type ConclusionScale } from '../../data/conclusions';
-import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
+import type { ResultMode } from '../../data/resultMode';
 import { ClientDone } from './ClientParts';
 
 const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
@@ -31,11 +31,11 @@ function SampleResult({ testId, mode }: { testId: string; mode: Exclude<ResultMo
   );
 }
 
-/** Окончание теста: благодарность и то, что клиент увидит о результате */
+/** Окончание теста: благодарность, а при показе результата под ней баллы или заключение */
 export function TestDone({ testId, result }: { testId: string; result: ResultMode }) {
   return (
-    <ClientDone title="Спасибо, тест завершен">
-      {result === 'thanks' ? <p className="tp__done-text">{RESULT_FACT.thanks}</p> : <SampleResult testId={testId} mode={result} />}
+    <ClientDone title="Спасибо за прохождение теста!" handover={false}>
+      {result !== 'thanks' && <SampleResult testId={testId} mode={result} />}
     </ClientDone>
   );
 }
