@@ -6,17 +6,6 @@
   min-height: 0;
 }
 
-.messages__profile,
-.messages__bell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  color: var(--color-text-primary);
-  font-size: var(--size-icon);
-}
-
 /* Список на белой панели во всю высоту: ниже последнего чата тот же фон, а не пустота */
 .messages__list {
   flex: 1;

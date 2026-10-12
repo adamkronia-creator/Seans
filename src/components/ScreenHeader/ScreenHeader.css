@@ -1,41 +1,38 @@
-/* Шапка раздела: заголовок 44 → 8 → поиск 40 → 12 → чипсы 32, поля 16, снизу 12 */
+/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка */
 .screen-header {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-4) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
-.screen-header__top {
+/* Поле поиска тянется, а кнопка справа от него (уведомления) держит свой размер */
+.screen-header__search {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 44px;
-  margin-bottom: calc(var(--space-1) * -1);
 }
 
-.screen-header__title {
+.screen-header__search .search-field {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-2xl);
-  letter-spacing: var(--letter-spacing-display);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.screen-header__side {
+/* Кнопка рядом с полем: плитка той же высоты, формы и заливки, что и поле */
+.screen-header__action {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--space-1);
-  /* Крайняя кнопка стоит ровно по полю экрана, а её зона нажатия выходит за него */
-  margin-right: calc(var(--space-1) * -1);
+  justify-content: center;
+  width: var(--size-search-h);
+  height: var(--size-search-h);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-fill);
+  color: var(--color-text-primary);
+  font-size: var(--size-icon);
 }
 
 /* Чипсы прокручиваются по горизонтали и выходят за край экрана */

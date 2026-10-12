@@ -39,6 +39,19 @@ input {
   color: inherit;
 }
 
+/* Скрыто с экрана, но читается программой экрана: у разделов нижней панели нет видимого названия, а заголовок нужен */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 button {
   padding: 0;
   border: 0;

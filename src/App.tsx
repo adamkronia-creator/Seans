@@ -93,9 +93,6 @@ export default function App() {
     }, id === active ? 'back' : 'fade');
   }, []);
 
-  /** Аватар в шапке «Диалогов» открывает раздел «Профиль» */
-  const openProfile = useCallback(() => handleTabChange('profile'), [handleTabChange]);
-
   /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад возвращает на ту вкладку */
   const openChat = useCallback((chatId: string, section: ChatSection) => {
     wantSection(chatId, section);
@@ -170,7 +167,7 @@ export default function App() {
     }
 
     if (at === 'messages') {
-      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage onOpenProfile={openProfile} />, at);
+      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at);
     }
     if (at === 'tests') {
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»

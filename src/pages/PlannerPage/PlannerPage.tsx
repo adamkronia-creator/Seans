@@ -199,28 +199,23 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
   return (
     <section className="planner">
       <header ref={header} className="screen-header planner__header">
-        <div className="screen-header__top">
-          <h1 className="screen-header__title">Ежедневник</h1>
-          <div className="screen-header__side">
-            <button
-              type="button"
-              className={`planner__today${selected === today ? ' planner__today--hidden' : ''}`}
-              tabIndex={selected === today ? -1 : 0}
-              onClick={() => setSelected(today)}
-            >
-              Сегодня
-            </button>
-          </div>
-        </div>
+        <h1 className="visually-hidden">Ежедневник</h1>
 
         <div className="planner__nav">
-          <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
-            <IconBack />
-          </button>
           <h2 className="planner__month">{monthTitle(month)}</h2>
-          <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
-            <IconBack />
-          </button>
+          <div className="planner__nav-side">
+            {selected !== today && (
+              <button type="button" className="planner__today" onClick={() => setSelected(today)}>
+                Сегодня
+              </button>
+            )}
+            <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
+              <IconBack />
+            </button>
+            <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
+              <IconBack />
+            </button>
+          </div>
         </div>
 
         <MonthGrid month={month} selected={selected} today={today} compact={compact} flags={flags} onSelect={setSelected} />

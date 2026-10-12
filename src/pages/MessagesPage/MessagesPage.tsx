@@ -1,13 +1,11 @@
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
-import { Avatar } from '../../components/Avatar/Avatar';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
 import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { CATEGORIES, type Chat, type ChatCategory } from '../../data/chats';
-import { useAvatarSrc } from '../../data/profile';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
@@ -31,13 +29,12 @@ const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOp
   );
 });
 
-export function MessagesPage({ onOpenProfile }: { onOpenProfile: () => void }) {
+export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const chats = useChats();
-  const avatar = useAvatarSrc();
   const root = useRef<HTMLElement>(null);
 
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
@@ -83,24 +80,14 @@ export function MessagesPage({ onOpenProfile }: { onOpenProfile: () => void }) {
     <section ref={root} className="messages">
       <ScreenHeader
         title="Диалоги"
-        trailing={
-          <>
-            <button
-              type="button"
-              className="messages__bell"
-              aria-label="События"
-              onClick={() => navigate('/events')}
-            >
-              <IconBell />
-            </button>
-            <button type="button" className="messages__profile" aria-label="Профиль" onClick={onOpenProfile}>
-              <Avatar src={avatar} size={32} />
-            </button>
-          </>
-        }
         searchValue={query}
         onSearchChange={setQuery}
         searchPlaceholder="Поиск по чатам"
+        searchAside={
+          <button type="button" className="screen-header__action" aria-label="События" onClick={() => navigate('/events')}>
+            <IconBell />
+          </button>
+        }
         chipsLabel="Фильтр диалогов"
         chips={
           <>

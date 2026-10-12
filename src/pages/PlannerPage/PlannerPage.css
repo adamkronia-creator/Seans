@@ -1,6 +1,6 @@
 /*
  * «Ежедневник»: белая шапка с календарем сверху и прокручиваемый распорядок выбранного дня на фоне приложения.
- * Шапка — общая .screen-header (заголовок 44, поля 16, линия снизу); ниже в ней строка месяца, календарь и ручка.
+ * Шапка — общая .screen-header (поля 12 и 16, линия снизу); названия раздела в ней нет: первой стоит строка месяца, ниже календарь и ручка.
  */
 .planner {
   --toast-bottom: var(--space-4);
@@ -16,9 +16,38 @@
   padding-bottom: 0;
 }
 
-/* «Сегодня» появляется, когда открыт другой день; место под ним не пропадает, поэтому заголовок не прыгает */
+/* Строка месяца: название слева, справа «Сегодня» (только когда открыт другой день) и стрелки.
+   Зона нажатия стрелок выходит за поле экрана, а сам значок стоит ровно по полю */
+.planner__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+}
+
+.planner__month {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-display);
+  line-height: var(--line-height-xl);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planner__nav-side {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+  margin-right: calc(var(--space-2) * -1);
+}
+
 .planner__today {
   height: 32px;
+  margin-right: var(--space-1);
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-accent-soft);
@@ -28,38 +57,35 @@
   line-height: var(--line-height-sm);
 }
 
-.planner__today--hidden {
-  visibility: hidden;
-}
-
-/* Строка месяца: название по центру, стрелки по краям (слева прошлый месяц, справа следующий); зона нажатия выходит за поле экрана */
-.planner__nav {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  height: 36px;
-  margin: 0 calc(var(--space-2) * -1) var(--space-1);
-}
-
-.planner__month {
-  text-align: center;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-title);
-  line-height: var(--line-height-lg);
-}
-
 .planner__arrow {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
-  height: 36px;
+  height: 40px;
   font-size: var(--size-icon);
 }
 
 .planner__arrow--next svg {
   transform: scaleX(-1);
+}
+
+/* На самом узком экране (320) рядом с «Сегодня» длинное «Сентябрь 2026» крупным кеглем не помещается:
+   название мельче, стрелки уже, чтобы оно нигде не обрезалось */
+@media (max-width: 359px) {
+  .planner__nav {
+    gap: var(--space-1);
+  }
+
+  .planner__month {
+    font-size: var(--font-size-lg);
+    letter-spacing: var(--letter-spacing-title);
+    line-height: var(--line-height-lg);
+  }
+
+  .planner__arrow {
+    width: 36px;
+  }
 }
 
 /* Ручка под календарем: свернуть до недели и развернуть обратно */
