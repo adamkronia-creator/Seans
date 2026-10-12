@@ -5,17 +5,31 @@
   min-height: 0;
 }
 
-/* Кнопка настроек списка в конце поля поиска: круг 32 */
-.library-page__filter {
+/* Под шапкой: страницы пейджера; поверх них подсказки под полем и панель выбора для сравнения */
+.library-page__body {
+  position: relative;
   display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
-  font-size: var(--size-icon-sm);
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Плитка фильтров рядом с полем поиска; когда что-то выбрано — акцентная, с числом выбранного */
+.library-page__tile {
+  position: relative;
+}
+
+.library-page__tile--on {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.library-page__tile-badge {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-2) * -1);
+  display: flex;
+  pointer-events: none;
 }
 
 /* Чипсы с иконкой: плюс 14, остальные 18 */
@@ -23,14 +37,40 @@
   font-size: 18px;
 }
 
-.library-page__list {
+/* Раздел, где по запросу ничего нет: бледнее остальных, но нажимается */
+.chip--dim:not(.chip--active) {
+  opacity: 0.45;
+}
+
+/* Страница раздела: строка над карточками и сами карточки прокручиваются вместе */
+.library-page__page {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-height: 0;
   padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
+}
+
+/* Пока выбирают для сравнения, внизу парит панель: последняя карточка не прячется под ней */
+.library-page--compare .library-page__page {
+  padding-bottom: 88px;
+}
+
+.library-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Метка в конце показанного: дошли до неё — добавляется следующая порция */
+.library-page__more {
+  flex-shrink: 0;
+  height: 1px;
 }
 
 .library-page__empty {

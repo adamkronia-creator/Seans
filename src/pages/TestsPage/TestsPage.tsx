@@ -14,7 +14,7 @@ export function TestsPage() {
       favorites={useFavorites()}
       onToggleFavorite={toggleFavorite}
       onOpen={(t) => navigate(`/tests/${t.id}`)}
-      labels={{ all: 'Все тесты', filters: 'Фильтр тестов', emptyRecent: 'Вы ещё не присылали тесты' }}
+      labels={{ all: 'Все тесты', filters: 'Фильтр тестов', emptyRecent: 'Вы ещё не присылали тесты', noun: ['тест', 'теста', 'тестов'], everywhere: 'Искать во всех тестах' }}
     />
   );
 }

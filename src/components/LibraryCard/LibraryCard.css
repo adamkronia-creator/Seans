@@ -1,5 +1,8 @@
 .lib-card {
   position: relative;
+  /* В длинном каталоге карточки за экраном не раскладываются и не рисуются; 96 — типичная высота, браузер запоминает настоящую */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px;
 }
 
 /* Название обрезается, не доходя до сердечка: иконка 16 + отступ */
@@ -34,5 +37,65 @@
 
 /* Не в избранном: сердечко бледнее, чтобы красные выделялись, а список не пестрел серыми */
 .lib-card__heart[aria-pressed='false'] svg {
+  opacity: 0.45;
+}
+
+/* Сведения и пояснение: мелкие строки под описанием */
+.lib-card__facts,
+.lib-card__why {
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+}
+
+/* Сведения — в одну строку: короткие, обрезать их незачем */
+.lib-card__facts {
+  color: var(--color-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Почему найдено — до двух строк: на узком экране «Также называется: Скрининг тревоги» не должно обрываться на полуслове */
+.lib-card__why {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--color-accent);
+}
+
+/* Выбор для сравнения: кружок 22 на месте сердечка, выбранная карточка обведена акцентом */
+.lib-card--pick .lib-card__top {
+  padding-right: 32px;
+}
+
+.lib-card__pick {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-text-placeholder);
+  border-radius: var(--radius-full);
+  color: var(--color-accent-on);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.lib-card--picked .lib-card__pick {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.lib-card--picked .test-card {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: -1.5px;
+}
+
+.lib-card--dim .test-card {
   opacity: 0.45;
 }

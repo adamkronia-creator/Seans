@@ -21,7 +21,7 @@ export function TasksPage() {
       onToggleFavorite={toggleTaskFavorite}
       // Настройки пока есть не у всех заданий: остальные карточки без перехода
       onOpen={(t) => hasTaskSettings(t.id) && navigate(`/tasks/${t.id}`)}
-      labels={{ all: 'Все задания', filters: 'Фильтр заданий', emptyRecent: 'Вы ещё не присылали задания' }}
+      labels={{ all: 'Все задания', filters: 'Фильтр заданий', emptyRecent: 'Вы ещё не присылали задания', noun: ['задание', 'задания', 'заданий'], everywhere: 'Искать во всех заданиях' }}
     />
   );
 }

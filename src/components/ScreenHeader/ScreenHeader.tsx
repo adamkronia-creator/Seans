@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode, Ref } from 'react';
 import { SearchField } from '../SearchField/SearchField';
 import './ScreenHeader.css';
 
@@ -15,6 +15,12 @@ interface ScreenHeaderProps {
   /** Чипсы под поиском */
   chips: ReactNode;
   chipsLabel: string;
+  /** Поле поиска с кнопкой «Очистить» и событиями фокуса: нужны разделам с подсказками под полем */
+  onSearchClear?: () => void;
+  searchInputRef?: Ref<HTMLInputElement>;
+  onSearchFocus?: () => void;
+  onSearchBlur?: () => void;
+  onSearchKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 /**
@@ -30,6 +36,11 @@ export function ScreenHeader({
   searchAside,
   chips,
   chipsLabel,
+  onSearchClear,
+  searchInputRef,
+  onSearchFocus,
+  onSearchBlur,
+  onSearchKeyDown,
 }: ScreenHeaderProps) {
   return (
     <header className="screen-header">
@@ -41,6 +52,11 @@ export function ScreenHeader({
           onChange={onSearchChange}
           placeholder={searchPlaceholder}
           trailing={searchTrailing}
+          onClear={onSearchClear}
+          inputRef={searchInputRef}
+          onFocus={onSearchFocus}
+          onBlur={onSearchBlur}
+          onKeyDown={onSearchKeyDown}
         />
         {searchAside}
       </div>
