@@ -1,4 +1,4 @@
-// Проверка поиска, фильтров и сравнения в библиотеке тестов и заданий: npm run test:library
+// Проверка поиска, фильтров и отметок («Избранное», «Недавние») в библиотеке тестов и заданий: npm run test:library
 // Движок не зависит от React, поэтому собирается esbuild и запускается в Node как есть.
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -21,7 +21,6 @@ const built = esbuild.buildSync({
       export * from './src/data/libraryMeta';
       export * from './src/data/libraryQuery';
       export { TASKS } from './src/data/taskContent';
-      export { plural } from './src/data/taskValues';
     `,
     resolveDir: root,
     loader: 'ts',
@@ -40,7 +39,7 @@ const lib = await import(pathToFileURL(file).href);
 fs.rmSync(dir, { recursive: true, force: true });
 
 const { stem, normalize, indexWords, editDistance, swapLayout } = lib;
-const { LIBRARY, TASK_LIBRARY, TASKS, plural, describe, catalogOf, listIds, facetCounts, relaxations, quickPicks, compare, summary, EMPTY_FILTERS, NONE, countFilters, createIndex, FIELDS } = lib;
+const { LIBRARY, TASK_LIBRARY, TASKS, TASK_META, parseAge, describe, catalogOf, listIds, markedScope, NO_MARKS, facetCounts, relaxations, quickPicks, EMPTY_FILTERS, NONE, countFilters, createIndex, FIELDS } = lib;
 
 const tests = catalogOf('test', LIBRARY);
 const tasks = catalogOf('task', TASK_LIBRARY);
@@ -229,43 +228,56 @@ test('раздел: запрос и фильтры действуют внутр
 test('пустая выдача подсказывает, что убрать', () => {
   const v = view('тревога', { time: ['long'], result: ['score'] });
   assert.deepEqual(ids(tests, allTests, v), []);
-  const r = relaxations(tests, v, allTests, allTests, noFav);
+  const everywhere = { scope: allTests, everything: allTests, marks: NO_MARKS, favorites: noFav, recent: [] };
+  const r = relaxations(tests, v, everywhere);
   assert.ok(r.some((x) => x.type === 'option' && x.count > 0));
   assert.ok(r.some((x) => x.type === 'filters'));
   assert.ok(r.every((x) => x.count > 0));
-  const scoped = relaxations(tests, view('тревога'), ['bdi'], allTests, noFav);
+  const scoped = relaxations(tests, view('тревога'), { ...everywhere, scope: ['bdi'] });
   assert.ok(scoped.some((x) => x.type === 'scope' && x.count > 0));
   const picks = quickPicks(tests, 4);
   assert.equal(picks.length, 4);
   assert.ok(picks.every((p) => p.count > 0));
 });
 
-test('сравнение: различия отдельно от общего, итог словами', () => {
-  const pick = (...names) => names.map((id) => tests.byId.get(id));
-  const c = compare('test', pick('phq9', 'bdi', 'smol'));
-  const diffIds = c.different.map((r) => r.id);
-  assert.ok(diffIds.includes('time') && diffIds.includes('size') && diffIds.includes('result'));
-  assert.ok(c.same.some((r) => r.id === 'age'), 'возраст у всех трёх 16+');
-  assert.ok(c.different.find((r) => r.id === 'size').bar);
-  assert.equal(c.different.find((r) => r.id === 'size').max, 71);
-  const lines = summary(pick('phq9', 'smol'));
-  assert.ok(lines.some((l) => l.startsWith('Быстрее всех: PHQ-9')));
-  assert.ok(lines.some((l) => l.startsWith('Больше всего вопросов: СМОЛ')));
-  const t = compare('task', [tasks.byId.get('worry'), tasks.byId.get('secret')]);
-  assert.ok(t.different.some((r) => r.id === 'approach'));
-  // Нет сведений — прочерк, а не «одинаково»
-  const missing = compare('test', pick('rses', 'gad7'));
-  assert.ok(missing.different.some((r) => r.id === 'time'));
+test('отметки: «Избранное» и «Недавние» сужают раздел вместе', () => {
+  const fav = new Set(['smol', 'itt', 'bdi', 'phq9']);
+  const recent = ['bdi', 'gad7', 'smol', 'itt'];
+  const scope = (marks, base = allTests) => markedScope(base, marks, fav, recent);
+  assert.deepEqual(scope(NO_MARKS), allTests, 'без отметок раздел как есть');
+  assert.deepEqual(scope({ favorites: true, recent: false }), allTests.filter((id) => fav.has(id)), 'избранное — в порядке раздела');
+  assert.deepEqual(scope({ favorites: false, recent: true }), recent, 'недавние — от самых свежих');
+  assert.deepEqual(scope({ favorites: true, recent: true }), ['bdi', 'smol', 'itt'], 'обе отметки — то, что в обоих списках, от самых свежих');
+  assert.deepEqual(scope({ favorites: false, recent: true }, ['smol', 'sq']), ['smol'], 'в категории — только то, что в ней есть');
+  // Запрос и фильтры действуют внутри отмеченного
+  assert.deepEqual(ids(tests, scope({ favorites: true, recent: false }), view('тревога')), ['itt']);
+  assert.deepEqual(ids(tests, scope({ favorites: false, recent: true }), view('')), recent, 'порядок недавних сохраняется');
 });
 
-test('сведения о тестах: у каждого есть область, у тестов с настройками есть и факты', () => {
+test('пустая выдача из-за отметок предлагает их выключить', () => {
+  const favorites = new Set(['smol']);
+  const marks = { favorites: true, recent: false };
+  const ctx = { scope: allTests, everything: allTests, marks, favorites, recent: [] };
+  const v = view('тревога');
+  assert.deepEqual(listIds(tests, v, markedScope(allTests, marks, favorites, []), favorites).ids, []);
+  const r = relaxations(tests, v, ctx);
+  const mark = r.find((x) => x.type === 'mark');
+  assert.ok(mark && mark.mark === 'favorites' && mark.count > 0, 'есть подсказка «не только избранное»');
+  assert.ok(r.every((x) => x.count > 0));
+  // Обе отметки: подсказки по каждой отдельно
+  const both = relaxations(tests, v, { ...ctx, marks: { favorites: true, recent: true }, favorites: new Set(['smol', 'gad7']), recent: ['smol', 'itt'] });
+  assert.deepEqual(both.filter((x) => x.type === 'mark').map((x) => x.mark).sort(), ['favorites', 'recent']);
+});
+
+test('сведения о тестах: у каждого есть область и другие названия', () => {
   for (const entry of tests.entries) {
     assert.ok(entry.d.facets.domain.length > 0, `${entry.item.id}: нет области`);
     assert.ok(entry.d.aliases.length > 0, `${entry.item.id}: нет других названий`);
   }
   const smol = tests.byId.get('smol').d;
-  assert.equal(smol.line.join(' · '), '71 вопрос · 15–20 мин · 16+');
+  assert.deepEqual(smol.line, [], 'в карточке теста вопросов, времени и возраста нет');
   assert.deepEqual(smol.minutes, [15, 20]);
+  assert.deepEqual(smol.facets.age, ['16']);
   const gad = tests.byId.get('gad7').d;
   assert.equal(gad.facets.age.length, 0, 'возраст не указан');
 });
@@ -277,11 +289,11 @@ test('сведения о заданиях совпадают с настрой�
     const t = TASKS[item.id];
     const d = describe('task', item);
     const where = item.id;
-    assert.equal(d.facts.time.text, t.duration, `${where}: время`);
-    assert.equal(d.facts.discussion.text, t.discussion, `${where}: обсуждение`);
-    assert.equal(d.facts.age.text, t.age, `${where}: возраст`);
+    const meta = TASK_META[item.id];
+    assert.ok(meta, `${where}: нет записи в TASK_META`);
+    assert.equal(meta.duration, t.duration, `${where}: время`);
+    assert.equal(meta.ageFrom, parseAge(t.age), `${where}: возраст`);
     const value = Number(t.volume.value);
-    assert.equal(d.facts.size.text, `${value} ${plural(value, t.volume.unit)}`, `${where}: объём`);
     const approaches = [...new Set(t.origin.fields.map((f) => approachOf[f]).filter(Boolean))].sort();
     assert.deepEqual([...d.facets.approach].sort(), approaches, `${where}: подход`);
 

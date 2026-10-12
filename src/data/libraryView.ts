@@ -1,26 +1,24 @@
 import { useSyncExternalStore } from 'react';
 import type { Kind } from './libraryMeta';
-import { EMPTY_FILTERS, SORTS, type Filters, type SortId } from './libraryQuery';
+import { EMPTY_FILTERS, NO_MARKS, SORTS, type Filters, type Marks, type SortId } from './libraryQuery';
 
 /*
- * Состояние поиска и фильтров библиотеки: запрос, выбранные фильтры, сортировка, прошлые запросы и выбор для сравнения.
- * Хранится вне экрана: человек открыл тест из выдачи и вернулся — запрос и фильтры на месте. Прошлые запросы и
- * сортировка переживают перезагрузку (localStorage); сам запрос и фильтры — нет: новый день, новая задача.
+ * Состояние поиска и фильтров библиотеки: запрос, выбранные фильтры, отметки «Избранное» и «Недавние», сортировка, прошлые запросы.
+ * Хранится вне экрана: человек открыл тест из выдачи и вернулся — запрос, фильтры и отметки на месте. Прошлые запросы и
+ * сортировка переживают перезагрузку (localStorage); сам запрос, фильтры и отметки — нет: новый день, новая задача.
  */
 
 export interface ViewState {
   query: string;
   filters: Filters;
+  /** Только избранное и/или только недавнее: кнопки в строке над списком */
+  marks: Marks;
   sort: SortId;
   /** Прошлые запросы, свежие первыми */
   history: string[];
-  /** Идёт выбор материалов для сравнения */
-  compare: boolean;
-  picked: string[];
 }
 
 export const HISTORY_LIMIT = 6;
-export const COMPARE_LIMIT = 3;
 const STORAGE_KEY = 'seans.library.v1';
 
 type Saved = Partial<Record<Kind, { history?: unknown; sort?: unknown }>>;
@@ -51,7 +49,7 @@ function initial(kind: Kind, saved: Saved): ViewState {
   const s = saved[kind];
   const history = Array.isArray(s?.history) ? (s.history as unknown[]).filter((q): q is string => typeof q === 'string').slice(0, HISTORY_LIMIT) : [];
   const sort = SORTS.some((o) => o.id === s?.sort) ? (s?.sort as SortId) : 'auto';
-  return { query: '', filters: EMPTY_FILTERS, sort, history, compare: false, picked: [] };
+  return { query: '', filters: EMPTY_FILTERS, marks: NO_MARKS, sort, history };
 }
 
 const saved = readSaved();
@@ -102,22 +100,14 @@ export function toggleOption(kind: Kind, facet: string, option: string) {
   update(kind, { filters });
 }
 
-export const resetSearch = (kind: Kind) => update(kind, { query: '', filters: EMPTY_FILTERS });
+// ——— Отметки ———
+
+/** Включить или выключить «Избранное» / «Недавние» */
+export function toggleMark(kind: Kind, mark: keyof Marks) {
+  const marks = states[kind].marks;
+  update(kind, { marks: { ...marks, [mark]: !marks[mark] } });
+}
 
 // ——— Сортировка ———
 
 export const setSort = (kind: Kind, sort: SortId) => update(kind, { sort }, true);
-
-// ——— Сравнение ———
-
-export const startCompare = (kind: Kind) => update(kind, { compare: true, picked: [] });
-export function stopCompare(kind: Kind) {
-  const s = states[kind];
-  if (s.compare || s.picked.length) update(kind, { compare: false, picked: [] });
-}
-
-export function togglePicked(kind: Kind, id: string) {
-  const picked = states[kind].picked;
-  if (picked.includes(id)) update(kind, { picked: picked.filter((p) => p !== id) });
-  else if (picked.length < COMPARE_LIMIT) update(kind, { picked: [...picked, id] });
-}

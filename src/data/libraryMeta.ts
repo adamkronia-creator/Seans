@@ -1,12 +1,11 @@
 import type { LibraryItem, LibraryTest } from './library';
-import { plural } from './taskValues';
 import { testSettings } from './testSettings';
 import { topicsOf } from './topics';
 
 /*
- * Сведения о тестах и заданиях для поиска, фильтров и сравнения: что материал оценивает, как долго длится, какой у него результат.
+ * Сведения о тестах и заданиях для поиска и фильтров: что материал оценивает, как долго длится, какой у него результат.
  *
- * У тестов длительность, число вопросов, возраст, формы и шкалы берутся из настроек теста (testSettings.ts), у заданий тексты
+ * У тестов длительность, возраст и шкалы берутся из настроек теста (testSettings.ts), у заданий тексты
  * лежат в тяжёлом taskContent.ts, который список не подключает, поэтому их краткие сведения записаны здесь, а соответствие
  * проверяет scripts/test-library.mjs. Что материал оценивает (области) и к какому подходу относится — решение автора каталога.
  *
@@ -30,12 +29,6 @@ export interface FacetDef {
   /** Пункты строятся из данных (возраст): каждое найденное значение — свой пункт */
   dynamic?: boolean;
   labelOf?: (value: string) => string;
-}
-
-/** Строка сравнения: текст и, если это число, оно же для полоски */
-export interface Fact {
-  text: string;
-  value?: number;
 }
 
 /** Пункт «Не указано»: у материала нет сведений для этого фильтра */
@@ -128,7 +121,7 @@ const TEST_META: Record<string, TestMeta> = {
   scl90: { domains: ['symptoms'], aliases: ['SCL90', 'SCL-90-R', 'Дерогатис', 'Derogatis', 'Симптоматический опросник'] },
 };
 
-interface TaskMeta {
+export interface TaskMeta {
   domains: string[];
   approaches: string[];
   /** short — один короткий ответ; steps — несколько шагов с оценками; diary — повторяющиеся записи */
@@ -137,23 +130,18 @@ interface TaskMeta {
   minutes: [number, number];
   /** Время так, как оно написано в настройках задания */
   duration: string;
-  discussion: string;
   ageFrom: number;
-  /** Типичный объём: сколько и как это называется */
-  volume: [number, [string, string, string]];
   aliases: string[];
 }
 
-const TASK_META: Record<string, TaskMeta> = {
+export const TASK_META: Record<string, TaskMeta> = {
   evidence: {
     domains: ['thoughts'],
     approaches: ['cbt'],
     shape: 'steps',
     minutes: [15, 20],
     duration: '15–20 мин',
-    discussion: '10–15 мин',
     ageFrom: 16,
-    volume: [1, ['мысль', 'мысли', 'мыслей']],
     aliases: ['Судебный процесс', 'Проверка мыслей', 'Когнитивная реструктуризация', 'Доказательства за и против'],
   },
   pie: {
@@ -162,9 +150,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'steps',
     minutes: [10, 15],
     duration: '10–15 мин',
-    discussion: '10–15 мин',
     ageFrom: 16,
-    volume: [1, ['событие', 'события', 'событий']],
     aliases: ['Круг ответственности', 'Responsibility pie', 'Пирог вины'],
   },
   smer: {
@@ -173,9 +159,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'diary',
     minutes: [15, 21],
     duration: '5–7 мин на запись',
-    discussion: '10–15 мин',
     ageFrom: 16,
-    volume: [3, ['запись', 'записи', 'записей']],
     aliases: ['Ситуация мысль эмоция реакция', 'Дневник мыслей', 'Дневник эмоций'],
   },
   activation: {
@@ -184,9 +168,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'diary',
     minutes: [9, 15],
     duration: '3–5 мин на дело',
-    discussion: '10–15 мин',
     ageFrom: 16,
-    volume: [3, ['дело', 'дела', 'дел']],
     aliases: ['Планирование дел', 'Расписание активности', 'Behavioral activation', 'План приятных дел'],
   },
   worry: {
@@ -195,9 +177,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'diary',
     minutes: [9, 15],
     duration: '3–5 мин на беспокойство',
-    discussion: '10–15 мин',
     ageFrom: 16,
-    volume: [3, ['беспокойство', 'беспокойства', 'беспокойств']],
     aliases: ['Время для беспокойства', 'Worry time', 'Откладывание тревоги'],
   },
   should: {
@@ -206,9 +186,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'short',
     minutes: [5, 10],
     duration: '5–10 мин',
-    discussion: '5–10 мин',
     ageFrom: 16,
-    volume: [10, ['предложение', 'предложения', 'предложений']],
     aliases: ['Долженствования', 'Я должен', 'Эллис'],
   },
   choice: {
@@ -217,9 +195,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'short',
     minutes: [5, 10],
     duration: '5–10 мин',
-    discussion: '5–10 мин',
     ageFrom: 16,
-    volume: [3, ['решение', 'решения', 'решений']],
     aliases: ['Принятие решений', 'Неопределенность', 'Прояснение ценностей'],
   },
   phrase: {
@@ -228,9 +204,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'short',
     minutes: [5, 10],
     duration: '5–10 мин',
-    discussion: '5–15 мин',
     ageFrom: 16,
-    volume: [1, ['фраза', 'фразы', 'фраз']],
     aliases: ['Детские фразы', 'Родительские послания', 'Ранние убеждения'],
   },
   secret: {
@@ -239,9 +213,7 @@ const TASK_META: Record<string, TaskMeta> = {
     shape: 'short',
     minutes: [3, 5],
     duration: '3–5 мин',
-    discussion: '5–10 мин',
     ageFrom: 16,
-    volume: [1, ['вопрос', 'вопроса', 'вопросов']],
     aliases: ['Если бы никто не узнал', 'Тайные желания', 'Свобода выбора'],
   },
 };
@@ -251,16 +223,14 @@ const TASK_META: Record<string, TaskMeta> = {
 export interface Described {
   /** Значения фильтров: идентификатор фильтра → идентификаторы пунктов; пусто — не указано */
   facets: Record<string, string[]>;
-  /** Строка под описанием в карточке: у теста «71 вопрос», «15–20 мин», «16+»; у задания «Дневник», «КПТ», «5–7 мин на запись» */
+  /** Строка под описанием в карточке задания: «Дневник», «КПТ», «5–7 мин на запись». У теста строки нет: вопросы, время и возраст в карточке не пишутся */
   line: string[];
-  /** Строки сравнения */
-  facts: Record<string, Fact>;
   /** Сколько времени занимает: для сортировки по длительности */
   minutes?: [number, number];
   aliases: string[];
   topics: string[];
   scales: string[];
-  /** Подписи областей, подходов и формата для поиска и сравнения */
+  /** Подписи областей, подходов и формата для поиска */
   domains: string[];
   approaches: string[];
   format?: string;
@@ -286,8 +256,6 @@ export function parseAge(text?: string): number | undefined {
   return m ? Number(m[1]) : undefined;
 }
 
-const noDot = (text?: string) => text?.replace(/\.$/, '');
-
 function describeTest(item: LibraryItem): Described {
   const meta = TEST_META[item.id];
   const s = testSettings(item as LibraryTest);
@@ -297,22 +265,10 @@ function describeTest(item: LibraryItem): Described {
   const mainCount = s.scales?.main.length ?? 0;
   const result = mainCount === 0 ? [] : [mainCount === 1 ? 'score' : 'profile'];
   const domains = meta?.domains ?? [];
-  const questions = s.questions !== undefined ? `${s.questions} ${plural(s.questions, ['вопрос', 'вопроса', 'вопросов'])}` : undefined;
-  const duration = noDot(s.duration);
-
-  const facts: Record<string, Fact> = {};
-  if (domains.length) facts.domain = { text: labelOf(TEST_DOMAINS, domains).join(', ') };
-  if (duration && minutes) facts.time = { text: duration, value: minutes[1] };
-  if (questions) facts.size = { text: questions, value: s.questions };
-  if (scales.length) facts.scales = { text: String(scales.length), value: scales.length };
-  if (result.length) facts.result = { text: labelOf(TEST_RESULTS, result)[0] };
-  if (ageFrom) facts.age = { text: `${ageFrom}+` };
-  if (s.forms?.length) facts.forms = { text: s.forms.join(', ') };
 
   return {
     facets: { domain: domains, time: timeOf(minutes), result, age: ageFrom ? [String(ageFrom)] : [] },
-    line: [questions, duration, s.age].filter((p): p is string => !!p),
-    facts,
+    line: [],
     minutes,
     aliases: meta?.aliases ?? [],
     topics: topicsOf(item.id),
@@ -327,24 +283,13 @@ function describeTest(item: LibraryItem): Described {
 function describeTask(item: LibraryItem): Described {
   const meta = TASK_META[item.id];
   if (!meta) {
-    return { facets: { domain: [], approach: [], shape: [], time: [], age: [] }, line: [], facts: {}, aliases: [], topics: topicsOf(item.id), scales: [], domains: [], approaches: [], concepts: [] };
+    return { facets: { domain: [], approach: [], shape: [], time: [], age: [] }, line: [], aliases: [], topics: topicsOf(item.id), scales: [], domains: [], approaches: [], concepts: [] };
   }
-  const [count, forms] = meta.volume;
-  const volume = `${count} ${plural(count, forms)}`;
   const approaches = labelOf(APPROACHES, meta.approaches);
   const shape = labelOf(TASK_SHAPES, [meta.shape])[0];
   return {
     facets: { domain: meta.domains, approach: meta.approaches, shape: [meta.shape], time: timeOf(meta.minutes), age: [String(meta.ageFrom)] },
     line: [shape, approaches[0], meta.duration].filter((p): p is string => !!p),
-    facts: {
-      domain: { text: labelOf(TASK_DOMAINS, meta.domains).join(', ') },
-      approach: { text: approaches.join(', ') },
-      shape: { text: shape },
-      time: { text: meta.duration, value: meta.minutes[1] },
-      size: { text: volume },
-      discussion: { text: meta.discussion },
-      age: { text: `${meta.ageFrom}+` },
-    },
     minutes: meta.minutes,
     aliases: meta.aliases,
     topics: topicsOf(item.id),
@@ -359,25 +304,3 @@ function describeTask(item: LibraryItem): Described {
 export function describe(kind: Kind, item: LibraryItem): Described {
   return kind === 'test' ? describeTest(item) : describeTask(item);
 }
-
-/** Строки сравнения: что показать, в каком порядке, где числа рисуются полоской */
-export const COMPARE_ROWS: Record<Kind, { id: string; label: string; bar?: boolean }[]> = {
-  test: [
-    { id: 'domain', label: 'Что оценивает' },
-    { id: 'time', label: 'Время', bar: true },
-    { id: 'size', label: 'Вопросов', bar: true },
-    { id: 'scales', label: 'Шкал', bar: true },
-    { id: 'result', label: 'Результат' },
-    { id: 'age', label: 'Возраст' },
-    { id: 'forms', label: 'Формы бланка' },
-  ],
-  task: [
-    { id: 'domain', label: 'С чем работает' },
-    { id: 'approach', label: 'Подход' },
-    { id: 'shape', label: 'Формат' },
-    { id: 'time', label: 'Время', bar: true },
-    { id: 'size', label: 'Объём' },
-    { id: 'discussion', label: 'Обсуждение с клиентом' },
-    { id: 'age', label: 'Возраст' },
-  ],
-};

@@ -1,9 +1,7 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
-import { IconFilterAll, IconFilterFavorites, IconFilterRecent, IconPlusChip } from '../../components/icons';
-import { CompareBar } from '../../components/LibraryFilters/CompareBar';
-import { CompareSheet } from '../../components/LibraryFilters/CompareSheet';
+import { IconFilterAll, IconPlusChip } from '../../components/icons';
 import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/EmptyResults';
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
 import { FilterSheet } from '../../components/LibraryFilters/FilterSheet';
@@ -16,24 +14,22 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
 import type { LibraryItem } from '../../data/library';
 import type { Kind } from '../../data/libraryMeta';
-import { catalogOf, countFilters, listIds, quickPicks, relaxations, type Catalog, type Listing, type Relaxation, type ViewQuery } from '../../data/libraryQuery';
 import {
-  clearFilters,
-  clearHistory,
-  COMPARE_LIMIT,
-  forgetQuery,
-  readLibraryView,
-  rememberQuery,
-  setFilters,
-  setQuery,
-  setSort,
-  startCompare,
-  stopCompare,
-  toggleOption,
-  togglePicked,
-  useLibraryView,
-  type ViewState,
-} from '../../data/libraryView';
+  catalogOf,
+  countFilters,
+  hasMarks,
+  listIds,
+  markedScope,
+  quickPicks,
+  relaxations,
+  type Catalog,
+  type Listing,
+  type Marks,
+  type Relaxation,
+  type ScopeContext,
+  type ViewQuery,
+} from '../../data/libraryQuery';
+import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, setSort, toggleMark, toggleOption, useLibraryView, type ViewState } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
 import { followChips } from '../../utils/followChips';
@@ -57,18 +53,26 @@ interface LibraryPageProps {
   labels: { all: string; filters: string; emptyRecent: string; noun: Noun; everywhere: string };
 }
 
-type Filter = string; // 'all' | 'favorites' | 'recent' | id категории
+type Section = string; // 'all' | id категории
 
-/** Что показывает страница фильтра, когда в ней вообще ничего нет */
-const emptyText = (filter: Filter, recent: string) => (filter === 'favorites' ? 'В избранном пока ничего нет' : filter === 'recent' ? recent : 'Здесь пока ничего нет');
+/** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от включённых «Избранное» и «Недавние» и от того, весь ли это каталог */
+function emptyText(marks: Marks, wholeCatalog: boolean, recent: string): string {
+  if (marks.favorites && marks.recent) return wholeCatalog ? 'Среди недавних нет избранного.' : 'В этом разделе среди недавних нет избранного.';
+  if (marks.favorites) return wholeCatalog ? 'В избранном пока ничего нет.' : 'В этом разделе нет избранного.';
+  if (marks.recent) return wholeCatalog ? `${recent}.` : 'В этом разделе нет недавних.';
+  return 'Здесь пока ничего нет.';
+}
+
+/** Где искали, когда включены «Избранное» и «Недавние»: «Среди избранного по запросу «…» ничего нет» */
+const whereText = (m: Marks) => (m.favorites && m.recent ? 'Среди недавних избранных' : m.favorites ? 'Среди избранного' : m.recent ? 'Среди недавних' : '');
 
 /** Порция карточек: длинный каталог показывается по мере прокрутки, а не весь сразу */
 const STEP = 30;
 
 interface ListProps {
   catalog: Catalog;
-  scope: string[];
-  everything: string[];
+  /** Раздел страницы без отметок, весь каталог, включённые отметки: по ним считается «из скольких» и подсказки для пустой выдачи */
+  ctx: ScopeContext;
   listing: Listing;
   query: ViewQuery;
   /** Исходный запрос, как его набрал человек */
@@ -78,28 +82,27 @@ interface ListProps {
   noun: Noun;
   everywhere: string;
   empty: string;
-  favorites: ReadonlySet<string>;
   view: ViewState;
   tokens: FilterToken[];
   resetKey: string;
   onToggleFavorite: (id: string) => void;
   onOpen: (item: LibraryItem) => void;
   onSort: () => void;
-  onCompare?: () => void;
+  onToggleMark: (mark: keyof Marks) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
 }
 
 /** Страница пейджера: строка над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
 function LibraryList(p: ListProps) {
-  const { catalog, listing, scope, narrowed, view } = p;
+  const { catalog, listing, ctx, narrowed, view } = p;
   const scroller = useRef<HTMLDivElement>(null);
   const more = useRef<HTMLDivElement>(null);
   const [limit, setLimit] = useState(STEP);
   const total = listing.ids.length;
   const shown = Math.min(limit, total);
 
-  // Запрос, фильтры или порядок изменились: список снова с начала
+  // Запрос, фильтры, отметки или порядок изменились: список снова с начала
   useEffect(() => {
     setLimit(STEP);
     if (scroller.current) scroller.current.scrollTop = 0;
@@ -120,7 +123,8 @@ function LibraryList(p: ListProps) {
   if (search?.partial && total > 0) notes.push('Совпали не все слова запроса: показано, что подходит хотя бы по части');
 
   const describe = (n: number) => `${n} ${plural(n, p.noun)}`;
-  const summary = narrowed ? `Найдено ${total} из ${scope.length}` : describe(scope.length);
+  const summary = narrowed ? `Найдено ${total} из ${ctx.scope.length}` : describe(ctx.scope.length);
+  const marked = hasMarks(ctx.marks);
 
   let body;
   if (total > 0) {
@@ -135,25 +139,34 @@ function LibraryList(p: ListProps) {
             <LibraryCard
               key={id}
               test={entry.item}
-              favorite={p.favorites.has(id)}
+              favorite={ctx.favorites.has(id)}
               onToggleFavorite={p.onToggleFavorite}
               onClick={p.onOpen}
-              facts={entry.d.line.join(' · ')}
+              facts={entry.d.line.join(' · ') || undefined}
               why={why}
               marks={search?.words}
-              pick={view.compare ? { selected: view.picked.includes(id), disabled: view.picked.length >= COMPARE_LIMIT } : undefined}
             />
           );
         })}
       </ul>
     );
-  } else if (scope.length === 0 && !narrowed) {
+  } else if (ctx.scope.length === 0 && !marked) {
     body = <p className="library-page__empty">{p.empty}</p>;
   } else {
     const label = (r: Relaxation) =>
-      r.type === 'option' ? `Без фильтра «${r.label}»` : r.type === 'filters' ? 'Сбросить все фильтры' : r.type === 'scope' ? p.everywhere : 'Очистить запрос';
-    const actions: EmptyAction[] = relaxations(catalog, p.query, scope, p.everything, p.favorites).map((r) => ({
-      key: r.type === 'option' ? `${r.facet}:${r.option}` : r.type,
+      r.type === 'option'
+        ? `Без фильтра «${r.label}»`
+        : r.type === 'filters'
+          ? 'Сбросить все фильтры'
+          : r.type === 'mark'
+            ? r.mark === 'favorites'
+              ? 'Показать не только избранное'
+              : 'Показать не только недавние'
+            : r.type === 'scope'
+              ? p.everywhere
+              : 'Очистить запрос';
+    const actions: EmptyAction[] = relaxations(catalog, p.query, ctx).map((r) => ({
+      key: r.type === 'option' ? `${r.facet}:${r.option}` : r.type === 'mark' ? `mark:${r.mark}` : r.type,
       label: label(r),
       count: r.count,
       onClick: () => p.onRelax(r),
@@ -161,27 +174,32 @@ function LibraryList(p: ListProps) {
     const typed = p.typed.trim();
     const words = normalize(typed) !== '';
     const filtered = countFilters(p.query.filters) > 0;
+    const where = whereText(ctx.marks);
     const text =
       words && filtered
-        ? `По запросу «${typed}» и выбранным фильтрам ничего нет.`
+        ? `${where ? `${where} по` : 'По'} запросу «${typed}» и выбранным фильтрам ничего нет.`
         : words
-          ? `По запросу «${typed}» ничего нет. Проверьте написание или попробуйте другое слово.`
+          ? where
+            ? `${where} по запросу «${typed}» ничего нет.`
+            : `По запросу «${typed}» ничего нет. Проверьте написание или попробуйте другое слово.`
           : filtered
-            ? 'Нет материалов, которые подходят под все выбранные фильтры.'
-            : 'Здесь пока ничего нет.';
-    body = <EmptyResults title="Ничего не нашлось" text={text} actions={actions} describe={describe} />;
+            ? `${where ? `${where} нет` : 'Нет'} материалов, которые подходят под все выбранные фильтры.`
+            : p.empty;
+    body = <EmptyResults title={words || filtered ? 'Ничего не нашлось' : 'Здесь пусто'} text={text} actions={actions} describe={describe} />;
   }
 
   return (
     <div ref={scroller} className="library-page__page">
-      {scope.length > 0 && (
+      {(ctx.scope.length > 0 || marked) && (
         <ResultsBar
           summary={summary}
           live={p.active}
           sortLabel={sortLabel(view.sort, !!search)}
-          onSort={total > 1 ? p.onSort : undefined}
-          onCompare={p.onCompare && (total > 1 || view.compare) ? p.onCompare : undefined}
-          comparing={view.compare}
+          sortChanged={view.sort !== 'auto'}
+          sortDisabled={total < 2}
+          onSort={p.onSort}
+          marks={ctx.marks}
+          onToggleMark={p.onToggleMark}
           tokens={p.tokens}
           onResetFilters={p.onResetFilters}
           notes={notes}
@@ -197,15 +215,16 @@ function LibraryList(p: ListProps) {
  * Библиотека для психолога: все тесты (или задания) приложения. Интерфейс общий,
  * потому что разделы «Диагностика» и «Задания» устроены одинаково.
  *
- * Разделы (все, избранное, недавние, категории) — страницы пейджера: список можно листать пальцем, а чипсы идут следом.
- * Поверх любого раздела работают поиск по словам, фильтры (лист «Фильтры»), порядок и сравнение выбранных материалов;
- * состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
+ * Разделы (все и свои категории) — страницы пейджера: список можно листать пальцем, а чипсы идут следом.
+ * Поверх любого раздела работают поиск по словам, фильтры (лист «Фильтры») и порядок; в строке над списком
+ * кнопки «Избранное» и «Недавние» оставляют только их. Состояние лежит в libraryView.ts,
+ * поэтому после открытия теста запрос, фильтры и кнопки на месте.
  */
 export function LibraryPage({ kind, title, searchPlaceholder, items, categories, favorites, onToggleFavorite, onOpen, labels }: LibraryPageProps) {
-  const [filter, setFilter] = useState<Filter>('all');
-  // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
+  const [section, setSection] = useState<Section>('all');
+  // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [sheet, setSheet] = useState<null | 'filters' | 'sort' | 'compare'>(null);
+  const [sheet, setSheet] = useState<null | 'filters' | 'sort'>(null);
   const [focused, setFocused] = useState(false);
   const client = useClientData();
   const view = useLibraryView(kind);
@@ -215,32 +234,26 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
   const catalog = useMemo(() => catalogOf(kind, items), [kind, items]);
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
-  /** Фильтры по порядку чипсов: по ним же идут страницы */
-  const filters = useMemo<Filter[]>(() => ['all', 'favorites', 'recent', ...categories.map((c) => c.id)], [categories]);
+  /** Разделы по порядку чипсов: по ним же идут страницы */
+  const sections = useMemo<Section[]>(() => ['all', ...categories.map((c) => c.id)], [categories]);
   const everything = useMemo(() => items.map((t) => t.id), [items]);
+  /** Недавние от самых свежих */
+  const recent = useMemo(() => recentIds(client, kind).filter((id) => catalog.byId.has(id)), [client, kind, catalog]);
 
   /** Материалы каждого раздела: идентификаторы в порядке раздела */
-  const scopes = useMemo(
-    () =>
-      filters.map((id) => {
-        if (id === 'all') return everything;
-        if (id === 'favorites') return everything.filter((x) => favorites.has(x));
-        // Недавние идут в порядке свежести, а не в порядке библиотеки
-        if (id === 'recent') return recentIds(client, kind).filter((rid) => catalog.byId.has(rid));
-        return items.filter((t) => t.categories.includes(id)).map((t) => t.id);
-      }),
-    [filters, everything, items, favorites, client, kind, catalog],
-  );
+  const bases = useMemo(() => sections.map((id) => (id === 'all' ? everything : items.filter((t) => t.categories.includes(id)).map((t) => t.id))), [sections, everything, items]);
+  /** Они же с учётом кнопок «Избранное» и «Недавние» */
+  const scopes = useMemo(() => bases.map((base) => markedScope(base, view.marks, favorites, recent)), [bases, view.marks, favorites, recent]);
 
   // Пока человек печатает, список догоняет с небольшим запозданием, а поле остаётся отзывчивым
   const query = useDeferredValue(view.query);
   const q = useMemo<ViewQuery>(() => ({ query, filters: view.filters, sort: view.sort }), [query, view.filters, view.sort]);
   const listings = useMemo(() => scopes.map((scope) => listIds(catalog, q, scope, favorites)), [catalog, q, scopes, favorites]);
-  const narrowed = normalize(query) !== '' || countFilters(view.filters) > 0;
+  const narrowed = normalize(query) !== '' || countFilters(view.filters) > 0 || hasMarks(view.marks);
   const activeCount = countFilters(view.filters);
-  const resetKey = `${query}|${JSON.stringify(view.filters)}|${view.sort}`;
+  const resetKey = `${query}|${JSON.stringify(view.filters)}|${view.sort}|${view.marks.favorites}|${view.marks.recent}`;
 
-  const index = Math.max(0, filters.indexOf(filter));
+  const index = Math.max(0, sections.indexOf(section));
   const shown = dragIndex ?? index;
 
   const tokens = useMemo<FilterToken[]>(
@@ -258,10 +271,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
 
   const open = useCallback(
     (item: LibraryItem) => {
-      // Состояние читается в момент нажатия: обработчики карточек не пересоздаются при каждом выборе
-      const state = readLibraryView(kind);
-      if (state.compare) return togglePicked(kind, item.id);
-      rememberQuery(kind, state.query);
+      // Запрос читается в момент нажатия: обработчики карточек не пересоздаются при каждой букве
+      rememberQuery(kind, readLibraryView(kind).query);
       onOpen?.(item);
     },
     [kind, onOpen],
@@ -271,26 +282,23 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
     (r: Relaxation) => {
       if (r.type === 'option') toggleOption(kind, r.facet, r.option);
       else if (r.type === 'filters') clearFilters(kind);
-      else if (r.type === 'scope') setFilter('all');
+      else if (r.type === 'mark') toggleMark(kind, r.mark);
+      else if (r.type === 'scope') setSection('all');
       else setQuery(kind, '');
     },
     [kind],
   );
 
-  const toggleCompare = useCallback(() => (readLibraryView(kind).compare ? stopCompare(kind) : startCompare(kind)), [kind]);
-
-  // Ушли с экрана посреди выбора — вернувшись, человек видит обычный список, а не недобранную пару для сравнения
-  useEffect(() => () => stopCompare(kind), [kind]);
+  const onToggleMark = useCallback((mark: keyof Marks) => toggleMark(kind, mark), [kind]);
 
   const pages = useMemo(
     () =>
-      filters.map((id, i) => ({
+      sections.map((id, i) => ({
         key: id,
         node: (
           <LibraryList
             catalog={catalog}
-            scope={scopes[i]}
-            everything={everything}
+            ctx={{ scope: bases[i], everything, marks: view.marks, favorites, recent }}
             listing={listings[i]}
             query={q}
             typed={query}
@@ -298,31 +306,30 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
             active={i === index}
             noun={labels.noun}
             everywhere={labels.everywhere}
-            empty={emptyText(id, labels.emptyRecent)}
-            favorites={favorites}
+            empty={emptyText(view.marks, id === 'all', labels.emptyRecent)}
             view={view}
             tokens={tokens}
             resetKey={resetKey}
             onToggleFavorite={onToggleFavorite}
             onOpen={open}
             onSort={() => setSheet('sort')}
-            onCompare={scopes[i].length >= 2 ? toggleCompare : undefined}
+            onToggleMark={onToggleMark}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
           />
         ),
       })),
-    [filters, catalog, scopes, everything, listings, q, query, narrowed, index, labels, favorites, view, tokens, resetKey, onToggleFavorite, open, relax, toggleCompare, kind],
+    [sections, catalog, bases, everything, listings, q, query, narrowed, index, labels, favorites, recent, view, tokens, resetKey, onToggleFavorite, open, onToggleMark, relax, kind],
   );
 
   const onDrag = useCallback(
     (position: number | null) => {
-      setDragIndex(position === null ? null : Math.round(Math.min(filters.length - 1, Math.max(0, position))));
+      setDragIndex(position === null ? null : Math.round(Math.min(sections.length - 1, Math.max(0, position))));
     },
-    [filters.length],
+    [sections.length],
   );
 
-  // Цвет чипсов идёт за положением страниц (чипс «+» не фильтр: он вне страниц)
+  // Цвет чипсов идёт за положением страниц (чипс «+» не раздел: он вне страниц)
   const onPosition = useCallback((position: number) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip:not(.chip--plus)');
     if (chips) followChips(chips, position);
@@ -331,17 +338,17 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
   }, []);
 
   // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи
-  const chip = (id: Filter, label: string, icon = false) => {
-    const i = filters.indexOf(id);
+  const chip = (id: Section, label: string, icon = false) => {
+    const i = sections.indexOf(id);
     const count = listings[i]?.ids.length ?? 0;
     return {
       follow: true,
       active: shown === i,
-      onClick: () => setFilter(id),
+      onClick: () => setSection(id),
       ariaLabel: narrowed ? `${label}: найдено ${count}` : icon ? label : undefined,
     };
   };
-  const chipClass = (id: Filter, extra?: string) => [extra, narrowed && (listings[filters.indexOf(id)]?.ids.length ?? 0) === 0 && 'chip--dim'].filter(Boolean).join(' ') || undefined;
+  const chipClass = (id: Section, extra?: string) => [extra, narrowed && (listings[sections.indexOf(id)]?.ids.length ?? 0) === 0 && 'chip--dim'].filter(Boolean).join(' ') || undefined;
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -359,10 +366,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
     input.current?.blur();
   };
 
-  const pickedEntries = view.picked.flatMap((id) => catalog.byId.get(id) ?? []);
-
   return (
-    <section ref={root} className={`library-page${view.compare ? ' library-page--compare' : ''}`}>
+    <section ref={root} className="library-page">
       <ScreenHeader
         title={title}
         searchValue={view.query}
@@ -398,12 +403,6 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
             <Chip iconOnly toggle className={chipClass('all', 'chip--glyph-lg')} {...chip('all', labels.all, true)}>
               <IconFilterAll />
             </Chip>
-            <Chip iconOnly toggle className={chipClass('favorites', 'chip--glyph-lg')} {...chip('favorites', 'Избранное', true)}>
-              <IconFilterFavorites />
-            </Chip>
-            <Chip iconOnly toggle className={chipClass('recent', 'chip--glyph-lg')} {...chip('recent', 'Недавние', true)}>
-              <IconFilterRecent />
-            </Chip>
             {categories.map(({ id, label }) => (
               <Chip key={id} className={chipClass(id)} {...chip(id, label)}>
                 {label}
@@ -414,7 +413,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
       />
 
       <div className="library-page__body">
-        <SwipePager index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} />
+        <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} />
         {showSuggest && (
           <SuggestPanel
             history={view.history}
@@ -428,9 +427,6 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
             onClearHistory={() => clearHistory(kind)}
             onPick={applyPick}
           />
-        )}
-        {view.compare && (
-          <CompareBar picked={pickedEntries.map((e) => e.item)} onCompare={() => setSheet('compare')} onCancel={() => stopCompare(kind)} />
         )}
       </div>
 
@@ -452,22 +448,6 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, categories,
           onPick={(sort) => {
             setSort(kind, sort);
             setSheet(null);
-          }}
-          onClose={() => setSheet(null)}
-        />
-      )}
-      {sheet === 'compare' && pickedEntries.length >= 2 && (
-        <CompareSheet
-          kind={kind}
-          entries={pickedEntries}
-          onOpen={(item) => {
-            setSheet(null);
-            stopCompare(kind);
-            onOpen?.(item);
-          }}
-          onRemove={(id) => {
-            togglePicked(kind, id);
-            if (pickedEntries.length <= 2) setSheet(null);
           }}
           onClose={() => setSheet(null)}
         />

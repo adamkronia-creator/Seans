@@ -299,6 +299,45 @@
   line-height: var(--line-height-xs);
 }
 
+/* Порядок полос в «Основных шкалах»: чипс в заголовке; когда порядок выбран — мягкая подсветка акцентом.
+   Узкий экран: подпись скрыта (она в подписи кнопки), направление видно по значку */
+.cc-sort {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  height: var(--size-chip-h);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-fill);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cc-sort--on {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.cc-sort__icon {
+  font-size: 18px;
+}
+
+@media (max-width: 359px) {
+  .cc-sort {
+    justify-content: center;
+    width: var(--size-chip-h);
+    padding: 0;
+  }
+
+  .cc-sort__label {
+    display: none;
+  }
+}
+
 /* Карточка шкалы: тексты 15/22 с полями 16, абзацы через 12 */
 .cc-scale {
   padding: var(--space-3) var(--space-4);

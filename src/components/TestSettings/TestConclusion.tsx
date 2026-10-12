@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { IconTestChevron, IconTestReportExtra, IconTestReportMain } from '../icons';
 import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
+import { ScaleSortButton, type ScaleOrder } from './ScaleSort';
 import { CollapseCard } from './TestBlank';
 import './TestSettings.css';
 import './TestConclusion.css';
@@ -119,6 +120,9 @@ function StatusIcon({ ok }: { ok: boolean }) {
   );
 }
 
+/** Сколько шкал должно быть в блоке «Основные шкалы», чтобы в нём появилась сортировка */
+const SORT_FROM = 4;
+
 function ScaleCharts({
   data,
   title,
@@ -127,6 +131,7 @@ function ScaleCharts({
   legend,
   validity,
   axisEach,
+  sortable,
   onOpen,
 }: {
   data: ConclusionData;
@@ -137,13 +142,27 @@ function ScaleCharts({
   validity?: boolean;
   /** Подпись оси под каждым столбцом (когда у шкал разные диапазоны) вместо одной общей внизу */
   axisEach?: boolean;
+  /** Основные шкалы: если их больше трёх, в заголовке есть кнопка порядка (от большего к меньшему и наоборот) */
+  sortable?: boolean;
   onOpen: (code: string) => void;
 }) {
+  const [order, setOrder] = useState<ScaleOrder>('none');
+  const canSort = !!sortable && scales.length >= SORT_FROM;
+  // Порядок по длине полосы (доля от максимума шкалы); у равных остаётся порядок теста
+  const rows = useMemo(() => {
+    if (!canSort || order === 'none') return scales;
+    const sign = order === 'desc' ? -1 : 1;
+    const share = (s: ConclusionScale) => s.score / s.max;
+    return scales
+      .map((s, i) => ({ s, i }))
+      .sort((a, b) => sign * (share(a.s) - share(b.s)) || a.i - b.i)
+      .map(({ s }) => s);
+  }, [scales, canSort, order]);
   return (
-    <CollapseCard title={title} id={id}>
+    <CollapseCard title={title} id={id} badge={canSort ? <ScaleSortButton order={order} onChange={setOrder} /> : undefined}>
       <div className="cc-chart cc-chart--flat">
         <ul className="cc-bars cc-bars--main">
-          {scales.map((s, i) => (
+          {rows.map((s, i) => (
             <li key={s.code} id={`cc-bar-${s.code}`}>
               {/* Строка целиком ведёт к описанию шкалы; из карточки та же полоса ведёт обратно */}
               <div
@@ -411,6 +430,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
             scales={scales.filter((s) => s.block === b.key)}
             legend
             axisEach={data.axisEach}
+            sortable={b.key === 'main'}
             onOpen={(c) => scrollTo(`cc-scale-${c}`)}
           />
         ) : (
@@ -428,7 +448,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
 
       {data.overview && (
         <>
-          <ScaleCharts data={data} title="Основные шкалы" id="cc-main" scales={main} legend onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
+          <ScaleCharts data={data} title="Основные шкалы" id="cc-main" scales={main} legend sortable onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
           {extra.length > 0 && (
             <ScaleCharts data={extraData} title="Дополнительные шкалы" id="cc-extra" scales={extra} validity onOpen={(c) => scrollTo(`cc-scale-${c}`)} />
           )}

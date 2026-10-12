@@ -33,15 +33,6 @@ export const IconSort = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-/** Сравнение: две колонки */
-export const IconCompare = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <rect x="3.5" y="4.5" width="7" height="15" rx="2.5" />
-    <rect x="13.5" y="4.5" width="7" height="15" rx="2.5" />
-    <path d="M6.5 9.5h1M16.5 9.5h1M6.5 13h1M16.5 13h1" />
-  </svg>
-);
-
 /** Прошлый запрос: часы со стрелкой назад */
 export const IconHistory = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>

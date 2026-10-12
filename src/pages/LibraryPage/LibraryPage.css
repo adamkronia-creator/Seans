@@ -5,7 +5,7 @@
   min-height: 0;
 }
 
-/* Под шапкой: страницы пейджера; поверх них подсказки под полем и панель выбора для сравнения */
+/* Под шапкой: страницы пейджера; поверх них подсказки под полем */
 .library-page__body {
   position: relative;
   display: flex;
@@ -51,11 +51,6 @@
   min-height: 0;
   padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
-}
-
-/* Пока выбирают для сравнения, внизу парит панель: последняя карточка не прячется под ней */
-.library-page--compare .library-page__page {
-  padding-bottom: 88px;
 }
 
 .library-page__list {

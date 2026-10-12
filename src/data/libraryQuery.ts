@@ -2,11 +2,11 @@ import { createIndex, type FieldSpec, type IndexDoc, type SearchIndex, type Sear
 import { normalize } from '../utils/ruText';
 import type { LibraryItem } from './library';
 import { CONCEPTS } from './libraryConcepts';
-import { COMPARE_ROWS, describe, FACETS, NONE, type Described, type Fact, type FacetDef, type Kind, type Option } from './libraryMeta';
+import { describe, FACETS, NONE, type Described, type FacetDef, type Kind, type Option } from './libraryMeta';
 
 /*
- * Каталог тестов или заданий для поиска и фильтров: слова + фильтры + сортировка, счётчики у пунктов фильтров,
- * подсказки для пустой выдачи и сравнение материалов. Здесь нет React: всё можно проверить скриптом (scripts/test-library.mjs).
+ * Каталог тестов или заданий для поиска и фильтров: слова + фильтры + сортировка, счётчики у пунктов фильтров
+ * и подсказки для пустой выдачи. Здесь нет React: всё можно проверить скриптом (scripts/test-library.mjs).
  */
 
 /** Поля поиска по важности: сокращение и название выше описания, темы и шкалы ниже */
@@ -129,6 +129,32 @@ function passes(entry: Entry, filters: Filters, skip?: string): boolean {
   return true;
 }
 
+// ——— Отметки: избранное и недавнее ———
+
+/** Отбор поверх раздела: только избранное и/или только то, что недавно присылали; включённые отметки действуют вместе («и») */
+export interface Marks {
+  favorites: boolean;
+  recent: boolean;
+}
+
+export const NO_MARKS: Marks = { favorites: false, recent: false };
+
+export const hasMarks = (marks: Marks): boolean => marks.favorites || marks.recent;
+
+/**
+ * Материалы раздела с учётом отметок. Недавние идут от самых свежих (recent уже в таком порядке),
+ * поэтому без выбора другого порядка список «недавних» начинается с последнего присланного; остальное — в порядке раздела.
+ */
+export function markedScope(scope: string[], marks: Marks, favorites: ReadonlySet<string>, recent: readonly string[]): string[] {
+  let ids = scope;
+  if (marks.recent) {
+    const inScope = new Set(ids);
+    ids = recent.filter((id) => inScope.has(id));
+  }
+  if (marks.favorites) ids = ids.filter((id) => favorites.has(id));
+  return ids;
+}
+
 // ——— Выдача ———
 
 export interface Listing {
@@ -143,7 +169,7 @@ const collator = new Intl.Collator('ru');
 const minutesOf = (e: Entry, i: 0 | 1) => e.d.minutes?.[i];
 
 /**
- * Материалы раздела (scope — их идентификаторы в порядке раздела: все, избранное, недавние, категория)
+ * Материалы раздела (scope — их идентификаторы в порядке раздела: все или категория, уже с учётом отметок)
  * после запроса, фильтров и сортировки.
  */
 export function listIds(catalog: Catalog, view: ViewQuery, scope: string[], favorites: ReadonlySet<string>): Listing {
@@ -215,12 +241,24 @@ export function facetCounts(catalog: Catalog, view: ViewQuery, scope: string[]):
 export type Relaxation =
   | { type: 'option'; facet: string; option: string; label: string; count: number }
   | { type: 'filters'; count: number }
+  | { type: 'mark'; mark: keyof Marks; count: number }
   | { type: 'scope'; count: number }
   | { type: 'query'; count: number };
 
+/** Откуда берутся материалы страницы: раздел без отметок, весь каталог, включённые отметки и то, от чего они зависят */
+export interface ScopeContext {
+  scope: string[];
+  everything: string[];
+  marks: Marks;
+  favorites: ReadonlySet<string>;
+  /** Недавние от самых свежих */
+  recent: readonly string[];
+}
+
 /** Что убрать, чтобы появились результаты, и сколько их будет: пустая выдача подсказывает выход, а не просто сообщает об этом */
-export function relaxations(catalog: Catalog, view: ViewQuery, scope: string[], everything: string[], favorites: ReadonlySet<string>): Relaxation[] {
-  const count = (v: ViewQuery, s = scope) => listIds(catalog, v, s, favorites).ids.length;
+export function relaxations(catalog: Catalog, view: ViewQuery, ctx: ScopeContext): Relaxation[] {
+  const { scope, everything, marks, favorites, recent } = ctx;
+  const count = (v: ViewQuery, m: Marks = marks, base = scope) => listIds(catalog, v, markedScope(base, m, favorites, recent), favorites).ids.length;
   const out: Relaxation[] = [];
   const selected = catalog.facets.flatMap((f) => (view.filters[f.id] ?? []).map((o) => ({ facet: f, option: o })));
   const single = selected
@@ -238,8 +276,13 @@ export function relaxations(catalog: Catalog, view: ViewQuery, scope: string[], 
     const n = count({ ...view, filters: EMPTY_FILTERS });
     if (n > 0) out.push({ type: 'filters', count: n });
   }
+  for (const mark of ['favorites', 'recent'] as const) {
+    if (!marks[mark]) continue;
+    const n = count(view, { ...marks, [mark]: false });
+    if (n > 0) out.push({ type: 'mark', mark, count: n });
+  }
   if (scope.length !== everything.length) {
-    const n = count(view, everything);
+    const n = count(view, marks, everything);
     if (n > 0) out.push({ type: 'scope', count: n });
   }
   if (normalize(view.query) !== '') {
@@ -266,59 +309,4 @@ export function quickPicks(catalog: Catalog, limit = 6): { facet: string; option
     .sort((a, b) => b.count - a.count || a.at - b.at)
     .slice(0, limit)
     .map(({ at: _at, ...pick }) => pick);
-}
-
-// ——— Сравнение ———
-
-export interface CompareRow {
-  id: string;
-  label: string;
-  cells: (Fact | undefined)[];
-  /** Наибольшее число в строке: от него считается длина полоски */
-  max?: number;
-  bar: boolean;
-}
-
-export interface Comparison {
-  /** Строки, где материалы различаются или у кого-то нет сведений */
-  different: CompareRow[];
-  /** Строки, где у всех одно и то же */
-  same: CompareRow[];
-}
-
-/** Подпись для сравнения: сокращение (СМОЛ, PHQ-9), а если его нет, название */
-export const shortName = (item: LibraryItem) => item.abbr ?? item.title;
-
-export function compare(kind: Kind, entries: Entry[]): Comparison {
-  const different: CompareRow[] = [];
-  const same: CompareRow[] = [];
-  for (const spec of COMPARE_ROWS[kind]) {
-    const cells = entries.map((e) => e.d.facts[spec.id]);
-    if (cells.every((c) => !c)) continue;
-    const values = cells.map((c) => c?.value).filter((v): v is number => v !== undefined);
-    const row: CompareRow = { id: spec.id, label: spec.label, cells, bar: !!spec.bar && values.length > 1, max: values.length ? Math.max(...values) : undefined };
-    const equal = cells.every((c) => c && c.text === cells[0]?.text);
-    (equal ? same : different).push(row);
-  }
-  return { different, same };
-}
-
-/** Итог сравнения словами: кто быстрее, у кого больше вопросов */
-export function summary(entries: Entry[]): string[] {
-  const lines: string[] = [];
-  const extreme = (key: string, low: string, high: string, unit: (v: number) => string) => {
-    const known = entries.filter((e) => e.d.facts[key]?.value !== undefined);
-    if (known.length < 2) return;
-    const values = known.map((e) => e.d.facts[key].value as number);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    if (min === max) return;
-    const names = (v: number) => known.filter((e) => e.d.facts[key].value === v).map((e) => shortName(e.item)).join(' и ');
-    lines.push(`${low}: ${names(min)}, ${unit(min)}`);
-    lines.push(`${high}: ${names(max)}, ${unit(max)}`);
-  };
-  extreme('time', 'Быстрее всех', 'Дольше всех', (v) => `до ${v} мин`);
-  const questions = entries.every((e) => e.d.facts.size?.value !== undefined);
-  if (questions) extreme('size', 'Меньше всего вопросов', 'Больше всего вопросов', (v) => String(v));
-  return lines;
 }
