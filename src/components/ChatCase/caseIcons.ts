@@ -1,4 +1,3 @@
-import type { ComponentType, SVGProps } from 'react';
 import {
   IconCaseAnamnesis,
   IconCaseGeneral,
@@ -21,32 +20,31 @@ import {
   IconCaseSignifiers,
   IconCaseStructure,
   IconCaseTransfer,
+  type IconComponent,
 } from '../icons';
 import type { CaseIconId } from '../../data/case';
 
-export type Icon = ComponentType<SVGProps<SVGSVGElement>>;
-
-// Иконки шапок карточек; size — размер файла иконки из Figma (22 или 24)
-export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; label: string }> = {
-  general: { Icon: IconCaseGeneral, size: 22, label: 'Человек' },
-  anamnesis: { Icon: IconCaseAnamnesis, size: 22, label: 'Анамнез' },
-  request: { Icon: IconCaseRequest, size: 22, label: 'Запрос' },
-  hypothesis: { Icon: IconCaseHypothesis, size: 24, label: 'Гипотеза' },
-  structure: { Icon: IconCaseStructure, size: 22, label: 'Структура' },
-  signifiers: { Icon: IconCaseSignifiers, size: 24, label: 'Означающие' },
-  scenario: { Icon: IconCaseScenario, size: 24, label: 'Сценарий' },
-  transfer: { Icon: IconCaseTransfer, size: 24, label: 'Перенос' },
-  pin: { Icon: IconCaseNotePin, size: 22, label: 'Булавка' },
-  eye: { Icon: IconCaseHeadEye, size: 20, label: 'Глаз' },
-  star: { Icon: IconCaseHeadStar, size: 20, label: 'Звезда' },
-  info: { Icon: IconCaseHeadInfo, size: 20, label: 'Важно' },
-  hospital: { Icon: IconCaseHeadHospital, size: 20, label: 'Больница' },
-  crown: { Icon: IconCaseHeadCrown, size: 20, label: 'Корона' },
-  bolt: { Icon: IconCaseHeadBolt, size: 20, label: 'Молния' },
-  cross: { Icon: IconCaseHeadCross, size: 20, label: 'Отмена' },
-  dots: { Icon: IconCaseHeadDots, size: 20, label: 'Ещё' },
-  checklist: { Icon: IconCaseHeadChecklist, size: 20, label: 'Проверено' },
-  flame: { Icon: IconCaseHeadFlame, size: 20, label: 'Пламя' },
-  briefcase: { Icon: IconCaseHeadBriefcase, size: 20, label: 'Портфель' },
-  bookmark: { Icon: IconCaseHeadBookmark, size: 20, label: 'Закладка' },
+// Значки шапок карточек (Lucide); размер у всех один, он задан в CSS плитки
+export const HEAD_ICONS: Record<CaseIconId, { Icon: IconComponent; label: string }> = {
+  general: { Icon: IconCaseGeneral, label: 'Человек' },
+  anamnesis: { Icon: IconCaseAnamnesis, label: 'Анамнез' },
+  request: { Icon: IconCaseRequest, label: 'Запрос' },
+  hypothesis: { Icon: IconCaseHypothesis, label: 'Гипотеза' },
+  structure: { Icon: IconCaseStructure, label: 'Структура' },
+  signifiers: { Icon: IconCaseSignifiers, label: 'Означающие' },
+  scenario: { Icon: IconCaseScenario, label: 'Сценарий' },
+  transfer: { Icon: IconCaseTransfer, label: 'Перенос' },
+  pin: { Icon: IconCaseNotePin, label: 'Булавка' },
+  eye: { Icon: IconCaseHeadEye, label: 'Глаз' },
+  star: { Icon: IconCaseHeadStar, label: 'Звезда' },
+  info: { Icon: IconCaseHeadInfo, label: 'Важно' },
+  hospital: { Icon: IconCaseHeadHospital, label: 'Больница' },
+  crown: { Icon: IconCaseHeadCrown, label: 'Корона' },
+  bolt: { Icon: IconCaseHeadBolt, label: 'Молния' },
+  cross: { Icon: IconCaseHeadCross, label: 'Отмена' },
+  dots: { Icon: IconCaseHeadDots, label: 'Ещё' },
+  checklist: { Icon: IconCaseHeadChecklist, label: 'Проверено' },
+  flame: { Icon: IconCaseHeadFlame, label: 'Пламя' },
+  briefcase: { Icon: IconCaseHeadBriefcase, label: 'Портфель' },
+  bookmark: { Icon: IconCaseHeadBookmark, label: 'Закладка' },
 };

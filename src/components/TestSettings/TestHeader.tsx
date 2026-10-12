@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
 import { BLIND_TITLE } from '../../data/resultMode';
@@ -27,13 +28,18 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
   const favorite = (kind === 'task' ? taskFavorites : testFavorites).has(test.id);
   const toggle = kind === 'task' ? toggleTaskFavorite : toggleFavorite;
   const hidden = Boolean(client?.blind);
+  const Glyph = test.icon;
   return (
     <header className="test-settings__header">
       <button type="button" className="test-settings__button" aria-label="Назад" onClick={onBack}>
         <IconBack />
       </button>
       <div className="test-settings__peer">
-        {!hidden && <img className="test-settings__icon" src={test.icon} alt="" />}
+        {!hidden && (
+          <span className="test-settings__icon" style={{ '--tint': test.tint } as CSSProperties}>
+            <Glyph />
+          </span>
+        )}
         <div className="test-settings__who">
           <h1 className="test-settings__name">{hidden ? BLIND_TITLE : shortTitle(test.title)}</h1>
           <p className="test-settings__status">{status}</p>

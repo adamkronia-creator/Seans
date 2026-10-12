@@ -1,8 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { IconBookingPin } from '../../components/icons';
+import { IconBookingPin, IconCamera, IconImage, IconPencil, IconPlusLine } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
-import { IconCamera, IconImage, IconPencil, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';

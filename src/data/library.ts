@@ -1,25 +1,28 @@
 import { useSyncExternalStore } from 'react';
-import smolIcon from '../assets/tests/smol.png';
-import bhsIcon from '../assets/tests/bhs.png';
-import sqIcon from '../assets/tests/sq.png';
-import ittIcon from '../assets/tests/itt.png';
-import bdiIcon from '../assets/tests/bdi.png';
-import itoIcon from '../assets/tests/ito.png';
-import ocrIcon from '../assets/tests/ocr.png';
-import phq9Icon from '../assets/tests/phq9.png';
-import gad7Icon from '../assets/tests/gad7.png';
-import rsesIcon from '../assets/tests/rses.png';
-import pfqIcon from '../assets/tests/5pfq.png';
-import scl90Icon from '../assets/tests/scl90.png';
-import evidenceIcon from '../assets/tasks/evidence.png';
-import pieIcon from '../assets/tasks/pie.png';
-import smerIcon from '../assets/tasks/smer.png';
-import activationIcon from '../assets/tasks/activation.png';
-import worryIcon from '../assets/tasks/worry.png';
-import shouldIcon from '../assets/tasks/should.png';
-import choiceIcon from '../assets/tasks/choice.png';
-import phraseIcon from '../assets/tasks/phrase.png';
-import secretIcon from '../assets/tasks/secret.png';
+import {
+  IconLibActivation,
+  IconLibBdi,
+  IconLibBhs,
+  IconLibChoice,
+  IconLibEvidence,
+  IconLibGad7,
+  IconLibIto,
+  IconLibItt,
+  IconLibOcr,
+  IconLibPfq,
+  IconLibPhq9,
+  IconLibPhrase,
+  IconLibPie,
+  IconLibRses,
+  IconLibScl90,
+  IconLibSecret,
+  IconLibShould,
+  IconLibSmer,
+  IconLibSmol,
+  IconLibSq,
+  IconLibWorry,
+  type IconComponent,
+} from '../components/icons';
 
 export type TestCategory = 'practice' | 'hospital' | 'project';
 export type TaskCategory = 'svo' | 'training';
@@ -38,7 +41,8 @@ export interface LibraryItem<C extends string = string> {
   /** Короткое название теста (СМОЛ, BDI): в карточках его нет, но по нему ищут */
   abbr?: string;
   description: string;
-  icon: string;
+  /** Значок методики: рисуется на плитке цвета `tint` */
+  icon: IconComponent;
   /** Фон аватарки, накладывается с прозрачностью 75% */
   tint: string;
   /** Какой категории принадлежит тест. В макете не показано, распределение условное */
@@ -49,18 +53,18 @@ export type LibraryTest = LibraryItem<TestCategory>;
 
 // Библиотека всех тестов приложения; порядок как в макете
 export const LIBRARY: LibraryTest[] = [
-  { id: 'smol', title: 'Сокращенный многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#B3E59F', categories: ['practice', 'hospital'] },
-  { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFD18D', categories: ['hospital'] },
-  { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FED2A4', categories: ['practice'] },
-  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FFE177', categories: ['practice', 'project'] },
-  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', icon: bdiIcon, tint: '#FFCEBF', categories: ['hospital'] },
-  { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#F2D1A5', categories: ['practice'] },
-  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E8EDF2', categories: ['hospital'] },
-  { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFCEBF', categories: ['hospital', 'practice'] },
-  { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFCEBF', categories: ['practice', 'hospital'] },
-  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: 'rgb(153 230 252 / 75%)', categories: ['project'] },
-  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: pfqIcon, tint: 'rgb(254 153 160 / 75%)', categories: ['project', 'practice'] },
-  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: 'rgb(255 95 122 / 75%)', categories: ['hospital'] },
+  { id: 'smol', title: 'Сокращенный многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: IconLibSmol, tint: '#B3E59F', categories: ['practice', 'hospital'] },
+  { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', icon: IconLibBhs, tint: '#FFD18D', categories: ['hospital'] },
+  { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', icon: IconLibSq, tint: '#FED2A4', categories: ['practice'] },
+  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: IconLibItt, tint: '#FFE177', categories: ['practice', 'project'] },
+  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', icon: IconLibBdi, tint: '#FFCEBF', categories: ['hospital'] },
+  { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', icon: IconLibIto, tint: '#F2D1A5', categories: ['practice'] },
+  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: IconLibOcr, tint: '#E8EDF2', categories: ['hospital'] },
+  { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: IconLibPhq9, tint: '#FFCEBF', categories: ['hospital', 'practice'] },
+  { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: IconLibGad7, tint: '#FFCEBF', categories: ['practice', 'hospital'] },
+  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: IconLibRses, tint: 'rgb(153 230 252 / 75%)', categories: ['project'] },
+  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: IconLibPfq, tint: 'rgb(254 153 160 / 75%)', categories: ['project', 'practice'] },
+  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: IconLibScl90, tint: 'rgb(255 95 122 / 75%)', categories: ['hospital'] },
 ];
 
 // ——— Избранное: сердечко на карточке включает и выключает элемент ———
@@ -99,15 +103,15 @@ export type LibraryTask = LibraryItem<TaskCategory>;
 
 // Библиотека заданий; порядок как в макете, распределение по категориям условное
 export const TASK_LIBRARY: LibraryTask[] = [
-  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', icon: evidenceIcon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: pieIcon, tint: '#6FD7A3', categories: ['svo'] },
-  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: smerIcon, tint: '#E19974', categories: ['svo', 'training'] },
-  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#B9EA6A', categories: ['svo'] },
-  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: 'rgb(255 225 119 / 75%)', categories: ['training'] },
-  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#EAF6FF', categories: ['training'] },
-  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFDECF', categories: ['training'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#F2EBDA', categories: ['training'] },
+  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', icon: IconLibEvidence, tint: '#FFCEBF', categories: ['svo'] },
+  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: IconLibPie, tint: '#6FD7A3', categories: ['svo'] },
+  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: IconLibSmer, tint: '#E19974', categories: ['svo', 'training'] },
+  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: IconLibActivation, tint: '#FFCEBF', categories: ['svo'] },
+  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: IconLibWorry, tint: '#B9EA6A', categories: ['svo'] },
+  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: IconLibShould, tint: 'rgb(255 225 119 / 75%)', categories: ['training'] },
+  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: IconLibChoice, tint: '#EAF6FF', categories: ['training'] },
+  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: IconLibPhrase, tint: '#FFDECF', categories: ['training'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: IconLibSecret, tint: '#F2EBDA', categories: ['training'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);

@@ -24,6 +24,7 @@
 .tp__fact-icon {
   flex-shrink: 0;
   color: var(--color-accent);
+  font-size: var(--size-icon-sm);
 }
 
 /* Окончание: карточка, в ней по центру значок, благодарность и пояснения */
@@ -44,6 +45,7 @@
   border-radius: 50%;
   background: var(--color-green-soft);
   color: var(--color-green-text);
+  font-size: var(--size-icon);
 }
 
 .tp__done-title {

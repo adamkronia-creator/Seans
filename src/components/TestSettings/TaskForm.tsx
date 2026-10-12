@@ -1,7 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { IconClose } from '../ChatParts/ChatIcons';
-import { IconPlus, IconTestChevronDown } from '../icons';
-import { IconTaskState } from './TaskIcons';
+import { IconClose, IconPlus, IconTaskState, IconTestChevronDown } from '../icons';
 import { BlankRules, CollapseCard } from './TestBlank';
 import {
   emptyValues,

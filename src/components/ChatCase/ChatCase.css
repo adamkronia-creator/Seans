@@ -115,6 +115,7 @@
   border-radius: 10px;
   background: var(--head-bg, var(--color-accent-soft));
   color: var(--head-fg, var(--color-accent));
+  font-size: 22px; /* значок Lucide занимает 20 из 24: в плитке 32 это 18 */
 }
 
 .case-card__icon svg {

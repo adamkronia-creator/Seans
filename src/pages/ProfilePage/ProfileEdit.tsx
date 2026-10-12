@@ -1,9 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { IconChevronDown, IconChevronUp, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { AutoTextarea } from '../../components/EditSheet/AutoTextarea';
-import { IconBack } from '../../components/icons';
-import { IconImage, IconPlusLine } from '../../components/Profile/ProfileIcons';
+import { IconBack, IconChevronDown, IconChevronUp, IconImage, IconPlusLine, IconTrash } from '../../components/icons';
 import { PhotoPickSheet, RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';

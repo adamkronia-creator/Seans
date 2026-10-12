@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
 import { TASK_DEADLINES, volumeText, type TaskSettingsData } from '../../data/taskValues';
+import { IconCalendar, IconCheck, IconClock, IconEye, IconLock, IconUndo } from '../icons';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './ClientParts.css';
 
@@ -9,61 +10,6 @@ import './ClientParts.css';
  * Всё остальное — шапка, карточки бланка, счётчик и кнопки — те же, что при самостоятельном прохождении:
  * клиент видит ровно тот же интерфейс, а от специалиста у него только сообщение, сведения перед началом и «Спасибо» в конце.
  */
-
-const Icon = ({ children }: { children: ReactNode }) => (
-  <svg
-    className="tp__fact-icon"
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    {children}
-  </svg>
-);
-
-const IconClock = () => (
-  <Icon>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" />
-  </Icon>
-);
-const IconUndo = () => (
-  <Icon>
-    <path d="M4 12a8 8 0 1 1 2.6 5.9" />
-    <path d="M4 5v5h5" />
-  </Icon>
-);
-const IconLock = () => (
-  <Icon>
-    <rect x="5" y="11" width="14" height="9" rx="2" />
-    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-  </Icon>
-);
-export const IconEyeOff = () => (
-  <Icon>
-    <path d="M3 3l18 18" />
-    <path d="M10.6 5.7A9.5 9.5 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.9 3.6M6.4 7.2A15.6 15.6 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4-.9" />
-    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
-  </Icon>
-);
-export const IconEye = () => (
-  <Icon>
-    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
-    <circle cx="12" cy="12" r="2.8" />
-  </Icon>
-);
-const IconCalendar = () => (
-  <Icon>
-    <rect x="4" y="5.5" width="16" height="14.5" rx="2.5" />
-    <path d="M8 3.5v4M16 3.5v4M4 10h16" />
-  </Icon>
-);
 
 export interface ClientFact {
   icon: ReactNode;
@@ -81,20 +27,20 @@ function questionsWord(n: number) {
 /** Что клиент должен знать о тесте до начала: объём и время, что можно менять, кто увидит ответы и результат */
 export function testFacts(total: number, duration: string | undefined, result: ResultMode): ClientFact[] {
   return [
-    { icon: <IconClock />, text: `${total} ${questionsWord(total)}${duration ? ` · ${duration.replace(/\.$/, '')}` : ''}` },
-    { icon: <IconUndo />, text: 'Ответы можно менять до конца' },
-    { icon: <IconLock />, text: 'Ответы увидит только специалист' },
-    { icon: <IconEye />, text: RESULT_FACT[result] },
+    { icon: <IconClock className="tp__fact-icon" />, text: `${total} ${questionsWord(total)}${duration ? ` · ${duration.replace(/\.$/, '')}` : ''}` },
+    { icon: <IconUndo className="tp__fact-icon" />, text: 'Ответы можно менять до конца' },
+    { icon: <IconLock className="tp__fact-icon" />, text: 'Ответы увидит только специалист' },
+    { icon: <IconEye className="tp__fact-icon" />, text: RESULT_FACT[result] },
   ];
 }
 
 /** То же для задания: объём и время, срок, что поля можно пропустить, кто увидит ответы */
 export function taskFacts(data: TaskSettingsData, form: string, deadline: string): ClientFact[] {
   return [
-    { icon: <IconClock />, text: `${volumeText(data, form)} · ${data.duration}` },
-    ...(deadline !== TASK_DEADLINES[0] ? [{ icon: <IconCalendar />, text: `Срок выполнения: ${deadline.toLowerCase()}` }] : []),
-    { icon: <IconUndo />, text: 'Любое поле можно пропустить' },
-    { icon: <IconLock />, text: 'Ответы увидит только специалист' },
+    { icon: <IconClock className="tp__fact-icon" />, text: `${volumeText(data, form)} · ${data.duration}` },
+    ...(deadline !== TASK_DEADLINES[0] ? [{ icon: <IconCalendar className="tp__fact-icon" />, text: `Срок выполнения: ${deadline.toLowerCase()}` }] : []),
+    { icon: <IconUndo className="tp__fact-icon" />, text: 'Любое поле можно пропустить' },
+    { icon: <IconLock className="tp__fact-icon" />, text: 'Ответы увидит только специалист' },
   ];
 }
 
@@ -135,9 +81,7 @@ export function ClientDone({ title, children }: { title: string; children?: Reac
   return (
     <section className="blank-card tp__done">
       <span className="tp__done-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12.5l4.5 4.5L19 7.5" />
-        </svg>
+        <IconCheck strokeWidth={2.5} />
       </span>
       <h2 className="tp__done-title">{title}</h2>
       <p className="tp__done-text">Ответы переданы вашему специалисту</p>

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { EMOJI } from '../../data/emoji';
-import { IconClose, IconReply } from '../ChatParts/ChatIcons';
-import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
+import { IconAttach, IconClose, IconEmoji, IconMicrophone, IconReply, IconSend } from '../icons';
 import './MessageInput.css';
 
 interface MessageInputProps {

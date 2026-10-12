@@ -13,11 +13,12 @@ interface LibraryCardProps {
 
 /** Карточка теста в библиотеке: вид как у карточки в чате, но справа сердечко «в избранное» */
 export function LibraryCard({ test, favorite, onToggleFavorite, onClick }: LibraryCardProps) {
+  const Glyph = test.icon;
   return (
     <li className="lib-card">
       <button type="button" className="test-card" onClick={() => onClick?.(test)}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
-          <img className="test-card__icon" src={test.icon} alt="" />
+          <Glyph className="test-card__icon" />
         </span>
         <span className="test-card__body">
           <span className="test-card__top lib-card__top">

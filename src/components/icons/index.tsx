@@ -1,157 +1,317 @@
-import type { SVGProps } from 'react';
+import type { ComponentType } from 'react';
+import {
+  Armchair,
+  BatteryCharging,
+  ArrowLeftRight,
+  Bell,
+  Bold,
+  Bookmark,
+  Brain,
+  BrainCog,
+  Briefcase,
+  Calendar,
+  CalendarDays,
+  CalendarSearch,
+  Camera,
+  Captions,
+  ChartPie,
+  Check,
+  CheckCheck,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  CircleAlert,
+  CircleArrowRight,
+  CircleCheck,
+  CircleEllipsis,
+  CirclePlay,
+  CircleX,
+  ClipboardCheck,
+  ClipboardList,
+  ClipboardPlus,
+  CloudDrizzle,
+  CloudLightning,
+  CloudRain,
+  Clock,
+  Copy,
+  Crown,
+  Drama,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  FaceSlightlyFrowning,
+  FileSearch,
+  FileText,
+  FingerprintPattern,
+  Flame,
+  Frown,
+  Handbag,
+  HandHeart,
+  Heart,
+  HeartPulse,
+  Hospital,
+  Hourglass,
+  Image,
+  Italic,
+  Laugh,
+  Layers,
+  Lightbulb,
+  List,
+  ListChecks,
+  ListOrdered,
+  Lock,
+  Mail,
+  Map,
+  MapPin,
+  MapPinned,
+  Meh,
+  MessageCircleMore,
+  MessageSquareQuote,
+  MirrorRound,
+  Mic,
+  NotebookPen,
+  NotebookText,
+  Palette,
+  PanelTop,
+  Paperclip,
+  Pencil,
+  Pin,
+  Plus,
+  Quote,
+  Redo2,
+  RefreshCw,
+  Reply,
+  RotateCcw,
+  Search,
+  Send,
+  Settings,
+  Shapes,
+  Signpost,
+  Skull,
+  Smile,
+  Split,
+  SquareArrowDown,
+  Star,
+  Stethoscope,
+  Strikethrough,
+  Trash2,
+  Underline,
+  Undo2,
+  User,
+  Users,
+  UsersRound,
+  Wallet,
+  X,
+  Zap,
+  type LucideIcon,
+  type LucideProps,
+} from 'lucide-react';
 
-// SVG из Figma; цвета в них заменяются на currentColor (см. vite.config.ts)
-export { default as IconPlanner } from '../../assets/icons/tabbar/planner.svg?react';
-export { default as IconMessages } from '../../assets/icons/tabbar/messages.svg?react';
-export { default as IconTests } from '../../assets/icons/tabbar/psych-tests.svg?react';
-export { default as IconTasks } from '../../assets/icons/tabbar/psych-tasks.svg?react';
-export { default as IconProfile } from '../../assets/icons/tabbar/profile.svg?react';
-export { default as IconSearch } from '../../assets/icons/search.svg?react';
-export { default as IconBell } from '../../assets/icons/notifications.svg?react';
-export { default as IconFavorites } from '../../assets/icons/favorites.svg?react';
-export { default as IconBack } from '../../assets/icons/back.svg?react';
-// Значок приглашения (лента истории)
-export { default as IconEventInvite } from '../../assets/icons/event-invite.svg?react';
+/*
+ * Все значки приложения — из набора Lucide (lucide.dev), вручную ничего не рисуется.
+ * Здесь они собраны под именами, которыми пользуется приложение: любой значок меняется в одном месте.
+ * Размер задаётся кеглем (1em), цвет — цветом текста (currentColor), толщина линии — одна на весь набор.
+ */
 
-// Плюс 12×12: нет в присланных иконках, нарисован по размерам из макета
-// (чипс «+» и кнопка создания). Размер задаётся через font-size (1em).
-export function IconPlus(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="1em"
-      height="1em"
-      viewBox="0 0 12 12"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M6 .75v10.5M.75 6h10.5" />
-    </svg>
-  );
+export type IconProps = Omit<LucideProps, 'ref'>;
+export type IconComponent = ComponentType<IconProps>;
+
+/** Толщина линии на сетке 24. В Lucide по умолчанию 2; на 1,75 значки рядом с текстом выглядят легче и аккуратнее */
+const STROKE = 1.75;
+
+/** Красное сердечко избранного (прежнее #FF383C с прозрачностью 80% на белом) */
+const HEART_RED = '#FF6063';
+
+/** Значок Lucide под размер шрифта; `preset` — особенности конкретного значка (заливка, цвет, обрезка поля) */
+function make(Glyph: LucideIcon, preset: IconProps = {}): IconComponent {
+  return function AppIcon(props) {
+    return <Glyph size="1em" strokeWidth={STROKE} {...preset} {...props} />;
+  };
 }
 
-// Плюс в чипсе «+»: линии длиной 12, толщина 1,5, с округлыми концами, итого 13,5×13,5.
-// Размер 1em = 13,5 при font-size 13.5px.
-export function IconPlusChip(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="1em"
-      height="1em"
-      viewBox="-0.75 -0.75 13.5 13.5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M6 0v12M0 6h12" />
-    </svg>
-  );
+// ——— Значки, которые встречаются в нескольких местах под разными именами ———
+export const IconPlusLine = make(Plus);
+export const IconCheck = make(Check);
+export const IconClose = make(X);
+export const IconEdit = make(Pencil);
+export const IconCopy = make(Copy);
+export const IconClock = make(Clock);
+export const IconLock = make(Lock);
+export const IconEye = make(Eye);
+export const IconPin = make(Pin);
+export const IconFile = make(FileText);
+export const IconFlame = make(Flame);
+export const IconStar = make(Star);
+export const IconBriefcase = make(Briefcase);
+export const IconBookmark = make(Bookmark);
+export const IconUser = make(User);
+export const IconSettings = make(Settings);
+export const IconMicrophone = make(Mic);
+export const IconCircleX = make(CircleX);
+export const IconCircleCheck = make(CircleCheck);
+export const IconCircleAlert = make(CircleAlert);
+export const IconChevronRight = make(ChevronRight);
+export const IconChevronDown = make(ChevronDown);
+export const IconChevronUp = make(ChevronUp);
+export const IconClipboardList = make(ClipboardList);
+
+// ——— Нижняя панель ———
+export const IconPlanner = make(CalendarDays);
+export const IconMessages = make(Mail);
+export const IconTests = IconClipboardList;
+// В Lucide нет человека в позе лотоса, который был у «Заданий»: подходит тетрадь с ручкой (дневники, листы заданий)
+export const IconTasks = make(NotebookPen);
+export const IconProfile = IconUser;
+
+// ——— Общие ———
+export const IconSearch = make(Search);
+export const IconBell = make(Bell);
+export const IconFavorites = IconBookmark;
+export const IconBack = make(ChevronLeft);
+export const IconTrash = make(Trash2);
+export const IconReply = make(Reply);
+export const IconEyeOff = make(EyeOff);
+export const IconCalendar = make(Calendar);
+export const IconUndo = make(RotateCcw);
+
+// Плюс на кнопках и в чипсе «+»: линии идут во всё поле значка, как у прежнего, поэтому поле обрезано по краям плюса
+// (иначе плюс в размер кнопки вышел бы мельче), и линия чуть толще
+export const IconPlus = make(Plus, { viewBox: '4 4 16 16', strokeWidth: 2 });
+export const IconPlusChip = IconPlus;
+
+// ——— Открытый чат ———
+export const IconAttach = make(Paperclip);
+export const IconEmoji = make(Smile);
+export const IconSend = make(Send);
+export const IconReadTicks = make(CheckCheck, { color: '#fff' });
+export const IconTickSingle = IconCheck;
+export const IconTabBooking = make(Armchair);
+
+// ——— Запись на прием ———
+export const IconBookingPin = make(MapPin);
+// «Показать на карте» — карта, «В картах» — карта с меткой
+export const IconBookingRoute = make(Map);
+export const IconBookingInMaps = make(MapPinned);
+export const IconBookingCopy = IconCopy;
+export const IconBookingWallet = make(Wallet);
+// «Как пройти» — указатель на развилке, «Что принести» — сумка
+export const IconBookingDirections = make(Signpost);
+export const IconBookingBag = make(Handbag);
+export const IconBookingCalendar = make(CalendarSearch);
+export const IconBookingExternal = make(ExternalLink);
+// Статусы в истории приемов: по форме видно, чем кончилось, даже без цвета
+export const IconBookingDone = IconCircleCheck;
+export const IconBookingCancelled = IconCircleX;
+export const IconBookingMoved = make(CircleArrowRight);
+export const IconBookingPending = IconClock;
+
+// ——— Вкладка «Кейс» ———
+// Карандаш «изменить» в карточках лёгкий и небольшой: поле шире значка, поэтому рисунок занимает около двух третей
+export const IconCaseEdit = make(Pencil, { viewBox: '-3 -3 30 30' });
+export const IconCaseLock = IconLock;
+export const IconCaseFileDownload = make(SquareArrowDown);
+// Значки шапок карточек (HEAD_ICONS в ChatCase/caseIcons.ts)
+export const IconCaseGeneral = IconUser;
+export const IconCaseAnamnesis = IconFile;
+export const IconCaseRequest = make(HandHeart);
+export const IconCaseHypothesis = make(Lightbulb);
+export const IconCaseStructure = make(Layers);
+export const IconCaseSignifiers = make(MessageCircleMore);
+export const IconCaseScenario = make(RefreshCw);
+export const IconCaseTransfer = make(ArrowLeftRight);
+export const IconCaseNotePin = IconPin;
+export const IconCaseHeadEye = IconEye;
+export const IconCaseHeadStar = IconStar;
+export const IconCaseHeadInfo = IconCircleAlert;
+export const IconCaseHeadHospital = make(Hospital);
+export const IconCaseHeadCrown = make(Crown);
+export const IconCaseHeadBolt = make(Zap);
+export const IconCaseHeadCross = IconCircleX;
+export const IconCaseHeadDots = make(CircleEllipsis);
+export const IconCaseHeadChecklist = make(ClipboardCheck);
+export const IconCaseHeadFlame = IconFlame;
+export const IconCaseHeadBriefcase = IconBriefcase;
+export const IconCaseHeadBookmark = IconBookmark;
+
+// ——— История взаимодействия: сами значки без плашки (цветную плашку рисует ChatHistory.css) ———
+export const IconEventInvite = IconPlusLine;
+export const IconTlNote = IconPin;
+export const IconTlDoc = IconFile;
+export const IconTlFlame = IconFlame;
+export const IconTlClock = IconClock;
+export const IconChevron = IconChevronRight;
+
+// ——— Тесты и задания ———
+// Сердечко избранного: закрашенное; красное — в избранном, серое (цвет текста) — нет
+export const IconHeartRed = make(Heart, { color: HEART_RED, fill: HEART_RED });
+export const IconHeartGray = make(Heart, { fill: 'currentColor' });
+export const IconHeartRedLg = IconHeartRed;
+export const IconHeartGrayLg = IconHeartGray;
+export const IconFilterAll = IconBriefcase;
+export const IconFilterFavorites = make(Heart);
+export const IconFilterRecent = IconClock;
+export const IconFilterSettings = IconSettings;
+
+export const IconTestChevron = IconChevronRight;
+export const IconTestChevronDown = IconChevronDown;
+export const IconTestMic = IconMicrophone;
+export const IconTestPass = make(CirclePlay);
+// «Отправить» — бумажный самолётик, как и в чате; «Отправить нескольким» — несколько человек
+export const IconTestSend = IconSend;
+export const IconTestSendMany = make(Users);
+export const IconTestReportMain = IconClipboardList;
+export const IconTestReportExtra = make(ClipboardPlus);
+
+// Рисунок теста или задания: на цветной плитке в карточках библиотеки и чата и в шапке настроек.
+// Подобраны по смыслу методики (в Lucide нет готовых «психологических» картинок)
+export const IconLibSmol = make(Drama); // СМОЛ: личность с разными «масками»
+export const IconLibBhs = make(CloudRain); // безнадежность: мрачный прогноз
+export const IconLibSq = make(FingerprintPattern); // Леонгард–Шмишек: особенности личности
+export const IconLibItt = make(HeartPulse); // тревожность
+export const IconLibBdi = make(CloudDrizzle); // депрессия (Бек)
+export const IconLibIto = make(UsersRound); // Собчик: типы личности
+export const IconLibOcr = make(Skull); // суицидальный риск
+export const IconLibPhq9 = make(CloudLightning); // депрессивное состояние
+export const IconLibGad7 = make(BrainCog); // генерализованное тревожное расстройство
+export const IconLibRses = make(MirrorRound); // самооценка: взгляд на себя
+export const IconLibPfq = make(Brain); // пятифакторный опросник личности
+export const IconLibScl90 = make(Stethoscope); // клиническая симптоматика
+export const IconLibEvidence = make(FileSearch); // поиск доказательств
+export const IconLibPie = make(ChartPie); // пирог ответственности
+export const IconLibSmer = make(NotebookText); // дневник СМЭР
+export const IconLibActivation = make(BatteryCharging); // поведенческая активация
+export const IconLibWorry = make(Hourglass); // отложенное беспокойство
+export const IconLibShould = make(ListChecks); // «что я должен?»
+export const IconLibChoice = make(Split); // выбор без правильного ответа
+export const IconLibPhrase = make(MessageSquareQuote); // запомнившаяся фраза
+export const IconLibSecret = make(EyeOff); // «если никто не узнает»
+
+// Шкала состояния («Как вы себя чувствуете?»): пять лиц от «очень плохо» до «очень хорошо»
+const FACES: LucideIcon[] = [Frown, FaceSlightlyFrowning, Meh, Smile, Laugh];
+export function IconTaskState({ level, ...props }: { level: number } & IconProps) {
+  const Face = FACES[level] ?? Meh;
+  return <Face size="1em" strokeWidth={STROKE} {...props} />;
 }
 
-// Экран открытого чата
-export { default as IconTabBooking } from '../../assets/icons/chat/tab-booking.svg?react';
-export { default as IconTabMessages } from '../../assets/icons/chat/tab-messages.svg?react';
-export { default as IconTabTests } from '../../assets/icons/chat/tab-tests.svg?react';
-export { default as IconTabPractices } from '../../assets/icons/chat/tab-practices.svg?react';
-export { default as IconTabNotes } from '../../assets/icons/chat/tab-notes.svg?react';
-export { default as IconTabLibrary } from '../../assets/icons/chat/tab-library.svg?react';
-export { default as IconSettings } from '../../assets/icons/chat/settings.svg?react';
-export { default as IconAttach } from '../../assets/icons/chat/attach.svg?react';
-export { default as IconEmoji } from '../../assets/icons/chat/emoji.svg?react';
-export { default as IconMicrophone } from '../../assets/icons/chat/microphone.svg?react';
-export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
-export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
+// ——— Окно редактирования: строки «Иконка» и «Цвет» ———
+export const IconSheetIcon = make(Shapes);
+export const IconSheetPalette = make(Palette);
 
-// Вкладка «Запись на прием»: все значки присланы; status-* — статусы в истории приемов (заменяются файлом с тем же именем)
-export { default as IconBookingPin } from '../../assets/icons/booking/pin.svg?react';
-export { default as IconBookingRoute } from '../../assets/icons/booking/route.svg?react';
-export { default as IconBookingInMaps } from '../../assets/icons/booking/in-maps.svg?react';
-export { default as IconBookingCopy } from '../../assets/icons/booking/copy.svg?react';
-export { default as IconBookingWallet } from '../../assets/icons/booking/wallet.svg?react';
-export { default as IconBookingDirections } from '../../assets/icons/booking/directions.svg?react';
-export { default as IconBookingBag } from '../../assets/icons/booking/bag.svg?react';
-export { default as IconBookingCalendar } from '../../assets/icons/booking/calendar.svg?react';
-export { default as IconBookingExternal } from '../../assets/icons/booking/external.svg?react';
-export { default as IconBookingDone } from '../../assets/icons/booking/status-done.svg?react';
-export { default as IconBookingCancelled } from '../../assets/icons/booking/status-cancelled.svg?react';
-export { default as IconBookingMoved } from '../../assets/icons/booking/status-moved.svg?react';
-export { default as IconBookingPending } from '../../assets/icons/booking/status-pending.svg?react';
+// ——— Профиль ———
+export const IconCamera = make(Camera);
+export const IconPencil = IconEdit;
+export const IconImage = make(Image);
+export const IconCover = make(PanelTop);
+export const IconCaption = make(Captions);
 
-// Вкладка «Кейс»
-export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
-export { default as IconCaseAttach } from '../../assets/icons/case/attach-file.svg?react';
-export { default as IconCaseFileDownload } from '../../assets/icons/case/file-download.svg?react';
-export { default as IconCaseAddNote } from '../../assets/icons/case/add-note.svg?react';
-export { default as IconCaseNotePin } from '../../assets/icons/case/note-pin.svg?react';
-export { default as IconCaseEdit } from '../../assets/icons/case/edit.svg?react';
-export { default as IconCaseLock } from '../../assets/icons/case/note-lock.svg?react';
-export { default as IconCaseGeneral } from '../../assets/icons/case/head-general.svg?react';
-export { default as IconCaseAnamnesis } from '../../assets/icons/case/head-anamnesis.svg?react';
-export { default as IconCaseRequest } from '../../assets/icons/case/head-request.svg?react';
-export { default as IconCaseHypothesis } from '../../assets/icons/case/head-hypothesis.svg?react';
-export { default as IconCaseStructure } from '../../assets/icons/case/head-structure.svg?react';
-export { default as IconCaseSignifiers } from '../../assets/icons/case/head-signifiers.svg?react';
-export { default as IconCaseScenario } from '../../assets/icons/case/head-scenario.svg?react';
-export { default as IconCaseTransfer } from '../../assets/icons/case/head-transfer.svg?react';
-export { default as IconCaseHeadEye } from '../../assets/icons/case/head-eye.svg?react';
-export { default as IconCaseHeadStar } from '../../assets/icons/case/head-star.svg?react';
-export { default as IconCaseHeadInfo } from '../../assets/icons/case/head-info.svg?react';
-export { default as IconCaseHeadHospital } from '../../assets/icons/case/head-hospital.svg?react';
-export { default as IconCaseHeadCrown } from '../../assets/icons/case/head-crown.svg?react';
-export { default as IconCaseHeadBolt } from '../../assets/icons/case/head-bolt.svg?react';
-export { default as IconCaseHeadCross } from '../../assets/icons/case/head-cross.svg?react';
-export { default as IconCaseHeadDots } from '../../assets/icons/case/head-dots.svg?react';
-export { default as IconCaseHeadChecklist } from '../../assets/icons/case/head-checklist.svg?react';
-export { default as IconCaseHeadFlame } from '../../assets/icons/case/head-flame.svg?react';
-export { default as IconCaseHeadBriefcase } from '../../assets/icons/case/head-briefcase.svg?react';
-export { default as IconCaseHeadBookmark } from '../../assets/icons/case/head-bookmark.svg?react';
-
-// История взаимодействия
-export { default as IconTlNote } from '../../assets/icons/history/tl-note.svg?react';
-export { default as IconTlClock } from '../../assets/icons/history/tl-clock.svg?react';
-export { default as IconTlDoc } from '../../assets/icons/history/tl-doc.svg?react';
-export { default as IconTlFlame } from '../../assets/icons/history/tl-flame.svg?react';
-export { default as IconChevron } from '../../assets/icons/history/chevron.svg?react';
-
-// Раздел «Психологические тесты»
-export { default as IconHeartRed } from '../../assets/icons/library/heart-red.svg?react';
-export { default as IconHeartGray } from '../../assets/icons/library/heart-gray.svg?react';
-export { default as IconFilterAll } from '../../assets/icons/library/filter-all.svg?react';
-export { default as IconFilterFavorites } from '../../assets/icons/library/filter-favorites.svg?react';
-export { default as IconFilterRecent } from '../../assets/icons/library/filter-recent.svg?react';
-export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
-
-// Настройки теста
-export { default as IconTestViewList } from '../../assets/icons/test/view-list.svg?react';
-export { default as IconTestViewSingle } from '../../assets/icons/test/view-single.svg?react';
-export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
-export { default as IconTestChevron } from '../../assets/icons/test/chevron-right.svg?react';
-export { default as IconTestPass } from '../../assets/icons/test/pass.svg?react';
-export { default as IconTestSend } from '../../assets/icons/test/send.svg?react';
-export { default as IconTestSendMany } from '../../assets/icons/test/send-many.svg?react';
-export { default as IconTestChevronDown } from '../../assets/icons/test/chevron-down.svg?react';
-export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.svg?react';
-export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';
-
-// Окно редактирования: строки «Иконка» и «Цвет»
-export { default as IconSheetIcon } from '../../assets/icons/sheet/icon-picker.svg?react';
-export { default as IconSheetPalette } from '../../assets/icons/sheet/palette.svg?react';
-
-// Инструменты форматирования текста в редакторе
-export { default as IconFmtBold } from '../../assets/icons/format/bold.svg?react';
-export { default as IconFmtItalic } from '../../assets/icons/format/italic.svg?react';
-export { default as IconFmtUnderline } from '../../assets/icons/format/underline.svg?react';
-export { default as IconFmtStrike } from '../../assets/icons/format/strike.svg?react';
-export { default as IconFmtBullets } from '../../assets/icons/format/list-bullets.svg?react';
-export { default as IconFmtNumbers } from '../../assets/icons/format/list-numbers.svg?react';
-export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?react';
-export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
-export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
-export { default as IconTestChevronUp } from '../../assets/icons/test/chevron-up.svg?react';
-export { default as IconTestReportMain } from '../../assets/icons/test/report-main.svg?react';
-export { default as IconTestReportExtra } from '../../assets/icons/test/report-extra.svg?react';
+// ——— Инструменты форматирования текста ———
+export const IconFmtBold = make(Bold);
+export const IconFmtItalic = make(Italic);
+export const IconFmtUnderline = make(Underline);
+export const IconFmtStrike = make(Strikethrough);
+export const IconFmtBullets = make(List);
+export const IconFmtNumbers = make(ListOrdered);
+export const IconFmtQuote = make(Quote);
+export const IconFmtUndo = make(Undo2);
+export const IconFmtRedo = make(Redo2);

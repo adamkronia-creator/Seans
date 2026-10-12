@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { IconChevronDown } from '../ChatParts/ChatIcons';
+import { IconChevronDown } from '../icons';
 import { reducedMotion } from '../../utils/swipe';
 import './ScrollHost.css';
 

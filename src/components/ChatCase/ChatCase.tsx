@@ -43,7 +43,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
     <li id={`case-s-${section.id}`} className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head" style={toneStyle(section.tone)}>
         {head && (
-          <span className="case-card__icon" style={{ fontSize: head.size }}>
+          <span className="case-card__icon">
             <head.Icon />
           </span>
         )}
@@ -163,7 +163,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
     <li id={`case-n-${note.id}`} className="case-card case-card--editable" {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         {head && (
-          <span className="case-card__icon" style={{ fontSize: head.size }}>
+          <span className="case-card__icon">
             <head.Icon />
           </span>
         )}

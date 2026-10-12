@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTest } from '../../data/library';
 import type { ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
-import { ClientIntro, IconEye, IconEyeOff, testFacts } from './ClientParts';
+import { IconEye, IconEyeOff } from '../icons';
+import { ClientIntro, testFacts } from './ClientParts';
 import { FillMeter } from './PassParts';
 import { TestDone } from './TestDone';
 import { TestHeader } from './TestHeader';
@@ -107,7 +108,7 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
         </div>
 
         <p className={`tp__badge${blind ? ' tp__badge--blind' : ''}`}>
-          {blind ? <IconEyeOff /> : <IconEye />}
+          {blind ? <IconEyeOff className="tp__fact-icon" /> : <IconEye className="tp__fact-icon" />}
           <span>{blind ? 'Слепое тестирование: название скрыто' : 'Клиент увидит название теста'}</span>
         </p>
 

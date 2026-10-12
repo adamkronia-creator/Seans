@@ -67,6 +67,7 @@
 .pl-choice__check {
   flex-shrink: 0;
   color: var(--color-accent);
+  font-size: 18px;
 }
 
 /* Длительность сеанса: кнопка-меню справа в строке */

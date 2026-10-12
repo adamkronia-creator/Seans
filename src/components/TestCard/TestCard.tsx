@@ -8,6 +8,7 @@ interface TestCardProps {
 }
 
 export function TestCard({ test, onClick }: TestCardProps) {
+  const Glyph = test.icon;
   return (
     <li>
       <button type="button" className="test-card" onClick={() => onClick?.(test)}>
@@ -15,7 +16,7 @@ export function TestCard({ test, onClick }: TestCardProps) {
           className="test-card__avatar"
           style={{ '--tint': test.tint } as CSSProperties}
         >
-          <img className="test-card__icon" src={test.icon} alt="" />
+          <Glyph className="test-card__icon" />
         </span>
         <span className="test-card__body">
           <span className="test-card__top">
