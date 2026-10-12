@@ -62,6 +62,8 @@ export interface TaskBlankData {
   state: string[];
   /** Подсказка над полем комментария */
   commentHint: string;
+  /** При выполнении каждый раздел бланка идёт отдельной страницей */
+  paged?: boolean;
 }
 
 export interface PieFactor {

@@ -43,8 +43,8 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
   const { done, total } = progressOf(sections, run.values);
   const started = run.startedAt !== undefined;
   // Если что-то уже написано (вышли и вернулись), открываем бланк, а не инструкцию
-  const steps = taskSteps(options);
-  const [step, setStep] = useState<TaskStep>(started ? 'form' : 'rules');
+  const steps = taskSteps(options, sections, data.blank.paged);
+  const [step, setStep] = useState<TaskStep>(started ? steps[1] : 'rules');
   const at = steps.indexOf(step);
   const lastStep = at === steps.length - 1;
   const [sheet, setSheet] = useState<'reset' | 'finish' | null>(null);
@@ -94,7 +94,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
             </CollapseCard>
           )
         ) : (
-          <TaskForm data={data} form={form} options={options} only={step as 'form' | 'comment' | 'state'} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
+          <TaskForm data={data} form={form} options={options} only={step} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
         )}
       </div>
 
@@ -115,7 +115,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
                 </button>
               )}
               {step === 'rules' ? (
-                <button type="button" className="test-settings__cta-button" onClick={() => setStep('form')}>
+                <button type="button" className="test-settings__cta-button" onClick={() => setStep(steps[1])}>
                   {started ? 'Продолжить' : 'Начать'}
                 </button>
               ) : !lastStep ? (

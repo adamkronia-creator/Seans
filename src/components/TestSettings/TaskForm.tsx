@@ -569,11 +569,10 @@ interface TaskFormProps {
   /** Что стоит между разделами и комментарием: например, пояснение */
   after?: ReactNode;
   /** При выполнении бланк идёт страницами: сами поля, комментарий и состояние по отдельности. Без значения показано всё сразу */
-  only?: TaskPart;
+  only?: string;
 }
 
-/** Страница бланка при выполнении */
-export type TaskPart = 'form' | 'comment' | 'state';
+
 
 /** Бланк задания целиком: инструкция (по желанию), разделы с полями, комментарий и шкала состояния, если они включены */
 export function TaskForm({ data, form, options, values, onChange, rules = false, after, only }: TaskFormProps) {
@@ -585,8 +584,11 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           <BlankRules rules={data.blank.rules(form)} />
         </CollapseCard>
       )}
-      {(!only || only === 'form') &&
-        sections.map((section) => <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />)}
+      {sections
+        .filter((section) => !only || only === 'form' || only === section.id)
+        .map((section) => (
+          <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />
+        ))}
       {options.comment && (!only || only === 'comment') && (
         <CollapseCard title="Комментарий">
           <div className="task-pad">
@@ -606,7 +608,7 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           </div>
         </CollapseCard>
       )}
-      {(!only || only === 'form') && after}
+      {(!only || only === 'form' || sections.some((section) => section.id === only)) && after}
     </>
   );
 }

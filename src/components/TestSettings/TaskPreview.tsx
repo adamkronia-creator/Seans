@@ -37,7 +37,7 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
-  const parts = taskSteps(options).slice(1) as ('form' | 'comment' | 'state')[];
+  const parts = taskSteps(options, data.blank.sections(form), data.blank.paged).slice(1);
   const [partAt, setPartAt] = useState(0);
   const part = Math.min(partAt, parts.length - 1);
   const { done, total } = progressOf(data.blank.sections(form), values);
