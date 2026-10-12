@@ -1,16 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ResultMode } from '../../data/resultMode';
 import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
+import { ClientIntro, testFacts } from './ClientParts';
+import { FillMeter } from './PassParts';
 import { BlankRules, CollapseCard } from './TestBlank';
-import { JumpSheet, PassQuestion } from './TestPassSingle';
+import { TestDone } from './TestDone';
+import { ADVANCE_MS, JumpSheet, PassQuestion } from './TestPassSingle';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestPass.css';
 
-/** Пауза после ответа, прежде чем открыть следующий вопрос: выбранный вариант успевает подсветиться */
-const ADVANCE_MS = 280;
+/** Экран клиента: тест, присланный специалистом (или отправленный себе). Прохождение то же, что у специалиста, только с его сообщением и «Спасибо» в конце */
+export interface TestClient {
+  /** Сообщение специалиста; пустое, если оно выключено */
+  message: string;
+  /** Что клиент увидит после теста */
+  result: ResultMode;
+  /** Время выполнения из описания теста («15–20 мин.») */
+  duration?: string;
+  /** «Завершить» на экране «Спасибо» */
+  onExit: () => void;
+}
 
 interface TestPassProps {
   testId: string;
@@ -19,8 +32,9 @@ interface TestPassProps {
   form: string;
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
   saveBlank: boolean;
-  /** Результат посчитан и сохранён: id результата */
-  onDone: (resultId: string) => void;
+  /** Результат посчитан и сохранён: id результата (у клиента не вызывается: он остаётся на экране «Спасибо») */
+  onDone?: (resultId: string) => void;
+  client?: TestClient;
 }
 
 function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConfirm: () => void; onClose: () => void }) {
@@ -50,8 +64,9 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
 /**
  * Прохождение теста самому: внизу счётчик и кнопки, ответы отмечаются в бланке.
  * Вопросы идут по одному: сначала инструкция, затем вопрос за вопросом с кнопками «Назад» и «Далее».
+ * У клиента тот же экран: на первом шаге добавляются сообщение специалиста и сведения, после завершения — «Спасибо».
  */
-export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassProps) {
+export function TestPass({ testId, blank, form, saveBlank, onDone, client }: TestPassProps) {
   const run = useSelfRun(testId);
   const total = blank.questions.length;
   const answered = Object.keys(run.answers).length;
@@ -69,6 +84,8 @@ export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassPro
   // Вопрос, с которого ушли к правилам: «Продолжить» вернёт на него
   const [returnTo, setReturnTo] = useState<number | null>(null);
   const [jumpOpen, setJumpOpen] = useState(false);
+  // Клиент прошёл тест: вместо результата экран «Спасибо»
+  const [finished, setFinished] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const advance = useRef<number>();
 
@@ -83,7 +100,7 @@ export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassPro
   // Новый вопрос всегда открывается с начала, даже если предыдущий пришлось прокручивать
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
-  }, [step]);
+  }, [step, finished]);
 
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
 
@@ -113,7 +130,9 @@ export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassPro
       return;
     }
     const result = finishRun(testId, total, form, saveBlank);
-    if (result) onDone(result.id);
+    if (!result) return;
+    if (client) setFinished(true);
+    else onDone?.(result.id);
   };
 
   const onAnswer = (question: number, answer: number) => {
@@ -135,11 +154,17 @@ export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassPro
 
   return (
     <>
-      <div className="test-settings__scroll" key="pass" ref={scrollRef}>
-        {step < 0 ? (
-          <CollapseCard title="Инструкция" id="blank-rules">
-            <BlankRules rules={blank.rules} />
-          </CollapseCard>
+      <div className="test-settings__scroll" key={finished ? 'thanks' : 'pass'} ref={scrollRef}>
+        {finished && client ? (
+          <TestDone testId={testId} result={client.result} />
+        ) : step < 0 ? (
+          client ? (
+            <ClientIntro message={client.message} rules={blank.rules} facts={testFacts(total, client.duration, client.result)} />
+          ) : (
+            <CollapseCard title="Инструкция" id="blank-rules">
+              <BlankRules rules={blank.rules} />
+            </CollapseCard>
+          )
         ) : (
           <PassQuestion
             data={blank}
@@ -155,44 +180,42 @@ export function TestPass({ testId, blank, form, saveBlank, onDone }: TestPassPro
       </div>
 
       <div className="test-settings__cta test-pass__cta">
-        <div className="test-pass__meta">
-          <span>
-            Отвечено: {answered} из {total}
-          </span>
-          {answered > 0 && (
-            <button type="button" className="test-pass__reset" onClick={() => setResetOpen(true)}>
-              Сбросить
+        {finished && client ? (
+          <div className="test-pass__buttons">
+            <button type="button" className="test-settings__cta-button" onClick={client.onExit}>
+              Завершить
             </button>
-          )}
-        </div>
-        <div className="test-pass__bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered}>
-          <span style={{ width: `${(answered / total) * 100}%` }} />
-        </div>
-        <div className="test-pass__buttons">
-          {step >= 0 && (
-            <button type="button" className="test-pass__back" onClick={() => goTo(step - 1)}>
-              Назад
-            </button>
-          )}
-          {step < 0 ? (
-            <button type="button" className="test-settings__cta-button" onClick={start}>
-              {answered > 0 || returnTo !== null ? 'Продолжить' : 'Начать'}
-            </button>
-          ) : step < total - 1 ? (
-            <button
-              type="button"
-              className="test-settings__cta-button"
-              disabled={run.answers[step] === undefined}
-              onClick={() => goTo(step + 1)}
-            >
-              Далее
-            </button>
-          ) : (
-            <button type="button" className="test-settings__cta-button" onClick={finish}>
-              Завершить тест
-            </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <FillMeter label="Отвечено" done={answered} total={total} onReset={answered > 0 ? () => setResetOpen(true) : undefined} />
+            <div className="test-pass__buttons">
+              {step >= 0 && (
+                <button type="button" className="test-pass__back" onClick={() => goTo(step - 1)}>
+                  Назад
+                </button>
+              )}
+              {step < 0 ? (
+                <button type="button" className="test-settings__cta-button" onClick={start}>
+                  {answered > 0 || returnTo !== null ? 'Продолжить' : 'Начать'}
+                </button>
+              ) : step < total - 1 ? (
+                <button
+                  type="button"
+                  className="test-settings__cta-button"
+                  disabled={run.answers[step] === undefined}
+                  onClick={() => goTo(step + 1)}
+                >
+                  Далее
+                </button>
+              ) : (
+                <button type="button" className="test-settings__cta-button" onClick={finish}>
+                  Завершить тест
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
         {toast && <Toast text={toast} className="test-pass__toast" />}
       </div>

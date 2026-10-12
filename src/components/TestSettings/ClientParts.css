@@ -1,0 +1,125 @@
+/* Экран клиента: сведения перед началом и благодарность в конце. Шапка, карточки бланка, счётчик и кнопки — те же, что при самостоятельном прохождении */
+
+/* Что нужно знать перед началом: карточка со строками и значками, строки разделены линией */
+.tp__facts {
+  margin: 0;
+  padding: 0 var(--space-4);
+  list-style: none;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tp__facts li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 48px;
+  padding: var(--space-2) 0;
+}
+
+.tp__facts li + li {
+  border-top: 1px solid var(--color-divider);
+}
+
+.tp__fact-icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+/* Окончание: карточка, в ней по центру значок, благодарность и пояснения */
+.tp__done {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.tp__done-mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-green-soft);
+  color: var(--color-green-text);
+}
+
+.tp__done-title {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+}
+
+.tp__done-text {
+  max-width: 260px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  text-wrap: balance;
+}
+
+/* Пример итога: серая плашка внутри белой карточки */
+.tp__sample {
+  align-self: stretch;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-app);
+  text-align: left;
+}
+
+.tp__sample-label {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.tp__sample-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tp__sample-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.tp__sample-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.tp__sample-level {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.tp__sample-score {
+  flex-shrink: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+.tp__sample-max {
+  color: var(--color-text-caption);
+  font-weight: var(--font-weight-regular);
+}
+
+.tp__sample-more {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-caption);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}

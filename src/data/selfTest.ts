@@ -211,6 +211,8 @@ export interface PassRequest {
 let pendingPass: PassRequest | null = null;
 export const requestPass = (request: PassRequest) => {
   pendingPass = request;
+  // Клиент начинает с чистого листа: черновик собственного прохождения этого теста ему не показывают
+  resetRun(request.testId);
 };
 export function takePass(testId: string) {
   const request = pendingPass?.testId === testId ? pendingPass : null;

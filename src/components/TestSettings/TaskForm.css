@@ -79,30 +79,6 @@
   font-size: 22px;
 }
 
-/* ——— «Плоский» вид: экран телефона клиента, без карточек — заголовок, под ним поля ——— */
-
-.tf-flat {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.tf-flat .blank-questions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.tf-flat .blank-question,
-.tf-flat .blank-question + .blank-question {
-  padding: 0;
-  border-top: 0;
-}
-
-.tf-flat .task-pad {
-  padding: 0;
-}
-
 /* ——— Предложение: номер и выбор начала фразы в одной строке, под ними поле ——— */
 
 .tf-sentence {
@@ -621,23 +597,4 @@
 
 .tf-entries__empty {
   padding: var(--space-4);
-}
-
-/* «Плоский» вид (экран телефона клиента): записи без полей карточки, между ними линия на всю ширину */
-.tf-flat .tf-entry {
-  padding: 0;
-}
-
-.tf-flat .tf-entry + .tf-entry {
-  margin-top: var(--space-5);
-  padding-top: var(--space-5);
-}
-
-.tf-flat .tf-entries__add {
-  margin-top: var(--space-4);
-  padding: 0;
-}
-
-.tf-flat .tf-entries__empty {
-  padding: 0;
 }

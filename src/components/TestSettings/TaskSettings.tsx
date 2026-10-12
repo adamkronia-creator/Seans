@@ -207,19 +207,27 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
     );
   }
 
-  const live = passRequest && view === 'pass';
+  // Задание, отправленное себе, открыто как у клиента: тот же интерфейс, только без «избранного» в шапке, с сообщением специалиста и «Спасибо» в конце
+  const live = Boolean(passRequest) && view === 'pass';
 
   return (
     <section className="test-settings">
-      {!live && <TestHeader test={task} kind="task" status={STATUS[view]} onBack={view === 'settings' ? onBack : stepBack} />}
+      <TestHeader
+        test={task}
+        kind="task"
+        client={live ? {} : undefined}
+        status={live ? 'Задание от вашего специалиста' : STATUS[view]}
+        onBack={view === 'settings' ? onBack : stepBack}
+      />
 
-      {view === 'pass' && !passRequest ? (
+      {view === 'pass' ? (
         <TaskPass
           taskId={task.id}
           data={data}
           form={form}
           options={options}
           saveBlank={saveBlank}
+          client={passRequest ? { message: passRequest.message, deadline: passRequest.deadline, onExit: onBack } : undefined}
           onDone={(id) => {
             // Результат открывается сразу; его копия лежит в «Избранное» → «Задания», в чате — сообщение с кнопкой
             transition(() => {
@@ -229,8 +237,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             }, 'forward');
           }}
         />
-      ) : live ? (
-        <TaskPreview task={task} data={data} form={form} options={options} message={passRequest.message} deadline={passRequest.deadline} onExit={onBack} live={{ saveBlank }} />
       ) : view === 'preview' ? (
         <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} onExit={() => openView('settings')} />
       ) : view === 'blank' ? (

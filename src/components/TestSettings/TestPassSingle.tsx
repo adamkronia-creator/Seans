@@ -7,6 +7,9 @@ import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import '../EditSheet/EditSheet.css';
 import './TestPass.css';
 
+/** Пауза после ответа, прежде чем открыть следующий вопрос: выбранный вариант успевает подсветиться */
+export const ADVANCE_MS = 280;
+
 /** Пояснение к группе вопросов («Сейчас, в данный момент:»): в данных оно стоит у первого вопроса группы, а на отдельном экране нужно у каждого */
 function headingOf(data: TestBlankData, index: number): string | undefined {
   for (let i = index; i >= 0; i--) {

@@ -141,6 +141,8 @@ export interface TaskPassRequest {
 let pendingPass: TaskPassRequest | null = null;
 export const requestTaskPass = (request: TaskPassRequest) => {
   pendingPass = request;
+  // Клиент начинает с чистого листа: черновик собственного выполнения этого задания ему не показывают
+  resetTaskRun(request.taskId);
 };
 export function takeTaskPass(taskId: string) {
   const request = pendingPass?.taskId === taskId ? pendingPass : null;

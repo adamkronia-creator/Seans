@@ -1,77 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { editTaskRun, finishTaskRun, resetTaskRun, useTaskRun } from '../../data/selfTask';
 import { progressOf, type TaskSettingsData } from '../../data/taskValues';
-import { SheetOverlay } from '../EditSheet/SheetOverlay';
-import { useSheet } from '../EditSheet/useSheet';
 import { Toast } from '../Toast/Toast';
+import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
+import { ConfirmSheet, FillMeter, unfilledText } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { BlankRules, CollapseCard } from './TestBlank';
-import '../EditSheet/EditSheet.css';
 import './TestPass.css';
 
-/** Окно с вопросом и двумя кнопками: подтвердить сброс или завершение с пустыми полями */
-export function ConfirmSheet({
-  title,
-  text,
-  confirm,
-  cancel = 'Отмена',
-  onConfirm,
-  onClose,
-}: {
-  title: string;
-  text: string;
-  confirm: string;
-  cancel?: string;
-  onConfirm: () => void;
-  onClose: () => void;
-}) {
-  useSheet(onClose);
-  return (
-    <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="sheet__header">
-          <h2 className="sheet__heading">{title}</h2>
-        </div>
-        <div className="sheet__body">
-          <p className="test-pass__confirm">{text}</p>
-        </div>
-        <div className="sheet__footer">
-          <button type="button" className="sheet__button" onClick={onClose}>
-            {cancel}
-          </button>
-          <button type="button" className="sheet__button sheet__button--primary" onClick={onConfirm}>
-            {confirm}
-          </button>
-        </div>
-      </div>
-    </SheetOverlay>
-  );
+/** Экран клиента: задание, присланное специалистом (или отправленное себе). Прохождение то же, что у специалиста, только с его сообщением и «Спасибо» в конце */
+export interface TaskClient {
+  /** Сообщение специалиста без строки про срок; пустое, если оно выключено */
+  message: string;
+  /** Срок выполнения из настроек («Без срока», «Сутки»…) */
+  deadline: string;
+  /** «Завершить» на экране «Спасибо» */
+  onExit: () => void;
 }
-
-/** «Заполнено 3 из 10» и полоса: сколько полей бланка уже написано */
-export function FillMeter({ done, total, onReset }: { done: number; total: number; onReset?: () => void }) {
-  return (
-    <>
-      <div className="test-pass__meta">
-        <span>
-          Заполнено: {done} из {total}
-        </span>
-        {onReset && (
-          <button type="button" className="test-pass__reset" onClick={onReset}>
-            Сбросить
-          </button>
-        )}
-      </div>
-      <div className="test-pass__bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
-        <span style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
-      </div>
-    </>
-  );
-}
-
-/** Текст окна «Завершить задание?», когда заполнены не все поля */
-export const unfilledText = (done: number, total: number) =>
-  `Заполнено ${done} из ${total}. Пустые поля в результате будут отмечены как «Не заполнено»: их можно пропустить.`;
 
 interface TaskPassProps {
   taskId: string;
@@ -82,15 +27,17 @@ interface TaskPassProps {
   options: { comment: boolean; state: boolean };
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли написанное вместе с результатом */
   saveBlank: boolean;
-  /** Задание выполнено и сохранено: номер результата */
-  onDone: (resultId: string) => void;
+  /** Задание выполнено и сохранено: номер результата (у клиента не вызывается: он остаётся на экране «Спасибо») */
+  onDone?: (resultId: string) => void;
+  client?: TaskClient;
 }
 
 /**
- * Выполнение задания самому: сначала инструкция, затем бланк целиком. Написанное остаётся, если выйти и вернуться.
+ * Выполнение задания: сначала инструкция, затем бланк целиком. Написанное остаётся, если выйти и вернуться.
  * Внизу счётчик заполненных полей и кнопки; пустые поля можно пропустить, но не все сразу.
+ * У клиента тот же экран: на первом шаге добавляются сообщение специалиста и сведения, после завершения — «Спасибо».
  */
-export function TaskPass({ taskId, data, form, options, saveBlank, onDone }: TaskPassProps) {
+export function TaskPass({ taskId, data, form, options, saveBlank, onDone, client }: TaskPassProps) {
   const run = useTaskRun(taskId);
   const sections = data.blank.sections(form);
   const { done, total } = progressOf(sections, run.values);
@@ -99,6 +46,8 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone }: Tas
   const [step, setStep] = useState<'rules' | 'form'>(started ? 'form' : 'rules');
   const [sheet, setSheet] = useState<'reset' | 'finish' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  // Клиент выполнил задание: вместо результата экран «Спасибо»
+  const [finished, setFinished] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number>();
 
@@ -106,11 +55,13 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone }: Tas
   // Новый экран всегда открывается с начала
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
-  }, [step]);
+  }, [step, finished]);
 
   const finish = () => {
     setSheet(null);
-    onDone(finishTaskRun(taskId, form, saveBlank).id);
+    const result = finishTaskRun(taskId, form, saveBlank);
+    if (client) setFinished(true);
+    else onDone?.(result.id);
   };
 
   const tryFinish = () => {
@@ -124,36 +75,54 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone }: Tas
     else finish();
   };
 
+  const rules = data.blank.rules(form);
+
   return (
     <>
-      <div className="test-settings__scroll" key={step} ref={scrollRef}>
-        {step === 'rules' ? (
-          <CollapseCard title="Инструкция" id="blank-rules">
-            <BlankRules rules={data.blank.rules(form)} />
-          </CollapseCard>
+      <div className="test-settings__scroll" key={finished ? 'thanks' : step} ref={scrollRef}>
+        {finished ? (
+          <TaskDone />
+        ) : step === 'rules' ? (
+          client ? (
+            <ClientIntro message={client.message} rules={rules} facts={taskFacts(data, form, client.deadline)} />
+          ) : (
+            <CollapseCard title="Инструкция" id="blank-rules">
+              <BlankRules rules={rules} />
+            </CollapseCard>
+          )
         ) : (
           <TaskForm data={data} form={form} options={options} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
         )}
       </div>
 
       <div className="test-settings__cta test-pass__cta">
-        <FillMeter done={done} total={total} onReset={started ? () => setSheet('reset') : undefined} />
-        <div className="test-pass__buttons">
-          {step === 'form' && (
-            <button type="button" className="test-pass__back" onClick={() => setStep('rules')}>
-              Назад
+        {finished && client ? (
+          <div className="test-pass__buttons">
+            <button type="button" className="test-settings__cta-button" onClick={client.onExit}>
+              Завершить
             </button>
-          )}
-          {step === 'rules' ? (
-            <button type="button" className="test-settings__cta-button" onClick={() => setStep('form')}>
-              {started ? 'Продолжить' : 'Начать'}
-            </button>
-          ) : (
-            <button type="button" className="test-settings__cta-button" onClick={tryFinish}>
-              Завершить задание
-            </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <>
+            <FillMeter done={done} total={total} onReset={started ? () => setSheet('reset') : undefined} />
+            <div className="test-pass__buttons">
+              {step === 'form' && (
+                <button type="button" className="test-pass__back" onClick={() => setStep('rules')}>
+                  Назад
+                </button>
+              )}
+              {step === 'rules' ? (
+                <button type="button" className="test-settings__cta-button" onClick={() => setStep('form')}>
+                  {started ? 'Продолжить' : 'Начать'}
+                </button>
+              ) : (
+                <button type="button" className="test-settings__cta-button" onClick={tryFinish}>
+                  Завершить задание
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
         {toast && <Toast text={toast} className="test-pass__toast" />}
       </div>

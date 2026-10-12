@@ -539,24 +539,12 @@ function FieldBody({ field, number, values, onChange, scope }: FieldProps) {
   }
 }
 
-/** Блок бланка: карточка с заголовком; в «плоском» виде (экран телефона клиента) это заголовок и поля без карточки */
-function Block({ title, flat, children }: { title: string; flat: boolean; children: ReactNode }) {
-  return flat ? (
-    <section className="tf-flat">
-      <h4 className="tp__label">{title}</h4>
-      {children}
-    </section>
-  ) : (
-    <CollapseCard title={title}>{children}</CollapseCard>
-  );
-}
-
 /** Раздел бланка: каждое поле — вопрос с линией между ними, как в бланке теста */
-export function TaskSectionCard({ section, values, onChange, flat = false }: { section: TaskSection; values: TaskValues; onChange?: (next: TaskValues) => void; flat?: boolean }) {
+export function TaskSectionCard({ section, values, onChange }: { section: TaskSection; values: TaskValues; onChange?: (next: TaskValues) => void }) {
   let sentence = 0;
   return (
-    <Block title={section.title} flat={flat}>
-      {section.hint && <p className={`task-hint${flat ? '' : ' tf-section-hint'}`}>{section.hint}</p>}
+    <CollapseCard title={section.title}>
+      {section.hint && <p className="task-hint tf-section-hint">{section.hint}</p>}
       <ol className="blank-questions">
         {section.fields.map((field) => (
           <li key={field.id} className={`blank-question${field.kind === 'entries' ? ' tf-q--entries' : ''}`}>
@@ -564,7 +552,7 @@ export function TaskSectionCard({ section, values, onChange, flat = false }: { s
           </li>
         ))}
       </ol>
-    </Block>
+    </CollapseCard>
   );
 }
 
@@ -578,14 +566,12 @@ interface TaskFormProps {
   onChange?: (next: TaskValues) => void;
   /** Первой карточкой идёт инструкция (в бланке задания; при выполнении она на отдельном экране) */
   rules?: boolean;
-  /** Без карточек: заголовки и поля прямо на белом (экран телефона клиента) */
-  flat?: boolean;
   /** Что стоит между разделами и комментарием: например, пояснение */
   after?: ReactNode;
 }
 
 /** Бланк задания целиком: инструкция (по желанию), разделы с полями, комментарий и шкала состояния, если они включены */
-export function TaskForm({ data, form, options, values, onChange, rules = false, flat = false, after }: TaskFormProps) {
+export function TaskForm({ data, form, options, values, onChange, rules = false, after }: TaskFormProps) {
   const sections = data.blank.sections(form);
   return (
     <>
@@ -595,10 +581,10 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
         </CollapseCard>
       )}
       {sections.map((section) => (
-        <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} flat={flat} />
+        <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />
       ))}
       {options.comment && (
-        <Block title="Комментарий" flat={flat}>
+        <CollapseCard title="Комментарий">
           <div className="task-pad">
             {onChange && <p className="task-hint">{data.blank.commentHint}</p>}
             {onChange ? (
@@ -607,14 +593,14 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
               <Answer text={values.comment} />
             )}
           </div>
-        </Block>
+        </CollapseCard>
       )}
       {options.state && (
-        <Block title="Как вы себя чувствуете?" flat={flat}>
+        <CollapseCard title="Как вы себя чувствуете?">
           <div className="task-pad">
             <StateScale labels={data.blank.state} value={values.state} onChange={onChange && ((state) => onChange({ ...values, state }))} />
           </div>
-        </Block>
+        </CollapseCard>
       )}
       {after}
     </>

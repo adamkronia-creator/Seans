@@ -280,16 +280,26 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     );
   }
 
+  // Тест, отправленный себе, открыт как у клиента: тот же интерфейс, только без «избранного» в шапке, с сообщением специалиста и «Спасибо» в конце;
+  // слепой тест без названия и значка методики
+  const live = Boolean(passRequest) && view === 'pass';
+
   return (
     <section className="test-settings">
-      {!(passRequest && view === 'pass') && <TestHeader test={test} status={STATUS[view]} onBack={view === 'settings' ? onBack : stepBack} />}
+      <TestHeader
+        test={test}
+        client={live ? { blind: passRequest?.blind } : undefined}
+        status={live ? 'Тест от вашего специалиста' : STATUS[view]}
+        onBack={view === 'settings' ? onBack : stepBack}
+      />
 
-      {view === 'pass' && blank && !passRequest ? (
+      {view === 'pass' && blank ? (
         <TestPass
           testId={test.id}
           blank={blank}
           form={form}
           saveBlank={saveBlank}
+          client={passRequest ? { message: passRequest.message, result: passRequest.result, duration: data.duration, onExit: onBack } : undefined}
           onDone={(id) => {
             // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
             transition(() => {
@@ -298,17 +308,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               notify('Заключение теста сохранено в избранном');
             }, 'forward');
           }}
-        />
-      ) : passRequest && view === 'pass' && blank ? (
-        <TestPreview
-          test={test}
-          blank={blank}
-          blind={passRequest.blind}
-          message={passRequest.message}
-          result={passRequest.result}
-          duration={data.duration}
-          onExit={onBack}
-          live={{ form: passRequest.form || form, saveBlank: passRequest.saveBlank }}
         />
       ) : view === 'preview' && blank ? (
         <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} onExit={() => openView('settings')} />
