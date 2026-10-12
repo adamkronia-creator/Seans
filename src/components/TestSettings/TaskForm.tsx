@@ -577,6 +577,7 @@ interface TaskFormProps {
 /** Бланк задания целиком: инструкция (по желанию), разделы с полями, комментарий и шкала состояния, если они включены */
 export function TaskForm({ data, form, options, values, onChange, rules = false, after, only }: TaskFormProps) {
   const sections = data.blank.sections(form);
+  const ids = (only ?? '').split('+');
   return (
     <>
       {rules && (
@@ -585,11 +586,11 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
         </CollapseCard>
       )}
       {sections
-        .filter((section) => !only || only === 'form' || only === section.id)
+        .filter((section) => !only || only === 'form' || ids.includes(section.id))
         .map((section) => (
           <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />
         ))}
-      {options.comment && (!only || only === 'comment') && (
+      {options.comment && (!only || ids.includes('comment')) && (
         <CollapseCard title="Комментарий">
           <div className="task-pad">
             {onChange && <p className="task-hint">{data.blank.commentHint}</p>}
@@ -601,14 +602,14 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           </div>
         </CollapseCard>
       )}
-      {options.state && (!only || only === 'state') && (
+      {options.state && (!only || ids.includes('state')) && (
         <CollapseCard title="Как вы себя чувствуете?">
           <div className="task-pad">
             <StateScale labels={data.blank.state} value={values.state} onChange={onChange && ((state) => onChange({ ...values, state }))} />
           </div>
         </CollapseCard>
       )}
-      {(!only || only === 'form' || sections.some((section) => section.id === only)) && after}
+      {(!only || only === 'form' || sections.some((section) => ids.includes(section.id))) && after}
     </>
   );
 }

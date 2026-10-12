@@ -68,10 +68,11 @@ export const unfilledText = (done: number, total: number) => `Заполнено
 
 /** Страницы выполнения задания: инструкция, поля, затем комментарий и «Как вы себя чувствуете?», если они включены в настройках */
 export type TaskStep = string;
-/** Страницы: 'rules', затем 'form' (все поля сразу) или номера разделов, если бланк постраничный, затем 'comment' и 'state' */
-export const taskSteps = (options: { comment: boolean; state: boolean }, sections: { id: string }[], paged?: boolean): TaskStep[] => [
+/** Страницы: 'rules', затем 'form' (всё сразу, комментарий отдельно) или группы разделов из `pages` (через «+»), затем 'state' */
+export const taskSteps = (options: { comment: boolean; state: boolean }, pages?: string[][]): TaskStep[] => [
   'rules',
-  ...(paged ? sections.map((section) => section.id) : ['form']),
-  ...(options.comment ? ['comment'] : []),
+  ...(pages
+    ? pages.map((group) => group.filter((id) => id !== 'comment' || options.comment).join('+')).filter(Boolean)
+    : ['form', ...(options.comment ? ['comment'] : [])]),
   ...(options.state ? ['state'] : []),
 ];

@@ -43,7 +43,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
   const { done, total } = progressOf(sections, run.values);
   const started = run.startedAt !== undefined;
   // Если что-то уже написано (вышли и вернулись), открываем бланк, а не инструкцию
-  const steps = taskSteps(options, sections, data.blank.paged);
+  const steps = taskSteps(options, data.blank.pages);
   const [step, setStep] = useState<TaskStep>(started ? steps[1] : 'rules');
   const at = steps.indexOf(step);
   const lastStep = at === steps.length - 1;
