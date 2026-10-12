@@ -18,7 +18,7 @@ interface LibraryCardProps {
   marks?: ReadonlySet<string> | null;
 }
 
-/** Карточка теста в библиотеке: вид как у карточки в чате, но справа сердечко «в избранное» */
+/** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», справа сердечко «в избранное» (см. LibraryCard.css) */
 export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, why, marks }: LibraryCardProps) {
   return (
     <li className="lib-card">

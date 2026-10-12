@@ -40,22 +40,24 @@
   opacity: 0.45;
 }
 
-/* Страница раздела: строка над карточками и сами карточки прокручиваются вместе */
+/* Страница раздела: строка над списком и сам список прокручиваются вместе. Фон белый во всю высоту, как у списка чатов:
+   ниже последней строки тот же фон, а не пустота */
 .library-page__page {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   min-height: 0;
-  padding: var(--space-3) var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-2);
   overflow-y: auto;
+  background: var(--color-bg-row);
 }
 
+/* Строки идут вплотную и во всю ширину страницы: поля у них свои (LibraryCard.css), как у чатов */
 .library-page__list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
+  margin: 0 calc(var(--space-4) * -1);
   padding: 0;
   list-style: none;
 }

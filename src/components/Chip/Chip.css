@@ -14,10 +14,6 @@
   font-weight: var(--font-weight-medium);
   line-height: 1;
   white-space: nowrap;
-  /* Удержание открывает меню папки: подпись не выделяется и системное меню касания не всплывает */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 /* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 6, как от верха и низа */
