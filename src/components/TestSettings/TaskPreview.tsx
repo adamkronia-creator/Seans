@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
 import { emptyValues, progressOf, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
 import { ClientIntro, IconEye, TaskDone, taskFacts } from './ClientParts';
-import { FillMeter } from './PassParts';
+import { FillMeter, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { TestHeader } from './TestHeader';
 import './TestPreview.css';
@@ -36,13 +36,17 @@ interface TaskPreviewProps {
 export function TaskPreview({ task, data, form, options, message, deadline, onExit }: TaskPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
+  // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
+  const parts = taskSteps(options).slice(1) as ('form' | 'comment' | 'state')[];
+  const [partAt, setPartAt] = useState(0);
+  const part = Math.min(partAt, parts.length - 1);
   const { done, total } = progressOf(data.blank.sections(form), values);
   const screenRef = useRef<HTMLDivElement>(null);
 
   // Новый этап открывается с начала экрана
   useEffect(() => {
     screenRef.current?.scrollTo({ top: 0 });
-  }, [stage]);
+  }, [stage, part]);
 
   // Свайпы переключают этапы целиком, как вкладки «Начало / В процессе / Конец»; с первого этапа вправо — к настройкам.
   // На полях ввода и ползунках свайп не работает
@@ -87,9 +91,9 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
           <span className="tp__notch" />
         </div>
         <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" onBack={onExit} />
-        <div className="test-settings__scroll tp__screen" key={stage} ref={screenRef}>
+        <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
           {stage === 'start' && <ClientIntro message={message} rules={data.blank.rules(form)} facts={taskFacts(data, form, deadline)} />}
-          {stage === 'progress' && <TaskForm data={data} form={form} options={options} values={values} onChange={setValues} />}
+          {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} />}
           {stage === 'end' && <TaskDone />}
         </div>
 
@@ -98,13 +102,24 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
             <FillMeter done={done} total={total} />
             <div className="test-pass__buttons">
               {stage === 'progress' && (
-                <button type="button" className="test-pass__back" onClick={() => setStage('start')}>
+                <button type="button" className="test-pass__back" onClick={() => (part > 0 ? setPartAt(part - 1) : setStage('start'))}>
                   Назад
                 </button>
               )}
               {stage === 'start' ? (
-                <button type="button" className="test-settings__cta-button" onClick={() => setStage('progress')}>
+                <button
+                  type="button"
+                  className="test-settings__cta-button"
+                  onClick={() => {
+                    setPartAt(0);
+                    setStage('progress');
+                  }}
+                >
                   Начать
+                </button>
+              ) : part < parts.length - 1 ? (
+                <button type="button" className="test-settings__cta-button" onClick={() => setPartAt(part + 1)}>
+                  Далее
                 </button>
               ) : (
                 <button type="button" className="test-settings__cta-button" onClick={() => setStage('end')}>

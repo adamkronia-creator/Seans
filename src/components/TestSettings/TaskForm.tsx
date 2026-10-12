@@ -568,10 +568,15 @@ interface TaskFormProps {
   rules?: boolean;
   /** Что стоит между разделами и комментарием: например, пояснение */
   after?: ReactNode;
+  /** При выполнении бланк идёт страницами: сами поля, комментарий и состояние по отдельности. Без значения показано всё сразу */
+  only?: TaskPart;
 }
 
+/** Страница бланка при выполнении */
+export type TaskPart = 'form' | 'comment' | 'state';
+
 /** Бланк задания целиком: инструкция (по желанию), разделы с полями, комментарий и шкала состояния, если они включены */
-export function TaskForm({ data, form, options, values, onChange, rules = false, after }: TaskFormProps) {
+export function TaskForm({ data, form, options, values, onChange, rules = false, after, only }: TaskFormProps) {
   const sections = data.blank.sections(form);
   return (
     <>
@@ -580,10 +585,9 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           <BlankRules rules={data.blank.rules(form)} />
         </CollapseCard>
       )}
-      {sections.map((section) => (
-        <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />
-      ))}
-      {options.comment && (
+      {(!only || only === 'form') &&
+        sections.map((section) => <TaskSectionCard key={section.id} section={section} values={values} onChange={onChange} />)}
+      {options.comment && (!only || only === 'comment') && (
         <CollapseCard title="Комментарий">
           <div className="task-pad">
             {onChange && <p className="task-hint">{data.blank.commentHint}</p>}
@@ -595,14 +599,14 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
           </div>
         </CollapseCard>
       )}
-      {options.state && (
+      {options.state && (!only || only === 'state') && (
         <CollapseCard title="Как вы себя чувствуете?">
           <div className="task-pad">
             <StateScale labels={data.blank.state} value={values.state} onChange={onChange && ((state) => onChange({ ...values, state }))} />
           </div>
         </CollapseCard>
       )}
-      {after}
+      {(!only || only === 'form') && after}
     </>
   );
 }

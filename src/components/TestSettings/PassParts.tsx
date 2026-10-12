@@ -65,3 +65,12 @@ export function FillMeter({ label = 'Заполнено', done, total, onReset }
 
 /** Текст окна «Завершить задание?», когда заполнены не все поля */
 export const unfilledText = (done: number, total: number) => `Заполнено ${done} из ${total}. Пустые поля в результате будут отмечены как «Не заполнено»: их можно пропустить.`;
+
+/** Страницы выполнения задания: инструкция, поля, затем комментарий и «Как вы себя чувствуете?», если они включены в настройках */
+export type TaskStep = 'rules' | 'form' | 'comment' | 'state';
+export const taskSteps = (options: { comment: boolean; state: boolean }): TaskStep[] => [
+  'rules',
+  'form',
+  ...(options.comment ? (['comment'] as const) : []),
+  ...(options.state ? (['state'] as const) : []),
+];

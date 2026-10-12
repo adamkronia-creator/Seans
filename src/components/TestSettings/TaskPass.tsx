@@ -3,7 +3,7 @@ import { editTaskRun, finishTaskRun, resetTaskRun, useTaskRun } from '../../data
 import { progressOf, type TaskSettingsData } from '../../data/taskValues';
 import { Toast } from '../Toast/Toast';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
-import { ConfirmSheet, FillMeter, unfilledText } from './PassParts';
+import { ConfirmSheet, FillMeter, taskSteps, unfilledText, type TaskStep } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './TestPass.css';
@@ -43,7 +43,10 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
   const { done, total } = progressOf(sections, run.values);
   const started = run.startedAt !== undefined;
   // Если что-то уже написано (вышли и вернулись), открываем бланк, а не инструкцию
-  const [step, setStep] = useState<'rules' | 'form'>(started ? 'form' : 'rules');
+  const steps = taskSteps(options);
+  const [step, setStep] = useState<TaskStep>(started ? 'form' : 'rules');
+  const at = steps.indexOf(step);
+  const lastStep = at === steps.length - 1;
   const [sheet, setSheet] = useState<'reset' | 'finish' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   // Клиент выполнил задание: вместо результата экран «Спасибо»
@@ -91,7 +94,7 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
             </CollapseCard>
           )
         ) : (
-          <TaskForm data={data} form={form} options={options} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
+          <TaskForm data={data} form={form} options={options} only={step as 'form' | 'comment' | 'state'} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
         )}
       </div>
 
@@ -106,14 +109,18 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
           <>
             <FillMeter done={done} total={total} onReset={started ? () => setSheet('reset') : undefined} />
             <div className="test-pass__buttons">
-              {step === 'form' && (
-                <button type="button" className="test-pass__back" onClick={() => setStep('rules')}>
+              {step !== 'rules' && (
+                <button type="button" className="test-pass__back" onClick={() => setStep(steps[at - 1])}>
                   Назад
                 </button>
               )}
               {step === 'rules' ? (
                 <button type="button" className="test-settings__cta-button" onClick={() => setStep('form')}>
                   {started ? 'Продолжить' : 'Начать'}
+                </button>
+              ) : !lastStep ? (
+                <button type="button" className="test-settings__cta-button" onClick={() => setStep(steps[at + 1])}>
+                  Далее
                 </button>
               ) : (
                 <button type="button" className="test-settings__cta-button" onClick={tryFinish}>
