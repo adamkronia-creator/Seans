@@ -202,20 +202,13 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
         <h1 className="visually-hidden">Ежедневник</h1>
 
         <div className="planner__nav">
+          <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
+            <IconBack />
+          </button>
           <h2 className="planner__month">{monthTitle(month)}</h2>
-          <div className="planner__nav-side">
-            {selected !== today && (
-              <button type="button" className="planner__today" onClick={() => setSelected(today)}>
-                Сегодня
-              </button>
-            )}
-            <button type="button" className="planner__arrow" aria-label={compact ? 'Предыдущая неделя' : 'Предыдущий месяц'} onClick={() => step(-1)}>
-              <IconBack />
-            </button>
-            <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
-              <IconBack />
-            </button>
-          </div>
+          <button type="button" className="planner__arrow planner__arrow--next" aria-label={compact ? 'Следующая неделя' : 'Следующий месяц'} onClick={() => step(1)}>
+            <IconBack />
+          </button>
         </div>
 
         <MonthGrid month={month} selected={selected} today={today} compact={compact} flags={flags} onSelect={setSelected} />
@@ -234,7 +227,14 @@ export function PlannerPage({ onOpenChat }: { onOpenChat: (chatId: string, secti
       <div ref={scroller} className="planner__scroll">
         <div className="planner__day-head">
           <h2 className="planner__day-title">{dayLong(selected, now)}</h2>
-          <span className="planner__day-rel">{dayRelative(selected, now)}</span>
+          <span className="planner__day-side">
+            <span className="planner__day-rel">{dayRelative(selected, now)}</span>
+            {selected !== today && (
+              <button type="button" className="planner__today" onClick={() => setSelected(today)}>
+                Сегодня
+              </button>
+            )}
+          </span>
         </div>
 
         {agenda.length > 0 ? (

@@ -12,10 +12,10 @@ export type TabId = 'planner' | 'messages' | 'tests' | 'tasks' | 'profile';
 
 // label — название для экранных читалок (подписей под значками нет)
 const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { id: 'tasks', label: 'Задания', Icon: IconTasks },
+  { id: 'tests', label: 'Диагностика', Icon: IconTests },
   { id: 'planner', label: 'Ежедневник', Icon: IconPlanner },
   { id: 'messages', label: 'Диалоги', Icon: IconMessages },
-  { id: 'tests', label: 'Диагностика', Icon: IconTests },
-  { id: 'tasks', label: 'Задания', Icon: IconTasks },
   { id: 'profile', label: 'Профиль', Icon: IconProfile },
 ];
 

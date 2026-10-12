@@ -223,7 +223,7 @@ export const TASK_META: Record<string, TaskMeta> = {
 export interface Described {
   /** Значения фильтров: идентификатор фильтра → идентификаторы пунктов; пусто — не указано */
   facets: Record<string, string[]>;
-  /** Строка под описанием в карточке задания: «Дневник», «КПТ», «5–7 мин на запись». У теста строки нет: вопросы, время и возраст в карточке не пишутся */
+  /** Строка под описанием в карточке; сейчас пустая и у тестов, и у заданий: формат, подход, время и вопросы в карточках не пишутся (они в настройках и фильтрах) */
   line: string[];
   /** Сколько времени занимает: для сортировки по длительности */
   minutes?: [number, number];
@@ -289,7 +289,7 @@ function describeTask(item: LibraryItem): Described {
   const shape = labelOf(TASK_SHAPES, [meta.shape])[0];
   return {
     facets: { domain: meta.domains, approach: meta.approaches, shape: [meta.shape], time: timeOf(meta.minutes), age: [String(meta.ageFrom)] },
-    line: [shape, approaches[0], meta.duration].filter((p): p is string => !!p),
+    line: [],
     minutes: meta.minutes,
     aliases: meta.aliases,
     topics: topicsOf(item.id),

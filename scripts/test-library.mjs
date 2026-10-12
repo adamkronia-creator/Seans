@@ -311,9 +311,7 @@ test('сведения о заданиях совпадают с настрой�
 
     // Строка в карточке: формат, подход, время — как напечатано в настройках; строка короткая и в одну строку на узком экране
     const shapeLabel = { diary: 'Дневник', steps: 'Пошаговое', short: 'Короткий ответ' }[shape];
-    assert.equal(d.line[0], shapeLabel, `${where}: формат в строке`);
-    assert.equal(d.line.at(-1), t.duration, `${where}: время в строке`);
-    assert.ok(d.line.join(' · ').length <= 42, `${where}: строка сведений длиннее 42 знаков: ${d.line.join(' · ')}`);
+    assert.deepEqual(d.line, [], `${where}: в карточке задания строки сведений нет`);
   }
 });
 

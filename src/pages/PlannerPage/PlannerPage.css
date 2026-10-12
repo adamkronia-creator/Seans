@@ -16,13 +16,21 @@
   padding-bottom: 0;
 }
 
-/* Строка месяца: название слева, справа «Сегодня» (только когда открыт другой день) и стрелки.
+/* Строка месяца: название по середине, слева стрелка к прошлому месяцу (неделе), справа к следующему.
    Зона нажатия стрелок выходит за поле экрана, а сам значок стоит ровно по полю */
 .planner__nav {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-height: 40px;
+}
+
+.planner__nav .planner__arrow:first-child {
+  margin-left: calc(var(--space-2) * -1);
+}
+
+.planner__nav .planner__arrow--next {
+  margin-right: calc(var(--space-2) * -1);
 }
 
 .planner__month {
@@ -33,21 +41,14 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-display);
   line-height: var(--line-height-xl);
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.planner__nav-side {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--space-1);
-  margin-right: calc(var(--space-2) * -1);
-}
-
+/* «Сегодня» (только когда открыт другой день) стоит в строке выбранного дня, справа */
 .planner__today {
-  height: 32px;
-  margin-right: var(--space-1);
+  height: 28px;
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-accent-soft);
@@ -55,6 +56,13 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
+}
+
+.planner__day-side {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .planner__arrow {
@@ -73,10 +81,6 @@
 /* На самом узком экране (320) рядом с «Сегодня» длинное «Сентябрь 2026» крупным кеглем не помещается:
    название мельче, стрелки уже, чтобы оно нигде не обрезалось */
 @media (max-width: 359px) {
-  .planner__nav {
-    gap: var(--space-1);
-  }
-
   .planner__month {
     font-size: var(--font-size-lg);
     letter-spacing: var(--letter-spacing-title);
@@ -115,7 +119,7 @@
 
 .planner__day-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
   margin-bottom: var(--space-3);
