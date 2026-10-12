@@ -3,6 +3,7 @@ import { DEFAULT_SENT_OPTIONS, type Message } from '../../data/messages';
 import type { LibraryTest } from '../../data/library';
 import { RESULT_MODES } from '../../data/resultMode';
 import { testSettings } from '../../data/testSettings';
+import { saveBlankLabel } from '../../data/optionHelp';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import './SentTestSheet.css';
@@ -40,7 +41,7 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
     ...(forms && form ? [{ label: 'Форма бланка', value: form }] : []),
     { label: 'Слепое тестирование', ...onOff(options.blind) },
     { label: 'Итог для клиента', value: RESULT_MODES.find((m) => m.id === options.result)?.value ?? '' },
-    { label: 'Сохранить бланк', ...onOff(options.saveBlank) },
+    { label: saveBlankLabel(test?.id), ...onOff(options.saveBlank) },
     { label: 'Сообщение для клиента', ...onOff(message.text.trim() !== '') },
   ];
 

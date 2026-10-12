@@ -1,0 +1,244 @@
+/* «?» справа от названия настройки: стоит в строке текста, при переносе остаётся рядом с последним словом */
+.option-help {
+  position: relative;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  margin-left: var(--space-2);
+  color: var(--color-text-caption);
+  font-size: 20px;
+  line-height: 0;
+  vertical-align: -4px;
+  transition: color 0.15s;
+}
+
+/* Нажимать можно не только по самому значку: область 36×44, но строка при этом не выше */
+.option-help::after {
+  content: '';
+  position: absolute;
+  inset: -12px -8px;
+}
+
+.option-help[data-pressed] {
+  color: var(--color-accent);
+}
+
+@media (hover: hover) {
+  .option-help:hover {
+    color: var(--color-accent);
+  }
+}
+
+/* ---------- Окно с каруселью ---------- */
+
+.option-help-sheet__body {
+  gap: 0;
+  /* Верхние 16 панели плавно гаснут (маска .sheet__body): скриншоты начинаются под ними, и верхний край не бледнеет */
+  padding-top: var(--space-4);
+}
+
+/*
+ * Карусель выходит за поля окна (по 16): края соседних скриншотов выглядывают и показывают, что их можно листать.
+ * Ширина слайда считается от ширины окна (cqw), поэтому у карусели свой контейнер. На низком экране слайды уже,
+ * чтобы окно целиком помещалось без прокрутки (350 — всё в окне, кроме скриншота).
+ */
+.oh {
+  --slide-w: min(332px, calc(100cqw - 56px), calc((100dvh - 350px) * 786 / 680));
+  container-type: inline-size;
+  margin-inline: calc(var(--space-4) * -1);
+}
+
+.oh__track {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 calc((100cqw - var(--slide-w)) / 2);
+  overflow-x: auto;
+  list-style: none;
+  outline: none;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.oh__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Фокус с клавиатуры (стрелки листают) виден по рамке вокруг показанного скриншота, а не вокруг всей ленты */
+.oh__track:focus-visible .oh__shot--on {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.oh__slide {
+  flex: 0 0 var(--slide-w);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+/* Скриншот: тот же размер, что у снятых; соседние бледнее и чуть меньше */
+.oh__shot {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 786 / 680;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-fill);
+  opacity: 0.55;
+  transform: scale(0.95);
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+}
+
+.oh__shot--on {
+  opacity: 1;
+  transform: none;
+}
+
+/* Выглядывающий скриншот открывается нажатием */
+.oh__slide:not(:has(.oh__shot--on)) {
+  cursor: pointer;
+}
+
+/* Тонкая рамка поверх картинки: светлые экраны не сливаются с фоном окна */
+.oh__shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(16 24 40 / 10%);
+  pointer-events: none;
+}
+
+.oh__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Рамка вокруг того, что изменилось: появляется, когда скриншот встал по центру. Оранжевая: на синих пузырях синяя пропала бы */
+.oh__mark {
+  position: absolute;
+  border: 2px solid var(--color-orange);
+  border-radius: 10px;
+  box-shadow: 0 0 0 3px rgb(255 141 40 / 22%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.oh__shot--on .oh__mark {
+  animation: oh-mark 0.45s 0.3s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+/* При закрытии остаётся копия окна и ждёт каждую анимацию внутри (utils/exitAnimation.ts): рамка не должна начинать свою заново */
+.is-leaving .oh__mark {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes oh-mark {
+  from {
+    opacity: 0;
+    transform: scale(1.14);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Точки: нажатием переходят к скриншоту; показанный вытянут в полоску */
+.oh__dots {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-top: var(--space-1);
+}
+
+.oh__dot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.oh__dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-text-placeholder);
+  opacity: 0.55;
+  transition:
+    width 0.25s,
+    background 0.25s,
+    opacity 0.25s;
+}
+
+.oh__dot[aria-current='true']::before {
+  width: 20px;
+  background: var(--color-accent);
+  opacity: 1;
+}
+
+/* Подписи лежат друг на друге в одной ячейке: высота окна равна самой длинной, и при смене подписи ничего не прыгает */
+.oh__captions {
+  display: grid;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-2);
+  text-align: center;
+}
+
+.oh__caption {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s,
+    visibility 0s linear 0.2s;
+}
+
+.oh__caption--on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s 0.05s;
+}
+
+.oh__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+  text-wrap: balance;
+}
+
+.oh__text {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oh__shot,
+  .oh__dot::before,
+  .oh__caption,
+  .oh__caption--on {
+    transition: none;
+  }
+
+  .oh__shot--on .oh__mark {
+    animation: none;
+    opacity: 1;
+  }
+}

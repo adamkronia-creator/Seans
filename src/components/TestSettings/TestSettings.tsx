@@ -4,6 +4,7 @@ import {
   IconTestMic,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
+import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
@@ -11,6 +12,7 @@ import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
+import { hasOptionHelp, saveBlankLabel, type OptionHelpId } from '../../data/optionHelp';
 import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
@@ -71,11 +73,26 @@ export function TopicTags({ id }: { id: string }) {
   );
 }
 
+/** Название строки с «?» в конце: значок прижат к последнему слову, и при переносе они не расходятся по разным строкам */
+function labelWithHelp(label: string, help: OptionHelpId) {
+  const cut = label.lastIndexOf(' ') + 1;
+  return (
+    <>
+      {label.slice(0, cut)}
+      <span className="ts-row__tail">
+        {label.slice(cut)}
+        <OptionHelp id={help} />
+      </span>
+    </>
+  );
+}
+
 /** Строка карточки: подпись и значение или переключатель справа; под подписью может стоять пояснение; значок бывает только у способа показа вопросов */
 export function Row({
   Icon,
   label,
   hint,
+  help,
   value,
   info,
   children,
@@ -84,21 +101,24 @@ export function Row({
   label: string;
   /** Пояснение мелким шрифтом под подписью: что делает настройка */
   hint?: string;
+  /** Вместо пояснения: «?» справа от подписи, по нажатию окно со скриншотами (OptionHelp) */
+  help?: OptionHelpId;
   /** Значение справа от подписи: строка превращается в «сведение» с тихой подписью */
   value?: string | number;
   info?: boolean;
   children?: React.ReactNode;
 }) {
+  const title = help ? labelWithHelp(label, help) : label;
   return (
     <li className={`ts-row${info || value !== undefined ? ' ts-row--info' : ''}`}>
       {Icon && <Icon className="ts-row__icon" />}
       {hint ? (
         <span className="ts-row__text">
-          <span className="ts-row__label">{label}</span>
+          <span className="ts-row__label">{title}</span>
           <span className="ts-row__hint">{hint}</span>
         </span>
       ) : (
-        <span className="ts-row__label">{label}</span>
+        <span className="ts-row__label">{title}</span>
       )}
       {value !== undefined && <span className="ts-row__value">{value}</span>}
       {children}
@@ -144,6 +164,9 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value
  */
 export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
+  // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
+  const newFeatures = hasOptionHelp(test.id);
+  const blankLabel = saveBlankLabel(test.id);
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
   const [form, setForm] = useState(passRequest?.form || (data.forms?.[0] ?? ''));
@@ -469,11 +492,20 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <CollapseCard title="Особенности тестирования">
           <ul className="ts-rows">
-            <Row label="Слепое тестирование" hint="Клиент не увидит название теста и его цель: так ответы честнее">
+            {/* Пробный вид: строки без описаний, пояснения в подсказке «?» со скриншотами (пока только СМОЛ) */}
+            <Row
+              label="Слепое тестирование"
+              hint={newFeatures ? undefined : 'Клиент не увидит название теста и его цель: так ответы честнее'}
+              help={newFeatures ? 'blind' : undefined}
+            >
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
-            <Row label="Сохранить бланк" hint="Заполненный бланк сохранится и будет доступен для просмотра в результате теста">
-              <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
+            <Row
+              label={blankLabel}
+              hint={newFeatures ? undefined : 'Заполненный бланк сохранится и будет доступен для просмотра в результате теста'}
+              help={newFeatures ? 'blank' : undefined}
+            >
+              <Switch checked={saveBlank} onChange={setSaveBlank} label={blankLabel} />
             </Row>
           </ul>
         </CollapseCard>

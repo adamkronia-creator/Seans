@@ -114,6 +114,8 @@ export { default as IconTestPass } from '../../assets/icons/test/pass.svg?react'
 export { default as IconTestSend } from '../../assets/icons/test/send.svg?react';
 export { default as IconTestSendMany } from '../../assets/icons/test/send-many.svg?react';
 export { default as IconTestChevronDown } from '../../assets/icons/test/chevron-down.svg?react';
+// Вопрос в круге: подсказка у настройки (OptionHelp)
+export { default as IconTestQuestion } from '../../assets/icons/test/question-circle.svg?react';
 export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.svg?react';
 export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';
 

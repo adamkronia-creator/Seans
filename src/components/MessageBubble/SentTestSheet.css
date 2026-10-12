@@ -13,13 +13,21 @@
   list-style: none;
 }
 
+/* Длинное название («Сохранить заполненный бланк») на узком экране переносится, а не выталкивает значение за край */
+.sent-sheet__rows .sheet__row-label {
+  flex-shrink: 1;
+  min-width: 0;
+  white-space: normal;
+}
+
 .sent-sheet__value {
   display: inline-flex;
   flex: 1;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-2);
-  min-width: 0;
+  /* Значение переносится по словам, но самое длинное слово («Выключено») не сжимается и не залезает под название */
+  min-width: min-content;
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
