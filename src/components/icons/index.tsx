@@ -5,7 +5,7 @@ export { default as IconPlanner } from '../../assets/icons/tabbar/planner.svg?re
 export { default as IconMessages } from '../../assets/icons/tabbar/messages.svg?react';
 export { default as IconTests } from '../../assets/icons/tabbar/psych-tests.svg?react';
 export { default as IconTasks } from '../../assets/icons/tabbar/psych-tasks.svg?react';
-export { default as IconReading } from '../../assets/icons/tabbar/reading-materials.svg?react';
+export { default as IconProfile } from '../../assets/icons/tabbar/profile.svg?react';
 export { default as IconSearch } from '../../assets/icons/search.svg?react';
 export { default as IconBell } from '../../assets/icons/notifications.svg?react';
 export { default as IconFavorites } from '../../assets/icons/favorites.svg?react';

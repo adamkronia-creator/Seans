@@ -1,0 +1,308 @@
+/* Экран без нижней панели разделов: подсказка стоит у самого низа */
+.pe {
+  --toast-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Верхняя панель вложенного экрана: «назад» слева, заголовок, справа «Готово» */
+.pe__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-bar-h);
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
+}
+
+.pe__back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: var(--size-icon);
+}
+
+.pe__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pe__done {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+}
+
+.pe__scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-3) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.pe__card {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-panel);
+}
+
+/* ---------- Фото профиля и обложка ---------- */
+
+.pe__row {
+  --press-scale: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+}
+
+.pe__row + .pe__row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.pe__row[data-pressed] {
+  background: var(--color-bg-pressed);
+}
+
+.pe__row-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.pe__row-action {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.pe__cover-thumb {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--size-icon);
+}
+
+.pe__cover-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Основное: подпись над полем, как в «Информации о приеме» ---------- */
+
+.pe__input {
+  position: relative;
+  display: block;
+  padding: var(--space-3) var(--space-4);
+}
+
+.pe__input + .pe__input::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.pe__label {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+}
+
+.pe__input input {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.pe__input input::placeholder,
+.pe__field-label::placeholder,
+.pe__field-text::placeholder {
+  color: var(--color-text-caption);
+}
+
+/* ---------- Личная информация ---------- */
+
+.pe__group {
+  padding: var(--space-2) var(--space-1) 0;
+}
+
+.pe__group-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.pe__hint {
+  margin-top: var(--space-1);
+  color: var(--color-text-caption);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-wrap: pretty;
+}
+
+.pe__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Название поля вводится прямо в шапке карточки; справа выше, ниже и удалить */
+.pe__field-head {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2) 0 var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.pe__field-label {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+}
+
+.pe__tool {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 48px;
+  color: var(--color-text-caption);
+  font-size: var(--size-icon-sm);
+}
+
+.pe__tool:disabled {
+  opacity: 0.3;
+}
+
+.pe__tool--danger {
+  color: var(--color-red-text);
+}
+
+/* Текст поля растёт вместе с написанным (AutoTextarea): внутренней прокрутки нет */
+.pe__field-text {
+  display: block;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  resize: none;
+}
+
+/* ---------- Добавить поле ---------- */
+
+.pe__add {
+  padding: var(--space-4);
+}
+
+.pe__add-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-lg);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.pe__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.pe__chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-fill);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.pe__chip--own {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.pe__chip svg {
+  font-size: 16px;
+}

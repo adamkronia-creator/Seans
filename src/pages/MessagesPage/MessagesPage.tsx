@@ -6,12 +6,8 @@ import { Chip } from '../../components/Chip/Chip';
 import { IconBell, IconPlus, IconPlusChip } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import {
-  CATEGORIES,
-  CURRENT_USER,
-  type Chat,
-  type ChatCategory,
-} from '../../data/chats';
+import { CATEGORIES, type Chat, type ChatCategory } from '../../data/chats';
+import { useAvatarSrc } from '../../data/profile';
 import { navigate } from '../../router';
 import { followChips } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
@@ -35,12 +31,13 @@ const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOp
   );
 });
 
-export function MessagesPage() {
+export function MessagesPage({ onOpenProfile }: { onOpenProfile: () => void }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const chats = useChats();
+  const avatar = useAvatarSrc();
   const root = useRef<HTMLElement>(null);
 
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
@@ -96,8 +93,8 @@ export function MessagesPage() {
             >
               <IconBell />
             </button>
-            <button type="button" className="messages__profile" aria-label="Профиль">
-              <Avatar src={CURRENT_USER.avatar} size={32} />
+            <button type="button" className="messages__profile" aria-label="Профиль" onClick={onOpenProfile}>
+              <Avatar src={avatar} size={32} />
             </button>
           </>
         }

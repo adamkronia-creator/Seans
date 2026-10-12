@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Avatar } from '../Avatar/Avatar';
-import { CHATS, CURRENT_USER } from '../../data/chats';
+import { CHATS } from '../../data/chats';
+import { useAvatarSrc } from '../../data/profile';
 import { IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
@@ -58,14 +59,14 @@ interface RecipientSheetProps {
 
 /** Получатели: сначала вы сами (тест придет в «Избранное»), затем клиенты */
 export const SELF_ID = 'favorites';
-const RECIPIENTS = [
-  { id: SELF_ID, name: 'Себе', avatar: CURRENT_USER.avatar },
-  ...CHATS.filter((c) => c.category === 'clients'),
-];
+const CLIENTS = CHATS.filter((c) => c.category === 'clients');
 
 /** Выбор получателей (вы сами и клиенты): одного (нажатие заменяет выбор) или нескольких */
 export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
   useSheet(onClose);
+  // «Себе» с вашим фото профиля
+  const myAvatar = useAvatarSrc();
+  const recipients = [{ id: SELF_ID, name: 'Себе', avatar: myAvatar }, ...CLIENTS];
   const [picked, setPicked] = useState<string[]>([]);
   const toggle = (id: string) =>
     setPicked((p) => (mode === 'one' ? [id] : p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -77,7 +78,7 @@ export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
         </div>
         <div className="sheet__body">
           <ul className="test-actions" role={mode === 'one' ? 'radiogroup' : 'group'}>
-            {RECIPIENTS.map((c) => {
+            {recipients.map((c) => {
               const on = picked.includes(c.id);
               return (
                 <li key={c.id}>

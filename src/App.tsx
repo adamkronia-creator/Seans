@@ -1,11 +1,11 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
-import { ComingSoon } from './components/ComingSoon/ComingSoon';
-import { IconReading } from './components/icons';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { PlannerPage } from './pages/PlannerPage/PlannerPage';
+import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
+import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
@@ -18,11 +18,6 @@ import { goBack, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition } from './utils/transition';
-
-/** Разделы нижней панели, которых еще нет: значок и название на пустом экране */
-const COMING_SOON = {
-  reading: { title: 'Материалы для чтения', Icon: IconReading },
-} as const;
 
 /** Что показывает адрес: key один и тот же, пока на экране тот же экран, поэтому при смене слоёв он не рисуется заново */
 interface Screen {
@@ -98,6 +93,9 @@ export default function App() {
     }, id === active ? 'back' : 'fade');
   }, []);
 
+  /** Аватар в шапке «Диалогов» открывает раздел «Профиль» */
+  const openProfile = useCallback(() => handleTabChange('profile'), [handleTabChange]);
+
   /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад возвращает на ту вкладку */
   const openChat = useCallback((chatId: string, section: ChatSection) => {
     wantSection(chatId, section);
@@ -171,7 +169,9 @@ export default function App() {
       };
     }
 
-    if (at === 'messages') return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at);
+    if (at === 'messages') {
+      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage onOpenProfile={openProfile} />, at);
+    }
     if (at === 'tests') {
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
@@ -184,9 +184,21 @@ export default function App() {
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at) : page('tasks', <TasksPage />, at);
     }
-    if (at === 'planner') return page('planner', <PlannerPage onOpenChat={openChat} />, at);
-    const soon = COMING_SOON[at];
-    return page(`tab/${at}`, <ComingSoon Icon={soon.Icon} title={soon.title} />, at);
+    if (at === 'profile') {
+      // /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
+      if (path === '/profile/edit') {
+        return {
+          key: 'profile/edit',
+          build: () => (
+            <main className="app__content">
+              <ProfileEditPage />
+            </main>
+          ),
+        };
+      }
+      return page('profile', <ProfilePage />, at);
+    }
+    return page('planner', <PlannerPage onOpenChat={openChat} />, at);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой

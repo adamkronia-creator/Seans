@@ -16,6 +16,10 @@
   object-fit: cover;
 }
 
+.avatar__img--empty {
+  background: var(--color-bg-fill);
+}
+
 .avatar__icon {
   display: flex;
   align-items: center;

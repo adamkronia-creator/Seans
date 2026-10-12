@@ -2,13 +2,13 @@ import type { ComponentType, SVGProps } from 'react';
 import {
   IconMessages,
   IconPlanner,
-  IconReading,
+  IconProfile,
   IconTasks,
   IconTests,
 } from '../icons';
 import './TabBar.css';
 
-export type TabId = 'planner' | 'messages' | 'tests' | 'tasks' | 'reading';
+export type TabId = 'planner' | 'messages' | 'tests' | 'tasks' | 'profile';
 
 // label — название для экранных читалок (подписей под значками нет)
 const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
@@ -16,7 +16,7 @@ const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGEleme
   { id: 'messages', label: 'Диалоги', Icon: IconMessages },
   { id: 'tests', label: 'Диагностика', Icon: IconTests },
   { id: 'tasks', label: 'Задания', Icon: IconTasks },
-  { id: 'reading', label: 'Материалы для чтения', Icon: IconReading },
+  { id: 'profile', label: 'Профиль', Icon: IconProfile },
 ];
 
 interface TabBarProps {
