@@ -16,7 +16,7 @@ import {
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
-import { clientResultId, clientResultPath } from '../../data/resultLinks';
+import { clientResultId, clientResultPath, recordRef } from '../../data/resultLinks';
 import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
@@ -203,10 +203,11 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
       if (text !== (event.comment ?? '')) setComment(event.id, text);
     }
   };
-  // Выполненный клиентом тест или задание открывает его результат (у заданий он есть не у всех)
+  // Выполненный клиентом тест или задание открывает его результат (у заданий он есть не у всех); у записи постоянного задания результат свой
+  const resultRef = event.kind === 'task' && event.record ? recordRef(event.ref, event.record) : event.kind === 'test' || event.kind === 'task' ? event.ref : '';
   const resultPath =
-    (event.kind === 'test' || (event.kind === 'task' && findClientTaskResult(clientResultId('maxim', event.ref)))) && event.state === 'done'
-      ? clientResultPath('maxim', event.ref)
+    (event.kind === 'test' || (event.kind === 'task' && findClientTaskResult(clientResultId('maxim', resultRef)))) && event.state === 'done'
+      ? clientResultPath('maxim', resultRef)
       : undefined;
   const scaleData = resultPath && event.kind === 'test' ? findClientResult(clientResultId('maxim', event.ref))?.data : undefined;
   return (

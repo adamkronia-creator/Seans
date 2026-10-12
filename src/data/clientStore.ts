@@ -6,7 +6,8 @@ import { LIBRARY, TASK_LIBRARY } from './library';
 import type { PsyTest } from './tests';
 import type { AppEvent } from './events';
 import { findClientTaskResult } from './clientTaskResults';
-import { clientResultId, clientResultPath } from './resultLinks';
+import { clientResultId, clientResultPath, recordRef } from './resultLinks';
+import { recordsText, type PermanentRule } from './taskValues';
 import avatar1 from '../assets/avatars/avatar-1.png';
 
 /*
@@ -36,7 +37,21 @@ export type Activity =
   | { id: string; kind: 'invite'; date: string }
   | { id: string; kind: 'session'; ref: string; date: string }
   | { id: string; kind: 'note'; ref: string; date: string }
-  | { id: string; kind: 'test' | 'task'; ref: string; state: ActivityState; date: string; time: string };
+  | {
+      id: string;
+      kind: 'test' | 'task';
+      ref: string;
+      state: ActivityState;
+      date: string;
+      time: string;
+      /** Постоянное задание (отправлено): клиент выполняет его не один раз, а когда нужно */
+      permanent?: PermanentRule;
+      /** Запись постоянного задания (выполнено): её номер; каждая запись — отдельное действие журнала */
+      record?: number;
+    };
+
+/** Действие с тестом или заданием */
+type ItemActivity = Extract<Activity, { state: ActivityState }>;
 
 interface ClientData {
   activity: Activity[];
@@ -128,13 +143,14 @@ const SESSIONS: Session[] = [
 
 let seq = 0;
 const nextId = () => `a${++seq}`;
-const t = (kind: 'test' | 'task', ref: string, state: ActivityState, date: string, time: string): Activity => ({
+const t = (kind: 'test' | 'task', ref: string, state: ActivityState, date: string, time: string, extra: { permanent?: PermanentRule; record?: number } = {}): Activity => ({
   id: nextId(),
   kind,
   ref,
   state,
   date,
   time,
+  ...extra,
 });
 const s = (ref: string, date: string): Activity => ({ id: nextId(), kind: 'session', ref, date });
 const n = (ref: string, date: string): Activity => ({ id: nextId(), kind: 'note', ref, date });
@@ -172,11 +188,15 @@ const SEED: Activity[] = [
   t('task', 'secret', 'done', '27.09.2026', '20:57'),
   n('n7', '27.09.2026'),
   s('s5', '01.10.2026'),
+  // Постоянное задание: дневник СМЭР, всего десять записей; две уже сделаны (их результаты — в clientTaskResults.ts)
+  t('task', 'smer', 'sent', '05.10.2026', '18:20', { permanent: { limit: 10 } }),
+  t('task', 'smer', 'done', '06.10.2026', '22:40', { record: 1 }),
+  t('task', 'smer', 'done', '07.10.2026', '21:15', { record: 2 }),
   s('s6', '08.10.2026'),
   // Есть во вкладках «Тесты» и «Задания» (09.10), в макете истории их нет; время придумано
   t('test', 'itt', 'sent', '09.10.2026', '09:30'),
   t('task', 'pie', 'sent', '09.10.2026', '09:40'),
-  t('task', 'smer', 'assigned', '09.10.2026', '09:50'),
+  t('task', 'evidence', 'assigned', '09.10.2026', '09:50'),
 ];
 
 let data: ClientData = {
@@ -315,10 +335,10 @@ export function attachFiles(clientId: string, picked: File[]) {
   update({ files: { ...data.files, [clientId]: [...added.reverse(), ...(data.files[clientId] ?? [])] } });
 }
 
-/** Тест или задание: назначено / отправлено / выполнено */
-export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState) {
+/** Тест или задание: назначено / отправлено / выполнено; у постоянного задания — правило или номер записи */
+export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState, extra: { permanent?: PermanentRule; record?: number } = {}) {
   const { date, time } = nowStamp();
-  update({ activity: [...data.activity, { id: nextId(), kind, ref, state, date, time }] });
+  update({ activity: [...data.activity, { id: nextId(), kind, ref, state, date, time, ...extra }] });
 }
 
 // ——— Выборки для экранов ———
@@ -338,6 +358,8 @@ export type HistoryEvent =
       text: string;
       /** Комментарий психолога под текстом события */
       comment?: string;
+      /** Номер записи, если это запись постоянного задания: по ней находится результат */
+      record?: number;
     };
 
 export type HistoryFilter = 'all' | 'session' | 'test' | 'task' | 'note';
@@ -349,7 +371,7 @@ const itemName = (kind: 'test' | 'task', ref: string) =>
     ? (TEST_META[ref]?.name ?? (({ abbr, title }) => abbr ?? title)(LIBRARY.find((x) => x.id === ref)!))
     : TASK_LIBRARY.find((x) => x.id === ref)!.title;
 
-function activityText(kind: 'test' | 'task', ref: string, state: ActivityState): string {
+function activityText({ kind, ref, state, permanent, record }: ItemActivity): string {
   if (kind === 'test') {
     const meta = TEST_META[ref];
     const what = meta?.what ?? `опросник «${itemName('test', ref)}»`;
@@ -357,8 +379,12 @@ function activityText(kind: 'test' | 'task', ref: string, state: ActivityState):
     return `Вы отправили ${what}`;
   }
   const name = itemName('task', ref);
-  if (state === 'done') return `Максим выполнил психологическое задание «${name}»`;
-  if (state === 'sent') return `Вы отправили психологическое задание «${name}»`;
+  if (state === 'done') return record ? `Максим добавил запись ${record} в психологическое задание «${name}»` : `Максим выполнил психологическое задание «${name}»`;
+  if (state === 'sent') {
+    return permanent
+      ? `Вы отправили постоянное психологическое задание «${name}»${permanent.limit ? ` (всего записей: ${permanent.limit})` : ''}`
+      : `Вы отправили психологическое задание «${name}»`;
+  }
   return `Вы назначили психологическое задание «${name}»`;
 }
 
@@ -415,8 +441,9 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
           ref: a.ref,
           title: a.kind === 'test' ? name : `«${name}»`,
           date: `${a.date} ${a.time}`,
-          text: activityText(a.kind, a.ref, a.state),
+          text: activityText(a),
           comment: d.comments[a.id],
+          ...(a.record ? { record: a.record } : {}),
         };
       }
     }
@@ -436,17 +463,40 @@ export function doneCount(d: ClientData, kind: 'test' | 'task'): number {
   return new Set(d.activity.flatMap((a) => (a.kind === kind && a.state === 'done' ? [a.ref] : []))).size;
 }
 
-/** Тесты и задания в том виде, как их показывают вкладки: статус и дата — по последнему действию */
+/**
+ * Тесты и задания в том виде, как их показывают вкладки: статус и дата — по последнему действию.
+ * Постоянное задание, пока записи не набраны, стоит в своём разделе («Записей: 2 из 10»), а каждая запись клиента
+ * — отдельная завершённая карточка («Запись 2»): её id — номер результата записи (см. recordRef).
+ */
 export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[] {
   const items: { item: PsyTest; index: number }[] = [];
   catalog(kind).forEach(({ categories: _c, ...base }) => {
     const item = { ...base, status: 'sent' as const, date: '' };
     let last = -1;
+    const records: number[] = [];
     d.activity.forEach((a, i) => {
-      if (a.kind === kind && a.ref === item.id) last = i;
+      if (a.kind !== kind || a.ref !== item.id) return;
+      if (a.record !== undefined) records.push(i);
+      else last = i;
+    });
+    records.forEach((i) => {
+      const a = d.activity[i] as ItemActivity;
+      items.push({ item: { ...item, id: recordRef(item.id, a.record!), description: `Запись ${a.record}`, status: 'done', date: a.date.slice(0, 5) }, index: i });
     });
     if (last < 0) return;
-    const a = d.activity[last] as Extract<Activity, { state: ActivityState }>;
+    const a = d.activity[last] as ItemActivity;
+    if (a.permanent) {
+      // Записи этого назначения — те, что сделаны после него
+      const mine = records.filter((i) => i > last);
+      // Набрано всё, что назначено: осталась история записей
+      if (a.permanent.limit && mine.length >= a.permanent.limit) return;
+      const newest = Math.max(last, ...mine);
+      items.push({
+        item: { ...item, status: 'permanent', date: d.activity[newest].date.slice(0, 5), description: recordsText(mine.length, a.permanent.limit) },
+        index: newest,
+      });
+      return;
+    }
     items.push({ item: { ...item, status: a.state, date: a.date.slice(0, 5) }, index: last });
   });
   // Свежие действия выше
@@ -463,6 +513,9 @@ export function recentIds(d: ClientData, kind: 'test' | 'task', limit = 5): stri
   return seen.slice(0, limit);
 }
 
+/** По какому номеру искать результат: у записи постоянного задания он свой, у остальных — номер теста или задания */
+const resultRef = (a: ItemActivity): string => (a.record ? recordRef(a.ref, a.record) : a.ref);
+
 /** Экран «События»: действия самого клиента (приглашение, пройденные опросники и задания), новые сверху */
 export function appEvents(d: ClientData): AppEvent[] {
   const maxim = { name: 'Максим Мартынов', avatar: avatar1 };
@@ -478,11 +531,13 @@ export function appEvents(d: ClientData): AppEvent[] {
         text:
           a.kind === 'test'
             ? `Прошел опросник «${itemName('test', a.ref)}»`
-            : `Выполнил задание «${itemName('task', a.ref)}»`,
+            : a.record
+              ? `Добавил запись ${a.record} в задание «${itemName('task', a.ref)}»`
+              : `Выполнил задание «${itemName('task', a.ref)}»`,
         date: a.date.slice(0, 5),
         link: true,
         // Пройденный тест или выполненное задание ведёт к результату клиента (у задания он есть не у всех)
-        ...(a.kind === 'test' || findClientTaskResult(clientResultId('maxim', a.ref)) ? { href: clientResultPath('maxim', a.ref) } : {}),
+        ...(a.kind === 'test' || findClientTaskResult(clientResultId('maxim', resultRef(a))) ? { href: clientResultPath('maxim', resultRef(a)) } : {}),
       });
     }
   });

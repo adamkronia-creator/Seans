@@ -1,5 +1,6 @@
 import type { ResultMode } from './resultMode';
-import { clientResultPath } from './resultLinks';
+import { clientResultPath, recordRef } from './resultLinks';
+import type { PermanentRule } from './taskValues';
 
 export interface Message {
   id: string;
@@ -16,6 +17,8 @@ export interface Message {
   task?: string;
   /** С какими настройками задание отправлено клиенту или себе */
   taskOptions?: SentTaskOptions;
+  /** Номер записи постоянного задания: карточка выполненного получает подпись «Запись задания» */
+  record?: number;
   /** Подпись карточки: «Присланный тест» (у отправленного вами кнопка «Настройки теста») или «Пройденный тест» (кнопка «Посмотреть»); без значения — присланный */
   testKind?: 'sent' | 'passed';
   /** С какими настройками тест отправлен клиенту; у старых сообщений нет, тогда считаются настройки по умолчанию */
@@ -51,13 +54,14 @@ export interface SentTaskOptions {
   comment: boolean;
   /** Клиент отмечает самочувствие по шкале */
   state: boolean;
-  saveBlank: boolean;
-  /** Срок выполнения: «Без срока», «Сутки», «3 дня», «Неделя» */
+  /** Срок выполнения: «Без срока», «Сутки», «3 дня», «Неделя»; у постоянного задания срока нет */
   deadline: string;
   /** Напомнить, если не выполнено */
   remind: boolean;
   /** Сообщение клиенту без строки про срок; пустое, если оно выключено */
   note: string;
+  /** Правило постоянного задания (клиент выполняет его не один раз); у обычного задания нет */
+  permanent?: PermanentRule;
 }
 
 export interface MessageButton {
@@ -265,6 +269,54 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       label: '5 октября, пн',
       messages: [
         { id: 'h85', from: 'them', text: 'Раньше мне было важно получить от вас правильный ответ. Сейчас я начинаю замечать, как сильно мне вообще нужен этот «правильный ответ».', time: '13:05' },
+        {
+          id: 't-smer-sent',
+          from: 'me',
+          text: 'Максим, предлагаю завести дневник. Когда заметите сильную эмоцию, коротко записывайте, что произошло, какая мысль пришла и как вы отреагировали. По одной записи за раз, как только получится.\n\nЗадание постоянное: выполняйте его снова, когда это нужно. Всего записей: 10.',
+          time: '18:20',
+          task: 'smer',
+          testKind: 'sent',
+          taskOptions: {
+            form: '1',
+            formLabel: 'Количество записей',
+            comment: true,
+            state: true,
+            deadline: 'Без срока',
+            remind: false,
+            note: 'Максим, предлагаю завести дневник. Когда заметите сильную эмоцию, коротко записывайте, что произошло, какая мысль пришла и как вы отреагировали. По одной записи за раз, как только получится.',
+            permanent: { limit: 10 },
+          },
+        },
+      ],
+    },
+    {
+      label: '6 октября, вт',
+      messages: [
+        {
+          id: 't-smer-r1',
+          from: 'them',
+          text: 'Максим добавил запись 1 в психологическое задание «Дневник СМЭР»',
+          time: '22:40',
+          task: 'smer',
+          testKind: 'passed',
+          record: 1,
+          buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', recordRef('smer', 1)) }],
+        },
+      ],
+    },
+    {
+      label: '7 октября, ср',
+      messages: [
+        {
+          id: 't-smer-r2',
+          from: 'them',
+          text: 'Максим добавил запись 2 в психологическое задание «Дневник СМЭР»',
+          time: '21:15',
+          task: 'smer',
+          testKind: 'passed',
+          record: 2,
+          buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', recordRef('smer', 2)) }],
+        },
       ],
     },
     {

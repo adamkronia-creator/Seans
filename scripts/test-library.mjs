@@ -294,7 +294,7 @@ test('сведения о заданиях совпадают с настрой�
     assert.equal(meta.duration, t.duration, `${where}: время`);
     assert.equal(meta.ageFrom, parseAge(t.age), `${where}: возраст`);
     const value = Number(t.volume.value);
-    const approaches = [...new Set(t.origin.fields.map((f) => approachOf[f]).filter(Boolean))].sort();
+    const approaches = [...new Set(t.approaches.map((f) => approachOf[f]).filter(Boolean))].sort();
     assert.deepEqual([...d.facets.approach].sort(), approaches, `${where}: подход`);
 
     // Время: «на запись» умножается на типичное число записей

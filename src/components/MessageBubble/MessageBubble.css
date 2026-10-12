@@ -328,6 +328,11 @@
   filter: brightness(0.94);
 }
 
+.bubble-button:disabled {
+  color: var(--color-text-caption);
+  pointer-events: none;
+}
+
 .bubble-button:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -397,9 +402,15 @@
   }
 }
 
-/* Отправленный слепой тест: вам название видно, клиенту — нет */
+/* Пояснение под названием: у отправленного слепого теста (вам название видно, клиенту — нет) и у постоянного задания (сколько записей) */
 .tcard__note {
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
+}
+
+/* В своём (синем) пузыре серый подпись почти не виден: берём цвет текста пузыря, как у подписи карточки */
+.bubble--out .tcard__note {
+  color: inherit;
+  opacity: 0.8;
 }

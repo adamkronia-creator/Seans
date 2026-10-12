@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
-import { TASK_DEADLINES, volumeText, type TaskSettingsData } from '../../data/taskValues';
+import { TASK_DEADLINES, volumeText, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './ClientParts.css';
 
@@ -58,6 +58,14 @@ export const IconEye = () => (
     <circle cx="12" cy="12" r="2.8" />
   </Icon>
 );
+const IconRepeat = () => (
+  <Icon>
+    <path d="M17 2l3 3-3 3" />
+    <path d="M4 11V9a4 4 0 0 1 4-4h12" />
+    <path d="M7 22l-3-3 3-3" />
+    <path d="M20 13v2a4 4 0 0 1-4 4H4" />
+  </Icon>
+);
 const IconCalendar = () => (
   <Icon>
     <rect x="4" y="5.5" width="16" height="14.5" rx="2.5" />
@@ -88,11 +96,15 @@ export function testFacts(total: number, duration: string | undefined, result: R
   ];
 }
 
-/** То же для задания: объём и время, срок, что поля можно пропустить, кто увидит ответы */
-export function taskFacts(data: TaskSettingsData, form: string, deadline: string): ClientFact[] {
+/** То же для задания: объём и время, срок (у постоянного — что оно постоянное), что поля можно пропустить, кто увидит ответы */
+export function taskFacts(data: TaskSettingsData, form: string, deadline: string, permanent?: PermanentRule): ClientFact[] {
   return [
     { icon: <IconClock />, text: `${volumeText(data, form)} · ${data.duration}` },
-    ...(deadline !== TASK_DEADLINES[0] ? [{ icon: <IconCalendar />, text: `Срок выполнения: ${deadline.toLowerCase()}` }] : []),
+    ...(permanent
+      ? [{ icon: <IconRepeat />, text: permanent.limit ? `Постоянное задание: всего записей — ${permanent.limit}` : 'Постоянное задание: можно выполнять снова' }]
+      : deadline !== TASK_DEADLINES[0]
+        ? [{ icon: <IconCalendar />, text: `Срок выполнения: ${deadline.toLowerCase()}` }]
+        : []),
     { icon: <IconUndo />, text: 'Любое поле можно пропустить' },
     { icon: <IconLock />, text: 'Ответы увидит только специалист' },
   ];
@@ -146,8 +158,15 @@ export function ClientDone({ title, children }: { title: string; children?: Reac
   );
 }
 
-/** Окончание задания: благодарность и что будет дальше */
-export function TaskDone() {
+/** Окончание задания: благодарность и что будет дальше; у постоянного — запись добавлена, вернуться можно, когда нужно */
+export function TaskDone({ record, limit }: { record?: number; limit?: number }) {
+  if (record) {
+    return (
+      <ClientDone title="Спасибо, запись добавлена">
+        <p className="tp__done-text">{limit && record >= limit ? 'Все записи выполнены' : 'Новую запись можно добавить, когда это понадобится'}</p>
+      </ClientDone>
+    );
+  }
   return (
     <ClientDone title="Спасибо, задание выполнено">
       <p className="tp__done-text">Вы обсудите их на ближайшей встрече</p>

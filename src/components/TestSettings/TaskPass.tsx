@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { editTaskRun, finishTaskRun, resetTaskRun, useTaskRun } from '../../data/selfTask';
-import { progressOf, type TaskSettingsData } from '../../data/taskValues';
+import { progressOf, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { Toast } from '../Toast/Toast';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
 import { ConfirmSheet, FillMeter, taskSteps, unfilledText, type TaskStep } from './PassParts';
@@ -14,6 +14,9 @@ export interface TaskClient {
   message: string;
   /** Срок выполнения из настроек («Без срока», «Сутки»…) */
   deadline: string;
+  /** Постоянное задание: правило и карточка-назначение в чате, к которой добавляется запись */
+  permanent?: PermanentRule;
+  assignment?: string;
   /** «Завершить» на экране «Спасибо» */
   onExit: () => void;
 }
@@ -25,8 +28,6 @@ interface TaskPassProps {
   form: string;
   /** Что включено в настройках: комментарий и оценка состояния */
   options: { comment: boolean; state: boolean };
-  /** Переключатель «Сохранить бланк» из настроек: сохранять ли написанное вместе с результатом */
-  saveBlank: boolean;
   /** Задание выполнено и сохранено: номер результата (у клиента не вызывается: он остаётся на экране «Спасибо») */
   onDone?: (resultId: string) => void;
   client?: TaskClient;
@@ -37,7 +38,7 @@ interface TaskPassProps {
  * Внизу счётчик заполненных полей и кнопки; пустые поля можно пропустить, но не все сразу.
  * У клиента тот же экран: на первом шаге добавляются сообщение специалиста и сведения, после завершения — «Спасибо».
  */
-export function TaskPass({ taskId, data, form, options, saveBlank, onDone, client }: TaskPassProps) {
+export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPassProps) {
   const run = useTaskRun(taskId);
   const sections = data.blank.sections(form);
   const { done, total } = progressOf(sections, run.values);
@@ -49,8 +50,9 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
   const lastStep = at === steps.length - 1;
   const [sheet, setSheet] = useState<'reset' | 'finish' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  // Клиент выполнил задание: вместо результата экран «Спасибо»
+  // Клиент выполнил задание: вместо результата экран «Спасибо»; у постоянного задания в нём номер записи
   const [finished, setFinished] = useState(false);
+  const [record, setRecord] = useState<number>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number>();
 
@@ -62,9 +64,11 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
 
   const finish = () => {
     setSheet(null);
-    const result = finishTaskRun(taskId, form, saveBlank);
-    if (client) setFinished(true);
-    else onDone?.(result.id);
+    const result = finishTaskRun(taskId, form, client?.assignment);
+    if (client) {
+      setRecord(result.record);
+      setFinished(true);
+    } else onDone?.(result.id);
   };
 
   const tryFinish = () => {
@@ -84,10 +88,10 @@ export function TaskPass({ taskId, data, form, options, saveBlank, onDone, clien
     <>
       <div className="test-settings__scroll" key={finished ? 'thanks' : step} ref={scrollRef}>
         {finished ? (
-          <TaskDone />
+          <TaskDone record={record} limit={client?.permanent?.limit} />
         ) : step === 'rules' ? (
           client ? (
-            <ClientIntro message={client.message} rules={rules} facts={taskFacts(data, form, client.deadline)} />
+            <ClientIntro message={client.message} rules={rules} facts={taskFacts(data, form, client.deadline, client.permanent)} />
           ) : (
             <CollapseCard title="Инструкция" id="blank-rules">
               <BlankRules rules={rules} />

@@ -7,6 +7,12 @@
 /** Номер результата клиента: «<чат>-<тест>», например «maxim-phq9» (результаты самого психолога — «r1», «r2»…) */
 export const clientResultId = (chatId: string, testId: string): string => `${chatId}-${testId}`;
 
+/**
+ * Постоянное задание: каждая запись клиента — отдельный результат со своим номером.
+ * Его «тест» в адресе — «<задание>-r<номер записи>», например «smer-r2» (результат «maxim-smer-r2»).
+ */
+export const recordRef = (taskId: string, record: number): string => `${taskId}-r${record}`;
+
 /** Адрес экрана результата (hash-маршрут без «#») */
 export const clientResultPath = (chatId: string, testId: string): string =>
   `/chat/${chatId}/result/${clientResultId(chatId, testId)}`;

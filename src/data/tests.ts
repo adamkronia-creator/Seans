@@ -1,8 +1,8 @@
 // Вид теста или задания в карточке чата: статус и дата берутся из журнала клиента (clientStore),
 // название, описание, иконка и цвет — из библиотеки (library.ts)
 
-/** assigned — назначено, sent — отправлено клиенту, done — завершено */
-export type TestStatus = 'assigned' | 'sent' | 'done';
+/** assigned — назначено, sent — отправлено клиенту, done — завершено, permanent — постоянное задание, которое клиент выполняет снова и снова */
+export type TestStatus = 'assigned' | 'sent' | 'done' | 'permanent';
 
 export interface PsyTest {
   id: string;

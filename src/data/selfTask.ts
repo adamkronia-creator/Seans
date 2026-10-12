@@ -3,7 +3,7 @@ import { receiveMessage } from './chatStore';
 import { findClientTaskResult } from './clientTaskResults';
 import { TASK_LIBRARY } from './library';
 import { FAVORITES_CHAT, formatDuration } from './selfTest';
-import { emptyValues, type TaskValues } from './taskValues';
+import { emptyValues, type PermanentRule, type TaskValues } from './taskValues';
 
 /*
  * Самостоятельное выполнение задания («Пройти или отправить» → «Пройти», а также задание, отправленное себе).
@@ -30,8 +30,11 @@ export interface TaskResult {
   info: TaskInfo;
   /** Дата для карточки в «Задания»: «дд.мм» */
   date: string;
-  /** Заполненный бланк; нет, если при выполнении была выключена «Сохранить бланк» */
-  values?: TaskValues;
+  /** Заполненный бланк */
+  values: TaskValues;
+  /** Постоянное задание: номер карточки-назначения в чате, к которой относится запись, и номер самой записи */
+  assignment?: string;
+  record?: number;
 }
 
 interface TaskRun {
@@ -63,6 +66,11 @@ export const useTaskResults = (): TaskResult[] => useSyncExternalStore(subscribe
 
 /** Один результат по номеру; undefined, если такого нет (например, после перезагрузки страницы) */
 export const useTaskResult = (id: string): TaskResult | undefined => useSyncExternalStore(subscribe, () => results.find((r) => r.id === id));
+
+const recordsOf = (assignment: string): number => results.filter((r) => r.assignment === assignment).length;
+
+/** Сколько записей уже сделано по постоянному заданию (карточка-назначение в чате «Избранное»); без номера — 0 */
+export const useAssignmentRecords = (assignment: string): number => useSyncExternalStore(subscribe, () => (assignment ? recordsOf(assignment) : 0));
 
 /** Номер собственного результата по виду («t1», «t2»…): у результатов тестов номера «r1», у результатов клиентов «<чат>-<задание>» */
 export const isSelfTaskId = (id: string): boolean => /^t\d+$/.test(id);
@@ -98,30 +106,33 @@ function runInfo(startedAt: number, finishedAt: number): TaskInfo {
 const titleOf = (taskId: string) => TASK_LIBRARY.find((t) => t.id === taskId)?.title ?? 'Задание';
 
 /**
- * Сохранить выполненное задание. Если включено «Сохранить бланк», вместе с результатом сохраняется то, что написано
- * (без него у результата только сведения о выполнении). В «Избранное» приходит сообщение с кнопкой к результату.
+ * Сохранить выполненное задание вместе с написанным: бланк сохраняется всегда. В «Избранное» приходит сообщение с кнопкой
+ * к результату. У постоянного задания (`assignment` — карточка-назначение в чате) результат становится очередной записью.
  */
-export function finishTaskRun(taskId: string, form: string, saveBlank: boolean): TaskResult {
+export function finishTaskRun(taskId: string, form: string, assignment?: string): TaskResult {
   const run = getTaskRun(taskId);
   const now = Date.now();
   const startedAt = run.startedAt ?? now;
   const day = new Date(startedAt);
+  const record = assignment ? recordsOf(assignment) + 1 : undefined;
   const result: TaskResult = {
     id: `t${nextResultId++}`,
     taskId,
     form,
     info: runInfo(startedAt, now),
     date: `${pad(day.getDate())}.${pad(day.getMonth() + 1)}`,
-    ...(saveBlank ? { values: run.values } : {}),
+    values: run.values,
+    ...(assignment && record ? { assignment, record } : {}),
   };
   results = [result, ...results];
   runs.delete(taskId);
   emit();
 
   receiveMessage(FAVORITES_CHAT, {
-    text: `Вы выполнили задание «${titleOf(taskId)}»`,
+    text: record ? `Вы добавили запись ${record} в задание «${titleOf(taskId)}»` : `Вы выполнили задание «${titleOf(taskId)}»`,
     task: taskId,
     testKind: 'passed',
+    ...(record ? { record } : {}),
     buttons: [{ label: 'Посмотреть', href: `/chat/${FAVORITES_CHAT}/result/${result.id}` }],
   });
   return result;
@@ -133,10 +144,12 @@ export interface TaskPassRequest {
   form: string;
   comment: boolean;
   state: boolean;
-  saveBlank: boolean;
   deadline: string;
   /** Сообщение клиенту без строки про срок */
   message: string;
+  /** Постоянное задание: правило и карточка-назначение, к которой добавится запись */
+  permanent?: PermanentRule;
+  assignment?: string;
 }
 let pendingPass: TaskPassRequest | null = null;
 export const requestTaskPass = (request: TaskPassRequest) => {

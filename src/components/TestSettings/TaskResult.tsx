@@ -2,7 +2,7 @@ import { IconBack } from '../icons';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
-import { formText, fullValues, progressOf, taskSettings } from '../../data/taskSettings';
+import { formText, progressOf, taskSettings } from '../../data/taskSettings';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
 import { CollapseCard } from './TestBlank';
@@ -19,7 +19,7 @@ interface TaskResultProps {
  * Результат задания: сведения о выполнении, заполненный клиентом бланк и подсказка для анализа материалов.
  * Открывается для собственного выполнения психолога и для задания, которое выполнил клиент
  * (кнопка «Посмотреть» под сообщением, карточка во вкладке «Задания», «События», «История взаимодействия»).
- * Если при выполнении была выключена «Сохранить бланк», вместо ответов показано пояснение.
+ * У постоянного задания так же открывается каждая запись: в общей информации у неё указан номер.
  */
 export function TaskResult({ resultId, onBack }: TaskResultProps) {
   const own = useTaskResult(resultId);
@@ -42,17 +42,17 @@ export function TaskResult({ resultId, onBack }: TaskResultProps) {
     );
   }
 
-  const values = result.values && fullValues(result.values);
-  const { info, form } = result;
-  const progress = values ? progressOf(data.blank.sections(form), values) : null;
-  const summary = (values && data.summary?.(values)) ?? [];
+  const { info, form, values } = result;
+  const progress = progressOf(data.blank.sections(form), values);
+  const summary = data.summary?.(values) ?? [];
   const rows: { label: string; value: string }[] = [
+    ...(result.record ? [{ label: 'Запись задания', value: `№${result.record}` }] : []),
     { label: 'Дата выполнения', value: info.date },
     { label: 'Время выполнения', value: info.time },
     { label: 'Длительность', value: info.duration },
     ...(info.age ? [{ label: 'Возраст', value: info.age }] : []),
     ...(form ? [{ label: data.formLabel ?? 'Форма бланка', value: formText(data, form) }] : []),
-    ...(progress ? [{ label: 'Заполнено полей', value: `${progress.done} из ${progress.total}` }] : []),
+    { label: 'Заполнено полей', value: `${progress.done} из ${progress.total}` },
     ...summary,
   ];
 
@@ -72,15 +72,7 @@ export function TaskResult({ resultId, onBack }: TaskResultProps) {
             </ul>
           </CollapseCard>
 
-          {values ? (
-            <TaskForm data={data} form={form} options={{ comment: values.comment.trim() !== '', state: values.state !== undefined }} values={values} />
-          ) : (
-            <CollapseCard title="Бланк задания">
-              <div className="task-pad">
-                <p className="task-hint">Бланк не сохранён: при выполнении была выключена настройка «Сохранить бланк». Остались только сведения о выполнении.</p>
-              </div>
-            </CollapseCard>
-          )}
+          <TaskForm data={data} form={form} options={{ comment: values.comment.trim() !== '', state: values.state !== undefined }} values={values} />
 
           <CollapseCard title="Анализ материалов">
             <div className="task-pad">

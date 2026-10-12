@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
-import { emptyValues, progressOf, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
+import { emptyValues, progressOf, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
 import { ClientIntro, IconEye, TaskDone, taskFacts } from './ClientParts';
 import { FillMeter, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
@@ -25,6 +25,8 @@ interface TaskPreviewProps {
   message: string;
   /** Срок выполнения из настроек («Без срока», «Сутки»…) */
   deadline: string;
+  /** Правило постоянного задания, если оно включено в «Правилах назначения» */
+  permanent?: PermanentRule;
   /** Свайп вправо на первом экране и стрелка «назад» */
   onExit: () => void;
 }
@@ -33,7 +35,7 @@ interface TaskPreviewProps {
  * Предпросмотр задания в рамке телефона: начало (сообщение, инструкция, объём, время, срок), бланк и завершение.
  * Внутри рамки тот же интерфейс, что у клиента и при прохождении самому. Написанное здесь никуда не сохраняется.
  */
-export function TaskPreview({ task, data, form, options, message, deadline, onExit }: TaskPreviewProps) {
+export function TaskPreview({ task, data, form, options, message, deadline, permanent, onExit }: TaskPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
@@ -94,9 +96,9 @@ export function TaskPreview({ task, data, form, options, message, deadline, onEx
         </div>
         <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" onBack={onExit} />
         <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
-          {stage === 'start' && <ClientIntro message={message} rules={data.blank.rules(form)} facts={taskFacts(data, form, deadline)} />}
+          {stage === 'start' && <ClientIntro message={message} rules={data.blank.rules(form)} facts={taskFacts(data, form, deadline, permanent)} />}
           {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} onEntryStep={(sectionId, index) => setPartId(`each:${sectionId}:${index}`)} />}
-          {stage === 'end' && <TaskDone />}
+          {stage === 'end' && <TaskDone record={permanent ? 1 : undefined} limit={permanent?.limit} />}
         </div>
 
         {stage !== 'end' && (

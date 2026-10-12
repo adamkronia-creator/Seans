@@ -11,8 +11,8 @@
   gap: var(--space-2);
 }
 
-/* «Происхождение задания», строка «Направления»: метки подходов в один ряд с переносом */
-.task-origin__tags {
+/* «Интерпретация задания», строка «Направления»: метки подходов в один ряд с переносом */
+.task-approaches {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -21,7 +21,7 @@
   list-style: none;
 }
 
-.task-origin__tag {
+.task-approaches__tag {
   padding: 4px var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-accent-soft);
@@ -29,4 +29,43 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
+}
+
+/* Строки «Правил назначения», которые зависят от переключателя «Назначить постоянным»: сворачиваются по высоте.
+   Внутри каждая строка отделена линией сверху, даже первая: над ней всегда есть другая строка */
+.ts-fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.ts-fold--open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.ts-fold__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ts-fold .ts-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-fold,
+  .ts-fold--open {
+    transition: none;
+  }
 }

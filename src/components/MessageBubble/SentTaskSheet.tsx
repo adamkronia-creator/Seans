@@ -1,6 +1,6 @@
 import type { Message, SentTaskOptions } from '../../data/messages';
 import type { LibraryTask } from '../../data/library';
-import { TASK_DEADLINES } from '../../data/taskValues';
+import { limitText, TASK_DEADLINES } from '../../data/taskValues';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import './SentTestSheet.css';
@@ -13,7 +13,7 @@ interface SentTaskSheetProps {
 }
 
 /** Настройки по умолчанию: как на экране «Настройка задания» до того, как их тронули (у сообщений, отправленных до появления настроек) */
-const DEFAULT_OPTIONS: SentTaskOptions = { comment: true, state: true, saveBlank: true, deadline: TASK_DEADLINES[0], remind: true, note: '' };
+const DEFAULT_OPTIONS: SentTaskOptions = { comment: true, state: true, deadline: TASK_DEADLINES[0], remind: true, note: '' };
 
 interface Row {
   label: string;
@@ -30,6 +30,7 @@ export function SentTaskSheet({ message, task, onClose }: SentTaskSheetProps) {
   useSheet(onClose);
   const options = message.taskOptions ?? DEFAULT_OPTIONS;
   const hasDeadline = options.deadline !== TASK_DEADLINES[0];
+  const { permanent } = options;
   const onOff = (on: boolean) => ({ value: on ? 'Включено' : 'Выключено', on });
 
   // Порядок и подписи те же, что на экране «Настройка задания»
@@ -37,9 +38,14 @@ export function SentTaskSheet({ message, task, onClose }: SentTaskSheetProps) {
     ...(options.form ? [{ label: options.formLabel ?? 'Форма бланка', value: options.form }] : []),
     { label: 'Комментарий клиента', ...onOff(options.comment) },
     { label: 'Оценка состояния', ...onOff(options.state) },
-    { label: 'Сохранить бланк', ...onOff(options.saveBlank) },
-    { label: 'Срок выполнения', value: options.deadline },
-    { label: 'Напоминание', ...onOff(options.remind && hasDeadline) },
+    { label: 'Постоянное задание', ...onOff(Boolean(permanent)) },
+    // У постоянного задания вместо срока и напоминания — сколько записей всего
+    ...(permanent
+      ? [{ label: 'Всего записей', value: limitText(permanent.limit) }]
+      : [
+          { label: 'Срок выполнения', value: options.deadline },
+          { label: 'Напоминание', ...onOff(options.remind && hasDeadline) },
+        ]),
     { label: 'Сообщение для клиента', ...onOff(options.note !== '') },
   ];
 

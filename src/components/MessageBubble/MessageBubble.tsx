@@ -1,6 +1,6 @@
 import { requestPass } from '../../data/selfTest';
-import { requestTaskPass } from '../../data/selfTask';
-import { TASK_DEADLINES } from '../../data/taskValues';
+import { requestTaskPass, useAssignmentRecords } from '../../data/selfTask';
+import { recordsText, TASK_DEADLINES } from '../../data/taskValues';
 import { BLIND_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
@@ -93,6 +93,10 @@ export function MessageBubble({
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);
   const out = message.from === 'me';
+  // Постоянное задание: клиенту ушло правило (сколько записей всего), а у отправленного себе считаются сделанные записи
+  const permanent = message.task ? message.taskOptions?.permanent : undefined;
+  const selfRecords = useAssignmentRecords(message.toSelf && permanent ? message.id : '');
+  const exhausted = Boolean(permanent?.limit && selfRecords >= permanent.limit);
 
   const clearTimer = () => {
     if (gesture.current?.timer) window.clearTimeout(gesture.current.timer);
@@ -221,10 +225,27 @@ export function MessageBubble({
             )}
             <span className="tcard__text">
               <span className="tcard__label">
-                {isTask ? (passed ? 'Выполненное задание' : settings ? 'Отправленное задание' : 'Присланное задание') : passed ? 'Пройденный тест' : 'Присланный тест'}
+                {isTask
+                  ? passed
+                    ? message.record
+                      ? 'Запись задания'
+                      : 'Выполненное задание'
+                    : permanent
+                      ? 'Постоянное задание'
+                      : settings
+                        ? 'Отправленное задание'
+                        : 'Присланное задание'
+                  : passed
+                    ? 'Пройденный тест'
+                    : 'Присланный тест'}
               </span>
               <span className="tcard__title">{hiddenTest ? BLIND_TITLE : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
+              {!passed && permanent && (
+                <span className="tcard__note">
+                  {message.toSelf ? recordsText(selfRecords, permanent.limit) : permanent.limit ? `Всего записей: ${permanent.limit}` : 'Записей без ограничения'}
+                </span>
+              )}
             </span>
           </div>
           {message.text ? (
@@ -244,6 +265,7 @@ export function MessageBubble({
             <button
               type="button"
               className="bubble-button"
+              disabled={exhausted}
               onClick={() => {
                 if (settings) return onTestSettings(message);
                 if (link) return onOpenLink(link.href);
@@ -256,9 +278,9 @@ export function MessageBubble({
                       form: o?.form ?? '',
                       comment: o?.comment ?? true,
                       state: o?.state ?? true,
-                      saveBlank: o?.saveBlank ?? true,
                       deadline: o?.deadline ?? TASK_DEADLINES[0],
                       message: o?.note ?? '',
+                      ...(permanent ? { permanent, assignment: message.id } : {}),
                     });
                   }
                   return onOpenTask(message.task!);
@@ -270,7 +292,7 @@ export function MessageBubble({
                 onOpenTest(message.test!);
               }}
             >
-              {settings ? (isTask ? 'Настройки задания' : 'Настройки теста') : passed ? 'Посмотреть' : 'Пройти'}
+              {settings ? (isTask ? 'Настройки задания' : 'Настройки теста') : passed ? 'Посмотреть' : exhausted ? 'Все записи выполнены' : 'Пройти'}
             </button>
           </li>
         </ul>

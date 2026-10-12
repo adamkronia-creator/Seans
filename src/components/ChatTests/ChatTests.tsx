@@ -22,6 +22,7 @@ const TEST_SECTIONS: SectionConfig[] = [
 const TASK_SECTIONS: SectionConfig[] = [
   { status: 'assigned', title: 'Назначенные', remind: true },
   { status: 'sent', title: 'Отправленные', remind: true },
+  { status: 'permanent', title: 'Постоянные' },
   { status: 'done', title: 'Завершенные' },
 ];
 
@@ -106,7 +107,11 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
   );
 }
 
-/** Вкладка «Задания» в открытом чате: отправленное задание открывает его настройку, выполненное — результат клиента */
+/**
+ * Вкладка «Задания» в открытом чате: отправленное задание открывает его настройку, выполненное — результат клиента.
+ * Постоянное задание стоит в своём разделе с числом записей, а каждая новая запись клиента появляется среди завершённых
+ * отдельной карточкой: её можно открыть и посмотреть.
+ */
 export function ChatTasks({
   hasData,
   onOpenTask,
@@ -133,7 +138,9 @@ export function SelfTasks({ onOpen }: { onOpen: (resultId: string) => void }) {
   const items = results.flatMap<PsyTest>((r) => {
     const task = TASK_LIBRARY.find((t) => t.id === r.taskId);
     // id карточки — id результата: по нему открывается экран результата
-    return task ? [{ id: r.id, title: task.title, description: task.description, date: r.date, status: 'done', icon: task.icon, tint: task.tint }] : [];
+    return task
+      ? [{ id: r.id, title: task.title, description: r.record ? `Запись ${r.record}` : task.description, date: r.date, status: 'done', icon: task.icon, tint: task.tint }]
+      : [];
   });
   return (
     <SectionedList

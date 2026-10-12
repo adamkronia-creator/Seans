@@ -17,7 +17,19 @@ import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTask } from '../../data/library';
-import { emptyValues, exampleValues, formText, TASK_DEADLINES, TASK_MESSAGE_LIMIT, taskSettings, type TaskValues } from '../../data/taskSettings';
+import {
+  emptyValues,
+  exampleValues,
+  formText,
+  limitText,
+  PERMANENT_LIMITS,
+  permanentNote,
+  TASK_DEADLINES,
+  TASK_MESSAGE_LIMIT,
+  taskSettings,
+  type PermanentRule,
+  type TaskValues,
+} from '../../data/taskSettings';
 import { takeTaskPass } from '../../data/selfTask';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -85,8 +97,9 @@ interface TaskSettingsProps {
 
 /**
  * Экран «Настройка задания»: шапка с названием и сердечком, описание, бланк, пример выполнения и предпросмотр,
- * информация, интерпретация, происхождение, особенности (комментарий, состояние, срок, напоминание),
- * сообщение клиенту и кнопка «Пройти или отправить» над нижней панелью.
+ * информация, интерпретация (в начале подходы), особенности (комментарий, состояние), правила назначения
+ * (постоянное задание с числом записей, а у обычного срок и напоминание), сообщение клиенту
+ * и кнопка «Пройти или отправить» над нижней панелью.
  */
 export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const data = taskSettings(task);
@@ -95,9 +108,11 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const [form, setForm] = useState(passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? ''));
   const [comment, setComment] = useState(passRequest?.comment ?? true);
   const [state, setState] = useState(passRequest?.state ?? true);
-  const [saveBlank, setSaveBlank] = useState(passRequest?.saveBlank ?? true);
   const [remind, setRemind] = useState(true);
   const [deadline, setDeadline] = useState(passRequest?.deadline ?? TASK_DEADLINES[0]);
+  // Правила назначения: постоянное задание и сколько записей всего (0 — без ограничения)
+  const [permanent, setPermanent] = useState(false);
+  const [limit, setLimit] = useState(0);
   const [messageOn, setMessageOn] = useState(true);
   const [message, setMessage] = useState(data?.message ?? '');
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
@@ -143,9 +158,13 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const options = { comment, state };
   const formLabel = data.formLabel ?? 'Форма бланка';
 
-  // Сообщение клиенту и, если выбран, срок: клиент видит их в карточке задания
+  // Постоянное задание: срока и напоминания у него нет, вместо них в сообщении строка про постоянство и число записей
+  const rule: PermanentRule | undefined = permanent ? (limit ? { limit } : {}) : undefined;
+
+  // Сообщение клиенту и, если выбран, срок или правило: клиент видит их в карточке задания
   const note = messageOn ? message.trim() : '';
-  const outgoing = [note, deadline !== TASK_DEADLINES[0] ? `Срок выполнения: ${deadline.toLowerCase()}.` : ''].filter(Boolean).join('\n\n');
+  const ruleLine = rule ? permanentNote(rule) : deadline !== TASK_DEADLINES[0] ? `Срок выполнения: ${deadline.toLowerCase()}.` : '';
+  const outgoing = [note, ruleLine].filter(Boolean).join('\n\n');
 
   const send = (ids: string[]) => {
     ids.forEach((id) => {
@@ -153,10 +172,18 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
       sendMessage(id, outgoing, undefined, {
         task: task.id,
         ...(id === SELF_ID ? { toSelf: true } : {}),
-        taskOptions: { ...(data.forms ? { form, ...(data.formLabel ? { formLabel: data.formLabel } : {}) } : {}), comment, state, saveBlank, deadline, remind, note },
+        taskOptions: {
+          ...(data.forms ? { form, ...(data.formLabel ? { formLabel: data.formLabel } : {}) } : {}),
+          comment,
+          state,
+          deadline: rule ? TASK_DEADLINES[0] : deadline,
+          remind: rule ? false : remind,
+          note,
+          ...(rule ? { permanent: rule } : {}),
+        },
       });
       // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
-      if (id === 'maxim') logStep('task', task.id, 'sent');
+      if (id === 'maxim') logStep('task', task.id, 'sent', rule ? { permanent: rule } : undefined);
     });
     setSheet(null);
     const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
@@ -226,8 +253,11 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
           data={data}
           form={form}
           options={options}
-          saveBlank={saveBlank}
-          client={passRequest ? { message: passRequest.message, deadline: passRequest.deadline, onExit: onBack } : undefined}
+          client={
+            passRequest
+              ? { message: passRequest.message, deadline: passRequest.deadline, permanent: passRequest.permanent, assignment: passRequest.assignment, onExit: onBack }
+              : undefined
+          }
           onDone={(id) => {
             // Результат открывается сразу; его копия лежит в «Избранное» → «Задания», в чате — сообщение с кнопкой
             transition(() => {
@@ -238,7 +268,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
           }}
         />
       ) : view === 'preview' ? (
-        <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} onExit={() => openView('settings')} />
+        <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} permanent={rule} onExit={() => openView('settings')} />
       ) : view === 'blank' ? (
         <ScrollHost className="test-settings__scroll" key="blank">
           <BlankView task={task} form={form} options={options} />
@@ -298,6 +328,18 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               <ul className="ts-rows">
                 <li className="ts-row ts-row--top">
                   <div className="ts-scale">
+                    <p className="ts-scale__title">Направления:</p>
+                    <ul className="task-approaches">
+                      {data.approaches.map((approach) => (
+                        <li key={approach} className="task-approaches__tag">
+                          {approach}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+                <li className="ts-row ts-row--top">
+                  <div className="ts-scale">
                     <p className="ts-scale__title">Цель задания:</p>
                     <div className="task-pad task-pad--inline">
                       <Paragraphs text={data.goal} />
@@ -315,39 +357,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               </ul>
             </CollapseCard>
 
-            <CollapseCard title="Происхождение задания">
-              <ul className="ts-rows">
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Направления:</p>
-                    <ul className="task-origin__tags">
-                      {data.origin.fields.map((field) => (
-                        <li key={field} className="task-origin__tag">
-                          {field}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Научная основа:</p>
-                    <div className="task-pad task-pad--inline">
-                      <Paragraphs text={data.origin.basis} />
-                    </div>
-                  </div>
-                </li>
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Авторство:</p>
-                    <div className="task-pad task-pad--inline">
-                      <Paragraphs text={data.origin.author} />
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </CollapseCard>
-
             <CollapseCard title="Особенности задания">
               <ul className="ts-rows">
                 <Row label="Разрешить комментарий клиента" hint="Клиент сможет дописать свои мысли после выполнения">
@@ -356,18 +365,38 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
                 <Row label="Оценить психоэмоциональное состояние" hint="Клиент отметит самочувствие по шкале, чтобы вы видели динамику">
                   <Switch checked={state} onChange={setState} label="Оценить психоэмоциональное состояние" />
                 </Row>
-                <Row label="Сохранить бланк" hint="Написанное клиентом сохранится в результате задания; без этого останутся только сведения о выполнении">
-                  <Switch checked={saveBlank} onChange={setSaveBlank} label="Сохранить бланк" />
+              </ul>
+            </CollapseCard>
+
+            <CollapseCard title="Правила назначения">
+              <ul className="ts-rows">
+                <Row label="Назначить постоянным" hint="Задание можно выполнять не один раз, а когда нужно, например записывать сны. Каждый раз — новая запись">
+                  <Switch checked={permanent} onChange={setPermanent} label="Назначить постоянным" />
                 </Row>
-                <Row label="Срок выполнения" info hint="Срок будет указан в сообщении с заданием">
-                  {select('Срок выполнения', deadline, TASK_DEADLINES, setDeadline)}
-                </Row>
-                <Row
-                  label="Напомнить, если не выполнено"
-                  hint={deadline === TASK_DEADLINES[0] ? 'Заработает, когда выберете срок выполнения' : 'Клиент получит напоминание, когда срок подойдет к концу'}
-                >
-                  <Switch checked={remind} onChange={setRemind} label="Напомнить, если не выполнено" />
-                </Row>
+                <li className={`ts-fold${permanent ? ' ts-fold--open' : ''}`} aria-hidden={!permanent}>
+                  <div className="ts-fold__inner">
+                    <ul className="ts-rows">
+                      <Row label="Всего записей" info>
+                        {select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
+                      </Row>
+                    </ul>
+                  </div>
+                </li>
+                <li className={`ts-fold${permanent ? '' : ' ts-fold--open'}`} aria-hidden={permanent}>
+                  <div className="ts-fold__inner">
+                    <ul className="ts-rows">
+                      <Row label="Срок выполнения" info hint="Срок будет указан в сообщении с заданием">
+                        {select('Срок выполнения', deadline, TASK_DEADLINES, setDeadline)}
+                      </Row>
+                      <Row
+                        label="Напомнить, если не выполнено"
+                        hint={deadline === TASK_DEADLINES[0] ? 'Заработает, когда выберете срок выполнения' : 'Клиент получит напоминание, когда срок подойдет к концу'}
+                      >
+                        <Switch checked={remind} onChange={setRemind} label="Напомнить, если не выполнено" />
+                      </Row>
+                    </ul>
+                  </div>
+                </li>
               </ul>
             </CollapseCard>
 

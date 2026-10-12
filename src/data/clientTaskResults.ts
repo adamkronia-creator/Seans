@@ -1,4 +1,4 @@
-import { clientResultId } from './resultLinks';
+import { clientResultId, recordRef } from './resultLinks';
 import type { TaskInfo } from './selfTask';
 import { fullValues, type TaskValues } from './taskValues';
 
@@ -6,6 +6,7 @@ import { fullValues, type TaskValues } from './taskValues';
  * Задания, которые выполнили клиенты (пока только Максим). Психолог открывает их карточкой на вкладке «Задания»,
  * записью в «Событиях» и в «Истории взаимодействия». Ответы подобраны под его кейс: тревога, ориентация на ожидания
  * других, строгость к себе, начальник, родители и девушка.
+ * У постоянного задания каждая запись — отдельный результат (`record` — её номер, в номере результата «…-r2»).
  */
 
 export interface ClientTaskResult {
@@ -17,19 +18,26 @@ export interface ClientTaskResult {
   form: string;
   info: TaskInfo;
   values: TaskValues;
+  /** Номер записи, если это запись постоянного задания */
+  record?: number;
 }
 
 /** Возраст клиента на момент выполнения: Максим родился 14.03.1997 */
 const AGE = '29 лет';
 
-const result = (taskId: string, form: string, info: Omit<TaskInfo, 'age'>, values: Partial<TaskValues>): ClientTaskResult => ({
-  id: clientResultId('maxim', taskId),
+const result = (taskId: string, form: string, info: Omit<TaskInfo, 'age'>, values: Partial<TaskValues>, record?: number): ClientTaskResult => ({
+  id: clientResultId('maxim', record ? recordRef(taskId, record) : taskId),
   chatId: 'maxim',
   taskId,
   form,
   info: { ...info, age: AGE },
   values: fullValues(values),
+  ...(record ? { record } : {}),
 });
+
+/** Запись дневника СМЭР: ситуация, мысль, эмоции, сила эмоции, реакция */
+const smerEntry = (situation: string, thought: string, emotions: string[], power: number, reaction: string): TaskValues =>
+  fullValues({ text: { situation, thought, reaction }, list: { emotions }, percent: { power } });
 
 const RESULTS: ClientTaskResult[] = [
   result(
@@ -93,6 +101,48 @@ const RESULTS: ClientTaskResult[] = [
       comment: 'Первое желание — уехать. Дальше писать было проще.',
       state: 3,
     },
+  ),
+  // Дневник СМЭР назначен постоянным: по записи, когда случается что-то заметное (по одной записи за раз)
+  result(
+    'smer',
+    '1',
+    { date: '06.10.2026', time: '22:31–22:40', duration: '9 мин. 4 с.' },
+    {
+      entries: {
+        records: [
+          smerEntry(
+            'Начальник посмотрел мой отчёт и ответил одним словом: «Принято».',
+            'Ему не понравилось, но он не хочет говорить прямо.',
+            ['Тревога', 'Стыд'],
+            70,
+            'Перечитал отчёт три раза, нашёл две опечатки и написал, что исправил. Ответа нет. Напряжение в плечах до самого вечера.',
+          ),
+        ],
+      },
+      comment: 'Заметил, что сначала придумываю, что он «на самом деле» думает, а потом уже переживаю.',
+      state: 1,
+    },
+    1,
+  ),
+  result(
+    'smer',
+    '1',
+    { date: '07.10.2026', time: '21:08–21:15', duration: '6 мин. 47 с.' },
+    {
+      entries: {
+        records: [
+          smerEntry(
+            'Девушка сказала, что вечером хочет побыть одна.',
+            'Я ей надоел. Что я сделал не так?',
+            ['Тревога', 'Обида'],
+            65,
+            'Предложил приехать позже и привезти ужин, хотя сам устал. Потом злился на себя, что не смог просто согласиться.',
+          ),
+        ],
+      },
+      state: 2,
+    },
+    2,
   ),
 ];
 
