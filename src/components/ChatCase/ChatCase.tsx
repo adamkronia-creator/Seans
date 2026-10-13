@@ -1,4 +1,3 @@
-import { Badge } from '../Badge/Badge';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SwipePager } from '../SwipePager/SwipePager';
@@ -298,7 +297,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
   // Сегменты стоят над страницами и не едут за ними; листать можно и за них
   const header = (
   <div className="case-segments" role="tablist" aria-label="Разделы кейса">
-    {segments.map(({ id, label, count }) => (
+    {segments.map(({ id, label }) => (
       <button
         key={id}
         type="button"
@@ -308,7 +307,6 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
         onClick={() => setSegment(id)}
       >
         <span>{label}</span>
-        <Badge count={count} variant="neutral" />
       </button>
     ))}
   </div>

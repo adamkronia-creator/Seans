@@ -1,4 +1,3 @@
-import { Badge } from '../Badge/Badge';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   acceptProposal,
@@ -32,12 +31,10 @@ const HISTORY_SHOWN = 3;
 
 function Section({
   title,
-  count,
   action,
   children,
 }: {
   title: string;
-  count?: number;
   action?: { label: string; onClick: () => void };
   children: ReactNode;
 }) {
@@ -45,7 +42,6 @@ function Section({
     <section className="booking__section">
       <div className="booking__heading">
         <h2 className="booking__title">{title}</h2>
-        {count !== undefined && <Badge count={count} variant="neutral" showZero ariaLabel={`Всего: ${count}`} />}
         {action && (
           <button type="button" className="booking__link" onClick={action.onClick}>
             {action.label}
@@ -130,7 +126,7 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
         )}
 
         {view.upcoming.length > 0 && (
-          <Section title="Предстоящие" count={view.upcoming.length}>
+          <Section title="Предстоящие">
             <ul className="booking__list">
               {view.upcoming.map((a, i) => (
                 <AppointmentCard
@@ -148,7 +144,7 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
         )}
 
         {pending.length > 0 && (
-          <Section title="Предложения" count={pending.length}>
+          <Section title="Предложения">
             <ul className="booking__list">
               {pending.map((a) => (
                 <AppointmentCard key={a.id} a={a} peerName={peerName} now={now} replaced={confirmedAt(a.replaces)} onAction={onAction} />
@@ -162,7 +158,7 @@ export function ChatBooking({ chatId, peerName }: ChatBookingProps) {
         </Section>
 
         {view.past.length > 0 && (
-          <Section title="История" count={view.past.length}>
+          <Section title="История">
             <div className="history-card">
               <HistoryList items={history} peerName={peerName} now={now} />
               {view.past.length > HISTORY_SHOWN && (

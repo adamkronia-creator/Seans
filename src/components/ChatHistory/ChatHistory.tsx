@@ -361,7 +361,6 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             key={id}
             follow
             active={shown === i}
-            count={hasData ? countOf(data, id) : 0}
             onClick={() => setFilter(id)}
           >
             {label}
