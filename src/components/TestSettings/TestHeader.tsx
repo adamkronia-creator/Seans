@@ -13,7 +13,8 @@ interface TestHeaderProps {
   kind?: 'test' | 'task';
   /** Что открыто под шапкой: «Настройка теста», «Бланк тестирования», «Результат тестирования»… */
   status: string;
-  onBack: () => void;
+  /** Без обработчика кнопка «Назад» неактивна: так в рамке телефона в предпросмотре */
+  onBack?: () => void;
   /**
    * Шапка клиента (тест или задание, присланное специалистом, и предпросмотр): те же значок, название и раздел,
    * но без «избранного» — это библиотека специалиста. Слепой тест клиенту не называют: значка нет, название нейтральное.
@@ -30,7 +31,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
   const hidden = Boolean(client?.blind);
   return (
     <header className="test-settings__header">
-      <button type="button" className="test-settings__button" aria-label="Назад" onClick={onBack}>
+      <button type="button" className="test-settings__button" aria-label="Назад" disabled={!onBack} onClick={onBack}>
         <IconBack />
       </button>
       <div className="test-settings__peer">

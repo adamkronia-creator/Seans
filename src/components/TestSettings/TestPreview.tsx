@@ -3,6 +3,7 @@ import type { LibraryTest } from '../../data/library';
 import type { ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
 import { ClientIntro, IconEye, IconEyeOff, testFacts } from './ClientParts';
+import { CollapseCard } from './TestBlank';
 import { FillMeter } from './PassParts';
 import { TestDone } from './TestDone';
 import { TestHeader } from './TestHeader';
@@ -28,16 +29,15 @@ interface TestPreviewProps {
   result: ResultMode;
   /** Время выполнения из описания теста («15–20 мин.») */
   duration?: string;
-  /** Свайп вправо на первом экране и стрелка «назад» */
-  onExit: () => void;
 }
 
 /**
- * Предпросмотр теста в рамке телефона: начало (сообщение, инструкция, число вопросов, время, кто увидит результат),
+ * Блок «Предпросмотр» внизу настроек теста: то, что увидит клиент, в рамке телефона. Меняете настройку выше — рамка меняется сразу.
+ * Внутри: начало (сообщение, инструкция, число вопросов, время, кто увидит результат),
  * вопрос с ответами и завершение. Внутри рамки тот же интерфейс, что у клиента и при прохождении самому.
  * Ответы здесь никуда не сохраняются. При слепом тестировании название и значок теста скрыты.
  */
-export function TestPreview({ test, blank, blind, message, result, duration, onExit }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, message, result, duration }: TestPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<'next' | 'prev'>('next');
@@ -73,12 +73,12 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
     setStage(next);
   };
 
-  // Свайпы переключают этапы целиком, как вкладки «Начало / В процессе / Конец»; с первого этапа вправо — к настройкам
+  // Свайпы переключают этапы целиком, как вкладки «Начало / В процессе / Конец»; на первом этапе вправо — ничего (экран настроек остаётся на месте)
   const touch = useRef<{ x: number; y: number } | null>(null);
   const step = (way: 1 | -1) => {
     const order: Stage[] = ['start', 'progress', 'end'];
     const next = order.indexOf(stage) + way;
-    if (next < 0) return onExit();
+    if (next < 0) return;
     if (next < order.length) toStage(order[next]);
   };
   const onTouchStart = (e: TouchEvent) => {
@@ -97,7 +97,8 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
 
   return (
     <>
-      <div className="test-settings__scroll tp" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <CollapseCard title="Предпросмотр" id="preview">
+      <div className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="tp__tabs" role="group" aria-label="Этап прохождения">
           {STAGES.map(({ id, label }) => (
             <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
@@ -111,11 +112,11 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
           <span>{blind ? 'Слепое тестирование: название скрыто' : 'Клиент увидит название теста'}</span>
         </p>
 
-        <div className="tp__phone">
+        <div className="tp__phone" data-hscroll>
           <div className="tp__status" aria-hidden="true">
             <span className="tp__notch" />
           </div>
-          <TestHeader test={test} client={{ blind }} status="Тест от вашего специалиста" onBack={onExit} />
+          <TestHeader test={test} client={{ blind }} status="Тест от вашего специалиста" />
           <div className="test-settings__scroll tp__screen" key={stage} ref={screenRef}>
             {stage === 'start' && <ClientIntro message={message} rules={blank.rules} facts={testFacts(total, duration, result)} />}
             {stage === 'progress' && (
@@ -163,6 +164,7 @@ export function TestPreview({ test, blank, blind, message, result, duration, onE
           )}
         </div>
       </div>
+      </CollapseCard>
 
       {jumpOpen && (
         <JumpSheet

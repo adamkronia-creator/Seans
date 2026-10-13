@@ -3,7 +3,7 @@
 Скриншоты для подсказок к настройкам теста (src/assets/help/*.webp, данные — src/data/optionHelp.ts).
 
 Снимает приложение в рамке телефона 393 px при плотности 2 и вырезает кадр 393×340 (786×680 пикселей):
-  blind-off, blind-on, blind-chat — «Слепое тестирование»: предпросмотр без слепого режима и с ним, пометка в чате;
+  blind-off, blind-on, blind-chat — «Слепое тестирование»: блок «Предпросмотр» без слепого режима и с ним, пометка в чате;
   blank-off, blank-on, blank-view — «Сохранить заполненный бланк»: результат без бланка и с ним, сам бланк;
   result-thanks, result-score, result-full — «Итог для клиента»: экран завершения у клиента при каждом из трёх вариантов.
 Кроме картинок печатает рамки (x, y, w, h в процентах кадра): их нужно перенести в `mark` слайдов в optionHelp.ts.
@@ -56,6 +56,11 @@ class Phone:
         self.tab('Диагностика')
         self.page.locator(TOP).get_by_text(SMOL, exact=True).first.click()
         self.wait(1000)
+
+    def show_preview(self):
+        """Блок «Предпросмотр» внизу настроек теста прокручен к верхнему краю экрана"""
+        self.page.evaluate("document.querySelector('#preview').scrollIntoView({block: 'start'})")
+        self.wait(900)
 
     def send(self, recipient):
         page = self.page
@@ -133,15 +138,14 @@ def main():
 
     with sync_playwright() as p:
         if want('blind'):
-            # Слепое тестирование: предпросмотр клиентского экрана без слепого режима и с ним (кадр под шапкой, с y = 56)
+            # Слепое тестирование: блок «Предпросмотр» в настройках без слепого режима и с ним (кадр под шапкой, с y = 56)
             for blind in (False, True):
                 phone = Phone(p, args.base)
                 phone.open_smol()
                 if not blind:
                     phone.page.get_by_role('switch', name='Слепое тестирование').click()
                     phone.wait(300)
-                phone.page.locator(TOP).get_by_text('Предпросмотр', exact=True).first.click()
-                phone.wait(1000)
+                phone.show_preview()
                 title = phone.rect(f'{TOP} .tp__phone .test-settings__peer', pad=4)
                 shots.take(phone, 'blind-on' if blind else 'blind-off', 56, title)
                 phone.close()
@@ -183,7 +187,7 @@ def main():
                 phone.close()
 
         if want('result'):
-            # Итог для клиента: предпросмотр, этап «Конец» (кадр с карточки «Спасибо», с y = 270; рамок нет)
+            # Итог для клиента: блок «Предпросмотр», этап «Конец» (кадр с y = 268; рамок нет)
             for name, mode in (('result-thanks', 'Только благодарность'), ('result-score', 'Только баллы'), ('result-full', 'Полное заключение')):
                 phone = Phone(p, args.base)
                 phone.open_smol()
@@ -191,13 +195,11 @@ def main():
                 row.scroll_into_view_if_needed()
                 row.click()
                 phone.wait(300)
-                preview = phone.page.locator(TOP).get_by_text('Предпросмотр', exact=True).first
-                preview.scroll_into_view_if_needed()
-                preview.click()
-                phone.wait(900)
+                phone.show_preview()
                 phone.page.get_by_role('button', name='Конец').click()
                 phone.wait(900)
-                shots.take(phone, name, 270)
+                phone.page.evaluate("document.querySelector('#preview').scrollIntoView({block: 'start'})")
+                shots.take(phone, name, 268)
                 phone.close()
 
     print('Рамки для optionHelp.ts (mark):')

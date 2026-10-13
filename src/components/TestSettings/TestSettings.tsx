@@ -38,14 +38,13 @@ const DESC_COLLAPSED = 6 * 22 + 12;
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
-type View = 'settings' | 'blank' | 'conclusion' | 'pass' | 'preview';
+type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка теста',
   blank: 'Бланк тестирования',
   conclusion: 'Пример заключения',
   pass: 'Прохождение теста',
-  preview: 'Предпросмотр теста',
 };
 
 interface TestSettingsProps {
@@ -332,8 +331,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
             }, 'forward');
           }}
         />
-      ) : view === 'preview' && blank ? (
-        <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} onExit={() => openView('settings')} />
       ) : view === 'conclusion' && conclusion ? (
         <div className="cc-wrap" key="conclusion">
           <ScrollHost className="test-settings__scroll">
@@ -523,22 +520,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           </div>
         </section>
 
-        <TopicTags id={test.id} />
-
-        {blank && (
-          <ul className="ts-card">
-            <li
-              className="ts-row ts-row--link"
-              role="button"
-              tabIndex={0}
-              onClick={() => openView('preview')}
-              onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
-            >
-              <span className="ts-row__link">Предпросмотр</span>
-              <IconTestChevron className="ts-row__chevron" />
-            </li>
-          </ul>
-        )}
+        {blank && <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} />}
       </div>
 
       <div className="test-settings__cta">
