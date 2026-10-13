@@ -113,7 +113,7 @@ export function TestPreview({ test, blank, blind, result, duration }: TestPrevie
           </div>
           <TestHeader test={test} client={{ blind, title }} status="Тест от вашего специалиста" />
           <div className="test-settings__scroll tp__screen" key={stage} ref={screenRef}>
-            {stage === 'start' && <ClientIntro message="" rules={blank.rules} facts={testFacts(total, duration, result)} />}
+            {stage === 'start' && <ClientIntro message="" rules={blank.rules} facts={testFacts(total, duration)} />}
             {stage === 'progress' && (
               <PassQuestion
                 data={blank}

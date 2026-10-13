@@ -1,12 +1,4 @@
-/* Итог для клиента: пояснение, три строки с кружком справа и примечание */
-.result-choice__sub {
-  margin: 0;
-  padding: var(--space-3) var(--space-4) var(--space-2);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
+/* Итог для клиента: три строки с кружком справа, без описаний; пояснение в подсказке «?» */
 .result-choice__row {
   padding: 0;
   transition: background-color 0.15s ease;
@@ -38,14 +30,4 @@
   flex-wrap: wrap;
   gap: var(--space-2);
   align-items: center;
-}
-
-.result-choice__note {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-divider);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  text-wrap: pretty;
 }

@@ -12,7 +12,7 @@ import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
-import { hasOptionHelp, saveBlankLabel, type OptionHelpId } from '../../data/optionHelp';
+import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
 import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
@@ -165,8 +165,7 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value
 export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const data = testSettings(test);
   // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
-  const newFeatures = hasOptionHelp(test.id);
-  const blankLabel = saveBlankLabel(test.id);
+  const blankLabel = SAVE_BLANK_LABEL;
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
   const [form, setForm] = useState(passRequest?.form || (data.forms?.[0] ?? ''));
@@ -478,25 +477,23 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
         <CollapseCard title="Особенности тестирования">
           <ul className="ts-rows">
-            {/* Пробный вид: строки без описаний, пояснения в подсказке «?» со скриншотами (пока только СМОЛ) */}
+            {/* Строки без описаний, пояснения в подсказке «?» со скриншотами */}
             <Row
               label="Слепое тестирование"
-              hint={newFeatures ? undefined : 'Клиент не увидит название теста и его цель: так ответы честнее'}
-              help={newFeatures ? 'blind' : undefined}
+              help="blind"
             >
               <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
             </Row>
             <Row
               label={blankLabel}
-              hint={newFeatures ? undefined : 'Заполненный бланк сохранится и будет доступен для просмотра в результате теста'}
-              help={newFeatures ? 'blank' : undefined}
+              help="blank"
             >
               <Switch checked={saveBlank} onChange={setSaveBlank} label={blankLabel} />
             </Row>
           </ul>
         </CollapseCard>
 
-        {conclusion && <ResultChoice value={result} onChange={setResult} compact={newFeatures} />}
+        {conclusion && <ResultChoice value={result} onChange={setResult} />}
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">

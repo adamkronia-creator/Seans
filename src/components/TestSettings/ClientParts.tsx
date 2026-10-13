@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { RESULT_FACT, type ResultMode } from '../../data/resultMode';
 import { TASK_DEADLINES, volumeText, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './ClientParts.css';
@@ -86,13 +85,12 @@ function questionsWord(n: number) {
   return last >= 2 && last <= 4 ? 'вопроса' : 'вопросов';
 }
 
-/** Что клиент должен знать о тесте до начала: объём и время, что можно менять, кто увидит ответы и результат */
-export function testFacts(total: number, duration: string | undefined, result: ResultMode): ClientFact[] {
+/** Что клиент должен знать о тесте до начала: объём и время, что можно менять, кто видит ответы */
+export function testFacts(total: number, duration: string | undefined): ClientFact[] {
   return [
     { icon: <IconClock />, text: `${total} ${questionsWord(total)}${duration ? ` · ${duration.replace(/\.$/, '')}` : ''}` },
-    { icon: <IconUndo />, text: 'Ответы можно менять до конца' },
-    { icon: <IconLock />, text: 'Ответы увидит только специалист' },
-    { icon: <IconEye />, text: RESULT_FACT[result] },
+    { icon: <IconUndo />, text: 'Можно менять ответы' },
+    { icon: <IconLock />, text: 'Ответы видит только специалист' },
   ];
 }
 

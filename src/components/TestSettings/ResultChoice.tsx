@@ -1,15 +1,14 @@
-import { RESULT_MODES, RESULT_NOTE, type ResultMode } from '../../data/resultMode';
+import { RESULT_MODES, type ResultMode } from '../../data/resultMode';
 import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { CollapseCard } from './TestBlank';
 import './ResultChoice.css';
 
 /** Блок «Итог для клиента»: что клиент увидит сразу после прохождения. Карточка и строки те же, что у остальных настроек */
-export function ResultChoice({ value, onChange, compact = false }: { value: ResultMode; onChange: (mode: ResultMode) => void; /** Новый вид (пробный запуск): без пояснений, вместо них «?» со скриншотами */ compact?: boolean }) {
+export function ResultChoice({ value, onChange }: { value: ResultMode; onChange: (mode: ResultMode) => void }) {
   return (
-    <CollapseCard title="Итог для клиента" id="result-choice" help={compact ? <OptionHelp id="result" /> : undefined}>
-      {!compact && <p className="result-choice__sub">Что клиент увидит сразу после прохождения</p>}
+    <CollapseCard title="Итог для клиента" id="result-choice" help={<OptionHelp id="result" />}>
       <ul className="ts-rows" role="radiogroup" aria-label="Итог для клиента">
-        {RESULT_MODES.map(({ id, title, hint }) => (
+        {RESULT_MODES.map(({ id, title }) => (
           <li key={id} className="ts-row result-choice__row">
             <label className="result-choice__label">
               <input
@@ -22,13 +21,11 @@ export function ResultChoice({ value, onChange, compact = false }: { value: Resu
               <span className="blank-answer__radio" aria-hidden="true" />
               <span className="ts-row__text">
                 <span className="ts-row__label">{title}</span>
-                {!compact && <span className="ts-row__hint">{hint}</span>}
               </span>
             </label>
           </li>
         ))}
       </ul>
-      {!compact && <p className="result-choice__note">{RESULT_NOTE}</p>}
     </CollapseCard>
   );
 }

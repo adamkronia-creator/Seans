@@ -31,7 +31,7 @@ const built = esbuild.buildSync({
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'seans-help-'));
 const file = path.join(dir, 'bundle.mjs');
 fs.writeFileSync(file, built.outputFiles.find((f) => f.path.endsWith('.js')).text);
-const { OPTION_HELP, HELP_SHOT, hasOptionHelp } = await import(pathToFileURL(file).href);
+const { OPTION_HELP, HELP_SHOT } = await import(pathToFileURL(file).href);
 fs.rmSync(dir, { recursive: true, force: true });
 
 /** Размер WebP из заголовка файла (три вида: сжатие без потерь, с потерями и расширенный) */
@@ -88,9 +88,4 @@ test('рамки лежат внутри скриншота', () => {
       assert.ok(mark.x + mark.w <= 100 && mark.y + mark.h <= 100, `${id}/${title}: рамка выходит за правый или нижний край`);
     }
   }
-});
-
-test('новый вид особенностей включён только у СМОЛ', () => {
-  assert.equal(hasOptionHelp('smol'), true);
-  for (const id of ['bdi', 'itt', 'ito', '5pfq', 'scl90', 'sq']) assert.equal(hasOptionHelp(id), false, id);
 });
