@@ -147,8 +147,43 @@
   vertical-align: middle;
 }
 
+/* Списки в текстах заданий: маркер или номер слева, перенос строки идёт под текстом, а не под маркером */
+.ts-card__list--hang li {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ts-card__list--hang li::before {
+  flex-shrink: 0;
+  margin: 8px 0 0 2px;
+}
+
+/* Нумерованный список: номер вместо точки */
+.ts-card__list--num {
+  counter-reset: item;
+}
+
+.ts-card__list--num li {
+  counter-increment: item;
+}
+
+.ts-card__list--num li::before {
+  content: counter(item) '.';
+  flex-shrink: 0;
+  width: 1.25em;
+  height: auto;
+  margin: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--color-text-secondary);
+}
+
 /* Списки: от основного текста 4, между пунктами 4 */
 .ts-card__paragraph p + .ts-card__list {
+  margin-top: var(--space-1);
+}
+
+.ts-card__paragraph .ts-card__list + p {
   margin-top: var(--space-1);
 }
 
