@@ -142,6 +142,12 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
   /** К какой странице идём */
   const target = useRef(index);
   const stopSpring = useRef<(() => void) | null>(null);
+  /**
+   * Переход через несколько страниц (нажали на чипс или вкладку не по соседству): страница-цель на время ставится
+   * вплотную к текущей, и ряд проезжает ровно один шаг, как обычный свайп, а не пролистывает все промежуточные.
+   * a и b — настоящие номера страниц, dir — в какую сторону едем; position при этом идёт от a к b
+   */
+  const jump = useRef<{ a: number; b: number; dir: 1 | -1 } | null>(null);
   const live = useRef({ index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight });
   /** Собственная метка пейджера: по ней знаем, что его страницы между местами (setPaging) */
   const self = useRef({}).current;
@@ -285,7 +291,23 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
   const apply = useCallback(
     (value: number) => {
       position.current = value;
-      if (track.current) track.current.style.transform = `translate3d(${-value * 100}%, 0, 0)`;
+      const j = jump.current;
+      // Пока идёт переход, показываемое место — на шаг от a в сторону b, а для остального считаем, что страницы «между»
+      const progress = j ? (value - j.a) / (j.b - j.a) : 0;
+      const shown = j ? j.a + j.dir * progress : value;
+      if (track.current) track.current.style.transform = `translate3d(${-shown * 100}%, 0, 0)`;
+      if (j) {
+        const arrived = progress > 0.999;
+        const between = progress > 0.001 && !arrived;
+        if (live.current.autoHeight) {
+          if (!between) land(arrived ? j.b : j.a);
+          else if (!rest.current.moving) shiftPages();
+          applyHeight(between ? j.a + j.dir * 0.5 : arrived ? j.b : j.a);
+        }
+        setPaging(self, between);
+        live.current.onPosition?.(value);
+        return;
+      }
       const between = Math.abs(value - Math.round(value)) > 0.001;
       if (live.current.autoHeight) {
         if (!between) land(Math.min(live.current.count - 1, Math.max(0, Math.round(value))));
@@ -299,11 +321,48 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
     [applyHeight, land, shiftPages, self],
   );
 
+  /** Закончить переход через несколько страниц (или оборвать): страницы встают в обычный порядок на ближайшей из двух */
+  const endJump = useCallback(() => {
+    stopSpring.current?.();
+    stopSpring.current = null;
+    const j = jump.current;
+    if (!j) return;
+    const reached = (position.current - j.a) / (j.b - j.a) >= 0.5 ? j.b : j.a;
+    jump.current = null;
+    Array.from(track.current?.children ?? []).forEach((el) => {
+      (el as HTMLElement).style.order = '';
+    });
+    apply(reached);
+  }, [apply]);
+
+  /** Поставить страницу b рядом с a и проехать один шаг */
+  const startJump = useCallback(
+    (b: number) => {
+      const a = Math.round(position.current);
+      const dir = b > a ? 1 : -1;
+      Array.from(track.current?.children ?? []).forEach((el, i) => {
+        (el as HTMLElement).style.order = String(i === b ? 2 * a + dir : 2 * i);
+      });
+      jump.current = { a, b, dir };
+      stopSpring.current = runSpring({
+        from: 0,
+        to: 1,
+        velocity: 0,
+        onFrame: (p) => apply(a + (b - a) * p),
+        onDone: () => {
+          stopSpring.current = null;
+          apply(b);
+          endJump();
+        },
+      });
+    },
+    [apply, endJump],
+  );
+
   /** Довести страницы до цели пружиной; velocity — страниц в секунду, чтобы продолжить взмах */
   const settle = useCallback(
     (to: number, velocity = 0) => {
-      stopSpring.current?.();
-      stopSpring.current = null;
+      endJump();
       if (reducedMotion() || (Math.abs(position.current - to) < 0.0005 && Math.abs(velocity) < 0.01)) {
         apply(to);
         return;
@@ -318,7 +377,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
         },
       });
     },
-    [apply],
+    [apply, endJump],
   );
 
   // Страница нарисовалась или сменилась: высота окна по ней. Раньше эффекта, который ставит страницы на место
@@ -365,8 +424,11 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
   useEffect(() => {
     if (target.current === index) return;
     target.current = index;
-    settle(index);
-  }, [index, settle]);
+    endJump();
+    const from = Math.round(position.current);
+    if (!reducedMotion() && Math.abs(position.current - from) < 0.001 && Math.abs(index - from) > 1) startJump(index);
+    else settle(index);
+  }, [index, settle, startJump, endJump]);
 
   // Неактивные страницы не получают нажатий и фокуса; сняв фокус с поля ввода, это же прячет клавиатуру телефона
   useLayoutEffect(() => {
@@ -504,8 +566,8 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
           return;
         } else {
           g.mode = 'drag';
-          stopSpring.current?.(); // схватили страницы на ходу: дальше ведёт палец
-          stopSpring.current = null;
+          endJump(); // схватили страницы на ходу: дальше ведёт палец
+
           g.base = position.current;
           // Страница, к которой тянут, должна быть готова, а не появляться пустой
           ensureLoaded(dx < 0 ? Math.floor(g.base) + 1 : Math.ceil(g.base) - 1);
@@ -606,7 +668,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
       }
       stopFling?.();
     };
-  }, [apply, settle, ensureLoaded, measure]);
+  }, [apply, settle, ensureLoaded, measure, endJump]);
 
   const row = (
     <div ref={track} className="swipe-pager__track">
