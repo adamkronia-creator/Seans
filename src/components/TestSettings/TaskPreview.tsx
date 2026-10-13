@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
 import { emptyValues, progressOf, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
-import { ClientIntro, IconEye, TaskDone, taskFacts } from './ClientParts';
+import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
+import { CollapseCard } from './TestBlank';
 import { FillMeter, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { TestHeader } from './TestHeader';
@@ -27,15 +28,14 @@ interface TaskPreviewProps {
   deadline: string;
   /** Правило постоянного задания, если оно включено в «Правилах назначения» */
   permanent?: PermanentRule;
-  /** Свайп вправо на первом экране и стрелка «назад» */
-  onExit: () => void;
 }
 
 /**
- * Предпросмотр задания в рамке телефона: начало (сообщение, инструкция, объём, время, срок), бланк и завершение.
+ * Блок «Предпросмотр» внизу настроек задания (как у теста): то, что увидит клиент, в рамке телефона, и меняется вместе с настройками выше.
+ * Внутри: начало (сообщение, инструкция, объём, время, срок), бланк и завершение.
  * Внутри рамки тот же интерфейс, что у клиента и при прохождении самому. Написанное здесь никуда не сохраняется.
  */
-export function TaskPreview({ task, data, form, options, message, deadline, permanent, onExit }: TaskPreviewProps) {
+export function TaskPreview({ task, data, form, options, message, deadline, permanent }: TaskPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
@@ -52,13 +52,13 @@ export function TaskPreview({ task, data, form, options, message, deadline, perm
     screenRef.current?.scrollTo({ top: 0 });
   }, [stage, part]);
 
-  // Свайпы переключают этапы целиком, как вкладки «Начало / В процессе / Конец»; с первого этапа вправо — к настройкам.
+  // Свайпы переключают этапы целиком, как вкладки «Начало / В процессе / Конец»; на первом этапе вправо — ничего.
   // На полях ввода и ползунках свайп не работает
   const touch = useRef<{ x: number; y: number } | null>(null);
   const step = (dir: 1 | -1) => {
     const order: Stage[] = ['start', 'progress', 'end'];
     const next = order.indexOf(stage) + dir;
-    if (next < 0) return onExit();
+    if (next < 0) return;
     if (next < order.length) setStage(order[next]);
   };
   const onTouchStart = (e: TouchEvent) => {
@@ -76,7 +76,8 @@ export function TaskPreview({ task, data, form, options, message, deadline, perm
   };
 
   return (
-    <div className="test-settings__scroll tp" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <CollapseCard title="Предпросмотр" id="preview">
+    <div className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div className="tp__tabs" role="group" aria-label="Этап выполнения">
         {STAGES.map(({ id, label }) => (
           <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => setStage(id)}>
@@ -85,16 +86,11 @@ export function TaskPreview({ task, data, form, options, message, deadline, perm
         ))}
       </div>
 
-      <p className="tp__badge">
-        <IconEye />
-        <span>Ответы в предпросмотре не сохраняются</span>
-      </p>
-
-      <div className="tp__phone">
+      <div className="tp__phone" data-hscroll>
         <div className="tp__status" aria-hidden="true">
           <span className="tp__notch" />
         </div>
-        <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" onBack={onExit} />
+        <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" />
         <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
           {stage === 'start' && <ClientIntro message={message} rules={data.blank.rules(form)} facts={taskFacts(data, form, deadline, permanent)} />}
           {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} onEntryStep={(sectionId, index) => setPartId(`each:${sectionId}:${index}`)} />}
@@ -135,5 +131,6 @@ export function TaskPreview({ task, data, form, options, message, deadline, perm
         )}
       </div>
     </div>
+    </CollapseCard>
   );
 }

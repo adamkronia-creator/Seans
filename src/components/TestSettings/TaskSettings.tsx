@@ -6,7 +6,7 @@ import { Toast } from '../Toast/Toast';
 import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
 import { CollapseCard } from './TestBlank';
 import { FormMenu } from './FormMenu';
-import { MessageField, Row, TopicTags } from './TestSettings';
+import { MessageField, Row } from './TestSettings';
 import { TestHeader } from './TestHeader';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
@@ -40,15 +40,14 @@ import './TaskSettings.css';
 /** Высота свернутого описания: 6 строк по 22 и промежуток между абзацами 12, как у тестов */
 const DESC_COLLAPSED = 6 * 22 + 12;
 
-/** Что показано под шапкой: настройки, бланк, пример выполнения, выполнение самому или предпросмотр */
-type View = 'settings' | 'blank' | 'example' | 'pass' | 'preview';
+/** Что показано под шапкой: настройки, бланк, пример выполнения или выполнение самому */
+type View = 'settings' | 'blank' | 'example' | 'pass';
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка задания',
   blank: 'Бланк задания',
   example: 'Пример выполнения',
   pass: 'Выполнение задания',
-  preview: 'Предпросмотр задания',
 };
 
 /** Бланк задания, как его увидит клиент: можно печатать, но написанное нигде не сохраняется */
@@ -267,8 +266,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             }, 'forward');
           }}
         />
-      ) : view === 'preview' ? (
-        <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} permanent={rule} onExit={() => openView('settings')} />
       ) : view === 'blank' ? (
         <ScrollHost className="test-settings__scroll" key="blank">
           <BlankView task={task} form={form} options={options} />
@@ -302,41 +299,15 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               {link('Пример выполнения', 'example')}
             </ul>
 
-            <CollapseCard title="Информация о задании">
+            <CollapseCard title="Общая информация">
               <ul className="ts-rows">
-                {/* У заданий с записями объём задан выбором формы («Количество записей»): он стоит на месте объёма */}
-                {data.formCount && data.forms ? (
-                  <Row label={formLabel} info>
-                    <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />
-                  </Row>
-                ) : (
-                  <Row label={data.volume.label} value={data.volume.value} />
-                )}
                 <Row label="Время выполнения" value={data.duration} />
-                <Row label="Время обсуждения" value={data.discussion} />
                 <Row label="Возраст" value={data.age} />
-                {data.forms && !data.formCount && (
-                  <Row label={formLabel} info value={data.forms.length === 1 ? data.forms[0] : undefined}>
-                    {data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
-                  </Row>
-                )}
               </ul>
             </CollapseCard>
 
             <CollapseCard title="Интерпретация задания">
               <ul className="ts-rows">
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Направления:</p>
-                    <ul className="task-approaches">
-                      {data.approaches.map((approach) => (
-                        <li key={approach} className="task-approaches__tag">
-                          {approach}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
                 <li className="ts-row ts-row--top">
                   <div className="ts-scale">
                     <p className="ts-scale__title">Цель задания:</p>
@@ -358,18 +329,25 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
 
             <CollapseCard title="Особенности задания">
               <ul className="ts-rows">
-                <Row label="Разрешить комментарий клиента" hint="Клиент сможет дописать свои мысли после выполнения">
+                {/* Выбор формы бланка (у заданий с записями — «Количество записей») */}
+                {data.formCount && data.forms ? (
+                  <Row label={formLabel} info>
+                    <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />
+                  </Row>
+                ) : (
+                  data.forms && (
+                    <Row label={formLabel} info value={data.forms.length === 1 ? data.forms[0] : undefined}>
+                      {data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
+                    </Row>
+                  )
+                )}
+                <Row label="Разрешить комментарий клиента">
                   <Switch checked={comment} onChange={setComment} label="Разрешить комментарий клиента" />
                 </Row>
-                <Row label="Оценить психоэмоциональное состояние" hint="Клиент отметит самочувствие по шкале, чтобы вы видели динамику">
+                <Row label="Оценить психоэмоциональное состояние">
                   <Switch checked={state} onChange={setState} label="Оценить психоэмоциональное состояние" />
                 </Row>
-              </ul>
-            </CollapseCard>
-
-            <CollapseCard title="Правила назначения">
-              <ul className="ts-rows">
-                <Row label="Назначить постоянным" hint="Задание можно выполнять не один раз, а когда нужно, например записывать сны. Каждый раз — новая запись">
+                <Row label="Назначить постоянным">
                   <Switch checked={permanent} onChange={setPermanent} label="Назначить постоянным" />
                 </Row>
                 <li className={`ts-fold${permanent ? ' ts-fold--open' : ''}`} aria-hidden={!permanent}>
@@ -399,6 +377,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               </ul>
             </CollapseCard>
 
+
             <section className="ts-card ts-message-card">
               <ul className="ts-rows">
                 <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с заданием">
@@ -422,9 +401,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               </div>
             </section>
 
-            <TopicTags id={task.id} />
-
-            <ul className="ts-card">{link('Предпросмотр', 'preview')}</ul>
+            <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} permanent={rule} />
           </div>
 
           <div className="test-settings__cta">

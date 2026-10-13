@@ -1,4 +1,4 @@
-/* Предпросмотр теста и задания: этапы, плашка над рамкой и рамка телефона с экраном клиента.
+/* Предпросмотр теста и задания: этапы и рамка телефона с экраном клиента.
    Внутри рамки тот же интерфейс, что при прохождении самому: шапка, карточки на сером, полоса со счётчиком и кнопками */
 .tp {
   display: flex;
@@ -43,25 +43,6 @@
   background: var(--color-bg-panel);
   color: var(--color-text-primary);
   box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
-}
-
-/* Слепое тестирование включено или выключено: одна строка с глазом, цветом отличается включенное */
-.tp__badge {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--space-2);
-  align-items: center;
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-fill);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
-.tp__badge svg {
-  flex-shrink: 0;
 }
 
 /* Корпус телефона: темная рамка; высота — всё свободное место экрана (не ниже 480), экран внутри прокручивается, кнопки внизу всегда на виду */
