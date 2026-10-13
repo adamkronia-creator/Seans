@@ -31,7 +31,7 @@ function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormS
           <section className="sheet__card form-menu__card">
             <ul className="ts-rows" role="radiogroup" aria-label={title}>
               {forms.map((f) => (
-                <li key={f} className={`ts-row result-choice__row${value === f ? ' result-choice__row--on' : ''}`}>
+                <li key={f} className="ts-row result-choice__row">
                   <label className="result-choice__label">
                     <input type="radio" className="blank-answer__input" name="form-menu" checked={value === f} onChange={() => onPick(f)} />
                     <span className="blank-answer__radio" aria-hidden="true" />

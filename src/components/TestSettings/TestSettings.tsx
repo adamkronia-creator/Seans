@@ -394,18 +394,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 <IconTestChevron className="ts-row__chevron" />
               </li>
             )}
-            {blank && (
-              <li
-                className="ts-row ts-row--link"
-                role="button"
-                tabIndex={0}
-                onClick={() => openView('preview')}
-                onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
-              >
-                <span className="ts-row__link">Предпросмотр</span>
-                <IconTestChevron className="ts-row__chevron" />
-              </li>
-            )}
           </ul>
         )}
 
@@ -536,6 +524,21 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         </section>
 
         <TopicTags id={test.id} />
+
+        {blank && (
+          <ul className="ts-card">
+            <li
+              className="ts-row ts-row--link"
+              role="button"
+              tabIndex={0}
+              onClick={() => openView('preview')}
+              onKeyDown={(e) => e.key === 'Enter' && openView('preview')}
+            >
+              <span className="ts-row__link">Предпросмотр</span>
+              <IconTestChevron className="ts-row__chevron" />
+            </li>
+          </ul>
+        )}
       </div>
 
       <div className="test-settings__cta">

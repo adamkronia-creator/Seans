@@ -5,7 +5,7 @@
   min-height: 0;
 }
 
-/* Шапка как у чата, без вкладок: строка 56, кнопки 40, значок теста 36, снизу разделитель */
+/* Шапка как у чата, без вкладок: строка 56, кнопки 40, аватарка теста 36 (круг, как у чата), снизу разделитель */
 .test-settings__header {
   display: flex;
   flex-shrink: 0;
@@ -31,7 +31,7 @@
   opacity: 0.45;
 }
 
-/* Значок 36, gap 12, имя и раздел */
+/* Аватарка 36, gap 12, имя и раздел */
 .test-settings__peer {
   display: flex;
   flex: 1;
@@ -40,10 +40,32 @@
   min-width: 0;
 }
 
-.test-settings__icon {
+/* Круг цвета теста (75%), как аватар в списке; значок внутри 24 */
+.test-settings__avatar {
+  position: relative;
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   width: 36px;
   height: 36px;
+  border-radius: var(--radius-full);
+  isolation: isolate;
+}
+
+.test-settings__avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint);
+  opacity: 0.75;
+}
+
+.test-settings__icon {
+  width: 24px;
+  height: 24px;
 }
 
 .test-settings__who {

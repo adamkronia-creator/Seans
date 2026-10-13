@@ -1,8 +1,8 @@
 /** Что клиент увидит на экране сразу после прохождения теста */
 export type ResultMode = 'thanks' | 'score' | 'full';
 
-export const RESULT_MODES: { id: ResultMode; title: string; hint: string; badge?: string; value: string }[] = [
-  { id: 'thanks', title: 'Только благодарность', badge: 'По умолчанию', hint: 'Результат обсудите вместе на встрече', value: 'Только благодарность' },
+export const RESULT_MODES: { id: ResultMode; title: string; hint: string; value: string }[] = [
+  { id: 'thanks', title: 'Только благодарность', hint: 'Результат обсудите вместе на встрече', value: 'Только благодарность' },
   { id: 'score', title: 'Только баллы', hint: 'Баллы по шкалам без расшифровки', value: 'Только баллы' },
   { id: 'full', title: 'Полное заключение', hint: 'Баллы, уровни и расшифровка по каждой шкале', value: 'Полное заключение' },
 ];

@@ -9,8 +9,8 @@ export function ResultChoice({ value, onChange, compact = false }: { value: Resu
     <CollapseCard title="Итог для клиента" id="result-choice" help={compact ? <OptionHelp id="result" /> : undefined}>
       {!compact && <p className="result-choice__sub">Что клиент увидит сразу после прохождения</p>}
       <ul className="ts-rows" role="radiogroup" aria-label="Итог для клиента">
-        {RESULT_MODES.map(({ id, title, hint, badge }) => (
-          <li key={id} className={`ts-row result-choice__row${value === id ? ' result-choice__row--on' : ''}`}>
+        {RESULT_MODES.map(({ id, title, hint }) => (
+          <li key={id} className="ts-row result-choice__row">
             <label className="result-choice__label">
               <input
                 type="radio"
@@ -21,10 +21,7 @@ export function ResultChoice({ value, onChange, compact = false }: { value: Resu
               />
               <span className="blank-answer__radio" aria-hidden="true" />
               <span className="ts-row__text">
-                <span className="ts-row__label">
-                  {title}
-                  {badge && <span className="result-choice__badge">{badge}</span>}
-                </span>
+                <span className="ts-row__label">{title}</span>
                 {!compact && <span className="ts-row__hint">{hint}</span>}
               </span>
             </label>

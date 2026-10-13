@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
 import { BLIND_TITLE } from '../../data/resultMode';
@@ -20,7 +21,7 @@ interface TestHeaderProps {
   client?: { blind?: boolean };
 }
 
-/** Шапка экранов теста: назад, иконка, название, раздел и сердечко «в избранное» */
+/** Шапка экранов теста — как шапка открытого чата: назад, аватарка теста, название, раздел и сердечко «в избранное» на месте поиска и настроек */
 export function TestHeader({ test, kind = 'test', status, onBack, client }: TestHeaderProps) {
   const testFavorites = useFavorites();
   const taskFavorites = useTaskFavorites();
@@ -33,7 +34,11 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
         <IconBack />
       </button>
       <div className="test-settings__peer">
-        {!hidden && <img className="test-settings__icon" src={test.icon} alt="" />}
+        {!hidden && (
+          <span className="test-settings__avatar" style={{ '--tint': test.tint } as CSSProperties}>
+            <img className="test-settings__icon" src={test.icon} alt="" />
+          </span>
+        )}
         <div className="test-settings__who">
           <h1 className="test-settings__name">{hidden ? BLIND_TITLE : shortTitle(test.title)}</h1>
           <p className="test-settings__status">{status}</p>

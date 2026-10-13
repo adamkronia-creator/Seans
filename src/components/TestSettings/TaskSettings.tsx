@@ -300,7 +300,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             <ul className="ts-card">
               {link('Бланк задания', 'blank')}
               {link('Пример выполнения', 'example')}
-              {link('Предпросмотр', 'preview')}
             </ul>
 
             <CollapseCard title="Информация о задании">
@@ -424,6 +423,8 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             </section>
 
             <TopicTags id={task.id} />
+
+            <ul className="ts-card">{link('Предпросмотр', 'preview')}</ul>
           </div>
 
           <div className="test-settings__cta">
