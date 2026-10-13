@@ -205,6 +205,8 @@ export interface PassRequest {
   form: string;
   saveBlank: boolean;
   blind: boolean;
+  /** Название слепого теста: то же, что в карточке в чате */
+  blindTitle?: string;
   result: 'thanks' | 'score' | 'full';
   message: string;
 }

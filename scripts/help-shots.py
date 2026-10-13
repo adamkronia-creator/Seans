@@ -187,7 +187,7 @@ def main():
                 phone.close()
 
         if want('result'):
-            # Итог для клиента: блок «Предпросмотр», этап «Конец» (кадр с y = 268; рамок нет)
+            # Итог для клиента: блок «Предпросмотр», этап «Конец» (кадр с y = 220; рамок нет)
             for name, mode in (('result-thanks', 'Только благодарность'), ('result-score', 'Только баллы'), ('result-full', 'Полное заключение')):
                 phone = Phone(p, args.base)
                 phone.open_smol()
@@ -199,7 +199,7 @@ def main():
                 phone.page.get_by_role('button', name='Конец').click()
                 phone.wait(900)
                 phone.page.evaluate("document.querySelector('#preview').scrollIntoView({block: 'start'})")
-                shots.take(phone, name, 268)
+                shots.take(phone, name, 220)
                 phone.close()
 
     print('Рамки для optionHelp.ts (mark):')

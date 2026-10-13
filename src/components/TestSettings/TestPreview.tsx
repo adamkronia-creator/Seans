@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTest } from '../../data/library';
-import type { ResultMode } from '../../data/resultMode';
+import { blindTitle, type ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
-import { ClientIntro, IconEye, IconEyeOff, testFacts } from './ClientParts';
+import { ClientIntro, testFacts } from './ClientParts';
 import { CollapseCard } from './TestBlank';
 import { FillMeter } from './PassParts';
 import { TestDone } from './TestDone';
@@ -23,8 +23,6 @@ interface TestPreviewProps {
   blank: TestBlankData;
   /** Слепое тестирование: клиент не видит название теста и его цель */
   blind: boolean;
-  /** Сообщение клиенту; пустая строка, если оно выключено */
-  message: string;
   /** Что клиент увидит после теста */
   result: ResultMode;
   /** Время выполнения из описания теста («15–20 мин.») */
@@ -37,7 +35,9 @@ interface TestPreviewProps {
  * вопрос с ответами и завершение. Внутри рамки тот же интерфейс, что у клиента и при прохождении самому.
  * Ответы здесь никуда не сохраняются. При слепом тестировании название и значок теста скрыты.
  */
-export function TestPreview({ test, blank, blind, message, result, duration }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, result, duration }: TestPreviewProps) {
+  // Номер слепого теста в предпросмотре: время открытия настроек; у настоящего теста он ставится при отправке
+  const [title] = useState(() => blindTitle());
   const [stage, setStage] = useState<Stage>('start');
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<'next' | 'prev'>('next');
@@ -107,18 +107,13 @@ export function TestPreview({ test, blank, blind, message, result, duration }: T
           ))}
         </div>
 
-        <p className={`tp__badge${blind ? ' tp__badge--blind' : ''}`}>
-          {blind ? <IconEyeOff /> : <IconEye />}
-          <span>{blind ? 'Слепое тестирование: название скрыто' : 'Клиент увидит название теста'}</span>
-        </p>
-
         <div className="tp__phone" data-hscroll>
           <div className="tp__status" aria-hidden="true">
             <span className="tp__notch" />
           </div>
-          <TestHeader test={test} client={{ blind }} status="Тест от вашего специалиста" />
+          <TestHeader test={test} client={{ blind, title }} status="Тест от вашего специалиста" />
           <div className="test-settings__scroll tp__screen" key={stage} ref={screenRef}>
-            {stage === 'start' && <ClientIntro message={message} rules={blank.rules} facts={testFacts(total, duration, result)} />}
+            {stage === 'start' && <ClientIntro message="" rules={blank.rules} facts={testFacts(total, duration, result)} />}
             {stage === 'progress' && (
               <PassQuestion
                 data={blank}

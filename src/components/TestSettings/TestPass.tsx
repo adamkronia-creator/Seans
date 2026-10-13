@@ -159,7 +159,7 @@ export function TestPass({ testId, blank, form, saveBlank, onDone, client }: Tes
           <TestDone testId={testId} result={client.result} />
         ) : step < 0 ? (
           client ? (
-            <ClientIntro message={client.message} rules={blank.rules} facts={testFacts(total, client.duration, client.result)} />
+            <ClientIntro message="" rules={blank.rules} facts={testFacts(total, client.duration, client.result)} />
           ) : (
             <CollapseCard title="Инструкция" id="blank-rules">
               <BlankRules rules={blank.rules} />

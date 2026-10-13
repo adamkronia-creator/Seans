@@ -60,11 +60,6 @@
   line-height: var(--line-height-sm);
 }
 
-.tp__badge--blind {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-
 .tp__badge svg {
   flex-shrink: 0;
 }

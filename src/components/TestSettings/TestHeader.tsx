@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
-import { BLIND_TITLE } from '../../data/resultMode';
+import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
 import './TestSettings.css';
 
 /** Название без аббревиатуры (на случай, если она осталась в заголовке): «BDI: Шкала депрессии А. Бека» → «Шкала депрессии А. Бека» */
@@ -19,7 +19,7 @@ interface TestHeaderProps {
    * Шапка клиента (тест или задание, присланное специалистом, и предпросмотр): те же значок, название и раздел,
    * но без «избранного» — это библиотека специалиста. Слепой тест клиенту не называют: значка нет, название нейтральное.
    */
-  client?: { blind?: boolean };
+  client?: { blind?: boolean; /** Название слепого теста («Тест №131020261007») */ title?: string };
 }
 
 /** Шапка экранов теста — как шапка открытого чата: назад, аватарка теста, название, раздел и сердечко «в избранное» на месте поиска и настроек */
@@ -41,7 +41,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
           </span>
         )}
         <div className="test-settings__who">
-          <h1 className="test-settings__name">{hidden ? BLIND_TITLE : shortTitle(test.title)}</h1>
+          <h1 className="test-settings__name">{hidden ? (client?.title ?? BLIND_FALLBACK_TITLE) : shortTitle(test.title)}</h1>
           <p className="test-settings__status">{status}</p>
         </div>
       </div>

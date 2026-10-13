@@ -1,7 +1,7 @@
 import { requestPass } from '../../data/selfTest';
 import { requestTaskPass, useAssignmentRecords } from '../../data/selfTask';
 import { recordsText, TASK_DEADLINES } from '../../data/taskValues';
-import { BLIND_TITLE } from '../../data/resultMode';
+import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
 import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
@@ -239,7 +239,7 @@ export function MessageBubble({
                     ? 'Пройденный тест'
                     : 'Присланный тест'}
               </span>
-              <span className="tcard__title">{hiddenTest ? BLIND_TITLE : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
+              <span className="tcard__title">{hiddenTest ? (message.testOptions?.blindTitle ?? BLIND_FALLBACK_TITLE) : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
               {!passed && permanent && (
                 <span className="tcard__note">
@@ -287,7 +287,7 @@ export function MessageBubble({
                 }
                 if (message.toSelf) {
                   const o = message.testOptions;
-                  requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, blind: o?.blind ?? true, result: o?.result ?? 'thanks', message: message.text });
+                  requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, blind: o?.blind ?? true, blindTitle: o?.blindTitle, result: o?.result ?? 'thanks', message: message.text });
                 }
                 onOpenTest(message.test!);
               }}

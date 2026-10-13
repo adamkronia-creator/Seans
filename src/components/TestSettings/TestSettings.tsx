@@ -25,6 +25,7 @@ import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
+import { blindTitle } from '../../data/resultMode';
 import { canPassSelf, formHint, takePass } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
@@ -203,7 +204,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         test: test.id,
         testKind: 'sent',
         ...(id === SELF_ID ? { toSelf: true } : {}),
-        testOptions: { blind, result, saveBlank, ...(data.forms ? { form } : {}) },
+        testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, ...(data.forms ? { form } : {}) },
       });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
       if (id === 'maxim') logStep('test', test.id, 'sent');
@@ -310,7 +311,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
     <section className="test-settings">
       <TestHeader
         test={test}
-        client={live ? { blind: passRequest?.blind } : undefined}
+        client={live ? { blind: passRequest?.blind, title: passRequest?.blindTitle } : undefined}
         status={live ? 'Тест от вашего специалиста' : STATUS[view]}
         onBack={view === 'settings' ? onBack : stepBack}
       />
@@ -520,7 +521,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
           </div>
         </section>
 
-        {blank && <TestPreview test={test} blank={blank} blind={blind} message={messageOn ? message : ''} result={result} duration={data.duration} />}
+        {blank && <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} />}
       </div>
 
       <div className="test-settings__cta">
