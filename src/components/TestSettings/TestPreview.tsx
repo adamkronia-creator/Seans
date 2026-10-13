@@ -3,7 +3,6 @@ import type { LibraryTest } from '../../data/library';
 import { blindTitle, type ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
 import { ClientIntro, testFacts } from './ClientParts';
-import { CollapseCard } from './TestBlank';
 import { FillMeter } from './PassParts';
 import { TestDone } from './TestDone';
 import { TestHeader } from './TestHeader';
@@ -97,8 +96,7 @@ export function TestPreview({ test, blank, blind, result, duration }: TestPrevie
 
   return (
     <>
-      <CollapseCard title="Предпросмотр" id="preview">
-      <div className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            <div id="preview" className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="tp__tabs" role="group" aria-label="Этап прохождения">
           {STAGES.map(({ id, label }) => (
             <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
@@ -159,8 +157,7 @@ export function TestPreview({ test, blank, blind, result, duration }: TestPrevie
           )}
         </div>
       </div>
-      </CollapseCard>
-
+      
       {jumpOpen && (
         <JumpSheet
           total={total}

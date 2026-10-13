@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
 import { emptyValues, progressOf, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
-import { CollapseCard } from './TestBlank';
 import { FillMeter, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { TestHeader } from './TestHeader';
@@ -74,8 +73,7 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
   };
 
   return (
-    <CollapseCard title="Предпросмотр" id="preview">
-    <div className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div id="preview" className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div className="tp__tabs" role="group" aria-label="Этап выполнения">
         {STAGES.map(({ id, label }) => (
           <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => setStage(id)}>
@@ -129,6 +127,5 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
         )}
       </div>
     </div>
-    </CollapseCard>
-  );
+      );
 }
