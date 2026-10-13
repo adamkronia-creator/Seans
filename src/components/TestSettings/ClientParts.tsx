@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { TASK_DEADLINES, volumeText, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
+import { TASK_DEADLINES, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './ClientParts.css';
 
@@ -94,17 +94,16 @@ export function testFacts(total: number, duration: string | undefined): ClientFa
   ];
 }
 
-/** То же для задания: объём и время, срок (у постоянного — что оно постоянное), что поля можно пропустить, кто увидит ответы */
-export function taskFacts(data: TaskSettingsData, form: string, deadline: string, permanent?: PermanentRule): ClientFact[] {
+/** То же для задания: время, срок (у постоянного — что оно постоянное), кто видит ответы */
+export function taskFacts(data: TaskSettingsData, deadline: string, permanent?: PermanentRule): ClientFact[] {
   return [
-    { icon: <IconClock />, text: `${volumeText(data, form)} · ${data.duration}` },
+    { icon: <IconClock />, text: data.duration },
     ...(permanent
       ? [{ icon: <IconRepeat />, text: permanent.limit ? `Постоянное задание: всего записей — ${permanent.limit}` : 'Постоянное задание: можно выполнять снова' }]
       : deadline !== TASK_DEADLINES[0]
         ? [{ icon: <IconCalendar />, text: `Срок выполнения: ${deadline.toLowerCase()}` }]
         : []),
-    { icon: <IconUndo />, text: 'Любое поле можно пропустить' },
-    { icon: <IconLock />, text: 'Ответы увидит только специалист' },
+    { icon: <IconLock />, text: 'Ответы видит только специалист' },
   ];
 }
 

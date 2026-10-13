@@ -35,6 +35,16 @@ export function useMessages(chatId: string): MessageGroup[] {
   return useSyncExternalStore(subscribe, () => messages[chatId] ?? NO_MESSAGES);
 }
 
+/** Сколько всего непрочитанных сообщений: число на значке вкладки «Диалоги» */
+export function useUnreadTotal(): number {
+  return useSyncExternalStore(subscribe, () => unreadTotal(chats));
+}
+let unreadMemo: { chats: Chat[]; total: number } | null = null;
+function unreadTotal(list: Chat[]) {
+  if (unreadMemo?.chats !== list) unreadMemo = { chats: list, total: list.reduce((sum, c) => sum + c.unread, 0) };
+  return unreadMemo.total;
+}
+
 /** Собеседник «печатает» */
 export function useTyping(chatId: string): boolean {
   return useSyncExternalStore(subscribe, () => !!typing[chatId]);
@@ -102,6 +112,10 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
 
   const id = String(nextId++);
   appendToday(chatId, { id, from: 'me', text, time: clock(), status: 'sending', ...(replyTo ? { replyTo } : {}), ...test });
+  // Тест или задание, отправленные себе («Избранное»), приходят как входящие: в чате счётчик, на вкладке «Диалоги» значок
+  if (test?.toSelf && (test.test || test.task) && chats.find((c) => c.id === chatId)?.favorites) {
+    chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
+  }
   setPreview(chatId);
   emit();
 

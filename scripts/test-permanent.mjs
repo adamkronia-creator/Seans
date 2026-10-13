@@ -62,7 +62,8 @@ test('номер результата записи: «<чат>-<задание>-
 
 test('у Максима дневник СМЭР постоянный: в «Постоянных» с числом записей, записи — среди завершённых', () => {
   const permanent = tasksBy('permanent');
-  assert.deepEqual(permanent.map((t) => [t.id, t.description]), [['smer', 'Записей: 2 из 10']]);
+  // «Назначенное» задание (Поиск доказательств) стоит там же: назначенное и постоянное — одно и то же
+  assert.deepEqual(permanent.map((t) => [t.id, t.description]), [['evidence', 'Для мыслей автоматического характера'], ['smer', 'Записей: 2 из 10']]);
   const done = tasksBy('done');
   // Новые сверху: запись 2, запись 1, затем прежние задания
   assert.deepEqual(done.slice(0, 2).map((t) => [t.id, t.description]), [['smer-r2', 'Запись 2'], ['smer-r1', 'Запись 1']]);
@@ -74,15 +75,15 @@ test('у Максима дневник СМЭР постоянный: в «По�
     assert.equal(result.taskId, 'smer');
     assert.equal(result.record, Number(t.id.slice(-1)));
   }
-  // Остальные разделы на месте: назначено и отправлено
-  assert.deepEqual(tasksBy('assigned').map((t) => t.id), ['evidence']);
+  // Раздела «Назначенные» нет, остался «Отправленные»
+  assert.deepEqual(tasksBy('assigned').map((t) => t.id), []);
   assert.deepEqual(tasksBy('sent').map((t) => t.id), ['pie']);
 });
 
 test('новая отправка постоянного задания: «Записей: 0 из N», прежнее выполнение уходит из завершённых', () => {
   assert.ok(tasksBy('done').some((t) => t.id === 'secret'), 'до отправки «Если никто не узнает» завершено');
   logStep('task', 'secret', 'sent', { permanent: { limit: 2 } });
-  assert.deepEqual(tasksBy('permanent').map((t) => [t.id, t.description]), [['secret', 'Записей: 0 из 2'], ['smer', 'Записей: 2 из 10']]);
+  assert.deepEqual(tasksBy('permanent').filter((t) => t.id !== 'evidence').map((t) => [t.id, t.description]), [['secret', 'Записей: 0 из 2'], ['smer', 'Записей: 2 из 10']]);
   assert.ok(!tasksBy('done').some((t) => t.id === 'secret'), 'теперь оно постоянное, а не завершённое');
 });
 

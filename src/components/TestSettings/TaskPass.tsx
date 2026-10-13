@@ -91,7 +91,7 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
           <TaskDone record={record} limit={client?.permanent?.limit} />
         ) : step === 'rules' ? (
           client ? (
-            <ClientIntro message={client.message} rules={rules} facts={taskFacts(data, form, client.deadline, client.permanent)} />
+            <ClientIntro message={client.message} rules={rules} facts={taskFacts(data, client.deadline, client.permanent)} />
           ) : (
             <CollapseCard title="Инструкция" id="blank-rules">
               <BlankRules rules={rules} />

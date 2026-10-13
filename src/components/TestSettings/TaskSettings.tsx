@@ -107,8 +107,8 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const [form, setForm] = useState(passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? ''));
   const [comment, setComment] = useState(passRequest?.comment ?? true);
   const [state, setState] = useState(passRequest?.state ?? true);
-  const [remind, setRemind] = useState(true);
-  const [deadline, setDeadline] = useState(passRequest?.deadline ?? TASK_DEADLINES[0]);
+  // Срока выполнения и напоминания в настройках нет: задание уходит без срока
+  const deadline = passRequest?.deadline ?? TASK_DEADLINES[0];
   // Правила назначения: постоянное задание и сколько записей всего (0 — без ограничения)
   const [permanent, setPermanent] = useState(false);
   const [limit, setLimit] = useState(0);
@@ -176,7 +176,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
           comment,
           state,
           deadline: rule ? TASK_DEADLINES[0] : deadline,
-          remind: rule ? false : remind,
+          remind: false,
           note,
           ...(rule ? { permanent: rule } : {}),
         },
@@ -341,11 +341,11 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
                     </Row>
                   )
                 )}
-                <Row label="Разрешить комментарий клиента">
-                  <Switch checked={comment} onChange={setComment} label="Разрешить комментарий клиента" />
+                <Row label="Комментарий клиента">
+                  <Switch checked={comment} onChange={setComment} label="Комментарий клиента" />
                 </Row>
-                <Row label="Оценить психоэмоциональное состояние">
-                  <Switch checked={state} onChange={setState} label="Оценить психоэмоциональное состояние" />
+                <Row label="Оценить состояние">
+                  <Switch checked={state} onChange={setState} label="Оценить состояние" />
                 </Row>
                 <Row label="Назначить постоянным">
                   <Switch checked={permanent} onChange={setPermanent} label="Назначить постоянным" />
@@ -355,21 +355,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
                     <ul className="ts-rows">
                       <Row label="Всего записей" info>
                         {select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
-                      </Row>
-                    </ul>
-                  </div>
-                </li>
-                <li className={`ts-fold${permanent ? '' : ' ts-fold--open'}`} aria-hidden={permanent}>
-                  <div className="ts-fold__inner">
-                    <ul className="ts-rows">
-                      <Row label="Срок выполнения" info hint="Срок будет указан в сообщении с заданием">
-                        {select('Срок выполнения', deadline, TASK_DEADLINES, setDeadline)}
-                      </Row>
-                      <Row
-                        label="Напомнить, если не выполнено"
-                        hint={deadline === TASK_DEADLINES[0] ? 'Заработает, когда выберете срок выполнения' : 'Клиент получит напоминание, когда срок подойдет к концу'}
-                      >
-                        <Switch checked={remind} onChange={setRemind} label="Напомнить, если не выполнено" />
                       </Row>
                     </ul>
                   </div>
@@ -401,7 +386,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               </div>
             </section>
 
-            <TaskPreview task={task} data={data} form={form} options={options} message={note} deadline={deadline} permanent={rule} />
+            <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
           </div>
 
           <div className="test-settings__cta">

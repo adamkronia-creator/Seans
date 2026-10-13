@@ -11,7 +11,7 @@
 /* Список на белой панели во всю высоту: ниже последнего чата тот же фон, а не пустота */
 .messages__list {
   flex: 1;
-  padding: calc(var(--space-3) / 2) 0;
+  padding: var(--space-2) 0;
   overflow-y: auto;
   background: var(--color-bg-row);
 }

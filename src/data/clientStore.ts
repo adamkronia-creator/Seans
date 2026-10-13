@@ -497,7 +497,8 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
       });
       return;
     }
-    items.push({ item: { ...item, status: a.state, date: a.date.slice(0, 5) }, index: last });
+    // «Назначенное» и «постоянное» задание — одно и то же: оба стоят в разделе «Постоянные»
+    items.push({ item: { ...item, status: a.state === 'assigned' ? 'permanent' : a.state, date: a.date.slice(0, 5) }, index: last });
   });
   // Свежие действия выше
   return items.sort((x, y) => y.index - x.index).map((x) => x.item);

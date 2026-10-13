@@ -20,7 +20,6 @@ const TEST_SECTIONS: SectionConfig[] = [
 ];
 
 const TASK_SECTIONS: SectionConfig[] = [
-  { status: 'assigned', title: 'Назначенные', remind: true },
   { status: 'sent', title: 'Отправленные', remind: true },
   { status: 'permanent', title: 'Постоянные' },
   { status: 'done', title: 'Завершенные' },
