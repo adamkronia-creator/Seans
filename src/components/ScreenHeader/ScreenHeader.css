@@ -35,10 +35,10 @@
   font-size: var(--size-icon);
 }
 
-/* Чипсы прокручиваются по горизонтали и выходят за край экрана */
+/* Чипсы прокручиваются по горизонтали и выходят за край экрана. Расстояния между ними задают сами чипсы (Chip.css, split):
+   невыбранные стоят вплотную, возле выбранного зазор */
 .screen-header__chips {
   display: flex;
-  gap: var(--space-2);
   margin: 0 calc(var(--space-4) * -1);
   padding: 0 var(--space-4);
   overflow-x: auto;

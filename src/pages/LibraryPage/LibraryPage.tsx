@@ -6,7 +6,6 @@ import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
 import { FilterSheet } from '../../components/LibraryFilters/FilterSheet';
 import { ResultsBar, type FilterToken } from '../../components/LibraryFilters/ResultsBar';
-import { SortSheet, sortLabel } from '../../components/LibraryFilters/SortSheet';
 import { SuggestPanel, type QuickPick } from '../../components/LibraryFilters/SuggestPanel';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
@@ -21,6 +20,7 @@ import {
   hasMarks,
   listIds,
   markedScope,
+  NO_MARKS,
   quickPicks,
   relaxations,
   type Catalog,
@@ -30,7 +30,7 @@ import {
   type ScopeContext,
   type ViewQuery,
 } from '../../data/libraryQuery';
-import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, setSort, toggleMark, toggleOption, useLibraryView, type ViewState } from '../../data/libraryView';
+import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, toggleOption, useLibraryView } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
 import { followChips, type PositionVia } from '../../utils/followChips';
@@ -53,49 +53,58 @@ interface LibraryPageProps {
   labels: { all: string; filters: string; emptyRecent: string; noun: Noun; everywhere: string };
 }
 
-type Section = string; // 'all' | номер папки
+/** 'all', 'favorites', 'recent' или номер папки */
+type Section = string;
 
-/** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от включённых «Избранное» и «Недавние» и от того, весь ли это каталог */
-function emptyText(marks: Marks, wholeCatalog: boolean, recent: string): string {
-  if (marks.favorites && marks.recent) return wholeCatalog ? 'Среди недавних нет избранного.' : 'В этой папке среди недавних нет избранного.';
-  if (marks.favorites) return wholeCatalog ? 'В избранном пока ничего нет.' : 'В этой папке нет избранного.';
-  if (marks.recent) return wholeCatalog ? `${recent}.` : 'В этой папке нет недавних.';
-  return wholeCatalog ? 'Здесь пока ничего нет.' : 'В этой папке пока ничего нет. Чтобы добавить, удерживайте её название и выберите «Настроить папку».';
+const FAVORITES = 'favorites';
+const RECENT = 'recent';
+
+/** Порядок выдачи один: по порядку раздела, а при поиске по совпадению (переключателя порядка в интерфейсе нет) */
+const SORT: ViewQuery['sort'] = 'auto';
+
+/** «Избранное» и «Недавнее» — отборы поверх всего каталога: те же отметки, что работают в движке поиска, только теперь это страницы ряда */
+const ONLY_FAVORITES: Marks = { favorites: true, recent: false };
+const ONLY_RECENT: Marks = { favorites: false, recent: true };
+const marksOf = (id: Section): Marks => (id === FAVORITES ? ONLY_FAVORITES : id === RECENT ? ONLY_RECENT : NO_MARKS);
+
+/** Раздел охватывает весь каталог: «Все» и отборы «Избранное» и «Недавнее» (у папки только то, что в неё выбрано) */
+const wholeCatalog = (id: Section) => id === 'all' || id === FAVORITES || id === RECENT;
+
+/** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от раздела */
+function emptyText(marks: Marks, whole: boolean, recent: string): string {
+  if (marks.favorites) return 'В избранном пока ничего нет.';
+  if (marks.recent) return `${recent}.`;
+  return whole ? 'Здесь пока ничего нет.' : 'В этой папке пока ничего нет. Чтобы добавить, удерживайте её название и выберите «Настроить папку».';
 }
 
-/** Где искали, когда включены «Избранное» и «Недавние»: «Среди избранного по запросу «…» ничего нет» */
-const whereText = (m: Marks) => (m.favorites && m.recent ? 'Среди недавних избранных' : m.favorites ? 'Среди избранного' : m.recent ? 'Среди недавних' : '');
+/** Где искали в «Избранном» и «Недавнем»: «Среди избранного по запросу «…» ничего нет» */
+const whereText = (m: Marks) => (m.favorites ? 'Среди избранного' : m.recent ? 'Среди недавних' : '');
 
 /** Порция карточек: длинный каталог показывается по мере прокрутки, а не весь сразу */
 const STEP = 30;
 
 interface ListProps {
   catalog: Catalog;
-  /** Раздел страницы без отметок, весь каталог, включённые отметки: по ним считается «из скольких» и подсказки для пустой выдачи */
+  /** Раздел страницы без отметок, весь каталог, отметка страницы («Избранное» или «Недавнее»): по ним считаются подсказки для пустой выдачи */
   ctx: ScopeContext;
   listing: Listing;
   query: ViewQuery;
   /** Исходный запрос, как его набрал человек */
   typed: string;
-  narrowed: boolean;
-  active: boolean;
   noun: Noun;
   everywhere: string;
   empty: string;
-  view: ViewState;
   tokens: FilterToken[];
   resetKey: string;
   onToggleFavorite: (id: string) => void;
   onOpen: (item: LibraryItem) => void;
-  onSort: () => void;
-  onToggleMark: (mark: keyof Marks) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
 }
 
-/** Страница пейджера: строка над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
+/** Страница пейджера: выбранные фильтры и пояснения над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
 function LibraryList(p: ListProps) {
-  const { catalog, listing, ctx, narrowed, view } = p;
+  const { catalog, listing, ctx } = p;
   const scroller = useRef<HTMLDivElement>(null);
   const more = useRef<HTMLDivElement>(null);
   const [limit, setLimit] = useState(STEP);
@@ -123,7 +132,6 @@ function LibraryList(p: ListProps) {
   if (search?.partial && total > 0) notes.push('Совпали не все слова запроса: показано, что подходит хотя бы по части');
 
   const describe = (n: number) => `${n} ${plural(n, p.noun)}`;
-  const summary = narrowed ? `Найдено ${total} из ${ctx.scope.length}` : describe(ctx.scope.length);
   const marked = hasMarks(ctx.marks);
 
   let body;
@@ -158,13 +166,9 @@ function LibraryList(p: ListProps) {
         ? `Без фильтра «${r.label}»`
         : r.type === 'filters'
           ? 'Сбросить все фильтры'
-          : r.type === 'mark'
-            ? r.mark === 'favorites'
-              ? 'Показать не только избранное'
-              : 'Показать не только недавние'
-            : r.type === 'scope'
-              ? p.everywhere
-              : 'Очистить запрос';
+          : r.type === 'mark' || r.type === 'scope'
+            ? p.everywhere
+            : 'Очистить запрос';
     const actions: EmptyAction[] = relaxations(catalog, p.query, ctx).map((r) => ({
       key: r.type === 'option' ? `${r.facet}:${r.option}` : r.type === 'mark' ? `mark:${r.mark}` : r.type,
       label: label(r),
@@ -190,21 +194,7 @@ function LibraryList(p: ListProps) {
 
   return (
     <div ref={scroller} className="library-page__page">
-      {(ctx.scope.length > 0 || marked) && (
-        <ResultsBar
-          summary={summary}
-          live={p.active}
-          sortLabel={sortLabel(view.sort, !!search)}
-          sortChanged={view.sort !== 'auto'}
-          sortDisabled={total < 2}
-          onSort={p.onSort}
-          marks={ctx.marks}
-          onToggleMark={p.onToggleMark}
-          tokens={p.tokens}
-          onResetFilters={p.onResetFilters}
-          notes={notes}
-        />
-      )}
+      {(ctx.scope.length > 0 || marked) && <ResultsBar tokens={p.tokens} onResetFilters={p.onResetFilters} notes={notes} />}
       {body}
       {shown < total && <div ref={more} className="library-page__more" aria-hidden="true" />}
     </div>
@@ -215,16 +205,16 @@ function LibraryList(p: ListProps) {
  * Библиотека для психолога: все тесты (или задания) приложения. Интерфейс общий,
  * потому что разделы «Диагностика» и «Задания» устроены одинаково.
  *
- * Разделы («Все» и папки) — страницы пейджера: список можно листать пальцем, а чипсы идут следом. Долгое нажатие на чипс открывает меню папки (useFolderMenu).
- * Поверх любого раздела работают поиск по словам, фильтры (лист «Фильтры») и порядок; в строке над списком
- * кнопки «Избранное» и «Недавние» оставляют только их. Состояние лежит в libraryView.ts,
- * поэтому после открытия теста запрос, фильтры и кнопки на месте.
+ * Разделы — страницы пейджера: «Все», «Избранное», «Недавнее» (то, что недавно присылали клиентам) и папки. Список можно листать пальцем,
+ * а чипсы идут следом: выбранный выходит из капсулы отдельной плашкой (Chip.css, split). Долгое нажатие на «Все» и на папку открывает меню (useFolderMenu).
+ * Поверх любого раздела работают поиск по словам и фильтры (лист «Фильтры»); выбранные фильтры и пояснения к выдаче стоят над списком.
+ * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
 export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, onOpen, labels }: LibraryPageProps) {
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [sheet, setSheet] = useState<null | 'filters' | 'sort'>(null);
+  const [sheet, setSheet] = useState<null | 'filters'>(null);
   const [focused, setFocused] = useState(false);
   const client = useClientData();
   const view = useLibraryView(kind);
@@ -237,8 +227,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const catalog = useMemo(() => catalogOf(kind, items), [kind, items]);
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
-  /** Разделы по порядку чипсов: по ним же идут страницы */
-  const sections = useMemo<Section[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
+  /** Разделы по порядку чипсов: по ним же идут страницы. Папки — после «Все», «Избранного» и «Недавнего» */
+  const sections = useMemo<Section[]>(() => ['all', FAVORITES, RECENT, ...folders.map((f) => f.id)], [folders]);
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = sections.join('|');
 
@@ -254,22 +244,22 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const bases = useMemo(
     () =>
       sections.map((id) => {
-        if (id === 'all') return everything;
+        if (wholeCatalog(id)) return everything;
         const members = new Set(folders.find((f) => f.id === id)?.ids);
         return items.filter((t) => members.has(t.id)).map((t) => t.id);
       }),
     [sections, everything, items, folders],
   );
-  /** Они же с учётом кнопок «Избранное» и «Недавние» */
-  const scopes = useMemo(() => bases.map((base) => markedScope(base, view.marks, favorites, recent)), [bases, view.marks, favorites, recent]);
+  /** Они же с учётом отметки страницы: в «Избранном» только избранное, в «Недавнем» только присланное, от самого свежего */
+  const scopes = useMemo(() => bases.map((base, i) => markedScope(base, marksOf(sections[i]), favorites, recent)), [bases, sections, favorites, recent]);
 
   // Пока человек печатает, список догоняет с небольшим запозданием, а поле остаётся отзывчивым
   const query = useDeferredValue(view.query);
-  const q = useMemo<ViewQuery>(() => ({ query, filters: view.filters, sort: view.sort }), [query, view.filters, view.sort]);
+  const q = useMemo<ViewQuery>(() => ({ query, filters: view.filters, sort: SORT }), [query, view.filters]);
   const listings = useMemo(() => scopes.map((scope) => listIds(catalog, q, scope, favorites)), [catalog, q, scopes, favorites]);
-  const narrowed = normalize(query) !== '' || countFilters(view.filters) > 0 || hasMarks(view.marks);
+  const narrowed = normalize(query) !== '' || countFilters(view.filters) > 0;
   const activeCount = countFilters(view.filters);
-  const resetKey = `${query}|${JSON.stringify(view.filters)}|${view.sort}|${view.marks.favorites}|${view.marks.recent}`;
+  const resetKey = `${query}|${JSON.stringify(view.filters)}`;
 
   const index = Math.max(0, sections.indexOf(section));
   const shown = dragIndex ?? index;
@@ -300,14 +290,12 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     (r: Relaxation) => {
       if (r.type === 'option') toggleOption(kind, r.facet, r.option);
       else if (r.type === 'filters') clearFilters(kind);
-      else if (r.type === 'mark') toggleMark(kind, r.mark);
-      else if (r.type === 'scope') setSection('all');
+      // «Не только избранное», «не только недавнее» и «во всех» — один и тот же выход: на «Все»
+      else if (r.type === 'mark' || r.type === 'scope') setSection('all');
       else setQuery(kind, '');
     },
     [kind],
   );
-
-  const onToggleMark = useCallback((mark: keyof Marks) => toggleMark(kind, mark), [kind]);
 
   const pages = useMemo(
     () =>
@@ -316,28 +304,23 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
         node: (
           <LibraryList
             catalog={catalog}
-            ctx={{ scope: bases[i], everything, marks: view.marks, favorites, recent }}
+            ctx={{ scope: bases[i], everything, marks: marksOf(id), favorites, recent }}
             listing={listings[i]}
             query={q}
             typed={query}
-            narrowed={narrowed}
-            active={i === index}
             noun={labels.noun}
             everywhere={labels.everywhere}
-            empty={emptyText(view.marks, id === 'all', labels.emptyRecent)}
-            view={view}
+            empty={emptyText(marksOf(id), wholeCatalog(id), labels.emptyRecent)}
             tokens={tokens}
             resetKey={resetKey}
             onToggleFavorite={onToggleFavorite}
             onOpen={open}
-            onSort={() => setSheet('sort')}
-            onToggleMark={onToggleMark}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, narrowed, index, labels, favorites, recent, view, tokens, resetKey, onToggleFavorite, open, onToggleMark, relax, kind],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, onToggleFavorite, open, relax, kind],
   );
 
   const onDrag = useCallback(
@@ -356,15 +339,16 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   }, []);
 
   // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи.
-  // Долгое нажатие открывает меню папки; у «Все» на экране одно слово, а читалке нужно знать, чего «все»: «Все тесты»
+  // Долгое нажатие открывает меню папки (у «Избранного» и «Недавнего» меню нет); у «Все» на экране одно слово, а читалке нужно знать, чего «все»: «Все тесты»
   const chip = (id: Section, label: string) => {
     const i = sections.indexOf(id);
     const count = listings[i]?.ids.length ?? 0;
     return {
       follow: true,
+      split: true,
       active: shown === i,
       onClick: () => setSection(id),
-      onLongPress: (el: HTMLElement) => folderMenu.open(id, el),
+      onLongPress: id === FAVORITES || id === RECENT ? undefined : (el: HTMLElement) => folderMenu.open(id, el),
       ariaLabel: narrowed ? `${label}: найдено ${count}` : id === 'all' ? label : undefined,
       className: narrowed && count === 0 ? 'chip--dim' : undefined,
     };
@@ -418,6 +402,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
         chips={
           <>
             <Chip {...chip('all', labels.all)}>Все</Chip>
+            <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
+            <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>
             {folders.map(({ id, name }) => (
               <Chip key={id} {...chip(id, name)}>
                 {name}
@@ -448,22 +434,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       {sheet === 'filters' && (
         <FilterSheet
           catalog={catalog}
-          view={{ query: view.query, filters: view.filters, sort: view.sort }}
+          view={{ query: view.query, filters: view.filters, sort: SORT }}
           scope={scopes[index]}
           favorites={favorites}
           noun={labels.noun}
           onApply={(next) => setFilters(kind, next)}
-          onClose={() => setSheet(null)}
-        />
-      )}
-      {sheet === 'sort' && (
-        <SortSheet
-          value={view.sort}
-          searching={normalize(view.query) !== ''}
-          onPick={(sort) => {
-            setSort(kind, sort);
-            setSheet(null);
-          }}
           onClose={() => setSheet(null)}
         />
       )}

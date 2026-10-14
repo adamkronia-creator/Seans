@@ -84,8 +84,6 @@ export { default as IconChevron } from '../../assets/icons/history/chevron.svg?r
 // Раздел «Психологические тесты»
 export { default as IconHeartRed } from '../../assets/icons/library/heart-red.svg?react';
 export { default as IconHeartGray } from '../../assets/icons/library/heart-gray.svg?react';
-export { default as IconFilterFavorites } from '../../assets/icons/library/filter-favorites.svg?react';
-export { default as IconFilterRecent } from '../../assets/icons/library/filter-recent.svg?react';
 export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
 
 // Настройки теста

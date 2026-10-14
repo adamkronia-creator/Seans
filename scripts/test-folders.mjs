@@ -48,15 +48,16 @@ test('начальные папки собраны из прежних кате�
   assert.deepEqual(getFolder('chats', 'clients').ids, CHATS.filter((c) => c.category === 'clients').map((c) => c.id));
   assert.deepEqual(getFolder('chats', 'colleagues').ids, CHATS.filter((c) => c.category === 'colleagues').map((c) => c.id));
   for (const id of ['clients', 'colleagues', 'seminars']) assert.ok(!getFolder('chats', id).ids.includes('favorites'));
-  assert.deepEqual(names('chats', ['clients', 'colleagues', 'seminars']), ['Клиенты', 'Коллеги', 'Семинары']);
-  assert.deepEqual(names('tests', ['practice', 'hospital', 'project']), ['Практика', 'Больница', 'Проект']);
-  assert.deepEqual(names('tasks', ['svo', 'training']), ['СВО', 'Тренинг']);
-  assert.deepEqual(getFolder('tests', 'practice').ids, LIBRARY.filter((t) => t.categories.includes('practice')).map((t) => t.id));
-  assert.deepEqual(getFolder('tasks', 'training').ids, TASK_LIBRARY.filter((t) => t.categories.includes('training')).map((t) => t.id));
+  assert.deepEqual(names('chats', ['clients', 'colleagues', 'seminars']), ['Клиенты', 'Коллеги', 'Семинар']);
+  assert.deepEqual(names('tests', ['training', 'svo']), ['Тренинг', 'СВО']);
+  assert.deepEqual(names('tasks', ['practice', 'hospital']), ['Практика', 'Больница']);
+  assert.deepEqual(getFolder('tests', 'training').ids, LIBRARY.filter((t) => t.categories.includes('training')).map((t) => t.id));
+  assert.deepEqual(getFolder('tasks', 'practice').ids, TASK_LIBRARY.filter((t) => t.categories.includes('practice')).map((t) => t.id));
+  for (const folder of [...getFolders('tests'), ...getFolders('tasks')]) assert.ok(folder.ids.length > 0, `папка «${folder.name}» не пустая`);
   assert.equal(getFolder('chats', 'clients').muted, false);
   assert.deepEqual(row('chats'), ['clients', 'colleagues', 'seminars'], 'порядок прежних категорий');
-  assert.deepEqual(row('tests'), ['practice', 'hospital', 'project']);
-  assert.deepEqual(row('tasks'), ['svo', 'training']);
+  assert.deepEqual(row('tests'), ['training', 'svo']);
+  assert.deepEqual(row('tasks'), ['practice', 'hospital']);
 });
 
 test('название: лишние пробелы убираются, длина не больше 16, пустое не годится', () => {
@@ -112,9 +113,9 @@ test('нетронутая новая папка при выходе убира�
     assert.ok(getFolder('tests', id), 'папка осталась');
     deleteFolder('tests', id);
   }
-  discardUntouchedFolder('tests', 'practice');
-  assert.ok(getFolder('tests', 'practice'), 'обычные папки отмена не трогает');
-  assert.deepEqual(row('tests'), ['practice', 'hospital', 'project']);
+  discardUntouchedFolder('tests', 'training');
+  assert.ok(getFolder('tests', 'training'), 'обычные папки отмена не трогает');
+  assert.deepEqual(row('tests'), ['training', 'svo']);
 });
 
 test('переименование и состав папки', () => {
@@ -135,11 +136,11 @@ test('переименование и состав папки', () => {
 
 test('другие папки и разделы при правке не пересоздаются', () => {
   const clients = getFolder('chats', 'clients');
-  const practice = getFolder('tests', 'practice');
+  const training = getFolder('tests', 'training');
   const id = createFolder('chats');
   renameFolder('chats', id, 'Новости');
   assert.equal(getFolder('chats', 'clients'), clients, 'соседняя папка — тот же объект');
-  assert.equal(getFolder('tests', 'practice'), practice, 'папка другого раздела — тот же объект');
+  assert.equal(getFolder('tests', 'training'), training, 'папка другого раздела — тот же объект');
   assert.notEqual(getFolder('chats', id), undefined);
   deleteFolder('chats', id);
 });
@@ -170,7 +171,7 @@ test('порядок чипсов: шаг вверх и вниз, на края�
   moveFolder('chats', 'clients', -1);
   moveFolder('chats', 'clients', -1);
   assert.deepEqual(row('chats'), ['clients', 'colleagues', 'seminars']);
-  assert.deepEqual(row('tests'), ['practice', 'hospital', 'project'], 'другие разделы не затронуты');
+  assert.deepEqual(row('tests'), ['training', 'svo'], 'другие разделы не затронуты');
 });
 
 test('удаление: папка исчезает, повторное удаление безвредно, содержимое раздела не страдает', () => {

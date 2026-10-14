@@ -11,73 +11,12 @@
   color: inherit;
 }
 
-/* ——— Строка над списком ——— */
+/* ——— Над списком: выбранные фильтры и пояснения ——— */
 
 .results-bar {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.results-bar__row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: var(--size-chip-h);
-}
-
-.results-bar__summary {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  overflow: hidden;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Три кнопки справа: порядок, только избранное, только недавнее. Круги цвета заливки, как поле поиска и чипсы, на белом фоне списка */
-.results-bar__tools {
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--space-2);
-}
-
-.results-bar__pill {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-chip-h);
-  height: var(--size-chip-h);
-  padding: 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-fill);
-  color: var(--color-text-primary);
-  line-height: 1;
-}
-
-/* Порядок выбран не по умолчанию: мягкая подсветка, как у плитки фильтров, когда в ней что-то выбрано */
-.results-bar__pill--tint {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-
-/* Включённое «Избранное» или «Недавние»: акцентная заливка, как у выбранного чипса */
-.results-bar__pill--on {
-  background: var(--color-accent);
-  color: var(--color-accent-on);
-}
-
-.results-bar__pill:disabled {
-  opacity: 0.4;
-}
-
-.results-bar__icon {
-  font-size: 18px;
 }
 
 /* Выбранные фильтры: прокручиваются вбок и выходят за край, как чипсы шапки */
@@ -186,64 +125,6 @@
 /* На фоне приложения (подсказки под полем) чипс белый, как карточка */
 .filter-chip--card {
   background: var(--color-bg-panel);
-}
-
-/* ——— Окно сортировки ——— */
-
-.pick-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pick-list li {
-  position: relative;
-}
-
-.pick-list li + li::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: var(--space-3);
-  left: var(--space-3);
-  height: 1px;
-  background: var(--color-divider);
-}
-
-.pick-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 52px;
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-}
-
-.pick-row__text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.pick-row__label {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
-}
-
-.pick-row__hint {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
-.pick-row__check {
-  flex-shrink: 0;
-  color: var(--color-accent);
-  font-size: var(--size-icon-sm);
 }
 
 /* ——— Подсказки под пустым полем ——— */

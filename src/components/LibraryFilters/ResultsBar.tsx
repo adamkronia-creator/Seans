@@ -1,7 +1,4 @@
 import { IconClose } from '../ChatParts/ChatIcons';
-import { IconFilterFavorites, IconFilterRecent } from '../icons';
-import type { Marks } from '../../data/libraryQuery';
-import { IconSort } from './FilterIcons';
 import './LibraryFilters.css';
 
 export interface FilterToken {
@@ -13,20 +10,6 @@ export interface FilterToken {
 }
 
 interface ResultsBarProps {
-  /** «12 тестов» или «Найдено 4 из 12» */
-  summary: string;
-  /** Читают вслух, когда число меняется: только у видимой страницы */
-  live: boolean;
-  /** Название порядка: значок без подписи, поэтому название слышно в подписи кнопки */
-  sortLabel: string;
-  /** Выбран не порядок по умолчанию: значок подсвечен, чтобы было видно, почему список идёт так */
-  sortChanged: boolean;
-  /** Упорядочивать нечего (в выдаче одно или ни одного): кнопка на месте, но недоступна, чтобы соседние не сдвигались */
-  sortDisabled: boolean;
-  onSort: () => void;
-  /** «Избранное» и «Недавние»: включаются независимо и действуют вместе */
-  marks: Marks;
-  onToggleMark: (mark: keyof Marks) => void;
   tokens: FilterToken[];
   onResetFilters: () => void;
   /** Пояснения к выдаче: что поправили в запросе, что совпало не полностью */
@@ -34,47 +17,13 @@ interface ResultsBarProps {
 }
 
 /**
- * Над карточками: сколько нашлось, справа три кнопки-значка — порядок, только избранное, только недавнее —
- * затем выбранные фильтры (каждый снимается одним касанием) и пояснения к выдаче.
+ * Над карточками: выбранные фильтры (каждый снимается одним касанием) и пояснения к выдаче. Когда показывать нечего,
+ * строки нет совсем: список начинается сразу под шапкой. Числа найденного здесь нет — его слышно в подписи чипсов.
  */
-export function ResultsBar({ summary, live, sortLabel, sortChanged, sortDisabled, onSort, marks, onToggleMark, tokens, onResetFilters, notes }: ResultsBarProps) {
+export function ResultsBar({ tokens, onResetFilters, notes }: ResultsBarProps) {
+  if (tokens.length === 0 && notes.length === 0) return null;
   return (
     <div className="results-bar">
-      <div className="results-bar__row">
-        <p className="results-bar__summary" aria-live={live ? 'polite' : 'off'}>
-          {summary}
-        </p>
-        <div className="results-bar__tools">
-          <button
-            type="button"
-            className={`results-bar__pill results-bar__pill--icon${sortChanged ? ' results-bar__pill--tint' : ''}`}
-            aria-haspopup="dialog"
-            aria-label={`Сортировка: ${sortLabel}`}
-            disabled={sortDisabled}
-            onClick={onSort}
-          >
-            <IconSort className="results-bar__icon" />
-          </button>
-          <button
-            type="button"
-            className={`results-bar__pill results-bar__pill--icon${marks.favorites ? ' results-bar__pill--on' : ''}`}
-            aria-pressed={marks.favorites}
-            aria-label="Только избранное"
-            onClick={() => onToggleMark('favorites')}
-          >
-            <IconFilterFavorites className="results-bar__icon" />
-          </button>
-          <button
-            type="button"
-            className={`results-bar__pill results-bar__pill--icon${marks.recent ? ' results-bar__pill--on' : ''}`}
-            aria-pressed={marks.recent}
-            aria-label="Только недавние"
-            onClick={() => onToggleMark('recent')}
-          >
-            <IconFilterRecent className="results-bar__icon" />
-          </button>
-        </div>
-      </div>
       {tokens.length > 0 && (
         <div className="results-bar__tokens" role="group" aria-label="Выбранные фильтры">
           {tokens.map((t) => (

@@ -31,9 +31,14 @@ interface ChipProps {
    * Раскрытие идёт за страницами пейджера так же, как цвет (см. followChips)
    */
   icon?: ReactNode;
+  /**
+   * Чипс ряда, где невыбранные сливаются в общую капсулу, а выбранный выходит из неё отдельной плашкой (шапки «Диалогов»,
+   * «Диагностики» и «Заданий»). Зазор и скругления на стыках идут за страницами пейджера (см. followChips и Chip.css)
+   */
+  split?: boolean;
 }
 
-export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon }: ChipProps) {
+export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false }: ChipProps) {
   const press = useRef<{ x: number; y: number; timer: number } | null>(null);
   /** Долгое нажатие уже открыло меню: клик, который придёт, когда палец поднимут, не должен выбирать чипс */
   const opened = useRef(false);
@@ -42,7 +47,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
 
   // Число в кружке рядом с названием показывается, только если оно не ноль
   const hasCount = count !== undefined && count > 0;
-  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
+  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', split && 'chip--split', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
 
   const stop = () => {
     if (press.current) window.clearTimeout(press.current.timer);

@@ -24,7 +24,7 @@ export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };
 export const CATEGORIES: { id: ChatCategory; label: string }[] = [
   { id: 'clients', label: 'Клиенты' },
   { id: 'colleagues', label: 'Коллеги' },
-  { id: 'seminars', label: 'Семинары' },
+  { id: 'seminars', label: 'Семинар' },
 ];
 
 // Тестовые данные. Тексты и время, кроме первых двух чатов, придуманы.
