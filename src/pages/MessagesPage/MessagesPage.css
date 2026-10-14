@@ -35,7 +35,7 @@
   height: var(--size-fab);
   border-radius: var(--radius-full);
   background: var(--color-accent);
-  box-shadow: 0 6px 16px rgb(0 136 255 / 32%), 0 1px 3px rgb(16 24 40 / 12%);
+  box-shadow: 0 6px 16px rgb(29 127 140 / 32%), 0 1px 3px rgb(24 41 46 / 12%);
   color: var(--color-accent-on);
   font-size: 18px; /* плюс 18×18 */
 }
