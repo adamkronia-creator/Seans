@@ -229,23 +229,23 @@ export function nowStamp() {
 
 // ——— Действия: каждое дописывает запись в журнал ———
 
-/** Первая непустая строка текста — заголовок карточки (в карточке длинный заголовок обрезается многоточием) */
-const titleOf = (text: string) => (text.split('\n').find((line) => line.trim()) ?? '').replace(/\s+/g, ' ').trim().slice(0, 120);
+/** Название записи, набранной в поле внизу вкладки: «Заметка от 14.10.2026, 12:13»; весь набранный текст остаётся в самой записи */
+const stampTitle = (what: string) => {
+  const { date, time } = nowStamp();
+  return `${what} от ${date}, ${time}`;
+};
 
 /**
- * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». У клиента (Максима) она попадает и в журнал,
- * то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
+ * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — «Заметка от <дата>, <время>», а текст целиком в заметке.
+ * У клиента (Максима) она попадает и в журнал, то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
  */
 export function addNote(chatId: string, text: string): string | null {
-  const title = titleOf(text);
-  if (!title) return null;
-  let paragraphs = textToParagraphs(text);
-  // Первая строка, стоящая отдельным абзацем, уже в заголовке: в тексте её не повторяем
-  if (paragraphs[0] === title) paragraphs = paragraphs.slice(1);
+  const paragraphs = textToParagraphs(text);
+  if (!paragraphs.some((p) => p.trim())) return null;
   const { date } = nowStamp();
   const note: CaseNote = {
     id: `n${data.notes.length + 1}-${Date.now()}`,
-    title,
+    title: stampTitle('Заметка'),
     paragraphs,
     icon: 'pin',
     tone: 'purple',
@@ -259,16 +259,14 @@ export function addNote(chatId: string, text: string): string | null {
   return note.id;
 }
 
-/** Новое сведение из текста, набранного в поле внизу вкладки «Сведения» */
+/** Новое сведение из текста, набранного в поле внизу вкладки «Сведения»: название «Сведения от <дата>, <время>», текст целиком внутри */
 export function addSection(chatId: string, text: string): string | null {
-  const title = titleOf(text);
-  if (!title) return null;
   const blocks = textToBlocks(text);
-  if (blocks[0]?.type === 'p' && blocks[0].text === title) blocks.shift();
+  if (blocks.length === 0 || !text.trim()) return null;
   const { date } = nowStamp();
   const section: CaseSection = {
     id: `c${data.caseSections.length + 1}-${Date.now()}`,
-    title,
+    title: stampTitle('Сведения'),
     icon: 'info',
     tone: 'blue',
     blocks,
@@ -389,7 +387,7 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
           id: a.id,
           kind: 'note',
           ref: note.id,
-          title: `Заметка: ${note.title}`,
+          title: note.title.startsWith('Заметка') ? note.title : `Заметка: ${note.title}`,
           date: a.date,
           paragraphs: note.paragraphs,
         };

@@ -311,7 +311,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
 });
 
 /**
- * Вкладка «История взаимодействия» в открытом чате: статистика, фильтры и лента событий.
+ * Вкладка «История взаимодействия» в открытом чате: лента событий (свежие внизу), под ней чипсы-фильтры, в самом низу учёт.
  * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
  * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
  */
@@ -322,7 +322,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const data = useClientData();
-  const events = useMemo(() => (hasData ? historyEvents(data).reverse() : []), [hasData, data]);
+  const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
 
   const pages = useMemo(
@@ -350,16 +350,15 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     if (row) centerChips(row, position, '.chip', via);
   }, []);
 
-  // Статистика и чипсы стоят над лентами: не едут вместе с ними, но за них тоже можно листать
-  const header = (
+  // Чипсы и под ними учёт стоят под лентами (как поле ввода под перепиской): не едут вместе с ними, но за них тоже можно листать
+  const footer = (
     <>
-      <Stats hasData={hasData} />
-
       <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
         {FILTERS.map(({ id, label }, i) => (
           <Chip
             key={id}
             follow
+            split
             active={shown === i}
             onClick={() => setFilter(id)}
           >
@@ -367,19 +366,21 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
           </Chip>
         ))}
       </div>
+
+      <Stats hasData={hasData} />
     </>
   );
 
   return (
     <div ref={root} className="hist-host">
-      <ScrollHost className="chat-history">
+      <ScrollHost className="chat-history" anchorEnd resetKey={filter}>
       <SwipePager
         className="chat-history__pager"
         autoHeight
         nested
         index={index}
         pages={pages}
-        header={header}
+        footer={footer}
         onIndexChange={(i) => setFilter(FILTERS[i].id)}
         onPosition={onPosition}
         onDrag={onDrag}

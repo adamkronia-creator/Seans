@@ -38,6 +38,8 @@ interface SwipePagerProps {
   autoHeight?: boolean;
   /** Над страницами, но в окне жеста: за пальцем не едет (только с autoHeight) */
   header?: ReactNode;
+  /** Под страницами, тоже в окне жеста и тоже не едет за пальцем (только с autoHeight) */
+  footer?: ReactNode;
   className?: string;
 }
 
@@ -132,7 +134,7 @@ interface ScrollMetrics {
  *    куда листать, а на его краю тот же жест листает внешний.
  * Мышью тоже можно тянуть (там, где не выделяется текст), а двухпальцевый жест по тачпаду листает страницы шагами.
  */
-export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, nested = false, autoHeight = false, header, className }: SwipePagerProps) {
+export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, nested = false, autoHeight = false, header, footer, className }: SwipePagerProps) {
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   /** Обрезка по высоте страницы (только autoHeight): меняется её высота, а ряд страниц остаётся своего размера */
@@ -694,6 +696,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
       ) : (
         row
       )}
+      {footer && <div className="swipe-pager__foot">{footer}</div>}
     </div>
   );
 }

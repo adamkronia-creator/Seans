@@ -1,5 +1,5 @@
 import { ScrollHost } from '../ScrollHost/ScrollHost';
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import { IconCaseEdit, IconCaseLock } from '../icons';
@@ -14,7 +14,6 @@ import type { CaseNote } from '../../data/notes';
 import { toneOf } from '../../data/tones';
 import { CLIENT_CHAT, updateNote, updateSection, useClientData } from '../../data/clientStore';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
-import { reducedMotion } from '../../utils/swipe';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { HEAD_ICONS } from './caseIcons';
 import './ChatCase.css';
@@ -160,38 +159,34 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   );
 }
 
-/** Новая карточка в конце списка: страница докручивается до неё (как лента чата до нового сообщения) */
-function useScrollToAppended(list: RefObject<HTMLElement>, count: number) {
-  const before = useRef(count);
-  useEffect(() => {
-    if (count > before.current) list.current?.lastElementChild?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
-    before.current = count;
-  }, [list, count]);
-}
+/** Дата «дд.мм.гггг» как число для порядка; без даты — самое давнее */
+const dayKey = (date?: string) => {
+  const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(date ?? '');
+  return m ? Number(m[3]) * 372 + Number(m[2]) * 31 + Number(m[1]) : 0;
+};
+/** Как в переписке: давние выше, свежие ниже (при одной дате порядок записи сохраняется) */
+const oldestFirst = <T extends { updated?: string }>(list: T[]) => list.map((x, i) => ({ x, i })).sort((a, b) => dayKey(a.x.updated) - dayKey(b.x.updated) || a.i - b.i).map(({ x }) => x);
 
 /** Вкладка «Заметки» в открытом чате: заметки этого чата, новые добавляются полем внизу (см. CaseComposer) */
 export function ChatNotes({ chatId }: { chatId: string }) {
   const { notes } = useClientData();
   // Тестовые заметки Максима не привязаны к чату, остальные — к чату, где их написали
-  const mine = notes.filter((note) => (note.chatId ?? CLIENT_CHAT) === chatId);
+  const mine = oldestFirst(notes.filter((note) => (note.chatId ?? CLIENT_CHAT) === chatId));
   const [editingId, setEditingId] = useState<string | null>(null);
   const editNote = mine.find((x) => x.id === editingId);
-  const list = useRef<HTMLUListElement>(null);
-  useScrollToAppended(list, mine.length);
 
   return (
-    <ScrollHost className="chat-case">
+    <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
-        <ul ref={list} className="case-cards" hidden={mine.length === 0}>
-          {mine.map((note) => (
-            <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
-          ))}
-        </ul>
-
         <p className="case-note">
           <IconCaseLock className="case-note__icon" />
           <span>Заметки видны только вам</span>
         </p>
+        <ul className="case-cards" hidden={mine.length === 0}>
+          {mine.map((note) => (
+            <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
+          ))}
+        </ul>
       </div>
 
       {editNote && (
@@ -224,25 +219,22 @@ export function ChatNotes({ chatId }: { chatId: string }) {
 /** Вкладка «Сведения» в открытом чате: сведения о клиенте этого чата, новые добавляются полем внизу (см. CaseComposer) */
 export function ChatInfo({ chatId }: { chatId: string }) {
   const { caseSections } = useClientData();
-  const mine = caseSections.filter((section) => (section.chatId ?? CLIENT_CHAT) === chatId);
+  const mine = oldestFirst(caseSections.filter((section) => (section.chatId ?? CLIENT_CHAT) === chatId));
   const [editingId, setEditingId] = useState<string | null>(null);
   const editSection = mine.find((x) => x.id === editingId);
-  const list = useRef<HTMLUListElement>(null);
-  useScrollToAppended(list, mine.length);
 
   return (
-    <ScrollHost className="chat-case">
+    <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
-        <ul ref={list} className="case-cards" hidden={mine.length === 0}>
-          {mine.map((section) => (
-            <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
-          ))}
-        </ul>
-
         <p className="case-note">
           <IconCaseLock className="case-note__icon" />
           <span>Психологический кейс виден только вам</span>
         </p>
+        <ul className="case-cards" hidden={mine.length === 0}>
+          {mine.map((section) => (
+            <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
+          ))}
+        </ul>
       </div>
 
       {editSection && (
