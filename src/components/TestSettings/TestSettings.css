@@ -13,7 +13,6 @@
   gap: var(--space-1);
   min-height: calc(56px + var(--safe-top));
   padding: var(--safe-top) var(--space-2) 0;
-  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
@@ -517,7 +516,6 @@
 .test-settings__cta {
   flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
-  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

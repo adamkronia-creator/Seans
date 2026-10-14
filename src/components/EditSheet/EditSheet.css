@@ -285,7 +285,6 @@
   flex-shrink: 0;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4) calc(var(--space-3) + var(--safe-bottom));
-  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

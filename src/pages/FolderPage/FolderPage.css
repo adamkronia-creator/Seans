@@ -15,7 +15,6 @@
   gap: var(--space-1);
   min-height: calc(var(--size-bar-h) + var(--safe-top));
   padding: calc(var(--space-1) + var(--safe-top)) var(--space-2) var(--space-1);
-  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

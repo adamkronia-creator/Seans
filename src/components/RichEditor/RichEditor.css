@@ -8,7 +8,6 @@
   display: flex;
   justify-content: space-between;
   padding: var(--space-2) var(--space-4);
-  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

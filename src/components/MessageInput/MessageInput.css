@@ -11,7 +11,6 @@
   align-items: flex-end;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-2) calc(var(--space-2) + var(--safe-bottom));
-  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
@@ -104,7 +103,6 @@
   height: 240px;
   padding: var(--space-1) var(--space-4) calc(var(--space-1) + var(--safe-bottom));
   overflow-y: auto;
-  border-top: 1px solid var(--color-divider);
 }
 
 .emoji-panel__item {
@@ -127,7 +125,6 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
-  border-top: 1px solid var(--color-divider);
 }
 
 .reply-bar__icon {
@@ -173,6 +170,5 @@
 }
 
 .reply-bar + .composer {
-  border-top: 0;
   padding-top: 0;
 }

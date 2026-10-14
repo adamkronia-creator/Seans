@@ -9,7 +9,6 @@
 .chat__header {
   flex-shrink: 0;
   padding-top: var(--safe-top);
-  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
