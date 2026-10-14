@@ -81,17 +81,10 @@
   display: flex;
   /* Вкладки растянуты на всю ширину между полями экрана: свободное место делится между ними поровну, gap — только запас, когда тесно */
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: 4px;
   padding: var(--space-2) var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
-  z-index: 2;
-  margin-bottom: calc(var(--chips-h) * -1);
-  pointer-events: none;
-}
-
-.chat__chips > * {
-  pointer-events: auto;
 }
 
 .chat__chips::-webkit-scrollbar {
@@ -113,7 +106,7 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding: calc(var(--chips-h) + var(--space-1)) var(--space-4) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   overflow-y: auto;
 }
 
@@ -142,7 +135,7 @@
 /* Подпись дня: плашка без тени, непрозрачная — прилипая, она закрывает пузыри под собой */
 .chat__day {
   position: sticky;
-  top: calc(var(--chips-h) + var(--space-1));
+  top: var(--space-1);
   z-index: 2;
   align-self: center;
   margin-bottom: var(--space-2);

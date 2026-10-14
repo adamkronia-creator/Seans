@@ -35,30 +35,17 @@
   font-size: var(--size-icon);
 }
 
-/* Высота ряда чипсов: 8 + 32 + 8. Ряд лежит поверх страниц, а у прокручиваемых блоков страниц верхнее поле на эту высоту больше */
-:root {
-  --chips-h: calc(var(--space-2) * 2 + var(--size-chip-h));
-}
-
-/* Чипсы стоят под разделителем шапки, без панели и без фона: ряд лежит поверх страницы (отрицательный нижний отступ), и содержание раздела видно между чипсами и под ними. Вкладки-значки (Chip с icon)
+/* Чипсы стоят под разделителем шапки, на фоне экрана, без панели: они «висят» над содержанием раздела. Вкладки-значки (Chip с icon)
    растянуты на всю ширину между полями: свободное место делится между ними поровну, gap — запас, когда тесно; не помещаются — ряд
    прокручивается вбок. Те же отступы у ряда разделов открытого чата (.chat__chips) */
 .screen-header__chips {
   display: flex;
   flex-shrink: 0;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: 4px;
   padding: var(--space-2) var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
-  position: relative;
-  z-index: 2;
-  margin-bottom: calc(var(--chips-h) * -1);
-  pointer-events: none;
-}
-
-.screen-header__chips > * {
-  pointer-events: auto;
 }
 
 .screen-header__chips::-webkit-scrollbar {

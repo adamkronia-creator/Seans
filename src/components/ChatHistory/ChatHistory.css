@@ -15,7 +15,6 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding-top: var(--chips-h);
   overflow-y: auto;
 }
 
@@ -32,13 +31,14 @@
   padding: var(--space-3) var(--space-4);
 }
 
-/* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: полоса без разделителя */
+/* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: полоса со своим разделителем */
 .hist-foot {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-divider);
 }
 
 /* Сводка: одна карточка, пять колонок — число крупно, под ним подпись */

@@ -4,7 +4,6 @@
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  padding-top: var(--chips-h);
   overflow-y: auto;
 }
 
