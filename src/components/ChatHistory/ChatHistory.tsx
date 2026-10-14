@@ -284,34 +284,41 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   );
 }
 
-/** События одного фильтра: страница пейджера. Своей прокрутки у неё нет, листает весь раздел */
+/**
+ * События одного фильтра: страница пейджера со своей прокруткой. Как в переписке, свежее внизу и лента открывается на конце;
+ * пока событий мало, они лежат у чипсов, а не у верха. У каждого фильтра свой конец и своя прокрутка, поэтому при смене фильтра
+ * ничего не сдвигается по вертикали: страницы только скользят вбок.
+ */
 const HistoryList = memo(function HistoryList({ events, onEdit }: { events: HistoryEvent[]; onEdit: (id: string) => void }) {
   return (
-    <div className="hist-page">
-      {events.length > 0 ? (
-        <ol className="hist-timeline">
-          {events.map((event, i) => {
-            const hasNext = i < events.length - 1;
-            return (
-              <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
-                <div className="hist-rail">
-                  <Marker event={event} />
-                  {hasNext && <span className="hist-item__line" aria-hidden="true" />}
-                </div>
-                <Card event={event} onEdit={() => onEdit(event.id)} />
-              </li>
-            );
-          })}
-        </ol>
-      ) : (
-        <p className="hist-empty">Событий пока нет</p>
-      )}
-    </div>
+    <ScrollHost className="chat-history" anchorEnd>
+      <div className="hist-page">
+        {events.length > 0 ? (
+          <ol className="hist-timeline">
+            {events.map((event, i) => {
+              const hasNext = i < events.length - 1;
+              return (
+                <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
+                  <div className="hist-rail">
+                    <Marker event={event} />
+                    {hasNext && <span className="hist-item__line" aria-hidden="true" />}
+                  </div>
+                  <Card event={event} onEdit={() => onEdit(event.id)} />
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p className="hist-empty">Событий пока нет</p>
+        )}
+      </div>
+    </ScrollHost>
   );
 });
 
 /**
  * Вкладка «История взаимодействия» в открытом чате: лента событий (свежие внизу), под ней чипсы-фильтры, в самом низу учёт.
+ * Чипсы и учёт закреплены внизу, как поле ввода в переписке; лента над ними прокручивается.
  * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
  * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
  */
@@ -350,8 +357,8 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     if (row) centerChips(row, position, '.chip', via);
   }, []);
 
-  // Чипсы и под ними учёт стоят под лентами (как поле ввода под перепиской): не едут вместе с ними, но за них тоже можно листать
-  const footer = (
+  // Чипсы и под ними учёт стоят под лентами, как поле ввода под перепиской: не прокручиваются вместе с лентой
+  const foot = (
     <>
       <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
         {FILTERS.map(({ id, label }, i) => (
@@ -373,19 +380,17 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
 
   return (
     <div ref={root} className="hist-host">
-      <ScrollHost className="chat-history" anchorEnd resetKey={filter}>
       <SwipePager
         className="chat-history__pager"
-        autoHeight
         nested
         index={index}
         pages={pages}
-        footer={footer}
         onIndexChange={(i) => setFilter(FILTERS[i].id)}
         onPosition={onPosition}
         onDrag={onDrag}
       />
-      </ScrollHost>
+
+      <div className="hist-foot">{foot}</div>
 
       {editing && (
         <EditSheet

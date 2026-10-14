@@ -30,7 +30,7 @@ import './TaskForm.css';
 const MAX_TEXT = 3000;
 const MAX_FACTORS = 8;
 /** Цвета долей «пирога»: спокойные серо-голубые, доля самого клиента — акцентным цветом */
-const PIE_COLORS = ['#5E6B7B', '#8E9AAB', '#B4BDC9', '#6F7F95', '#9FB0C8', '#CBD3DD', '#7C8BA0', '#A9B4C2'];
+const PIE_COLORS = ['#52708B', '#7F98B2', '#B0C2D5', '#6584A0', '#9CB3C9', '#C9D6E3', '#7A93AC', '#A5B9CD'];
 const colorOf = (i: number) => PIE_COLORS[i % PIE_COLORS.length];
 
 // ——— Поля ———

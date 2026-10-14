@@ -54,7 +54,7 @@ export const LIBRARY: LibraryTest[] = [
   { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FFE177', categories: ['training', 'svo'] },
   { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', icon: bdiIcon, tint: '#FFCEBF', categories: ['svo'] },
   { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#F2D1A5', categories: ['training'] },
-  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E8EDF2', categories: ['svo'] },
+  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#DDE8F3', categories: ['svo'] },
   { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFCEBF', categories: ['svo'] },
   { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFCEBF', categories: ['svo'] },
   { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: 'rgb(153 230 252 / 75%)', categories: ['training'] },

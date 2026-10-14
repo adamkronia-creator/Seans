@@ -149,8 +149,8 @@
   border-radius: 50%;
   background: #fff;
   box-shadow:
-    0 1px 4px rgb(16 24 40 / 30%),
-    0 0 0 1px rgb(16 24 40 / 6%);
+    0 1px 4px rgb(15 34 52 / 30%),
+    0 0 0 1px rgb(15 34 52 / 6%);
   -webkit-appearance: none;
   appearance: none;
 }
@@ -163,8 +163,8 @@
   border-radius: 50%;
   background: #fff;
   box-shadow:
-    0 1px 4px rgb(16 24 40 / 30%),
-    0 0 0 1px rgb(16 24 40 / 6%);
+    0 1px 4px rgb(15 34 52 / 30%),
+    0 0 0 1px rgb(15 34 52 / 6%);
 }
 
 .tf-percent__range:focus-visible::-webkit-slider-thumb {

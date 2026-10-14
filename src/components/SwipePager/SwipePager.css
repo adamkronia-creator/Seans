@@ -60,8 +60,6 @@
 
 /* Шапка над страницами лежит в окне жеста, но не в ряду: за пальцем не едет, листать за неё можно */
 .swipe-pager__head,
-.swipe-pager__head *,
-.swipe-pager__foot,
-.swipe-pager__foot * {
+.swipe-pager__head * {
   touch-action: pan-y pinch-zoom;
 }
