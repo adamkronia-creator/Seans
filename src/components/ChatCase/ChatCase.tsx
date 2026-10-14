@@ -2,7 +2,7 @@ import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { useState, type CSSProperties } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
-import { IconCaseEdit, IconCaseLock } from '../icons';
+import { IconCaseEdit } from '../icons';
 import {
   blocksToText,
   paragraphsToText,
@@ -178,10 +178,6 @@ export function ChatNotes({ chatId }: { chatId: string }) {
   return (
     <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
-        <p className="case-note">
-          <IconCaseLock className="case-note__icon" />
-          <span>Заметки видны только вам</span>
-        </p>
         <ul className="case-cards" hidden={mine.length === 0}>
           {mine.map((note) => (
             <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
@@ -226,10 +222,6 @@ export function ChatInfo({ chatId }: { chatId: string }) {
   return (
     <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
-        <p className="case-note">
-          <IconCaseLock className="case-note__icon" />
-          <span>Психологический кейс виден только вам</span>
-        </p>
         <ul className="case-cards" hidden={mine.length === 0}>
           {mine.map((section) => (
             <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
