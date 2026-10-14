@@ -6,7 +6,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgb(24 41 46 / 40%);
+  background: rgb(23 34 46 / 40%);
 }
 
 /* Панель на фоне приложения, карточки внутри белые; верхние углы 24 */
@@ -28,7 +28,7 @@
   height: 4px;
   margin: var(--space-2) auto 0;
   border-radius: 2px;
-  background: rgb(106 123 130 / 40%);
+  background: rgb(108 122 138 / 40%);
 }
 
 /* Заголовок есть только у окон выбора (отправка теста) */

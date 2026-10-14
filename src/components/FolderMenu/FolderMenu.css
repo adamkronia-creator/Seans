@@ -3,7 +3,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgb(24 41 46 / 28%);
+  background: rgb(23 34 46 / 28%);
   animation: chip-dim-in 0.18s ease-out both;
 }
 
