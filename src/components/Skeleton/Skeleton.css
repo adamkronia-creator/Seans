@@ -36,8 +36,8 @@
 .skeleton-screen__body {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
-  padding: var(--band-gap) 0;
+  gap: var(--section-gap);
+  padding: var(--space-4) 0;
 }
 
 .skeleton-card {
@@ -45,7 +45,6 @@
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 

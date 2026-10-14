@@ -60,10 +60,9 @@
   margin-top: 0;
 }
 
-/* Пояснение к разделу: стоит над полями и отделено от них линией */
+/* Пояснение к разделу: стоит над полями, отделено от них воздухом */
 .tf-section-hint {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-divider);
+  padding: 0 var(--space-4) var(--space-3);
 }
 
 /* Шкала «Как вы себя чувствуете?»: значок слева от подписи */
@@ -306,7 +305,7 @@
   min-height: 44px;
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-bg-app);
+  background: var(--color-bg-plate);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
 }
@@ -380,10 +379,6 @@
   padding: var(--space-2) 0;
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
-}
-
-.tf-legend li + li {
-  border-top: 1px solid var(--color-divider);
 }
 
 .tf-legend__name {
@@ -543,10 +538,6 @@
   flex-direction: column;
   gap: var(--space-4);
   padding: var(--space-4);
-}
-
-.tf-entry + .tf-entry {
-  border-top: 1px solid var(--color-divider);
 }
 
 .tf-entry__head {

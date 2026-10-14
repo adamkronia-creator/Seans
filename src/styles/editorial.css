@@ -50,6 +50,7 @@
 .pe__group-title,
 .pe__add-title,
 .sheet__heading,
+.sheet__preview-input,
 .empty-state__title,
 .empty-results__title,
 .tp__done-title {
@@ -97,12 +98,29 @@
 .tp__facts,
 .tp__done-text,
 .profile__field-value,
-.pe__field-text {
+.pe__field-text,
+.rich-editor,
+.task-answer,
+.hist-flow .hist-card__text {
   font-family: var(--font-serif);
   font-size: var(--font-size-read);
   line-height: var(--line-height-read);
   hyphens: auto;
   -webkit-hyphens: auto;
+}
+
+/* Управление внутри текста остаётся гротеском: «Читать далее» не часть записи, а действие над ней */
+.ts-desc__toggle {
+  font-family: var(--font-family);
+}
+
+/* Подзаголовок группы вопросов («Сейчас, в данный момент:») — как врезка в журнале: курсивом, акцентным цветом, без плашки */
+.blank-heading {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-read);
+  font-style: italic;
+  font-weight: 500;
+  line-height: var(--line-height-read);
 }
 
 /* Комментарий психолога под событием: курсивом, как пометка на полях */
@@ -111,4 +129,13 @@
   font-size: var(--font-size-read);
   font-style: italic;
   line-height: var(--line-height-read);
+}
+
+/* Узкий экран: имя в шапке делит строку с двумя кнопками, антиква шире гротеска — кегль на ступень меньше, чтобы имя не обрезалось раньше времени */
+@media (max-width: 359px) {
+  .chat__name,
+  .test-settings__name {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-sm);
+  }
 }

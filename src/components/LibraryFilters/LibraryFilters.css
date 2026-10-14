@@ -122,9 +122,9 @@
   opacity: 0.75;
 }
 
-/* На фоне приложения (подсказки под полем) чипс белый, как карточка */
+/* Подсказки под полем: чипс с заливкой, как все остальные */
 .filter-chip--card {
-  background: var(--color-bg-panel);
+  background: var(--color-bg-fill);
 }
 
 /* ——— Подсказки под пустым полем ——— */
@@ -171,7 +171,6 @@
 .suggest__list {
   margin: 0 calc(var(--space-4) * -1);
   padding: 0;
-  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
   list-style: none;
 }
@@ -180,16 +179,6 @@
   position: relative;
   display: flex;
   align-items: center;
-}
-
-.suggest__item + .suggest__item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: var(--space-4);
-  height: var(--hairline);
-  background: var(--color-divider);
 }
 
 .suggest__row {

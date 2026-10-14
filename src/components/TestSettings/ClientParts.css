@@ -1,6 +1,6 @@
 /* Экран клиента: сведения перед началом и благодарность в конце. Шапка, карточки бланка, счётчик и кнопки — те же, что при самостоятельном прохождении */
 
-/* Что нужно знать перед началом: карточка со строками и значками, строки разделены линией */
+/* Что нужно знать перед началом: раздел со строками и значками, строки отделяет высота, а не линия */
 .tp__facts {
   margin: 0;
   padding: 0 var(--space-4);
@@ -15,10 +15,6 @@
   align-items: center;
   min-height: 48px;
   padding: var(--space-2) 0;
-}
-
-.tp__facts li + li {
-  border-top: 1px solid var(--color-divider);
 }
 
 .tp__fact-icon {
@@ -62,13 +58,13 @@
   text-wrap: balance;
 }
 
-/* Пример итога: серая плашка внутри белой карточки */
+/* Пример итога: тональная плита на бумаге */
 .tp__sample {
   align-self: stretch;
   margin-top: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-lg);
-  background: var(--color-bg-app);
+  background: var(--color-bg-plate);
   text-align: left;
 }
 

@@ -54,17 +54,16 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--band-gap);
+  gap: var(--section-gap);
   min-height: 0;
-  padding: var(--band-gap) 0 calc(var(--space-6) + var(--safe-bottom));
+  padding: var(--space-4) 0 calc(var(--space-6) + var(--safe-bottom));
   overflow-y: auto;
 }
 
-/* Полоса во всю ширину: белая, с тонкой линией сверху и снизу */
+/* Раздел во всю ширину на бумаге, без рамок */
 .fp__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 

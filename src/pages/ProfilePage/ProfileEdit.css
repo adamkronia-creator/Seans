@@ -51,21 +51,20 @@
   line-height: var(--line-height-md);
 }
 
-/* Полосы во всю ширину, между ними щель фона 8; подписи и пояснения между полосами держат поля 16 */
+/* Разделы на бумаге во всю ширину, между ними воздух; подписи и пояснения держат поля 16 */
 .pe__scroll {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--band-gap);
+  gap: var(--section-gap);
   min-height: 0;
-  padding: var(--band-gap) 0 calc(var(--space-6) + var(--safe-bottom));
+  padding: var(--space-4) 0 calc(var(--space-6) + var(--safe-bottom));
   overflow-y: auto;
 }
 
 .pe__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -81,16 +80,6 @@
   min-height: 56px;
   padding: var(--space-2) var(--space-4);
   text-align: left;
-}
-
-.pe__row + .pe__row::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: var(--space-4);
-  height: 1px;
-  background: var(--color-divider);
 }
 
 .pe__row[data-pressed] {
@@ -137,16 +126,6 @@
   position: relative;
   display: block;
   padding: var(--space-3) var(--space-4);
-}
-
-.pe__input + .pe__input::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: var(--space-4);
-  height: 1px;
-  background: var(--color-divider);
 }
 
 .pe__label {
@@ -202,15 +181,14 @@
 .pe__fields {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
+  gap: var(--section-gap);
 }
 
-/* Название поля вводится прямо в шапке карточки; справа выше, ниже и удалить */
+/* Название поля вводится прямо в шапке; справа выше, ниже и удалить */
 .pe__field-head {
   display: flex;
   align-items: center;
   padding: 0 var(--space-2) 0 var(--space-4);
-  border-bottom: 1px solid var(--color-divider);
 }
 
 .pe__field-label {

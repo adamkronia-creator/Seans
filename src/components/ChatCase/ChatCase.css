@@ -16,12 +16,12 @@
   margin-top: auto;
 }
 
-/* Одна страница: блоки — полосы во всю ширину с щелью фона 8; щель есть и сверху, и снизу, у поля ввода */
+/* Одна страница: записи идут на бумаге одна за другой, между ними воздух; поле 16 есть и сверху, и снизу, у поля ввода */
 .case-page {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
-  padding: var(--band-gap) 0;
+  gap: var(--section-gap);
+  padding: var(--space-4) 0;
 }
 
 .case-page > * {
@@ -31,7 +31,7 @@
 .case-cards {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
+  gap: var(--section-gap);
 }
 
 /* Двойной клик или двойное касание открывает редактор: без масштабирования по двойному тапу */
@@ -39,10 +39,9 @@
   touch-action: manipulation;
 }
 
-/* Полоса: белая, от края до края, тонкая линия сверху и снизу. Шапка: значок на цветной плитке, название, карандаш; поля 16 */
+/* Запись: на бумаге, без рамок. Шапка: значок на цветной плитке, название, карандаш; поля 16, заголовок ближе к тексту, чем к предыдущей записи */
 .case-card {
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -50,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  padding: 0 var(--space-4) var(--space-3);
 }
 
 /* Плитка 32 цвета раздела (10% цвета, значок полным цветом); без цвета — без плитки, значок акцентный */
@@ -92,21 +91,19 @@
   font-size: var(--size-icon-sm);
 }
 
-/* Общая информация: подпись слева, значение справа; строки разделены линией от края до края внутри полей 16 */
+/* Общая информация: подпись слева, значение справа; строки отделяет высота (12 + 12), линий нет */
 .case-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-4);
   margin: 0 var(--space-4);
-  padding: var(--space-3) 0;
-  border-top: var(--hairline) solid var(--color-divider);
+  padding: var(--space-2) 0;
 }
 
-/* Между шапкой карточки и первой строкой линии нет (разделители только между строками), а отступ такой же, как до текста в других разделах: 12 */
+/* Между шапкой записи и первой строкой отступ такой же, как до текста в других разделах: 12 */
 .case-row:first-child {
   padding-top: 0;
-  border-top: 0;
 }
 
 /* Подпись при нехватке места переносится, значение стоит целиком, пока не займёт больше 60% строки */
