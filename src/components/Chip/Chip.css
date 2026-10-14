@@ -80,7 +80,7 @@
 .chip--tab {
   --cols: 0fr;
   gap: 0;
-  padding: 0 12px;
+  padding: 0 11px;
   border-radius: 10px;
 }
 

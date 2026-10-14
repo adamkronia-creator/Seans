@@ -1,0 +1,53 @@
+/* Каркас нижнего окна (Frame) и общие для таких окон подпись, карточка и поле текста. Остальное — в EditSheet.css */
+
+/* Что именно меняем: под заголовком, мелко и по центру */
+.frame-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Карточка с подписью и содержимым */
+.frame-card {
+  padding: var(--space-3) var(--space-4);
+}
+
+.frame-label {
+  display: block;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-xs);
+}
+
+/* Поле без рамки внутри белой карточки; высота растет по тексту (AutoTextarea) */
+.frame-textarea {
+  display: block;
+  width: 100%;
+  min-height: 22px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  overflow: hidden;
+  background: none;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  resize: none;
+}
+
+.frame-textarea::placeholder {
+  color: var(--color-text-caption);
+}
+
+/* Красная кнопка действия (отказ, отмена) */
+.sheet__button--danger {
+  background: var(--color-red-text);
+  color: var(--color-accent-on);
+}

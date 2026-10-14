@@ -1,6 +1,6 @@
 import { moveFolder, useFolders, type FolderScope } from '../../data/folders';
 import { plural } from '../../data/taskValues';
-import { Frame } from '../ChatBooking/BookingSheets';
+import { Frame } from '../Frame/Frame';
 import { IconChevronDown, IconChevronUp } from '../ChatParts/ChatIcons';
 import { FOLDER_NOUNS } from './folderTexts';
 import './FolderMenu.css';

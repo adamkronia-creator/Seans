@@ -4,14 +4,12 @@ import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { FolderPage } from './pages/FolderPage/FolderPage';
-import { PlannerPage } from './pages/PlannerPage/PlannerPage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
-import { wantSection, type ChatSection } from './data/chatIntent';
 import { CHATS } from './data/chats';
 import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
@@ -70,10 +68,6 @@ function Layer({ top, children }: { top: boolean; children: ReactNode }) {
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('messages');
-  // Вкладка, из которой открыли чат (из «Ежедневника»): «назад» из чата возвращает на неё, а не к списку чатов
-  const [origin, setOrigin] = useState<TabId | null>(null);
-  /** Чат уже открыт: возврат на корень считается возвратом из него (а не просто моментом до перехода) */
-  const away = useRef(false);
   const { path: route, prev } = useRoute();
   const appRef = useRef<HTMLDivElement>(null);
 
@@ -86,8 +80,6 @@ export default function App() {
 
   const handleTabChange = useCallback((id: TabId) => {
     const { route: current, tab: active } = latest.current;
-    // Вкладку выбрали сами: возвращаться на ту, откуда открыли чат, уже не нужно
-    setOrigin(null);
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
     const toRoot = (id === 'messages' || current.startsWith('/tests/') || current.startsWith('/tasks/')) && current !== '/';
     if (id === active && !toRoot) return;
@@ -96,18 +88,6 @@ export default function App() {
       setTab(id);
       if (toRoot) navigate('/', 'none');
     }, id === active ? 'back' : 'fade');
-  }, []);
-
-  /** Открыть чат на нужном разделе из другой вкладки (из «Ежедневника»): назад возвращает на ту вкладку */
-  const openChat = useCallback((chatId: string, section: ChatSection) => {
-    wantSection(chatId, section);
-    const from = latest.current.tab;
-    transition(() => {
-      away.current = false;
-      setOrigin(from);
-      setTab('messages');
-      navigate(`/chat/${chatId}`, 'none');
-    }, 'forward');
   }, []);
 
   /** Настройки папки на весь экран, без нижней панели (как редактирование профиля); если такой папки нет, экран не строится */
@@ -206,21 +186,18 @@ export default function App() {
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at) : page('tasks', <TasksPage />, at);
     }
-    if (at === 'profile') {
-      // /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
-      if (path === '/profile/edit') {
-        return {
-          key: 'profile/edit',
-          build: () => (
-            <main className="app__content">
-              <ProfileEditPage />
-            </main>
-          ),
-        };
-      }
-      return page('profile', <ProfilePage />, at);
+    // Остался «Профиль». /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
+    if (path === '/profile/edit') {
+      return {
+        key: 'profile/edit',
+        build: () => (
+          <main className="app__content">
+            <ProfileEditPage />
+          </main>
+        ),
+      };
     }
-    return page('planner', <PlannerPage onOpenChat={openChat} />, at);
+    return page('profile', <ProfilePage />, at);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой
@@ -239,27 +216,11 @@ export default function App() {
     return { key, node };
   };
 
-  // Пока чат только открывается или уже закрылся, корень — это вкладка, откуда пришли: ее экран остается на месте и не пересоздается
-  const topTab = origin && tab === 'messages' && route === '/' ? origin : tab;
-  const top = screenFor(route, topTab);
+  const top = screenFor(route);
   // Под экраном лежит тот, откуда пришли (а при прямой ссылке — тот, куда вёл бы «назад»). У корня «назад» нет
   const underPath = route === '/' ? null : prev ?? parentOf(route);
-  // Чат открыт из другой вкладки: под ним лежит она (то же, что было на экране), а не список чатов
-  const underTab = origin && underPath === '/' && tab === 'messages' ? origin : tab;
-  let under = underPath !== null && underPath !== route ? screenFor(underPath, underTab) : null;
+  let under = underPath !== null && underPath !== route ? screenFor(underPath) : null;
   if (under?.key === top.key) under = null;
-
-  // Вернулись из чата на корень: открывается вкладка, с которой пришли; ее экран уже нарисован под чатом и остается как был
-  useLayoutEffect(() => {
-    if (origin === null) return;
-    if (route !== '/') {
-      away.current = true;
-    } else if (away.current) {
-      away.current = false;
-      setTab(origin);
-      setOrigin(null);
-    }
-  }, [route, origin]);
 
   useEdgeBack(appRef, {
     enabled: under !== null,

@@ -12,6 +12,8 @@ export interface CaseNote {
   tone: ToneId | null;
   /** Дата последнего обновления */
   updated: string;
+  /** Чат, в котором написана заметка; у заметок Максима не задан */
+  chatId?: string;
 }
 
 export const CASE_NOTES: CaseNote[] = [

@@ -82,6 +82,12 @@
   color: var(--color-accent-on);
 }
 
+/* Пока писать нечего (поле заметки): круг серый и не нажимается */
+.composer__round--send:disabled {
+  background: var(--color-bg-fill);
+  color: var(--color-text-placeholder);
+}
+
 .composer__emoji--active {
   color: var(--color-accent);
 }

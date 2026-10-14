@@ -11,9 +11,15 @@ interface MessageInputProps {
   /** Сообщение, на которое пишется ответ */
   reply?: { name: string; text: string };
   onCancelReply?: () => void;
+  /** Подпись пустого поля и название поля для экранных читалок */
+  placeholder?: string;
+  /** Кнопки «Прикрепить» и «Голосовое сообщение»: у поля заметки их нет, а кнопка «Отправить» стоит всегда и ждёт текста */
+  extras?: boolean;
+  /** Страница с полем сейчас на экране: на компьютере (с мышью) курсор сразу встаёт в поле, на телефоне — нет, чтобы не выезжала клавиатура */
+  active?: boolean;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -21,6 +27,11 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
   const savedRange = useRef<Range | null>(null);
 
   const hasText = text.trim().length > 0;
+
+  // Страница открылась: на компьютере писать можно сразу, не нажимая на поле
+  useEffect(() => {
+    if (active && window.matchMedia('(hover: hover) and (pointer: fine)').matches) inputRef.current?.focus({ preventScroll: true });
+  }, [active]);
 
   // Выбран ответ: фокус в поле, ленту удерживаем внизу после появления плашки
   useEffect(() => {
@@ -56,9 +67,12 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
     if (emojiOpen) setPanel(false);
   };
 
+  // Заметка на телефоне — это несколько абзацев, а Shift на экранной клавиатуре нет: там Enter переносит строку, отправляет кнопка
+  const enterSends = () => extras || window.matchMedia('(pointer: fine)').matches;
+
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     // Enter отправляет, Shift+Enter переносит строку
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && enterSends()) {
       e.preventDefault();
       submit();
     }
@@ -111,9 +125,11 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
       )}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className={`composer${emojiOpen ? ' composer--panel' : ''}`}>
-        <button type="button" className="composer__round" aria-label="Прикрепить">
-          <IconAttach />
-        </button>
+        {extras && (
+          <button type="button" className="composer__round" aria-label="Прикрепить">
+            <IconAttach />
+          </button>
+        )}
 
         <div className="composer__field">
           <div
@@ -122,11 +138,11 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
             contentEditable="plaintext-only"
             suppressContentEditableWarning
             role="textbox"
-            aria-label="Сообщение"
+            aria-label={placeholder}
             aria-multiline="true"
-            data-placeholder="Сообщение"
+            data-placeholder={placeholder}
             inputMode="text"
-            enterKeyHint="send"
+            enterKeyHint={extras ? 'send' : 'enter'}
             autoCapitalize="sentences"
             spellCheck
             onInput={(e) => {
@@ -154,8 +170,15 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply }: M
           </button>
         </div>
 
-        {hasText ? (
-          <button type="button" className="composer__round composer__round--send" aria-label="Отправить" onClick={submit} onMouseDown={(e) => e.preventDefault()}>
+        {hasText || !extras ? (
+          <button
+            type="button"
+            className="composer__round composer__round--send"
+            aria-label="Отправить"
+            disabled={!hasText}
+            onClick={submit}
+            onMouseDown={(e) => e.preventDefault()}
+          >
             <IconSend />
           </button>
         ) : (

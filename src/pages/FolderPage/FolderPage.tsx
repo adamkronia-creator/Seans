@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { Frame } from '../../components/ChatBooking/BookingSheets';
+import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
 import { IconBack } from '../../components/icons';

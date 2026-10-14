@@ -1,13 +1,13 @@
 import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
-import { Frame } from '../ChatBooking/BookingSheets';
+import { Frame } from '../Frame/Frame';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { IconCamera, IconCheck } from './ProfileIcons';
 import { filesOf, uploadPhotos } from './upload';
 import './ProfileSheets.css';
 
 /*
- * Нижние окна профиля. Подписи и поле текста — те же, что в «Информации о приеме» (.bk-card, .bk-label, .bk-textarea из BookingSheets.css).
+ * Нижние окна профиля. Подписи и поле текста — общие для нижних окон (.frame-card, .frame-label, .frame-textarea из Frame.css).
  */
 
 interface PickProps {
@@ -122,13 +122,13 @@ export function CaptionSheet({ photoId, onClose }: { photoId: string; onClose: (
         </>
       }
     >
-      <section className="sheet__card bk-card">
-        <label className="bk-label" htmlFor={`${uid}-caption`}>
+      <section className="sheet__card frame-card">
+        <label className="frame-label" htmlFor={`${uid}-caption`}>
           Подпись
         </label>
         <AutoTextarea
           id={`${uid}-caption`}
-          className="bk-textarea"
+          className="frame-textarea"
           rows={2}
           value={text}
           onChange={setText}

@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { IconBookingPin } from '../../components/icons';
+import { IconPin } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { IconCamera, IconImage, IconPencil, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { PhotoPickSheet } from '../../components/Profile/ProfileSheets';
@@ -98,7 +98,7 @@ export function ProfilePage() {
             {headline.trim() && <p className="profile__headline">{headline.trim()}</p>}
             {city.trim() && (
               <p className="profile__city">
-                <IconBookingPin />
+                <IconPin />
                 {city.trim()}
               </p>
             )}

@@ -1,7 +1,6 @@
 import type { SVGProps } from 'react';
 
 // SVG из Figma; цвета в них заменяются на currentColor (см. vite.config.ts)
-export { default as IconPlanner } from '../../assets/icons/tabbar/planner.svg?react';
 export { default as IconMessages } from '../../assets/icons/tabbar/messages.svg?react';
 export { default as IconTests } from '../../assets/icons/tabbar/psych-tests.svg?react';
 export { default as IconTasks } from '../../assets/icons/tabbar/psych-tasks.svg?react';
@@ -34,11 +33,11 @@ export function IconPlus(props: SVGProps<SVGSVGElement>) {
 }
 
 // Экран открытого чата
-export { default as IconTabBooking } from '../../assets/icons/chat/tab-booking.svg?react';
 export { default as IconTabMessages } from '../../assets/icons/chat/tab-messages.svg?react';
 export { default as IconTabTests } from '../../assets/icons/chat/tab-tests.svg?react';
 export { default as IconTabPractices } from '../../assets/icons/chat/tab-practices.svg?react';
 export { default as IconTabNotes } from '../../assets/icons/chat/tab-notes.svg?react';
+export { default as IconTabInfo } from '../../assets/icons/chat/tab-info.svg?react';
 export { default as IconTabLibrary } from '../../assets/icons/chat/tab-library.svg?react';
 export { default as IconSettings } from '../../assets/icons/chat/settings.svg?react';
 export { default as IconAttach } from '../../assets/icons/chat/attach.svg?react';
@@ -47,26 +46,10 @@ export { default as IconMicrophone } from '../../assets/icons/chat/microphone.sv
 export { default as IconReadTicks } from '../../assets/icons/chat/read-ticks.svg?react';
 export { default as IconSend } from '../../assets/icons/chat/send.svg?react';
 
-// Вкладка «Запись на прием»: все значки присланы; status-* — статусы в истории приемов (заменяются файлом с тем же именем)
-export { default as IconBookingPin } from '../../assets/icons/booking/pin.svg?react';
-export { default as IconBookingRoute } from '../../assets/icons/booking/route.svg?react';
-export { default as IconBookingInMaps } from '../../assets/icons/booking/in-maps.svg?react';
-export { default as IconBookingCopy } from '../../assets/icons/booking/copy.svg?react';
-export { default as IconBookingWallet } from '../../assets/icons/booking/wallet.svg?react';
-export { default as IconBookingDirections } from '../../assets/icons/booking/directions.svg?react';
-export { default as IconBookingBag } from '../../assets/icons/booking/bag.svg?react';
-export { default as IconBookingCalendar } from '../../assets/icons/booking/calendar.svg?react';
-export { default as IconBookingExternal } from '../../assets/icons/booking/external.svg?react';
-export { default as IconBookingDone } from '../../assets/icons/booking/status-done.svg?react';
-export { default as IconBookingCancelled } from '../../assets/icons/booking/status-cancelled.svg?react';
-export { default as IconBookingMoved } from '../../assets/icons/booking/status-moved.svg?react';
-export { default as IconBookingPending } from '../../assets/icons/booking/status-pending.svg?react';
+// Метка места (профиль)
+export { default as IconPin } from '../../assets/icons/pin.svg?react';
 
-// Вкладка «Кейс»
-export { default as IconCaseAdd } from '../../assets/icons/case/add-pencil.svg?react';
-export { default as IconCaseAttach } from '../../assets/icons/case/attach-file.svg?react';
-export { default as IconCaseFileDownload } from '../../assets/icons/case/file-download.svg?react';
-export { default as IconCaseAddNote } from '../../assets/icons/case/add-note.svg?react';
+// Карточки вкладок «Заметки» и «Сведения»
 export { default as IconCaseNotePin } from '../../assets/icons/case/note-pin.svg?react';
 export { default as IconCaseEdit } from '../../assets/icons/case/edit.svg?react';
 export { default as IconCaseLock } from '../../assets/icons/case/note-lock.svg?react';

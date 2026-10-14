@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { CASE_SECTIONS, type CaseSection } from './case';
-import { CASE_FILES, fileKind, fileMeta, type CaseFile } from './files';
+import { CASE_SECTIONS, textToBlocks, textToParagraphs, type CaseSection } from './case';
 import { CASE_NOTES, type CaseNote } from './notes';
 import { LIBRARY, TASK_LIBRARY } from './library';
 import type { PsyTest } from './tests';
@@ -13,7 +12,7 @@ import avatar1 from '../assets/avatars/avatar-1.png';
 /*
  * Единый источник правды по клиенту (пока только Максим): журнал действий.
  * Из него собираются «История взаимодействия», вкладки «Тесты», «Задания»,
- * «Кейс → Заметки» и экран «События», поэтому новое действие появляется везде сразу.
+ * «Заметки», «Сведения» и экран «События», поэтому новое действие появляется везде сразу.
  * Новые действия добавляются в конец журнала функциями ниже (addNote, sendTest и т. д.).
  */
 
@@ -27,11 +26,6 @@ export interface Session {
 
 /** Чат клиента, чьи данные хранятся здесь (пока только Максим) */
 export const CLIENT_CHAT = 'maxim';
-
-/** Сеанс вместе с днём, когда он прошёл: для «Ежедневника» (день — «2026-10-08») */
-export interface SessionRecord extends Session {
-  date: string;
-}
 
 export type Activity =
   | { id: string; kind: 'invite'; date: string }
@@ -61,8 +55,6 @@ interface ClientData {
   caseSections: CaseSection[];
   /** Комментарии психолога к тестам и заданиям в истории: id записи журнала → текст */
   comments: Record<string, string>;
-  /** Файлы кейса по клиентам: id чата → файлы, новые сверху */
-  files: Record<string, CaseFile[]>;
 }
 
 /** Как называется тест в тексте событий и истории */
@@ -205,7 +197,6 @@ let data: ClientData = {
   sessions: SESSIONS,
   caseSections: CASE_SECTIONS,
   comments: {},
-  files: { maxim: CASE_FILES },
 };
 const listeners = new Set<() => void>();
 
@@ -238,7 +229,19 @@ export function nowStamp() {
 
 // ——— Действия: каждое дописывает запись в журнал ———
 
-export function addNote(title: string, paragraphs: string[]) {
+/** Первая непустая строка текста — заголовок карточки (в карточке длинный заголовок обрезается многоточием) */
+const titleOf = (text: string) => (text.split('\n').find((line) => line.trim()) ?? '').replace(/\s+/g, ' ').trim().slice(0, 120);
+
+/**
+ * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». У клиента (Максима) она попадает и в журнал,
+ * то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
+ */
+export function addNote(chatId: string, text: string): string | null {
+  const title = titleOf(text);
+  if (!title) return null;
+  let paragraphs = textToParagraphs(text);
+  // Первая строка, стоящая отдельным абзацем, уже в заголовке: в тексте её не повторяем
+  if (paragraphs[0] === title) paragraphs = paragraphs.slice(1);
   const { date } = nowStamp();
   const note: CaseNote = {
     id: `n${data.notes.length + 1}-${Date.now()}`,
@@ -247,46 +250,33 @@ export function addNote(title: string, paragraphs: string[]) {
     icon: 'pin',
     tone: 'purple',
     updated: date,
+    ...(chatId === CLIENT_CHAT ? {} : { chatId }),
   };
   update({
     notes: [...data.notes, note],
-    activity: [...data.activity, { id: nextId(), kind: 'note', ref: note.id, date }],
+    ...(chatId === CLIENT_CHAT ? { activity: [...data.activity, { id: nextId(), kind: 'note' as const, ref: note.id, date }] } : {}),
   });
+  return note.id;
 }
 
-/** «08.10.2026» ↔ «2026-10-08» */
-const toDayKey = (ru: string) => `${ru.slice(6, 10)}-${ru.slice(3, 5)}-${ru.slice(0, 2)}`;
-const toRuDate = (key: string) => `${key.slice(8, 10)}.${key.slice(5, 7)}.${key.slice(0, 4)}`;
-
-/** Номера сеансов идут по порядку в журнале: сеанс, внесённый задним числом, встаёт на своё место и сдвигает следующие */
-function numbered(sessions: Session[], activity: Activity[]): Session[] {
-  const order = activity.flatMap((a) => (a.kind === 'session' ? [a.ref] : []));
-  return sessions.map((x) => ({ ...x, number: order.indexOf(x.id) + 1 }));
-}
-
-/**
- * Сеанс состоялся: запись о нём попадает в журнал на место по дате, а не в конец, чтобы лента истории шла по времени.
- * Возвращает id сеанса. День — «2026-10-08»; без него берётся сегодняшний.
- */
-export function registerSession(day?: string, paragraphs: string[] = []): string {
-  const date = day ? toRuDate(day) : nowStamp().date;
-  const id = `s${data.sessions.length + 1}-${Date.now()}`;
-  const key = toDayKey(date);
-  let at = data.activity.length;
-  while (at > 0 && toDayKey(data.activity[at - 1].date) > key) at--;
-  const activity = [...data.activity.slice(0, at), { id: nextId(), kind: 'session' as const, ref: id, date }, ...data.activity.slice(at)];
-  update({ sessions: numbered([...data.sessions, { id, number: 0, paragraphs }], activity), activity });
-  return id;
-}
-
-/** Снимает запись о сеансе (отметку «состоялся» отменили); номера следующих пересчитываются */
-export function removeSession(id: string) {
-  const activity = data.activity.filter((a) => !(a.kind === 'session' && a.ref === id));
-  update({ sessions: numbered(data.sessions.filter((x) => x.id !== id), activity), activity });
-}
-
-export function addSession(paragraphs: string[]) {
-  registerSession(undefined, paragraphs);
+/** Новое сведение из текста, набранного в поле внизу вкладки «Сведения» */
+export function addSection(chatId: string, text: string): string | null {
+  const title = titleOf(text);
+  if (!title) return null;
+  const blocks = textToBlocks(text);
+  if (blocks[0]?.type === 'p' && blocks[0].text === title) blocks.shift();
+  const { date } = nowStamp();
+  const section: CaseSection = {
+    id: `c${data.caseSections.length + 1}-${Date.now()}`,
+    title,
+    icon: 'info',
+    tone: 'blue',
+    blocks,
+    updated: date,
+    ...(chatId === CLIENT_CHAT ? {} : { chatId }),
+  };
+  update({ caseSections: [...data.caseSections, section] });
+  return section.id;
 }
 
 /** Меняет сведения кейса; у текстовых разделов обновляется дата */
@@ -316,23 +306,6 @@ export function setComment(activityId: string, text: string) {
   if (text) comments[activityId] = text;
   else delete comments[activityId];
   update({ comments });
-}
-
-/** Прикрепляет выбранные файлы к кейсу клиента; новые идут первыми */
-export function attachFiles(clientId: string, picked: File[]) {
-  const { date } = nowStamp();
-  const added: CaseFile[] = picked.map((f, i) => {
-    const kind = fileKind(f);
-    return {
-      id: `f-${Date.now()}-${i}`,
-      name: f.name,
-      kind,
-      meta: fileMeta(kind, f.size),
-      date: date.slice(0, 5),
-      url: URL.createObjectURL(f),
-    };
-  });
-  update({ files: { ...data.files, [clientId]: [...added.reverse(), ...(data.files[clientId] ?? [])] } });
 }
 
 /** Тест или задание: назначено / отправлено / выполнено; у постоянного задания — правило или номер записи */
@@ -386,17 +359,6 @@ function activityText({ kind, ref, state, permanent, record }: ItemActivity): st
       : `Вы отправили психологическое задание «${name}»`;
   }
   return `Вы назначили психологическое задание «${name}»`;
-}
-
-/** Сеансы с днями, когда они прошли (день берётся из журнала) */
-export function sessionRecords(d: ClientData): SessionRecord[] {
-  const out: SessionRecord[] = [];
-  d.activity.forEach((a) => {
-    if (a.kind !== 'session') return;
-    const session = d.sessions.find((x) => x.id === a.ref);
-    if (session) out.push({ ...session, date: toDayKey(a.date) });
-  });
-  return out;
 }
 
 export function historyEvents(d: ClientData): HistoryEvent[] {

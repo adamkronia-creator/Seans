@@ -106,7 +106,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'booking' | 'buttons'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 
@@ -122,8 +122,7 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
   setTimeout(() => patchMessage(chatId, id, { status: 'sent' }), 500);
   setTimeout(() => patchMessage(chatId, id, { status: 'read' }), 1400);
   if (chats.find((c) => c.id === chatId)?.online) {
-    // Оповещение о записи на прием уходит без «печатает…»: это не реплика, на которую отвечают
-    if (SIMULATE_TYPING && !test?.booking) {
+    if (SIMULATE_TYPING) {
       setTimeout(() => {
         typing = { ...typing, [chatId]: true };
         emit();

@@ -79,7 +79,9 @@
 .chat__chips {
   position: relative;
   display: flex;
-  gap: 6px;
+  /* Вкладки растянуты на всю ширину между полями экрана: свободное место делится между ними поровну, gap — только запас, когда тесно */
+  justify-content: space-between;
+  gap: 4px;
   padding: var(--space-1) var(--space-4) var(--space-3);
   overflow-x: auto;
   scrollbar-width: none;

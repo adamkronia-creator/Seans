@@ -1,13 +1,8 @@
 import { ScrollHost } from '../ScrollHost/ScrollHost';
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { SwipePager } from '../SwipePager/SwipePager';
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
-import {
-  IconCaseFileDownload,
-  IconCaseEdit,
-  IconCaseLock,
-} from '../icons';
+import { IconCaseEdit, IconCaseLock } from '../icons';
 import {
   blocksToText,
   paragraphsToText,
@@ -15,11 +10,11 @@ import {
   textToParagraphs,
   type CaseSection,
 } from '../../data/case';
-import type { CaseFile } from '../../data/files';
 import type { CaseNote } from '../../data/notes';
 import { toneOf } from '../../data/tones';
-import { attachFiles, updateNote, updateSection, useClientData } from '../../data/clientStore';
+import { CLIENT_CHAT, updateNote, updateSection, useClientData } from '../../data/clientStore';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
+import { reducedMotion } from '../../utils/swipe';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { HEAD_ICONS } from './caseIcons';
 import './ChatCase.css';
@@ -29,8 +24,6 @@ const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
   const { bg, fg } = toneOf(tone);
   return { '--head-bg': bg, '--head-fg': fg } as CSSProperties;
 };
-
-type SegmentId = 'info' | 'notes' | 'materials';
 
 function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
   const head = section.icon ? HEAD_ICONS[section.icon] : null;
@@ -127,33 +120,6 @@ function CaseRow({
   );
 }
 
-function FileCard({ file }: { file: CaseFile }) {
-  const body = (
-    <>
-      <span className={`case-file__thumb case-file__thumb--${file.kind}`}>
-        <IconCaseFileDownload />
-      </span>
-      <div className="case-file__info">
-        <span className="case-file__name">{file.name}</span>
-        <span className="case-file__meta">{file.meta}</span>
-      </div>
-      <span className="case-file__date">{file.date}</span>
-    </>
-  );
-  // Загруженный файл открывается и скачивается по нажатию
-  return (
-    <li>
-      {file.url ? (
-        <a className="case-file case-file--link" href={file.url} download={file.name} target="_blank" rel="noreferrer">
-          {body}
-        </a>
-      ) : (
-        <div className="case-file">{body}</div>
-      )}
-    </li>
-  );
-}
-
 function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   const head = note.icon ? HEAD_ICONS[note.icon] : null;
   const [quick, setQuick] = useState(false);
@@ -194,135 +160,90 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   );
 }
 
-/** Вкладка «Кейс» в открытом чате: сведения о клиенте, заметки и материалы */
-export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: string }) {
-  const { notes, caseSections, files: allFiles } = useClientData();
-  const files = allFiles[clientId] ?? [];
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [segment, setSegment] = useState<SegmentId>('info');
-  // Что сейчас редактируется: сведение или заметка
-  const [editing, setEditing] = useState<{ kind: 'section' | 'note'; id: string } | null>(null);
-  const editSection = editing?.kind === 'section' ? caseSections.find((x) => x.id === editing.id) : undefined;
-  const editNote = editing?.kind === 'note' ? notes.find((x) => x.id === editing.id) : undefined;
+/** Новая карточка в конце списка: страница докручивается до неё (как лента чата до нового сообщения) */
+function useScrollToAppended(list: RefObject<HTMLElement>, count: number) {
+  const before = useRef(count);
+  useEffect(() => {
+    if (count > before.current) list.current?.lastElementChild?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+    before.current = count;
+  }, [list, count]);
+}
 
-  const segments: { id: SegmentId; label: string; count: number }[] = [
-    { id: 'info', label: 'Сведения', count: hasData ? caseSections.length : 0 },
-    { id: 'notes', label: 'Заметки', count: hasData ? notes.length : 0 },
-    { id: 'materials', label: 'Файлы', count: files.length },
-  ];
-
-  const page = (children: ReactNode) => <div className="case-page">{children}</div>;
-  const pages = [
-    {
-      key: 'info',
-      node: page(
-        <>
-          <button type="button" className="case-add">
-            Добавить сведения
-          </button>
-
-          <ul className="case-cards" hidden={!hasData}>
-            {(hasData ? caseSections : []).map((section) => (
-              <CaseCard
-                key={section.id}
-                section={section}
-                onEdit={() => setEditing({ kind: 'section', id: section.id })}
-              />
-            ))}
-          </ul>
-
-          <p className="case-note">
-            <IconCaseLock className="case-note__icon" />
-            <span>Психологический кейс виден только вам</span>
-          </p>
-        </>,
-      ),
-    },
-    {
-      key: 'notes',
-      node: page(
-        <>
-          <button type="button" className="case-add">
-            Добавить заметку
-          </button>
-
-          <ul className="case-cards" hidden={!hasData}>
-            {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onEdit={() => setEditing({ kind: 'note', id: note.id })} />
-            ))}
-          </ul>
-
-          <p className="case-note">
-            <IconCaseLock className="case-note__icon" />
-            <span>Заметки видны только вам</span>
-          </p>
-        </>,
-      ),
-    },
-    {
-      key: 'materials',
-      node: page(
-        <>
-          <button type="button" className="case-add" onClick={() => fileInput.current?.click()}>
-            Прикрепить файл
-          </button>
-          {/* Системное окно выбора файлов; можно выбрать несколько */}
-          <input
-            ref={fileInput}
-            type="file"
-            multiple
-            hidden
-            onChange={(e) => {
-              const picked = Array.from(e.target.files ?? []);
-              if (picked.length > 0) attachFiles(clientId, picked);
-              e.target.value = ''; // тот же файл можно выбрать снова
-            }}
-          />
-
-          <ul className="case-cards" hidden={files.length === 0}>
-            {files.map((file) => (
-              <FileCard key={file.id} file={file} />
-            ))}
-          </ul>
-
-          <p className="case-note">
-            <IconCaseLock className="case-note__icon" />
-            <span>Файлы видны только вам</span>
-          </p>
-        </>,
-      ),
-    },
-  ];
-
-  // Сегменты стоят над страницами и не едут за ними; листать можно и за них
-  const header = (
-  <div className="case-segments" role="tablist" aria-label="Разделы кейса">
-    {segments.map(({ id, label }) => (
-      <button
-        key={id}
-        type="button"
-        role="tab"
-        aria-selected={segment === id}
-        className={`case-segments__item${segment === id ? ' case-segments__item--active' : ''}`}
-        onClick={() => setSegment(id)}
-      >
-        <span>{label}</span>
-      </button>
-    ))}
-  </div>
-  );
+/** Вкладка «Заметки» в открытом чате: заметки этого чата, новые добавляются полем внизу (см. CaseComposer) */
+export function ChatNotes({ chatId }: { chatId: string }) {
+  const { notes } = useClientData();
+  // Тестовые заметки Максима не привязаны к чату, остальные — к чату, где их написали
+  const mine = notes.filter((note) => (note.chatId ?? CLIENT_CHAT) === chatId);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editNote = mine.find((x) => x.id === editingId);
+  const list = useRef<HTMLUListElement>(null);
+  useScrollToAppended(list, mine.length);
 
   return (
     <ScrollHost className="chat-case">
-      <SwipePager
-        className="chat-case__pager"
-        autoHeight
-        nested
-        index={segments.findIndex((x) => x.id === segment)}
-        pages={pages}
-        header={header}
-        onIndexChange={(i) => setSegment(segments[i].id)}
-      />
+      <div className="case-page">
+        <ul ref={list} className="case-cards" hidden={mine.length === 0}>
+          {mine.map((note) => (
+            <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
+          ))}
+        </ul>
+
+        <p className="case-note">
+          <IconCaseLock className="case-note__icon" />
+          <span>Заметки видны только вам</span>
+        </p>
+      </div>
+
+      {editNote && (
+        <EditSheet
+          key={editNote.id}
+          heading="Редактирование заметки"
+          initial={{
+            title: editNote.title,
+            text: paragraphsToText(editNote.paragraphs),
+            icon: editNote.icon,
+            tone: editNote.tone,
+          }}
+          textPlaceholder="Введите текст"
+          onClose={() => setEditingId(null)}
+          onSave={(v: EditValues) => {
+            updateNote(editNote.id, {
+              title: v.title,
+              paragraphs: textToParagraphs(v.text ?? ''),
+              icon: v.icon,
+              tone: v.tone,
+            });
+            setEditingId(null);
+          }}
+        />
+      )}
+    </ScrollHost>
+  );
+}
+
+/** Вкладка «Сведения» в открытом чате: сведения о клиенте этого чата, новые добавляются полем внизу (см. CaseComposer) */
+export function ChatInfo({ chatId }: { chatId: string }) {
+  const { caseSections } = useClientData();
+  const mine = caseSections.filter((section) => (section.chatId ?? CLIENT_CHAT) === chatId);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editSection = mine.find((x) => x.id === editingId);
+  const list = useRef<HTMLUListElement>(null);
+  useScrollToAppended(list, mine.length);
+
+  return (
+    <ScrollHost className="chat-case">
+      <div className="case-page">
+        <ul ref={list} className="case-cards" hidden={mine.length === 0}>
+          {mine.map((section) => (
+            <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
+          ))}
+        </ul>
+
+        <p className="case-note">
+          <IconCaseLock className="case-note__icon" />
+          <span>Психологический кейс виден только вам</span>
+        </p>
+      </div>
 
       {editSection && (
         <EditSheet
@@ -337,7 +258,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
           }}
           rowLabels={editSection.rows?.map((r) => r.label)}
           textPlaceholder="Введите текст"
-          onClose={() => setEditing(null)}
+          onClose={() => setEditingId(null)}
           onSave={(v: EditValues) => {
             updateSection(editSection.id, {
               title: v.title,
@@ -348,31 +269,7 @@ export function ChatCase({ hasData, clientId }: { hasData: boolean; clientId: st
                 ? { rows: editSection.rows.map((r, i) => ({ ...r, value: v.rows![i] })) }
                 : {}),
             });
-            setEditing(null);
-          }}
-        />
-      )}
-
-      {editNote && (
-        <EditSheet
-          key={editNote.id}
-          heading="Редактирование заметки"
-          initial={{
-            title: editNote.title,
-            text: paragraphsToText(editNote.paragraphs),
-            icon: editNote.icon,
-            tone: editNote.tone,
-          }}
-          textPlaceholder="Введите текст"
-          onClose={() => setEditing(null)}
-          onSave={(v: EditValues) => {
-            updateNote(editNote.id, {
-              title: v.title,
-              paragraphs: textToParagraphs(v.text ?? ''),
-              icon: v.icon,
-              tone: v.tone,
-            });
-            setEditing(null);
+            setEditingId(null);
           }}
         />
       )}

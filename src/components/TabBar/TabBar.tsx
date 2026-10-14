@@ -1,7 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 import {
   IconMessages,
-  IconPlanner,
   IconProfile,
   IconTasks,
   IconTests,
@@ -10,13 +9,12 @@ import { Badge } from '../Badge/Badge';
 import { useUnreadTotal } from '../../data/chatStore';
 import './TabBar.css';
 
-export type TabId = 'planner' | 'messages' | 'tests' | 'tasks' | 'profile';
+export type TabId = 'messages' | 'tests' | 'tasks' | 'profile';
 
 // label — название для экранных читалок (подписей под значками нет)
 const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
   { id: 'tasks', label: 'Задания', Icon: IconTasks },
   { id: 'tests', label: 'Диагностика', Icon: IconTests },
-  { id: 'planner', label: 'Ежедневник', Icon: IconPlanner },
   { id: 'messages', label: 'Диалоги', Icon: IconMessages },
   { id: 'profile', label: 'Профиль', Icon: IconProfile },
 ];

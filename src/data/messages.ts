@@ -27,8 +27,6 @@ export interface Message {
   toSelf?: boolean;
   /** Кнопки под пузырём, как у ботов в Telegram */
   buttons?: MessageButton[];
-  /** Оповещение о записи на прием (карточка в стиле присланного теста): заголовок; кнопка берется из buttons */
-  booking?: { title: string };
 }
 
 /** Настройки, с которыми тест ушел клиенту (то, что стояло на экране «Настройка теста» в момент отправки) */
@@ -69,7 +67,6 @@ export interface SentTaskOptions {
 export interface MessageButton {
   label: string;
   /** Адрес внутри приложения (hash-маршрут без «#»), например «/chat/favorites/result/r1» */
-  /** Или «section:booking»: открыть раздел этого же чата */
   href: string;
 }
 

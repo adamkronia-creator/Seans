@@ -5,16 +5,15 @@ import {
   IconSearch,
   IconFavorites,
   IconSettings,
-  IconTabBooking,
+  IconTabInfo,
   IconTabLibrary,
   IconTabMessages,
   IconTabNotes,
   IconTabPractices,
   IconTabTests,
 } from '../../components/icons';
-import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
-import { ChatCase } from '../../components/ChatCase/ChatCase';
+import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
@@ -24,6 +23,7 @@ import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
+import { addNote, addSection } from '../../data/clientStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -32,27 +32,26 @@ import { hasTaskSettings } from '../../data/taskValues';
 import { Chip } from '../../components/Chip/Chip';
 import { followChips, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
-import { clearWanted, wantedSection, type ChatSection } from '../../data/chatIntent';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
-// Разделы карточки собеседника; при открытии чата виден «Сообщения»
-type SectionId = ChatSection;
+// Разделы карточки собеседника; при открытии чата виден «Диалог»
+type SectionId = 'messages' | 'tests' | 'tasks' | 'notes' | 'info' | 'library';
 
 const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
-  { id: 'booking', label: 'Прием', icon: <IconTabBooking /> },
   { id: 'messages', label: 'Диалог', icon: <IconTabMessages /> },
   { id: 'tests', label: 'Тесты', icon: <IconTabTests /> },
   { id: 'tasks', label: 'Задания', icon: <IconTabPractices /> },
-  { id: 'notes', label: 'Кейс', icon: <IconTabNotes /> },
+  { id: 'notes', label: 'Заметки', icon: <IconTabNotes /> },
+  { id: 'info', label: 'Сведения', icon: <IconTabInfo /> },
   { id: 'library', label: 'История', icon: <IconTabLibrary /> },
 ];
 
-/** В «Избранном» нет записи на прием и истории взаимодействия: записываться не к кому, взаимодействовать не с кем */
-const FAVORITES_HIDDEN: SectionId[] = ['booking', 'library'];
+/** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
+const FAVORITES_HIDDEN: SectionId[] = ['library'];
 const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
@@ -127,14 +126,17 @@ interface SectionPageProps {
   chatId: string;
   /** Чат «Избранное»: вместо тестов клиента показываются свои */
   favorites: boolean;
-  /** Имя собеседника без фамилии */
-  peerName: string;
   hasClientData: boolean;
+  /** Раздел сейчас на экране */
+  active: boolean;
   onAppTabChange: (id: TabId) => void;
 }
 
-/** Страница раздела, кроме переписки: содержимое и снизу панель приложения. Не перерисовывается, пока не изменились эти поля */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName, hasClientData, onAppTabChange }: SectionPageProps) {
+/**
+ * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
+ * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
+ */
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -157,10 +159,20 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, peerName,
             onOpenResult={(taskId) => findClientTaskResult(clientResultId(chatId, taskId)) && navigate(clientResultPath(chatId, taskId))}
           />
         ))}
-      {id === 'notes' && <ChatCase hasData={hasClientData} clientId={chatId} />}
+      {id === 'notes' && (
+        <>
+          <ChatNotes chatId={chatId} />
+          <MessageInput placeholder="Заметка" extras={false} active={active} onSend={(text) => void addNote(chatId, text)} />
+        </>
+      )}
+      {id === 'info' && (
+        <>
+          <ChatInfo chatId={chatId} />
+          <MessageInput placeholder="Сведения" extras={false} active={active} onSend={(text) => void addSection(chatId, text)} />
+        </>
+      )}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
-      {id === 'booking' && <ChatBooking chatId={chatId} peerName={peerName} />}
-      <TabBar active="messages" onChange={onAppTabChange} />
+      {id !== 'notes' && id !== 'info' && <TabBar active="messages" onChange={onAppTabChange} />}
     </>
   );
 });
@@ -173,17 +185,14 @@ interface ChatPageProps {
 
 /** Чат с собеседником. Настройка теста и результат открываются поверх него отдельными экранами (ChatScreens.tsx) */
 export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
-  // Из «Ежедневника» чат может открываться сразу на нужном разделе; записка стирается, когда чат открылся
-  const [picked, setSection] = useState<SectionId>(() => wantedSection(chatId) ?? 'messages');
+  // Раздел, который выбрал пользователь (нажатием на вкладку или свайпом)
+  const [picked, setSection] = useState<SectionId>('messages');
   // После первого показа новые сообщения появляются с движением, а уже лежавшие в ленте — нет (см. styles/micro.css)
   useEffect(() => {
     listRef.current?.setAttribute('data-live', '');
   }, []);
 
-  useEffect(() => {
-    clearWanted();
-  }, []);
-  // Тесты, задания и кейс пока есть только у Максима
+  // Тесты, задания и история пока есть только у Максима
   const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);
   const sections = chat?.favorites ? FAVORITES_SECTIONS : SECTIONS;
@@ -340,7 +349,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
                     onOpenTask={(id) => navigate(`/chat/${chatId}/tasks/${id}`)}
                     onTestSettings={setSettingsOf}
-                    onOpenLink={(href) => (href.startsWith('section:') ? setSection(href.slice('section:'.length) as SectionId) : navigate(href))}
+                    onOpenLink={(href) => navigate(href)}
                   />
                 );
               })}
@@ -387,8 +396,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           id={id}
           chatId={chatId}
           favorites={Boolean(chat.favorites)}
-          peerName={chat.name.split(' ')[0]}
           hasClientData={hasClientData}
+          active={id === section}
           onAppTabChange={onAppTabChange}
         />
       ),
