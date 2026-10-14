@@ -19,6 +19,8 @@ export function followChips(chips: Iterable<HTMLElement>, position: number, via?
     // Переход через несколько страниц: цвет перетекает прямо от чипса к чипсу, не задевая те, что между ними
     const w = via ? (i === via.from ? 1 - t : i === via.to ? t : 0) : Math.max(0, 1 - Math.abs(p - i));
     chip.style.setProperty('--w', String(w));
+    // Вкладка-значок: подпись раскрывается на долю своей ширины (столбец сетки в fr), так что ширина идёт за пальцем без измерений
+    if (chip.classList.contains('chip--tab')) chip.style.setProperty('--cols', `${w.toFixed(4)}fr`);
     // Метка на самом элементе, а не класс: className держит React и сбросил бы его при смене выбранного чипса
     chip.toggleAttribute('data-moving', w > 0.001 && w < 0.999);
   });

@@ -70,3 +70,88 @@
   background: var(--color-accent);
   opacity: var(--w);
 }
+
+/*
+ * Вкладка-значок (разделы открытого чата): ячейка со значком, а у выбранной раскрывается подпись; у наведённой мышью тоже.
+ * Подпись лежит в сетке с одним столбцом: ширина столбца в долях fr от ширины самой подписи, так что 0fr — подписи нет, 1fr — вся
+ * (без замеров текста). Долю задаёт followChips по положению страниц (--cols), пока они идут: раскрытие идёт за пальцем.
+ * В покое (data-moving нет) изменение доли плавное: так раскрывается наведённая мышью и выбранная без жеста.
+ */
+.chip--tab {
+  --cols: 0fr;
+  gap: 0;
+  padding: 0 12px;
+  border-radius: 10px;
+}
+
+.chip--tab.chip--active {
+  --cols: 1fr;
+}
+
+/* Заливка у всех одна: выбранную отличает только раскрытая подпись (цвет акцента не нужен) */
+.chip--tab.chip--follow::after {
+  display: none;
+}
+
+.chip--tab.chip--follow::before {
+  opacity: 1;
+}
+
+.chip--tab {
+  color: var(--color-text-secondary);
+}
+
+.chip--tab.chip--active {
+  color: var(--color-text-primary);
+}
+
+/* Цвет значка и подписи темнеет вместе с раскрытием (где color-mix нет, остаются две ступени выше) */
+.chip--tab,
+.chip--tab.chip--active {
+  color: color-mix(in srgb, var(--color-text-primary) calc(var(--w) * 100%), var(--color-text-secondary));
+}
+
+.chip__icon {
+  display: flex;
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 0;
+}
+
+.chip__reveal {
+  display: grid;
+  grid-template-columns: var(--cols);
+  transition: grid-template-columns 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.chip__label {
+  min-width: 0;
+  overflow: hidden;
+  /* Отступ от значка — отступом первой строки, а не полем: поле не сжалось бы вместе со столбцом, и у свёрнутой вкладки остался бы зазор */
+  text-indent: 6px;
+  opacity: var(--w);
+  transition: opacity 200ms ease;
+}
+
+/* Пока подпись идёт за пальцем, плавность не нужна: кадры и так следуют за жестом */
+.chip[data-moving] .chip__reveal,
+.chip[data-moving] .chip__label {
+  transition: none;
+}
+
+@media (hover: hover) {
+  .chip--tab:hover .chip__reveal {
+    grid-template-columns: 1fr;
+  }
+
+  .chip--tab:hover .chip__label {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip__reveal,
+  .chip__label {
+    transition: none;
+  }
+}

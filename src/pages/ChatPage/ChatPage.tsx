@@ -1,10 +1,16 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
   IconBack,
   IconSearch,
   IconFavorites,
   IconSettings,
+  IconTabBooking,
+  IconTabLibrary,
+  IconTabMessages,
+  IconTabNotes,
+  IconTabPractices,
+  IconTabTests,
 } from '../../components/icons';
 import { ChatBooking } from '../../components/ChatBooking/ChatBooking';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
@@ -36,13 +42,13 @@ import './ChatPage.css';
 // Разделы карточки собеседника; при открытии чата виден «Сообщения»
 type SectionId = ChatSection;
 
-const SECTIONS: { id: SectionId; label: string }[] = [
-  { id: 'booking', label: 'Прием' },
-  { id: 'messages', label: 'Диалог' },
-  { id: 'tests', label: 'Тесты' },
-  { id: 'tasks', label: 'Задания' },
-  { id: 'notes', label: 'Кейс' },
-  { id: 'library', label: 'История' },
+const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
+  { id: 'booking', label: 'Прием', icon: <IconTabBooking /> },
+  { id: 'messages', label: 'Диалог', icon: <IconTabMessages /> },
+  { id: 'tests', label: 'Тесты', icon: <IconTabTests /> },
+  { id: 'tasks', label: 'Задания', icon: <IconTabPractices /> },
+  { id: 'notes', label: 'Кейс', icon: <IconTabNotes /> },
+  { id: 'library', label: 'История', icon: <IconTabLibrary /> },
 ];
 
 /** В «Избранном» нет записи на прием и истории взаимодействия: записываться не к кому, взаимодействовать не с кем */
@@ -461,8 +467,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         )}
 
         <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
-          {sections.map(({ id, label }) => (
-            <Chip key={id} follow active={id === section} onClick={() => setSection(id)}>
+          {sections.map(({ id, label, icon }) => (
+            <Chip key={id} follow icon={icon} active={id === section} onClick={() => setSection(id)}>
               {label}
             </Chip>
           ))}

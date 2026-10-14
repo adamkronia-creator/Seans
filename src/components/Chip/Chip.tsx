@@ -26,9 +26,14 @@ interface ChipProps {
   className?: string;
   /** За чипсом идут страницы пейджера: цвет перетекает вслед за пальцем (см. followChips) */
   follow?: boolean;
+  /**
+   * Вкладка-значок: в покое только значок, а у выбранной (и у наведённой мышью) плавно раскрывается подпись из children.
+   * Раскрытие идёт за страницами пейджера так же, как цвет (см. followChips)
+   */
+  icon?: ReactNode;
 }
 
-export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false }: ChipProps) {
+export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon }: ChipProps) {
   const press = useRef<{ x: number; y: number; timer: number } | null>(null);
   /** Долгое нажатие уже открыло меню: клик, который придёт, когда палец поднимут, не должен выбирать чипс */
   const opened = useRef(false);
@@ -37,7 +42,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
 
   // Число в кружке рядом с названием показывается, только если оно не ноль
   const hasCount = count !== undefined && count > 0;
-  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
+  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
 
   const stop = () => {
     if (press.current) window.clearTimeout(press.current.timer);
@@ -102,7 +107,18 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       aria-pressed={active}
       aria-label={ariaLabel}
     >
-      {children}
+      {icon !== undefined ? (
+        <>
+          <span className="chip__icon" aria-hidden="true">
+            {icon}
+          </span>
+          <span className="chip__reveal">
+            <span className="chip__label">{children}</span>
+          </span>
+        </>
+      ) : (
+        children
+      )}
       {hasCount && <Badge count={count} variant={muted ? (active ? 'quiet-inverse' : 'quiet') : active ? 'inverse' : 'neutral'} />}
     </button>
   );
