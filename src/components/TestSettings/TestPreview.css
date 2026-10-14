@@ -56,10 +56,10 @@
   max-height: 720px;
   margin: var(--space-1) auto 0;
   overflow: hidden;
-  border: 8px solid #14202C;
+  border: 8px solid #1c2128;
   border-radius: 40px;
   background: var(--color-bg-panel);
-  box-shadow: 0 4px 20px rgb(15 34 52 / 16%);
+  box-shadow: 0 4px 20px rgb(15 23 42 / 16%);
 }
 
 /* Неподвижная шторка с «островком»: шапка и карточки при прокрутке уходят под нее, а не под чёлку */
@@ -76,7 +76,7 @@
   width: 72px;
   height: 20px;
   border-radius: 10px;
-  background: #14202C;
+  background: #1c2128;
   transform: translateX(-50%);
 }
 
