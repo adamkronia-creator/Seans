@@ -24,7 +24,7 @@ import { findClientTaskResult } from '../../data/clientTaskResults';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
 import { Chip } from '../../components/Chip/Chip';
-import { followChips } from '../../utils/followChips';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import { clearWanted, wantedSection, type ChatSection } from '../../data/chatIntent';
 import { goBack, navigate } from '../../router';
@@ -284,11 +284,11 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Чипсы разделов идут за страницами: цвет перетекает вслед за пальцем, а не прыгает на готовый выбор,
   // а ряд едет так, чтобы выбранный чипс оставался посередине (видно больше соседей)
   const chipsRef = useRef<HTMLDivElement>(null);
-  const showPosition = useCallback((position: number) => {
+  const showPosition = useCallback((position: number, via?: PositionVia) => {
     const row = chipsRef.current;
     if (!row) return;
-    followChips(row.querySelectorAll<HTMLElement>('.chip'), position);
-    centerChips(row, position);
+    followChips(row.querySelectorAll<HTMLElement>('.chip'), position, via);
+    centerChips(row, position, '.chip', via);
   }, []);
   // Чат открыт сразу на нужном разделе: ряд уже стоит на нем
   useEffect(() => {

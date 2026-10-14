@@ -21,7 +21,7 @@ import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { navigate } from '../../router';
-import { followChips } from '../../utils/followChips';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
@@ -342,12 +342,12 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   }, []);
 
   // Цвет чипсов идёт за положением страниц, а не прыгает на середине
-  const onPosition = useCallback((position: number) => {
+  const onPosition = useCallback((position: number, via?: PositionVia) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.hist-chips .chip');
-    if (chips) followChips(chips, position);
+    if (chips) followChips(chips, position, via);
     // Ряд чипсов едет за страницами: активный остаётся посередине
     const row = root.current?.querySelector<HTMLElement>('.hist-chips');
-    if (row) centerChips(row, position);
+    if (row) centerChips(row, position, '.chip', via);
   }, []);
 
   // Статистика и чипсы стоят над лентами: не едут вместе с ними, но за них тоже можно листать

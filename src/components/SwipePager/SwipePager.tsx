@@ -29,7 +29,7 @@ interface SwipePagerProps {
   pages: PagerPage[];
   onIndexChange: (index: number) => void;
   /** Положение в страницах, дробное (1,4 — между второй и третьей): вызывается на каждом кадре движения, чтобы шапка шла за пальцем */
-  onPosition?: (position: number) => void;
+  onPosition?: (position: number, via?: { from: number; to: number; t: number }) => void;
   /** Пока страницы ведёт палец: положение в страницах (дробное), а когда палец отпустили, null. По нему чипсы подсвечивают страницу под пальцем, не дожидаясь отпускания */
   onDrag?: (position: number | null) => void;
   /** Пейджер лежит внутри страницы другого пейджера: когда листать некуда, жест отдаётся внешнему, а не упирается в резинку */
@@ -305,7 +305,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
           applyHeight(between ? j.a + j.dir * 0.5 : arrived ? j.b : j.a);
         }
         setPaging(self, between);
-        live.current.onPosition?.(value);
+        live.current.onPosition?.(value, { from: j.a, to: j.b, t: progress });
         return;
       }
       const between = Math.abs(value - Math.round(value)) > 0.001;

@@ -9,7 +9,7 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import type { Chat } from '../../data/chats';
 import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
-import { followChips } from '../../utils/followChips';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import './MessagesPage.css';
 
@@ -88,11 +88,11 @@ export function MessagesPage() {
   );
 
   // Цвет чипсов идёт за положением страниц, а не прыгает на середине
-  const onPosition = useCallback((position: number) => {
+  const onPosition = useCallback((position: number, via?: PositionVia) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip');
-    if (chips) followChips(chips, position);
+    if (chips) followChips(chips, position, via);
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    if (row) centerChips(row, position);
+    if (row) centerChips(row, position, '.chip', via);
   }, []);
 
   return (

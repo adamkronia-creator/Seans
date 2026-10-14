@@ -33,7 +33,7 @@ import {
 import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, setSort, toggleMark, toggleOption, useLibraryView, type ViewState } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
-import { followChips } from '../../utils/followChips';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 
@@ -348,11 +348,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   // Цвет чипсов идёт за положением страниц
-  const onPosition = useCallback((position: number) => {
+  const onPosition = useCallback((position: number, via?: PositionVia) => {
     const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip');
-    if (chips) followChips(chips, position);
+    if (chips) followChips(chips, position, via);
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    if (row) centerChips(row, position);
+    if (row) centerChips(row, position, '.chip', via);
   }, []);
 
   // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи.
