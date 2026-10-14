@@ -82,6 +82,9 @@
   --font-size-lg: 16px;   --line-height-lg: 22px;   /* имена, заголовки карточек и верхней панели */
   --font-size-xl: 20px;   --line-height-xl: 28px;   /* крупные числа, заголовки листов */
   --font-size-2xl: 24px;  --line-height-2xl: 30px;  /* заголовок экрана */
+  /* Роли поверх шкалы: заголовок вложенного экрана («События», «Редактирование») и тихая подпись раздела над списком */
+  --font-size-title: 18px; --line-height-title: 24px;
+  --font-size-label: 13px; --line-height-label: 18px;
 
   --letter-spacing-title: -0.01em;   /* от 16 px кегль плотнее */
   --letter-spacing-display: -0.02em;  /* от 20 px ещё плотнее */

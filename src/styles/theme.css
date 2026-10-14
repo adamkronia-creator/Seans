@@ -18,3 +18,41 @@ textarea,
   caret-color: var(--color-accent);
 }
 
+
+/* ——— Типографика: три ступени ———
+   Заголовок экрана (18, насыщенный) → название в строке и карточке (16) → описание (14) и подпись (12–13).
+   Подпись раздела над списком — тихая: мельче названий в строках, чтобы заголовок не спорил с содержимым. */
+.events__title,
+.fp__title,
+.pe__title {
+  font-size: var(--font-size-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.chat-tests__title {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-label);
+  letter-spacing: 0.01em;
+}
+
+.chat-tests__remind {
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label);
+}
+
+/* Время, даты, счётчики и числа в таблицах: цифры одной ширины, колонки не «дышат» */
+.chat-item__time,
+.event-item__date,
+.bubble__meta,
+.badge,
+.chat-tests__count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Абзацы без «висячих» коротких слов в последней строке (где браузер умеет) */
+p {
+  text-wrap: pretty;
+}
