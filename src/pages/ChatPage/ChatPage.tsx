@@ -474,15 +474,15 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             </button>
           </div>
         )}
-
-        <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
-          {sections.map(({ id, label, icon }) => (
-            <Chip key={id} follow icon={icon} active={id === section} onClick={() => setSection(id)}>
-              {label}
-            </Chip>
-          ))}
-        </div>
       </header>
+
+      <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
+        {sections.map(({ id, label, icon }) => (
+          <Chip key={id} follow icon={icon} active={id === section} onClick={() => setSection(id)}>
+            {label}
+          </Chip>
+        ))}
+      </div>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} onPosition={showPosition} />
 

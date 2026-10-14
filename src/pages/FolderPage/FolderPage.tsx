@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type 
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
+import { FOLDER_ICON_LABELS, FolderGlyph } from '../../components/FolderMenu/FolderGlyphs';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
 import { IconBack } from '../../components/icons';
 import { IconCheck, IconPlusLine } from '../../components/Profile/ProfileIcons';
@@ -13,8 +14,10 @@ import {
   discardUntouchedFolder,
   getFolder,
   isFreshFolder,
+  FOLDER_ICON_IDS,
   removeFromFolder,
   renameFolder,
+  setFolderIcon,
   setFolderItems,
   useFolder,
   type Folder,
@@ -148,7 +151,7 @@ interface FolderPageProps {
 }
 
 /**
- * «Настроить папку» (как в Telegram): название со счётчиком оставшихся букв, выбранные чаты, тесты или задания с кнопкой
+ * «Настроить папку» (как в Telegram): название со счётчиком оставшихся букв, значок для чипса, выбранные чаты, тесты или задания с кнопкой
  * «Добавить» и «Удалить папку». Правки сохраняются сразу, как печатаешь, поэтому «Готово» просто возвращает к списку.
  * Новая папка (из меню «Все») открывается сюда же, с курсором в названии; если в ней так ничего и не тронули, при выходе она убирается.
  */
@@ -236,6 +239,27 @@ export function FolderPage({ scope, id }: FolderPageProps) {
               </span>
             </span>
           </label>
+        </section>
+
+        <section className="fp__card" aria-labelledby="fp-icon">
+          <h2 id="fp-icon" className="fp__heading fp__heading--pad">
+            Значок
+          </h2>
+          <div className="fp__icons" role="radiogroup" aria-labelledby="fp-icon">
+            {FOLDER_ICON_IDS.map((icon) => (
+              <button
+                key={icon}
+                type="button"
+                role="radio"
+                aria-checked={folder.icon === icon}
+                aria-label={FOLDER_ICON_LABELS[icon]}
+                className="fp__icon"
+                onClick={() => setFolderIcon(scope, id, icon)}
+              >
+                <FolderGlyph id={icon} />
+              </button>
+            ))}
+          </div>
         </section>
 
         <section className="fp__card" aria-labelledby="fp-selected">
