@@ -7,14 +7,17 @@
 
 /* Шапка как у чата, без вкладок: строка 56, кнопки 40, аватарка теста 36 (круг, как у чата), снизу разделитель */
 .test-settings__header {
+  position: relative;
+  z-index: 1; /* тень шапки ложится на страницу под ней */
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
   min-height: 56px;
   padding: 0 var(--space-2);
-  border-bottom: 1px solid var(--color-divider);
-  background: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-separator);
+  background: var(--color-bg-bar);
+  box-shadow: var(--shadow-bar-down);
 }
 
 .test-settings__button {
@@ -505,10 +508,13 @@
 /* Кнопка над нижней панелью: светлая полоса с разделителем, кнопка 44; «Назад» рядом с ней белая */
 .test-settings__cta {
   --control-ring: none;
+  position: relative;
+  z-index: 1; /* тень панели ложится на карточки над ней */
   flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid var(--color-separator);
   background: var(--color-bg-bar);
+  box-shadow: var(--shadow-bar-up);
 }
 
 /* Кнопка «Пройти или отправить» парит над содержимым: без полосы и линии, под ней прокручивается страница */
@@ -519,6 +525,7 @@
   padding: 0;
   border: 0;
   background: none;
+  box-shadow: none;
 }
 
 .test-settings__cta:not(.test-pass__cta) > .test-settings__cta-button {

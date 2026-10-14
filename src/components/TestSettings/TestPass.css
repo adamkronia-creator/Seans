@@ -86,8 +86,7 @@
 }
 
 .test-pass__buttons .test-settings__cta-button:disabled {
-  opacity: 0.4;
-  cursor: default;
+  opacity: var(--opacity-disabled);
 }
 
 .test-pass__back {

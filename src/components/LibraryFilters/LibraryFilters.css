@@ -23,8 +23,8 @@
 .results-bar__tokens {
   display: flex;
   gap: var(--space-2);
-  margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4);
+  margin: -4px calc(var(--space-4) * -1);
+  padding: 4px var(--space-4); /* поля 4 — под кольцо фокуса, см. .screen-header__chips */
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -110,7 +110,7 @@
 }
 
 .filter-chip:disabled {
-  opacity: 0.4;
+  opacity: var(--opacity-disabled);
 }
 
 .filter-chip__count {

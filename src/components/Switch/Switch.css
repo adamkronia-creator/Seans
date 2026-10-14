@@ -4,7 +4,7 @@
   width: 44px;
   height: 26px;
   border-radius: 13px;
-  background: #CDD3DB;
+  background: var(--color-switch-off);
   transition: background 0.15s;
 }
 

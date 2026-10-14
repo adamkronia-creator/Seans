@@ -1,7 +1,11 @@
 .composer-wrap {
   --control-ring: none;
+  position: relative;
+  z-index: 1; /* тень панели ложится на ленту над ней */
   flex-shrink: 0;
+  border-top: 1px solid var(--color-separator);
   background: var(--color-bg-bar);
+  box-shadow: var(--shadow-bar-up);
 }
 
 /* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле белое на светлой подложке панели.
@@ -12,7 +16,6 @@
   align-items: flex-end;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--color-divider);
   background: var(--color-bg-bar);
 }
 
@@ -130,7 +133,6 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
-  border-top: 1px solid var(--color-divider);
 }
 
 .reply-bar__icon {
@@ -176,6 +178,5 @@
 }
 
 .reply-bar + .composer {
-  border-top: 0;
   padding-top: 0;
 }

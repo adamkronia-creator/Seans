@@ -1,0 +1,466 @@
+/*
+ * Состояния элементов: под курсором мыши, под пальцем, в фокусе, выбранные, выключенные. Подключается после компонентов (main.tsx),
+ * поэтому правила здесь не зависят от порядка их файлов. Чипсы описаны в Chip.css: у них заливка лежит в ::before и ::after.
+ *
+ * Шесть семейств, у каждого свой рисунок состояния, а цвета берутся из токенов (tokens.css):
+ *   1. Строки списков и карточек — заливка всей строки: --color-bg-row-hover / --color-bg-row-pressed.
+ *   2. Белые кнопки и плитки (вторичные) — слой серо-голубого на шаг/два темнее и кольцо --control-ring-hover.
+ *   3. Акцентные кнопки (основные) — заливка темнее на 10 / 20 %. Красная (опасное действие) — так же.
+ *   4. Мягкие акцентные (подложка акцентом, текст акцентом) — подложка 10 → 16 → 24 %.
+ *   5. Текстовые кнопки и значки — слова темнее (акцент), значки в мягкой подложке-«ореоле» (--state-hover / --state-pressed).
+ *   6. Поля — рамка темнее под курсором, акцентное кольцо в фокусе.
+ * Наведение — только там, где есть мышь (hover: hover), и не поверх нажатия: нажатая строка не должна показывать обе заливки.
+ * Нажатие — атрибут data-pressed (utils/pressEffect.ts): в отличие от :active он ставится сразу и держится минимум 110 мс.
+ * Выбранное — у каждого своё (акцентная заливка, подложка), здесь только его реакция на курсор. Выключенное — --opacity-disabled.
+ */
+
+/* Подложки состояний одним градиентом: слой ложится поверх любой заливки элемента, не меняя её цвет */
+:root {
+  --layer-hover: linear-gradient(var(--state-hover), var(--state-hover));
+  --layer-pressed: linear-gradient(var(--state-pressed), var(--state-pressed));
+}
+
+/* ——— 1. Строки списков и карточек ——— */
+
+@media (hover: hover) {
+  .chat-item__button:hover:not([data-pressed], :active),
+  .lib-card .test-card:hover:not([data-pressed], :active),
+  .chat-tests__list .test-card:hover:not([data-pressed], :active),
+  button.event-item__inner:hover:not([data-pressed], :active),
+  .ts-row--link:hover:not([data-pressed], :active),
+  .pe__row:hover:not([data-pressed], :active),
+  .fp-pick__row:hover:not([data-pressed], :active),
+  .fp__add:hover:not([data-pressed], :active),
+  .fp__delete:hover:not([data-pressed], :active),
+  .profile__field:hover:not([data-pressed], :active),
+  .profile__add:hover:not([data-pressed], :active),
+  .profile__more:hover:not([data-pressed], :active),
+  .msg-menu__item:hover:not([data-pressed], :active),
+  .chip-menu__item:hover:not([data-pressed], :active),
+  .blank-card__head:hover:not([data-pressed], :active),
+  .history__more:hover:not([data-pressed], :active),
+  .suggest__row:hover:not([data-pressed], :active),
+  .test-actions__card:hover:not([data-pressed], :active),
+  .pf-remove:hover:not([data-pressed], :active),
+  .result-choice__label:hover:not(:active) {
+    background-color: var(--color-bg-row-hover);
+  }
+
+  .hist-card__event--link:hover:not([data-pressed], :active) {
+    opacity: 0.8;
+  }
+
+  .cc-row:hover:not([data-pressed], :active) .cc-bar {
+    opacity: 0.9;
+  }
+}
+
+/* Нажатая строка: у строк без собственного правила (у остальных оно в их файле) */
+.suggest__row[data-pressed],
+.test-actions__card[data-pressed],
+.pf-remove[data-pressed] {
+  background-color: var(--color-bg-row-pressed);
+}
+
+/* Строка заполняет весь блок, кольцо фокуса снаружи обрезалось бы краем карточки: рисуем его внутри */
+.chat-item__button:focus-visible,
+.lib-card .test-card:focus-visible,
+.chat-tests__list .test-card:focus-visible,
+.event-item__inner:focus-visible,
+.ts-row--link:focus-visible,
+.pe__row:focus-visible,
+.fp-pick__row:focus-visible,
+.fp__add:focus-visible,
+.fp__delete:focus-visible,
+.profile__field:focus-visible,
+.profile__add:focus-visible,
+.profile__more:focus-visible,
+.msg-menu__item:focus-visible,
+.chip-menu__item:focus-visible,
+.blank-card__head:focus-visible,
+.history__more:focus-visible,
+.suggest__row:focus-visible,
+.test-actions__card:focus-visible {
+  outline-offset: -2px;
+}
+
+/* ——— 2. Белые кнопки и плитки (вторичные) ——— */
+
+@media (hover: hover) {
+  .screen-header__action:hover:not([data-pressed], :active),
+  .sheet__button:not(.sheet__button--primary, .sheet__button--danger):not(:disabled):hover:not([data-pressed], :active),
+  .test-pass__back:hover:not([data-pressed], :active),
+  .cc-sort:not(.cc-sort--on):hover:not([data-pressed], :active),
+  .empty-results__action:hover:not([data-pressed], :active),
+  .filter-chip:not([aria-pressed='true']):not(:disabled):hover:not([data-pressed], :active),
+  .pe__chip:hover:not([data-pressed], :active),
+  .pf-tile:hover:not([data-pressed], :active),
+  .tf-chip:not(.tf-chip--on, .tf-chip--static):hover:not([data-pressed], :active) {
+    background-image: var(--layer-hover);
+    box-shadow: var(--control-ring-hover);
+  }
+
+  /* Без кольца: у этих белое уже стоит на белом или на заливке, кольцо рисовало бы лишнюю рамку */
+  .bubble-button:not(:disabled):hover:not([data-pressed], :active),
+  .chat__down:hover:not([data-pressed], :active),
+  .scroll-host__down:hover:not([data-pressed], :active),
+  .profile__tile:hover:not([data-pressed], :active) {
+    background-image: var(--layer-hover);
+  }
+}
+
+.screen-header__action[data-pressed],
+.sheet__button:not(.sheet__button--primary, .sheet__button--danger)[data-pressed],
+.test-pass__back[data-pressed],
+.cc-sort:not(.cc-sort--on)[data-pressed],
+.empty-results__action[data-pressed],
+.filter-chip:not([aria-pressed='true'])[data-pressed],
+.pe__chip[data-pressed],
+.pf-tile[data-pressed],
+.tf-chip:not(.tf-chip--on, .tf-chip--static)[data-pressed] {
+  background-image: var(--layer-pressed);
+  box-shadow: var(--control-ring-hover);
+}
+
+.bubble-button[data-pressed],
+.chat__down[data-pressed],
+.scroll-host__down[data-pressed],
+.profile__tile[data-pressed] {
+  background-image: var(--layer-pressed);
+}
+
+/* ——— 3. Акцентные кнопки (основные) и красная (опасное действие) ——— */
+
+@media (hover: hover) {
+  .sheet__button--primary:not(:disabled):hover:not([data-pressed], :active),
+  .test-settings__cta-button:not(:disabled):hover:not([data-pressed], :active),
+  .messages__fab:hover:not([data-pressed], :active),
+  .composer__round--send:not(:disabled):hover:not([data-pressed], :active),
+  .filter-chip[aria-pressed='true']:not(:disabled):hover:not([data-pressed], :active),
+  .tf-chip--on:hover:not([data-pressed], :active),
+  .profile__badge--avatar:hover:not([data-pressed], :active) {
+    background-color: var(--color-accent-hover);
+  }
+
+  .sheet__button--danger:not(:disabled):hover:not([data-pressed], :active) {
+    background-color: var(--color-danger-hover);
+  }
+
+  .profile__badge--cover:hover:not([data-pressed], :active) {
+    background-color: rgb(16 24 40 / 68%);
+  }
+}
+
+.sheet__button--primary[data-pressed],
+.test-settings__cta-button[data-pressed],
+.messages__fab[data-pressed],
+.composer__round--send:not(:disabled)[data-pressed],
+.filter-chip[aria-pressed='true'][data-pressed],
+.tf-chip--on[data-pressed],
+.profile__badge--avatar[data-pressed] {
+  background-color: var(--color-accent-pressed);
+}
+
+.sheet__button--danger[data-pressed] {
+  background-color: var(--color-danger-pressed);
+}
+
+.profile__badge--cover[data-pressed] {
+  background-color: rgb(16 24 40 / 78%);
+}
+
+/* ——— 4. Мягкие акцентные (подложка и текст акцентом) ——— */
+
+@media (hover: hover) {
+  .filter-token:not(.filter-token--reset):hover:not([data-pressed], :active),
+  .tf-add:hover:not([data-pressed], :active),
+  .profile__edit:hover:not([data-pressed], :active),
+  .ts-select:hover:not([data-pressed], :active) {
+    background-color: var(--color-accent-soft-hover);
+  }
+}
+
+.filter-token:not(.filter-token--reset)[data-pressed],
+.tf-add[data-pressed],
+.profile__edit[data-pressed],
+.ts-select[data-pressed] {
+  background-color: var(--color-accent-soft-pressed);
+}
+
+/* «Сбросить» рядом с выбранными фильтрами: серые слова без подложки, под курсором и пальцем появляется ореол */
+@media (hover: hover) {
+  .filter-token--reset:hover:not([data-pressed], :active) {
+    background-color: var(--state-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+.filter-token--reset[data-pressed] {
+  background-color: var(--state-pressed);
+  color: var(--color-text-primary);
+}
+
+/* ——— 5. Текстовые кнопки и значки ——— */
+
+/* Слова акцентом без подложки: под курсором темнеют и подчёркиваются (цвет на 10 % — тонкий сигнал для текста, подчёркивание его усиливает) */
+@media (hover: hover) {
+  .pe__done:hover:not([data-pressed], :active),
+  .fp__done:hover:not([data-pressed], :active),
+  .ts-desc__toggle:hover:not([data-pressed], :active),
+  .chat-tests__remind:hover:not([data-pressed], :active),
+  .pass-q__all:hover:not([data-pressed], :active),
+  .test-pass__reset:hover:not([data-pressed], :active),
+  .hist-scales__toggle:hover:not([data-pressed], :active),
+  .suggest__clear:hover:not([data-pressed], :active),
+  .profile__card-link:hover:not([data-pressed], :active) {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+}
+
+.pe__done[data-pressed],
+.fp__done[data-pressed],
+.ts-desc__toggle[data-pressed],
+.chat-tests__remind[data-pressed],
+.pass-q__all[data-pressed],
+.test-pass__reset[data-pressed],
+.hist-scales__toggle[data-pressed],
+.suggest__clear[data-pressed],
+.profile__card-link[data-pressed] {
+  color: var(--color-accent-pressed);
+}
+
+/* Значки без заливки (назад, закрыть, действия в шапках): под курсором и пальцем — ореол размером с кнопку; у тех, что и без того серые, ещё и темнеет значок */
+.pe__back,
+.fp__back,
+.events__back,
+.chat__icon-button,
+.test-settings__button,
+.ts-message__mic,
+.reply-bar__close,
+.fp__remove,
+.pe__tool,
+.suggest__forget,
+.profile__card-button {
+  border-radius: var(--radius-md);
+}
+
+@media (hover: hover) {
+  .pe__back:hover:not([data-pressed], :active),
+  .fp__back:hover:not([data-pressed], :active),
+  .events__back:hover:not([data-pressed], :active),
+  .chat__icon-button:not(:disabled):hover:not([data-pressed], :active),
+  .test-settings__button:hover:not([data-pressed], :active),
+  .ts-message__mic:hover:not([data-pressed], :active),
+  .reply-bar__close:hover:not([data-pressed], :active),
+  .fp__remove:hover:not([data-pressed], :active),
+  .search-field__clear:hover:not([data-pressed], :active),
+  .pe__tool:not(:disabled):hover:not([data-pressed], :active),
+  .suggest__forget:hover:not([data-pressed], :active),
+  .profile__card-button:hover:not([data-pressed], :active),
+  .composer__round:not(.composer__round--send):hover:not([data-pressed], :active) {
+    background-color: var(--state-hover);
+  }
+
+  .test-settings__button--muted:hover:not([data-pressed], :active) svg {
+    opacity: 0.8;
+  }
+
+  .reply-bar__close:hover:not([data-pressed], :active),
+  .fp__remove:hover:not([data-pressed], :active),
+  .search-field__clear:hover:not([data-pressed], :active),
+  .pe__tool:not(.pe__tool--danger):not(:disabled):hover:not([data-pressed], :active),
+  .suggest__forget:hover:not([data-pressed], :active),
+  .profile__card-button:hover:not([data-pressed], :active),
+  .composer__round:not(.composer__round--send):hover:not([data-pressed], :active),
+  .case-card__edit:hover:not([data-pressed], :active),
+  .hist-card__edit:hover:not([data-pressed], :active) {
+    color: var(--color-text-secondary);
+  }
+
+  .composer__emoji:not(.composer__emoji--active):hover:not([data-pressed], :active) {
+    color: var(--color-text-primary);
+  }
+}
+
+.pe__back[data-pressed],
+.fp__back[data-pressed],
+.events__back[data-pressed],
+.chat__icon-button[data-pressed],
+.test-settings__button[data-pressed],
+.ts-message__mic[data-pressed],
+.reply-bar__close[data-pressed],
+.fp__remove[data-pressed],
+.search-field__clear[data-pressed],
+.pe__tool[data-pressed],
+.suggest__forget[data-pressed],
+.profile__card-button[data-pressed],
+.composer__round:not(.composer__round--send)[data-pressed] {
+  background-color: var(--state-pressed);
+}
+
+/* Мелкие значки без области нажатия вокруг (изменить заметку, эмодзи): ореола нет, темнеет сам значок */
+.case-card__edit[data-pressed],
+.hist-card__edit[data-pressed],
+.composer__emoji:not(.composer__emoji--active)[data-pressed] {
+  color: var(--color-text-primary);
+}
+
+/* Значки, кнопки и подписи на тёмном фоне просмотра фото: ореол светлый */
+@media (hover: hover) {
+  .viewer__button:hover:not([data-pressed], :active) {
+    background-color: rgb(255 255 255 / 14%);
+    border-radius: var(--radius-md);
+  }
+
+  .viewer__nav:hover:not([data-pressed], :active) {
+    background-color: rgb(255 255 255 / 24%);
+  }
+
+  .viewer__action:hover:not([data-pressed], :active) {
+    color: var(--color-accent-on);
+  }
+}
+
+.viewer__button[data-pressed] {
+  background-color: rgb(255 255 255 / 24%);
+  border-radius: var(--radius-md);
+}
+
+.viewer__nav[data-pressed] {
+  background-color: rgb(255 255 255 / 34%);
+}
+
+/* Вкладки нижней панели: значок темнеет под курсором (выбранный и так акцентный); кольцо фокуса — внутри ячейки, у края экрана снаружи оно обрезалось бы */
+.tabbar__item {
+  border-radius: var(--radius-md);
+}
+
+.tabbar__item:focus-visible {
+  outline-offset: -4px;
+}
+
+@media (hover: hover) {
+  .tabbar__item:not(.tabbar__item--active):hover:not([data-pressed], :active) {
+    color: var(--color-text-secondary);
+  }
+}
+
+.tabbar__item:not(.tabbar__item--active)[data-pressed] {
+  color: var(--color-text-secondary);
+}
+
+/* Этапы предпросмотра теста («Начало / В процессе / Конец»): выбранный лежит белой плашкой на серой дорожке, невыбранный темнеет */
+@media (hover: hover) {
+  .tp__tab:not(.tp__tab--on):hover:not([data-pressed], :active) {
+    background-color: var(--state-hover);
+    color: var(--color-text-primary);
+  }
+}
+
+.tp__tab:not(.tp__tab--on)[data-pressed] {
+  background-color: var(--state-pressed);
+  color: var(--color-text-primary);
+}
+
+/* ——— 6. Поля ввода и варианты ответа ——— */
+
+/* Рамка у поля темнеет под курсором; у выбранного в фокусе её заменяет акцентное кольцо компонента */
+@media (hover: hover) {
+  .search-field:hover:not(:focus-within),
+  .composer__field:hover:not(:focus-within),
+  .task-field:hover:not(:focus),
+  .tf-factor__name:hover:not(:focus) {
+    box-shadow: var(--control-ring-hover);
+  }
+
+  .blank-answer:not(.blank-answer--locked, :has(:checked)):hover:not(:active),
+  .blank-scale__item:not(.blank-answer--locked, :has(:checked)):hover:not(:active) {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-bg-row-hover);
+  }
+}
+
+/* Поле сообщения в фокусе — то же кольцо, что у поиска и текстовых полей */
+.composer__field:focus-within {
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+}
+
+/* Поле-строка внутри карточки (имя, название папки): строка в фокусе слегка подсвечивается */
+.pe__input:focus-within,
+.fp__field:focus-within {
+  background-color: var(--color-bg-row-hover);
+}
+
+.result-choice__label:active {
+  background-color: var(--color-bg-row-pressed);
+}
+
+/* ——— Сердечко «в избранное» на значке теста ——— */
+
+@media (hover: hover) {
+  .lib-card__heart:hover:not([data-pressed], :active) {
+    background-image: linear-gradient(var(--color-red-soft), var(--color-red-soft));
+  }
+
+  .lib-card__heart[aria-pressed='false']:hover:not([data-pressed], :active) svg {
+    opacity: 0.9;
+  }
+}
+
+.lib-card__heart[data-pressed] {
+  background-image: linear-gradient(var(--color-red-soft), var(--color-red-soft));
+}
+
+/* ——— Обложка и фото профиля: вся область нажимается, поэтому под курсором и пальцем по ней ложится лёгкая тень ——— */
+
+.profile__avatar-hit {
+  position: relative;
+}
+
+.profile__cover-hit::after,
+.profile__avatar-hit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .profile__cover-hit:hover:not([data-pressed], :active)::after,
+  .profile__avatar-hit:hover:not([data-pressed], :active)::after {
+    background-color: rgb(16 24 40 / 6%);
+  }
+}
+
+.profile__cover-hit[data-pressed]::after,
+.profile__avatar-hit[data-pressed]::after {
+  background-color: rgb(16 24 40 / 14%);
+}
+
+/* ——— Переключатель ——— */
+
+@media (hover: hover) {
+  .switch:not(.switch--on):hover {
+    background: var(--color-switch-off-hover);
+  }
+
+  .switch--on:hover {
+    background: var(--color-accent-hover);
+  }
+}
+
+/* ——— Выключенное ——— */
+
+button:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+/* Основная кнопка «Пройти»/«Далее»: единственная, у которой своего правила для выключенного нет (у остальных оно в их файлах, с тем же токеном) */
+.test-settings__cta-button:disabled {
+  opacity: var(--opacity-disabled);
+}

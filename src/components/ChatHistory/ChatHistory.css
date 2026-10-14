@@ -34,12 +34,16 @@
 /* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: полоса со своим разделителем */
 .hist-foot {
   --control-ring: none;
+  position: relative;
+  z-index: 1; /* тень панели ложится на ленту над ней */
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid var(--color-separator);
+  background: var(--color-bg-bar);
+  box-shadow: var(--shadow-bar-up);
 }
 
 /* Сводка: одна карточка, пять колонок — число крупно, под ним подпись */
@@ -318,7 +322,7 @@
   margin-top: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-bg-app);
+  background: var(--color-bg-inset);
 }
 
 .hist-scales__list {

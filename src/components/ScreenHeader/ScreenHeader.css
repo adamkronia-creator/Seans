@@ -2,13 +2,16 @@
    Подложка светлая, а поле, кнопка и чипсы на ней белые */
 .screen-header {
   --control-ring: none;
+  position: relative;
+  z-index: 1; /* тень шапки ложится на список под ней */
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-divider);
+  border-bottom: 1px solid var(--color-separator);
   background: var(--color-bg-bar);
+  box-shadow: var(--shadow-bar-down);
 }
 
 /* Поле поиска тянется, а кнопка справа от него (уведомления) держит свой размер */
@@ -42,8 +45,9 @@
    невыбранные стоят вплотную, возле выбранного зазор */
 .screen-header__chips {
   display: flex;
-  margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4);
+  /* Поля 4 сверху и снизу нужны кольцу фокуса: ряд прокручивается, а у прокручиваемого блока всё, что снаружи, обрезается; из размеров они вычтены */
+  margin: -4px calc(var(--space-4) * -1);
+  padding: 4px var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
 }
