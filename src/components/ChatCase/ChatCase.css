@@ -16,12 +16,12 @@
   margin-top: auto;
 }
 
-/* Одна страница: поля 16, расстояния между блоками 12 */
+/* Одна страница: блоки — полосы во всю ширину с щелью фона 8; щель есть и сверху, и снизу, у поля ввода */
 .case-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) var(--space-4);
+  gap: var(--band-gap);
+  padding: var(--band-gap) 0;
 }
 
 .case-page > * {
@@ -31,7 +31,7 @@
 .case-cards {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--band-gap);
 }
 
 /* Двойной клик или двойное касание открывает редактор: без масштабирования по двойному тапу */
@@ -39,10 +39,10 @@
   touch-action: manipulation;
 }
 
-/* Карточка: белая, радиус 16, без тени. Шапка: значок на цветной плитке, название, карандаш */
+/* Полоса: белая, от края до края, тонкая линия сверху и снизу. Шапка: значок на цветной плитке, название, карандаш; поля 16 */
 .case-card {
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
 }
 
 /* Плитка 32 цвета раздела (10% цвета, значок полным цветом); без цвета — без плитки, значок акцентный */
@@ -98,9 +98,9 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-4);
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-4);
   padding: var(--space-3) 0;
-  border-top: 1px solid var(--color-divider);
+  border-top: var(--hairline) solid var(--color-divider);
 }
 
 /* Между шапкой карточки и первой строкой линии нет (разделители только между строками), а отступ такой же, как до текста в других разделах: 12 */
@@ -132,7 +132,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: 0 var(--space-3) var(--space-3);
+  padding: 0 var(--space-4) var(--space-3);
 }
 
 .case-card__text,

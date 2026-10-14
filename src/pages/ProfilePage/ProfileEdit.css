@@ -52,20 +52,21 @@
   line-height: var(--line-height-md);
 }
 
+/* Полосы во всю ширину, между ними щель фона 8; подписи и пояснения между полосами держат поля 16 */
 .pe__scroll {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--band-gap);
   min-height: 0;
-  padding: var(--space-3) var(--space-4) calc(var(--space-6) + var(--safe-bottom));
+  padding: var(--band-gap) 0 calc(var(--space-6) + var(--safe-bottom));
   overflow-y: auto;
 }
 
 .pe__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -181,7 +182,7 @@
 /* ---------- Личная информация ---------- */
 
 .pe__group {
-  padding: var(--space-2) var(--space-1) 0;
+  padding: var(--space-2) var(--space-4) 0;
 }
 
 .pe__group-title {
@@ -202,7 +203,7 @@
 .pe__fields {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--band-gap);
 }
 
 /* Название поля вводится прямо в шапке карточки; справа выше, ниже и удалить */

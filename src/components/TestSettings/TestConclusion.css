@@ -465,15 +465,14 @@
   color: var(--color-orange-text);
 }
 
-/* Предупреждение психологу над шкалами: отдельная карточка с красноватой заливкой и значком */
+/* Предупреждение психологу над шкалами: отдельная полоса с красноватой заливкой и значком */
 .cc-alert {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-3);
-  margin: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
+  border-block-color: color-mix(in srgb, var(--color-red) 22%, var(--color-border));
   background: color-mix(in srgb, var(--color-red) 8%, var(--color-bg-panel));
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);

@@ -1,7 +1,8 @@
 /*
- * Вкладка «История взаимодействия»: поля 16, сверху лента событий (свежие внизу), под ней чипсы, в самом низу сводка.
- * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому поля 16 у чипсов, сводки и у самих лент свои,
- * а лента при листании уходит к краю экрана, а не обрезается у поля.
+ * Вкладка «История взаимодействия»: сверху лента событий (свежие внизу), под ней чипсы, в самом низу сводка.
+ * Лента — одна белая полоса во всю ширину, события в ней — строки, разделённые тонкой линией от текста до края;
+ * слева значки на сплошной линии времени. Чипсы и сводка — закреплённая белая панель, как поле ввода в переписке.
+ * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому лента при листании уходит к краю экрана, а не обрезается у поля.
  */
 .hist-host {
   display: flex;
@@ -28,28 +29,27 @@
 }
 
 .hist-page {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--band-gap) 0;
 }
 
-/* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: полоса со своим разделителем */
+/* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: белая панель во всю ширину со своей линией сверху */
 .hist-foot {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-divider);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  border-top: var(--hairline) solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
-/* Сводка: одна карточка, пять колонок — число крупно, под ним подпись */
+/* Сводка: пять колонок — число крупно, под ним подпись; без своей карточки, это часть панели */
 .hist-stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   margin: 0;
-  padding: var(--space-3) var(--space-1);
+  padding: var(--space-1) 0;
   list-style: none;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-panel);
 }
 
 .hist-stats__item {
@@ -106,31 +106,43 @@
   scrollbar-width: none;
 }
 
-/* Лента: значки слева (x 16), линия по центру значков, карточки от x 48 */
+/* Лента: одна белая полоса от края до края; значки слева (x 16), линия по центру значков, текст событий от x 52 */
 .hist-timeline {
   display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
   flex-direction: column;
-  gap: var(--space-3);
+  border-block: var(--hairline) solid var(--color-border);
+  background: var(--color-bg-panel);
 }
 
 .hist-item {
   position: relative;
-  padding-left: 32px;
+  padding: 0 var(--space-4) 0 52px;
 }
 
-/* Рейка слева от карточки: значок 20 на уровне названия и под ним линия до значка следующего события.
-   Рейка тянется от значка этого события до значка следующего (вниз на промежуток между карточками и ещё на отступ значка
-   от верха карточки), поэтому линия не обрывается: прерывают её только значки, за 4 px до значка и через 4 px после.
+/* Между событиями тонкая линия от текста до правого края: левее неё идёт сплошная линия времени */
+.hist-item + .hist-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 52px;
+  height: var(--hairline);
+  background: var(--color-divider);
+}
+
+/* Рейка слева от события: значок 20 на уровне названия и под ним линия до значка следующего события.
+   Рейка тянется от значка этого события до значка следующего (вниз на отступ значка от верха строки),
+   поэтому линия не обрывается: прерывают её только значки, за 4 px до значка и через 4 px после.
    У последнего события линии нет */
 .hist-rail {
   --marker-top: 13px;
   position: absolute;
   top: var(--marker-top);
-  bottom: calc((var(--space-3) + var(--marker-top)) * -1);
-  left: 0;
+  bottom: calc(var(--marker-top) * -1);
+  left: var(--space-4);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -199,14 +211,12 @@
   }
 }
 
-/* Карточка события: белая, радиус 16, поля 12, без тени */
+/* Событие: строка полосы без своей рамки, отступы сверху и снизу 12 */
 .hist-card {
   touch-action: manipulation; /* двойное касание открывает редактор, а не масштабирует */
   display: flex;
   flex-direction: column;
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-panel);
+  padding: var(--space-3) 0;
 }
 
 .hist-card__top {

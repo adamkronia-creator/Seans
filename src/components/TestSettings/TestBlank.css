@@ -1,8 +1,7 @@
-/* Карточка бланка: заголовок 52, разделитель 1, содержимое с полями 16 */
+/* Полоса бланка: заголовок 52, разделитель 1, содержимое с полями 16. Поля контейнера и линии краёв — в TestSettings.css (.ts-card, .blank-card) */
 .blank-card {
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
 }
 

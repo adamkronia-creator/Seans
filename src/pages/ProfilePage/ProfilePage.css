@@ -8,12 +8,13 @@
   min-height: 0;
 }
 
-/* Страница прокручивается целиком, вместе с обложкой; карточки на фоне приложения, между ними 12 */
+/* Страница прокручивается целиком, вместе с обложкой. Блоки — полосы во всю ширину: белые, с тонкой линией сверху и снизу,
+   между ними щель фона приложения 8 */
 .profile__scroll {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--band-gap);
   min-height: 0;
   padding-bottom: var(--space-4);
   overflow-y: auto;
@@ -23,6 +24,7 @@
    под строкой состояния (к её высоте добавляется безопасная зона, видимые 144 остаются) */
 .profile__top {
   flex-shrink: 0;
+  border-bottom: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -212,13 +214,12 @@
   line-height: var(--line-height-xs);
 }
 
-/* ---------- Карточки ---------- */
+/* ---------- Полосы ---------- */
 
 .profile__card {
   flex-shrink: 0;
-  margin: 0 var(--space-4);
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -356,11 +357,13 @@
 
 /* ---------- Фото ---------- */
 
+/* Галерея идёт от края до края: плитки без скруглений, между ними щель 2 */
 .profile__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-1);
-  padding: 0 var(--space-4) var(--space-4);
+  gap: 2px;
+  padding: 0;
+  border-top: var(--hairline) solid var(--color-divider);
 }
 
 .profile__tile {
@@ -369,7 +372,6 @@
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: var(--radius-sm);
   background: var(--color-bg-fill);
 }
 
@@ -384,7 +386,7 @@
 }
 
 .profile__more {
-  margin-top: calc(var(--space-4) * -1);
+  margin-top: 0;
 }
 
 /* Пустая галерея: большая кнопка добавления */
