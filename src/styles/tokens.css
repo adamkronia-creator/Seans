@@ -24,8 +24,8 @@
   --color-accent-strong: #146673; /* глубже: нажатое, ссылки на тёплом фоне, низ градиента пузырей */
 
   /* Палитра */
-  --color-green: #34C759;
-  --color-yellow: #FFCC00;
+  --color-green: #33B26E;       /* статусные цвета чуть спокойнее прежних: смысл тот же, но не кричат на мягком фоне */
+  --color-yellow: #F2B33D;
   --color-lime: #8BD100;
   --color-coral: #FF6A55;
   --color-gray: #8E8E93;
@@ -37,8 +37,8 @@
   --color-mint: #00C8B3;
   --color-teal: #00C3D0;
   --color-cyan: #00C0E8;
-  --color-orange: #FF8D28;
-  --color-red: #FF383C;
+  --color-orange: #F28B3C;
+  --color-red: #E5484D;
   --color-darkred: #A8161C;      /* пятый уровень шкал: тяжелая степень */
   --color-brown: #AC7F5E;
 
@@ -62,9 +62,9 @@
   --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
   --color-bubble-out-from: #2A8E9B;                     /* исходящие пузыри: градиент по окну ленты, сверху светлее акцента */
   --color-bubble-out-to: #176A76;                       /* ...снизу глубже; белый текст на нём 6 : 1 */
-  --color-green-soft: rgb(52 199 89 / 14%);             /* подложки меток: подтверждено, состоялось */
-  --color-yellow-soft: rgb(255 204 0 / 20%);            /* ждем ответа */
-  --color-red-soft: rgb(255 56 60 / 10%);               /* отказ, отмена */
+  --color-green-soft: rgb(51 178 110 / 14%);            /* подложки меток: подтверждено, состоялось */
+  --color-yellow-soft: rgb(242 179 61 / 20%);            /* ждем ответа */
+  --color-red-soft: rgb(229 72 77 / 10%);               /* отказ, отмена */
 
   /* Шрифт: Inter с оптическими размерами (мелкий кегль рисуется шире и разборчивее, крупный плотнее) */
   --font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
