@@ -3,7 +3,7 @@
 .test-settings__toast {
   position: absolute;
   right: var(--space-4);
-  bottom: var(--toast-bottom, calc(var(--size-tab) + env(safe-area-inset-bottom) + var(--space-3)));
+  bottom: var(--toast-bottom, calc(var(--size-tab) + var(--safe-bottom) + var(--space-3)));
   left: var(--space-4);
   z-index: 10;
   padding: var(--space-3) var(--space-4);
@@ -16,5 +16,5 @@
 }
 
 .test-settings__toast--cta {
-  bottom: calc(var(--size-tab) + env(safe-area-inset-bottom) + 61px + var(--space-2));
+  bottom: calc(var(--size-tab) + var(--safe-bottom) + 61px + var(--space-2));
 }

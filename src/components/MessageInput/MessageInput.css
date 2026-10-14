@@ -10,8 +10,8 @@
   flex-shrink: 0;
   align-items: flex-end;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--color-divider);
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + var(--safe-bottom));
+  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
@@ -102,7 +102,7 @@
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   height: 240px;
-  padding: var(--space-1) var(--space-4) calc(var(--space-1) + env(safe-area-inset-bottom));
+  padding: var(--space-1) var(--space-4) calc(var(--space-1) + var(--safe-bottom));
   overflow-y: auto;
   border-top: 1px solid var(--color-divider);
 }

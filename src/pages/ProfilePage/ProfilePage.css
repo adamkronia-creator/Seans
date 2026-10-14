@@ -19,7 +19,8 @@
   overflow-y: auto;
 }
 
-/* Обложка и шапка с именем — один белый блок без боковых отступов: обложка идёт от края до края */
+/* Обложка и шапка с именем — один белый блок без боковых отступов: обложка идёт от края до края и от самого верха экрана,
+   под строкой состояния (к её высоте добавляется безопасная зона, видимые 144 остаются) */
 .profile__top {
   flex-shrink: 0;
   background: var(--color-bg-panel);
@@ -29,7 +30,7 @@
 
 .profile__cover {
   position: relative;
-  height: var(--size-cover-h);
+  height: calc(var(--size-cover-h) + var(--safe-top));
   overflow: hidden;
   background: linear-gradient(var(--color-accent-soft), var(--color-accent-soft)) var(--color-bg-panel);
 }
@@ -53,6 +54,7 @@
   justify-content: center;
   gap: var(--space-2);
   height: 100%;
+  padding-top: var(--safe-top);
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);

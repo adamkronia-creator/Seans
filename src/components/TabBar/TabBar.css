@@ -2,8 +2,8 @@
 .tabbar {
   display: flex;
   flex-shrink: 0;
-  padding: 0 var(--space-1) env(safe-area-inset-bottom);
-  border-top: 1px solid var(--color-divider);
+  padding: 0 var(--space-1) var(--safe-bottom);
+  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

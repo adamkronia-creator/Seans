@@ -1,11 +1,12 @@
-/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка */
+/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка.
+   Белая полоса идёт от самого верха экрана: сверху к 12 добавляется безопасная зона (строка состояния, вырез) */
 .screen-header {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-divider);
+  padding: calc(var(--space-3) + var(--safe-top)) var(--space-4) var(--space-3);
+  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
