@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { IconBack } from '../icons';
+import { EmptyState } from '../EmptyState/EmptyState';
+import { IconBack, IconSearch, IconTabTests } from '../icons';
 import { findClientResult } from '../../data/clientResults';
 import type { ConclusionData } from '../../data/conclusions';
 import { LIBRARY } from '../../data/library';
@@ -48,7 +49,7 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
           </button>
           <h1 className="test-settings__name">Результат тестирования</h1>
         </header>
-        <p className="chat__empty chat__empty--grow">Результат не найден</p>
+        <EmptyState icon={<IconSearch />} title="Результат не найден" text="Результаты хранятся, пока приложение открыто: после перезагрузки страницы они пропадают." />
       </section>
     );
   }
@@ -61,7 +62,7 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
     return (
       <section className="test-settings">
         <TestHeader test={test} status={status} onBack={onBack} />
-        <p className="chat__empty chat__empty--grow">Заключение для этого теста пока недоступно</p>
+        <EmptyState icon={<IconTabTests />} title="Заключение пока недоступно" text="Для этого теста в приложении ещё нет шкал и подсчёта баллов." />
       </section>
     );
   }

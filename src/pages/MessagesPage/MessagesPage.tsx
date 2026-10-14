@@ -2,8 +2,9 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
+import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
-import { IconBell, IconPlus } from '../../components/icons';
+import { IconBell, IconPlus, IconSearch } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import type { Chat } from '../../data/chats';
@@ -25,7 +26,7 @@ const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOp
       ))}
     </ul>
   ) : (
-    <p className="messages__empty">Ничего не найдено</p>
+    <EmptyState icon={<IconSearch />} title="Ничего не найдено" text="В этом разделе нет подходящих чатов." />
   );
 });
 

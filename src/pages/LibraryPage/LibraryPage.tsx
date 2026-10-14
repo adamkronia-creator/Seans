@@ -1,6 +1,8 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
+import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { IconFavorites, IconTabLibrary, IconTabTests } from '../../components/icons';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/EmptyResults';
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
@@ -70,11 +72,13 @@ const marksOf = (id: Section): Marks => (id === FAVORITES ? ONLY_FAVORITES : id 
 /** Раздел охватывает весь каталог: «Все» и отборы «Избранное» и «Недавнее» (у папки только то, что в неё выбрано) */
 const wholeCatalog = (id: Section) => id === 'all' || id === FAVORITES || id === RECENT;
 
-/** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от раздела */
-function emptyText(marks: Marks, whole: boolean, recent: string): string {
-  if (marks.favorites) return 'В избранном пока ничего нет.';
-  if (marks.recent) return `${recent}.`;
-  return whole ? 'Здесь пока ничего нет.' : 'В этой папке пока ничего нет. Чтобы добавить, удерживайте её название и выберите «Настроить папку».';
+/** Что написано там, где нет ничего и нет ни запроса, ни фильтров: зависит от раздела (заголовок и пояснение) */
+function emptyText(marks: Marks, whole: boolean, recent: string): { title: string; text: string } {
+  if (marks.favorites) return { title: 'В избранном пусто', text: 'Отмечайте сердечком нужные материалы — они появятся здесь.' };
+  if (marks.recent) return { title: 'Пока пусто', text: `${recent}.` };
+  return whole
+    ? { title: 'Пока пусто', text: 'Материалов здесь пока нет.' }
+    : { title: 'Папка пуста', text: 'Чтобы добавить, удерживайте название папки и выберите «Настроить папку».' };
 }
 
 /** Где искали в «Избранном» и «Недавнем»: «Среди избранного по запросу «…» ничего нет» */
@@ -93,7 +97,7 @@ interface ListProps {
   typed: string;
   noun: Noun;
   everywhere: string;
-  empty: string;
+  empty: { title: string; text: string };
   tokens: FilterToken[];
   resetKey: string;
   onToggleFavorite: (id: string) => void;
@@ -159,7 +163,7 @@ function LibraryList(p: ListProps) {
       </ul>
     );
   } else if (ctx.scope.length === 0 && !marked) {
-    body = <p className="library-page__empty">{p.empty}</p>;
+    body = <EmptyState icon={ctx.marks.favorites ? <IconFavorites /> : ctx.marks.recent ? <IconTabLibrary /> : <IconTabTests />} title={p.empty.title} text={p.empty.text} />;
   } else {
     const label = (r: Relaxation) =>
       r.type === 'option'
@@ -188,7 +192,7 @@ function LibraryList(p: ListProps) {
             : `По запросу «${typed}» ничего нет. Проверьте написание или попробуйте другое слово.`
           : filtered
             ? `${where ? `${where} нет` : 'Нет'} материалов, которые подходят под все выбранные фильтры.`
-            : p.empty;
+            : p.empty.text;
     body = <EmptyResults title={words || filtered ? 'Ничего не нашлось' : 'Здесь пусто'} text={text} actions={actions} describe={describe} />;
   }
 

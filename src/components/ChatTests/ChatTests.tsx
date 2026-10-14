@@ -1,3 +1,5 @@
+import { EmptyState } from '../EmptyState/EmptyState';
+import { IconTabPractices, IconTabTests } from '../icons';
 import { TestCard } from '../TestCard/TestCard';
 import { itemsWithStatus, useClientData } from '../../data/clientStore';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
@@ -5,6 +7,13 @@ import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import type { PsyTest, TestStatus } from '../../data/tests';
 import './ChatTests.css';
+
+/** Что показать, когда во вкладке ничего нет: что именно пусто и что делать дальше */
+interface EmptyConfig {
+  kind: 'test' | 'task';
+  title: string;
+  text: string;
+}
 
 interface SectionConfig {
   status: TestStatus;
@@ -28,16 +37,18 @@ const TASK_SECTIONS: SectionConfig[] = [
 function SectionedList({
   items,
   sections,
-  emptyText,
+  empty,
   onOpen,
 }: {
   items: PsyTest[];
   sections: SectionConfig[];
-  emptyText: string;
+  empty: EmptyConfig;
   /** Нажатие на карточку */
   onOpen?: (item: PsyTest) => void;
 }) {
-  if (items.length === 0) return <p className="chat-tests__empty">{emptyText}</p>;
+  if (items.length === 0) {
+    return <EmptyState icon={empty.kind === 'test' ? <IconTabTests /> : <IconTabPractices />} title={empty.title} text={empty.text} />;
+  }
   return (
     <div className="chat-tests">
       {sections.map(({ status, title, remind }) => {
@@ -80,7 +91,7 @@ export function ChatTests({
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
-      emptyText="Тесты ещё не отправлялись"
+      empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTest?.(t.id))}
     />
   );
@@ -98,7 +109,7 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
     <SectionedList
       items={items}
       sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
-      emptyText="Пройденных тестов пока нет"
+      empty={{ kind: 'test', title: 'Пройденных тестов пока нет', text: 'Тесты, которые вы пройдёте сами, будут храниться здесь.' }}
       onOpen={(t) => onOpen(t.id)}
     />
   );
@@ -123,7 +134,7 @@ export function ChatTasks({
     <SectionedList
       items={hasData ? itemsWithStatus(data, 'task') : []}
       sections={TASK_SECTIONS}
-      emptyText="Заданий пока нет"
+      empty={{ kind: 'task', title: 'Заданий пока нет', text: 'Отправьте задание из раздела «Задания» — оно появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTask?.(t.id))}
     />
   );
@@ -143,7 +154,7 @@ export function SelfTasks({ onOpen }: { onOpen: (resultId: string) => void }) {
     <SectionedList
       items={items}
       sections={TASK_SECTIONS.filter((s) => s.status === 'done')}
-      emptyText="Выполненных заданий пока нет"
+      empty={{ kind: 'task', title: 'Выполненных заданий пока нет', text: 'Задания, которые вы выполните сами, будут храниться здесь.' }}
       onOpen={(t) => onOpen(t.id)}
     />
   );

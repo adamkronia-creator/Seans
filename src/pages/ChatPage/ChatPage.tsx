@@ -13,6 +13,7 @@ import {
   IconTabTests,
 } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
+import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
@@ -314,7 +315,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   if (!chat) {
     return (
       <section className="chat">
-        <p className="chat__empty">Чат не найден</p>
+        <EmptyState icon={<IconSearch />} title="Чат не найден" text="Возможно, его удалили." />
       </section>
     );
   }
@@ -324,6 +325,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     <>
       <div className="chat__feed">
         <div className="chat__messages" ref={listRef} onScroll={onFeedScroll}>
+          {groups.length === 0 && (
+            <EmptyState
+              icon={<IconTabMessages />}
+              title="Пока нет сообщений"
+              text={chat.favorites ? 'Здесь будут тесты и задания, которые вы отправляете себе.' : 'Напишите первое сообщение — оно появится здесь.'}
+            />
+          )}
           {groups.map((group) => (
             <ul className="chat__group" key={group.label}>
               <li className="chat__day">

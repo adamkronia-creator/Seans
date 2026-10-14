@@ -253,8 +253,8 @@
   width: 56px;
   height: 56px;
   border-radius: var(--radius-full);
-  background: var(--color-bg-fill-strong);
-  color: var(--color-text-caption);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
   font-size: var(--size-icon);
 }
 

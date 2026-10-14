@@ -1,4 +1,5 @@
-import { IconBack } from '../icons';
+import { EmptyState } from '../EmptyState/EmptyState';
+import { IconBack, IconSearch } from '../icons';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
@@ -37,7 +38,7 @@ export function TaskResult({ resultId, onBack }: TaskResultProps) {
           </button>
           <h1 className="test-settings__name">Результат задания</h1>
         </header>
-        <p className="chat__empty chat__empty--grow">Результат не найден</p>
+        <EmptyState icon={<IconSearch />} title="Результат не найден" text="Результаты хранятся, пока приложение открыто: после перезагрузки страницы они пропадают." />
       </section>
     );
   }
