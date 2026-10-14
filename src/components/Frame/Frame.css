@@ -49,6 +49,5 @@
 /* Красная кнопка действия (отказ, отмена) */
 .sheet__button--danger {
   background: var(--color-red-text);
-  box-shadow: none;
   color: var(--color-accent-on);
 }

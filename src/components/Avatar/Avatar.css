@@ -20,12 +20,11 @@
   background: var(--color-bg-fill);
 }
 
-/* Значок вместо фото: подложка акцентом поверх белого, чтобы на светлой подложке шапки тон был тем же, что на белой строке списка */
 .avatar__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(var(--color-accent-soft), var(--color-accent-soft)) var(--color-bg-control);
+  background: var(--color-accent-soft);
   color: var(--color-accent);
 }
 
@@ -35,7 +34,7 @@
   bottom: 0;
   width: 12px;
   height: 12px;
-  border: 2px solid var(--avatar-ring, var(--color-bg-panel)); /* кольцо цвета того, что под аватаром */
+  border: 2px solid var(--color-bg-panel);
   border-radius: var(--radius-full);
   background: var(--color-success);
 }

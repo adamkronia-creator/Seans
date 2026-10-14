@@ -1,9 +1,8 @@
 .skeleton {
-  --skeleton-base: var(--color-bg-fill); /* на белой карточке; на панели темнее, иначе заглушка сливается с ней */
   display: block;
   max-width: 100%;
   border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--skeleton-base) 0%, rgb(255 255 255 / 70%) 50%, var(--skeleton-base) 100%) var(--skeleton-base);
+  background: linear-gradient(90deg, var(--color-bg-fill) 0%, rgb(255 255 255 / 70%) 50%, var(--color-bg-fill) 100%) var(--color-bg-fill);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s linear infinite;
 }
@@ -26,19 +25,12 @@
   background: var(--color-bg-app);
 }
 
-/* Заглушка шапки: та же панель с кромкой и тенью, что у настоящей, и заглушки на ней темнее */
 .skeleton-screen__bar {
-  --skeleton-base: var(--color-bg-fill-strong);
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--space-3);
   height: 56px;
   padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-down);
 }
 
 .skeleton-screen__body {

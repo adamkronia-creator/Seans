@@ -1,17 +1,12 @@
-/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка.
-   Подложка светлая, а поле, кнопка и чипсы на ней белые */
+/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка */
 .screen-header {
-  --control-ring: none;
-  position: relative;
-  z-index: 1; /* тень шапки ложится на список под ней */
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-down);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 /* Поле поиска тянется, а кнопка справа от него (уведомления) держит свой размер */
@@ -35,8 +30,7 @@
   width: var(--size-search-h);
   height: var(--size-search-h);
   border-radius: var(--radius-md);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   color: var(--color-text-primary);
   font-size: var(--size-icon);
 }
@@ -45,9 +39,8 @@
    невыбранные стоят вплотную, возле выбранного зазор */
 .screen-header__chips {
   display: flex;
-  /* Поля 4 сверху и снизу нужны кольцу фокуса: ряд прокручивается, а у прокручиваемого блока всё, что снаружи, обрезается; из размеров они вычтены */
-  margin: -4px calc(var(--space-4) * -1);
-  padding: 4px var(--space-4);
+  margin: 0 calc(var(--space-4) * -1);
+  padding: 0 var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
 }

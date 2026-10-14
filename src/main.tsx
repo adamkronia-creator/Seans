@@ -10,7 +10,6 @@ import './styles/micro.css';
 import './styles/press.css';
 import App from './App';
 import './styles/theme.css';
-import './styles/states.css';
 import { installHoverTitles } from './utils/hoverTitles';
 import { installInertiaScroll } from './utils/inertiaScroll';
 import { installPressEffect } from './utils/pressEffect';

@@ -17,16 +17,11 @@
   text-align: center;
 }
 
-/* Шапка: строка 56 (кнопки 40, аватар 36), под ней чипсы разделов, снизу разделитель. Подложка светлая, плитки разделов на ней белые */
+/* Шапка: строка 56 (кнопки 40, аватар 36), под ней чипсы разделов, снизу разделитель */
 .chat__header {
-  --control-ring: none;
-  --avatar-ring: var(--color-bg-bar);
-  position: relative;
-  z-index: 3; /* тень шапки ложится на ленту, поверх подписи дня (2) */
   flex-shrink: 0;
-  border-bottom: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-down);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .chat__top {
@@ -222,7 +217,7 @@
 }
 
 .chat__icon-button:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.35;
 }
 
 /* Меню сообщения */

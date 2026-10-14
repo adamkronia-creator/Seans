@@ -9,17 +9,14 @@
 
 /* Верхняя панель: «назад», название папки, справа «Готово» */
 .fp__header {
-  position: relative;
-  z-index: 1; /* тень шапки ложится на страницу под ней */
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
   min-height: var(--size-bar-h);
   padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-down);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .fp__back {

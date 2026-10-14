@@ -5,7 +5,7 @@
  */
 
 :root {
-  --color-bg-pressed: var(--color-bg-row-pressed); /* нажатая строка внутри белой карточки: тот же шаг, что у строк списков */
+  --color-bg-pressed: rgb(0 0 0 / 5%); /* нажатая строка внутри белой карточки */
 }
 
 .chat-item__button,

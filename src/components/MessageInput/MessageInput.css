@@ -1,14 +1,9 @@
 .composer-wrap {
-  --control-ring: none;
-  position: relative;
-  z-index: 1; /* тень панели ложится на ленту над ней */
   flex-shrink: 0;
-  border-top: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-up);
+  background: var(--color-bg-panel);
 }
 
-/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле белое на светлой подложке панели.
+/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле — заливка.
    Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края */
 .composer {
   display: flex;
@@ -16,7 +11,8 @@
   align-items: flex-end;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-  background: var(--color-bg-bar);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .composer__round {
@@ -40,8 +36,7 @@
   padding: 0 var(--space-2) 0 var(--space-3);
   /* Стадион: при одной строке полукруги, при нескольких — скругление 20 */
   border-radius: var(--radius-xl);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
 }
 
 .composer__input {
@@ -87,10 +82,9 @@
   color: var(--color-accent-on);
 }
 
-/* Пока писать нечего (поле заметки): круг белый, стрелка бледная, не нажимается */
+/* Пока писать нечего (поле заметки): круг серый и не нажимается */
 .composer__round--send:disabled {
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   color: var(--color-text-placeholder);
 }
 
@@ -124,7 +118,7 @@
 }
 
 .emoji-panel__item:active {
-  background: var(--color-bg-control);
+  background: var(--color-bg-fill);
 }
 
 /* Плашка ответа над панелью ввода */
@@ -133,6 +127,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-divider);
 }
 
 .reply-bar__icon {
@@ -178,5 +173,6 @@
 }
 
 .reply-bar + .composer {
+  border-top: 0;
   padding-top: 0;
 }

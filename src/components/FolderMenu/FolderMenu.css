@@ -136,7 +136,7 @@
 }
 
 .fo-row__tool:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.3;
 }
 
 .fo-hint {

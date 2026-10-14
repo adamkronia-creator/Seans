@@ -10,17 +10,14 @@
 
 /* Верхняя панель вложенного экрана: «назад» слева, заголовок, справа «Готово» */
 .pe__header {
-  position: relative;
-  z-index: 1; /* тень шапки ложится на страницу под ней */
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
   min-height: var(--size-bar-h);
   padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--color-separator);
-  background: var(--color-bg-bar);
-  box-shadow: var(--shadow-bar-down);
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg-panel);
 }
 
 .pe__back {
@@ -244,7 +241,7 @@
 }
 
 .pe__tool:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.3;
 }
 
 .pe__tool--danger {
@@ -294,8 +291,7 @@
   height: 36px;
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
@@ -303,6 +299,5 @@
 
 .pe__chip--own {
   background: var(--color-accent-soft);
-  box-shadow: none;
   color: var(--color-accent);
 }

@@ -86,15 +86,15 @@
 }
 
 .test-pass__buttons .test-settings__cta-button:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.4;
+  cursor: default;
 }
 
 .test-pass__back {
   flex: 1;
   height: 44px;
   border-radius: var(--radius-md);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);

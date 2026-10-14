@@ -1,4 +1,4 @@
-/* Поле поиска: белая заливка (на светлой подложке шапки рамка не нужна, на белой карточке она появляется), радиус 12, высота 40 */
+/* Поле поиска: заливка без рамки, радиус 12, высота 40 */
 .search-field {
   display: flex;
   align-items: center;
@@ -6,8 +6,7 @@
   height: var(--size-search-h);
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   color: var(--color-text-caption);
   transition: box-shadow 0.15s;
 }

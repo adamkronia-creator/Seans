@@ -1,5 +1,4 @@
-/* Чипс: белая заливка, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный. Чипсы стоят на светлой подложке шапок
-   (там --control-ring равен none); на белой карточке у них появляется тонкая рамка */
+/* Чипс: заливка без рамки, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный */
 .chip {
   display: inline-flex;
   flex-shrink: 0;
@@ -9,8 +8,7 @@
   padding: 0 14px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -25,7 +23,6 @@
 
 .chip--active {
   background: var(--color-accent);
-  box-shadow: none;
   color: var(--color-accent-on);
 }
 
@@ -42,7 +39,6 @@
   position: relative;
   isolation: isolate;
   background: none;
-  box-shadow: none;
 }
 
 .chip--follow.chip--active {
@@ -66,8 +62,7 @@
 }
 
 .chip--follow::before {
-  background: var(--color-bg-control);
-  box-shadow: var(--control-ring);
+  background: var(--color-bg-fill);
   opacity: calc(1 - var(--w));
 }
 
@@ -123,10 +118,9 @@
   color: color-mix(in srgb, var(--color-accent-on) clamp(0%, calc((var(--w) - 0.6) * 1000%), 100%), var(--color-text-secondary));
 }
 
-/* Чипс не уменьшается под пальцем (в слитой капсуле он оставил бы дыру); нажатие видно по заливке (см. «Состояния» ниже), а не по прозрачности:
-   приглушённый чипс стал бы светлее соседей и показался дырой */
+/* Чипс не уменьшается под пальцем (в слитой капсуле он оставил бы дыру); нажатие видно по приглушению */
 .chip--split[data-pressed] {
-  opacity: 1;
+  opacity: 0.7;
 }
 
 /* Раздел, где по запросу ничего нет, бледнеет только подписью: если приглушить весь чипс, заливка в капсуле станет светлее соседней и покажется дырой */
@@ -203,23 +197,6 @@
   transition: none;
 }
 
-/*
- * Состояния. Белый чипс: под курсором мыши заливка темнее на шаг и проступает кольцо (на подложке шапки в покое его нет, оно нужно, чтобы
- * чипс не слился с ней), под пальцем — на два шага. Выбранный (акцентный): заливка темнее на 10 и на 20 %. У чипсов с --follow заливка
- * лежит в ::before (белая) и ::after (акцентная), поэтому состояние рисуется на этих слоях, а не на самом чипсе: прозрачность слоёв
- * по-прежнему ведёт --w. Наведение не включается, пока чипс нажат (:not([data-pressed])): иначе мышь, нажавшая чипс, видела бы обе заливки.
- */
-.chip:not(.chip--active, .chip--follow)[data-pressed],
-.chip--follow[data-pressed]::before {
-  background-image: linear-gradient(var(--state-pressed), var(--state-pressed));
-  box-shadow: var(--control-ring-hover);
-}
-
-.chip--active:not(.chip--follow)[data-pressed],
-.chip--follow[data-pressed]::after {
-  background-color: var(--color-accent-pressed);
-}
-
 @media (hover: hover) {
   .chip--tab:hover .chip__reveal {
     grid-template-columns: 1fr;
@@ -227,17 +204,6 @@
 
   .chip--tab:hover .chip__label {
     opacity: 1;
-  }
-
-  .chip:not(.chip--active, .chip--follow):hover:not([data-pressed], :active),
-  .chip--follow:hover:not([data-pressed], :active)::before {
-    background-image: linear-gradient(var(--state-hover), var(--state-hover));
-    box-shadow: var(--control-ring-hover);
-  }
-
-  .chip--active:not(.chip--follow):hover:not([data-pressed], :active),
-  .chip--follow:hover:not([data-pressed], :active)::after {
-    background-color: var(--color-accent-hover);
   }
 }
 
