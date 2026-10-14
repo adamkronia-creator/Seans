@@ -18,32 +18,14 @@ export interface Folder {
   ids: string[];
   /** Уведомления папки выключены: число непрочитанных на её чипсе приглушено (только у чатов) */
   muted: boolean;
-  /** Значок на чипсе (один из FOLDER_ICON_IDS): в покое чипс показывает только его, подпись раскрывается у выбранного */
-  icon: FolderIconId;
 }
-
-/** Значки, из которых выбирают в настройках папки (рисунки — в components/FolderMenu/FolderGlyphs.tsx) */
-export const FOLDER_ICON_IDS = ['folder', 'user', 'users', 'chat', 'briefcase', 'book', 'bolt', 'flag', 'heart', 'cross', 'star', 'flame', 'bookmark', 'checklist'] as const;
-export type FolderIconId = (typeof FOLDER_ICON_IDS)[number];
-export const DEFAULT_FOLDER_ICON: FolderIconId = 'folder';
-
-/** Значки начальных папок: по смыслу прежних категорий */
-const SEED_ICONS: Record<string, FolderIconId> = {
-  clients: 'user',
-  colleagues: 'users',
-  seminars: 'book',
-  training: 'bolt',
-  svo: 'flag',
-  practice: 'heart',
-  hospital: 'cross',
-};
 
 /** Название папки не длиннее: чипсы стоят в один ряд, а длинное название съест его целиком */
 export const FOLDER_NAME_MAX = 16;
 export const NEW_FOLDER_NAME = 'Новая папка';
 
 const seed = (categories: { id: string; label: string }[], members: (id: string) => string[]): Folder[] =>
-  categories.map(({ id, label }) => ({ id, name: label, ids: members(id), muted: false, icon: SEED_ICONS[id] ?? DEFAULT_FOLDER_ICON }));
+  categories.map(({ id, label }) => ({ id, name: label, ids: members(id), muted: false }));
 
 let state: Record<FolderScope, Folder[]> = {
   // «Избранное» лежит только в «Все»: это системный чат
@@ -101,7 +83,7 @@ export function createFolder(scope: FolderScope): string {
   serial += 1;
   const id = `folder-${serial}`;
   fresh.add(id);
-  commit(scope, [...state[scope], { id, name: NEW_FOLDER_NAME, ids: [], muted: false, icon: DEFAULT_FOLDER_ICON }]);
+  commit(scope, [...state[scope], { id, name: NEW_FOLDER_NAME, ids: [], muted: false }]);
   return id;
 }
 
@@ -111,12 +93,6 @@ export function renameFolder(scope: FolderScope, id: string, name: string) {
   if (!next) return;
   touched(id);
   patch(scope, id, { name: next });
-}
-
-/** Выбрать значок папки (настройки папки) */
-export function setFolderIcon(scope: FolderScope, id: string, icon: FolderIconId) {
-  touched(id);
-  patch(scope, id, { icon });
 }
 
 /** Заменить состав папки (окно выбора) */

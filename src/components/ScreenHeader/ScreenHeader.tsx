@@ -1,6 +1,6 @@
-import type { KeyboardEvent, ReactNode, Ref } from "react";
-import { SearchField } from "../SearchField/SearchField";
-import "./ScreenHeader.css";
+import type { KeyboardEvent, ReactNode, Ref } from 'react';
+import { SearchField } from '../SearchField/SearchField';
+import './ScreenHeader.css';
 
 interface ScreenHeaderProps {
   /** Название раздела: на экране его нет (раздел узнают по значку на нижней панели), но программа экрана его читает */
@@ -24,9 +24,8 @@ interface ScreenHeaderProps {
 }
 
 /**
- * Общая шапка разделов «Диалоги», «Диагностика» и «Задания»: белая панель с полем поиска (рядом с ним при необходимости кнопка)
- * и тонким разделителем снизу. Чипсы стоят не в панели, а ниже разделителя, на фоне экрана: они висят над содержанием раздела.
- * Крупного названия раздела нет, чтобы список начинался выше.
+ * Общая шапка разделов «Диалоги», «Диагностика» и «Задания»: поле поиска (рядом с ним при необходимости кнопка) и чипсы под ним.
+ * Крупного названия раздела нет, чтобы список начинался выше. Белая панель с тонким разделителем снизу.
  */
 export function ScreenHeader({
   title,
@@ -44,29 +43,27 @@ export function ScreenHeader({
   onSearchKeyDown,
 }: ScreenHeaderProps) {
   return (
-    <>
-      <header className="screen-header">
-        <h1 className="visually-hidden">{title}</h1>
+    <header className="screen-header">
+      <h1 className="visually-hidden">{title}</h1>
 
-        <div className="screen-header__search">
-          <SearchField
-            value={searchValue}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-            trailing={searchTrailing}
-            onClear={onSearchClear}
-            inputRef={searchInputRef}
-            onFocus={onSearchFocus}
-            onBlur={onSearchBlur}
-            onKeyDown={onSearchKeyDown}
-          />
-          {searchAside}
-        </div>
-      </header>
+      <div className="screen-header__search">
+        <SearchField
+          value={searchValue}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+          trailing={searchTrailing}
+          onClear={onSearchClear}
+          inputRef={searchInputRef}
+          onFocus={onSearchFocus}
+          onBlur={onSearchBlur}
+          onKeyDown={onSearchKeyDown}
+        />
+        {searchAside}
+      </div>
 
       <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
         {chips}
       </div>
-    </>
+    </header>
   );
 }

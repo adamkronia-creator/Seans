@@ -1,8 +1,6 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
-import { FolderGlyph } from '../../components/FolderMenu/FolderGlyphs';
-import { IconFavorites } from '../../components/icons';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/EmptyResults';
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
@@ -208,7 +206,7 @@ function LibraryList(p: ListProps) {
  * потому что разделы «Диагностика» и «Задания» устроены одинаково.
  *
  * Разделы — страницы пейджера: «Все», «Избранное», «Недавнее» (то, что недавно присылали клиентам) и папки. Список можно листать пальцем,
- * а чипсы идут следом: это вкладки-значки, у выбранной раскрывается подпись (Chip.css, chip--tab); значок папки выбирают в её настройках. Долгое нажатие на «Все» и на папку открывает меню (useFolderMenu).
+ * а чипсы идут следом: выбранный выходит из капсулы отдельной плашкой (Chip.css, split). Долгое нажатие на «Все» и на папку открывает меню (useFolderMenu).
  * Поверх любого раздела работают поиск по словам и фильтры (лист «Фильтры»); выбранные фильтры и пояснения к выдаче стоят над списком.
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
@@ -347,6 +345,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     const count = listings[i]?.ids.length ?? 0;
     return {
       follow: true,
+      split: true,
       active: shown === i,
       onClick: () => setSection(id),
       onLongPress: id === FAVORITES || id === RECENT ? undefined : (el: HTMLElement) => folderMenu.open(id, el),
@@ -402,17 +401,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
         chipsLabel={labels.filters}
         chips={
           <>
-            <Chip {...chip('all', labels.all)} icon={<FolderGlyph id="all" />}>
-              Все
-            </Chip>
-            <Chip {...chip(FAVORITES, 'Избранное')} icon={<IconFavorites />}>
-              Избранное
-            </Chip>
-            <Chip {...chip(RECENT, 'Недавнее')} icon={<FolderGlyph id="recent" />}>
-              Недавнее
-            </Chip>
-            {folders.map(({ id, name, icon }) => (
-              <Chip key={id} {...chip(id, name)} icon={<FolderGlyph id={icon} />}>
+            <Chip {...chip('all', labels.all)}>Все</Chip>
+            <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
+            <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>
+            {folders.map(({ id, name }) => (
+              <Chip key={id} {...chip(id, name)}>
                 {name}
               </Chip>
             ))}

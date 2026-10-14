@@ -2,7 +2,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
-import { FolderGlyph } from '../../components/FolderMenu/FolderGlyphs';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconBell, IconPlus } from '../../components/icons';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
@@ -111,14 +110,14 @@ export function MessagesPage() {
         chipsLabel="Фильтр диалогов"
         chips={
           <>
-            <Chip follow icon={<FolderGlyph id="all" />} active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
+            <Chip follow split active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
-            {folders.map(({ id, name, muted, icon }, i) => (
+            {folders.map(({ id, name, muted }, i) => (
               <Chip
                 key={id}
                 follow
-                icon={<FolderGlyph id={icon} />}
+                split
                 active={shown === i + 1}
                 count={countOf(id)}
                 muted={muted}
