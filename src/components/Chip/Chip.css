@@ -1,4 +1,5 @@
-/* Чипс: заливка без рамки, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный */
+/* Чипс: белая заливка, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный. Чипсы стоят на светлой подложке шапок
+   (там --control-ring равен none); на белой карточке у них появляется тонкая рамка */
 .chip {
   display: inline-flex;
   flex-shrink: 0;
@@ -8,7 +9,8 @@
   padding: 0 14px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -23,6 +25,7 @@
 
 .chip--active {
   background: var(--color-accent);
+  box-shadow: none;
   color: var(--color-accent-on);
 }
 
@@ -39,6 +42,7 @@
   position: relative;
   isolation: isolate;
   background: none;
+  box-shadow: none;
 }
 
 .chip--follow.chip--active {
@@ -62,7 +66,8 @@
 }
 
 .chip--follow::before {
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
   opacity: calc(1 - var(--w));
 }
 

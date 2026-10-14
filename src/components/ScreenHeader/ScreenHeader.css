@@ -1,12 +1,14 @@
-/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка */
+/* Шапка раздела: поиск 40 → 12 → чипсы 32; со всех сторон 12 (по бокам 16). Названия раздела нет — это 56 высоты для списка.
+   Подложка светлая, а поле, кнопка и чипсы на ней белые */
 .screen-header {
+  --control-ring: none;
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-divider);
-  background: var(--color-bg-panel);
+  background: var(--color-bg-bar);
 }
 
 /* Поле поиска тянется, а кнопка справа от него (уведомления) держит свой размер */
@@ -30,7 +32,8 @@
   width: var(--size-search-h);
   height: var(--size-search-h);
   border-radius: var(--radius-md);
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
   color: var(--color-text-primary);
   font-size: var(--size-icon);
 }

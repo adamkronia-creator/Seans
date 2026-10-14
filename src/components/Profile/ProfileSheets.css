@@ -17,7 +17,8 @@
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: var(--radius-md);
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
 }
 
 .pf-tile img {

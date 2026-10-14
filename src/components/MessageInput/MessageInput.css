@@ -1,9 +1,10 @@
 .composer-wrap {
+  --control-ring: none;
   flex-shrink: 0;
-  background: var(--color-bg-panel);
+  background: var(--color-bg-bar);
 }
 
-/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле — заливка.
+/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле белое на светлой подложке панели.
    Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края */
 .composer {
   display: flex;
@@ -12,7 +13,7 @@
   gap: var(--space-1);
   padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-divider);
-  background: var(--color-bg-panel);
+  background: var(--color-bg-bar);
 }
 
 .composer__round {
@@ -36,7 +37,8 @@
   padding: 0 var(--space-2) 0 var(--space-3);
   /* Стадион: при одной строке полукруги, при нескольких — скругление 20 */
   border-radius: var(--radius-xl);
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
 }
 
 .composer__input {
@@ -82,9 +84,10 @@
   color: var(--color-accent-on);
 }
 
-/* Пока писать нечего (поле заметки): круг серый и не нажимается */
+/* Пока писать нечего (поле заметки): круг белый, стрелка бледная, не нажимается */
 .composer__round--send:disabled {
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
   color: var(--color-text-placeholder);
 }
 
@@ -118,7 +121,7 @@
 }
 
 .emoji-panel__item:active {
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
 }
 
 /* Плашка ответа над панелью ввода */

@@ -23,7 +23,7 @@
 }
 
 .library-page__tile--on {
-  background: var(--color-accent-soft);
+  background: linear-gradient(var(--color-accent-soft), var(--color-accent-soft)) var(--color-bg-control);
   color: var(--color-accent);
 }
 

@@ -502,12 +502,13 @@
   font-size: var(--size-icon-sm);
 }
 
-/* Кнопка над нижней панелью: белая полоса с разделителем, кнопка 44 */
+/* Кнопка над нижней панелью: светлая полоса с разделителем, кнопка 44; «Назад» рядом с ней белая */
 .test-settings__cta {
+  --control-ring: none;
   flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
   border-top: 1px solid var(--color-divider);
-  background: var(--color-bg-panel);
+  background: var(--color-bg-bar);
 }
 
 /* Кнопка «Пройти или отправить» парит над содержимым: без полосы и линии, под ней прокручивается страница */
@@ -576,7 +577,8 @@
   min-height: var(--size-chip-h);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
-  background: var(--color-bg-fill);
+  background: var(--color-bg-control);
+  box-shadow: var(--control-ring);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
