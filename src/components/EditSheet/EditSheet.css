@@ -67,6 +67,11 @@
   display: none;
 }
 
+/* Окно без подвала: содержимое заканчивается выше индикатора «домой», а не под ним */
+.sheet__body:last-child {
+  padding-bottom: calc(var(--space-4) + var(--safe-bottom));
+}
+
 /* Шапка карточки, как она будет выглядеть; заголовок вводится прямо в ней */
 .sheet__preview {
   display: flex;
