@@ -15,6 +15,7 @@
   gap: var(--space-1);
   min-height: calc(var(--size-bar-h) + var(--safe-top));
   padding: calc(var(--space-1) + var(--safe-top)) var(--space-2) var(--space-1);
+  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
@@ -54,16 +55,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--section-gap);
+  gap: var(--band-gap);
   min-height: 0;
-  padding: var(--space-4) 0 calc(var(--space-6) + var(--safe-bottom));
+  padding: var(--band-gap) 0 calc(var(--space-6) + var(--safe-bottom));
   overflow-y: auto;
 }
 
-/* Раздел во всю ширину на бумаге, без рамок */
+/* Полоса во всю ширину: белая, с тонкой линией сверху и снизу */
 .fp__card {
   flex-shrink: 0;
   overflow: hidden;
+  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 

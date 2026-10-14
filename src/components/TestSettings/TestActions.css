@@ -2,12 +2,23 @@
   display: flex;
   flex-direction: column;
   margin: 0 calc(var(--space-4) * -1);
+  border-block: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
-/* Строки идут во всю ширину листа, их отделяет высота, а не линия */
+/* Строки одной полосы во всю ширину, между ними линия от поля до края */
 .test-actions > li {
   position: relative;
+}
+
+.test-actions > li + li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: var(--hairline);
+  background: var(--color-divider);
 }
 
 /* Клиент в списке выбора: строка 56; выбранный — на лёгкой акцентной подложке, кружок справа заполнен */

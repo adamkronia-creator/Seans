@@ -13,6 +13,7 @@
   gap: var(--space-1);
   min-height: calc(56px + var(--safe-top));
   padding: var(--safe-top) var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 
@@ -91,25 +92,27 @@
   line-height: var(--line-height-xs);
 }
 
-/* Разделы идут один за другим на бумаге, между ними воздух (--section-gap), от шапки и до панели внизу не меньше --fade-h.
-   Поля 16 у контейнера нужны подписям и плитам, сами разделы выходят на всю ширину (--bleed): их содержимое стоит на поле 16 от края экрана */
+/* Полосы: от шапки щель фона 8, между полосами 8. Поля 16 у контейнера нужны подписям и пояснениям между полосами,
+   сами полосы выходят на всю ширину (--bleed) */
 .test-settings__scroll {
   --bleed: calc(var(--space-4) * -1);
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--section-gap);
+  gap: var(--band-gap);
   min-height: 0;
-  padding: var(--space-4) var(--space-4) var(--space-6);
+  padding: var(--band-gap) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
-/* Раздел: без фона, рамок и теней; содержимое с полями 16. Тот же вид у блоков бланка (.blank-card) и предупреждения (.cc-alert), у них поля свои, ниже */
+/* Полоса: белая, от края до края, тонкая линия сверху и снизу, без скруглений и тени; содержимое с полями 16.
+   Тот же вид у блоков бланка (.blank-card) и предупреждения (.cc-alert), у них поля и линии свои, ниже */
 .ts-card,
 .blank-card,
 .cc-alert {
   margin-inline: var(--bleed, calc(var(--space-4) * -1));
   border-radius: 0;
+  border-block: var(--hairline) solid var(--color-border);
 }
 
 .ts-card {
@@ -241,11 +244,11 @@
   opacity: 0;
 }
 
-/* Линии между текстом и кнопкой нет: отступы те же, а граница — воздух */
 .ts-desc__rule {
   height: 0;
   margin: 0;
   border: 0;
+  border-top: 1px solid var(--color-divider);
 }
 
 /* Область нажатия 8 по краям: видимые отступы 12 сверху (разделитель) и 12 снизу (конец блока) */
@@ -271,7 +274,7 @@
   list-style: none;
 }
 
-/* Строка: высота не меньше 48, поля 16; строки отделяет друг от друга высота, а не линия */
+/* Строка: высота не меньше 48, поля 16, разделитель от поля до правого края */
 .ts-row {
   position: relative;
   display: flex;
@@ -279,6 +282,16 @@
   gap: var(--space-3);
   min-height: 48px;
   padding: var(--space-2) var(--space-4);
+}
+
+.ts-row + .ts-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
 }
 
 .ts-row--top {
@@ -504,6 +517,7 @@
 .test-settings__cta {
   flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
+  border-top: var(--hairline) solid var(--color-divider);
   background: var(--color-bg-panel);
 }
 

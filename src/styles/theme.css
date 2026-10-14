@@ -19,8 +19,24 @@ textarea,
 }
 
 
-/* ——— Типографика: гротеск ———
-   Что набрано антиквой — styles/editorial.css. Здесь остаётся гротеск: подписи, действия, время и числа в таблицах. */
+/* ——— Типографика: три ступени ———
+   Заголовок экрана (18, насыщенный) → название в строке и карточке (16) → описание (14) и подпись (12–13).
+   Подпись раздела над списком — тихая: мельче названий в строках, чтобы заголовок не спорил с содержимым. */
+.events__title,
+.fp__title,
+.pe__title {
+  font-size: var(--font-size-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.chat-tests__title {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label);
+  line-height: var(--line-height-label);
+  letter-spacing: 0.01em;
+}
+
 .chat-tests__remind {
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-semibold);

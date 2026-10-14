@@ -1,4 +1,4 @@
-/* Общая информация: строки от 48, подпись слева тише, значение справа; строки отделяет высота, а не линия */
+/* Общая информация: строки от 48, подпись слева тише, значение справа; разделитель от поля 16 до края */
 .cc-info {
   margin: 0;
   padding: 0;
@@ -15,6 +15,16 @@
   padding: var(--space-2) var(--space-4);
 }
 
+.cc-info li + li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--color-divider);
+}
+
 .cc-info__label {
   flex: 1;
   color: var(--color-text-secondary);
@@ -29,7 +39,7 @@
 
 /* Диаграмма: ось сверху, строки 24 через 12, внизу легенда */
 .cc-chart {
-  padding: var(--space-2) 0 var(--space-4);
+  padding: var(--space-4) 0;
 }
 
 .cc-axis {
@@ -174,7 +184,7 @@
   font-size: var(--size-icon);
 }
 
-/* Легенда: цветные метки по центру */
+/* Легенда: цветные метки по центру, разделитель по ширине полей */
 .cc-legend {
   display: flex;
   flex-wrap: wrap;
@@ -182,12 +192,14 @@
   gap: var(--space-2);
   margin: var(--space-3) var(--space-4) 0;
   padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--color-divider);
   list-style: none;
 }
 
-/* В дополнительных шкалах над маркерами меньше воздуха */
+/* В дополнительных шкалах разделителя над маркерами нет */
 .cc-chart:has(.cc-bars--extra) .cc-legend {
   padding-top: 0;
+  border-top: 0;
 }
 
 .cc-profile .cc-legend {
@@ -357,10 +369,11 @@
   padding: 0;
 }
 
-/* Диапазоны: заголовок с меткой, абзацы через 12; один диапазон от другого отделяют поля 12 + 12 */
+/* Диапазоны: разделитель по ширине полей, заголовок с меткой, абзацы через 12 */
 .cc-level {
   margin: 0 var(--space-4);
   padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-divider);
   line-height: var(--line-height-md);
 }
 
@@ -436,6 +449,7 @@
   gap: var(--space-3);
   margin: 0;
   padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-divider);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
 }
@@ -451,15 +465,14 @@
   color: var(--color-orange-text);
 }
 
-/* Предупреждение психологу над шкалами: плита с красноватой заливкой и значком; единственная плита на всю ширину, не выходит за поля 16 */
+/* Предупреждение психологу над шкалами: отдельная полоса с красноватой заливкой и значком */
 .cc-alert {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-3);
-  margin-inline: 0;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
+  border-block-color: color-mix(in srgb, var(--color-red) 22%, var(--color-border));
   background: color-mix(in srgb, var(--color-red) 8%, var(--color-bg-panel));
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
@@ -553,6 +566,7 @@
 
 .cc-chart--flat .cc-legend {
   padding-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
 }
 
 .cc-single--flat {
@@ -593,9 +607,14 @@
   margin-top: var(--space-2);
 }
 
-/* «Читать далее» между диапазоном клиента и остальными: кнопка, свёрнутые диапазоны */
+/* «Читать далее» между диапазоном клиента и остальными: разделитель, кнопка, свёрнутые диапазоны */
 .cc-more {
   margin: 0 var(--space-4);
+  border-top: 1px solid var(--color-divider);
+}
+
+.cc-more--end {
+  border-top: 0;
 }
 
 .cc-more .ts-desc__toggle {
@@ -620,6 +639,10 @@
 .cc-rest__inner {
   min-height: 0;
   overflow: hidden;
+}
+
+.cc-rest .cc-level--flat:last-child {
+  border-bottom: 1px solid var(--color-divider);
 }
 
 /* Подпись оси под каждым столбцом общей диаграммы: отступ 8 */

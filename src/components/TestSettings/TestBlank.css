@@ -1,4 +1,4 @@
-/* Раздел бланка: заголовок 44 (антиква, editorial.css) и содержимое с полями 16, ближе к заголовку, чем к предыдущему разделу. Поля контейнера — в TestSettings.css (.ts-card, .blank-card) */
+/* Полоса бланка: заголовок 52, разделитель 1, содержимое с полями 16. Поля контейнера и линии краёв — в TestSettings.css (.ts-card, .blank-card) */
 .blank-card {
   flex-shrink: 0;
   overflow: hidden;
@@ -11,7 +11,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   width: 100%;
-  min-height: 44px;
+  min-height: 52px;
   padding: 0 var(--space-4);
   text-align: left;
 }
@@ -46,14 +46,9 @@
   overflow: hidden;
 }
 
-/* Содержимое стоит вплотную к своему заголовку: первый абзац и первый вопрос без верхнего поля */
-.blank-card__body > .ts-desc,
-.blank-card__body > .blank-rules {
-  padding-top: 0;
-}
-
-.blank-card__body > .blank-questions > .blank-question:first-child {
-  padding-top: var(--space-2);
+/* Содержимое отделено от заголовка линией 1 */
+.blank-card__body {
+  border-top: 1px solid var(--color-divider);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -95,16 +90,22 @@
   list-style: none;
 }
 
-/* Пояснение к группе вопросов («Сейчас, в данный момент:», «В последнее время:»): подзаголовок акцентным цветом, без плашки; у всех групп одинаковый */
+/* Пояснение к группе вопросов («Сейчас, в данный момент:», «В последнее время:»): плашка с полями 12 / 16, у всех групп одинаковая */
 .blank-heading {
-  padding: var(--space-4) var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-md);
 }
 
-/* Вопрос: поля 16, формулировка 16/25, между ней и ответами 12; вопросы отделены друг от друга полями 16 + 16, линий нет.
+.blank-heading:first-child {
+  border-top: 0;
+}
+
+/* Вопрос: поля 16, формулировка 16/22, между ней и ответами 12; вопросы разделены линией на всю ширину.
    Те же размеры в просмотре бланка, прохождении списком и прохождении по одному вопросу */
 .blank-question {
   display: flex;
@@ -113,6 +114,10 @@
   padding: var(--space-4);
   font-size: var(--font-size-lg);
   line-height: var(--line-height-lg);
+}
+
+.blank-question + .blank-question {
+  border-top: 1px solid var(--color-divider);
 }
 
 /* Вопрос без ответа, к которому ведёт «Завершить тест»: мягкая красная подсветка */
@@ -143,17 +148,15 @@
   list-style: none;
 }
 
-/* Вариант ответа: радиокнопка 20 слева, текст 15/22 рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем.
-   Без рамки: плита тоном бумаги, выбранный — акцентная подложка и тонкое кольцо (состояние — информация, ему линия положена) */
+/* Вариант ответа: радиокнопка 20 слева, текст 15/22 рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем */
 .blank-answer {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
   padding: 10px var(--space-3);
-  border: 1px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg-plate);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
   cursor: pointer;
@@ -162,14 +165,14 @@
     background-color 0.15s ease;
 }
 
-/* Выбранный вариант: акцентное кольцо и лёгкая заливка */
+/* Выбранный вариант: акцентная обводка и лёгкая заливка */
 .blank-answer:has(.blank-answer__input:checked) {
   border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-panel));
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .blank-answer:active {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-panel));
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 /* Сохранённый бланк: ответы видны, менять их нельзя */
@@ -249,9 +252,8 @@
   align-items: center;
   gap: var(--space-1);
   padding: 10px 0;
-  border: 1px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg-plate);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -260,11 +262,11 @@
 
 .blank-scale__item:has(.blank-answer__input:checked) {
   border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-panel));
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .blank-scale__item:active {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-panel));
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .blank-scale__value {

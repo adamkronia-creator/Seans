@@ -1,4 +1,4 @@
-/* Строка события: как строка чата — аватар 48, отступы 12 и 16, без разделителя */
+/* Строка события: как строка чата — аватар 48, отступы 12 и 16, разделитель от текста */
 .event-item {
   background: var(--color-bg-row);
 }
@@ -11,6 +11,16 @@
   width: 100%;
   padding: var(--space-3) var(--space-4);
   text-align: left;
+}
+
+.event-item + .event-item .event-item__inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: calc(var(--space-4) + var(--size-avatar-lg) + var(--space-3));
+  height: 1px;
+  background: var(--color-divider);
 }
 
 button.event-item__inner:active,
