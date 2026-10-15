@@ -37,8 +37,10 @@ import { transition } from '../../utils/transition';
 import './TestSettings.css';
 import './TaskSettings.css';
 
-/** Высота свернутого описания: 6 строк по 22 и промежуток между абзацами 12, как у тестов */
-const DESC_COLLAPSED = 6 * 22 + 12;
+/** Строка текста для чтения (--line-height-read, editorial.css): описание набрано антиквой 16/25 */
+const DESC_LINE = 25;
+/** Высота свёрнутого описания: 6 строк и промежуток между абзацами 12, одинаково у всех тестов и заданий */
+const DESC_COLLAPSED = 6 * DESC_LINE + 12;
 
 /** Что показано под шапкой: настройки, бланк, пример выполнения или выполнение самому */
 type View = 'settings' | 'blank' | 'example' | 'pass';
@@ -123,7 +125,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
   const descRef = useRef<HTMLDivElement>(null);
-  const descLong = descFull > DESC_COLLAPSED + 22;
+  const descLong = descFull > DESC_COLLAPSED + DESC_LINE;
 
   const notify = (text: string) => {
     setToast(text);
