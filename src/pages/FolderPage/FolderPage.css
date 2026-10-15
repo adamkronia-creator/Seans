@@ -61,12 +61,16 @@
   overflow-y: auto;
 }
 
-/* Полоса во всю ширину: белая, с тонкой линией сверху и снизу */
+/* Раздел во всю ширину: с тонкой линией сверху (у первого её нет: над ним линия шапки) */
 .fp__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
+  border-top: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
+}
+
+.fp__scroll > :first-child {
+  border-top: 0;
 }
 
 /* Заголовки карточек акцентные, как в Telegram */

@@ -24,7 +24,6 @@
    под строкой состояния (к её высоте добавляется безопасная зона, видимые 144 остаются) */
 .profile__top {
   flex-shrink: 0;
-  border-bottom: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 
@@ -219,7 +218,7 @@
 .profile__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
+  border-top: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
 }
 

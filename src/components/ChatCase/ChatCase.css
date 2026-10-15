@@ -39,11 +39,15 @@
   touch-action: manipulation;
 }
 
-/* Полоса: белая, от края до края, тонкая линия сверху и снизу. Шапка: значок на цветной плитке, название, карандаш; поля 16 */
+/* Запись: от края до края, линия сверху (у первой её нет: над ней линия шапки). Шапка: значок на цветной плитке, название, карандаш; поля 16 */
 .case-card {
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
+  border-top: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
+}
+
+.case-cards > .case-card:first-child {
+  border-top: 0;
 }
 
 .case-card__head {

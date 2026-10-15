@@ -66,8 +66,12 @@
 .pe__card {
   flex-shrink: 0;
   overflow: hidden;
-  border-block: var(--hairline) solid var(--color-border);
+  border-top: var(--hairline) solid var(--color-border);
   background: var(--color-bg-panel);
+}
+
+.pe__scroll > :first-child {
+  border-top: 0;
 }
 
 /* ---------- Фото профиля и обложка ---------- */

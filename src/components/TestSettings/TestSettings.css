@@ -105,14 +105,18 @@
   overflow-y: auto;
 }
 
-/* Полоса: белая, от края до края, тонкая линия сверху и снизу, без скруглений и тени; содержимое с полями 16.
-   Тот же вид у блоков бланка (.blank-card) и предупреждения (.cc-alert), у них поля и линии свои, ниже */
+/* Раздел: от края до края, одна тонкая линия сверху (первый раздел начинается под линией шапки), без скруглений и тени;
+   содержимое с полями 16. Тот же вид у блоков бланка (.blank-card) и предупреждения (.cc-alert), у них поля и линии свои, ниже */
 .ts-card,
 .blank-card,
 .cc-alert {
   margin-inline: var(--bleed, calc(var(--space-4) * -1));
   border-radius: 0;
-  border-block: var(--hairline) solid var(--color-border);
+  border-top: var(--hairline) solid var(--color-border);
+}
+
+.test-settings__scroll > :first-child {
+  border-top: 0;
 }
 
 .ts-card {
