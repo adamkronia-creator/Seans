@@ -111,7 +111,7 @@ export function MessagesPage() {
         chipsLabel="Фильтр диалогов"
         chips={
           <>
-            <Chip follow split active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
+            <Chip follow split tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
             {folders.map(({ id, name, muted }, i) => (
@@ -119,6 +119,7 @@ export function MessagesPage() {
                 key={id}
                 follow
                 split
+                tone="chat"
                 active={shown === i + 1}
                 count={countOf(id)}
                 muted={muted}

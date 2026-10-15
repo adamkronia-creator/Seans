@@ -1,3 +1,4 @@
+import type { Tone } from '../../utils/tone';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import {
@@ -53,6 +54,9 @@ const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
 
 /** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
 const FAVORITES_HIDDEN: SectionId[] = ['library'];
+/** Пастель раздела: она же у чипса раздела, у видов событий в истории и у значков в списках */
+const SECTION_TONE: Record<SectionId, Tone> = { messages: 'chat', tests: 'test', tasks: 'task', notes: 'note', info: 'info', library: 'session' };
+
 const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
@@ -485,7 +489,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
         <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
           {sections.map(({ id, label, icon }) => (
-            <Chip key={id} follow icon={icon} active={id === section} onClick={() => setSection(id)}>
+            <Chip key={id} follow icon={icon} tone={SECTION_TONE[id]} active={id === section} onClick={() => setSection(id)}>
               {label}
             </Chip>
           ))}

@@ -38,7 +38,7 @@ export interface LibraryItem<C extends string = string> {
   abbr?: string;
   description: string;
   icon: string;
-  /** Фон аватарки, накладывается с прозрачностью 75% */
+  /** Фон аватарки: цвет палитры get-color.ru/pastel, без прозрачности */
   tint: string;
   /** Какой категории принадлежит тест. В макете не показано, распределение условное */
   categories: C[];
@@ -48,18 +48,18 @@ export type LibraryTest = LibraryItem<TestCategory>;
 
 // Библиотека всех тестов приложения; порядок как в макете
 export const LIBRARY: LibraryTest[] = [
-  { id: 'smol', title: 'Сокращенный многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#B3E59F', categories: ['training', 'svo'] },
-  { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFD18D', categories: ['svo'] },
-  { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FED2A4', categories: ['training'] },
-  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FFE177', categories: ['training', 'svo'] },
-  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', icon: bdiIcon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#F2D1A5', categories: ['training'] },
-  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E8EDF2', categories: ['svo'] },
-  { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFCEBF', categories: ['svo'] },
-  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: 'rgb(153 230 252 / 75%)', categories: ['training'] },
-  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: pfqIcon, tint: 'rgb(254 153 160 / 75%)', categories: ['training'] },
-  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: 'rgb(255 95 122 / 75%)', categories: ['svo'] },
+  { id: 'smol', title: 'Сокращенный многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#A8E4A0', categories: ['training', 'svo'] },
+  { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFDB8B', categories: ['svo'] },
+  { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FAD6A5', categories: ['training'] },
+  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FCDD76', categories: ['training', 'svo'] },
+  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', icon: bdiIcon, tint: '#FFBCAD', categories: ['svo'] },
+  { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', icon: itoIcon, tint: '#EDD19C', categories: ['training'] },
+  { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', icon: ocrIcon, tint: '#E6E6FA', categories: ['svo'] },
+  { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', icon: phq9Icon, tint: '#FFBCAD', categories: ['svo'] },
+  { id: 'gad7', title: 'Опросник генерализованного тревожного расстройства', abbr: 'GAD-7', description: 'Для оценки тревожности', icon: gad7Icon, tint: '#FFBCAD', categories: ['svo'] },
+  { id: 'rses', title: 'Шкала самоуважения М. Розенберга', abbr: 'RSES', description: 'Для исследования самооценки', icon: rsesIcon, tint: '#AFEEEE', categories: ['training'] },
+  { id: '5pfq', title: 'Пятифакторный опросник личности', abbr: '5PFQ', description: 'Для оценки факторов личности', icon: pfqIcon, tint: '#FFC1CC', categories: ['training'] },
+  { id: 'scl90', title: 'Симптоматический опросник', abbr: 'SCL-90', description: 'Для оценки клинической симптоматики', icon: scl90Icon, tint: '#FF9BAA', categories: ['svo'] },
 ];
 
 // ——— Избранное: сердечко на карточке включает и выключает элемент ———
@@ -99,15 +99,15 @@ export type LibraryTask = LibraryItem<TaskCategory>;
 
 // Библиотека заданий; порядок как в макете, распределение по категориям условное
 export const TASK_LIBRARY: LibraryTask[] = [
-  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', icon: evidenceIcon, tint: '#FFCEBF', categories: ['practice'] },
-  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: pieIcon, tint: '#6FD7A3', categories: ['practice'] },
-  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: smerIcon, tint: '#E19974', categories: ['practice', 'hospital'] },
-  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFCEBF', categories: ['hospital'] },
-  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#B9EA6A', categories: ['hospital'] },
-  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: 'rgb(255 225 119 / 75%)', categories: ['practice'] },
-  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#EAF6FF', categories: ['practice'] },
-  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFDECF', categories: ['practice'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#F2EBDA', categories: ['practice'] },
+  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', icon: evidenceIcon, tint: '#FFBCAD', categories: ['practice'] },
+  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: pieIcon, tint: '#9FE2BF', categories: ['practice'] },
+  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: smerIcon, tint: '#FFB28B', categories: ['practice', 'hospital'] },
+  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
+  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
+  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
+  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
+  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#EAE0C8', categories: ['practice'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);

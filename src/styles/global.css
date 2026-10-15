@@ -20,7 +20,7 @@ body {
 
 body {
   margin: 0;
-  background: var(--color-bg-app);
+  background: var(--color-bg-desk);
   color: var(--color-text-primary);
   font-family: var(--font-family);
   font-size: var(--font-size-md);

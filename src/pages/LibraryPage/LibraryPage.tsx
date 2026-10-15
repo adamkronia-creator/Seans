@@ -350,6 +350,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     return {
       follow: true,
       split: true,
+      tone: kind,
       active: shown === i,
       onClick: () => setSection(id),
       onLongPress: id === FAVORITES || id === RECENT ? undefined : (el: HTMLElement) => folderMenu.open(id, el),

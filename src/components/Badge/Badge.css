@@ -34,9 +34,9 @@
   color: var(--color-accent-on);
 }
 
-/* Невыбранный чипс залит тем же серым (--color-bg-fill), поэтому кружок темнее его: серо-синий 16 % */
+/* Невыбранный чипс залит жемчужным (--color-bg-fill), поэтому кружок темнее его: чернила 12 % */
 .badge--neutral {
-  background: rgb(108 122 138 / 16%);
+  background: rgb(23 46 47 / 12%);
   color: var(--color-text-secondary);
 }
 
@@ -53,7 +53,7 @@
 
 .badge--green {
   background: var(--color-green);
-  color: var(--color-accent-on);
+  color: var(--color-text-primary);
 }
 
 /* Неактивная вкладка переключателя */
@@ -65,7 +65,7 @@
 /* Уведомления папки выключены: то же число, но в тонком кольце без заливки, тише обычного кружка */
 .badge--quiet {
   background: none;
-  box-shadow: inset 0 0 0 1.5px rgb(108 122 138 / 40%);
+  box-shadow: inset 0 0 0 1.5px rgb(23 46 47 / 35%);
   color: var(--color-text-secondary);
 }
 
@@ -73,4 +73,10 @@
   background: none;
   box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 60%);
   color: rgb(255 255 255 / 88%);
+}
+
+/* Выбранный чипс с тоном залит пастелью: кружок «тихий» на нём кольцом чернил, а не белым */
+.chip[data-tone] .badge--quiet-inverse {
+  box-shadow: inset 0 0 0 1.5px rgb(23 46 47 / 45%);
+  color: var(--color-text-secondary);
 }

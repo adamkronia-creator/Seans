@@ -17,36 +17,38 @@ export type ToneId =
   | 'gray'
   | 'slate';
 
-// Цвет иконки — основной цвет из палитры (tokens.css); фон шапки — тот же цвет с прозрачностью 10%
-const tone = (id: ToneId, label: string, token: string) => ({
+// Пастель с палитры (tokens.css) годится для заливок, но не для штрихов значка: на светлой плитке значок рисуется тёмным оттенком того же цвета
+// (≥ 4,8:1), плитка — та же пастель вполсилы на бумаге, а в окне выбора цвета кружок залит самой пастелью
+const tone = (id: ToneId, label: string, token: string, ink: string) => ({
   id,
   label,
-  fg: `var(--color-${token})`,
-  bg: `color-mix(in srgb, var(--color-${token}) 10%, transparent)`,
+  swatch: `var(--color-${token})`,
+  fg: ink,
+  bg: `color-mix(in srgb, var(--color-${token}) 50%, var(--color-bg-app))`,
 });
 
 // 16 цветов: два ряда по 8 в окне редактирования
 export const TONES = [
-  tone('blue', 'Синий', 'blue'),
-  tone('cyan', 'Голубой', 'cyan'),
-  tone('teal', 'Бирюзовый', 'teal'),
-  tone('mint', 'Мятный', 'mint'),
-  tone('green', 'Зелёный', 'green'),
-  tone('lime', 'Салатовый', 'lime'),
-  tone('yellow', 'Жёлтый', 'yellow'),
-  tone('orange', 'Оранжевый', 'orange'),
-  tone('coral', 'Коралловый', 'coral'),
-  tone('red', 'Красный', 'red'),
-  tone('pink', 'Розовый', 'pink'),
-  tone('magenta', 'Пурпурный', 'magenta'),
-  tone('purple', 'Фиолетовый', 'purple'),
-  tone('brown', 'Коричневый', 'brown'),
-  tone('gray', 'Серый', 'gray'),
-  tone('slate', 'Графитовый', 'slate'),
+  tone('blue', 'Синий', 'blue', '#0E6091'),
+  tone('cyan', 'Голубой', 'cyan', '#356B74'),
+  tone('teal', 'Бирюзовый', 'teal', '#105556'),
+  tone('mint', 'Мятный', 'mint', '#005C38'),
+  tone('green', 'Зелёный', 'green', '#116223'),
+  tone('lime', 'Салатовый', 'lime', '#566A1B'),
+  tone('yellow', 'Жёлтый', 'yellow', '#854900'),
+  tone('orange', 'Оранжевый', 'orange', '#873300'),
+  tone('coral', 'Коралловый', 'coral', '#913719'),
+  tone('red', 'Красный', 'red', '#892936'),
+  tone('pink', 'Розовый', 'pink', '#815964'),
+  tone('magenta', 'Пурпурный', 'magenta', '#6D576E'),
+  tone('purple', 'Фиолетовый', 'purple', '#514F78'),
+  tone('brown', 'Коричневый', 'brown', '#624F2D'),
+  tone('gray', 'Серо-лиловый', 'gray', '#5C4451'),
+  tone('slate', 'Серо-бирюзовый', 'slate', '#275C5D'),
 ];
 
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
-export const NEUTRAL_TONE = { id: null, label: 'Без цвета', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
+export const NEUTRAL_TONE = { id: null, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
 
 export const toneOf = (id: ToneId | null) =>
   id === null ? NEUTRAL_TONE : (TONES.find((t) => t.id === id) ?? TONES[0]);

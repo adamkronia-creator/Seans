@@ -37,7 +37,7 @@
 
 .bubble--in {
   align-self: flex-start;
-  background: var(--color-bg-panel);
+  background: var(--color-bubble-in);
   color: var(--color-text-primary);
   border-bottom-left-radius: 6px;
 }
@@ -52,7 +52,7 @@
   background-repeat: no-repeat;
   background-size: 100% var(--feed-h, 100%);
   background-position: 0 var(--gy, 0);
-  color: var(--color-accent-on);
+  color: var(--color-ink-on-pastel);
   border-bottom-right-radius: 6px;
 }
 
@@ -75,7 +75,12 @@
 }
 
 .bubble--out .bubble__meta {
-  color: rgb(255 255 255 / 80%);
+  color: var(--color-text-secondary);
+}
+
+/* Галочки доставки в пастельном пузыре — акцентным цветом: белёсые на нём не видны */
+.bubble--out .bubble__ticks {
+  color: var(--color-accent);
 }
 
 .bubble__meta--ghost {
@@ -93,12 +98,12 @@
 /* Подсветка в поиске по чату */
 .bubble__mark {
   border-radius: 3px;
-  background: rgb(255 204 0 / 55%);
+  background: rgb(255 207 72 / 55%);
   color: inherit;
 }
 
 .bubble__mark--active {
-  background: #ffcc00;
+  background: #FFCF48; /* Восход солнца */
   color: var(--color-text-primary);
 }
 
@@ -133,7 +138,7 @@
 }
 
 .bubble--out .bubble__quote {
-  border-left-color: rgb(255 255 255 / 80%);
+  border-left-color: var(--color-accent-strong);
 }
 
 .bubble__quote-name {
@@ -142,7 +147,7 @@
 }
 
 .bubble--out .bubble__quote-name {
-  color: var(--color-accent-on);
+  color: var(--color-accent-strong);
 }
 
 .bubble__quote-text {
@@ -154,9 +159,9 @@
   color: var(--color-accent);
 }
 
-/* В исходящем пузыре фон синий: текст цитаты белый, иначе синее на синем не видно */
+/* В исходящем пузыре фон пастельный: текст цитаты тёмный, иначе акцентный на нём слабо виден */
 .bubble--out .bubble__quote-text {
-  color: rgb(255 255 255 / 90%);
+  color: var(--color-text-secondary);
 }
 
 /* Подсказка свайпа: значок «ответить» появляется слева */
@@ -304,7 +309,7 @@
   padding: var(--space-2) var(--space-4);
   border: 0;
   border-radius: 4px;
-  background: var(--color-bg-panel);
+  background: var(--color-bubble-in);
   color: var(--color-accent);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
@@ -399,7 +404,7 @@
   line-height: var(--line-height-xs);
 }
 
-/* В своём (синем) пузыре серый подпись почти не виден: берём цвет текста пузыря, как у подписи карточки */
+/* В своём (пастельном) пузыре серая подпись слабо видна: берём цвет текста пузыря, как у подписи карточки */
 .bubble--out .tcard__note {
   color: inherit;
   opacity: 0.8;

@@ -2,7 +2,7 @@
   display: block;
   max-width: 100%;
   border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--color-bg-fill) 0%, rgb(255 255 255 / 70%) 50%, var(--color-bg-fill) 100%) var(--color-bg-fill);
+  background: linear-gradient(90deg, var(--color-bg-fill) 0%, rgb(255 251 242 / 70%) 50%, var(--color-bg-fill) 100%) var(--color-bg-fill);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s linear infinite;
 }

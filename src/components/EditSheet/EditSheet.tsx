@@ -162,7 +162,7 @@ export function EditSheet({
                 </div>
                 <Collapse open={toneOn}>
                   <div className="sheet__tones" role="radiogroup" aria-labelledby={`${uid}-tone`}>
-                    {TONES.map(({ id, label, bg, fg }) => (
+                    {TONES.map(({ id, label, bg, fg, swatch }) => (
                       <button
                         key={id}
                         type="button"
@@ -170,7 +170,7 @@ export function EditSheet({
                         aria-checked={id === tone}
                         aria-label={label}
                         className={`sheet__tone${id === tone ? ' sheet__tone--active' : ''}`}
-                        style={{ '--head-bg': bg, '--head-fg': fg } as CSSProperties}
+                        style={{ '--head-bg': bg, '--head-fg': fg, '--head-swatch': swatch } as CSSProperties}
                         onClick={() => setTone(id)}
                       />
                     ))}

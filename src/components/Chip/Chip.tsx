@@ -1,5 +1,6 @@
 import { useRef, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
+import type { Tone } from '../../utils/tone';
 import './Chip.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у сообщений в чате */
@@ -36,9 +37,11 @@ interface ChipProps {
    * «Диагностики» и «Заданий»). Зазор и скругления на стыках идут за страницами пейджера (см. followChips и Chip.css)
    */
   split?: boolean;
+  /** Вид содержимого: выбранный чипс заливается пастелью этого вида (см. --tone-* в tokens.css), подпись по ней тёмная. Без тона — акцентный */
+  tone?: Tone;
 }
 
-export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false }: ChipProps) {
+export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone }: ChipProps) {
   const press = useRef<{ x: number; y: number; timer: number } | null>(null);
   /** Долгое нажатие уже открыло меню: клик, который придёт, когда палец поднимут, не должен выбирать чипс */
   const opened = useRef(false);
@@ -111,6 +114,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       onContextMenu={onLongPress ? onContextMenu : undefined}
       aria-pressed={active}
       aria-label={ariaLabel}
+      data-tone={tone}
     >
       {icon !== undefined ? (
         <>

@@ -15,6 +15,7 @@ import {
 } from '../icons';
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
+import type { Tone } from '../../utils/tone';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultId, clientResultPath, recordRef } from '../../data/resultLinks';
 import { findClientResult } from '../../data/clientResults';
@@ -50,23 +51,25 @@ interface StatItem {
   label: string;
   value: number;
   total?: number;
+  /** Цвет типа: над числом метка того же тона, что у круга события и чипса раздела */
+  tone: Tone;
 }
 
-/** Сводка в одну строку: число крупно, под ним подпись; у тестов и заданий «выполнено / всего» */
+/** Сводка в одну строку: над числом метка цвета типа, число крупно, под ним подпись; у тестов и заданий «выполнено / всего» */
 function Stats({ hasData }: { hasData: boolean }) {
   const d = useClientData();
   const n = (value: number) => (hasData ? value : 0);
   const items: StatItem[] = [
-    { label: 'Сеансы', value: n(countOf(d, 'session')) },
-    { label: 'Тесты', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')) },
-    { label: 'Задания', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')) },
-    { label: 'Сведения', value: n(d.caseSections.length) },
-    { label: 'Заметки', value: n(countOf(d, 'note')) },
+    { label: 'Сеансы', value: n(countOf(d, 'session')), tone: 'session' },
+    { label: 'Тесты', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')), tone: 'test' },
+    { label: 'Задания', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')), tone: 'task' },
+    { label: 'Сведения', value: n(d.caseSections.length), tone: 'info' },
+    { label: 'Заметки', value: n(countOf(d, 'note')), tone: 'note' },
   ];
   return (
     <ul className="hist-stats">
-      {items.map(({ label, value, total }) => (
-        <li key={label} className="hist-stats__item" title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
+      {items.map(({ label, value, total, tone }) => (
+        <li key={label} className="hist-stats__item" data-tone={tone} title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
           <span className="hist-stats__value">
             {value}
             {total !== undefined && <span className="hist-stats__total">/{total}</span>}
@@ -89,18 +92,19 @@ function authorOf(event: HistoryEvent) {
   return event.state === 'done' ? client : 'Вы';
 }
 
-/** Значок события на рейке: номер сеанса или значок типа */
+/** Значок события на рейке: круг цвета типа (тот же тон, что у чипса раздела) и чернильный знак; номер у сеанса.
+    Ещё не выполненное — бледный круг с кольцом и часами */
 function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'invite') {
     return (
-      <div className="hist-marker">
+      <div className="hist-marker hist-marker--invite">
         <IconEventInvite />
       </div>
     );
   }
   if (event.kind === 'session') {
     return (
-      <div className="hist-marker">
+      <div className="hist-marker hist-marker--session">
         <span className="hist-marker__number">
           <span className="hist-marker__digit">{event.number}</span>
         </span>
@@ -109,7 +113,7 @@ function Marker({ event }: { event: HistoryEvent }) {
   }
   if (event.kind === 'note') {
     return (
-      <div className="hist-marker">
+      <div className="hist-marker hist-marker--note">
         <IconTlNote />
       </div>
     );
@@ -117,7 +121,7 @@ function Marker({ event }: { event: HistoryEvent }) {
   const done = event.state === 'done';
   const StateIcon = done ? (event.kind === 'test' ? IconTlDoc : IconTlFlame) : IconTlClock;
   return (
-    <div className={`hist-marker${done ? '' : ' hist-marker--clock'}`}>
+    <div className={`hist-marker hist-marker--${event.kind}${done ? '' : ' hist-marker--pending'}`}>
       <StateIcon />
     </div>
   );
@@ -366,6 +370,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             key={id}
             follow
             split
+            tone={id === 'all' ? undefined : id}
             active={shown === i}
             onClick={() => setFilter(id)}
           >

@@ -1,5 +1,7 @@
-/* Чипс: заливка без рамки, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный */
+/* Чипс: заливка без рамки, высота 32, подпись 14 средней насыщенности. Выбранный — акцентный, а с тоном (data-tone) — пастель своего вида с тёмной подписью */
 .chip {
+  --chip-bg: var(--color-accent);
+  --chip-on: var(--color-accent-on);
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -21,9 +23,20 @@
   padding-right: 6px;
 }
 
+.chip[data-tone] {
+  --chip-on: var(--color-ink-on-pastel);
+}
+
+.chip[data-tone='chat'] { --chip-bg: var(--tone-chat); }
+.chip[data-tone='session'] { --chip-bg: var(--tone-session); }
+.chip[data-tone='test'] { --chip-bg: var(--tone-test); }
+.chip[data-tone='task'] { --chip-bg: var(--tone-task); }
+.chip[data-tone='info'] { --chip-bg: var(--tone-info); }
+.chip[data-tone='note'] { --chip-bg: var(--tone-note); }
+
 .chip--active {
-  background: var(--color-accent);
-  color: var(--color-accent-on);
+  background: var(--chip-bg);
+  color: var(--chip-on);
 }
 
 /*
@@ -67,7 +80,7 @@
 }
 
 .chip--follow::after {
-  background: var(--color-accent);
+  background: var(--chip-bg);
   opacity: var(--w);
 }
 
@@ -110,12 +123,12 @@
 }
 
 /*
- * Подпись меняет цвет там, где заливка уже достаточно синяя для белого текста (около 0,65 пути): серый на светло-голубом читается,
+ * Подпись меняет цвет там, где заливка уже достаточно насыщенная для подписи выбранного (около 0,65 пути): вторичный цвет на светлой заливке читается,
  * а при плавном перетекании цветов на полпути оба были бы бледными. Где color-mix нет, остаются две ступени от .chip и .chip--active.
  */
 .chip--split,
 .chip--split.chip--active {
-  color: color-mix(in srgb, var(--color-accent-on) clamp(0%, calc((var(--w) - 0.6) * 1000%), 100%), var(--color-text-secondary));
+  color: color-mix(in srgb, var(--chip-on) clamp(0%, calc((var(--w) - 0.6) * 1000%), 100%), var(--color-text-secondary));
 }
 
 /* Чипс не уменьшается под пальцем (в слитой капсуле он оставил бы дыру); нажатие видно по приглушению */
@@ -153,6 +166,15 @@
 
 .chip--tab.chip--follow::before {
   opacity: 1;
+}
+
+/* С тоном выбранная вкладка заливается пастелью своего раздела вслед за пальцем, как чипсы списков */
+.chip--tab.chip--follow[data-tone]::after {
+  display: block;
+}
+
+.chip--tab.chip--follow[data-tone]::before {
+  opacity: calc(1 - var(--w));
 }
 
 .chip--tab {
