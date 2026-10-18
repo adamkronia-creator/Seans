@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, setArchived, useChats } from '../../data/chatStore';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
@@ -8,8 +8,8 @@ import { useToast } from '../../components/Toast/useToast';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
-import { IconBell, IconPlus, IconSearch } from '../../components/icons';
-import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
+import { IconSearch } from '../../components/icons';
+import { ChatsHeader } from './ChatsHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import type { Chat } from '../../data/chats';
 import { useFolders } from '../../data/folders';
@@ -21,7 +21,11 @@ import './MessagesPage.css';
 /** 'all' или номер папки */
 type Filter = string;
 
-/** Чаты одного фильтра: страница пейджера, у каждой своя прокрутка */
+/**
+ * Чаты одного фильтра: страница пейджера со своей прокруткой. На странице «Все» над «Избранным» стоит строка «Архивы», но при открытии
+ * список сдвинут на её высоту, и строка спрятана под шапкой; протяжка вниз выдвигает её, а недотянутую или недоведённую до конца
+ * прокрутку список сам доводит до ближайшего края.
+ */
 const ChatList = memo(function ChatList({
   chats,
   archived,
@@ -29,18 +33,70 @@ const ChatList = memo(function ChatList({
   onMenu,
 }: {
   chats: Chat[];
-  /** Чаты в архиве: если они есть, первой строкой стоит «Архив чатов» (только на странице «Все», без поиска) */
+  /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
   archived: Chat[];
   onOpen: (chat: Chat) => void;
   onMenu: (chat: Chat, row: HTMLElement) => void;
 }) {
-  return chats.length > 0 || archived.length > 0 ? (
-    <ul className="messages__list">
-      {archived.length > 0 && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
-      {chats.map((chat) => (
-        <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={chat.favorites ? undefined : onMenu} />
-      ))}
-    </ul>
+  const scroller = useRef<HTMLDivElement>(null);
+  const rows = useRef<HTMLUListElement>(null);
+  const hasArchive = archived.length > 0;
+  const favorites = chats.find((c) => c.favorites);
+  const others = chats.filter((c) => !c.favorites);
+
+  // Высота спрятанной части: строка «Архивы» вместе с промежутком до следующей
+  const hiddenHeight = () => {
+    const archive = rows.current?.querySelector<HTMLElement>('.chat-item--archive');
+    return archive ? (archive.nextElementSibling as HTMLElement | null)?.offsetTop! - archive.offsetTop : 0;
+  };
+
+  // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать; при открытии строка спрятана
+  useLayoutEffect(() => {
+    const box = scroller.current;
+    const list = rows.current;
+    if (!box || !list || !hasArchive) return;
+    const fit = () => {
+      const cs = getComputedStyle(box);
+      const inner = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      list.style.minHeight = `${inner + hiddenHeight()}px`;
+    };
+    fit();
+    box.scrollTop = hiddenHeight();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [hasArchive]);
+
+  // Доводка: отпустили на полпути — строка либо выезжает целиком, либо уходит обратно
+  useEffect(() => {
+    const box = scroller.current;
+    if (!box || !hasArchive) return;
+    let timer = 0;
+    const settle = () => {
+      const h = hiddenHeight();
+      if (box.scrollTop > 0 && box.scrollTop < h) box.scrollTo({ top: box.scrollTop < h / 2 ? 0 : h, behavior: 'smooth' });
+    };
+    const onScroll = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(settle, 140);
+    };
+    box.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      box.removeEventListener('scroll', onScroll);
+      window.clearTimeout(timer);
+    };
+  }, [hasArchive]);
+
+  return chats.length > 0 || hasArchive ? (
+    <div ref={scroller} className="messages__list">
+      <ul ref={rows} className="messages__rows">
+        {hasArchive && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
+        {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
+        {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
+        {others.map((chat) => (
+          <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} />
+        ))}
+      </ul>
+    </div>
   ) : (
     <div className="messages__empty">
       <EmptyState icon={<IconSearch />} title="Ничего не найдено" text="В этом разделе нет подходящих чатов." />
@@ -50,6 +106,7 @@ const ChatList = memo(function ChatList({
 
 export function MessagesPage() {
   const [query, setQuery] = useState('');
+  const [searching, setSearching] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -136,18 +193,11 @@ export function MessagesPage() {
 
   return (
     <section ref={root} className="messages">
-      <ScreenHeader
-        title="Диалоги"
-        showTitle
-        searchValue={query}
-        onSearchChange={setQuery}
-        searchPlaceholder="Поиск"
-        titleAside={
-          <button type="button" className="screen-header__action" aria-label="События" onClick={() => navigate('/events')}>
-            <IconBell />
-          </button>
-        }
-        chipsLabel="Фильтр диалогов"
+      <ChatsHeader
+        searching={searching}
+        onSearching={setSearching}
+        query={query}
+        onQuery={setQuery}
         chips={
           <>
             <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
@@ -172,10 +222,6 @@ export function MessagesPage() {
       />
 
       <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} />
-
-      <button type="button" className="messages__fab" aria-label="Новый диалог">
-        <IconPlus />
-      </button>
 
       {folderMenu.node}
       {rowMenu && <ChipMenu anchor={rowMenu.rect} opener={rowMenu.row} items={menuItems} onClose={() => setRowMenu(null)} />}

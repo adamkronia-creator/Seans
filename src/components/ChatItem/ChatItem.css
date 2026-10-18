@@ -1,14 +1,10 @@
 /*
  * Строка списка чатов по системе мессенджера (ChatListItem): до краёв экрана, без разделителей, высота size-row = 12 + 48 + 12.
- * Отступы и размеры — только токены сетки 4. Закреплённая строка («Избранное») — тёплое выделение bg-warm.
+ * Отступы и размеры — только токены сетки 4.
  */
 .chat-item {
   --ring: var(--bg-canvas); /* кольцо точки присутствия — цвет подложки строки */
   --avatar-size: var(--size-avatar);
-}
-
-.chat-item--pinned {
-  --ring: var(--bg-warm);
 }
 
 .chat-item__button {
@@ -20,10 +16,6 @@
   padding: var(--space-3) var(--space-4);
   background: var(--chat-item-bg, transparent);
   text-align: left;
-}
-
-.chat-item--pinned .chat-item__button {
-  --chat-item-bg: var(--bg-warm);
 }
 
 /* Нажатие и наведение мышью: заливка bg-subtle на всю ширину, кольцо присутствия берёт тот же цвет */
@@ -80,7 +72,8 @@
 .chat-item .chat-item__time {
   flex-shrink: 0;
   color: var(--text-secondary);
-  font: var(--type-meta);
+  font: var(--type-label);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
 
@@ -89,22 +82,25 @@
   overflow: hidden;
   color: var(--text-secondary);
   font: var(--type-label);
-  font-weight: 400;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Значок закрепа на месте счётчика, как в Telegram */
-.chat-item__pin {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: var(--size-icon-sm);
+/* Компактные строки «Архивы» и «Избранное» (макет): высота аватара, поля только по бокам; промежуток между ними и отступы задаёт список */
+.chat-item--compact .chat-item__button {
+  min-height: var(--size-avatar);
+  padding: 0 var(--space-4);
 }
 
-/* Строка «Архив чатов»: круг с коробкой на нейтральной подложке, не акцентный */
-[data-pm] .chat-item--archive .avatar__icon {
-  background: var(--bg-field);
-  color: var(--text-secondary);
+.chat-item--archive {
+  margin-bottom: var(--space-3);
+}
+
+.chat-item__chevron {
+  flex-shrink: 0;
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
 }
 
 /* Долгое нажатие не выделяет текст и не зовёт системное меню */

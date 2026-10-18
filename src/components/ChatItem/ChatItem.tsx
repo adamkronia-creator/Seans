@@ -2,8 +2,7 @@ import { useRef, type MouseEvent, type PointerEvent } from 'react';
 import type { Chat } from '../../data/chats';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
-import { IconArchive, IconPinned } from '../FolderMenu/FolderIcons';
-import { IconFavorites } from '../icons';
+import { IconArchiveMk, IconBookmarkMk, IconChevronMk } from './ChatIcons';
 import './ChatItem.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у чипсов и сообщений */
@@ -81,15 +80,30 @@ export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
   const pinned = chat.favorites === true;
   const cls = ['chat-item', chat.unread > 0 && 'chat-item--unread', pinned && 'chat-item--pinned'].filter(Boolean).join(' ');
   const { handlers, swallow } = useLongPress(onLongPress ? (el) => onLongPress(chat, el) : undefined);
+  // «Избранное» — компактная строка с шевроном, как в макете: без времени и счётчика
+  if (pinned) {
+    return (
+      <li className={`${cls} chat-item--compact`}>
+        <button type="button" className="chat-item__button" onClick={() => onClick?.(chat)}>
+          <span className="visually-hidden">Закреплённый чат. </span>
+          <Avatar icon={<IconBookmarkMk />} />
+          <span className="chat-item__body">
+            <span className="chat-item__row chat-item__row--top">
+              <span className="chat-item__name">{chat.name}</span>
+            </span>
+            <span className="chat-item__row chat-item__row--bottom">
+              <span className="chat-item__preview">{chat.lastMessage}</span>
+            </span>
+          </span>
+          <IconChevronMk className="chat-item__chevron" />
+        </button>
+      </li>
+    );
+  }
   return (
     <li className={cls}>
       <button type="button" className="chat-item__button" onClick={(e) => !swallow(e) && onClick?.(chat)} {...handlers}>
-        {pinned && <span className="visually-hidden">Закреплённый чат. </span>}
-        {pinned ? (
-          <Avatar icon={<IconFavorites />} />
-        ) : (
-          <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} />
-        )}
+        <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} />
 
         <span className="chat-item__body">
           <span className="chat-item__row chat-item__row--top">
@@ -99,7 +113,6 @@ export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
           <span className="chat-item__row chat-item__row--bottom">
             <span className="chat-item__preview">{chat.lastMessage}</span>
             <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
-            {pinned && chat.unread === 0 && <IconPinned className="chat-item__pin" />}
           </span>
         </span>
       </button>
@@ -114,22 +127,23 @@ interface ArchiveRowProps {
 }
 
 /**
- * Строка «Архив чатов» в начале списка, как в Telegram: круг с коробкой вместо фото, в превью имена чатов из архива,
- * справа число непрочитанных чатов (тихое, серое: архив не должен кричать).
+ * Строка «Архивы» в начале списка, как в макете: круг с градиентом и коробкой, в превью имена чатов из архива, справа время
+ * последнего и число непрочитанных сообщений. Список при открытии сдвинут так, что строки не видно: она выезжает при протяжке вниз.
  */
 export function ArchiveRow({ chats, onClick }: ArchiveRowProps) {
-  const unread = chats.filter((c) => c.unread > 0).length;
+  const unread = chats.reduce((sum, c) => sum + c.unread, 0);
   return (
-    <li className="chat-item chat-item--archive">
+    <li className="chat-item chat-item--compact chat-item--archive">
       <button type="button" className="chat-item__button" onClick={onClick}>
-        <Avatar icon={<IconArchive />} />
+        <Avatar icon={<IconArchiveMk />} />
         <span className="chat-item__body">
           <span className="chat-item__row chat-item__row--top">
-            <span className="chat-item__name">Архив чатов</span>
+            <span className="chat-item__name">Архивы</span>
+            <span className="chat-item__time">{chats[0]?.time}</span>
           </span>
           <span className="chat-item__row chat-item__row--bottom">
             <span className="chat-item__preview">{chats.map((c) => c.name.split(' ')[0]).join(', ')}</span>
-            <Badge count={unread} variant="neutral" ariaLabel={`Непрочитанных чатов в архиве: ${unread}`} />
+            <Badge count={unread} ariaLabel={`Непрочитанных в архиве: ${unread}`} />
           </span>
         </span>
       </button>

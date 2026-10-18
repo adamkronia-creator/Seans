@@ -12,7 +12,7 @@ import { goBack, navigate } from '../../router';
 import './ArchivePage.css';
 
 /**
- * «Архив чатов», как в Telegram: отдельный экран со списком убранных чатов. Строка открывает чат, долгое нажатие возвращает его в список.
+ * «Архивы», как в Telegram: отдельный экран со списком убранных чатов. Строка открывает чат, долгое нажатие возвращает его в список.
  * Экран на новой системе (data-pm): цвета, Inter и сетка 4 из токенов.
  */
 export function ArchivePage() {
@@ -32,7 +32,7 @@ export function ArchivePage() {
         <button type="button" className="archive__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
         </button>
-        <h1 className="archive__title">Архив чатов</h1>
+        <h1 className="archive__title">Архивы</h1>
       </header>
 
       {chats.length > 0 ? (
