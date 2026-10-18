@@ -463,10 +463,13 @@ html[data-theme='dark']:has([data-pm]) body {
   --glass-drop-blue: 0 var(--space-1) var(--space-3) rgb(38 136 235 / 0.28);
   --glass-drop-pill: 0 var(--space-1) var(--space-2) rgb(38 136 235 / 0.3);
   --scene:
-    radial-gradient(60% 34% at 12% 8%, rgb(120 170 255 / 0.5), transparent 70%),
-    radial-gradient(55% 34% at 95% 30%, rgb(255 176 150 / 0.45), transparent 70%),
-    radial-gradient(70% 38% at 25% 96%, rgb(176 150 255 / 0.45), transparent 70%),
-    linear-gradient(180deg, #f3f6ff 0%, #fdf1ee 100%);
+    radial-gradient(55% 30% at 6% 5%, rgb(96 165 250 / 0.6), transparent 72%),
+    radial-gradient(50% 26% at 100% 12%, rgb(255 140 170 / 0.5), transparent 72%),
+    radial-gradient(55% 28% at 94% 46%, rgb(255 190 120 / 0.5), transparent 72%),
+    radial-gradient(60% 30% at 0% 50%, rgb(110 220 200 / 0.45), transparent 72%),
+    radial-gradient(60% 32% at 72% 100%, rgb(170 130 255 / 0.55), transparent 72%),
+    radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
+    linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
 }
 
 [data-theme='dark'] [data-pm] {
@@ -483,10 +486,13 @@ html[data-theme='dark']:has([data-pm]) body {
   --glass-drop-blue: 0 var(--space-1) var(--space-3) rgb(47 143 240 / 0.3);
   --glass-drop-pill: 0 var(--space-1) var(--space-2) rgb(47 143 240 / 0.3);
   --scene:
-    radial-gradient(60% 34% at 12% 8%, rgb(47 143 240 / 0.35), transparent 70%),
-    radial-gradient(55% 34% at 95% 30%, rgb(214 108 120 / 0.25), transparent 70%),
-    radial-gradient(70% 38% at 25% 96%, rgb(120 100 220 / 0.3), transparent 70%),
-    linear-gradient(180deg, #141922 0%, #1a141c 100%);
+    radial-gradient(55% 30% at 6% 5%, rgb(47 143 240 / 0.42), transparent 72%),
+    radial-gradient(50% 26% at 100% 12%, rgb(214 90 130 / 0.32), transparent 72%),
+    radial-gradient(55% 28% at 94% 46%, rgb(224 140 80 / 0.28), transparent 72%),
+    radial-gradient(60% 30% at 0% 50%, rgb(50 170 150 / 0.28), transparent 72%),
+    radial-gradient(60% 32% at 72% 100%, rgb(130 100 230 / 0.42), transparent 72%),
+    radial-gradient(55% 28% at 8% 100%, rgb(47 120 220 / 0.3), transparent 72%),
+    linear-gradient(170deg, #121823 0%, #1a141c 55%, #16162a 100%);
 }
 
 [data-pm] .messages {
