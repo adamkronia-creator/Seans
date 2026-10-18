@@ -13,6 +13,9 @@
 [data-pm] {
   --bg-canvas: #ffffff;
   --bg-bar: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-raised: #ffffff;
+  --bg-warm: #ffffff;
   --bg-field: #ebedf0;
   --bg-subtle: #f2f3f5;
   --border-subtle: #eeeeef;
@@ -29,15 +32,18 @@
   --chat-unread-text: #ffffff;
   --border-focus: #2688eb;
   --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #2688eb;
-  /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%), выбранный и невыбранный чипс */
+  --presence-online: #4bb34b; /* точка «в сети» */
+  /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%) и выбранный чипс; невыбранный чипс без заливки */
   --grad-circle: linear-gradient(135deg, rgb(38 136 235 / 0.62), rgb(38 136 235 / 0.4));
   --grad-chip-active: linear-gradient(135deg, #3f9bf1 0%, #2688eb 100%);
-  --grad-chip-idle: linear-gradient(135deg, #e6e9ed 0%, #ebedf0 45%, #f4f5f7 100%);
 }
 
 [data-theme='dark'] [data-pm] {
   --bg-canvas: #111418;
   --bg-bar: #111418;
+  --bg-surface: #111418;
+  --bg-raised: #1b2027;
+  --bg-warm: #111418;
   --bg-field: #232a33;
   --bg-subtle: #1b2027;
   --border-subtle: #262d36;
@@ -54,7 +60,6 @@
   --chat-unread-bg: #2f8ff0;
   --grad-circle: linear-gradient(135deg, rgb(47 143 240 / 0.55), rgb(47 143 240 / 0.3));
   --grad-chip-active: linear-gradient(135deg, #4aa3f5 0%, #2f8ff0 100%);
-  --grad-chip-idle: linear-gradient(135deg, #1d242c 0%, #232a33 55%, #2a323c 100%);
 }
 
 /* ——— Переходный слой: прежние имена переменных указывают на токены новой системы ———
@@ -65,7 +70,7 @@
   --color-bg-row: transparent;
   --color-bg-row-pressed: var(--bg-subtle);
   --color-bg-pressed: var(--bg-subtle);
-  --color-bg-fill: var(--grad-chip-idle); /* невыбранный чипс — градиент серого */
+  --color-bg-fill: transparent; /* невыбранный чипс без заливки */
   --color-bg-fill-strong: var(--border-subtle);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
@@ -107,10 +112,10 @@
   z-index: 3;
   padding: 0 var(--space-1) var(--safe-bottom);
   border-top: var(--hairline) solid var(--border-subtle);
-  background: var(--bg-bar);
+  background: var(--bg-canvas);
 }
 
-/* ——— Чипсы папок: отдельные плитки высотой space-8 (32) с радиусом radius-sm (8), зазор space-2; выбранный — градиент акцента, остальные — градиент серого ——— */
+/* ——— Чипсы папок: отдельные пилюли высотой space-8 (32), зазор space-2; выбранный — градиент акцента, невыбранные без заливки, подпись text-chip ——— */
 /* Зазор задаёт ряд, а не чипс. Если экран на новой системе оставит «капсулу» (Chip с split), ряду там нужен gap: 0 */
 /* Ряд прокручивается вбок и обрезает всё, что выходит за него; кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
 [data-pm] .screen-header__chips {
@@ -128,7 +133,7 @@
 }
 
 [data-pm] .chip:not(.chip--split, .chip--tab) {
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
 }
 
 [data-pm] .chip--counted {

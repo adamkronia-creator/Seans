@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
-import { useAvatarSrc, useProfile } from '../../data/profile';
+import { useAvatarSrc } from '../../data/profile';
 import { navigate } from '../../router';
 
 interface ChatsHeaderProps {
@@ -13,11 +13,10 @@ interface ChatsHeaderProps {
 }
 
 /**
- * Шапка «Диалогов» по макету: фото специалиста со статусом (имя и строка специализации), справа значки поиска и уведомлений,
+ * Шапка «Диалогов» по макету: фото специалиста, заголовок «Чаты» с подписью «Ваши диалоги», справа значки поиска и уведомлений,
  * ниже чипсы папок. Значок поиска заменяет верхнюю строку полем с кнопкой «Отмена». Размеры — токены сетки 4 (messages.css).
  */
 export function ChatsHeader({ searching, onSearching, query, onQuery, chips }: ChatsHeaderProps) {
-  const profile = useProfile();
   const avatar = useAvatarSrc();
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -48,8 +47,8 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips }: C
         <div className="chats-header__top">
           {avatar ? <img className="chats-header__avatar" src={avatar} alt="" /> : <span className="chats-header__avatar" />}
           <span className="chats-header__who">
-            <span className="chats-header__name">{profile.name}</span>
-            <span className="chats-header__status">{profile.headline}</span>
+            <span className="chats-header__name">Чаты</span>
+            <span className="chats-header__status">Ваши диалоги</span>
           </span>
           <button type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
             <IconSearchMk />

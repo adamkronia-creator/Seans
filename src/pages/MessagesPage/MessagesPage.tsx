@@ -50,20 +50,31 @@ const ChatList = memo(function ChatList({
     return archive ? (archive.nextElementSibling as HTMLElement | null)?.offsetTop! - archive.offsetTop : 0;
   };
 
-  // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать; при открытии строка спрятана
+  // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать. Пока человек список не трогал,
+  // строка остаётся спрятанной при любом пересчёте размеров (шрифты, адресная строка, поворот): иначе она бы выглядывала по умолчанию
   useLayoutEffect(() => {
     const box = scroller.current;
     const list = rows.current;
     if (!box || !list || !hasArchive) return;
+    let touched = false;
     const fit = () => {
+      if (box.clientHeight === 0) return; // страница ещё не показана
       const cs = getComputedStyle(box);
       const inner = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
       list.style.minHeight = `${inner + hiddenHeight()}px`;
+      if (!touched) box.scrollTop = hiddenHeight();
+    };
+    const touch = () => {
+      touched = true;
     };
     fit();
-    box.scrollTop = hiddenHeight();
-    window.addEventListener('resize', fit);
-    return () => window.removeEventListener('resize', fit);
+    const watch = new ResizeObserver(fit);
+    watch.observe(box);
+    for (const type of ['pointerdown', 'wheel', 'keydown'] as const) box.addEventListener(type, touch, { passive: true });
+    return () => {
+      watch.disconnect();
+      for (const type of ['pointerdown', 'wheel', 'keydown'] as const) box.removeEventListener(type, touch);
+    };
   }, [hasArchive]);
 
   // Доводка: отпустили на полпути — строка либо выезжает целиком, либо уходит обратно
