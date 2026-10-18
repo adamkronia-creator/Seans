@@ -51,7 +51,6 @@
 }
 
 /* ——— Парящие панели: bg-bar с размытием, без линий и теней; край смягчает градиент высотой space-4 ——— */
-[data-pm] .screen-header,
 [data-pm] .tabbar {
   border: 0;
   background: var(--bg-bar);
@@ -59,7 +58,10 @@
   backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
 }
 
+/* Верхняя панель — своего цвета (bg-selected, тональный индиго), не как список на bg-canvas: край панели сам отделяет её, разделитель не нужен */
 [data-pm] .screen-header {
+  border: 0;
+  background: var(--bg-selected);
   position: absolute;
   top: 0;
   right: 0;
@@ -78,7 +80,6 @@
   padding: 0 var(--space-1) var(--safe-bottom);
 }
 
-[data-pm] .screen-header::after,
 [data-pm] .tabbar::before {
   content: '';
   position: absolute;
@@ -88,38 +89,20 @@
   pointer-events: none;
 }
 
-/* Тонкий разделитель между чипсами и первым чатом: волосяная линия border-subtle, поля space-4 как у шапки */
-[data-pm] .screen-header::after {
-  top: 100%;
-  right: var(--space-4);
-  left: var(--space-4);
-  height: var(--hairline);
-  background: var(--border-subtle);
-}
-
 [data-pm] .tabbar::before {
   bottom: 100%;
   background: linear-gradient(transparent, var(--bg-bar));
 }
 
-/* Без размытия панель сплошная, и только тогда допустима волосяная линия border-subtle */
+/* Без размытия нижняя панель сплошная, и только тогда допустима волосяная линия border-subtle */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  [data-pm] .screen-header,
   [data-pm] .tabbar {
     background: var(--bg-canvas);
-  }
-
-  [data-pm] .screen-header {
-    border-bottom: var(--hairline) solid var(--border-subtle);
-  }
-
-  [data-pm] .tabbar {
     border-top: var(--hairline) solid var(--border-subtle);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  [data-pm] .screen-header,
   [data-pm] .tabbar {
     background: var(--bg-canvas);
     -webkit-backdrop-filter: none;
@@ -174,7 +157,7 @@
 [data-pm] .search-field {
   height: var(--size-control-sm);
   border-radius: var(--radius-full);
-  background: var(--bg-field);
+  background: var(--bg-surface);
   color: var(--text-secondary);
 }
 
@@ -201,10 +184,14 @@
   font-size: var(--size-icon-sm);
 }
 
-/* ——— Чипсы папок: обычные отдельные пилюли высотой size-control-sm, между всеми зазор space-2; выбранный — тональный action-secondary, остальные на bg-field ——— */
+/* ——— Чипсы папок: обычные отдельные пилюли высотой size-control-sm, между всеми зазор space-2; выбранный — action-primary, остальные на bg-surface (панель цветная) ——— */
 /* Зазор задаёт ряд, а не чипс. Если экран на новой системе оставит «капсулу» (Chip с split), ряду там нужен gap: 0: зазоры у капсулы задают сами чипсы */
 /* Ряд прокручивается вбок и обрезает всё, что выходит за него; кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
 [data-pm] .screen-header__chips {
+  /* На цветной панели невыбранные чипсы — bg-surface, выбранный — action-primary */
+  --color-bg-fill: var(--bg-surface);
+  --tone-chat: var(--action-primary);
+  --color-ink-on-pastel: var(--action-primary-text);
   gap: var(--space-2);
   margin: calc(var(--space-1) * -1) 0;
   padding: var(--space-1) var(--space-4);
@@ -248,10 +235,10 @@
   color: var(--action-secondary-text);
 }
 
-/* На выбранном чипсе — полный индиго */
+/* На выбранном чипсе (залит action-primary) счётчик обращённый: светлый кружок с индиго */
 [data-pm] .badge--inverse {
-  background: var(--chat-unread-bg);
-  color: var(--chat-unread-text);
+  background: var(--action-primary-text);
+  color: var(--action-primary);
 }
 
 /* Уведомления папки выключены: то же число в кольце без заливки */
@@ -260,6 +247,11 @@
   background: none;
   box-shadow: inset 0 0 0 2px var(--text-secondary);
   color: var(--text-secondary);
+}
+
+[data-pm] .chip[data-tone] .badge--quiet-inverse {
+  box-shadow: inset 0 0 0 2px var(--action-primary-text);
+  color: var(--action-primary-text);
 }
 
 /* ——— Аватар: значок «Избранного» в цветах пузыря собеседника ——— */
