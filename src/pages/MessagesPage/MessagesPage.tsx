@@ -1,6 +1,10 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { markRead, useChats } from '../../data/chatStore';
-import { ChatItem } from '../../components/ChatItem/ChatItem';
+import { markRead, setArchived, useChats } from '../../data/chatStore';
+import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
+import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
+import { IconArchive } from '../../components/FolderMenu/FolderIcons';
+import { Toast } from '../../components/Toast/Toast';
+import { useToast } from '../../components/Toast/useToast';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
@@ -18,11 +22,23 @@ import './MessagesPage.css';
 type Filter = string;
 
 /** Чаты одного фильтра: страница пейджера, у каждой своя прокрутка */
-const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOpen: (chat: Chat) => void }) {
-  return chats.length > 0 ? (
+const ChatList = memo(function ChatList({
+  chats,
+  archived,
+  onOpen,
+  onMenu,
+}: {
+  chats: Chat[];
+  /** Чаты в архиве: если они есть, первой строкой стоит «Архив чатов» (только на странице «Все», без поиска) */
+  archived: Chat[];
+  onOpen: (chat: Chat) => void;
+  onMenu: (chat: Chat, row: HTMLElement) => void;
+}) {
+  return chats.length > 0 || archived.length > 0 ? (
     <ul className="messages__list">
+      {archived.length > 0 && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
       {chats.map((chat) => (
-        <ChatItem key={chat.id} chat={chat} onClick={onOpen} />
+        <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={chat.favorites ? undefined : onMenu} />
       ))}
     </ul>
   ) : (
@@ -40,6 +56,8 @@ export function MessagesPage() {
   const chats = useChats();
   const folders = useFolders('chats');
   const folderMenu = useFolderMenu('chats');
+  const [toast, say] = useToast();
+  const [rowMenu, setRowMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
   const root = useRef<HTMLElement>(null);
 
   /** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
@@ -56,7 +74,7 @@ export function MessagesPage() {
   // «Все» считает и «Избранное»; папки — только свои чаты. При нуле кружок скрыт.
   const countOf = (id: Filter) => {
     const members = id === 'all' ? null : new Set(folders.find((f) => f.id === id)?.ids);
-    return chats.filter((c) => c.unread > 0 && (members === null || (!c.favorites && members.has(c.id)))).length;
+    return chats.filter((c) => !c.archived && c.unread > 0 && (members === null || (!c.favorites && members.has(c.id)))).length;
   };
 
   // Открытие чата помечает его прочитанным и ведёт в переписку
@@ -71,13 +89,31 @@ export function MessagesPage() {
     const matches = (chat: Chat) => !q || chat.name.toLowerCase().includes(q) || chat.lastMessage.toLowerCase().includes(q);
     return filters.map((id) => {
       const members = id === 'all' ? null : new Set(folders.find((f) => f.id === id)?.ids);
-      return chats.filter((chat) => (members === null || (!chat.favorites && members.has(chat.id))) && matches(chat));
+      // Чаты из архива видны только в поиске по всем чатам
+      return chats.filter((chat) => (!chat.archived || (!!q && id === 'all')) && (members === null || (!chat.favorites && members.has(chat.id))) && matches(chat));
     });
   }, [chats, folders, filters, query]);
 
+  const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
+
+  const openMenu = useCallback((chat: Chat, row: HTMLElement) => setRowMenu({ chat, rect: row.getBoundingClientRect(), row }), []);
+  const menuItems: ChipMenuItem[] = rowMenu
+    ? [
+        {
+          key: 'archive',
+          label: rowMenu.chat.archived ? 'Вернуть из архива' : 'В архив',
+          Icon: IconArchive,
+          run: () => {
+            setArchived(rowMenu.chat.id, !rowMenu.chat.archived);
+            say(rowMenu.chat.archived ? `«${rowMenu.chat.name}» возвращён из архива` : `«${rowMenu.chat.name}» перенесён в архив`);
+          },
+        },
+      ]
+    : [];
+
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} onOpen={openChat} /> })),
-    [filters, lists, openChat],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={openChat} onMenu={openMenu} /> })),
+    [filters, lists, archived, openChat, openMenu],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -142,6 +178,8 @@ export function MessagesPage() {
       </button>
 
       {folderMenu.node}
+      {rowMenu && <ChipMenu anchor={rowMenu.rect} opener={rowMenu.row} items={menuItems} onClose={() => setRowMenu(null)} />}
+      {toast && <Toast text={toast} />}
     </section>
   );
 }

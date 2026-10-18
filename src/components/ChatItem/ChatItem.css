@@ -93,3 +93,22 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Значок закрепа на месте счётчика, как в Telegram */
+.chat-item__pin {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-sm);
+}
+
+/* Строка «Архив чатов»: круг с коробкой на нейтральной подложке, не акцентный */
+[data-pm] .chat-item--archive .avatar__icon {
+  background: var(--bg-field);
+  color: var(--text-secondary);
+}
+
+/* Долгое нажатие не выделяет текст и не зовёт системное меню */
+.chat-item__button {
+  -webkit-touch-callout: none;
+  user-select: none;
+}

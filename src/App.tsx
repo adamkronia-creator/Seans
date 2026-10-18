@@ -13,6 +13,7 @@ import { TestSettings } from './components/TestSettings/TestSettingsLazy';
 import { CHATS } from './data/chats';
 import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
+import { ArchivePage } from './pages/ArchivePage/ArchivePage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { goBack, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
@@ -172,6 +173,18 @@ export default function App() {
     if (at === 'messages') {
       const folder = folderScreen(path, 'chats');
       if (folder) return folder;
+      // /archive: «Архив чатов» на весь экран, без нижней панели
+      if (path === '/archive') {
+        return {
+          key: 'archive',
+          pm: true,
+          build: () => (
+            <main className="app__content">
+              <ArchivePage />
+            </main>
+          ),
+        };
+      }
       return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at, true);
     }
     if (at === 'tests') {

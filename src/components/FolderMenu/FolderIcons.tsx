@@ -49,3 +49,29 @@ export const IconFolderPlus = (p: SVGProps<SVGSVGElement>) => (
     <path d="M12 11.5v5M9.5 14h5" />
   </svg>
 );
+
+/** Архив: коробка с крышкой и стрелкой вниз */
+export const IconArchive = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4" width="18" height="4.5" rx="1.5" />
+    <path d="M5 8.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5" />
+    <path d="M12 11.5v5M9.8 14.5l2.2 2.2 2.2-2.2" />
+  </svg>
+);
+
+/** Вернуть из архива: коробка со стрелкой вверх */
+export const IconUnarchive = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4" width="18" height="4.5" rx="1.5" />
+    <path d="M5 8.5V18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5" />
+    <path d="M12 16.5v-5M9.8 13.7l2.2-2.2 2.2 2.2" />
+  </svg>
+);
+
+/** Закреп: кнопка-булавка */
+export const IconPinned = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M9 3.5h6l-1 6 3 3.5H7l3-3.5-1-6z" />
+    <path d="M12 13v7.5" />
+  </svg>
+);

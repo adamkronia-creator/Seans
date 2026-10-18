@@ -35,14 +35,22 @@ export function useMessages(chatId: string): MessageGroup[] {
   return useSyncExternalStore(subscribe, () => messages[chatId] ?? NO_MESSAGES);
 }
 
-/** Сколько всего непрочитанных сообщений: число на значке вкладки «Диалоги» */
+/** Сколько всего непрочитанных сообщений: число на значке вкладки «Диалоги» (чаты в архиве не считаются) */
 export function useUnreadTotal(): number {
   return useSyncExternalStore(subscribe, () => unreadTotal(chats));
 }
 let unreadMemo: { chats: Chat[]; total: number } | null = null;
 function unreadTotal(list: Chat[]) {
-  if (unreadMemo?.chats !== list) unreadMemo = { chats: list, total: list.reduce((sum, c) => sum + c.unread, 0) };
+  if (unreadMemo?.chats !== list) unreadMemo = { chats: list, total: list.filter((c) => !c.archived).reduce((sum, c) => sum + c.unread, 0) };
   return unreadMemo.total;
+}
+
+/** Отправить чат в архив или вернуть его в список. «Избранное» закреплено навсегда и в архив не уходит */
+export function setArchived(id: string, archived: boolean) {
+  const chat = chats.find((c) => c.id === id);
+  if (!chat || chat.favorites || !!chat.archived === archived) return;
+  chats = chats.map((c) => (c.id === id ? { ...c, archived } : c));
+  emit();
 }
 
 /** Собеседник «печатает» */

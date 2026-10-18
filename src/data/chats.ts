@@ -17,6 +17,8 @@ export interface Chat {
   lastMessage: string;
   time: string;
   unread: number;
+  /** Чат в архиве: не показывается в списке и папках, лежит на экране «Архив чатов» */
+  archived?: boolean;
 }
 
 export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };
@@ -74,5 +76,6 @@ export const CHATS: Chat[] = [
     lastMessage: 'Мы же читаем третий семинар, верно?',
     time: 'Вчера',
     unread: 0,
+    archived: true, // для показа: в архиве уже есть чат
   },
 ];

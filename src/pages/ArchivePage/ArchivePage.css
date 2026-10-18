@@ -1,0 +1,77 @@
+/*
+ * Экран «Архив чатов» на системе мессенджера: тот же фон до краёв, верхняя панель парит над списком (bg-bar с размытием),
+ * строки — те же ChatItem. Размеры только токены сетки 4.
+ */
+.archive {
+  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--space-2) * 2);
+  --toast-bottom: calc(var(--safe-bottom) + var(--space-8));
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.archive__bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-2);
+  background: var(--bg-bar);
+  -webkit-backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
+  backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
+}
+
+.archive__back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-touch);
+  height: var(--size-touch);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: var(--size-icon-lg);
+}
+
+.archive__back:active {
+  background: var(--bg-subtle);
+}
+
+.archive__back:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.archive .archive__title {
+  margin: 0;
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+.archive__list {
+  flex: 1;
+  padding: var(--pm-top) 0 calc(var(--safe-bottom) + var(--space-8));
+  overflow-y: auto;
+}
+
+.archive__empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--pm-top) 0 var(--safe-bottom);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .archive__bar {
+    background: var(--bg-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
