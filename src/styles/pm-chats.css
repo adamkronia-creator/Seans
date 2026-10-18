@@ -9,7 +9,7 @@
  */
 
 /* ——— Палитра макета «Диалогов»: белая основа, синий акцент 2688EB ———
-   Имена токенов те же, что в справочнике мессенджера, значения — из присланного макета; тёмная тема подобрана в тон. */
+   Имена токенов те же, что в справочнике мессенджера, значения — из присланного макета. */
 [data-pm] {
   --bg-canvas: #ffffff;
   --bg-bar: #ffffff;
@@ -36,30 +36,6 @@
   /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%) и выбранный чипс; невыбранный чипс без заливки */
   --grad-circle: linear-gradient(135deg, rgb(38 136 235 / 0.62), rgb(38 136 235 / 0.4));
   --grad-chip-active: linear-gradient(135deg, #3f9bf1 0%, #2688eb 100%);
-}
-
-[data-theme='dark'] [data-pm] {
-  --bg-canvas: #111418;
-  --bg-bar: #111418;
-  --bg-surface: #111418;
-  --bg-raised: #1b2027;
-  --bg-warm: #111418;
-  --bg-field: #232a33;
-  --bg-subtle: #1b2027;
-  --border-subtle: #262d36;
-  --text-primary: #f2f4f7;
-  --text-secondary: #8b96a3;
-  --text-icon: #6f7b89;
-  --text-chip: #8b96a3;
-  --text-link: #4aa3f5;
-  --action-primary: #2f8ff0;
-  --action-primary-hover: #4aa3f5;
-  --action-primary-pressed: #1f7ad9;
-  --border-focus: #4aa3f5;
-  --focus-ring: 0 0 0 2px #111418, 0 0 0 4px #4aa3f5;
-  --chat-unread-bg: #2f8ff0;
-  --grad-circle: linear-gradient(135deg, rgb(47 143 240 / 0.55), rgb(47 143 240 / 0.3));
-  --grad-chip-active: linear-gradient(135deg, #4aa3f5 0%, #2f8ff0 100%);
 }
 
 /* ——— Переходный слой: прежние имена переменных указывают на токены новой системы ———
@@ -117,12 +93,12 @@
 
 /* ——— Чипсы папок: отдельные пилюли высотой space-8 (32), зазор space-2; выбранный — градиент акцента, невыбранные без заливки, подпись text-chip ——— */
 /* Зазор задаёт ряд, а не чипс. Если экран на новой системе оставит «капсулу» (Chip с split), ряду там нужен gap: 0 */
-/* Ряд прокручивается вбок и обрезает всё, что выходит за него по вертикали: кольцу фокуса (4 снаружи) и тени стекла (до 12) оставлено место, space-3 сверху и снизу; высота ряда прежняя */
+/* Ряд прокручивается вбок и обрезает всё, что выходит за него по вертикали: кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
 [data-pm] .screen-header__chips {
   position: relative;
   gap: var(--space-2);
-  margin: calc(var(--space-3) * -1) 0;
-  padding: var(--space-3) var(--space-4);
+  margin: calc(var(--space-1) * -1) 0;
+  padding: var(--space-1) var(--space-4);
 }
 
 [data-pm] .chip {
@@ -140,10 +116,6 @@
 /* Под приложением (системная панель внизу, края) — тот же фон, что у экрана, а не «жемчужный» стол */
 html:has([data-pm]) body {
   background: #ffffff;
-}
-
-html[data-theme='dark']:has([data-pm]) body {
-  background: #111418;
 }
 
 /* Заливка выбранного — один подвижный элемент на весь ряд (followChips ставит --pill-x и --pill-w): едет от чипса к чипсу */
@@ -443,25 +415,18 @@ html[data-theme='dark']:has([data-pm]) body {
 
 /* ——— «Диалоги»: стекло на градиентном фоне ———
    Фон экрана — мягкий градиент с цветными пятнами. Шапка и нижняя панель — матовое стекло во всю ширину: полупрозрачная заливка и размытие,
-   список прокручивается под ними и просвечивает. Кнопки, чипсы, плитка «добавить историю» и круги «Избранное» и «Архивы» — стеклянные
-   объекты: заливка-градиент, размытие фона, светлая кромка (ярче сверху слева, слабее снизу справа), внутреннее свечение и лёгкая тень. */
+   список прокручивается под ними и просвечивает. Кнопки, чипсы, плитка «добавить историю» и круги «Избранное» и «Архивы» — тоже стекло:
+   плоская полупрозрачная заливка и размытие фона, без бликов, кромок, свечения и теней. */
 [data-pm] {
   --glass: rgb(255 255 255 / 0.55); /* панели */
   --glass-solid: rgb(255 255 255 / 0.92);
   --glass-line: rgb(255 255 255 / 0.85);
   --glass-blur: blur(var(--space-6)) saturate(1.8);
   /* стеклянные объекты: белые (кнопки, чипсы, плитка истории) */
-  --glass-fill: linear-gradient(135deg, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.3));
-  --glass-rim: inset 1px 1px 0 rgb(255 255 255 / 0.95), inset -1px -1px 0 rgb(255 255 255 / 0.45);
-  --glass-glow: inset 0 0 var(--space-3) rgb(255 255 255 / 0.4);
-  --glass-drop: 0 2px var(--space-2) rgb(52 96 170 / 0.14);
+  --glass-fill: rgb(255 255 255 / 0.5);
   --glass-filter: blur(var(--space-5)) saturate(1.8);
   /* стеклянные объекты: синие (выбранный чипс, круги «Избранное» и «Архивы») */
   --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.88), rgb(38 136 235 / 0.94));
-  --glass-rim-blue: inset 1px 1px 0 rgb(255 255 255 / 0.7), inset -1px -1px 0 rgb(255 255 255 / 0.22);
-  --glass-glow-blue: inset 0 0 var(--space-3) rgb(255 255 255 / 0.25);
-  --glass-drop-blue: 0 var(--space-1) var(--space-3) rgb(38 136 235 / 0.28);
-  --glass-drop-pill: 0 var(--space-1) var(--space-2) rgb(38 136 235 / 0.3);
   --scene:
     radial-gradient(55% 30% at 6% 5%, rgb(96 165 250 / 0.6), transparent 72%),
     radial-gradient(50% 26% at 100% 12%, rgb(255 140 170 / 0.5), transparent 72%),
@@ -470,29 +435,6 @@ html[data-theme='dark']:has([data-pm]) body {
     radial-gradient(60% 32% at 72% 100%, rgb(170 130 255 / 0.55), transparent 72%),
     radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
     linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
-}
-
-[data-theme='dark'] [data-pm] {
-  --glass: rgb(34 40 50 / 0.55);
-  --glass-solid: rgb(34 40 50 / 0.92);
-  --glass-line: rgb(255 255 255 / 0.12);
-  --glass-fill: linear-gradient(135deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.05));
-  --glass-rim: inset 1px 1px 0 rgb(255 255 255 / 0.4), inset -1px -1px 0 rgb(255 255 255 / 0.08);
-  --glass-glow: inset 0 0 var(--space-3) rgb(255 255 255 / 0.05);
-  --glass-drop: 0 2px var(--space-2) rgb(0 0 0 / 0.35);
-  --glass-chip-active: linear-gradient(135deg, rgb(74 163 245 / 0.88), rgb(47 143 240 / 0.94));
-  --glass-rim-blue: inset 1px 1px 0 rgb(255 255 255 / 0.45), inset -1px -1px 0 rgb(255 255 255 / 0.1);
-  --glass-glow-blue: inset 0 0 var(--space-3) rgb(255 255 255 / 0.12);
-  --glass-drop-blue: 0 var(--space-1) var(--space-3) rgb(47 143 240 / 0.3);
-  --glass-drop-pill: 0 var(--space-1) var(--space-2) rgb(47 143 240 / 0.3);
-  --scene:
-    radial-gradient(55% 30% at 6% 5%, rgb(47 143 240 / 0.42), transparent 72%),
-    radial-gradient(50% 26% at 100% 12%, rgb(214 90 130 / 0.32), transparent 72%),
-    radial-gradient(55% 28% at 94% 46%, rgb(224 140 80 / 0.28), transparent 72%),
-    radial-gradient(60% 30% at 0% 50%, rgb(50 170 150 / 0.28), transparent 72%),
-    radial-gradient(60% 32% at 72% 100%, rgb(130 100 230 / 0.42), transparent 72%),
-    radial-gradient(55% 28% at 8% 100%, rgb(47 120 220 / 0.3), transparent 72%),
-    linear-gradient(170deg, #121823 0%, #1a141c 55%, #16162a 100%);
 }
 
 [data-pm] .messages {
@@ -525,7 +467,7 @@ html[data-theme='dark']:has([data-pm]) body {
 [data-pm] .stories__add,
 [data-pm] .screen-header__chips .chip--follow::before {
   background: var(--glass-fill);
-  box-shadow: var(--glass-rim), var(--glass-glow), var(--glass-drop);
+  box-shadow: none;
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
 }
@@ -535,11 +477,6 @@ html[data-theme='dark']:has([data-pm]) body {
   opacity: calc(1 - var(--cover, var(--w)));
 }
 
-/* Плитка «добавить историю» обведена пунктиром, поэтому кромки и тени у неё нет, только заливка и свечение */
-[data-pm] .stories__add {
-  box-shadow: var(--glass-glow);
-}
-
 [data-pm] .chats-header__action:active {
   background: var(--glass-solid);
 }
@@ -547,13 +484,13 @@ html[data-theme='dark']:has([data-pm]) body {
 /* Синее стекло: выбранный чипс и круги «Избранное» и «Архивы» (заливка круга — прежний градиент акцента на 50%) */
 [data-pm] .chips-pill {
   background: var(--glass-chip-active);
-  box-shadow: var(--glass-rim-blue), var(--glass-glow-blue), var(--glass-drop-pill);
+  box-shadow: none;
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
 }
 
 [data-pm] .avatar__icon {
-  box-shadow: var(--glass-rim-blue), var(--glass-glow-blue), var(--glass-drop-blue);
+  box-shadow: none;
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
 }
