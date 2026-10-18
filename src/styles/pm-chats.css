@@ -548,3 +548,44 @@ html[data-theme='dark']:has([data-pm]) body {
     --chat-item-bg: var(--glass);
   }
 }
+
+/* ——— Стекло и у цветных, и у белых элементов «Диалогов» ———
+   Белые (поиск, оповещения, невыбранные чипсы, «добавить историю») — легче шапки, с яркой кромкой сверху; синие (выбранный чипс, круги
+   «Избранное» и «Архивы») — прозрачный акцент с размытием фона и светлой кромкой. */
+[data-pm] {
+  --glass-control: rgb(255 255 255 / 0.38);
+  --glass-edge: inset 0 var(--hairline) 0 rgb(255 255 255 / 0.9), inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.6);
+  --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.78), rgb(38 136 235 / 0.88));
+}
+
+[data-theme='dark'] [data-pm] {
+  --glass-control: rgb(255 255 255 / 0.08);
+  --glass-edge: inset 0 var(--hairline) 0 rgb(255 255 255 / 0.22), inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.1);
+  --glass-chip-active: linear-gradient(135deg, rgb(74 163 245 / 0.75), rgb(47 143 240 / 0.85));
+}
+
+[data-pm] .chats-header__action,
+[data-pm] .stories__add,
+[data-pm] .screen-header__chips .chip--follow::before {
+  background: var(--glass-control);
+  box-shadow: var(--glass-edge);
+  -webkit-backdrop-filter: blur(var(--space-4)) saturate(1.6);
+  backdrop-filter: blur(var(--space-4)) saturate(1.6);
+}
+
+[data-pm] .chats-header__action:active {
+  background: var(--glass);
+}
+
+[data-pm] .chips-pill {
+  background: var(--glass-chip-active);
+  box-shadow: inset 0 var(--hairline) 0 rgb(255 255 255 / 0.55), inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.25);
+  -webkit-backdrop-filter: blur(var(--space-3)) saturate(1.6);
+  backdrop-filter: blur(var(--space-3)) saturate(1.6);
+}
+
+[data-pm] .avatar__icon {
+  box-shadow: inset 0 var(--hairline) 0 rgb(255 255 255 / 0.55), inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.25);
+  -webkit-backdrop-filter: blur(var(--space-3)) saturate(1.6);
+  backdrop-filter: blur(var(--space-3)) saturate(1.6);
+}
