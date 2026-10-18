@@ -130,7 +130,7 @@
   height: var(--space-8);
   padding: 0 var(--space-3);
   font: var(--type-body);
-  font-weight: 400;
+  font-weight: 500;
 }
 
 [data-pm] .chip:not(.chip--split, .chip--tab) {
@@ -588,53 +588,4 @@ html[data-theme='dark']:has([data-pm]) body {
   box-shadow: inset 0 var(--hairline) 0 rgb(255 255 255 / 0.55), inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.25);
   -webkit-backdrop-filter: blur(var(--space-3)) saturate(1.6);
   backdrop-filter: blur(var(--space-3)) saturate(1.6);
-}
-
-/* ——— По образцу с картинки ———
-   Чипсы — матовые пилюли: лёгкая белая заливка, тонкая светлая кромка, сильное размытие, без яркой верхней грани. Значки поиска и
-   оповещений — стеклянные круги со значком 20 тонкой линией. «Добавить историю» — пунктирный скруглённый квадрат. Метка «в сети» — без кольца:
-   между ней и фото ничего нет. */
-[data-pm] .screen-header__chips .chip--follow::before {
-  background: rgb(255 255 255 / 0.3);
-  box-shadow: inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.6);
-  -webkit-backdrop-filter: blur(var(--space-5)) saturate(1.8);
-  backdrop-filter: blur(var(--space-5)) saturate(1.8);
-}
-
-[data-theme='dark'] [data-pm] .screen-header__chips .chip--follow::before {
-  background: rgb(255 255 255 / 0.07);
-  box-shadow: inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.12);
-}
-
-[data-pm] .chips-pill {
-  box-shadow: inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.45);
-}
-
-[data-pm] .chats-header__action {
-  background: rgb(255 255 255 / 0.3);
-  box-shadow: inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.6);
-  -webkit-backdrop-filter: blur(var(--space-5)) saturate(1.8);
-  backdrop-filter: blur(var(--space-5)) saturate(1.8);
-  font-size: var(--size-icon);
-}
-
-[data-theme='dark'] [data-pm] .chats-header__action {
-  background: rgb(255 255 255 / 0.07);
-  box-shadow: inset 0 0 0 var(--hairline) rgb(255 255 255 / 0.12);
-}
-
-[data-pm] .stories__ring--empty {
-  border-radius: var(--radius-md);
-}
-
-[data-pm] .stories__add {
-  border: 1.5px dashed rgb(153 162 173 / 0.7);
-  border-radius: var(--radius-md);
-  background: rgb(255 255 255 / 0.3);
-  box-shadow: none;
-  font-size: var(--size-icon);
-}
-
-[data-pm] .avatar__presence {
-  box-shadow: none;
 }
