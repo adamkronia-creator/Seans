@@ -30,8 +30,10 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
       vv.removeEventListener('scroll', fit);
     };
   }, []);
+  // Окно живёт в body, вне экрана; если открыто с экрана на новой системе, оно оформлено по ней же (data-pm)
+  const pm = document.querySelector('.screen[data-layer="top"][data-pm]') !== null;
   return createPortal(
-    <div ref={ref} className="sheet-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div ref={ref} className="sheet-overlay" data-pm={pm ? '' : undefined} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       {children}
     </div>,
     document.body,

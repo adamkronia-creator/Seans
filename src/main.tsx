@@ -6,7 +6,6 @@ import '@fontsource-variable/inter/opsz-italic.css';
 // Антиква для имён, заголовков, записей и цифр (styles/editorial.css): с оптическими размерами, кириллицей и курсивом
 import '@fontsource-variable/literata/opsz.css';
 import '@fontsource-variable/literata/opsz-italic.css';
-import '@fontsource-variable/manrope/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
 import './styles/motion.css';

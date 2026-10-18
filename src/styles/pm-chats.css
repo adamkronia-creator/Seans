@@ -1,15 +1,23 @@
 /*
- * «Диалоги» по системе мессенджера (claude/messenger-color-system.md). Правила действуют на экране с data-pm
- * и перекрывают прежние компоненты (чипсы, поиск, строки чатов, счётчик, нижняя панель) только здесь.
- * Старые имена переменных подменены семантическими токенами, поэтому незатронутые части (меню папок, пустое состояние)
- * тоже берут новые цвета.
+ * Экраны на системе мессенджера (claude/messenger-color-system.md): правила для общих частей — шапка, чипсы, поиск, счётчик,
+ * нижняя панель, меню папки, подсказка, пустое состояние и листы. Действуют только внутри [data-pm]: приложение ставит этот
+ * атрибут на экраны, уже переведённые на новую систему, а лист в body получает его от экрана, откуда открыт.
+ *
+ * Правила: цвета — только семантические токены; отступы, размеры и скругления — токены сетки 4 (space-*, size-*, radius-*);
+ * вне сетки только толщины линий (1,75 у значков, 2 у кольца фокуса). Гарнитура — Inter, стили текста — токены --type-*.
+ * Когда на новую систему перейдёт всё приложение, эти правила станут базовыми и этот файл растворится в компонентах.
  */
-.screen:has([data-pm]) {
+
+/* ——— Переходный слой: прежние имена переменных указывают на токены новой системы ———
+   Так общие части, которых не касаются правила ниже (чипы, переключатели, строки листов), берут новую палитру сами. */
+[data-pm] {
   --color-bg-app: var(--bg-canvas);
   --color-bg-panel: var(--bg-canvas);
   --color-bg-row: transparent;
   --color-bg-row-pressed: var(--bg-subtle);
+  --color-bg-pressed: var(--bg-subtle);
   --color-bg-fill: var(--bg-field);
+  --color-bg-fill-strong: var(--border-subtle);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-caption: var(--text-secondary);
@@ -18,37 +26,49 @@
   --color-accent-strong: var(--action-primary-hover);
   --color-accent-on: var(--action-primary-text);
   --color-accent-soft: var(--action-secondary);
-  --color-divider: transparent;
-  --tone-chat: var(--action-secondary);
+  --color-border: var(--border-subtle);
+  --color-stroke: var(--border-subtle);
+  --color-divider: transparent; /* разделителей в списках нет: их разводит ритм */
+  --color-red-text: var(--error-text);
+  --color-success: var(--presence-online);
   --color-ink-on-pastel: var(--action-secondary-text);
-  --size-chip-h: var(--size-control-sm);
-  --size-tab: var(--size-bar);
-  --font-sans: 'Manrope Variable', Manrope, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-family: var(--font-sans);
+  --tone-chat: var(--action-secondary); /* выбранный чипс — тональная заливка action-secondary */
+  --shadow-float: var(--shadow-lg);
+  --ring: var(--bg-canvas); /* кольцо точки присутствия: цвет подложки */
+  --inset-top: max(var(--safe-top), var(--space-2)); /* верх шапки: безопасная зона, в браузере без выреза — space-2 */
+  --icon-stroke: 1.75px;
   color: var(--text-primary);
   font-family: var(--font-sans);
 }
 
-/* ——— Парящие панели: фон bg-bar, размытие, без линий; край смягчает градиент ——— */
-.screen:has([data-pm]) .screen-header,
-.screen:has([data-pm]) .tabbar {
+/* Значки: линия 1,75 с округлыми концами, одинаковая на любом размере */
+[data-pm] svg :is(path, circle, rect, line, polyline, polygon, ellipse) {
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ——— Парящие панели: bg-bar с размытием, без линий и теней; край смягчает градиент высотой space-4 ——— */
+[data-pm] .screen-header,
+[data-pm] .tabbar {
+  border: 0;
   background: var(--bg-bar);
   -webkit-backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
   backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
-  border: 0;
 }
 
-.screen:has([data-pm]) .screen-header {
+[data-pm] .screen-header {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   z-index: 3;
   gap: var(--space-2);
-  padding: var(--safe-top) 0 var(--space-2);
+  padding: var(--inset-top) 0 var(--space-2);
 }
 
-.screen:has([data-pm]) .tabbar {
+[data-pm] .tabbar {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -57,207 +77,391 @@
   padding: 0 var(--space-1) var(--safe-bottom);
 }
 
-.screen:has([data-pm]) .screen-header::after,
-.screen:has([data-pm]) .tabbar::before {
+[data-pm] .screen-header::after,
+[data-pm] .tabbar::before {
   content: '';
   position: absolute;
   right: 0;
   left: 0;
   height: var(--space-4);
-  background: linear-gradient(var(--bg-bar), transparent);
   pointer-events: none;
 }
 
-.screen:has([data-pm]) .screen-header::after {
+[data-pm] .screen-header::after {
   top: 100%;
+  background: linear-gradient(var(--bg-bar), transparent);
 }
 
-.screen:has([data-pm]) .tabbar::before {
+[data-pm] .tabbar::before {
   bottom: 100%;
   background: linear-gradient(transparent, var(--bg-bar));
 }
 
-/* Без размытия (старое устройство, «Уменьшить прозрачность») панель сплошная, и только тогда допустима волосяная линия */
+/* Без размытия панель сплошная, и только тогда допустима волосяная линия border-subtle */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .screen:has([data-pm]) .screen-header,
-  .screen:has([data-pm]) .tabbar {
+  [data-pm] .screen-header,
+  [data-pm] .tabbar {
     background: var(--bg-canvas);
   }
 
-  .screen:has([data-pm]) .screen-header { border-bottom: var(--hairline) solid var(--border-subtle); }
-  .screen:has([data-pm]) .tabbar { border-top: var(--hairline) solid var(--border-subtle); }
+  [data-pm] .screen-header {
+    border-bottom: var(--hairline) solid var(--border-subtle);
+  }
+
+  [data-pm] .tabbar {
+    border-top: var(--hairline) solid var(--border-subtle);
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .screen:has([data-pm]) .screen-header,
-  .screen:has([data-pm]) .tabbar {
+  [data-pm] .screen-header,
+  [data-pm] .tabbar {
     background: var(--bg-canvas);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
-  .screen:has([data-pm]) .screen-header::after,
-  .screen:has([data-pm]) .tabbar::before {
+  [data-pm] .screen-header::after,
+  [data-pm] .tabbar::before {
     display: none;
   }
 }
 
-/* ——— Заголовок, поиск, чипсы ——— */
-.screen:has([data-pm]) .screen-header__title {
+/* ——— Шапка: заголовок (display) с кнопкой справа, поиск, чипсы. Три строки через space-2 ——— */
+[data-pm] .screen-header__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--size-touch);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+[data-pm] .screen-header__title {
   margin: 0;
-  padding: var(--space-2) var(--space-4) 0;
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 36px;
+  color: var(--text-primary);
+  font: var(--type-display);
+  letter-spacing: 0;
 }
 
-.screen:has([data-pm]) .screen-header__search {
-  padding: 0 var(--space-4);
-}
-
-.screen:has([data-pm]) .search-field {
-  height: var(--size-control);
-  border-radius: var(--radius-md);
-  background: var(--bg-field);
+/* Кнопка рядом с заголовком: значок 24 в зоне нажатия 44 */
+[data-pm] .screen-header__action {
+  width: var(--size-touch);
+  height: var(--size-touch);
+  border-radius: var(--radius-full);
+  background: transparent;
   color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
 }
 
-.screen:has([data-pm]) .search-field__icon {
-  font-size: var(--size-icon);
+@media (hover: hover) {
+  [data-pm] .screen-header__action:hover {
+    background: var(--bg-subtle);
+  }
 }
 
-.screen:has([data-pm]) .search-field__input {
-  font-size: 15px;
-  line-height: 20px;
-}
-
-.screen:has([data-pm]) .search-field__input::placeholder {
-  color: var(--text-secondary);
-}
-
-.screen:has([data-pm]) .search-field:focus-within {
-  box-shadow: inset 0 0 0 2px var(--border-focus);
-}
-
-.screen:has([data-pm]) .screen-header__action {
-  width: var(--size-control);
-  height: var(--size-control);
-  border-radius: var(--radius-md);
-  background: var(--bg-field);
-  color: var(--text-secondary);
-}
-
-.screen:has([data-pm]) .screen-header__chips {
-  margin: 0;
-  padding: 0 var(--space-4);
-}
-
-.screen:has([data-pm]) .chip {
-  gap: var(--space-2);
-  padding: 0 var(--space-4);
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.screen:has([data-pm]) .chip--counted {
-  padding-right: var(--space-2);
-}
-
-.screen:has([data-pm]) .chip:focus-visible,
-.screen:has([data-pm]) .screen-header__action:focus-visible,
-.screen:has([data-pm]) .tabbar__item:focus-visible,
-.screen:has([data-pm]) .chat-item__button:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-/* ——— Строки чатов: до краёв, без разделителей, ритм 72 ——— */
-.screen:has([data-pm]) .chat-item__button {
-  gap: var(--space-3);
-  min-height: var(--size-row);
-  padding: var(--space-3) var(--space-4);
-}
-
-.screen:has([data-pm]) .chat-item__button:active,
-.screen:has([data-pm]) .chat-item__button[data-pressed] {
-  --ring: var(--bg-subtle);
+[data-pm] .screen-header__action:active {
   background: var(--bg-subtle);
 }
 
-.screen:has([data-pm]) .chat-item__button:active .avatar,
-.screen:has([data-pm]) .chat-item__button[data-pressed] .avatar {
-  --ring: var(--bg-subtle);
+[data-pm] .screen-header__search {
+  padding: 0 var(--space-4);
 }
 
-.screen:has([data-pm]) .chat-item__body {
-  gap: 0;
-}
-
-.screen:has([data-pm]) .chat-item__name {
-  font-family: var(--font-sans);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 24px;
-}
-
-.screen:has([data-pm]) .chat-item__time,
-.screen:has([data-pm]) .chat-item--unread .chat-item__time {
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-}
-
-.screen:has([data-pm]) .chat-item__preview {
-  font-size: 15px;
-  line-height: 20px;
-}
-
-.screen:has([data-pm]) .avatar__img--empty {
+[data-pm] .search-field {
+  height: var(--size-control);
+  border-radius: var(--radius-md);
   background: var(--bg-field);
+  color: var(--text-secondary);
 }
 
-.screen:has([data-pm]) .avatar__icon {
-  background: var(--bubble-in-bg);
-  color: var(--bubble-in-text);
+[data-pm] .search-field__icon {
+  font-size: var(--size-icon);
 }
 
-/* ——— Счётчик: индиго, не красный ——— */
-.screen:has([data-pm]) .badge {
+[data-pm] .search-field__input {
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+[data-pm] .search-field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+[data-pm] .search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+[data-pm] .search-field__clear {
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  font-size: var(--size-icon-sm);
+}
+
+/* ——— Чипсы папок: пилюли высотой size-control-sm; выбранный — тональный action-secondary, остальные на bg-field ——— */
+/* Ряд прокручивается вбок и обрезает всё, что выходит за него; кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
+[data-pm] .screen-header__chips {
+  margin: calc(var(--space-1) * -1) 0;
+  padding: var(--space-1) var(--space-4);
+}
+
+[data-pm] .chip {
+  gap: var(--space-2);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-4);
+  font: var(--type-label);
+}
+
+[data-pm] .chip--counted {
+  padding-right: var(--space-2);
+}
+
+/* ——— Счётчик непрочитанных: индиго, не красный; высота space-5 ——— */
+[data-pm] .badge {
+  min-width: var(--space-5);
+  height: var(--space-5);
   padding: 0 var(--space-1);
-  font-size: 12px;
+  font: var(--type-meta);
   font-weight: 700;
-  line-height: 16px;
+  font-variant-numeric: tabular-nums;
 }
 
-.screen:has([data-pm]) .badge--accent {
+[data-pm] .badge--accent {
   background: var(--chat-unread-bg);
   color: var(--chat-unread-text);
 }
 
-.screen:has([data-pm]) .badge--neutral {
+/* Счётчик на невыбранном чипсе тише: тональный */
+[data-pm] .badge--neutral {
   background: var(--action-secondary-hover);
   color: var(--action-secondary-text);
 }
 
-.screen:has([data-pm]) .badge--inverse {
+/* На выбранном чипсе — полный индиго */
+[data-pm] .badge--inverse {
+  background: var(--chat-unread-bg);
+  color: var(--chat-unread-text);
+}
+
+/* Уведомления папки выключены: то же число в кольце без заливки */
+[data-pm] .badge--quiet,
+[data-pm] .chip[data-tone] .badge--quiet-inverse {
+  background: none;
+  box-shadow: inset 0 0 0 2px var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+/* ——— Аватар: значок «Избранного» в цветах пузыря собеседника ——— */
+[data-pm] .avatar__img--empty {
+  background: var(--bg-field);
+}
+
+[data-pm] .avatar__icon {
+  background: var(--bubble-in-bg);
+  color: var(--bubble-in-text);
+  font-size: var(--size-icon-lg);
+}
+
+/* ——— Нижняя панель разделов: значки 24, выбранный — text-link ——— */
+[data-pm] .tabbar__item {
+  height: var(--size-bar);
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .tabbar__item--active {
+  color: var(--text-link);
+}
+
+[data-pm] .tabbar__badge {
+  bottom: calc(100% - var(--space-2));
+  left: calc(100% - var(--space-2));
+}
+
+/* ——— Фокус с клавиатуры: focus-ring, не убирать ——— */
+[data-pm] .chip:focus-visible,
+[data-pm] .screen-header__action:focus-visible,
+[data-pm] .tabbar__item:focus-visible,
+[data-pm] .search-field__clear:focus-visible,
+[data-pm] .chip-menu__item:focus-visible,
+[data-pm] .sheet__button:focus-visible,
+[data-pm] .fo-row__tool:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ——— Пустое состояние ——— */
+[data-pm] .empty-state {
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-7);
+}
+
+[data-pm] .empty-state__icon {
+  width: var(--space-16);
+  height: var(--space-16);
+  margin-bottom: var(--space-2);
+  background: var(--action-secondary);
+  color: var(--action-secondary-text);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .empty-state .empty-state__title {
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+[data-pm] .empty-state__text {
+  max-width: 20em;
+  color: var(--text-secondary);
+  font: var(--type-body);
+}
+
+/* ——— Подсказка (тост): bg-inverse, радиус md, shadow-lg, поля space-4 от краёв ——— */
+[data-pm] .test-settings__toast {
+  right: var(--space-4);
+  left: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-inverse);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-inverse);
+  font: var(--type-label);
+  font-weight: 400;
+  text-align: left;
+}
+
+/* ——— Меню папки (долгое нажатие на чипс): bg-raised над bg-scrim, shadow-lg ——— */
+[data-pm] .chip-menu__backdrop {
+  background: var(--bg-scrim);
+}
+
+[data-pm] .chip-menu {
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-pm] .chip-menu__item {
+  height: var(--space-12);
+  font: var(--type-body);
+  color: var(--text-primary);
+}
+
+[data-pm] .chip-menu__item svg {
+  color: var(--text-secondary);
+  font-size: var(--size-icon);
+}
+
+[data-pm] .chip-menu__item--danger,
+[data-pm] .chip-menu__item--danger svg {
+  color: var(--error-text);
+}
+
+/* ——— Листы (порядок папок, удаление): шторка до нижнего края, верхние углы radius-lg, под ней bg-scrim ——— */
+.sheet-overlay[data-pm] {
+  background: var(--bg-scrim);
+}
+
+[data-pm] .sheet {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--bg-raised);
+  color: var(--text-primary);
+}
+
+[data-pm] .sheet__grab {
+  width: var(--space-10);
+  height: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--border-strong);
+}
+
+[data-pm] .sheet__header {
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+[data-pm] .sheet .sheet__heading {
+  font: var(--type-title);
+  letter-spacing: 0;
+  text-align: left;
+}
+
+[data-pm] .sheet__body {
+  gap: var(--space-3);
+}
+
+/* Блок листа на всю ширину, без линий */
+[data-pm] .sheet__card {
+  border-top: 0;
+  background: transparent;
+}
+
+[data-pm] .sheet__footer {
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + var(--safe-bottom));
+  border-top: 0;
+  background: transparent;
+}
+
+[data-pm] .sheet__button {
+  height: var(--size-touch);
+  border-radius: var(--radius-md);
+  background: var(--action-secondary);
+  color: var(--action-secondary-text);
+  font: var(--type-label);
+}
+
+[data-pm] .sheet__button--primary {
   background: var(--action-primary);
   color: var(--action-primary-text);
 }
 
-.screen:has([data-pm]) .badge--quiet,
-.screen:has([data-pm]) .chip[data-tone] .badge--quiet-inverse {
-  box-shadow: inset 0 0 0 1.5px var(--text-secondary);
-  color: var(--text-secondary);
+/* Удаление — тональная кнопка цветов ошибки: сплошную терракоту хранит срочная помощь */
+[data-pm] .sheet__button--danger {
+  background: var(--error-bg);
+  color: var(--error-text);
 }
 
-/* ——— Нижняя панель разделов ——— */
-.screen:has([data-pm]) .tabbar__item {
-  color: var(--text-secondary);
+[data-pm] .sheet__button:disabled {
+  background: var(--action-disabled);
+  color: var(--text-disabled);
+  opacity: 1;
 }
 
-.screen:has([data-pm]) .tabbar__item--active {
-  color: var(--text-link);
+[data-pm] .pf-confirm {
+  padding: 0;
+  color: var(--text-primary);
+  font: var(--type-body);
+  text-align: left;
+}
+
+/* Порядок папок: строки до краёв, без разделителей */
+[data-pm] .fo-row {
+  min-height: var(--size-bar);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+[data-pm] .fo-row__text {
+  gap: 0;
+}
+
+[data-pm] .fo-row__name {
+  color: var(--text-primary);
+  font: var(--type-headline);
+}
+
+[data-pm] .fo-row__count {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+}
+
+[data-pm] .fo-row__tool {
+  width: var(--size-touch);
+  height: var(--size-bar);
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .fo-hint {
+  padding: 0;
+  color: var(--text-secondary);
+  font: var(--type-caption);
 }

@@ -2,6 +2,8 @@
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
+  width: var(--avatar-size, 48px);
+  height: var(--avatar-size, 48px);
   border-radius: var(--radius-full);
 }
 
@@ -26,41 +28,39 @@
   justify-content: center;
   background: var(--color-accent-soft);
   color: var(--color-accent);
+  font-size: calc(var(--avatar-size, 48px) * 0.48);
 }
 
 .avatar__online {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 12px;
-  height: 12px;
+  width: var(--size-dot);
+  height: var(--size-dot);
   border: 2px solid var(--color-bg-panel);
   border-radius: var(--radius-full);
   background: var(--color-success);
 }
 
-/* Присутствие (цвета и форма — из системы мессенджера, вне её экранов запасные значения): точка 12 с кольцом 2 цвета подложки */
-.avatar {
-  --ring: var(--bg-canvas, var(--color-bg-panel));
-}
-
+/* Присутствие (цвета и форма — из системы мессенджера): точка 12 с кольцом 2 цвета подложки. Подложку задаёт --ring: у экрана это фон,
+   у строки списка под пальцем — цвет нажатия */
 .avatar__presence {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 12px;
-  height: 12px;
+  width: var(--size-dot);
+  height: var(--size-dot);
   border-radius: var(--radius-full);
-  box-shadow: 0 0 0 2px var(--ring);
+  box-shadow: 0 0 0 2px var(--ring, var(--bg-canvas));
 }
 
 .avatar__presence--online {
-  background: var(--presence-online, var(--color-success));
+  background: var(--presence-online);
 }
 
 /* На сессии: точка с паузой внутри, специалист занят, но не пропал */
 .avatar__presence--session {
-  background: var(--presence-session, var(--color-warning));
+  background: var(--presence-session);
 }
 
 .avatar__presence--session::before,
@@ -71,7 +71,7 @@
   width: 2px;
   height: 6px;
   border-radius: 1px;
-  background: var(--ring);
+  background: var(--ring, var(--bg-canvas));
 }
 
 .avatar__presence--session::before {
@@ -84,6 +84,6 @@
 
 /* Не в сети: пустое кольцо */
 .avatar__presence--offline {
-  background: var(--ring);
-  box-shadow: inset 0 0 0 2px var(--presence-offline, var(--color-text-caption)), 0 0 0 2px var(--ring);
+  background: var(--ring, var(--bg-canvas));
+  box-shadow: inset 0 0 0 2px var(--presence-offline), 0 0 0 2px var(--ring, var(--bg-canvas));
 }

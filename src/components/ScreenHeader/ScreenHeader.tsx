@@ -7,6 +7,8 @@ interface ScreenHeaderProps {
   title: string;
   /** Показать название раздела крупным заголовком над поиском (новая система); иначе оно только для экранных читалок */
   showTitle?: boolean;
+  /** Кнопка в строке заголовка справа (например, уведомления); работает вместе с showTitle, класс — `screen-header__action` */
+  titleAside?: ReactNode;
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
@@ -32,6 +34,7 @@ interface ScreenHeaderProps {
 export function ScreenHeader({
   title,
   showTitle = false,
+  titleAside,
   searchValue,
   onSearchChange,
   searchPlaceholder,
@@ -47,7 +50,14 @@ export function ScreenHeader({
 }: ScreenHeaderProps) {
   return (
     <header className="screen-header">
-      <h1 className={showTitle ? 'screen-header__title' : 'visually-hidden'}>{title}</h1>
+      {showTitle ? (
+        <div className="screen-header__head">
+          <h1 className="screen-header__title">{title}</h1>
+          {titleAside}
+        </div>
+      ) : (
+        <h1 className="visually-hidden">{title}</h1>
+      )}
 
       <div className="screen-header__search">
         <SearchField

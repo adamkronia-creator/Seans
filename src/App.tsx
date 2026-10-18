@@ -23,12 +23,15 @@ import { transition } from './utils/transition';
 interface Screen {
   key: string;
   node: ReactNode;
+  /** Экран уже на новой системе (цвета, шрифт и сетка из справочника мессенджера): его слой получает data-pm */
+  pm?: boolean;
 }
 
 /** Экран по адресу, ещё не построенный: у экрана и при смене слоёв один и тот же key */
 interface Resolved {
   key: string;
   build: () => ReactNode;
+  pm?: boolean;
 }
 
 /**
@@ -51,7 +54,7 @@ function parentOf(path: string): string | null {
  * Один экран-слой. Верхний лежит поверх всего, нижний (тот, куда вернёмся) спрятан, но уже нарисован
  * и показывается при жесте «назад» (utils/edgeBack.ts), поэтому в нём сохраняются прокрутка и набранное.
  */
-function Layer({ top, children }: { top: boolean; children: ReactNode }) {
+function Layer({ top, pm, children }: { top: boolean; pm?: boolean; children: ReactNode }) {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
   const info = useMemo(() => ({ top, element }), [top, element]);
   // Нижний экран не получает нажатий и фокуса, даже когда виден при жесте
@@ -59,7 +62,7 @@ function Layer({ top, children }: { top: boolean; children: ReactNode }) {
     if (element) element.inert = !top;
   }, [element, top]);
   return (
-    <div ref={setElement} className="screen" data-layer={top ? 'top' : 'under'}>
+    <div ref={setElement} className="screen" data-layer={top ? 'top' : 'under'} data-pm={pm ? '' : undefined}>
       <LayerContext.Provider value={info}>{children}</LayerContext.Provider>
       <div className="screen__dim" aria-hidden="true" />
     </div>
@@ -105,8 +108,9 @@ export default function App() {
   };
 
   /** Обычный экран приложения: содержимое и нижняя панель разделов */
-  const page = (key: string, node: ReactNode, at: TabId): Resolved => ({
+  const page = (key: string, node: ReactNode, at: TabId, pm = false): Resolved => ({
     key,
+    pm,
     build: () => (
       <>
         <main className="app__content">{node}</main>
@@ -168,7 +172,7 @@ export default function App() {
     if (at === 'messages') {
       const folder = folderScreen(path, 'chats');
       if (folder) return folder;
-      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at);
+      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at, true);
     }
     if (at === 'tests') {
       const folder = folderScreen(path, 'tests');
@@ -205,7 +209,7 @@ export default function App() {
   const built = useRef(new Map<string, ReactNode>());
   const used = new Set<string>();
   const screenFor = (path: string, at: TabId = tab): Screen => {
-    const { key, build } = resolve(path, at);
+    const { key, build, pm } = resolve(path, at);
     const id = `${at}|${key}`;
     used.add(id);
     let node = built.current.get(id);
@@ -213,7 +217,7 @@ export default function App() {
       node = build();
       built.current.set(id, node);
     }
-    return { key, node };
+    return { key, node, pm };
   };
 
   const top = screenFor(route);
@@ -242,7 +246,7 @@ export default function App() {
   return (
     <div className="app" ref={appRef}>
       {layers.map(({ screen, top: onTop }) => (
-        <Layer key={screen.key} top={onTop}>
+        <Layer key={screen.key} top={onTop} pm={screen.pm}>
           {screen.node}
         </Layer>
       ))}

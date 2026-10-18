@@ -1,7 +1,15 @@
-/* Экран «Диалоги» по системе мессенджера: один фон до краёв, шапка и нижняя панель парят над списком, список уходит под них */
+/*
+ * Экран «Диалоги» на системе мессенджера: один фон до краёв, шапка и нижняя панель парят над списком, список уходит под них.
+ * Все размеры — токены сетки 4: высота шапки и нижнее поле списка складываются из них, измерять в скрипте нечего.
+ */
 .messages {
-  /* Подсказка (уведомления папки, папка удалена) стоит над кнопкой «Новый диалог»: панель + 16 + 52 + 12 */
-  --toast-bottom: calc(var(--size-bar, 56px) + var(--safe-bottom) + var(--space-4) + var(--size-fab) + var(--space-3));
+  /* Шапка: верхний отступ, строка заголовка (size-touch), поиск (size-control), чипсы (size-control-sm), три промежутка шапки по space-2
+     и ещё space-2 воздуха до первой строки */
+  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--size-control) + var(--size-control-sm) + var(--space-2) * 4);
+  /* Нижняя панель разделов с безопасной зоной */
+  --pm-bottom: calc(var(--size-bar) + var(--safe-bottom));
+  /* Подсказка (уведомления папки, папка удалена) стоит над кнопкой «Новый диалог» */
+  --toast-bottom: calc(var(--pm-bottom) + var(--space-4) + var(--size-bar) + var(--space-3));
   position: relative;
   display: flex;
   flex: 1;
@@ -9,35 +17,44 @@
   min-height: 0;
 }
 
-/* Список лежит прямо на фоне экрана; сверху поле на высоту шапки, снизу — на панель разделов и кнопку */
+/* Список лежит прямо на фоне экрана: сверху поле на высоту шапки, снизу — на панель разделов и кнопку */
 .messages__list {
   flex: 1;
-  padding: var(--pm-top, 168px) 0 calc(var(--size-bar) + var(--safe-bottom) + var(--space-16));
+  padding: var(--pm-top) 0 calc(var(--pm-bottom) + var(--space-16));
   overflow-y: auto;
+  scroll-padding: var(--pm-top) 0 var(--pm-bottom);
 }
 
+/* Пустой раздел: пустое состояние стоит по центру места между шапкой и нижней панелью */
 .messages__empty {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-top: var(--pm-top, 168px);
+  padding: var(--pm-top) 0 var(--pm-bottom);
 }
 
+/* Главное действие экрана — одна кнопка action-primary; парит над списком, поэтому у неё тень shadow-lg */
 .messages__fab {
   position: absolute;
   right: var(--space-4);
-  bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-4));
+  bottom: calc(var(--pm-bottom) + var(--space-4));
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--size-fab);
-  height: var(--size-fab);
+  width: var(--size-bar);
+  height: var(--size-bar);
   border-radius: var(--radius-full);
   background: var(--action-primary);
   box-shadow: var(--shadow-lg);
   color: var(--action-primary-text);
-  font-size: var(--size-icon);
+  font-size: var(--size-icon-lg);
+}
+
+@media (hover: hover) {
+  .messages__fab:hover {
+    background: var(--action-primary-hover);
+  }
 }
 
 .messages__fab:active {
@@ -46,5 +63,5 @@
 
 .messages__fab:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--focus-ring), var(--shadow-lg);
 }

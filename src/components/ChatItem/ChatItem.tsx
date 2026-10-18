@@ -4,22 +4,26 @@ import { Badge } from '../Badge/Badge';
 import { IconFavorites } from '../icons';
 import './ChatItem.css';
 
-// Размер аватара в списке чатов (см. --size-avatar-lg в tokens.css)
-const AVATAR_SIZE = 48;
-
 interface ChatItemProps {
   chat: Chat;
   onClick?: (chat: Chat) => void;
 }
 
+/**
+ * Строка списка чатов (ChatListItem системы мессенджера): аватар с присутствием, имя, превью, время и счётчик.
+ * Размер аватара, поля и высота строки заданы токенами сетки 4 в ChatItem.css.
+ */
 export function ChatItem({ chat, onClick }: ChatItemProps) {
+  const pinned = chat.favorites === true;
+  const cls = ['chat-item', chat.unread > 0 && 'chat-item--unread', pinned && 'chat-item--pinned'].filter(Boolean).join(' ');
   return (
-    <li className={`chat-item${chat.unread > 0 ? ' chat-item--unread' : ''}`}>
+    <li className={cls}>
       <button type="button" className="chat-item__button" onClick={() => onClick?.(chat)}>
-        {chat.favorites ? (
-          <Avatar icon={<IconFavorites />} size={AVATAR_SIZE} />
+        {pinned && <span className="visually-hidden">Закреплённый чат. </span>}
+        {pinned ? (
+          <Avatar icon={<IconFavorites />} />
         ) : (
-          <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} size={AVATAR_SIZE} />
+          <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} />
         )}
 
         <span className="chat-item__body">

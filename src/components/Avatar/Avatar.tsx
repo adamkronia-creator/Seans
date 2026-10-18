@@ -1,26 +1,27 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import './Avatar.css';
 
+/** Подписи точки присутствия для чтения с экрана: форма точки несёт смысл, цвет только помогает */
 const PRESENCE_LABEL = { online: 'в сети', session: 'на сессии', offline: 'не в сети' } as const;
 
 interface AvatarProps {
   src?: string;
   alt?: string;
+  /** Размер в пикселях; без него размер берёт стиль (--avatar-size, по умолчанию 48) — так экраны на сетке 4 задают его токеном */
   size?: number;
   online?: boolean;
-  /** Присутствие собеседника: форма точки (сплошная, с паузой, пустое кольцо) и подпись для чтения с экрана */
-  presence?: 'online' | 'session' | 'offline';
+  /** Присутствие собеседника: сплошная точка, точка с паузой (на сессии) или пустое кольцо */
+  presence?: keyof typeof PRESENCE_LABEL;
   /** Вместо фото: иконка на цветном фоне (например, «Избранное») */
   icon?: ReactNode;
 }
 
-export function Avatar({ src, alt = '', size = 48, online, presence, icon }: AvatarProps) {
+export function Avatar({ src, alt = '', size, online, presence, icon }: AvatarProps) {
+  const style = size === undefined ? undefined : ({ '--avatar-size': `${size}px` } as CSSProperties);
   return (
-    <span className="avatar" style={{ width: size, height: size }}>
+    <span className="avatar" style={style}>
       {icon ? (
-        <span className="avatar__icon" style={{ fontSize: size * 0.48 }}>
-          {icon}
-        </span>
+        <span className="avatar__icon">{icon}</span>
       ) : src ? (
         <img className="avatar__img" src={src} alt={alt} />
       ) : (
