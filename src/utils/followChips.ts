@@ -51,6 +51,7 @@ export function placePill(chips: HTMLElement[], weights: number[]) {
     x += weights[i] * chip.offsetLeft;
     w += weights[i] * chip.offsetWidth;
   });
+  pill.style.top = `${chips[0].offsetTop}px`;
   pill.dataset.weights = weights.join(',');
   // Подпись белая там, где под ней заливка: доля чипса, накрытая плашкой (а не вес выбора, иначе подпись белеет вне плашки)
   chips.forEach((chip) => {

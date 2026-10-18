@@ -435,3 +435,17 @@ html[data-theme='dark']:has([data-pm]) body {
   color: var(--text-secondary);
   font: var(--type-caption);
 }
+
+/* Метка «в сети»: классические 10 с кольцом 2, в правом верхнем углу ровно на окружности аватара (центр на 45°: 24 · (1 − cos 45°) ≈ 7 от краёв) */
+[data-pm] .avatar__presence {
+  top: 2px;
+  right: 2px;
+  bottom: auto;
+  width: 10px;
+  height: 10px;
+}
+
+/* Чипс с числом: поля слева и справа равны, содержимое по центру синей плашки */
+[data-pm] .chip--counted {
+  padding-right: var(--space-3);
+}
