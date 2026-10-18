@@ -103,7 +103,7 @@ export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
   return (
     <li className={cls}>
       <button type="button" className="chat-item__button" onClick={(e) => !swallow(e) && onClick?.(chat)} {...handlers}>
-        <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} />
+        <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />
 
         <span className="chat-item__body">
           <span className="chat-item__row chat-item__row--top">

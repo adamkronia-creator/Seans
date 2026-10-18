@@ -59,6 +59,7 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips }: C
         </div>
       )}
       <div className="screen-header__chips" role="group" aria-label="Фильтр диалогов">
+        <span className="chips-pill" aria-hidden="true" />
         {chips}
       </div>
     </header>

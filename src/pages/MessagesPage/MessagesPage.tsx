@@ -14,7 +14,7 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import type { Chat } from '../../data/chats';
 import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
-import { followChips, type PositionVia } from '../../utils/followChips';
+import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import './MessagesPage.css';
 
@@ -201,6 +201,23 @@ export function MessagesPage() {
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
     if (row) centerChips(row, position, '.chip', via);
   }, []);
+
+  // В покое подвижная заливка стоит под выбранным чипсом; пересчёт при смене выбора, счётчиков, папок, размера и после загрузки шрифтов
+  const countsKey = chats.map((c) => (c.archived ? 0 : c.unread > 0 ? 1 : 0)).join('');
+  useLayoutEffect(() => {
+    const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
+    if (!row) return;
+    const place = () => {
+      const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
+      placePill(chips, chips.map((_, i) => (i === index ? 1 : 0)));
+    };
+    place();
+    const watch = new ResizeObserver(place);
+    watch.observe(row);
+    row.querySelectorAll('.chip').forEach((c) => watch.observe(c));
+    void document.fonts?.ready.then(place);
+    return () => watch.disconnect();
+  }, [index, order, countsKey, searching]);
 
   return (
     <section ref={root} className="messages">

@@ -35,4 +35,22 @@ export function followChips(chips: Iterable<HTMLElement>, position: number, via?
     // Метка на самом элементе, а не класс: className держит React и сбросил бы его при смене выбранного чипса
     chip.toggleAttribute('data-moving', w > 0.001 && w < 0.999);
   });
+  placePill(items, weights);
+}
+
+/**
+ * Ряд с общей подвижной заливкой (элемент `.chips-pill` внутри ряда, как у «Диалогов»): заливка выбранного одна на весь ряд и едет
+ * от чипса к чипсу, а не перетекает цветом: положение и ширина — взвешенная сумма положений и ширин чипсов (веса те же, что у --w).
+ */
+export function placePill(chips: HTMLElement[], weights: number[]) {
+  const pill = chips[0]?.parentElement?.querySelector<HTMLElement>(':scope > .chips-pill');
+  if (!pill) return;
+  let x = 0;
+  let w = 0;
+  chips.forEach((chip, i) => {
+    x += weights[i] * chip.offsetLeft;
+    w += weights[i] * chip.offsetWidth;
+  });
+  pill.style.setProperty('--pill-x', `${x}px`);
+  pill.style.setProperty('--pill-w', `${w}px`);
 }

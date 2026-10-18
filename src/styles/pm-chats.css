@@ -119,6 +119,7 @@
 /* Зазор задаёт ряд, а не чипс. Если экран на новой системе оставит «капсулу» (Chip с split), ряду там нужен gap: 0 */
 /* Ряд прокручивается вбок и обрезает всё, что выходит за него; кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
 [data-pm] .screen-header__chips {
+  position: relative;
   gap: var(--space-2);
   margin: calc(var(--space-1) * -1) 0;
   padding: var(--space-1) var(--space-4);
@@ -134,6 +135,28 @@
 
 [data-pm] .chip:not(.chip--split, .chip--tab) {
   border-radius: var(--radius-full);
+}
+
+/* Заливка выбранного — один подвижный элемент на весь ряд (followChips ставит --pill-x и --pill-w): едет от чипса к чипсу */
+[data-pm] .chips-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--pill-w, 0);
+  height: var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--grad-chip-active);
+  pointer-events: none;
+  transform: translateX(var(--pill-x, 0));
+}
+
+[data-pm] .screen-header__chips .chip {
+  z-index: 1;
+}
+
+[data-pm] .screen-header__chips .chip--follow::before,
+[data-pm] .screen-header__chips .chip--follow::after {
+  display: none;
 }
 
 [data-pm] .chip--counted {
