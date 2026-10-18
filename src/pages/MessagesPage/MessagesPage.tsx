@@ -86,12 +86,22 @@ const ChatList = memo(function ChatList({
       const h = hiddenHeight();
       if (box.scrollTop > 0 && box.scrollTop < h) box.scrollTo({ top: box.scrollTop < h / 2 ? 0 : h, behavior: 'smooth' });
     };
+    // Шапка — стекло, и спрятанная выше строка «Архивы» просвечивала бы сквозь неё: прозрачность строки идёт за тем, сколько её ниже шапки
+    const archive = rows.current?.querySelector<HTMLElement>('.chat-item--archive');
+    const fade = () => {
+      if (archive) archive.style.opacity = String(Math.max(0, Math.min(1, (hiddenHeight() - box.scrollTop) / 24)));
+    };
+    fade();
     const onScroll = () => {
+      fade();
       window.clearTimeout(timer);
       timer = window.setTimeout(settle, 140);
     };
     box.addEventListener('scroll', onScroll, { passive: true });
+    const watch = new ResizeObserver(fade);
+    watch.observe(box);
     return () => {
+      watch.disconnect();
       box.removeEventListener('scroll', onScroll);
       window.clearTimeout(timer);
     };
@@ -126,7 +136,13 @@ export function MessagesPage() {
   const folderMenu = useFolderMenu('chats');
   const [toast, say] = useToast();
   const [rowMenu, setRowMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
-  const root = useRef<HTMLElement>(null);
+  const root = useRef<HTMLElement | null>(null);
+  // Экран нужен историям (открываются поверх него): после монтирования он попадает в состояние
+  const [screen, setScreen] = useState<HTMLElement | null>(null);
+  const setRoot = useCallback((el: HTMLElement | null) => {
+    root.current = el;
+    setScreen(el);
+  }, []);
 
   /** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
   const filters = useMemo<Filter[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
@@ -224,12 +240,13 @@ export function MessagesPage() {
   }, [index, order, countsKey, searching]);
 
   return (
-    <section ref={root} className="messages">
+    <section ref={setRoot} className="messages">
       <ChatsHeader
         searching={searching}
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
+        storiesRoot={screen}
         chips={
           <>
             <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>

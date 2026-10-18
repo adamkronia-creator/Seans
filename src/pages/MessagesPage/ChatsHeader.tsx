@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
+import { StoriesRow } from '../../components/Stories/Stories';
 import { navigate } from '../../router';
 
 interface ChatsHeaderProps {
@@ -10,13 +11,15 @@ interface ChatsHeaderProps {
   query: string;
   onQuery: (q: string) => void;
   chips: ReactNode;
+  /** Экран, поверх которого открываются истории */
+  storiesRoot: HTMLElement | null;
 }
 
 /**
  * Шапка «Диалогов» по макету: фото специалиста, заголовок «Чаты» с подписью «Ваши диалоги», справа значки поиска и уведомлений,
  * ниже чипсы папок. Значок поиска заменяет верхнюю строку полем с кнопкой «Отмена». Размеры — токены сетки 4 (messages.css).
  */
-export function ChatsHeader({ searching, onSearching, query, onQuery, chips }: ChatsHeaderProps) {
+export function ChatsHeader({ searching, onSearching, query, onQuery, chips, storiesRoot }: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -58,6 +61,7 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips }: C
           </button>
         </div>
       )}
+      <StoriesRow root={storiesRoot} />
       <div className="screen-header__chips" role="group" aria-label="Фильтр диалогов">
         <span className="chips-pill" aria-hidden="true" />
         {chips}

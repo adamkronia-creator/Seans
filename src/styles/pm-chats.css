@@ -449,3 +449,82 @@ html[data-theme='dark']:has([data-pm]) body {
 [data-pm] .chip--counted {
   padding-right: var(--space-3);
 }
+
+/* ——— «Диалоги»: стекло на градиентном фоне ———
+   Фон экрана — мягкий градиент с цветными пятнами; шапка, нижняя панель, кнопки и невыбранные чипсы — матовое стекло: полупрозрачная
+   белая заливка, размытие и светлая линия по краю. Список прокручивается под шапкой и панелью и просвечивает сквозь них. */
+[data-pm] {
+  --glass: rgb(255 255 255 / 0.55);
+  --glass-solid: rgb(255 255 255 / 0.92);
+  --glass-line: rgb(255 255 255 / 0.85);
+  --glass-blur: blur(var(--space-6)) saturate(1.8);
+  --scene:
+    radial-gradient(60% 34% at 12% 8%, rgb(120 170 255 / 0.5), transparent 70%),
+    radial-gradient(55% 34% at 95% 30%, rgb(255 176 150 / 0.45), transparent 70%),
+    radial-gradient(70% 38% at 25% 96%, rgb(176 150 255 / 0.45), transparent 70%),
+    linear-gradient(180deg, #f3f6ff 0%, #fdf1ee 100%);
+}
+
+[data-theme='dark'] [data-pm] {
+  --glass: rgb(34 40 50 / 0.55);
+  --glass-solid: rgb(34 40 50 / 0.92);
+  --glass-line: rgb(255 255 255 / 0.12);
+  --scene:
+    radial-gradient(60% 34% at 12% 8%, rgb(47 143 240 / 0.35), transparent 70%),
+    radial-gradient(55% 34% at 95% 30%, rgb(214 108 120 / 0.25), transparent 70%),
+    radial-gradient(70% 38% at 25% 96%, rgb(120 100 220 / 0.3), transparent 70%),
+    linear-gradient(180deg, #141922 0%, #1a141c 100%);
+}
+
+[data-pm] .messages {
+  background: var(--scene);
+}
+
+[data-pm] .chats-header,
+[data-pm]:has(.messages) .tabbar {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+[data-pm] .chats-header {
+  border-bottom-color: var(--glass-line);
+}
+
+[data-pm]:has(.messages) .tabbar {
+  border-top-color: var(--glass-line);
+}
+
+[data-pm] .chats-header__action {
+  background: var(--glass);
+  box-shadow: inset 0 0 0 var(--hairline) var(--glass-line);
+  -webkit-backdrop-filter: blur(var(--space-3));
+  backdrop-filter: blur(var(--space-3));
+}
+
+[data-pm] .chats-header__action:active {
+  background: var(--glass-solid);
+}
+
+/* Невыбранный чипс — стеклянная пилюля: слой под подписью гаснет там, где её накрывает синяя плашка */
+[data-pm] .screen-header__chips .chip--follow::before {
+  display: block;
+  background: var(--glass);
+  box-shadow: inset 0 0 0 var(--hairline) var(--glass-line);
+  opacity: calc(1 - var(--cover, var(--w)));
+}
+
+[data-pm] .messages__divider {
+  background: var(--glass-line);
+}
+
+[data-pm] .chat-item__button:active,
+[data-pm] .chat-item__button[data-pressed] {
+  --chat-item-bg: var(--glass);
+}
+
+@media (hover: hover) {
+  [data-pm] .chat-item__button:hover {
+    --chat-item-bg: var(--glass);
+  }
+}

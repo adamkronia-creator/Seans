@@ -14,6 +14,14 @@ const base = (p: SVGProps<SVGSVGElement>): SVGProps<SVGSVGElement> => ({
   ...p,
 });
 
+/** Двойная галочка статуса: сетка 18×12, линия 1,5; серая — отправлено, синяя — прочитано */
+export const IconTicksMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)} width="1.5em" height="1em" viewBox="0 0 18 12">
+    <path d="M1 6.5L4.5 10L11 2" />
+    <path d="M7.5 8.5L8.5 9.5L15.5 2" />
+  </svg>
+);
+
 export const IconBellMk = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M18.7491 9.00497V9.70957C18.7491 10.5552 18.9903 11.3818 19.4422 12.0854L20.5496 13.8095C21.5612 15.3843 20.789 17.5249 19.0296 18.0229C14.4273 19.3257 9.57274 19.3257 4.97036 18.0229C3.21105 17.5249 2.43882 15.3843 3.45036 13.8095L4.5578 12.0854C5.00972 11.3818 5.25087 10.5552 5.25087 9.70957V9.00497C5.25087 5.13623 8.27256 2 12 2C15.7274 2 18.7491 5.13623 18.7491 9.00497Z" />
@@ -48,5 +56,17 @@ export const IconArchiveMk = (p: SVGProps<SVGSVGElement>) => (
 export const IconChevronMk = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M9 5l7 7-7 7" />
+  </svg>
+);
+
+export const IconPlusMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M12 5V19M5 12H19" />
+  </svg>
+);
+
+export const IconCloseMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M5 5L19 19M19 5L5 19" />
   </svg>
 );

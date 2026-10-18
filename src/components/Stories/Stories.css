@@ -1,0 +1,309 @@
+/*
+ * Истории: ряд над чипсами и просмотр на весь экран. Размеры — токены сетки 4; вне сетки только линии 2 (кольцо, зазор, полоски).
+ * Круг 64 = кольцо 2 + зазор 2 + аватар 56 + зазор 2 + кольцо 2; под ним подпись высотой space-4.
+ */
+.stories {
+  --story-avatar: calc(var(--space-12) + var(--space-2));
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  height: calc(var(--space-16) + var(--space-1) + var(--space-4));
+  padding: 0 var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.stories::-webkit-scrollbar {
+  display: none;
+}
+
+.stories__cell {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Тонкая черта между «Вы» и собеседниками, по центру круга */
+.stories__divider {
+  width: var(--hairline);
+  height: var(--space-6);
+  margin-top: var(--space-5);
+  background: var(--glass-line);
+}
+
+.stories__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: var(--space-16);
+}
+
+.stories__ring {
+  display: grid;
+  place-items: center;
+  width: var(--space-16);
+  height: var(--space-16);
+  padding: 2px;
+  border-radius: var(--radius-full);
+}
+
+/* Зазор между кольцом и аватаром — цвет подложки */
+.stories__ring .avatar {
+  --avatar-size: var(--story-avatar);
+  box-shadow: 0 0 0 2px var(--glass-solid);
+  border-radius: var(--radius-full);
+}
+
+.stories__ring--new {
+  background: var(--grad-chip-active);
+}
+
+.stories__ring--seen {
+  background: var(--text-icon);
+  opacity: 0.6;
+}
+
+.stories__ring--empty {
+  padding: 0;
+}
+
+/* «Вы» без историй: пунктирный круг с плюсом */
+.stories__add {
+  display: grid;
+  place-items: center;
+  width: var(--story-avatar);
+  height: var(--story-avatar);
+  border: 1.5px dashed var(--text-icon);
+  border-radius: var(--radius-full);
+  background: var(--glass);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+}
+
+/* Число непросмотренных историй: на окружности, справа сверху */
+.stories__count {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  min-width: var(--space-4);
+  height: var(--space-4);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  box-shadow: 0 0 0 2px var(--glass-solid);
+  color: var(--action-primary-text);
+  font: var(--type-caption);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: var(--space-4);
+  text-align: center;
+}
+
+.stories__label {
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  line-height: var(--space-4);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Плюс на круге «Вы», когда свои истории уже есть */
+.stories__plus {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  box-shadow: 0 0 0 2px var(--glass-solid);
+  color: var(--action-primary-text);
+  font-size: var(--size-icon-sm);
+}
+
+.stories__item:focus-visible,
+.stories__plus:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-md);
+}
+
+/* ——— Просмотр ——— */
+.story-view {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-3)) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
+  color: #ffffff;
+}
+
+.story-view__bars {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.story-view__bar {
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 0.35);
+}
+
+.story-view__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+}
+
+.story-view__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.story-view__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.story-view__name {
+  font: var(--type-headline);
+}
+
+.story-view__ago {
+  font: var(--type-label);
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.story-view__close {
+  display: grid;
+  place-items: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 0.2);
+  color: #ffffff;
+  font-size: var(--size-icon-lg);
+}
+
+.story-view__body {
+  position: relative;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: var(--space-6);
+  touch-action: none;
+  user-select: none;
+}
+
+.story-view__tap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: none;
+}
+
+.story-view__tap--prev {
+  left: 0;
+  width: 33%;
+}
+
+.story-view__tap--next {
+  right: 0;
+  left: 33%;
+}
+
+.story-view__text {
+  margin: 0;
+  font: var(--type-display);
+  font-weight: 600;
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: none;
+}
+
+.story-view__reply {
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 0.22);
+  color: #ffffff;
+  font: var(--type-body);
+  font-weight: 600;
+  -webkit-backdrop-filter: blur(var(--space-4));
+  backdrop-filter: blur(var(--space-4));
+}
+
+.story-view__reply:disabled {
+  opacity: 0.5;
+}
+
+.story-view button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* ——— Новая история ——— */
+.story-compose__field {
+  flex: 1;
+  width: 100%;
+  padding: var(--space-6);
+  border: 0;
+  background: none;
+  color: #ffffff;
+  font: var(--type-display);
+  font-weight: 600;
+  text-align: center;
+  resize: none;
+  outline: none;
+}
+
+.story-compose__field::placeholder {
+  color: rgb(255 255 255 / 0.7);
+}
+
+.story-compose__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.story-compose__swatches {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.story-compose__swatch {
+  width: var(--space-8);
+  height: var(--space-8);
+  border: 2px solid rgb(255 255 255 / 0.5);
+  border-radius: var(--radius-full);
+}
+
+.story-compose__swatch[data-on] {
+  border-color: #ffffff;
+}
+
+/* Пока открыт просмотр, нижняя панель разделов не нужна */
+[data-pm]:has(.story-view) .tabbar {
+  display: none;
+}

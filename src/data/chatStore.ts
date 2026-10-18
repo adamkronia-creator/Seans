@@ -9,12 +9,12 @@ let typing: Record<string, boolean> = {};
 const listeners = new Set<() => void>();
 
 /** Превью чата в списке берётся из последнего сообщения переписки */
-function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage' | 'time'> | undefined {
+function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage' | 'time' | 'outgoing'> | undefined {
   const lastGroup = groups?.[groups.length - 1];
   const last = lastGroup?.messages[lastGroup.messages.length - 1];
   if (!last) return undefined;
   const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.test ? 'Тест' : last.task ? 'Задание' : '');
-  return { lastMessage: last.from === 'me' ? `Вы: ${text}` : text, time: last.time };
+  return { lastMessage: text, time: last.time, outgoing: last.from === 'me' ? (last.status === 'read' || !last.status ? 'read' : 'sent') : undefined };
 }
 
 let chats: Chat[] = CHATS.map((c) => ({ ...c, ...previewOf(MESSAGES[c.id]) }));

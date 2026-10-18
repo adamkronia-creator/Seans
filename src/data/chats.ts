@@ -17,6 +17,8 @@ export interface Chat {
   lastMessage: string;
   time: string;
   unread: number;
+  /** Последнее сообщение отправили вы: доставлено (серые галочки) или прочитано (синие) */
+  outgoing?: 'sent' | 'read';
   /** Чат в архиве: не показывается в списке и папках, лежит на экране «Архив чатов» */
   archived?: boolean;
 }
@@ -45,7 +47,8 @@ export const CHATS: Chat[] = [
     avatar: avatar1,
     category: 'clients',
     online: true,
-    lastMessage: 'Вы: Напомню: сеанс состоится 21/04 в 18:00. Кабинет №91.',
+    lastMessage: 'Напомню: сеанс состоится 21/04 в 18:00. Кабинет №91.',
+    outgoing: 'read',
     time: '00:00',
     unread: 0, // прочитано
   },
@@ -73,7 +76,8 @@ export const CHATS: Chat[] = [
     name: 'Богдан Ермолаев',
     avatar: avatar4,
     category: 'seminars',
-    lastMessage: 'Мы же читаем третий семинар, верно?',
+    lastMessage: 'Да, третий семинар в четверг.',
+    outgoing: 'sent',
     time: 'Вчера',
     unread: 0,
     archived: true, // для показа: в архиве уже есть чат

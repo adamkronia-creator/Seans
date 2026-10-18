@@ -2,7 +2,7 @@ import { useRef, type MouseEvent, type PointerEvent } from 'react';
 import type { Chat } from '../../data/chats';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
-import { IconArchiveMk, IconBookmarkMk, IconChevronMk } from './ChatIcons';
+import { IconArchiveMk, IconBookmarkMk, IconChevronMk, IconTicksMk } from './ChatIcons';
 import './ChatItem.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у чипсов и сообщений */
@@ -111,7 +111,14 @@ export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
             <span className="chat-item__time">{chat.time}</span>
           </span>
           <span className="chat-item__row chat-item__row--bottom">
-            <span className="chat-item__preview">{chat.lastMessage}</span>
+            <span className="chat-item__line">
+              {chat.outgoing && (
+                <span className={`chat-item__ticks chat-item__ticks--${chat.outgoing}`} role="img" aria-label={chat.outgoing === 'read' ? 'Прочитано' : 'Отправлено'}>
+                  <IconTicksMk />
+                </span>
+              )}
+              <span className="chat-item__preview">{chat.lastMessage}</span>
+            </span>
             <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
           </span>
         </span>

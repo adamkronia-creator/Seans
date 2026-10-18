@@ -108,3 +108,23 @@
   -webkit-touch-callout: none;
   user-select: none;
 }
+
+/* Статус своего последнего сообщения: двойная галочка слева от превью, серая — отправлено, акцентная — прочитано */
+.chat-item__line {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.chat-item__ticks {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-icon);
+  font-size: var(--size-icon-sm);
+}
+
+.chat-item__ticks--read {
+  color: var(--action-primary);
+}
