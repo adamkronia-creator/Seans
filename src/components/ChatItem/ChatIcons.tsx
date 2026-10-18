@@ -14,11 +14,11 @@ const base = (p: SVGProps<SVGSVGElement>): SVGProps<SVGSVGElement> => ({
   ...p,
 });
 
-/** Двойная галочка статуса: сетка 18×12, линия 1,5; серая — отправлено, синяя — прочитано */
+/** Двойная галочка статуса (Check Read): сетка 24, линия 1,5; серая — отправлено, синяя — прочитано */
 export const IconTicksMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)} width="1.5em" height="1em" viewBox="0 0 18 12">
-    <path d="M1 6.5L4.5 10L11 2" />
-    <path d="M7.5 8.5L8.5 9.5L15.5 2" />
+  <svg {...base(p)}>
+    <path d="M4 12.9L7.14286 16.5L15 7.5" />
+    <path d="M20 7.5625L11.4283 16.5625L11 16" />
   </svg>
 );
 
