@@ -38,3 +38,52 @@
   border-radius: var(--radius-full);
   background: var(--color-success);
 }
+
+/* Присутствие (цвета и форма — из системы мессенджера, вне её экранов запасные значения): точка 12 с кольцом 2 цвета подложки */
+.avatar {
+  --ring: var(--bg-canvas, var(--color-bg-panel));
+}
+
+.avatar__presence {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.avatar__presence--online {
+  background: var(--presence-online, var(--color-success));
+}
+
+/* На сессии: точка с паузой внутри, специалист занят, но не пропал */
+.avatar__presence--session {
+  background: var(--presence-session, var(--color-warning));
+}
+
+.avatar__presence--session::before,
+.avatar__presence--session::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 2px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--ring);
+}
+
+.avatar__presence--session::before {
+  left: 3px;
+}
+
+.avatar__presence--session::after {
+  right: 3px;
+}
+
+/* Не в сети: пустое кольцо */
+.avatar__presence--offline {
+  background: var(--ring);
+  box-shadow: inset 0 0 0 2px var(--presence-offline, var(--color-text-caption)), 0 0 0 2px var(--ring);
+}

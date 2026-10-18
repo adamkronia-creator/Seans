@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { Chip } from '../../components/Chip/Chip';
@@ -26,7 +26,9 @@ const ChatList = memo(function ChatList({ chats, onOpen }: { chats: Chat[]; onOp
       ))}
     </ul>
   ) : (
-    <EmptyState icon={<IconSearch />} title="Ничего не найдено" text="В этом разделе нет подходящих чатов." />
+    <div className="messages__empty">
+      <EmptyState icon={<IconSearch />} title="Ничего не найдено" text="В этом разделе нет подходящих чатов." />
+    </div>
   );
 });
 
@@ -39,6 +41,18 @@ export function MessagesPage() {
   const folders = useFolders('chats');
   const folderMenu = useFolderMenu('chats');
   const root = useRef<HTMLElement>(null);
+
+  // Шапка парит над списком (полупрозрачная, список уходит под неё): её высота задаёт верхнее поле списка
+  useLayoutEffect(() => {
+    const section = root.current;
+    const header = section?.querySelector<HTMLElement>('.screen-header');
+    if (!section || !header) return;
+    const measure = () => section.style.setProperty('--pm-top', `${header.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   /** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
   const filters = useMemo<Filter[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
@@ -97,9 +111,10 @@ export function MessagesPage() {
   }, []);
 
   return (
-    <section ref={root} className="messages">
+    <section ref={root} className="messages" data-pm="">
       <ScreenHeader
         title="Диалоги"
+        showTitle
         searchValue={query}
         onSearchChange={setQuery}
         searchPlaceholder="Поиск по чатам"

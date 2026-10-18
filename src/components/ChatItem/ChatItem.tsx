@@ -19,7 +19,7 @@ export function ChatItem({ chat, onClick }: ChatItemProps) {
         {chat.favorites ? (
           <Avatar icon={<IconFavorites />} size={AVATAR_SIZE} />
         ) : (
-          <Avatar src={chat.avatar} alt="" online={chat.online} size={AVATAR_SIZE} />
+          <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : 'offline'} size={AVATAR_SIZE} />
         )}
 
         <span className="chat-item__body">

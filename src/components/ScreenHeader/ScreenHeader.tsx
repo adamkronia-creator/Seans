@@ -5,6 +5,8 @@ import './ScreenHeader.css';
 interface ScreenHeaderProps {
   /** Название раздела: на экране его нет (раздел узнают по значку на нижней панели), но программа экрана его читает */
   title: string;
+  /** Показать название раздела крупным заголовком над поиском (новая система); иначе оно только для экранных читалок */
+  showTitle?: boolean;
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
@@ -29,6 +31,7 @@ interface ScreenHeaderProps {
  */
 export function ScreenHeader({
   title,
+  showTitle = false,
   searchValue,
   onSearchChange,
   searchPlaceholder,
@@ -44,7 +47,7 @@ export function ScreenHeader({
 }: ScreenHeaderProps) {
   return (
     <header className="screen-header">
-      <h1 className="visually-hidden">{title}</h1>
+      <h1 className={showTitle ? 'screen-header__title' : 'visually-hidden'}>{title}</h1>
 
       <div className="screen-header__search">
         <SearchField

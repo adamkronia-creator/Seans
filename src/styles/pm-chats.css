@@ -1,0 +1,263 @@
+/*
+ * «Диалоги» по системе мессенджера (claude/messenger-color-system.md). Правила действуют на экране с data-pm
+ * и перекрывают прежние компоненты (чипсы, поиск, строки чатов, счётчик, нижняя панель) только здесь.
+ * Старые имена переменных подменены семантическими токенами, поэтому незатронутые части (меню папок, пустое состояние)
+ * тоже берут новые цвета.
+ */
+.screen:has([data-pm]) {
+  --color-bg-app: var(--bg-canvas);
+  --color-bg-panel: var(--bg-canvas);
+  --color-bg-row: transparent;
+  --color-bg-row-pressed: var(--bg-subtle);
+  --color-bg-fill: var(--bg-field);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-caption: var(--text-secondary);
+  --color-text-placeholder: var(--text-secondary);
+  --color-accent: var(--action-primary);
+  --color-accent-strong: var(--action-primary-hover);
+  --color-accent-on: var(--action-primary-text);
+  --color-accent-soft: var(--action-secondary);
+  --color-divider: transparent;
+  --tone-chat: var(--action-secondary);
+  --color-ink-on-pastel: var(--action-secondary-text);
+  --size-chip-h: var(--size-control-sm);
+  --size-tab: var(--size-bar);
+  --font-sans: 'Manrope Variable', Manrope, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-family: var(--font-sans);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* ——— Парящие панели: фон bg-bar, размытие, без линий; край смягчает градиент ——— */
+.screen:has([data-pm]) .screen-header,
+.screen:has([data-pm]) .tabbar {
+  background: var(--bg-bar);
+  -webkit-backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
+  backdrop-filter: blur(var(--blur-bar)) saturate(1.2);
+  border: 0;
+}
+
+.screen:has([data-pm]) .screen-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  gap: var(--space-2);
+  padding: var(--safe-top) 0 var(--space-2);
+}
+
+.screen:has([data-pm]) .tabbar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  padding: 0 var(--space-1) var(--safe-bottom);
+}
+
+.screen:has([data-pm]) .screen-header::after,
+.screen:has([data-pm]) .tabbar::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: var(--space-4);
+  background: linear-gradient(var(--bg-bar), transparent);
+  pointer-events: none;
+}
+
+.screen:has([data-pm]) .screen-header::after {
+  top: 100%;
+}
+
+.screen:has([data-pm]) .tabbar::before {
+  bottom: 100%;
+  background: linear-gradient(transparent, var(--bg-bar));
+}
+
+/* Без размытия (старое устройство, «Уменьшить прозрачность») панель сплошная, и только тогда допустима волосяная линия */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .screen:has([data-pm]) .screen-header,
+  .screen:has([data-pm]) .tabbar {
+    background: var(--bg-canvas);
+  }
+
+  .screen:has([data-pm]) .screen-header { border-bottom: var(--hairline) solid var(--border-subtle); }
+  .screen:has([data-pm]) .tabbar { border-top: var(--hairline) solid var(--border-subtle); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .screen:has([data-pm]) .screen-header,
+  .screen:has([data-pm]) .tabbar {
+    background: var(--bg-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .screen:has([data-pm]) .screen-header::after,
+  .screen:has([data-pm]) .tabbar::before {
+    display: none;
+  }
+}
+
+/* ——— Заголовок, поиск, чипсы ——— */
+.screen:has([data-pm]) .screen-header__title {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) 0;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 36px;
+}
+
+.screen:has([data-pm]) .screen-header__search {
+  padding: 0 var(--space-4);
+}
+
+.screen:has([data-pm]) .search-field {
+  height: var(--size-control);
+  border-radius: var(--radius-md);
+  background: var(--bg-field);
+  color: var(--text-secondary);
+}
+
+.screen:has([data-pm]) .search-field__icon {
+  font-size: var(--size-icon);
+}
+
+.screen:has([data-pm]) .search-field__input {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.screen:has([data-pm]) .search-field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+.screen:has([data-pm]) .search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+.screen:has([data-pm]) .screen-header__action {
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-md);
+  background: var(--bg-field);
+  color: var(--text-secondary);
+}
+
+.screen:has([data-pm]) .screen-header__chips {
+  margin: 0;
+  padding: 0 var(--space-4);
+}
+
+.screen:has([data-pm]) .chip {
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.screen:has([data-pm]) .chip--counted {
+  padding-right: var(--space-2);
+}
+
+.screen:has([data-pm]) .chip:focus-visible,
+.screen:has([data-pm]) .screen-header__action:focus-visible,
+.screen:has([data-pm]) .tabbar__item:focus-visible,
+.screen:has([data-pm]) .chat-item__button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ——— Строки чатов: до краёв, без разделителей, ритм 72 ——— */
+.screen:has([data-pm]) .chat-item__button {
+  gap: var(--space-3);
+  min-height: var(--size-row);
+  padding: var(--space-3) var(--space-4);
+}
+
+.screen:has([data-pm]) .chat-item__button:active,
+.screen:has([data-pm]) .chat-item__button[data-pressed] {
+  --ring: var(--bg-subtle);
+  background: var(--bg-subtle);
+}
+
+.screen:has([data-pm]) .chat-item__button:active .avatar,
+.screen:has([data-pm]) .chat-item__button[data-pressed] .avatar {
+  --ring: var(--bg-subtle);
+}
+
+.screen:has([data-pm]) .chat-item__body {
+  gap: 0;
+}
+
+.screen:has([data-pm]) .chat-item__name {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.screen:has([data-pm]) .chat-item__time,
+.screen:has([data-pm]) .chat-item--unread .chat-item__time {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.screen:has([data-pm]) .chat-item__preview {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.screen:has([data-pm]) .avatar__img--empty {
+  background: var(--bg-field);
+}
+
+.screen:has([data-pm]) .avatar__icon {
+  background: var(--bubble-in-bg);
+  color: var(--bubble-in-text);
+}
+
+/* ——— Счётчик: индиго, не красный ——— */
+.screen:has([data-pm]) .badge {
+  padding: 0 var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.screen:has([data-pm]) .badge--accent {
+  background: var(--chat-unread-bg);
+  color: var(--chat-unread-text);
+}
+
+.screen:has([data-pm]) .badge--neutral {
+  background: var(--action-secondary-hover);
+  color: var(--action-secondary-text);
+}
+
+.screen:has([data-pm]) .badge--inverse {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+.screen:has([data-pm]) .badge--quiet,
+.screen:has([data-pm]) .chip[data-tone] .badge--quiet-inverse {
+  box-shadow: inset 0 0 0 1.5px var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+/* ——— Нижняя панель разделов ——— */
+.screen:has([data-pm]) .tabbar__item {
+  color: var(--text-secondary);
+}
+
+.screen:has([data-pm]) .tabbar__item--active {
+  color: var(--text-link);
+}
