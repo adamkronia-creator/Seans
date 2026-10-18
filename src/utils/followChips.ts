@@ -51,6 +51,12 @@ export function placePill(chips: HTMLElement[], weights: number[]) {
     x += weights[i] * chip.offsetLeft;
     w += weights[i] * chip.offsetWidth;
   });
+  pill.dataset.weights = weights.join(',');
+  // Подпись белая там, где под ней заливка: доля чипса, накрытая плашкой (а не вес выбора, иначе подпись белеет вне плашки)
+  chips.forEach((chip) => {
+    const overlap = Math.max(0, Math.min(x + w, chip.offsetLeft + chip.offsetWidth) - Math.max(x, chip.offsetLeft));
+    chip.style.setProperty('--cover', String(Math.min(1, overlap / chip.offsetWidth)));
+  });
   pill.style.setProperty('--pill-x', `${x}px`);
   pill.style.setProperty('--pill-w', `${w}px`);
 }

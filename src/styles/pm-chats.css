@@ -137,6 +137,15 @@
   border-radius: var(--radius-full);
 }
 
+/* Под приложением (системная панель внизу, края) — тот же фон, что у экрана, а не «жемчужный» стол */
+html:has([data-pm]) body {
+  background: #ffffff;
+}
+
+html[data-theme='dark']:has([data-pm]) body {
+  background: #111418;
+}
+
 /* Заливка выбранного — один подвижный элемент на весь ряд (followChips ставит --pill-x и --pill-w): едет от чипса к чипсу */
 [data-pm] .chips-pill {
   position: absolute;
@@ -166,7 +175,7 @@
 /* Подпись идёт за заливкой вслед за пальцем и меняет цвет там, где заливка уже достаточно насыщенная для подписи выбранного (около 0,6 пути) */
 [data-pm] .chip--follow:not(.chip--split, .chip--tab),
 [data-pm] .chip--follow.chip--active:not(.chip--split, .chip--tab) {
-  color: color-mix(in srgb, var(--chip-on) clamp(0%, calc((var(--w) - 0.6) * 1000%), 100%), var(--text-chip));
+  color: color-mix(in srgb, var(--chip-on) clamp(0%, calc((var(--cover, var(--w)) - 0.6) * 1000%), 100%), var(--text-chip));
 }
 
 /* ——— Счётчик непрочитанных: индиго, не красный; высота space-5 ——— */

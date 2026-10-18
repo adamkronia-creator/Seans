@@ -203,13 +203,17 @@ export function MessagesPage() {
   }, []);
 
   // В покое подвижная заливка стоит под выбранным чипсом; пересчёт при смене выбора, счётчиков, папок, размера и после загрузки шрифтов
+  const keptOrder = useRef('');
   const countsKey = chats.map((c) => (c.archived ? 0 : c.unread > 0 ? 1 : 0)).join('');
   useLayoutEffect(() => {
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
     if (!row) return;
     const place = () => {
       const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
-      placePill(chips, chips.map((_, i) => (i === index ? 1 : 0)));
+      // Пока страницы идут (жест или пружина), заливка стоит там, где её поставил followChips: прыгать к выбранному нельзя
+      const kept = row.querySelector<HTMLElement>(':scope > .chips-pill')?.dataset.weights?.split(',').map(Number);
+      placePill(chips, kept && kept.length === chips.length && order === keptOrder.current ? kept : chips.map((_, i) => (i === index ? 1 : 0)));
+      keptOrder.current = order;
     };
     place();
     const watch = new ResizeObserver(place);
