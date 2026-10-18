@@ -33,6 +33,7 @@
   --color-success: var(--presence-online);
   --color-ink-on-pastel: var(--action-secondary-text);
   --tone-chat: var(--action-secondary); /* выбранный чипс — тональная заливка action-secondary */
+  --radius-pill: var(--radius-full); /* чипсы и счётчики — полные пилюли */
   --shadow-float: var(--shadow-lg);
   --ring: var(--bg-canvas); /* кольцо точки присутствия: цвет подложки */
   --inset-top: max(var(--safe-top), var(--space-2)); /* верх шапки: безопасная зона, в браузере без выреза — space-2 */
@@ -87,9 +88,13 @@
   pointer-events: none;
 }
 
+/* Тонкий разделитель между чипсами и первым чатом: волосяная линия border-subtle, поля space-4 как у шапки */
 [data-pm] .screen-header::after {
   top: 100%;
-  background: linear-gradient(var(--bg-bar), transparent);
+  right: var(--space-4);
+  left: var(--space-4);
+  height: var(--hairline);
+  background: var(--border-subtle);
 }
 
 [data-pm] .tabbar::before {
@@ -121,7 +126,6 @@
     backdrop-filter: none;
   }
 
-  [data-pm] .screen-header::after,
   [data-pm] .tabbar::before {
     display: none;
   }
@@ -168,14 +172,14 @@
 }
 
 [data-pm] .search-field {
-  height: var(--size-control);
-  border-radius: var(--radius-md);
+  height: var(--size-control-sm);
+  border-radius: var(--radius-full);
   background: var(--bg-field);
   color: var(--text-secondary);
 }
 
 [data-pm] .search-field__icon {
-  font-size: var(--size-icon);
+  font-size: var(--size-icon-sm);
 }
 
 [data-pm] .search-field__input {
@@ -197,9 +201,11 @@
   font-size: var(--size-icon-sm);
 }
 
-/* ——— Чипсы папок: пилюли высотой size-control-sm; выбранный — тональный action-secondary, остальные на bg-field ——— */
+/* ——— Чипсы папок: обычные отдельные пилюли высотой size-control-sm, между всеми зазор space-2; выбранный — тональный action-secondary, остальные на bg-field ——— */
+/* Зазор задаёт ряд, а не чипс. Если экран на новой системе оставит «капсулу» (Chip с split), ряду там нужен gap: 0: зазоры у капсулы задают сами чипсы */
 /* Ряд прокручивается вбок и обрезает всё, что выходит за него; кольцу фокуса (4 снаружи) оставлено место, высота ряда прежняя */
 [data-pm] .screen-header__chips {
+  gap: var(--space-2);
   margin: calc(var(--space-1) * -1) 0;
   padding: var(--space-1) var(--space-4);
 }
@@ -213,6 +219,12 @@
 
 [data-pm] .chip--counted {
   padding-right: var(--space-2);
+}
+
+/* Подпись идёт за заливкой вслед за пальцем и меняет цвет там, где заливка уже достаточно насыщенная для подписи выбранного (около 0,6 пути) */
+[data-pm] .chip--follow:not(.chip--split, .chip--tab),
+[data-pm] .chip--follow.chip--active:not(.chip--split, .chip--tab) {
+  color: color-mix(in srgb, var(--chip-on) clamp(0%, calc((var(--w) - 0.6) * 1000%), 100%), var(--text-secondary));
 }
 
 /* ——— Счётчик непрочитанных: индиго, не красный; высота space-5 ——— */

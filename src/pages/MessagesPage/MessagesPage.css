@@ -5,7 +5,7 @@
 .messages {
   /* Шапка: верхний отступ, строка заголовка (size-touch), поиск (size-control), чипсы (size-control-sm), три промежутка шапки по space-2
      и ещё space-2 воздуха до первой строки */
-  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--size-control) + var(--size-control-sm) + var(--space-2) * 4);
+  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--size-control-sm) + var(--size-control-sm) + var(--space-2) * 4);
   /* Нижняя панель разделов с безопасной зоной */
   --pm-bottom: calc(var(--size-bar) + var(--safe-bottom));
   /* Подсказка (уведомления папки, папка удалена) стоит над кнопкой «Новый диалог» */

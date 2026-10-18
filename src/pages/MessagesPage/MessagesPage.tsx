@@ -105,7 +105,7 @@ export function MessagesPage() {
         showTitle
         searchValue={query}
         onSearchChange={setQuery}
-        searchPlaceholder="Поиск по чатам"
+        searchPlaceholder="Поиск"
         titleAside={
           <button type="button" className="screen-header__action" aria-label="События" onClick={() => navigate('/events')}>
             <IconBell />
@@ -114,14 +114,13 @@ export function MessagesPage() {
         chipsLabel="Фильтр диалогов"
         chips={
           <>
-            <Chip follow split tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
+            <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
             {folders.map(({ id, name, muted }, i) => (
               <Chip
                 key={id}
                 follow
-                split
                 tone="chat"
                 active={shown === i + 1}
                 count={countOf(id)}
