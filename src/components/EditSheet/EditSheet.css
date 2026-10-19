@@ -324,8 +324,18 @@
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones,
 [data-pm] .sheet__footer,
+/* Карточка с текстом скругляет углы сама (overflow: clip не мешает прилипанию панели), панель — прямая полоса: у скруглённой панели
+   в нижних углах, пока она прилипла к краю окна, просвечивал бы прокручиваемый текст */
+[data-pm] .sheet .sheet__card:has(.rich-toolbar) {
+  overflow: clip;
+}
+
 [data-pm] .rich-toolbar {
-  border-top: 0;
+  padding: var(--space-3);
+  border: 0;
+  border-top: 1px solid var(--glass-border);
+  border-radius: 0;
+  background: var(--glass-plain, #ffffff);
 }
 
 [data-pm] .sheet__preview {
