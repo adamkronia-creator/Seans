@@ -1,6 +1,7 @@
 import type React from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chip } from '../Chip/Chip';
+import { EmptyState } from '../EmptyState/EmptyState';
 import { EditSheet } from '../EditSheet/EditSheet';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { SwipePager } from '../SwipePager/SwipePager';
@@ -8,6 +9,7 @@ import {
   IconCaseEdit,
   IconEventInvite,
   IconChevron,
+  IconTabLibrary,
   IconTlClock,
   IconTlDoc,
   IconTlFlame,
@@ -144,7 +146,7 @@ function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: str
       {long && <hr className="hist-scales__rule" />}
       {long && (
         <button type="button" className="hist-scales__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
-          {open ? 'Скрыть' : `Читать далее (еще ${scales.length - SCALES_SHOWN})`}
+          {open ? 'Скрыть' : `Читать далее (ещё ${scales.length - SCALES_SHOWN})`}
         </button>
       )}
     </div>
@@ -156,7 +158,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
   // Сеанс без текста: только название и дата
   const bare = 'paragraphs' in event && event.paragraphs.length === 0 && !quick;
-  // Тест или задание, которое отправили или назначили вы: клиент его еще не выполнил, комментировать и открывать нечего
+  // Тест или задание, которое отправили или назначили вы: клиент его ещё не выполнил, комментировать и открывать нечего
   const outgoing = (event.kind === 'test' || event.kind === 'task') && event.state !== 'done';
   // Править можно все, кроме приглашения и отправленного: двойной клик/касание — быстрая правка текста или комментария
   // на месте, полный редактор открывает карандаш
@@ -320,7 +322,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     observer.observe(foot);
     apply();
     return () => observer.disconnect();
-  }, []);
+  }, [events.length === 0]);
 
   const pages = useMemo(
     () =>
@@ -378,17 +380,24 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
 
   return (
     <div ref={root} className="hist-host">
-      <SwipePager
-        className="chat-history__pager"
-        nested
-        index={index}
-        pages={pages}
-        onIndexChange={(i) => setFilter(FILTERS[i].id)}
-        onPosition={onPosition}
-        onDrag={onDrag}
-      />
+      {events.length === 0 ? (
+        // Событий нет совсем: подсказка вместо пустых лент и чипсов с нулями
+        <EmptyState icon={<IconTabLibrary />} title="История пока пуста" text="Здесь появятся сеансы, тесты, задания и заметки по этому клиенту." />
+      ) : (
+        <>
+          <SwipePager
+            className="chat-history__pager"
+            nested
+            index={index}
+            pages={pages}
+            onIndexChange={(i) => setFilter(FILTERS[i].id)}
+            onPosition={onPosition}
+            onDrag={onDrag}
+          />
 
-      <div className="hist-foot">{foot}</div>
+          <div className="hist-foot">{foot}</div>
+        </>
+      )}
 
       {editing && (
         <EditSheet

@@ -52,7 +52,7 @@ function entriesOf(scope: FolderScope): Entry[] {
     note: item.description,
     visual: (
       <span className="fp-icon" style={{ '--tint': item.tint } as CSSProperties}>
-        <img src={item.icon} alt="" />
+        <img src={item.icon} alt="" loading="lazy" decoding="async" />
       </span>
     ),
   }));

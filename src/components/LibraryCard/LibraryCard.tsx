@@ -24,7 +24,7 @@ export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, 
     <li className="lib-card">
       <button type="button" className="test-card" onClick={() => onClick?.(test)}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
-          <img className="test-card__icon" src={test.icon} alt="" />
+          <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />
         </span>
         <span className="test-card__body">
           <span className="test-card__top lib-card__top">

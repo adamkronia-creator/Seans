@@ -7,7 +7,7 @@ import type { AppEvent } from './events';
 import { findClientTaskResult } from './clientTaskResults';
 import { clientResultId, clientResultPath, recordRef } from './resultLinks';
 import { recordsText, type PermanentRule } from './taskValues';
-import avatar1 from '../assets/avatars/avatar-1.png';
+import avatar1 from '../assets/avatars/avatar-1.jpg';
 
 /*
  * Единый источник правды по клиенту (пока только Максим): журнал действий.
@@ -229,23 +229,34 @@ export function nowStamp() {
 
 // ——— Действия: каждое дописывает запись в журнал ———
 
-/** Название записи, набранной в поле внизу вкладки: «Заметка от 14.10.2026, 12:13»; весь набранный текст остаётся в самой записи */
-const stampTitle = (what: string) => {
-  const { date, time } = nowStamp();
-  return `${what} от ${date}, ${time}`;
+/**
+ * Название записи, набранной в поле внизу вкладки, и её текст. Название — первая строка (до 48 знаков, по границе слова);
+ * если строка поместилась целиком, в тексте остаётся только остальное, иначе текст остаётся полным, чтобы ничего не потерять.
+ * Если текста нет — название «Заметка» или «Сведения».
+ */
+const splitTitle = (text: string, fallback: string) => {
+  const lines = text.split('\n');
+  const at = lines.findIndex((x) => x.trim());
+  if (at < 0) return { title: fallback, body: '' };
+  const line = lines[at].trim();
+  if (line.length <= 48) return { title: line, body: lines.slice(at + 1).join('\n').trim() };
+  const cut = line.slice(0, 48);
+  const space = cut.lastIndexOf(' ');
+  return { title: `${(space > 24 ? cut.slice(0, space) : cut).replace(/[\s.,;:—-]+$/, '')}…`, body: text.trim() };
 };
 
 /**
- * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — «Заметка от <дата>, <время>», а текст целиком в заметке.
+ * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — первая строка текста, остальное — в заметке (дата — в «Последнем обновлении»).
  * У клиента (Максима) она попадает и в журнал, то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
  */
 export function addNote(chatId: string, text: string): string | null {
-  const paragraphs = textToParagraphs(text);
-  if (!paragraphs.some((p) => p.trim())) return null;
+  if (!textToParagraphs(text).some((p) => p.trim())) return null;
+  const { title, body } = splitTitle(text, 'Заметка');
+  const paragraphs = body ? textToParagraphs(body) : [];
   const { date } = nowStamp();
   const note: CaseNote = {
     id: `n${data.notes.length + 1}-${Date.now()}`,
-    title: stampTitle('Заметка'),
+    title,
     paragraphs,
     icon: 'pin',
     tone: 'purple',
@@ -259,14 +270,15 @@ export function addNote(chatId: string, text: string): string | null {
   return note.id;
 }
 
-/** Новое сведение из текста, набранного в поле внизу вкладки «Сведения»: название «Сведения от <дата>, <время>», текст целиком внутри */
+/** Новое сведение из текста, набранного в поле внизу вкладки «Сведения»: название — первая строка текста, остальное внутри */
 export function addSection(chatId: string, text: string): string | null {
-  const blocks = textToBlocks(text);
-  if (blocks.length === 0 || !text.trim()) return null;
+  if (textToBlocks(text).length === 0 || !text.trim()) return null;
+  const { title, body } = splitTitle(text, 'Сведения');
+  const blocks = body ? textToBlocks(body) : [];
   const { date } = nowStamp();
   const section: CaseSection = {
     id: `c${data.caseSections.length + 1}-${Date.now()}`,
-    title: stampTitle('Сведения'),
+    title,
     icon: 'info',
     tone: 'blue',
     blocks,
@@ -399,7 +411,7 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
           kind: a.kind,
           state: a.state,
           ref: a.ref,
-          title: a.kind === 'test' ? name : `«${name}»`,
+          title: `«${name}»`,
           date: `${a.date} ${a.time}`,
           text: activityText(a),
           comment: d.comments[a.id],
@@ -491,7 +503,7 @@ export function appEvents(d: ClientData): AppEvent[] {
         type: a.kind === 'test' ? 'survey' : 'task',
         text:
           a.kind === 'test'
-            ? `Прошел опросник «${itemName('test', a.ref)}»`
+            ? `Прошёл опросник «${itemName('test', a.ref)}»`
             : a.record
               ? `Добавил запись ${a.record} в задание «${itemName('task', a.ref)}»`
               : `Выполнил задание «${itemName('task', a.ref)}»`,

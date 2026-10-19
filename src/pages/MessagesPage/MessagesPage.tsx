@@ -155,10 +155,10 @@ export function MessagesPage() {
   }, [filters, filter]);
 
   // Счётчик чипса = число непрочитанных ЧАТОВ в нём (не сообщений).
-  // «Все» считает и «Избранное»; папки — только свои чаты. При нуле кружок скрыт.
+  // «Избранное» не считается нигде (его строка без счётчика); папки — только свои чаты. При нуле кружок скрыт.
   const countOf = (id: Filter) => {
     const members = id === 'all' ? null : new Set(folders.find((f) => f.id === id)?.ids);
-    return chats.filter((c) => !c.archived && c.unread > 0 && (members === null || (!c.favorites && members.has(c.id)))).length;
+    return chats.filter((c) => !c.archived && c.unread > 0 && !c.favorites && (members === null || members.has(c.id))).length;
   };
 
   // Открытие чата помечает его прочитанным и ведёт в переписку
@@ -220,7 +220,7 @@ export function MessagesPage() {
 
   // В покое подвижная заливка стоит под выбранным чипсом; пересчёт при смене выбора, счётчиков, папок, размера и после загрузки шрифтов
   const keptOrder = useRef('');
-  const countsKey = chats.map((c) => (c.archived ? 0 : c.unread > 0 ? 1 : 0)).join('');
+  const countsKey = chats.map((c) => (c.archived || c.favorites ? 0 : c.unread > 0 ? 1 : 0)).join('');
   useLayoutEffect(() => {
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
     if (!row) return;

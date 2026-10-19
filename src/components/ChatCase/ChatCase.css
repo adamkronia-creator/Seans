@@ -179,3 +179,8 @@
   font-weight: 400;
   text-align: right;
 }
+
+/* Пустая вкладка: подсказка по центру свободного места, а не у поля ввода */
+.chat-case > .case-page:has(> .empty-state) {
+  margin-block: auto;
+}

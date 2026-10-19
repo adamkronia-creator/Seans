@@ -29,7 +29,7 @@ const built = esbuild.buildSync({
   write: false,
   format: 'esm',
   platform: 'node',
-  loader: { '.png': 'dataurl', '.svg': 'dataurl' },
+  loader: { '.png': 'dataurl', '.webp': 'dataurl', '.jpg': 'dataurl', '.svg': 'dataurl' },
   logLevel: 'error',
 });
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'seans-library-'));

@@ -20,4 +20,12 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // React отдельным файлом: он почти не меняется, и при обновлении приложения браузер берёт его из кэша
+        manualChunks: (id) => (/node_modules\/(react|react-dom|scheduler)\//.test(id) ? 'vendor' : undefined),
+      },
+    },
+  },
 });

@@ -24,13 +24,13 @@ interface SectionConfig {
 
 const TEST_SECTIONS: SectionConfig[] = [
   { status: 'sent', title: 'Отправленные', remind: true },
-  { status: 'done', title: 'Завершенные' },
+  { status: 'done', title: 'Завершённые' },
 ];
 
 const TASK_SECTIONS: SectionConfig[] = [
   { status: 'sent', title: 'Отправленные', remind: true },
   { status: 'permanent', title: 'Постоянные' },
-  { status: 'done', title: 'Завершенные' },
+  { status: 'done', title: 'Завершённые' },
 ];
 
 /** Разделы со списками карточек: общий вид для вкладок «Тесты» и «Задания» */

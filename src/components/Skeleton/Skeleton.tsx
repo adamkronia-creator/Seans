@@ -1,6 +1,6 @@
 import './Skeleton.css';
 
-/** Серая заготовка на месте содержимого, которое еще загружается: мягко мерцает (при «уменьшении движения» стоит) */
+/** Серая заготовка на месте содержимого, которое ещё загружается: мягко мерцает (при «уменьшении движения» стоит) */
 export function Skeleton({ width, height = 16, radius, className = '' }: { width?: number | string; height?: number | string; radius?: number | string; className?: string }) {
   return <span className={`skeleton ${className}`} style={{ width, height, borderRadius: radius }} aria-hidden="true" />;
 }

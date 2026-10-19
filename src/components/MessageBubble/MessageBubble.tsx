@@ -181,7 +181,7 @@ export function MessageBubble({
           <div className="tcard">
             {test && !hiddenTest && (
               <span className="tcard__icon" style={{ background: test.tint }}>
-                <img src={test.icon} alt="" />
+                <img src={test.icon} alt="" loading="lazy" decoding="async" />
               </span>
             )}
             <span className="tcard__text">
@@ -198,7 +198,9 @@ export function MessageBubble({
                         : 'Присланное задание'
                   : passed
                     ? 'Пройденный тест'
-                    : 'Присланный тест'}
+                    : settings
+                      ? 'Отправленный тест'
+                      : 'Присланный тест'}
               </span>
               <span className="tcard__title">{hiddenTest ? (message.testOptions?.blindTitle ?? BLIND_FALLBACK_TITLE) : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
               {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}

@@ -1,7 +1,7 @@
-import avatar1 from '../assets/avatars/avatar-1.png';
-import avatar2 from '../assets/avatars/avatar-2.png';
-import avatar3 from '../assets/avatars/avatar-3.png';
-import avatar4 from '../assets/avatars/avatar-4.png';
+import avatar1 from '../assets/avatars/avatar-1.jpg';
+import avatar2 from '../assets/avatars/avatar-2.jpg';
+import avatar3 from '../assets/avatars/avatar-3.jpg';
+import avatar4 from '../assets/avatars/avatar-4.jpg';
 import userAvatar from '../assets/avatars/user-avatar-200.jpg';
 
 export type ChatCategory = 'clients' | 'colleagues' | 'seminars';
@@ -37,7 +37,7 @@ export const CHATS: Chat[] = [
     id: 'favorites',
     name: 'Избранное',
     favorites: true,
-    lastMessage: 'Вы прошли «Сокращенный многофакторный опросник»',
+    lastMessage: 'Вы прошли «Сокращённый многофакторный опросник»',
     time: '00:00',
     unread: 5,
   },
@@ -47,7 +47,7 @@ export const CHATS: Chat[] = [
     avatar: avatar1,
     category: 'clients',
     online: true,
-    lastMessage: 'Напомню: сеанс состоится 21/04 в 18:00. Кабинет №91.',
+    lastMessage: 'Напомню: сеанс состоится 21.04 в 18:00. Кабинет №91.',
     outgoing: 'read',
     time: '00:00',
     unread: 0, // прочитано

@@ -288,8 +288,9 @@
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
-  background: var(--glass-fill-panel);
-  color: var(--text-icon);
+  /* Плотнее обычного стекла: плашка проезжает над синими пузырями, и на прозрачной подписи не прочесть */
+  background: rgb(255 255 255 / 0.78);
+  color: var(--text-secondary);
   font: var(--type-caption);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);

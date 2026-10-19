@@ -200,7 +200,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const send = (ids: string[]) => {
     ids.forEach((id) => {
       // В чат уходит карточка теста: сообщение клиенту, если оно включено, стоит в ней текстом, а настройки,
-      // с которыми тест ушел, лежат в ней же (их показывает кнопка «Настройки теста»)
+      // с которыми тест ушёл, лежат в ней же (их показывает кнопка «Настройки теста»)
       sendMessage(id, messageOn ? message : '', undefined, {
         test: test.id,
         testKind: 'sent',

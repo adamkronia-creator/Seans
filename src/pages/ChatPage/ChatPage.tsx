@@ -23,7 +23,7 @@ import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
-import { addNote, addSection, CLIENT_CHAT, itemsWithStatus, useClientData } from '../../data/clientStore';
+import { addNote, addSection, CLIENT_CHAT, countOf, useClientData } from '../../data/clientStore';
 import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import type { Message } from '../../data/messages';
@@ -173,13 +173,13 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
       {id === 'notes' && (
         <>
           <ChatNotes chatId={chatId} />
-          <MessageInput placeholder="Заметка" extras={false} active={active} onSend={(text) => void addNote(chatId, text)} />
+          <MessageInput placeholder="Напишите заметку" extras={false} active={active} onSend={(text) => void addNote(chatId, text)} />
         </>
       )}
       {id === 'info' && (
         <>
           <ChatInfo chatId={chatId} />
-          <MessageInput placeholder="Сведения" extras={false} active={active} onSend={(text) => void addSection(chatId, text)} />
+          <MessageInput placeholder="Добавьте сведения" extras={false} active={active} onSend={(text) => void addSection(chatId, text)} />
         </>
       )}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
@@ -334,8 +334,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     if (!hasClientData) return {};
     const mine = (chatOf?: string) => (chatOf ?? CLIENT_CHAT) === chatId;
     return {
-      tests: itemsWithStatus(clientData, 'test').length,
-      tasks: itemsWithStatus(clientData, 'task').length,
+      // Те же числа, что на чипсах «Истории»: считаются тесты и задания, а не карточки (у постоянного задания их несколько: запись = карточка)
+      tests: countOf(clientData, 'test'),
+      tasks: countOf(clientData, 'task'),
       notes: clientData.notes.filter((n) => mine(n.chatId)).length,
       info: clientData.caseSections.filter((x) => mine(x.chatId)).length,
     };

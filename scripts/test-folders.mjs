@@ -27,7 +27,7 @@ const built = esbuild.buildSync({
   format: 'esm',
   platform: 'node',
   define: { 'process.env.NODE_ENV': '"production"' },
-  loader: { '.png': 'dataurl', '.svg': 'dataurl', '.jpg': 'dataurl', '.webp': 'dataurl', '.css': 'empty' },
+  loader: { '.png': 'dataurl', '.webp': 'dataurl', '.jpg': 'dataurl', '.svg': 'dataurl', '.jpg': 'dataurl', '.webp': 'dataurl', '.css': 'empty' },
   logLevel: 'error',
 });
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'seans-folders-'));

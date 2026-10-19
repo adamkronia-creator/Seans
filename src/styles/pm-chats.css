@@ -20,22 +20,23 @@
   --bg-subtle: #f2f3f5;
   --border-subtle: #eeeeef;
   --text-primary: #000000;
-  --text-secondary: #818c99; /* текст сообщений, время, подпись статуса */
-  --text-icon: #6b7585; /* значки поиска и уведомлений, неактивные значки нижней панели (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
-  --text-chip: #6b7585; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
-  --text-link: #2688eb;
-  --action-primary: #2688eb;
-  --action-primary-hover: #1f7ad9;
-  --action-primary-pressed: #1a6bc0;
+  --text-secondary: #586573; /* текст сообщений, время, подпись статуса (в макете #818c99 даёт 3,4:1 на белом и 2,9:1 на цветном фоне; здесь 5–6:1) */
+  --text-icon: #5f6b7a; /* значки поиска и уведомлений, неактивные значки нижней панели, плашка дня (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
+  --text-chip: #5f6b7a; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
+  /* Синий для букв и кнопок с белой подписью: #2688eb даёт лишь 3,6:1, #1260b0 — 6,3:1 на белом и 5,1:1 на цветном стекле. Фирменный #2688eb остаётся в заливках без текста (круги, кольца историй, значки цветов) */
+  --text-link: #1260b0;
+  --action-primary: #1260b0;
+  --action-primary-hover: #0c4a8f;
+  --action-primary-pressed: #08376b;
   --action-primary-text: #ffffff;
-  --chat-unread-bg: #2688eb;
+  --chat-unread-bg: #1260b0;
   --chat-unread-text: #ffffff;
   --border-focus: #2688eb;
   --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #2688eb;
   --presence-online: #4bb34b; /* точка «в сети» */
   /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%) и выбранный чипс; невыбранный чипс без заливки */
   --grad-circle: linear-gradient(135deg, rgb(45 150 245 / 0.96), rgb(20 115 225 / 0.9));
-  --grad-chip-active: linear-gradient(135deg, #3f9bf1 0%, #2688eb 100%);
+  --grad-chip-active: linear-gradient(135deg, #1b72d0 0%, #1260b0 100%); /* белая подпись ≥ 4,9:1 */
 }
 
 /* ——— Переходный слой: прежние имена переменных указывают на токены новой системы ———
@@ -440,7 +441,7 @@ html:has([data-pm]) body {
   --glass-filter-panel: blur(var(--space-6)) saturate(2);
   --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(60 80 160 / 0.2);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
-  --glass-chip-active: linear-gradient(135deg, rgb(45 150 245 / 0.97), rgb(20 115 225 / 0.97));
+  --glass-chip-active: linear-gradient(135deg, rgb(27 114 208 / 0.97), rgb(18 96 176 / 0.97)); /* белая подпись ≥ 4,9:1 */
   --glass-border-blue: rgb(255 255 255 / 0.45);
   /* Фон — прежний мягкий градиент: шесть цветных пятен на светлой основе */
   --scene:
@@ -456,8 +457,8 @@ html:has([data-pm]) body {
   --glass-bubble-in: rgb(255 255 255 / 0.78);
   /* Карточки внутри вкладок чата (тесты, сведения, заметки, события): белое стекло плотнее панелей, без размытия — позади гладкий фон */
   --glass-card: rgb(255 255 255 / 0.62);
-  --glass-bubble-out-from: var(--action-primary);
-  --glass-bubble-out-to: var(--action-primary-pressed);
+  --glass-bubble-out-from: #1b6fcb;
+  --glass-bubble-out-to: #0f4f9c;
 }
 
 [data-pm] .messages {

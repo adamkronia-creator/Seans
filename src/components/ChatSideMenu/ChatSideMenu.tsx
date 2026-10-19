@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 import { IconCloseMk, IconSearchMk } from '../ChatItem/ChatIcons';
@@ -23,7 +23,7 @@ interface ChatSideMenuProps {
   items: SideMenuItem[];
   active: string;
   onSelect: (id: string) => void;
-  /** Поиск по сообщениям: строка под вкладками */
+  /** Поиск по сообщениям: кнопка в шапке панели */
   onSearch?: () => void;
 }
 
@@ -44,20 +44,45 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     latest.current = onClose;
   });
 
-  // Закрытая панель не получает ни нажатий, ни фокуса; открытая забирает фокус и возвращает его, когда закрыта
-  useEffect(() => {
+  // Закрытая панель не получает ни нажатий, ни фокуса, а пока она открыта, недоступно всё остальное в чате (шапка, страницы, поле ввода).
+  // Layout-эффект: недоступность снимается до того, как React сфокусирует поле поиска (autoFocus) в шапке
+  useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
     el.inert = !open;
     if (!open) return;
+    const behind = [...(el.parentElement?.children ?? [])].filter((c): c is HTMLElement => c instanceof HTMLElement && c !== el);
+    behind.forEach((c) => (c.inert = true));
+    return () => behind.forEach((c) => (c.inert = false));
+  }, [open]);
+
+  // Открытая панель забирает фокус, держит его в себе (Tab ходит по кругу: крестик, поиск, вкладки) и возвращает, когда закрыта
+  useEffect(() => {
+    const el = root.current;
+    if (!el || !open) return;
     const before = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     close.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && latest.current();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') return latest.current();
+      if (e.key !== 'Tab') return;
+      const stops = [...el.querySelectorAll<HTMLElement>('button:not([disabled])')];
+      if (stops.length === 0) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const now = document.activeElement;
+      if (e.shiftKey && (now === first || !el.contains(now))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (now === last || !el.contains(now))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
       // Фокус возвращается, только если он остался в панели (закрыли крестиком, затемнением или Esc). Если он уже ушёл дальше
-      // (на поле поиска, которое открыла строка «Поиск по чату»), его не отнимаем
+      // (на поле поиска, которое открыла кнопка «Поиск по чату»), его не отнимаем
       const now = document.activeElement;
       if (!now || now === document.body || el.contains(now)) before?.focus({ preventScroll: true });
     };
@@ -127,6 +152,9 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     // Без data-no-swipe: жест «назад» от левого края (utils/edgeBack.ts) при открытой панели закрывает её, а не уводит из чата
     <div ref={root} className={`side-menu${open ? ' is-open' : ''}`}>
       <div className="side-menu__scrim" aria-hidden="true" onClick={onClose} />
+      <button ref={close} type="button" className="side-menu__close" aria-label="Закрыть меню" onClick={onClose}>
+        <IconCloseMk />
+      </button>
       <div ref={panel} className="side-menu__panel" role="dialog" aria-modal="true" aria-label="Разделы чата" aria-hidden={!open}>
         <div className="side-menu__head">
           {avatar}
@@ -157,9 +185,6 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
           ))}
         </nav>
       </div>
-      <button ref={close} type="button" className="side-menu__close" aria-label="Закрыть меню" onClick={onClose}>
-        <IconCloseMk />
-      </button>
     </div>
   );
 }

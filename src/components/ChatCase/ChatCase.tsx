@@ -2,7 +2,8 @@ import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { useState, type CSSProperties } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
-import { IconCaseEdit } from '../icons';
+import { EmptyState } from '../EmptyState/EmptyState';
+import { IconCaseEdit, IconTabInfo, IconTabNotes } from '../icons';
 import {
   blocksToText,
   paragraphsToText,
@@ -178,6 +179,9 @@ export function ChatNotes({ chatId }: { chatId: string }) {
   return (
     <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
+        {mine.length === 0 && (
+          <EmptyState icon={<IconTabNotes />} title="Заметок пока нет" text="Напишите первую в поле внизу — она появится здесь." />
+        )}
         <ul className="case-cards" hidden={mine.length === 0}>
           {mine.map((note) => (
             <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
@@ -222,6 +226,9 @@ export function ChatInfo({ chatId }: { chatId: string }) {
   return (
     <ScrollHost className="chat-case" anchorEnd>
       <div className="case-page">
+        {mine.length === 0 && (
+          <EmptyState icon={<IconTabInfo />} title="Сведений пока нет" text="Добавьте первое в поле внизу — оно появится здесь." />
+        )}
         <ul className="case-cards" hidden={mine.length === 0}>
           {mine.map((section) => (
             <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />

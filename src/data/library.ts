@@ -1,25 +1,25 @@
 import { useSyncExternalStore } from 'react';
-import smolIcon from '../assets/tests/smol.png';
-import bhsIcon from '../assets/tests/bhs.png';
-import sqIcon from '../assets/tests/sq.png';
-import ittIcon from '../assets/tests/itt.png';
-import bdiIcon from '../assets/tests/bdi.png';
-import itoIcon from '../assets/tests/ito.png';
-import ocrIcon from '../assets/tests/ocr.png';
-import phq9Icon from '../assets/tests/phq9.png';
-import gad7Icon from '../assets/tests/gad7.png';
-import rsesIcon from '../assets/tests/rses.png';
-import pfqIcon from '../assets/tests/5pfq.png';
-import scl90Icon from '../assets/tests/scl90.png';
-import evidenceIcon from '../assets/tasks/evidence.png';
-import pieIcon from '../assets/tasks/pie.png';
-import smerIcon from '../assets/tasks/smer.png';
-import activationIcon from '../assets/tasks/activation.png';
-import worryIcon from '../assets/tasks/worry.png';
-import shouldIcon from '../assets/tasks/should.png';
-import choiceIcon from '../assets/tasks/choice.png';
-import phraseIcon from '../assets/tasks/phrase.png';
-import secretIcon from '../assets/tasks/secret.png';
+import smolIcon from '../assets/tests/smol.webp';
+import bhsIcon from '../assets/tests/bhs.webp';
+import sqIcon from '../assets/tests/sq.webp';
+import ittIcon from '../assets/tests/itt.webp';
+import bdiIcon from '../assets/tests/bdi.webp';
+import itoIcon from '../assets/tests/ito.webp';
+import ocrIcon from '../assets/tests/ocr.webp';
+import phq9Icon from '../assets/tests/phq9.webp';
+import gad7Icon from '../assets/tests/gad7.webp';
+import rsesIcon from '../assets/tests/rses.webp';
+import pfqIcon from '../assets/tests/5pfq.webp';
+import scl90Icon from '../assets/tests/scl90.webp';
+import evidenceIcon from '../assets/tasks/evidence.webp';
+import pieIcon from '../assets/tasks/pie.webp';
+import smerIcon from '../assets/tasks/smer.webp';
+import activationIcon from '../assets/tasks/activation.webp';
+import worryIcon from '../assets/tasks/worry.webp';
+import shouldIcon from '../assets/tasks/should.webp';
+import choiceIcon from '../assets/tasks/choice.webp';
+import phraseIcon from '../assets/tasks/phrase.webp';
+import secretIcon from '../assets/tasks/secret.webp';
 
 export type TestCategory = 'training' | 'svo';
 export type TaskCategory = 'practice' | 'hospital';
@@ -48,7 +48,7 @@ export type LibraryTest = LibraryItem<TestCategory>;
 
 // Библиотека всех тестов приложения; порядок как в макете
 export const LIBRARY: LibraryTest[] = [
-  { id: 'smol', title: 'Сокращенный многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#A8E4A0', categories: ['training', 'svo'] },
+  { id: 'smol', title: 'Сокращённый многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', icon: smolIcon, tint: '#A8E4A0', categories: ['training', 'svo'] },
   { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', icon: bhsIcon, tint: '#FFDB8B', categories: ['svo'] },
   { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', icon: sqIcon, tint: '#FAD6A5', categories: ['training'] },
   { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', icon: ittIcon, tint: '#FCDD76', categories: ['training', 'svo'] },

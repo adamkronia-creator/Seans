@@ -35,13 +35,13 @@ export function useMessages(chatId: string): MessageGroup[] {
   return useSyncExternalStore(subscribe, () => messages[chatId] ?? NO_MESSAGES);
 }
 
-/** Сколько всего непрочитанных сообщений: число на значке вкладки «Диалоги» (чаты в архиве не считаются) */
+/** Сколько чатов с непрочитанными: число на значке вкладки «Диалоги», в той же единице, что и на чипсах (архив и «Избранное» не считаются) */
 export function useUnreadTotal(): number {
   return useSyncExternalStore(subscribe, () => unreadTotal(chats));
 }
 let unreadMemo: { chats: Chat[]; total: number } | null = null;
 function unreadTotal(list: Chat[]) {
-  if (unreadMemo?.chats !== list) unreadMemo = { chats: list, total: list.filter((c) => !c.archived).reduce((sum, c) => sum + c.unread, 0) };
+  if (unreadMemo?.chats !== list) unreadMemo = { chats: list, total: list.filter((c) => !c.archived && !c.favorites && c.unread > 0).length };
   return unreadMemo.total;
 }
 

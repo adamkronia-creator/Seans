@@ -36,7 +36,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
           onClick={() => onChange(id)}
           aria-label={label}
           aria-current={id === active ? 'page' : undefined}
-          aria-description={id === 'messages' && unread > 0 ? `Непрочитанных: ${unread}` : undefined}
+          aria-description={id === 'messages' && unread > 0 ? `Непрочитанных чатов: ${unread}` : undefined}
         >
           <span className="tabbar__icon">
             <Icon />

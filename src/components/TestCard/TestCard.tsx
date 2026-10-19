@@ -15,7 +15,7 @@ export function TestCard({ test, onClick }: TestCardProps) {
           className="test-card__avatar"
           style={{ '--tint': test.tint } as CSSProperties}
         >
-          <img className="test-card__icon" src={test.icon} alt="" />
+          <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />
         </span>
         <span className="test-card__body">
           <span className="test-card__top">

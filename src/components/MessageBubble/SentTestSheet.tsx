@@ -26,7 +26,7 @@ interface Row {
 }
 
 /**
- * Окно «Настройки теста» под карточкой отправленного клиенту теста: с какими настройками он ушел.
+ * Окно «Настройки теста» под карточкой отправленного клиенту теста: с какими настройками он ушёл.
  * Только просмотр: тест уже у клиента, поменять настройки нельзя (для другого набора отправляют тест заново).
  */
 export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
@@ -65,7 +65,7 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
               </li>
             ))}
           </ul>
-          <p className="sent-sheet__hint">Так тест ушел клиенту. Чтобы отправить с другими настройками, отправьте его заново.</p>
+          <p className="sent-sheet__hint">Так тест ушёл клиенту. Чтобы отправить с другими настройками, отправьте его заново.</p>
         </div>
         <div className="sheet__footer">
           <button type="button" className="sheet__button" onClick={onClose}>

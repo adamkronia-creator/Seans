@@ -2,7 +2,7 @@ import { Fragment, useState, type ReactNode } from 'react';
 import type { TestBlankData } from '../../data/testBlank';
 import './TestBlank.css';
 
-/** Карточка бланка, настройки или заключения: заголовок и содержимое; сворачивать ее не нужно, всё всегда раскрыто */
+/** Карточка бланка, настройки или заключения: заголовок и содержимое; сворачивать её не нужно, всё всегда раскрыто */
 export function CollapseCard({ title, badge, help, id, children }: { title: string; badge?: ReactNode; /** «?» сразу за названием */ help?: ReactNode; id?: string; children: ReactNode }) {
   return (
     <section className="blank-card" id={id}>
