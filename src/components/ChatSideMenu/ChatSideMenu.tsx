@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
-import { IconCloseMk, IconSearchMk } from '../ChatItem/ChatIcons';
+import { IconArchiveMk, IconBellMk, IconCalendarMk, IconCardMk, IconCloseMk, IconFolderMk, IconHelpMk, IconSearchMk } from '../ChatItem/ChatIcons';
 import './ChatSideMenu.css';
 
 export interface SideMenuItem {
@@ -25,6 +25,32 @@ interface ChatSideMenuProps {
   onSelect: (id: string) => void;
   /** Поиск по сообщениям: кнопка в шапке панели */
   onSearch?: () => void;
+}
+
+/** Пункты, которых пока нет: показаны приглушёнными с пометкой «Скоро», нажатия не принимают */
+const SOON_CLIENT: { label: string; icon: ReactNode }[] = [
+  { label: 'Расписание', icon: <IconCalendarMk /> },
+  { label: 'Файлы', icon: <IconFolderMk /> },
+  { label: 'Оплата', icon: <IconCardMk /> },
+];
+const SOON_CHAT: { label: string; icon: ReactNode }[] = [
+  { label: 'Уведомления', icon: <IconBellMk /> },
+  { label: 'В архив', icon: <IconArchiveMk /> },
+  { label: 'Помощь', icon: <IconHelpMk /> },
+];
+
+function SoonGroup({ label, items }: { label: string; items: { label: string; icon: ReactNode }[] }) {
+  return (
+    <nav className="side-menu__list" aria-label={label}>
+      {items.map((item) => (
+        <button key={item.label} type="button" className="side-menu__item side-menu__item--soon" disabled>
+          {item.icon}
+          <span className="side-menu__label">{item.label}</span>
+          <span className="side-menu__soon">Скоро</span>
+        </button>
+      ))}
+    </nav>
+  );
 }
 
 /* Закрытие свайпом вправо — по общим порогам всех жестов (utils/swipe.ts): 30% ширины экрана с учётом скорости */
@@ -169,6 +195,8 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
           )}
         </div>
 
+        <hr className="side-menu__rule" />
+
         <nav className="side-menu__list" aria-label="Разделы">
           {items.map(({ id, label, icon, count }) => (
             <button
@@ -184,6 +212,14 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
             </button>
           ))}
         </nav>
+
+        <hr className="side-menu__rule" />
+        <SoonGroup label="О клиенте" items={SOON_CLIENT} />
+
+        <div className="side-menu__bottom">
+          <hr className="side-menu__rule" />
+          <SoonGroup label="Чат" items={SOON_CHAT} />
+        </div>
       </div>
     </div>
   );

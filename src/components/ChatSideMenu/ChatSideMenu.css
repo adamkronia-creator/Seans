@@ -42,7 +42,7 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   /* Левый край панели — на левом краю самых широких исходящих сообщений психолога (пузырь до 85% ширины ленты с полями space-4) */
   width: calc((100% - var(--space-8)) * 0.85 + var(--space-4) + 1px);
   padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) calc(var(--safe-bottom) + var(--space-4)) var(--space-3);
@@ -140,7 +140,23 @@
   background: var(--glass-solid); /* белый круг, как у кнопки поиска (на затемнении без заливки он сер) */
 }
 
-/* Вкладки: пилюли высотой 48; выбранная залита синим стеклом, как выбранный чипс в «Диалогах» */
+/* Группы пунктов разделены линиями 1 px (под пользователем, между группами) */
+.side-menu__rule {
+  flex-shrink: 0;
+  height: var(--hairline);
+  margin: 0 var(--space-3) 0 var(--space-1);
+  border: 0;
+  background: var(--border-subtle);
+}
+
+.side-menu__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: auto; /* последняя группа прижата к низу панели */
+}
+
+/* Пункты: высота 44, значок 24 и подпись; у выбранной вкладки заливка идёт до правого края экрана (поле панели справа гасится отрицательным отступом) */
 .side-menu__list {
   display: flex;
   flex-direction: column;
@@ -153,7 +169,7 @@
   gap: var(--space-3);
   box-sizing: border-box;
   width: 100%;
-  height: var(--size-avatar);
+  height: var(--size-touch);
   padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
@@ -164,7 +180,9 @@
 }
 
 .side-menu__item > svg {
-  display: none; /* у вкладок значков нет: подпись и число */
+  flex-shrink: 0;
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
 }
 
 .side-menu__label {
@@ -175,20 +193,25 @@
   white-space: nowrap;
 }
 
-
 .side-menu__item:active {
   background: var(--glass);
 }
 
 @media (hover: hover) {
-  .side-menu__item:hover {
+  .side-menu__item:hover:not(:disabled) {
     background: var(--glass);
   }
 }
 
+/* Выбранная вкладка: синее стекло, слева скруглено, справа уходит за край экрана */
 .side-menu__item--active,
 .side-menu__item--active:active {
+  width: calc(100% + var(--space-4));
+  margin-right: calc(var(--space-4) * -1);
+  padding-right: calc(var(--space-4) + var(--space-4));
   border-color: var(--glass-border-blue);
+  border-right: 0;
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
   background: var(--glass-chip-active);
   color: var(--action-primary-text);
 }
@@ -203,7 +226,7 @@
   color: var(--action-primary-text);
 }
 
-/* Счётчик на выбранной вкладке (синее стекло): светлый кружок, как на выбранном чипсе */
+/* Счётчик на выбранной вкладке: светлый кружок, как на выбранном чипсе */
 .side-menu__item--active .badge {
   background: var(--action-primary-text);
   color: var(--action-primary);
@@ -213,14 +236,20 @@
   flex-shrink: 0;
 }
 
-/* Поиск — действие, а не вкладка: отдельно от списка, без заливки */
-.side-menu__item--action {
-  margin-top: auto;
-  color: var(--text-link);
+/* Пока не работает: приглушён, с пометкой «Скоро» */
+.side-menu__item--soon {
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
-.side-menu__item--action > svg {
-  color: var(--text-link);
+.side-menu__item--soon > svg {
+  opacity: 0.7;
+}
+
+.side-menu__soon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font: var(--type-meta);
 }
 
 .side-menu__close:focus-visible,

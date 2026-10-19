@@ -84,3 +84,38 @@ export const IconMenuMk = (p: SVGProps<SVGSVGElement>) => (
     <path d="M4 7H20M4 12H20M4 17H13" />
   </svg>
 );
+
+/** Календарь: «Расписание» в боковой панели чата */
+export const IconCalendarMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4.5" width="18" height="16.5" rx="3.5" />
+    <path d="M3 9.5H21" />
+    <path d="M8 2.5V6" />
+    <path d="M16 2.5V6" />
+  </svg>
+);
+
+/** Папка: «Файлы» */
+export const IconFolderMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M3 8.5C3 6.3 3 5.2 3.7 4.5C4.4 3.8 5.5 3.8 7.7 3.8H8.6C9.4 3.8 9.8 3.8 10.2 4C10.6 4.2 10.9 4.5 11.4 5.2L12 6H16.3C18.5 6 19.6 6 20.3 6.7C21 7.4 21 8.5 21 10.7V15.5C21 18.3 21 19.7 20.1 20.6C19.2 21.5 17.8 21.5 15 21.5H9C6.2 21.5 4.8 21.5 3.9 20.6C3 19.7 3 18.3 3 15.5V8.5Z" />
+  </svg>
+);
+
+/** Банковская карта: «Оплата» */
+export const IconCardMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
+    <path d="M2.5 10H21.5" />
+    <path d="M6.5 15H10" />
+  </svg>
+);
+
+/** Вопрос в круге: «Помощь» */
+export const IconHelpMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9.5" />
+    <path d="M9.5 9.5C9.5 8.1 10.6 7 12 7C13.4 7 14.5 8.1 14.5 9.4C14.5 11.4 12 11.5 12 13.5" />
+    <path d="M12 16.6V16.7" />
+  </svg>
+);
