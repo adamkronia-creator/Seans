@@ -71,6 +71,7 @@
 .side-menu__head .avatar {
   --avatar-size: var(--size-avatar-sm);
   --presence-inset: 1.5px;
+  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
 .side-menu__who {
@@ -99,7 +100,8 @@
   font-weight: 400;
 }
 
-.side-menu__close {
+.side-menu__close,
+.side-menu__search {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -115,7 +117,25 @@
   backdrop-filter: var(--glass-filter);
 }
 
-.side-menu__close:active {
+/* Крестик стоит вне панели, на затемнении слева от неё, на уровне фото (в самой панели его срезала бы прокрутка); появляется вместе с панелью */
+.side-menu__close {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--space-4));
+  right: calc(min(calc(var(--space-16) * 5), calc(100% - var(--space-12))) + var(--space-1));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.side-menu.is-open .side-menu__close {
+  opacity: 1;
+}
+
+.side-menu[data-dragging] .side-menu__close {
+  opacity: 0;
+}
+
+.side-menu__close:active,
+.side-menu__search:active {
   background: var(--glass-solid);
 }
 

@@ -61,6 +61,9 @@ function sameRun(a: Message | undefined, b: Message | undefined) {
   return d >= 0 && d < 5;
 }
 
+/** Подпись под именем: вид диалога (в сети показывает зелёная точка у фото) */
+const KIND: Record<string, string> = { clients: 'Клиент', colleagues: 'Коллега', seminars: 'Семинар' };
+
 const MENU_W = 196;
 const MENU_ITEM_H = 44;
 
@@ -434,7 +437,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   }));
 
   // Подпись под именем: в диалоге — состояние собеседника, в остальных вкладках — название вкладки (чипсов разделов в шапке больше нет)
-  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : chat.online ? 'в сети' : 'был(а) недавно';
+  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : (KIND[chat.category ?? ''] ?? 'Диалог');
   const subtitle = section === 'messages' ? status : (sections.find((item) => item.id === section)?.label ?? '');
   const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />;
 

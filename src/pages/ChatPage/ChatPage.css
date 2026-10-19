@@ -59,6 +59,8 @@
 .chat__top .avatar {
   --avatar-size: var(--size-avatar-sm);
   --presence-inset: 1.5px;
+  /* Центр выреза в фото считается от отступа метки; на этом элементе пересчитывается заново (иначе остаётся от отступа 2,5) */
+  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
 .chat__who {

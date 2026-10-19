@@ -138,9 +138,11 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
             <span className="side-menu__name">{name}</span>
             <span className="side-menu__status">{status}</span>
           </div>
-          <button ref={close} type="button" className="side-menu__close" aria-label="Закрыть меню" onClick={onClose}>
-            <IconCloseMk />
-          </button>
+          {onSearch && (
+            <button type="button" className="side-menu__search" aria-label="Поиск по чату" onClick={onSearch}>
+              <IconSearchMk />
+            </button>
+          )}
         </div>
 
         <nav className="side-menu__list" aria-label="Разделы">
@@ -158,14 +160,10 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
             </button>
           ))}
         </nav>
-
-        {onSearch && (
-          <button type="button" className="side-menu__item side-menu__item--action" onClick={onSearch}>
-            <IconSearchMk />
-            <span className="side-menu__label">Поиск по чату</span>
-          </button>
-        )}
       </div>
+      <button ref={close} type="button" className="side-menu__close" aria-label="Закрыть меню" onClick={onClose}>
+        <IconCloseMk />
+      </button>
     </div>
   );
 }

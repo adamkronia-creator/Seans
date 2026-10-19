@@ -90,7 +90,10 @@
 /* Компактные строки «Архивы» и «Избранное» (макет): высота аватара, поля только по бокам; промежуток между ними и отступы задаёт список */
 .chat-item--compact .chat-item__button {
   min-height: var(--size-avatar);
-  padding: 0 var(--space-4);
+  /* Область нажатия та же, что у обычной строки (48 + по 8 сверху и снизу), а положение строки в списке прежнее: поля уходят в отрицательный отступ */
+  margin: calc(var(--space-2) * -1) 0;
+  padding: var(--space-2) var(--space-4);
+  box-sizing: content-box;
 }
 
 .chat-item--archive {
