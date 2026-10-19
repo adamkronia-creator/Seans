@@ -164,7 +164,7 @@
 .messages__divider {
   height: var(--hairline);
   margin: var(--space-3) var(--space-4) var(--space-1);
-  background: var(--border-subtle);
+  background: var(--divider);
 }
 
 /* Пустой раздел: пустое состояние стоит по центру места между шапкой и нижней панелью */

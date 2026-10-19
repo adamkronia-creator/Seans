@@ -23,7 +23,7 @@
   gap: var(--space-1);
   padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-2);
   background: var(--bg-bar);
-  border-bottom: var(--hairline) solid var(--border-subtle);
+  border-bottom: var(--hairline) solid var(--divider);
 }
 
 .archive__back {

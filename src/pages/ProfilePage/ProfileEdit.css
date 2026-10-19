@@ -308,7 +308,7 @@
 
 /* ——— Редактирование в стиле «Диалогов» (data-pm): стеклянная шапка, карточки с полями 16 и скруглением 20, Inter ——— */
 [data-pm] .pe__header {
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
@@ -361,7 +361,7 @@
 
 [data-pm] .pe__row + .pe__row::before,
 [data-pm] .pe__input + .pe__input::before {
-  background: var(--border-subtle);
+  background: var(--divider);
 }
 
 [data-pm] .pe__row[data-pressed] {
@@ -424,7 +424,7 @@
 }
 
 [data-pm] .pe__field-head {
-  border-bottom-color: var(--border-subtle);
+  border-bottom-color: var(--divider);
 }
 
 [data-pm] .pe__tool {

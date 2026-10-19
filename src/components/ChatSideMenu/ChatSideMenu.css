@@ -146,7 +146,7 @@
   height: var(--hairline);
   margin: 0 var(--space-3) 0 var(--space-1);
   border: 0;
-  background: var(--border-subtle);
+  background: var(--divider);
 }
 
 .side-menu__bottom {

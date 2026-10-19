@@ -495,7 +495,7 @@
 }
 
 [data-pm] .profile__stat + .profile__stat {
-  border-left-color: var(--border-subtle);
+  border-left-color: var(--divider);
 }
 
 [data-pm] .profile__stat strong {
@@ -558,12 +558,12 @@
 [data-pm] .profile__fields li + li::before,
 [data-pm] .profile__add,
 [data-pm] .profile__more {
-  border-color: var(--border-subtle);
+  border-color: var(--divider);
   background-color: transparent;
 }
 
 [data-pm] .profile__fields li + li::before {
-  background: var(--border-subtle);
+  background: var(--divider);
 }
 
 [data-pm] .profile__field[data-pressed],
@@ -584,5 +584,5 @@
 }
 
 [data-pm] .profile__drop {
-  border-color: var(--border-subtle);
+  border-color: var(--divider);
 }

@@ -333,7 +333,7 @@
 [data-pm] .rich-toolbar {
   padding: var(--space-3);
   border: 0;
-  border-top: 1px solid var(--glass-border);
+  border-top: 1px solid var(--divider);
   border-radius: 0;
   background: var(--glass-plain, #ffffff);
 }
@@ -353,7 +353,7 @@
   /* Разделитель 0,5 px под строкой: 12 над ним и 12 под ним */
   margin-top: var(--space-3);
   padding: var(--space-3) 0 0;
-  border-top: 0.5px solid rgb(60 60 67 / 0.35);
+  border-top: 0.5px solid var(--divider);
   row-gap: calc((100cqw - var(--cols) * 36px) / (var(--cols) - 1));
 }
 
