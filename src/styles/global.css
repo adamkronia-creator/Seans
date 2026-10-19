@@ -194,3 +194,9 @@ html.is-grabbing * {
   display: flex;
   flex-direction: column;
 }
+
+/* Переносов по слогам в приложении нет: слова переносятся на следующую строку целиком */
+* {
+  hyphens: none;
+  -webkit-hyphens: none;
+}

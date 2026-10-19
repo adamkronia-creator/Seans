@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
-import { IconArchiveMk, IconBellMk, IconCalendarMk, IconCardMk, IconCloseMk, IconFolderMk, IconHelpMk, IconSearchMk } from '../ChatItem/ChatIcons';
+import { IconCalendarMk, IconCardMk, IconCloseMk, IconFolderMk, IconGearMk, IconHelpMk, IconSearchMk } from '../ChatItem/ChatIcons';
 import './ChatSideMenu.css';
 
 export interface SideMenuItem {
@@ -23,6 +23,8 @@ interface ChatSideMenuProps {
   items: SideMenuItem[];
   active: string;
   onSelect: (id: string) => void;
+  /** Свайп вверх или вниз по открытой панели: другая вкладка, панель остаётся открытой */
+  onSwitch?: (id: string) => void;
   /** Поиск по сообщениям: кнопка в шапке панели */
   onSearch?: () => void;
 }
@@ -34,8 +36,7 @@ const SOON_CLIENT: { label: string; icon: ReactNode }[] = [
   { label: 'Оплата', icon: <IconCardMk /> },
 ];
 const SOON_CHAT: { label: string; icon: ReactNode }[] = [
-  { label: 'Уведомления', icon: <IconBellMk /> },
-  { label: 'В архив', icon: <IconArchiveMk /> },
+  { label: 'Настройки', icon: <IconGearMk /> },
   { label: 'Помощь', icon: <IconHelpMk /> },
 ];
 
@@ -53,6 +54,9 @@ function SoonGroup({ label, items }: { label: string; items: { label: string; ic
   );
 }
 
+/** Путь пальца по вертикали, с которого свайп по панели меняет вкладку */
+const SWITCH_DISTANCE = 48;
+
 /* Закрытие свайпом вправо — по общим порогам всех жестов (utils/swipe.ts): 30% ширины экрана с учётом скорости */
 
 /**
@@ -60,14 +64,20 @@ function SoonGroup({ label, items }: { label: string; items: { label: string; ic
  * Вкладку можно выбрать здесь или листать страницы чата пальцем, как раньше. Закрывается нажатием на затемнение, крестиком,
  * жестом вправо, Esc и жестом «назад» (его подключает чат через useBackHandler). Всегда в разметке, пока закрыта — недоступна (inert).
  */
-export function ChatSideMenu({ open, onClose, avatar, name, status, items, active, onSelect, onSearch }: ChatSideMenuProps) {
+export function ChatSideMenu({ open, onClose, avatar, name, status, items, active, onSelect, onSwitch, onSearch }: ChatSideMenuProps) {
   const root = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const close = useRef<HTMLButtonElement>(null);
   // Обработчик может меняться при каждой перерисовке чата: эффекты ниже держат свежий, а сами не перезапускаются
   const latest = useRef(onClose);
+  const step = useRef<(dir: 1 | -1) => void>(() => {});
   useEffect(() => {
     latest.current = onClose;
+    // Вверх — следующая вкладка, вниз — предыдущая; на краях остаётся на месте
+    step.current = (dir) => {
+      const i = items.findIndex((x) => x.id === active) + dir;
+      if (i >= 0 && i < items.length) onSwitch?.(items[i].id);
+    };
   });
 
   // Закрытая панель не получает ни нажатий, ни фокуса, а пока она открыта, недоступно всё остальное в чате (шапка, страницы, поле ввода).
@@ -114,6 +124,20 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     };
   }, [open]);
 
+  // Браузер не должен забирать вертикальный жест себе (иначе придёт pointercancel и свайп вкладок не сработает): пока панель
+  // не прокручивается, жест отдан нам; на низком экране, где прокрутка нужна, она остаётся браузерной
+  useEffect(() => {
+    const el = panel.current;
+    if (!el) return;
+    const sync = () => {
+      el.style.touchAction = el.scrollHeight > el.clientHeight ? '' : 'none';
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Жест вправо по панели закрывает её: панель едет за пальцем, затемнение светлеет
   useEffect(() => {
     const el = panel.current;
@@ -121,12 +145,14 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     if (!el || !host) return;
     let start: { id: number; x: number; y: number; t: number } | null = null;
     let dragging = false;
+    let vertical = false;
     let dx = 0;
     let speed = new VelocityTracker();
 
     const reset = () => {
       start = null;
       dragging = false;
+      vertical = false;
       dx = 0;
       delete host.dataset.dragging;
       el.style.transform = '';
@@ -143,7 +169,9 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
       const my = e.clientY - start.y;
       if (!dragging) {
         if (Math.abs(my) > SWIPE_SLOP && Math.abs(my) > Math.abs(mx)) {
-          start = null; // это прокрутка списка
+          // Если панель прокручивается (низкий экран), это прокрутка; иначе жест переключает вкладки
+          if (el.scrollHeight > el.clientHeight) start = null;
+          else vertical = true;
           return;
         }
         if (mx < SWIPE_SLOP || mx < Math.abs(my) * SWIPE_DOMINANCE) return;
@@ -158,6 +186,12 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     };
     const up = (e: PointerEvent) => {
       if (!start || e.pointerId !== start.id) return;
+      if (vertical) {
+        const my = e.clientY - start.y;
+        reset();
+        if (Math.abs(my) >= SWITCH_DISTANCE) step.current(my < 0 ? 1 : -1);
+        return;
+      }
       const shouldClose = dragging && swipeCommits(dx, speed.velocity(e.timeStamp));
       reset();
       if (shouldClose) latest.current();

@@ -538,6 +538,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           setSection(id as SectionId);
           setMenuOpen(false);
         }}
+        onSwitch={(id) => setSection(id as SectionId)}
         onSearch={openSearch}
       />
 
