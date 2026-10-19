@@ -70,3 +70,17 @@ export const IconCloseMk = (p: SVGProps<SVGSVGElement>) => (
     <path d="M5 5L19 19M19 5L5 19" />
   </svg>
 );
+
+/** Назад: шеврон влево */
+export const IconBackMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M15 5L8 12L15 19" />
+  </svg>
+);
+
+/** Боковое меню: три линии, нижняя короче */
+export const IconMenuMk = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M4 7H20M4 12H20M4 17H13" />
+  </svg>
+);

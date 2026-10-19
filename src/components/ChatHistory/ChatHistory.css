@@ -1,15 +1,16 @@
 /*
- * Вкладка «История взаимодействия»: сверху лента событий (свежие внизу), под ней чипсы, в самом низу сводка.
- * Лента — страница без своих рамок: сверху её ограничивает линия шапки, снизу линия панели чипсов. События — строки,
- * разделённые тонкой линией от текста до края; слева круги цвета типа на сплошной линии времени.
- * Чипсы и сводка — закреплённая панель, как поле ввода в переписке.
+ * Вкладка «История взаимодействия» на системе мессенджера: сверху лента событий (свежие внизу), под ней стеклянная панель с чипсами-фильтрами
+ * и сводкой, ниже нижняя капсула приложения. События — карточки белого стекла, слева круги цвета типа на сплошной линии времени.
  * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому лента при листании уходит к краю экрана, а не обрезается у поля.
+ * Верхний отступ ленты (под шапку) задаёт ChatPage.css. Размеры — токены сетки 4; вне сетки метки и линии (22×6, 20, 1,5).
  */
 .hist-host {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  /* Снизу место под нижнюю капсулу приложения */
+  padding-bottom: var(--page-bottom, 0px);
 }
 
 .chat-history {
@@ -24,24 +25,36 @@
   flex-shrink: 0;
 }
 
-/* Страница ленты: своя прокрутка. Свежее внизу, как в переписке: пока событий мало, лента лежит у чипсов (margin, а не justify-content: верх длинной ленты остался бы недоступен) */
+/* Страница ленты: своя прокрутка. Свежее внизу, как в переписке: пока событий мало, лента лежит у панели (margin, а не justify-content: верх длинной ленты остался бы недоступен) */
 .chat-history > .hist-page {
   margin-top: auto;
 }
 
 .hist-page {
-  padding: var(--band-gap) 0;
+  padding: 0 0 var(--space-4);
 }
 
-/* Чипсы и учёт закреплены под лентами, как поле ввода под перепиской: белая панель во всю ширину со своей линией сверху */
+/* Событий нет: надпись по центру свободного места, а не прижата к панели фильтров */
+.chat-history > .hist-page:has(.hist-empty) {
+  margin-block: auto;
+}
+
+/* Чипсы и сводка закреплены под лентами в стеклянной панели: поля space-4 от краёв экрана, как у нижней капсулы */
 .hist-foot {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4) var(--space-2);
-  border-top: var(--hairline) solid var(--color-divider);
-  background: var(--color-bg-panel);
+  margin: 0 var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
 /* Сводка: пять колонок — над числом метка цвета типа, число крупно, под ним подпись; без своей карточки, это часть панели */
@@ -54,7 +67,7 @@
 }
 
 .hist-stats__item {
-  --tick: var(--color-bg-fill-strong);
+  --tick: var(--border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,7 +75,7 @@
   min-width: 0;
 }
 
-/* Метка 22×6 цвета типа с тонким кантом: самые светлые тона (заметка) не пропадают на бумаге */
+/* Метка 22×6 цвета типа с тонким кантом: самые светлые тона (заметка) не пропадают на светлом стекле */
 .hist-stats__item::before {
   content: '';
   width: 22px;
@@ -93,84 +106,82 @@
   --tick: var(--tone-note);
 }
 
-.hist-stats__value {
+.chat .hist-stats__value {
   display: flex;
   align-items: baseline;
-  font-size: var(--font-size-xl);
+  color: var(--text-primary);
+  font: var(--type-title);
   font-variant-numeric: tabular-nums;
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-xl);
-  letter-spacing: var(--letter-spacing-display);
+  letter-spacing: 0;
 }
 
 .hist-stats__total {
   margin-left: 1px;
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  font: var(--type-caption);
   line-height: 1;
-  letter-spacing: 0;
 }
 
 .hist-stats__label {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+  font-weight: 400;
 }
 
-/* Узкий экран: подписи «Задания» и «Сведения» без запаса касались бы друг друга */
-@media (max-width: 359px) {
-  .hist-stats__label {
-    font-size: var(--font-size-2xs);
-  }
-
-  .hist-stats__value {
-    font-size: var(--font-size-lg);
-  }
-}
-
-/* Чипсы — те же, что на главном экране; уходят вбок за край экрана. Двигает их скрипт (data-hscroll, SwipePager),
-   а не браузер: иначе боковое движение пальца по ним не дошло бы до листания разделов, когда чипсы дошли до края */
+/* Чипсы фильтров: как в «Диалогах» — невыбранные без заливки, выбранный залит цветом своего типа (тот же, что у круга события).
+   Уходят вбок за край панели. Двигает их скрипт (data-hscroll, SwipePager), а не браузер: иначе боковое движение пальца по ним
+   не дошло бы до листания разделов, когда чипсы дошли до края */
 .hist-chips {
   display: flex;
-  margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4);
+  margin: 0 calc(var(--space-3) * -1);
+  padding: 0 var(--space-3);
   overflow-x: hidden;
   scrollbar-width: none;
+  /* Подпись невыбранного — тот же серо-синий, что в «Диалогах» (на стекле над цветным фоном светло-серый не читается) */
+  --color-text-secondary: var(--text-chip);
 }
 
-/* Лента от края до края; значки слева (x 16), линия по центру значков, текст событий от x 52 */
+/* Чипсы не «капсула» с раскрывающимися стыками, а обычные пилюли с постоянным зазором space-1 */
+.chat .hist-chips .chip {
+  margin-right: var(--space-1);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.chat .hist-chips .chip:last-child {
+  margin-right: 0;
+}
+
+/* Выбранный чипс вида (сеансы, тесты, задания, заметки) залит пастелью, подпись на ней чернильная: «чернила на пастели» в новой системе белые
+   (так подписан синий чипс «Диалогов»), а белое на розовом и бежевом не читается. У «Все» тона нет, он остаётся синим с белой подписью */
+.hist-chips .chip[data-tone] {
+  --chip-on: var(--text-primary);
+}
+
+/* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 */
 .hist-timeline {
   display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
   flex-direction: column;
-  background: var(--color-bg-panel);
 }
 
 .hist-item {
   position: relative;
-  padding: 0 var(--space-4) 0 52px;
+  padding: 0 var(--space-4) var(--space-3) 52px;
 }
 
-/* Между событиями тонкая линия от текста до правого края: левее неё идёт сплошная линия времени */
-.hist-item + .hist-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 52px;
-  height: var(--hairline);
-  background: var(--color-divider);
+.hist-item:last-child {
+  padding-bottom: 0;
 }
 
 /* Рейка слева от события: значок 20 на уровне названия и под ним линия до значка следующего события.
-   Рейка тянется от значка этого события до значка следующего (вниз на отступ значка от верха строки),
+   Рейка тянется от значка этого события до значка следующего (вниз на отступ значка от верха карточки),
    поэтому линия не обрывается: прерывают её только значки, за 4 px до значка и через 4 px после.
    У последнего события линии нет */
 .hist-rail {
-  --marker-top: 13px;
+  --marker-top: 14px;
   position: absolute;
   top: var(--marker-top);
   bottom: calc(var(--marker-top) * -1);
@@ -191,13 +202,13 @@
   min-height: 0;
   margin: var(--space-1) 0;
   border-radius: 1px;
-  background: rgb(81 110 110 / 20%); /* серо-синяя дымка: на фоне приложения даёт спокойную линию, не серую полосу */
+  background: rgb(107 117 133 / 35%); /* серо-синяя дымка text-icon: на цветном фоне даёт спокойную линию */
 }
 
 /* Круг 20 цвета типа события: те же тона, что у чипсов разделов (сеанс — бирюзовый, тест — розовый, задание — зелёный,
    заметка — тёплый, приглашение — голубой). Знак на круге чернильный: на пастели читается любой знак */
 .hist-marker {
-  --marker-bg: var(--color-bg-fill);
+  --marker-bg: var(--bg-subtle);
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -206,7 +217,8 @@
   height: 20px;
   border-radius: 50%;
   background: var(--marker-bg);
-  color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--glass-border);
+  color: var(--text-primary);
 }
 
 .hist-marker--invite {
@@ -237,7 +249,7 @@
 
 /* Ждёт выполнения: круг бледнее и в кольце цвета типа, внутри часы (на пройденном — знак типа) */
 .hist-marker--pending {
-  background: color-mix(in srgb, var(--marker-bg) 38%, var(--color-bg-app));
+  background: color-mix(in srgb, var(--marker-bg) 38%, #ffffff);
   box-shadow: inset 0 0 0 1.5px var(--marker-bg);
 }
 
@@ -247,9 +259,9 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  font-size: var(--font-size-xs);
+  font: var(--type-meta);
   font-variant-numeric: proportional-nums;
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -265,12 +277,15 @@
   }
 }
 
-/* Событие: строка полосы без своей рамки, отступы сверху и снизу 12 */
+/* Событие: карточка белого стекла, поля 12 и 16 */
 .hist-card {
   touch-action: manipulation; /* двойное касание открывает редактор, а не масштабирует */
   display: flex;
   flex-direction: column;
-  padding: var(--space-3) 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
 }
 
 .hist-card__top {
@@ -279,14 +294,13 @@
   align-items: flex-start;
 }
 
-.hist-card__title {
+.chat .hist-card__title {
   flex: 1;
   min-width: 0;
   margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
-  letter-spacing: var(--letter-spacing-title);
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
 }
 
 .hist-card__title--single {
@@ -298,9 +312,19 @@
 .hist-card__edit {
   display: flex;
   flex-shrink: 0;
-  margin: 1px 0;
-  color: var(--color-text-placeholder);
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  margin: calc(var(--space-2) * -1) calc(var(--space-3) * -1) calc(var(--space-2) * -1) 0;
+  border-radius: var(--radius-full);
+  color: var(--text-icon);
   font-size: var(--size-icon-sm);
+}
+
+.hist-card__edit:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* Дата и автор в одной строке через точку */
@@ -309,10 +333,10 @@
   flex-wrap: wrap;
   gap: 0 6px;
   margin: 0 0 var(--space-2);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font: var(--type-caption);
   font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-xs);
+  font-weight: 400;
 }
 
 .hist-card__date span + span::before {
@@ -320,10 +344,10 @@
   margin-right: 6px;
 }
 
-.hist-card__text {
+.chat .hist-card__text {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  color: var(--text-primary);
+  font: var(--type-body);
 }
 
 .hist-flow {
@@ -332,10 +356,13 @@
   gap: var(--space-3);
 }
 
-/* Комментарий психолога: под текстом события, переносы строк сохраняются */
-.hist-card__comment,
-.hist-card__event + .hist-card__comment {
+/* Комментарий психолога: под текстом события, переносы строк сохраняются; слева акцентная черта вместо курсива */
+.chat .hist-card__comment,
+.chat .hist-card__event + .hist-card__comment {
   margin-top: var(--space-3);
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--action-primary);
+  font-style: normal;
   white-space: pre-line;
 }
 
@@ -361,19 +388,19 @@
 
 .hist-card__chevron {
   flex-shrink: 0;
-  color: var(--color-text-caption);
+  color: var(--text-icon);
   font-size: var(--size-icon-sm);
 }
 
 .hist-empty {
   padding: var(--space-8) 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
   text-align: center;
 }
 
-/* Шкалы пройденного теста: серый контейнер, внутри список (по нажатию открывает результат), разделитель и кнопка по центру;
+/* Шкалы пройденного теста: тонированная врезка в карточке, внутри список (по нажатию открывает результат), разделитель и кнопка по центру;
    полосы цвета диапазона берут заливку у .cc-fill--* */
 .hist-scales {
   display: flex;
@@ -381,13 +408,13 @@
   margin-top: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-bg-app);
+  background: color-mix(in srgb, var(--action-primary) 7%, transparent);
 }
 
 .hist-scales__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -398,24 +425,29 @@
   height: 0;
   margin: var(--space-3) 0 0;
   border: 0;
-  border-top: 1px solid var(--color-bg-fill-strong);
+  border-top: 1px solid var(--glass-border);
 }
 
 .hist-scales__toggle {
   align-self: center;
-  margin: 0 0 -8px;
+  margin: 0 0 calc(var(--space-2) * -1);
   padding: var(--space-2) var(--space-6);
   border: 0;
   background: none;
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  color: var(--action-primary);
+  font: var(--type-label);
+}
+
+.hist-scales__toggle:focus-visible,
+.hist-scales__list:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 
 .hist-scale {
   display: grid;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .hist-scale__head {
@@ -423,17 +455,18 @@
   gap: var(--space-2);
   align-items: baseline;
   justify-content: space-between;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 400;
 }
 
 .hist-scale__code {
-  color: var(--color-text-caption);
+  color: var(--text-secondary);
 }
 
 .hist-scale__value {
   flex-shrink: 0;
-  font-weight: var(--font-weight-medium);
+  font-weight: 600;
 }
 
 .hist-scale__track {
@@ -441,7 +474,7 @@
   height: 6px;
   overflow: hidden;
   border-radius: 3px;
-  background: var(--color-divider);
+  background: rgb(107 117 133 / 18%);
 }
 
 .hist-scale__fill {

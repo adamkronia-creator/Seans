@@ -443,6 +443,12 @@ html:has([data-pm]) body {
     radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
     linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
   --glass-fill-header: rgb(255 255 255 / 0.62);
+  /* Пузыри чата: входящие — белое стекло, исходящие — синий градиент акцента (от action-primary к action-primary-pressed, белая подпись держит 3,6–5,5:1) */
+  --glass-bubble-in: rgb(255 255 255 / 0.78);
+  /* Карточки внутри вкладок чата (тесты, сведения, заметки, события): белое стекло плотнее панелей, без размытия — позади гладкий фон */
+  --glass-card: rgb(255 255 255 / 0.62);
+  --glass-bubble-out-from: var(--action-primary);
+  --glass-bubble-out-to: var(--action-primary-pressed);
 }
 
 [data-pm] .messages {
@@ -512,7 +518,7 @@ html:has([data-pm]) body {
 
 /* Нижняя панель — плавающая стеклянная капсула: отступ space-4 по бокам и space-3 над безопасной зоной, внутри отступ space-1,
    выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми */
-[data-pm]:has(.messages) .tabbar {
+[data-pm]:is(:has(.messages), :has(.chat)) .tabbar {
   right: var(--space-4);
   bottom: calc(var(--safe-bottom) + var(--space-3));
   left: var(--space-4);
@@ -525,12 +531,12 @@ html:has([data-pm]) body {
   backdrop-filter: var(--glass-filter-panel);
 }
 
-[data-pm]:has(.messages) .tabbar__item {
+[data-pm]:is(:has(.messages), :has(.chat)) .tabbar__item {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
 }
 
-[data-pm]:has(.messages) .tabbar__item--active {
+[data-pm]:is(:has(.messages), :has(.chat)) .tabbar__item--active {
   background: rgb(255 255 255 / 0.55);
 }
 

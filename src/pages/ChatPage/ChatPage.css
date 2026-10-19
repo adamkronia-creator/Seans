@@ -1,3 +1,9 @@
+/*
+ * Открытый чат на системе мессенджера (data-pm), в стиле «Диалогов»: тот же градиентный фон, стеклянная шапка и стеклянные кнопки,
+ * вместо чипсов разделов — боковая панель (ChatSideMenu). Размеры — токены сетки 4; вне сетки только рамка 1 px.
+ * Шапка и поле ввода лежат поверх страниц, а сообщения (и содержимое вкладок) проезжают под ними размытыми.
+ * Файл подключают и экраны настройки теста и результата (они лежат в том же .chat, но без data-pm): им нужен только каркас.
+ */
 .chat {
   display: flex;
   flex: 1;
@@ -5,89 +11,207 @@
   min-height: 0;
 }
 
-/* Шапка: строка 56 (кнопки 40, аватар 36), под ней чипсы разделов, снизу разделитель. Полоса идёт от верха экрана, под строкой состояния */
-.chat__header {
-  flex-shrink: 0;
-  padding-top: var(--safe-top);
-  border-bottom: var(--hairline) solid var(--color-divider);
-  background: var(--color-bg-panel);
+[data-pm] .chat {
+  /* Шапка: безопасная зона, space-4 до фото, фото (size-avatar-sm), space-3 до низа подложки, как у «Диалогов» без историй и чипсов */
+  --chat-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3));
+  /* Плавающая нижняя капсула приложения: высота панели, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
+  --chat-tabs: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+  /* Подсказка стоит над капсулой */
+  --toast-bottom: calc(var(--chat-tabs) + var(--space-4));
+  position: relative;
+  background: var(--scene);
 }
 
+/* ——— Шапка: фото, имя и подпись слева, справа «назад» и меню ——— */
+.chat__header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  padding: calc(var(--safe-top) + var(--space-4)) 0 var(--space-3);
+  isolation: isolate;
+}
+
+/* Стеклянная подложка — отдельный слой позади с размытием, а не на самой шапке: предок с backdrop-filter стал бы «корнем фона»,
+   и стеклянные кнопки внутри видели бы сквозь него только саму шапку. Сообщения уходят под неё размытыми */
+.chat__header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+  pointer-events: none;
+}
+
+/* Те же размеры, что у шапки «Диалогов»: поля 16 слева и 8 справа, зазор 12, фото 40 */
 .chat__top {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  min-height: 56px;
-  padding: 0 var(--space-2);
-}
-
-.chat__icon-button {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: var(--size-icon);
-}
-
-/* Аватарка 36, gap 12, блок с именем и статусом */
-.chat__peer {
-  display: flex;
-  flex: 1;
-  align-items: center;
   gap: var(--space-3);
-  min-width: 0;
+  height: var(--size-avatar-sm);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+/* Метка «в сети» на окружности фото 40: центр на дуге, 1,5 от краёв (для 48 в списке — 2,5) */
+.chat__top .avatar {
+  --avatar-size: var(--size-avatar-sm);
+  --presence-inset: 1.5px;
 }
 
 .chat__who {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center; /* без статуса (Избранное) имя стоит по центру */
   min-width: 0;
 }
 
-.chat__name {
+/* Имя — headline, подпись — label обычного начертания; строки по space-5, вдвоём ровно высота фото.
+   Перекрывает антикву редакционного слоя: в новой системе весь интерфейс набран гарнитурой Inter */
+.chat .chat__name,
+.chat .chat__status {
   overflow: hidden;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
-  letter-spacing: var(--letter-spacing-title);
+  line-height: var(--space-5);
+  letter-spacing: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.chat__status {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+.chat .chat__name {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  line-height: var(--space-5);
 }
 
-/* Разделы чата — вкладки-значки (Chip с icon): у выбранной раскрывается подпись, и раскрытие идёт за страницами; если не помещаются, ряд прокручивается вбок */
-.chat__chips {
-  position: relative;
+.chat .chat__status {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+}
+
+.chat .chat__status--typing {
+  color: var(--action-primary);
+}
+
+/* Стеклянные кнопки: «назад» на месте поиска «Диалогов», меню на месте оповещений */
+.chat__action {
   display: flex;
-  /* Вкладки растянуты на всю ширину между полями экрана: свободное место делится между ними поровну, gap — только запас, когда тесно */
-  justify-content: space-between;
-  gap: 4px;
-  padding: var(--space-1) var(--space-4) var(--space-3);
-  overflow-x: auto;
-  scrollbar-width: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
-.chat__chips::-webkit-scrollbar {
+.chat__action:active {
+  background: var(--glass-solid);
+}
+
+@media (hover: hover) {
+  .chat__action:hover {
+    background: var(--glass-solid);
+  }
+}
+
+.chat__action:disabled {
+  opacity: 0.4;
+}
+
+.chat__action--small {
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  font-size: var(--size-icon);
+}
+
+.chat__action:focus-visible,
+.chat__cancel:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ——— Поиск по чату: поле вместо верхней строки, справа переходы между совпадениями и «Отмена» ——— */
+.chat__search {
+  gap: var(--space-2);
+}
+
+.chat__search-field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: var(--size-control);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  color: var(--text-icon);
+  font-size: var(--size-icon);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.chat__search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+.chat__search-field > svg {
+  flex-shrink: 0;
+}
+
+.chat__search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.chat__search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+.chat__search-input::-webkit-search-cancel-button {
   display: none;
 }
 
-/* Лента: обёртка для плавающей кнопки «вниз»; сообщения прижаты к низу; поля 12 */
+.chat__search-count {
+  flex: none;
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.chat__cancel {
+  flex-shrink: 0;
+  height: var(--size-control);
+  padding: 0 var(--space-2);
+  color: var(--action-primary);
+  font: var(--type-body);
+}
+
+/* ——— Лента: страница на весь экран, сообщения прижаты к низу и проезжают под шапкой и полем ввода ——— */
 .chat__feed {
   position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  background: var(--color-bg-chat);
 }
 
 .chat__messages {
@@ -103,7 +227,34 @@
   margin-top: auto;
 }
 
-/* День одной группой: подпись дня прилипает к верху ленты, пока идёт день */
+/* Страницы вкладок лежат на весь экран: сверху место под шапку, снизу — под поле ввода или нижнюю капсулу (--page-bottom,
+   поле ввода ставит его по своей высоте) */
+[data-pm] .chat .swipe-pager__page {
+  --page-bottom: var(--chat-tabs);
+  position: relative;
+}
+
+[data-pm] .chat .chat__messages {
+  padding-top: calc(var(--chat-top) + var(--space-2));
+  padding-bottom: var(--page-bottom);
+}
+
+[data-pm] .chat .chat-tests {
+  padding-top: calc(var(--chat-top) + var(--space-3));
+  padding-bottom: var(--page-bottom);
+}
+
+[data-pm] .chat .chat-case {
+  padding-top: var(--chat-top);
+  padding-bottom: var(--page-bottom);
+}
+
+/* История: каждая лента фильтра прокручивается под шапкой; снизу ленту ограничивает панель с чипсами (низ .hist-host занимает капсула) */
+[data-pm] .chat .chat-history {
+  padding-top: var(--chat-top);
+}
+
+/* День одной группой: подпись дня — стеклянная плашка, прилипает под шапкой, пока идёт день */
 .chat__group {
   display: flex;
   flex-direction: column;
@@ -121,95 +272,63 @@
   margin-top: 0 !important;
 }
 
-/* Подпись дня: плашка без тени, непрозрачная — прилипая, она закрывает пузыри под собой */
 .chat__day {
+  /* Прилипание отсчитывается от внутреннего края отступа ленты (браузеры не считают padding прокручиваемого блока частью окна прилипания):
+     top 0 — ровно там, где у ленты кончается отступ под шапкой, то есть space-2 под шапкой */
   position: sticky;
-  top: var(--space-1);
+  top: 0;
   z-index: 2;
   align-self: center;
-  margin-bottom: var(--space-2);
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-pill);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  color: var(--text-icon);
+  font: var(--type-caption);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
-/* Кнопка «к последним сообщениям» */
+/* Кнопка «к последним сообщениям»: стеклянный круг над полем ввода */
 .chat__down {
   position: absolute;
-  right: var(--space-3);
-  bottom: var(--space-3);
+  right: var(--space-4);
+  bottom: calc(var(--page-bottom) + var(--space-2));
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-bg-panel);
-  box-shadow: var(--shadow-float);
-  color: var(--color-text-secondary);
-  font-size: var(--size-icon);
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.chat__down:active {
+  background: var(--glass-solid);
 }
 
 .chat__down-badge {
   position: absolute;
-  top: -8px;
-  right: -4px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: var(--color-accent);
-  color: var(--color-accent-on);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-1) * -1);
+  min-width: var(--space-5);
+  height: var(--space-5);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--chat-unread-bg);
+  color: var(--chat-unread-text);
+  font: var(--type-caption);
+  font-weight: 700;
   text-align: center;
 }
 
-.chat__status--typing {
-  color: var(--color-accent);
-}
-
-/* Поиск по чату в шапке */
-.chat__search {
-  gap: var(--space-1);
-}
-
-.chat__search-input {
-  flex: 1;
-  min-width: 0;
-  height: 40px;
-  border: 0;
-  background: none;
-  outline: 0;
-  font-size: var(--font-size-md);
-}
-
-.chat__search-input::-webkit-search-cancel-button {
-  display: none;
-}
-
-.chat__search-count {
-  flex: none;
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
-}
-
-.chat__icon-button--small {
-  width: 32px;
-  font-size: var(--size-icon);
-}
-
-.chat__icon-button:disabled {
-  opacity: 0.35;
-}
-
-/* Меню сообщения */
+/* ——— Меню сообщения (долгое нажатие): стеклянный лист ——— */
 .msg-menu__backdrop {
   position: fixed;
   inset: 0;
@@ -220,31 +339,41 @@
   position: fixed;
   margin: 0;
   padding: var(--space-1) 0;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: var(--color-bg-panel);
-  box-shadow: var(--shadow-float);
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
   list-style: none;
 }
 
+/* Высота строки 44 — по ней чат считает, где поставить меню (MENU_ITEM_H) */
 .msg-menu__item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  height: 44px;
+  height: var(--size-touch);
   padding: 0 var(--space-4);
-  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  font: var(--type-body);
   text-align: left;
 }
 
 .msg-menu__item svg {
-  color: var(--color-text-caption);
-  font-size: var(--size-icon-sm);
+  color: var(--text-icon);
+  font-size: var(--size-icon);
 }
 
 .msg-menu__item--danger,
 .msg-menu__item--danger svg {
-  color: var(--color-red);
+  color: var(--error-text);
+}
+
+.msg-menu__item:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--border-focus);
 }
 
 /* Между сообщениями разных авторов 12, одного автора 4 */

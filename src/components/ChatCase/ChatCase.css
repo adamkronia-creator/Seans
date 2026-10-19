@@ -1,9 +1,15 @@
-/* Вкладки «Заметки» и «Сведения»: прокручиваемая страница с карточками, внизу поле ввода (MessageInput) */
+/*
+ * Вкладки «Заметки» и «Сведения» в чате на системе мессенджера: страница прокручивается под шапкой и нижним полем ввода,
+ * записи — карточки белого стекла (шапка с цветной плиткой раздела, текст или строки «подпись — значение»), между ними space-3.
+ * Верхний и нижний отступы страницы задаёт ChatPage.css. Размеры — токены сетки 4.
+ */
 .chat-case {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  padding-right: var(--space-4);
+  padding-left: var(--space-4);
   overflow-y: auto;
 }
 
@@ -16,12 +22,11 @@
   margin-top: auto;
 }
 
-/* Одна страница: блоки — полосы во всю ширину с щелью фона 8; щель есть и сверху, и снизу, у поля ввода */
 .case-page {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
-  padding: var(--band-gap) 0;
+  gap: var(--space-3);
+  padding: 0;
 }
 
 .case-page > * {
@@ -31,7 +36,14 @@
 .case-cards {
   display: flex;
   flex-direction: column;
-  gap: var(--band-gap);
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-cards[hidden] {
+  display: none;
 }
 
 /* Двойной клик или двойное касание открывает редактор: без масштабирования по двойному тапу */
@@ -39,15 +51,14 @@
   touch-action: manipulation;
 }
 
-/* Запись: от края до края, линия сверху (у первой её нет: над ней линия шапки). Шапка: значок на цветной плитке, название, карандаш; поля 16 */
+/* Запись: карточка белого стекла. Шапка: плитка раздела, название, карандаш; поля 16 */
 .case-card {
   overflow: hidden;
-  border-top: var(--hairline) solid var(--color-border);
-  background: var(--color-bg-panel);
-}
-
-.case-cards > .case-card:first-child {
-  border-top: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+  /* При переходе по оглавлению карточка встаёт с отступом от шапки */
+  scroll-margin-top: var(--space-3);
 }
 
 .case-card__head {
@@ -63,11 +74,11 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: var(--head-bg, var(--color-accent-soft));
-  color: var(--head-fg, var(--color-accent));
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--head-bg, var(--action-secondary));
+  color: var(--head-fg, var(--action-primary));
 }
 
 .case-card__icon svg {
@@ -75,86 +86,77 @@
 }
 
 /* Название до двух строк: на узком экране «Анамнестические сведения» не обрезается на полуслове */
-.case-card__title {
+.chat .case-card__title {
   display: -webkit-box;
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
-  letter-spacing: var(--letter-spacing-title);
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .case-card__edit {
   display: flex;
   flex-shrink: 0;
-  color: var(--color-text-placeholder);
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0;
+  border-radius: var(--radius-full);
+  color: var(--text-icon);
   font-size: var(--size-icon-sm);
 }
 
-/* Общая информация: подпись слева, значение справа; строки разделены линией от края до края внутри полей 16 */
+.case-card__edit:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Общая информация: подпись слева, значение справа; строки разделены только воздухом */
+.case-card__rows {
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  list-style: none;
+}
+
 .case-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-4);
-  margin: 0 var(--space-4);
-  padding: var(--space-3) 0;
-  border-top: var(--hairline) solid var(--color-divider);
-}
-
-/* Между шапкой карточки и первой строкой линии нет (разделители только между строками), а отступ такой же, как до текста в других разделах: 12 */
-.case-row:first-child {
-  padding-top: 0;
-  border-top: 0;
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
 }
 
 /* Подпись при нехватке места переносится, значение стоит целиком, пока не займёт больше 60% строки */
 .case-row__label {
   flex: 1 1 auto;
   min-width: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-md);
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
 }
 
 .case-row__value {
   flex: 0 0 auto;
   max-width: 60%;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  color: var(--text-primary);
+  font: var(--type-body);
   text-align: right;
 }
 
-/* Текстовые разделы: поля 12, текст 15/22, абзацы через 12, дата обновления справа */
+/* Текстовые разделы: поля 16, текст body, абзацы через 12, дата обновления справа */
 .case-card__body {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: 0 var(--space-4) var(--space-3);
-}
-
-.case-card__text,
-.case-card__list {
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
-}
-
-.case-card__updated {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.case-cards[hidden] {
-  display: none;
+  padding: 0 var(--space-4) var(--space-4);
 }
 
 /* Заметка: текст сразу под шапкой */
@@ -162,7 +164,16 @@
   padding-top: 0;
 }
 
-/* При переходе по оглавлению карточка встаёт с отступом от шапки */
-.case-card {
-  scroll-margin-top: var(--space-3);
+.chat .case-card__text,
+.chat .case-card__list {
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.case-card__updated {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  text-align: right;
 }

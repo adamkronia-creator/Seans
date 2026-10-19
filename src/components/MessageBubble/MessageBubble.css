@@ -1,11 +1,14 @@
-/* Пузырь: отступы 8 / 12, текст 15 / 22, радиус 18, «хвостик» 6 внизу со стороны автора */
+/*
+ * Пузыри чата на системе мессенджера: входящие — белое стекло с тонкой светлой рамкой, исходящие — синий градиент акцента с белым текстом.
+ * Текст — body 16/24, время — meta 12/16; поля 8 / 12, углы radius-lg, «хвостик» со стороны автора radius-xs. Размеры — токены сетки 4.
+ */
 .bubble {
   position: relative;
   max-width: 85%;
   padding: var(--space-2) var(--space-3);
-  border-radius: 18px;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  font: var(--type-body);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   touch-action: pan-y;
@@ -16,47 +19,47 @@
 
 /* Серия сообщений одного автора: время и «хвостик» только у последнего, стыки скруглены слабее, интервал 4 */
 .bubble--joined-prev {
-  margin-top: -4px;
+  margin-top: calc(var(--space-1) * -1);
 }
 
 .bubble--in.bubble--joined-prev {
-  border-top-left-radius: 6px;
+  border-top-left-radius: var(--radius-xs);
 }
 
 .bubble--out.bubble--joined-prev {
-  border-top-right-radius: 6px;
+  border-top-right-radius: var(--radius-xs);
 }
 
 .bubble--in:not(.bubble--last) {
-  border-bottom-left-radius: 6px;
+  border-bottom-left-radius: var(--radius-xs);
 }
 
 .bubble--out:not(.bubble--last) {
-  border-bottom-right-radius: 6px;
+  border-bottom-right-radius: var(--radius-xs);
 }
 
 .bubble--in {
   align-self: flex-start;
-  background: var(--color-bubble-in);
-  color: var(--color-text-primary);
-  border-bottom-left-radius: 6px;
+  background: var(--glass-bubble-in);
+  color: var(--text-primary);
+  border-bottom-left-radius: var(--radius-xs);
 }
 
 .bubble--out {
   align-self: flex-end;
-  /* Градиент как в Telegram: привязан к окну ленты, а не к самому пузырю, поэтому выше по экрану пузырь ближе к акценту,
-     ниже глубже, и при прокрутке цвет плавно меняется. --feed-h (высота окна) и --gy (сдвиг пузыря) ставит
-     utils/bubbleGradient.ts; без них градиент идёт по самому пузырю */
-  background-color: var(--color-bubble-out-to);
-  background-image: linear-gradient(to bottom, var(--color-bubble-out-from), var(--color-bubble-out-to));
+  /* Градиент привязан к окну ленты, а не к самому пузырю, поэтому выше по экрану пузырь светлее, ниже глубже, и при прокрутке цвет
+     плавно меняется. --feed-h (высота окна) и --gy (сдвиг пузыря) ставит utils/bubbleGradient.ts; без них градиент идёт по самому пузырю */
+  border-color: var(--glass-border-blue);
+  background-color: var(--glass-bubble-out-to);
+  background-image: linear-gradient(to bottom, var(--glass-bubble-out-from), var(--glass-bubble-out-to));
   background-repeat: no-repeat;
   background-size: 100% var(--feed-h, 100%);
   background-position: 0 var(--gy, 0);
-  color: var(--color-ink-on-pastel);
-  border-bottom-right-radius: 6px;
+  color: var(--action-primary-text);
+  border-bottom-right-radius: var(--radius-xs);
 }
 
-/* Время 11 в правом нижнем углу (на 6 от низа и на 12 от края) */
+/* Время в правом нижнем углу (на 6 от низа и на 12 от края) */
 .bubble__meta {
   position: absolute;
   right: var(--space-3);
@@ -64,28 +67,28 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: var(--font-size-2xs);
+  font: var(--type-meta);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-2xs);
   white-space: nowrap;
 }
 
 .bubble--in .bubble__meta {
-  color: var(--color-text-caption);
+  color: var(--text-secondary);
 }
 
 .bubble--out .bubble__meta {
-  color: var(--color-text-secondary);
+  color: rgb(255 255 255 / 0.82);
 }
 
-/* Галочки доставки в пастельном пузыре — акцентным цветом: белёсые на нём не видны */
+/* Галочки доставки на синем — белые */
 .bubble--out .bubble__ticks {
-  color: var(--color-accent);
+  color: var(--action-primary-text);
 }
 
 .bubble__meta--ghost {
   position: static;
-  margin-left: 10px;
+  margin-left: var(--space-3);
   visibility: hidden;
 }
 
@@ -104,7 +107,7 @@
 
 .bubble__mark--active {
   background: #FFCF48; /* Восход солнца */
-  color: var(--color-text-primary);
+  color: var(--text-primary);
 }
 
 /* Короткая подсветка сообщения после перехода по цитате */
@@ -123,7 +126,7 @@
   animation: bubble-flash 1.1s ease;
 }
 
-/* Цитата ответа внутри пузыря */
+/* Цитата ответа внутри пузыря: во входящем акцентная, в исходящем белая на синем */
 .bubble__quote {
   display: flex;
   flex-direction: column;
@@ -131,23 +134,22 @@
   max-width: 100%;
   margin: 0 0 var(--space-1);
   padding: 0 0 0 var(--space-2);
-  border-left: 2px solid var(--color-accent);
+  border-left: 2px solid var(--action-primary);
   text-align: left;
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-xs);
+  font: var(--type-caption);
 }
 
 .bubble--out .bubble__quote {
-  border-left-color: var(--color-accent-strong);
+  border-left-color: rgb(255 255 255 / 0.7);
 }
 
 .bubble__quote-name {
-  color: var(--color-accent);
-  font-weight: var(--font-weight-medium);
+  color: var(--action-primary);
+  font-weight: 600;
 }
 
 .bubble--out .bubble__quote-name {
-  color: var(--color-accent-strong);
+  color: var(--action-primary-text);
 }
 
 .bubble__quote-text {
@@ -156,12 +158,12 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   line-clamp: 1;
-  color: var(--color-accent);
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
-/* В исходящем пузыре фон пастельный: текст цитаты тёмный, иначе акцентный на нём слабо виден */
 .bubble--out .bubble__quote-text {
-  color: var(--color-text-secondary);
+  color: rgb(255 255 255 / 0.85);
 }
 
 /* Подсказка свайпа: значок «ответить» появляется слева */
@@ -171,14 +173,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  margin-top: -16px;
-  border-radius: 50%;
-  background: var(--color-bg-panel);
-  box-shadow: var(--shadow-float);
-  color: var(--color-text-secondary);
-  font-size: 18px;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  margin-top: calc(var(--size-control-sm) / -2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  color: var(--text-icon);
+  font-size: var(--size-icon);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 /* Время в служебных иконках статуса */
@@ -192,7 +196,7 @@
   transform: translate(0, 0);
 }
 
-/* Карточка теста: аватарка 48 слева, подпись, название; ниже текст; кнопка под пузырём */
+/* Карточка теста: значок 48 слева, подпись, название; ниже текст; кнопка под пузырём */
 .bubble-group--card {
   width: 85%;
 }
@@ -205,7 +209,7 @@
 
 /* Без текста время стоит под названием: нужен запас снизу */
 .bubble--tcard-bare {
-  padding-bottom: 24px;
+  padding-bottom: var(--space-6);
 }
 
 .tcard {
@@ -221,14 +225,14 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: var(--size-avatar);
+  height: var(--size-avatar);
   border-radius: var(--radius-md);
 }
 
 .tcard__icon img {
-  width: 32px;
-  height: 32px;
+  width: var(--space-8);
+  height: var(--space-8);
   object-fit: contain;
 }
 
@@ -240,15 +244,13 @@
 }
 
 .tcard__label {
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+  font: var(--type-caption);
   opacity: 0.8;
 }
 
 .tcard__title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  font: var(--type-label);
+  font-weight: 600;
 }
 
 .tcard__body {
@@ -260,7 +262,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   width: fit-content;
   max-width: 85%;
   touch-action: pan-y;
@@ -285,35 +287,33 @@
    «хвостик» переходит на нижнюю кнопку */
 .bubble--with-buttons.bubble--in,
 .bubble--with-buttons.bubble--out {
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-xs);
 }
 
 .bubble-buttons {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Кнопка под пузырём: белая с акцентной подписью, высота 40, как инлайн-кнопки ботов: отдельное действие, а не ещё один синий пузырь.
-   Углы разные: стык с пузырём и между кнопками 4, нижние у последней кнопки как у пузыря (18, у «хвостика» 6) */
+/* Кнопка под пузырём: белое стекло с акцентной подписью, высота 40, как инлайн-кнопки ботов: отдельное действие, а не ещё один синий пузырь.
+   Углы разные: стык с пузырём и между кнопками 4, нижние у последней кнопки как у пузыря (radius-lg, у «хвостика» 4) */
 .bubble-button {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 40px;
+  min-height: var(--size-control);
   padding: var(--space-2) var(--space-4);
-  border: 0;
-  border-radius: 4px;
-  background: var(--color-bubble-in);
-  color: var(--color-accent);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xs);
+  background: var(--glass-bubble-in);
+  color: var(--action-primary);
+  font: var(--type-label);
   text-align: center;
   transition: filter 0.15s ease;
 }
@@ -324,43 +324,43 @@
 }
 
 .bubble-button:disabled {
-  color: var(--color-text-caption);
+  color: var(--text-secondary);
   pointer-events: none;
 }
 
 .bubble-button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .bubble-buttons li:last-child .bubble-button {
-  border-bottom-right-radius: 18px;
-  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-lg);
 }
 
 .bubble-group--in .bubble-buttons li:last-child .bubble-button {
-  border-bottom-left-radius: 6px;
+  border-bottom-left-radius: var(--radius-xs);
 }
 
 .bubble-group--out .bubble-buttons li:last-child .bubble-button {
-  border-bottom-right-radius: 6px;
+  border-bottom-right-radius: var(--radius-xs);
 }
 
-/* «Печатает…» */
+/* «Печатает…»: три точки в белом стекле */
 .bubble--typing {
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 36px;
-  padding: 0 14px;
+  gap: var(--space-1);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-3);
   align-self: flex-start;
 }
 
 .bubble--typing i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-text-caption);
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--text-icon);
   animation: typing-dot 1.1s infinite ease-in-out;
 }
 
@@ -399,12 +399,11 @@
 
 /* Пояснение под названием: у отправленного слепого теста (вам название видно, клиенту — нет) и у постоянного задания (сколько записей) */
 .tcard__note {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+  color: var(--text-secondary);
+  font: var(--type-caption);
 }
 
-/* В своём (пастельном) пузыре серая подпись слабо видна: берём цвет текста пузыря, как у подписи карточки */
+/* В своём (синем) пузыре серая подпись слабо видна: берём цвет текста пузыря, как у подписи карточки */
 .bubble--out .tcard__note {
   color: inherit;
   opacity: 0.8;

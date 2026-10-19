@@ -1,12 +1,15 @@
-/* Вкладки «Тесты» и «Задания» в чате устроены как списки разделов «Диагностика» и «Задания»: строки без карточек, во всю ширину,
-   значок в круге 48, название в одну строку, поля 16 и 8 (между содержимым строк 16). Заголовок раздела (название и число) стоит над белым списком */
+/*
+ * Вкладки «Тесты» и «Задания» в чате на системе мессенджера: заголовок раздела и под ним одна стеклянная панель со строками
+ * (значок в круге 48, название, описание, дата). Панели лежат на градиентном фоне и проезжают под шапкой и нижней капсулой.
+ * Верхний и нижний отступы страницы задаёт ChatPage.css (под шапку и под капсулу). Размеры — токены сетки 4.
+ */
 .chat-tests {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: var(--space-5);
   min-height: 0;
-  padding: var(--space-3) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
 }
 
@@ -21,40 +24,60 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-1);
 }
 
-.chat-tests__title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
-  letter-spacing: var(--letter-spacing-title);
+.chat .chat-tests__title {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
 }
 
-.chat-tests__remind {
+.chat .chat-tests__remind {
   margin-left: auto;
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-sm);
+  color: var(--action-primary);
+  font: var(--type-label);
 }
 
+.chat-tests__remind:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Строки одной панелью: белое стекло, рамка 1 px, скругление radius-lg; нажатая строка светлеет */
 .chat-tests__list {
   display: flex;
   flex-direction: column;
-  padding: var(--space-2) 0;
-  background: var(--color-bg-row);
+  margin: 0;
+  padding: var(--space-1) 0;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+  list-style: none;
 }
 
-.chat-tests__list .test-card {
+.chat .chat-tests__list .test-card {
   padding: var(--space-2) var(--space-4);
   border-radius: 0;
   background: none;
 }
 
-.chat-tests__list .test-card:active,
-.chat-tests__list .test-card[data-pressed] {
-  background: var(--color-bg-row-pressed);
+.chat .chat-tests__list .test-card:active,
+.chat .chat-tests__list .test-card[data-pressed] {
+  background: var(--glass);
+}
+
+@media (hover: hover) {
+  .chat .chat-tests__list .test-card:hover {
+    background: var(--glass);
+  }
+}
+
+.chat .chat-tests__list .test-card:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--border-focus);
 }
 
 .chat-tests__list .test-card__avatar {
@@ -62,15 +85,30 @@
 }
 
 .chat-tests__list .test-card__icon {
-  width: 32px;
-  height: 32px;
+  width: var(--space-8);
+  height: var(--space-8);
 }
 
-.chat-tests__list .test-card__title {
+/* Название в одну строку — headline; под ним описание — label обычного начертания; дата — caption */
+.chat .chat-tests__list .test-card__title {
   display: block;
   overflow: hidden;
-  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.chat .chat-tests__list .test-card__description {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+.chat .chat-tests__list .test-card__date {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-weight: 400;
+  line-height: var(--space-6);
+}

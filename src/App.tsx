@@ -162,6 +162,7 @@ export default function App() {
       }
       return {
         key: `chat/${chatId}`,
+        pm: true,
         build: () => (
           <main className="app__content">
             <ChatPage chatId={chatId} onAppTabChange={handleTabChange} />

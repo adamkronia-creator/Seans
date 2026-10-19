@@ -1,11 +1,8 @@
-import type { Tone } from '../../utils/tone';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import {
-  IconBack,
   IconSearch,
-  IconFavorites,
-  IconSettings,
   IconTabInfo,
   IconTabLibrary,
   IconTabMessages,
@@ -14,6 +11,7 @@ import {
   IconTabTests,
 } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
+import { ChatSideMenu } from '../../components/ChatSideMenu/ChatSideMenu';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
@@ -25,15 +23,14 @@ import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
-import { addNote, addSection } from '../../data/clientStore';
+import { addNote, addSection, CLIENT_CHAT, itemsWithStatus, useClientData } from '../../data/clientStore';
+import { useTaskResults } from '../../data/selfTask';
+import { useSelfResults } from '../../data/selfTest';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
-import { Chip } from '../../components/Chip/Chip';
-import { followChips, type PositionVia } from '../../utils/followChips';
-import { centerChips } from '../../utils/centerChips';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
@@ -54,9 +51,6 @@ const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
 
 /** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
 const FAVORITES_HIDDEN: SectionId[] = ['library'];
-/** Пастель раздела: она же у чипса раздела, у видов событий в истории и у значков в списках */
-const SECTION_TONE: Record<SectionId, Tone> = { messages: 'chat', tests: 'test', tasks: 'task', notes: 'note', info: 'info', library: 'session' };
-
 const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
@@ -69,6 +63,14 @@ function sameRun(a: Message | undefined, b: Message | undefined) {
 
 const MENU_W = 196;
 const MENU_ITEM_H = 44;
+
+/** Где можно ставить меню сообщения: вся лента, кроме полосы под шапкой (лента лежит под ней, и меню не должно закрывать название и кнопки) */
+function menuBounds(list: HTMLElement | null) {
+  if (!list) return undefined;
+  const rect = list.getBoundingClientRect();
+  const inset = parseFloat(getComputedStyle(list).paddingTop) || 0;
+  return new DOMRect(rect.left, rect.top + inset, rect.width, rect.height - inset);
+}
 
 /** Меню сообщения по долгому нажатию: ответить, копировать, удалить */
 function MessageMenu({
@@ -217,6 +219,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // «Поиск по чату» из боковой панели на другой вкладке: сначала едем в диалог, и только потом поиск открывается
+  const searchAfterSwitch = useRef(false);
 
   const flat = useMemo(() => groups.flatMap((g) => g.messages), [groups]);
   const byId = useMemo(() => new Map(flat.map((m) => [m.id, m])), [flat]);
@@ -245,7 +250,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   }, [chatId]);
 
   // Листая разделы, переписку не теряем: прокрутка, набранный текст и ответ остаются на месте. Закрывается только поиск
+  // (кроме случая, когда в диалог перешли как раз ради поиска)
   useEffect(() => {
+    if (searchAfterSwitch.current && section === 'messages') {
+      searchAfterSwitch.current = false;
+      setSearchOpen(true);
+      return;
+    }
     setSearchOpen(false);
     setQuery('');
   }, [chatId, section]);
@@ -299,22 +310,29 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Жест «назад» при открытом поиске закрывает его, как кнопка в строке поиска
   useBackHandler(searchOpen && section === 'messages', closeSearch);
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  // Жест «назад» при открытой боковой панели закрывает её
+  useBackHandler(menuOpen, closeMenu);
+  // Чат сменился или закрылся: панель не остаётся открытой
+  useEffect(() => setMenuOpen(false), [chatId]);
+
   const index = sections.findIndex((item) => item.id === section);
 
-  // Чипсы разделов идут за страницами: цвет перетекает вслед за пальцем, а не прыгает на готовый выбор,
-  // а ряд едет так, чтобы выбранный чипс оставался посередине (видно больше соседей)
-  const chipsRef = useRef<HTMLDivElement>(null);
-  const showPosition = useCallback((position: number, via?: PositionVia) => {
-    const row = chipsRef.current;
-    if (!row) return;
-    followChips(row.querySelectorAll<HTMLElement>('.chip'), position, via);
-    centerChips(row, position, '.chip', via);
-  }, []);
-  // Чат открыт сразу на нужном разделе: ряд уже стоит на нем
-  useEffect(() => {
-    if (chipsRef.current) centerChips(chipsRef.current, index);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Сколько записей в разделах: подпись в боковой панели. «Избранное» считает то, что психолог прошёл сам
+  const clientData = useClientData();
+  const selfTests = useSelfResults();
+  const selfTasks = useTaskResults();
+  const counts = useMemo<Partial<Record<SectionId, number>>>(() => {
+    if (chat?.favorites) return { tests: selfTests.length, tasks: selfTasks.length };
+    if (!hasClientData) return {};
+    const mine = (chatOf?: string) => (chatOf ?? CLIENT_CHAT) === chatId;
+    return {
+      tests: itemsWithStatus(clientData, 'test').length,
+      tasks: itemsWithStatus(clientData, 'task').length,
+      notes: clientData.notes.filter((n) => mine(n.chatId)).length,
+      info: clientData.caseSections.filter((x) => mine(x.chatId)).length,
+    };
+  }, [chat?.favorites, hasClientData, clientData, selfTests, selfTasks, chatId]);
 
   if (!chat) {
     return (
@@ -415,31 +433,46 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       ),
   }));
 
+  // Подпись под именем: в диалоге — состояние собеседника, в остальных вкладках — название вкладки (чипсов разделов в шапке больше нет)
+  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : chat.online ? 'в сети' : 'был(а) недавно';
+  const subtitle = section === 'messages' ? status : (sections.find((item) => item.id === section)?.label ?? '');
+  const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />;
+
+  const openSearch = () => {
+    setMenuOpen(false);
+    if (section === 'messages') {
+      setSearchOpen(true);
+    } else {
+      searchAfterSwitch.current = true;
+      setSection('messages');
+    }
+  };
+
   return (
     <section className="chat">
       <header className="chat__header">
         {searchOpen && section === 'messages' ? (
-          <div className="chat__top chat__search">
-            <button type="button" className="chat__icon-button" aria-label="Закрыть поиск" onClick={closeSearch}>
-              <IconBack />
-            </button>
-            <input
-              className="chat__search-input"
-              type="search"
-              autoFocus
-              placeholder="Поиск по чату"
-              aria-label="Поиск по чату"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') closeSearch();
-                if (e.key === 'Enter' && matches.length) setActiveIdx((i) => (e.shiftKey ? (i + 1) % matches.length : (i - 1 + matches.length) % matches.length));
-              }}
-            />
-            <span className="chat__search-count">{q ? (matches.length ? `${activeIdx + 1} из ${matches.length}` : 'Нет') : ''}</span>
+          <div key="search" className="chat__top chat__search">
+            <label className="chat__search-field">
+              <IconSearchMk />
+              <input
+                className="chat__search-input"
+                type="search"
+                autoFocus
+                placeholder="Поиск по чату"
+                aria-label="Поиск по чату"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') closeSearch();
+                  if (e.key === 'Enter' && matches.length) setActiveIdx((i) => (e.shiftKey ? (i + 1) % matches.length : (i - 1 + matches.length) % matches.length));
+                }}
+              />
+              <span className="chat__search-count">{q ? (matches.length ? `${activeIdx + 1} из ${matches.length}` : 'Нет') : ''}</span>
+            </label>
             <button
               type="button"
-              className="chat__icon-button chat__icon-button--small"
+              className="chat__action chat__action--small"
               aria-label="Предыдущее совпадение"
               disabled={!matches.length}
               onClick={() => setActiveIdx((i) => (i - 1 + matches.length) % matches.length)}
@@ -448,61 +481,63 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             </button>
             <button
               type="button"
-              className="chat__icon-button chat__icon-button--small"
+              className="chat__action chat__action--small"
               aria-label="Следующее совпадение"
               disabled={!matches.length}
               onClick={() => setActiveIdx((i) => (i + 1) % matches.length)}
             >
               <IconChevronDown />
             </button>
+            <button type="button" className="chat__cancel" onClick={closeSearch}>
+              Отмена
+            </button>
           </div>
         ) : (
-          <div className="chat__top">
-            <button type="button" className="chat__icon-button" aria-label="Назад" onClick={() => goBack()}>
-              <IconBack />
-            </button>
-            <div className="chat__peer">
-              {chat.favorites ? (
-                <Avatar icon={<IconFavorites />} size={36} />
-              ) : (
-                <Avatar src={chat.avatar} alt="" size={36} online={chat.online} />
-              )}
-              <div className="chat__who">
-                <h1 className="chat__name">{chat.name}</h1>
-                {!chat.favorites && (
-                  <p className={`chat__status${typing ? ' chat__status--typing' : ''}`}>
-                    {typing ? 'печатает…' : chat.online ? 'в сети' : 'был(а) недавно'}
-                  </p>
-                )}
-              </div>
+          <div key="top" className="chat__top">
+            {avatar}
+            <div className="chat__who">
+              <h1 className="chat__name">{chat.name}</h1>
+              <p className={`chat__status${section === 'messages' && typing ? ' chat__status--typing' : ''}`}>{subtitle}</p>
             </div>
-            {section === 'messages' && (
-              <button type="button" className="chat__icon-button" aria-label="Поиск по чату" onClick={() => setSearchOpen(true)}>
-                <IconSearch />
-              </button>
-            )}
-            <button type="button" className="chat__icon-button" aria-label="Настройки чата">
-              <IconSettings />
+            <button type="button" className="chat__action" aria-label="Назад" onClick={() => goBack()}>
+              <IconBackMk />
+            </button>
+            <button
+              type="button"
+              className="chat__action"
+              aria-label="Меню чата"
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+            >
+              <IconMenuMk />
             </button>
           </div>
         )}
-
-        <div className="chat__chips" role="group" aria-label="Разделы" ref={chipsRef}>
-          {sections.map(({ id, label, icon }) => (
-            <Chip key={id} follow icon={icon} tone={SECTION_TONE[id]} active={id === section} onClick={() => setSection(id)}>
-              {label}
-            </Chip>
-          ))}
-        </div>
       </header>
 
-      <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} onPosition={showPosition} />
+      <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />
+
+      <ChatSideMenu
+        open={menuOpen}
+        onClose={closeMenu}
+        avatar={avatar}
+        name={chat.name}
+        status={status}
+        items={sections.map(({ id, label, icon }) => ({ id, label, icon, count: counts[id] }))}
+        active={section}
+        onSelect={(id) => {
+          setSection(id as SectionId);
+          setMenuOpen(false);
+        }}
+        onSearch={openSearch}
+      />
 
       {menu && (
         <MessageMenu
           message={menu.message}
           rect={menu.rect}
-          bounds={listRef.current?.getBoundingClientRect()}
+          bounds={menuBounds(listRef.current)}
           onClose={() => setMenu(null)}
           onReply={() => setReplyTo(menu.message)}
           onDelete={() => {

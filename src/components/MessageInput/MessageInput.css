@@ -1,18 +1,46 @@
+/*
+ * Поле ввода на системе мессенджера: плавающая стеклянная капсула над нижним краем страницы, как нижняя панель «Диалогов»
+ * (поля space-4 по бокам и space-3 над безопасной зоной; заливка, размытие и рамка 1 px те же). Сообщения проезжают под ней размытыми.
+ * Капсула лежит поверх страницы, а не в потоке: её высоту MessageInput сообщает странице как --page-bottom, и лента оставляет под неё место.
+ * Размеры — токены сетки 4; вне сетки только рамка 1 px.
+ */
 .composer-wrap {
-  flex-shrink: 0;
-  background: var(--color-bg-panel);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) calc(var(--safe-bottom) + var(--space-3));
+  /* Промежутки вокруг капсулы не перехватывают нажатия: сквозь них ленту можно прокручивать */
+  pointer-events: none;
 }
 
-/* Панель ввода: отступы 8 и 8, элементы высотой 40, gap 4. Кнопки без рамок и колец, поле — заливка.
-   Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края */
+.composer-wrap > * {
+  pointer-events: auto;
+}
+
+/* Открытая панель эмодзи прижата к нижнему краю: безопасный отступ переходит к ней */
+.composer-wrap--panel {
+  padding-bottom: 0;
+}
+
+/* Капсула: поля space-2, элементы высотой 40, зазор space-1 — одна строка даёт те же 58, что и нижняя панель.
+   Когда текст не помещается в строку, поле растёт вверх, а кнопки остаются у нижнего края; скругление 28 не раздувается вместе с высотой */
 .composer {
   display: flex;
   flex-shrink: 0;
   align-items: flex-end;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-2) calc(var(--space-2) + var(--safe-bottom));
-  border-top: var(--hairline) solid var(--color-divider);
-  background: var(--color-bg-panel);
+  padding: var(--space-2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--space-7);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
 .composer__round {
@@ -20,11 +48,23 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--size-control);
+  height: var(--size-control);
   border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
-  font-size: var(--size-icon);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+}
+
+.composer__round:active,
+.composer__emoji:active {
+  background: var(--glass);
+}
+
+@media (hover: hover) {
+  .composer__round:hover,
+  .composer__emoji:hover {
+    background: var(--glass);
+  }
 }
 
 .composer__field {
@@ -32,107 +72,150 @@
   flex: 1;
   align-items: flex-end;
   min-width: 0;
-  min-height: 40px;
-  padding: 0 var(--space-2) 0 var(--space-3);
-  /* Стадион: при одной строке полукруги, при нескольких — скругление 20 */
-  border-radius: var(--radius-xl);
-  background: var(--color-bg-fill);
+  min-height: var(--size-control);
+  padding-left: var(--space-2);
 }
 
 .composer__input {
   flex: 1;
   min-width: 0;
+  /* Строка 24 и по space-2 сверху и снизу дают 40; шесть строк, дальше поле прокручивается */
+  max-height: calc(var(--space-6) * 6 + var(--space-4));
+  padding: var(--space-2) 0;
   border: 0;
-  background: none;
   outline: 0;
-  /* Строка 22, по 9 сверху и снизу дают поле 40 */
-  padding: 9px 0;
-  max-height: 150px; /* шесть строк, дальше поле прокручивается */
   overflow-y: auto;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  background: none;
+  caret-color: var(--action-primary);
+  color: var(--text-primary);
+  font: var(--type-body);
   -webkit-user-select: text;
   user-select: text;
 }
 
 .composer__input:empty::before {
   content: attr(data-placeholder);
-  color: var(--color-text-caption);
+  color: var(--text-secondary);
   pointer-events: none;
 }
 
 .composer__input::placeholder {
-  color: var(--color-text-caption);
+  color: var(--text-secondary);
   opacity: 1;
 }
 
 .composer__emoji {
   display: flex;
   flex-shrink: 0;
-  margin-bottom: var(--space-2); /* иконка 24 по центру нижней строки */
-  color: var(--color-text-secondary);
-  font-size: var(--size-icon);
-}
-
-/* Отправить: акцентный круг 40 со стрелкой */
-.composer__round--send {
-  background: var(--color-accent);
-  color: var(--color-accent-on);
-}
-
-/* Пока писать нечего (поле заметки): круг серый и не нажимается */
-.composer__round--send:disabled {
-  background: var(--color-bg-fill);
-  color: var(--color-text-placeholder);
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
 }
 
 .composer__emoji--active {
-  color: var(--color-accent);
+  color: var(--action-primary);
 }
 
-/* Когда открыта панель эмодзи, безопасный отступ снизу переходит к ней */
-.composer--panel {
-  padding-bottom: var(--space-2);
+/* Отправить: круг синего стекла, как выбранный чипс «Диалогов», со стрелкой */
+.composer__round--send {
+  border: 1px solid var(--glass-border-blue);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
 }
 
-/* Панель эмодзи: 8 в ряд, ячейки 40×40, прокручивается */
+.composer__round--send:active {
+  background: var(--glass-chip-active);
+  filter: brightness(0.92);
+}
+
+@media (hover: hover) {
+  .composer__round--send:hover {
+    background: var(--glass-chip-active);
+    filter: brightness(0.96);
+  }
+}
+
+/* Пока писать нечего (поле заметки): круг прозрачный и не нажимается */
+.composer__round--send:disabled {
+  border-color: transparent;
+  background: var(--glass-fill);
+  color: var(--text-icon);
+  filter: none;
+  opacity: 0.6;
+}
+
+.composer__round:focus-visible,
+.composer__emoji:focus-visible,
+.reply-bar__close:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Панель эмодзи: стеклянный лист от края до края под капсулой, 8 в ряд, ячейки 44, прокручивается */
 .emoji-panel {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   height: 240px;
-  padding: var(--space-1) var(--space-4) calc(var(--space-1) + var(--safe-bottom));
+  margin: 0 calc(var(--space-4) * -1);
+  padding: var(--space-2) var(--space-4) calc(var(--space-2) + var(--safe-bottom));
   overflow-y: auto;
-  border-top: 1px solid var(--color-divider);
+  border: 1px solid var(--glass-border);
+  border-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: rgb(255 255 255 / 0.72);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
 .emoji-panel__item {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  border-radius: var(--radius-sm);
+  height: var(--size-touch);
+  border-radius: var(--radius-md);
   font-size: 26px;
   line-height: 1;
 }
 
 .emoji-panel__item:active {
-  background: var(--color-bg-fill);
+  background: var(--glass);
 }
 
-/* Плашка ответа над панелью ввода */
+@media (hover: hover) {
+  .emoji-panel__item:hover {
+    background: var(--glass);
+  }
+}
+
+.emoji-panel__item:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+/* Плашка ответа над капсулой: отдельное стеклянное окошко с акцентной чертой слева */
 .reply-bar {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
-  border-top: 1px solid var(--color-divider);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
 .reply-bar__icon {
   flex: none;
-  color: var(--color-accent);
+  color: var(--action-primary);
   font-size: var(--size-icon-sm);
 }
 
@@ -142,21 +225,20 @@
   flex-direction: column;
   min-width: 0;
   padding-left: var(--space-2);
-  border-left: 2px solid var(--color-accent);
+  border-left: 2px solid var(--action-primary);
 }
 
 .reply-bar__name {
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  color: var(--action-primary);
+  font: var(--type-caption);
+  font-weight: 600;
 }
 
 .reply-bar__quote {
   overflow: hidden;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -166,13 +248,9 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  color: var(--color-text-caption);
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  color: var(--text-icon);
   font-size: var(--size-icon-sm);
-}
-
-.reply-bar + .composer {
-  border-top: 0;
-  padding-top: 0;
 }

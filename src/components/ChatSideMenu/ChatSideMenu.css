@@ -1,0 +1,213 @@
+/*
+ * Боковая панель чата: матовое стекло справа (заливка, размытие, рамка 1 px — те же, что у шапки и нижней капсулы «Диалогов»).
+ * Размеры — токены сетки 4. Лежит поверх экрана чата (его слой), поэтому уезжает вместе с ним при жесте «назад».
+ */
+.side-menu {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.34s;
+}
+
+.side-menu.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.side-menu__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(30 40 80 / 0.28);
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.side-menu.is-open .side-menu__scrim {
+  opacity: var(--drag, 1);
+}
+
+/* Пока панель ведёт палец, плавности нет: кадры идут за жестом */
+.side-menu[data-dragging] .side-menu__scrim,
+.side-menu[data-dragging] .side-menu__panel {
+  transition: none;
+}
+
+.side-menu__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(calc(var(--space-16) * 5), calc(100% - var(--space-12)));
+  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) calc(var(--safe-bottom) + var(--space-4)) var(--space-3);
+  border-left: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: rgb(255 255 255 / 0.66);
+  box-shadow: calc(var(--space-2) * -1) 0 var(--space-8) rgb(60 80 160 / 0.22);
+  -webkit-backdrop-filter: blur(var(--space-8)) saturate(2);
+  backdrop-filter: blur(var(--space-8)) saturate(2);
+  transform: translateX(100%);
+  transition: transform 0.34s var(--ease-ios);
+  overflow-y: auto;
+}
+
+.side-menu.is-open .side-menu__panel {
+  transform: none;
+}
+
+/* Верх: фото собеседника, имя и подпись — как в шапке чата, справа крестик */
+.side-menu__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-left: var(--space-1);
+}
+
+.side-menu__head .avatar {
+  --avatar-size: var(--size-avatar);
+}
+
+.side-menu__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.side-menu__name,
+.side-menu__status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-menu__name {
+  color: var(--text-primary);
+  font: var(--type-headline);
+}
+
+.side-menu__status {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+.side-menu__close {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.side-menu__close:active {
+  background: var(--glass-solid);
+}
+
+/* Вкладки: пилюли высотой 48; выбранная залита синим стеклом, как выбранный чипс в «Диалогах» */
+.side-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.side-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--size-avatar);
+  padding: 0 var(--space-4) 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font: var(--type-body);
+  font-weight: 500;
+  text-align: left;
+}
+
+.side-menu__item > svg {
+  flex-shrink: 0;
+  color: var(--text-icon);
+  font-size: var(--size-icon-lg);
+}
+
+.side-menu__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-menu__count {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.side-menu__item:active {
+  background: var(--glass);
+}
+
+@media (hover: hover) {
+  .side-menu__item:hover {
+    background: var(--glass);
+  }
+}
+
+.side-menu__item--active,
+.side-menu__item--active:active {
+  border-color: var(--glass-border-blue);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+}
+
+@media (hover: hover) {
+  .side-menu__item--active:hover {
+    background: var(--glass-chip-active);
+  }
+}
+
+.side-menu__item--active > svg,
+.side-menu__item--active .side-menu__count {
+  color: var(--action-primary-text);
+}
+
+/* Поиск — действие, а не вкладка: отдельно от списка, без заливки */
+.side-menu__item--action {
+  margin-top: auto;
+  color: var(--text-link);
+}
+
+.side-menu__item--action > svg {
+  color: var(--text-link);
+}
+
+.side-menu__close:focus-visible,
+.side-menu__item:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-menu,
+  .side-menu__scrim,
+  .side-menu__panel {
+    transition: none;
+  }
+}

@@ -22,11 +22,42 @@ interface MessageInputProps {
 export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   // Последняя позиция курсора в поле: нужна, чтобы вставить эмодзи, когда поле не в фокусе
   const savedRange = useRef<Range | null>(null);
+  // Обработчик меняется при каждой перерисовке чата: наблюдатель ниже держит свежий, а сам не пересоздаётся
+  const layoutRef = useRef(onLayoutChange);
+  useEffect(() => {
+    layoutRef.current = onLayoutChange;
+  });
 
   const hasText = text.trim().length > 0;
+
+  // Панель лежит поверх страницы, поэтому сообщает ей свою высоту: --page-bottom — сколько снизу оставить ленте (панель и промежуток над ней).
+  // Высота меняется, когда поле растёт на несколько строк, появляется плашка ответа или открывается панель эмодзи
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const page = wrap?.closest<HTMLElement>('.swipe-pager__page');
+    if (!wrap || !page) return;
+    let last = -1;
+    const apply = () => {
+      const height = Math.round(wrap.getBoundingClientRect().height);
+      if (height === last) return;
+      const first = last < 0;
+      last = height;
+      page.style.setProperty('--page-bottom', `calc(${height}px + var(--space-2))`);
+      // Лента подстраивается под новый отступ после перерисовки; при первом замере её ставит на место сам чат
+      if (!first) layoutRef.current?.();
+    };
+    const observer = new ResizeObserver(apply);
+    observer.observe(wrap);
+    apply();
+    return () => {
+      observer.disconnect();
+      page.style.removeProperty('--page-bottom');
+    };
+  }, []);
 
   // Страница открылась: на компьютере писать можно сразу, не нажимая на поле
   useEffect(() => {
@@ -110,7 +141,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
   };
 
   return (
-    <div className="composer-wrap">
+    <div ref={wrapRef} className={`composer-wrap${emojiOpen ? ' composer-wrap--panel' : ''}`}>
       {reply && (
         <div className="reply-bar">
           <IconReply className="reply-bar__icon" />
@@ -124,7 +155,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
         </div>
       )}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
-      <div className={`composer${emojiOpen ? ' composer--panel' : ''}`}>
+      <div className="composer">
         {extras && (
           <button type="button" className="composer__round" aria-label="Прикрепить">
             <IconAttach />
