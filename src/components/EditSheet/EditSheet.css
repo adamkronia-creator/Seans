@@ -28,7 +28,7 @@
   height: 4px;
   margin: var(--space-2) auto 0;
   border-radius: 2px;
-  background: rgb(77 94 122 / 40%);
+  background: rgb(60 60 67 / 40%);
 }
 
 /* Заголовок есть только у окон выбора (отправка теста) */
@@ -343,7 +343,7 @@
   /* Разделитель 0,5 px под строкой: 12 над ним и 12 под ним */
   margin-top: var(--space-3);
   padding: var(--space-3) 0 0;
-  border-top: 0.5px solid rgb(107 117 133 / 0.35);
+  border-top: 0.5px solid rgb(60 60 67 / 0.35);
   row-gap: calc((100cqw - var(--cols) * 36px) / (var(--cols) - 1));
 }
 

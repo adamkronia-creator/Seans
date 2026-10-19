@@ -62,6 +62,7 @@
 }
 
 .case-card__head {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -85,19 +86,23 @@
   flex-shrink: 0;
 }
 
-/* Название до двух строк: на узком экране «Анамнестические сведения» не обрезается на полуслове */
+/* Название переносится по словам. Карандаш лежит поверх угла шапки, а место под него резервирует только первая строка (поплавок
+   ниже строки не опускается): вторая и следующие идут во всю ширину, и название не переносится, пока есть место */
 .chat .case-card__title {
-  display: -webkit-box;
+  display: block;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
   overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+}
+
+.chat .case-card__title::before {
+  content: '';
+  float: right;
+  width: var(--space-6);
+  height: var(--space-4);
 }
 
 .case-card__edit {
@@ -107,9 +112,10 @@
   justify-content: center;
   width: var(--size-control-sm);
   height: var(--size-control-sm);
-  align-self: flex-start;
-  /* Всегда в верхнем правом углу шапки, на уровне первой строки названия (строка 24, кнопка 32) */
-  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1) 0 0;
+  /* Всегда в верхнем правом углу шапки, на уровне первой строки названия (строка 24, кнопка 32); не занимает место в строке */
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
   border-radius: var(--radius-full);
   color: var(--text-icon);
   font-size: var(--size-icon-sm);

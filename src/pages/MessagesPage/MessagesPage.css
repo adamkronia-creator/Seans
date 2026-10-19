@@ -147,6 +147,12 @@
   padding: var(--pm-top) 0 var(--pm-bottom);
   overflow-y: auto;
   scroll-padding-top: var(--pm-top);
+  overflow-x: hidden;
+  scrollbar-width: none; /* полос прокрутки в списке чатов нет */
+}
+
+.messages__list::-webkit-scrollbar {
+  display: none;
 }
 
 /* От линии шапки до первой строки space-3 */

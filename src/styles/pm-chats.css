@@ -16,27 +16,27 @@
   --bg-surface: #ffffff;
   --bg-raised: #ffffff;
   --bg-warm: #ffffff;
-  --bg-field: #ebedf0;
-  --bg-subtle: #f2f3f5;
-  --border-subtle: #eeeeef;
+  --bg-field: #e9e9eb;
+  --bg-subtle: #f2f2f7;
+  --border-subtle: #e5e5ea;
   --text-primary: #000000;
-  --text-secondary: #586573; /* текст сообщений, время, подпись статуса (в макете #818c99 даёт 3,4:1 на белом и 2,9:1 на цветном фоне; здесь 5–6:1) */
-  --text-icon: #5f6b7a; /* значки поиска и уведомлений, неактивные значки нижней панели, плашка дня (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
-  --text-chip: #5f6b7a; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
-  /* Синий для букв и кнопок с белой подписью: #2688eb даёт лишь 3,6:1, #1260b0 — 6,3:1 на белом и 5,1:1 на цветном стекле. Фирменный #2688eb остаётся в заливках без текста (круги, кольца историй, значки цветов) */
-  --text-link: #1260b0;
-  --action-primary: #1260b0;
-  --action-primary-hover: #0c4a8f;
-  --action-primary-pressed: #08376b;
+  --text-secondary: #636366; /* текст сообщений, время, подпись статуса (в макете #818c99 даёт 3,4:1 на белом и 2,9:1 на цветном фоне; здесь 5–6:1) */
+  --text-icon: #636366; /* значки поиска и уведомлений, неактивные значки нижней панели, плашка дня (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
+  --text-chip: #636366; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
+  /* Синий для букв и кнопок с белой подписью: #007aff даёт лишь 3,6:1, #007aff — 6,3:1 на белом и 5,1:1 на цветном стекле. Фирменный #007aff остаётся в заливках без текста (круги, кольца историй, значки цветов) */
+  --text-link: #007aff;
+  --action-primary: #007aff;
+  --action-primary-hover: #0062cc;
+  --action-primary-pressed: #004fa3;
   --action-primary-text: #ffffff;
-  --chat-unread-bg: #1260b0;
+  --chat-unread-bg: #007aff;
   --chat-unread-text: #ffffff;
-  --border-focus: #2688eb;
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #2688eb;
-  --presence-online: #4bb34b; /* точка «в сети» */
+  --border-focus: #007aff;
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #007aff;
+  --presence-online: #34c759; /* точка «в сети» */
   /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%) и выбранный чипс; невыбранный чипс без заливки */
-  --grad-circle: linear-gradient(135deg, rgb(45 150 245 / 0.96), rgb(20 115 225 / 0.9));
-  --grad-chip-active: linear-gradient(135deg, #1b72d0 0%, #1260b0 100%); /* белая подпись ≥ 4,9:1 */
+  --grad-circle: linear-gradient(135deg, rgb(51 149 255 / 0.96), rgb(0 122 255 / 0.92));
+  --grad-chip-active: linear-gradient(135deg, #1a85ff 0%, #0071ee 100%); /* белая подпись ≥ 4,9:1 */
 }
 
 /* ——— Переходный слой: прежние имена переменных указывают на токены новой системы ———
@@ -302,7 +302,7 @@ html:has([data-pm]) body {
 
 /* ——— Листы (порядок папок, удаление): шторка до нижнего края, верхние углы radius-lg, под ней bg-scrim ——— */
 .sheet-overlay[data-pm] {
-  background: rgb(30 40 80 / 0.28);
+  background: rgb(0 0 0 / 0.3);
 }
 
 /* Лист — «зеркало», как боковая панель чата и нижняя капсула: белая полупрозрачная заливка, размытие и насыщенность того, что позади, рамка 1 px.
@@ -312,7 +312,7 @@ html:has([data-pm]) body {
   border-bottom: 0;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: rgb(255 255 255 / 0.66);
-  box-shadow: 0 calc(var(--space-2) * -1) var(--space-8) rgb(60 80 160 / 0.22);
+  box-shadow: 0 calc(var(--space-2) * -1) var(--space-8) rgb(0 0 0 / 0.14);
   color: var(--text-primary);
   -webkit-backdrop-filter: blur(var(--space-8)) saturate(2);
   backdrop-filter: blur(var(--space-8)) saturate(2);
@@ -322,7 +322,7 @@ html:has([data-pm]) body {
   width: var(--space-10);
   height: var(--space-1);
   border-radius: var(--radius-full);
-  background: rgb(107 117 133 / 0.4);
+  background: rgb(60 60 67 / 0.4);
 }
 
 [data-pm] .sheet__header {
@@ -439,26 +439,26 @@ html:has([data-pm]) body {
   --glass-border: rgb(255 255 255 / 0.7);
   --glass-filter: blur(var(--space-4)) saturate(1.8);
   --glass-filter-panel: blur(var(--space-6)) saturate(2);
-  --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(60 80 160 / 0.2);
+  --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(0 0 0 / 0.14);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
-  --glass-chip-active: linear-gradient(135deg, rgb(27 114 208 / 0.97), rgb(18 96 176 / 0.97)); /* белая подпись ≥ 4,9:1 */
+  --glass-chip-active: linear-gradient(135deg, rgb(26 132 255 / 0.97), rgb(0 113 238 / 0.97)); /* белая подпись ≥ 4,9:1 */
   --glass-border-blue: rgb(255 255 255 / 0.45);
   /* Фон — прежний мягкий градиент: шесть цветных пятен на светлой основе */
   --scene:
-    radial-gradient(55% 30% at 6% 5%, rgb(96 165 250 / 0.6), transparent 72%),
-    radial-gradient(50% 26% at 100% 12%, rgb(255 140 170 / 0.5), transparent 72%),
-    radial-gradient(55% 28% at 94% 46%, rgb(255 190 120 / 0.5), transparent 72%),
-    radial-gradient(60% 30% at 0% 50%, rgb(110 220 200 / 0.45), transparent 72%),
-    radial-gradient(60% 32% at 72% 100%, rgb(170 130 255 / 0.55), transparent 72%),
-    radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
+    radial-gradient(55% 30% at 6% 5%, rgb(0 122 255 / 0.32), transparent 72%),
+    radial-gradient(50% 26% at 100% 12%, rgb(255 45 85 / 0.26), transparent 72%),
+    radial-gradient(55% 28% at 94% 46%, rgb(255 149 0 / 0.28), transparent 72%),
+    radial-gradient(60% 30% at 0% 50%, rgb(0 199 190 / 0.28), transparent 72%),
+    radial-gradient(60% 32% at 72% 100%, rgb(175 82 222 / 0.3), transparent 72%),
+    radial-gradient(55% 28% at 8% 100%, rgb(50 173 230 / 0.3), transparent 72%),
     linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
   --glass-fill-header: rgb(255 255 255 / 0.62);
   /* Пузыри чата: входящие — белое стекло, исходящие — синий градиент акцента (от action-primary к action-primary-pressed, белая подпись держит 3,6–5,5:1) */
   --glass-bubble-in: rgb(255 255 255 / 0.78);
   /* Карточки внутри вкладок чата (тесты, сведения, заметки, события): белое стекло плотнее панелей, без размытия — позади гладкий фон */
   --glass-card: rgb(255 255 255 / 0.62);
-  --glass-bubble-out-from: #1b6fcb;
-  --glass-bubble-out-to: #0f4f9c;
+  --glass-bubble-out-from: #1a85ff;
+  --glass-bubble-out-to: #007aff;
 }
 
 [data-pm] .messages {
@@ -503,7 +503,7 @@ html:has([data-pm]) body {
 }
 
 [data-pm] .stories__add {
-  border: 1.5px dashed rgb(107 117 133 / 0.55);
+  border: 1.5px dashed rgb(60 60 67 / 0.55);
 }
 
 [data-pm] .chats-header__action:active {
@@ -600,4 +600,14 @@ html:has([data-pm]) body {
 [data-pm] .sheet--edit .sheet__preview-input {
   font: var(--type-headline);
   letter-spacing: 0;
+}
+
+/* Кнопка «в конец страницы» (заметки, сведения): стеклянный круг, как «к последним сообщениям» в переписке */
+[data-pm] .scroll-host__down {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-panel);
+  box-shadow: none;
+  color: var(--text-icon);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }

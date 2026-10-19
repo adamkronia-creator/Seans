@@ -22,7 +22,7 @@ export interface StoryAuthor {
 export const STORY_BACKGROUNDS = [
   'linear-gradient(160deg, #3f9bf1 0%, #7b6cf0 100%)',
   'linear-gradient(160deg, #f6a469 0%, #e8647c 100%)',
-  'linear-gradient(160deg, #4bb34b 0%, #2688eb 100%)',
+  'linear-gradient(160deg, #4bb34b 0%, #007AFF 100%)',
   'linear-gradient(160deg, #8e7cf0 0%, #d46cc0 100%)',
   'linear-gradient(160deg, #2c3a4d 0%, #4a6a8f 100%)',
 ];

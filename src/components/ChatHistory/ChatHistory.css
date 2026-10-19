@@ -214,6 +214,7 @@
 
 /* Событие: карточка белого стекла, поля 12 и 16 */
 .hist-card {
+  position: relative;
   touch-action: manipulation; /* двойное касание открывает редактор, а не масштабирует */
   display: flex;
   flex-direction: column;
@@ -233,9 +234,26 @@
   flex: 1;
   min-width: 0;
   margin: 0;
+  overflow-wrap: anywhere;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
+}
+
+/* Карандаш лежит поверх угла карточки; место под него резервирует только первая строка названия (поплавок короче строки) */
+.hist-card__top:has(.hist-card__edit) .hist-card__title::before {
+  content: '';
+  float: right;
+  width: calc(var(--space-3) + var(--space-2));
+  height: var(--space-4);
+}
+
+.hist-card__top:has(.hist-card__edit) .hist-card__title--single {
+  padding-right: calc(var(--space-3) + var(--space-2));
+}
+
+.hist-card__top:has(.hist-card__edit) .hist-card__title--single::before {
+  display: none;
 }
 
 .hist-card__title--single {
@@ -251,7 +269,9 @@
   justify-content: center;
   width: var(--size-control-sm);
   height: var(--size-control-sm);
-  margin: calc(var(--space-2) * -1) calc(var(--space-3) * -1) calc(var(--space-2) * -1) 0;
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
   border-radius: var(--radius-full);
   color: var(--text-icon);
   font-size: var(--size-icon-sm);
@@ -312,7 +332,7 @@
 
 .hist-card__event {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1);
   align-items: center;
 }
 
@@ -409,7 +429,7 @@
   height: 6px;
   overflow: hidden;
   border-radius: 3px;
-  background: rgb(107 117 133 / 18%);
+  background: rgb(60 60 67 / 18%);
 }
 
 .hist-scale__fill {

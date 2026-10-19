@@ -108,7 +108,7 @@
 }
 
 .bubble__mark--active {
-  background: #FFCF48; /* Восход солнца */
+  background: #FFCC00; /* Восход солнца */
   color: var(--text-primary);
 }
 

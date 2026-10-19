@@ -59,7 +59,7 @@
   max-height: 720px;
   margin: var(--space-1) auto 0;
   overflow: hidden;
-  border: 8px solid #13203A;
+  border: 8px solid #000000;
   border-radius: 40px;
   background: var(--color-bg-panel);
   box-shadow: 0 4px 20px rgb(19 32 58 / 16%);
@@ -79,7 +79,7 @@
   width: 72px;
   height: 20px;
   border-radius: 10px;
-  background: #13203A;
+  background: #000000;
   transform: translateX(-50%);
 }
 

@@ -47,6 +47,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
       const first = last < 0;
       last = height;
       page.style.setProperty('--page-bottom', `calc(${height}px + var(--space-2))`);
+      page.style.setProperty('--down-gap', 'var(--space-2)'); // кнопке «в конец страницы» до 16 над капсулой не хватает 8
       // Лента подстраивается под новый отступ после перерисовки; при первом замере её ставит на место сам чат
       if (!first) layoutRef.current?.();
     };
@@ -56,6 +57,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
     return () => {
       observer.disconnect();
       page.style.removeProperty('--page-bottom');
+      page.style.removeProperty('--down-gap');
     };
   }, []);
 

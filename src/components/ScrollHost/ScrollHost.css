@@ -10,8 +10,8 @@
 /* Круглая кнопка 40, как «к последним сообщениям» в переписке */
 .scroll-host__down {
   position: absolute;
-  right: var(--space-3);
-  bottom: var(--space-3);
+  right: var(--space-4);
+  bottom: calc(var(--page-bottom, var(--space-4)) + var(--foot-h, 0px) + var(--down-gap, 0px)); /* 16 над панелью приложения (--page-bottom уже с запасом), над полем ввода --down-gap добавляет 8, над чипсами истории — их высота */
   z-index: 2;
   display: flex;
   align-items: center;
