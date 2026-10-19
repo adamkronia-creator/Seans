@@ -30,13 +30,12 @@ export function StoriesRow({ root }: { root: HTMLElement | null }) {
 
   return (
     <div className="stories" role="group" aria-label="Истории">
-      {authors.map((a, i) => {
+      {authors.map((a) => {
         const unseen = a.stories.filter((s) => !isSeen(s.id)).length;
         const has = a.stories.length > 0;
         const mine = a.id === 'me';
         return (
           <div key={a.id} className="stories__cell">
-            {i === 1 && <span className="stories__divider" aria-hidden="true" />}
             <button
               type="button"
               className="stories__item"
