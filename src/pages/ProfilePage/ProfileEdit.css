@@ -255,8 +255,10 @@
 /* Текст поля растёт вместе с написанным (AutoTextarea): внутренней прокрутки нет */
 .pe__field-text {
   display: block;
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
+  /* Поле отступает от края карточки: у края экрана касание принадлежит жесту «назад», а не полю */
+  width: calc(100% - var(--space-4));
+  margin-inline: var(--space-2);
+  padding: var(--space-3) var(--space-2);
   border: 0;
   outline: 0;
   overflow: hidden;

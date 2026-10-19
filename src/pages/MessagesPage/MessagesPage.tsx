@@ -11,6 +11,7 @@ import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
 import { ChatsHeader } from './ChatsHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
+import { switchTab } from '../../utils/tabNav';
 import type { Chat } from '../../data/chats';
 import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
@@ -270,7 +271,7 @@ export function MessagesPage() {
         }
       />
 
-      <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} />
+      <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={(d) => d > 0 && switchTab('profile')} />
 
       {folderMenu.node}
       {rowMenu && <ChipMenu anchor={rowMenu.rect} opener={rowMenu.row} items={menuItems} onClose={() => setRowMenu(null)} />}

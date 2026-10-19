@@ -12,6 +12,7 @@ import { useChats } from '../../data/chatStore';
 import { avatarSrcOf, coverSrcOf, useProfile } from '../../data/profile';
 import { wantEdit } from '../../data/profileIntent';
 import { navigate } from '../../router';
+import { useTabSwipe } from '../../utils/tabNav';
 import './ProfilePage.css';
 
 /** Сколько фото видно в сетке, пока не нажали «Показать все»: три ряда по три */
@@ -30,6 +31,9 @@ export function ProfilePage() {
   const [expanded, setExpanded] = useState(false);
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
+  const root = useRef<HTMLElement>(null);
+  // Свайп вправо ведёт в чаты (предыдущий раздел нижней панели)
+  useTabSwipe(root, 'right', 'messages');
 
   const { photos, thumbs, uploading, name, headline, city, fields } = profile;
   const cover = coverSrcOf(profile);
@@ -47,7 +51,7 @@ export function ProfilePage() {
   };
 
   return (
-    <section className="profile">
+    <section ref={root} className="profile">
       <div className="profile__scroll">
         <div className="profile__top">
           <div className="profile__cover">

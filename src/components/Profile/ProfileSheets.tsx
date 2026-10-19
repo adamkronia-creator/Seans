@@ -53,6 +53,7 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
   return (
     <Frame
       title={isAvatar ? 'Фото профиля' : 'Обложка'}
+      quietTitle
       onClose={onClose}
       footer={
         <button type="button" className="sheet__button" onClick={onClose}>

@@ -17,15 +17,39 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
     const vv = window.visualViewport;
     const el = ref.current;
     if (!vv || !el) return;
+    /** Поле, которое сейчас набирают, остаётся на виду: клавиатура и сдвиг окна не должны уводить его за край прокрутки */
+    const reveal = () => {
+      const field = document.activeElement;
+      if (!(field instanceof HTMLElement) || !field.matches('input, textarea, [contenteditable]') || !el.contains(field)) return;
+      const body = field.closest<HTMLElement>('.sheet__body');
+      if (!body) return;
+      // Поле заголовка стоит в карточке-шапке: показываем её целиком
+      const box = field.closest<HTMLElement>('.sheet__preview') ?? field;
+      const margin = 16;
+      const scroller = body.getBoundingClientRect();
+      const rect = box.getBoundingClientRect();
+      const bottomLimit = scroller.bottom - (field.matches('textarea, [contenteditable]') ? 65 : margin);
+      if (rect.top < scroller.top + margin) body.scrollTop += rect.top - scroller.top - margin;
+      else if (rect.bottom > bottomLimit) body.scrollTop += rect.bottom - bottomLimit;
+    };
     const fit = () => {
       const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
       el.style.bottom = covered > 80 ? `${covered}px` : '';
       el.style.setProperty('--sheet-max', covered > 80 ? `${vv.height - 8}px` : '');
+      reveal();
     };
+    // Клавиатура выезжает не сразу: сначала фокус, потом изменение окна; проверяем и там, и там
+    const onFocus = () => {
+      reveal();
+      window.setTimeout(reveal, 120);
+      window.setTimeout(reveal, 350);
+    };
+    el.addEventListener('focusin', onFocus);
     fit();
     vv.addEventListener('resize', fit);
     vv.addEventListener('scroll', fit);
     return () => {
+      el.removeEventListener('focusin', onFocus);
       vv.removeEventListener('resize', fit);
       vv.removeEventListener('scroll', fit);
     };

@@ -114,3 +114,10 @@
   background: var(--action-primary);
   color: var(--action-primary-text);
 }
+
+/* Заголовок окна — как подпись группы «Фон приложения»: тот же шрифт, цвет и отступ слева 4 от полей */
+[data-pm] .sheet .sheet__heading.sheet__heading--quiet {
+  padding: 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--type-label);
+}

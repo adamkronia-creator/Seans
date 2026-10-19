@@ -8,13 +8,15 @@ interface FrameProps {
   title: string;
   /** Пояснение под заголовком: что именно меняем */
   subtitle?: string;
+  /** Заголовок мелкий, как подпись группы (окна выбора фото и фона) */
+  quietTitle?: boolean;
   footer: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }
 
 /** Каркас нижнего окна: ручка, заголовок, прокручиваемое содержимое и нижние кнопки */
-export function Frame({ title, subtitle, footer, onClose, children }: FrameProps) {
+export function Frame({ title, subtitle, quietTitle, footer, onClose, children }: FrameProps) {
   useSheet(onClose);
   const body = useRef<HTMLDivElement>(null);
   return (
@@ -22,7 +24,7 @@ export function Frame({ title, subtitle, footer, onClose, children }: FrameProps
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
         <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__header">
-          <h2 className="sheet__heading">{title}</h2>
+          <h2 className={`sheet__heading${quietTitle ? ' sheet__heading--quiet' : ''}`}>{title}</h2>
           {subtitle && <p className="frame-subtitle">{subtitle}</p>}
         </div>
         <div className="sheet__body" ref={body}>

@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
+import { registerTabSwitch } from './utils/tabNav';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
@@ -93,6 +94,9 @@ export default function App() {
       if (toRoot) navigate('/', 'none');
     }, id === active ? 'back' : 'fade');
   }, []);
+  useLayoutEffect(() => {
+    registerTabSwitch(handleTabChange);
+  }, [handleTabChange]);
 
   /** Настройки папки на весь экран, без нижней панели (как редактирование профиля); если такой папки нет, экран не строится */
   const folderScreen = (path: string, scope: FolderScope): Resolved | null => {

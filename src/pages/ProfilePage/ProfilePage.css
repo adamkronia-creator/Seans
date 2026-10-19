@@ -586,3 +586,8 @@
 [data-pm] .profile__drop {
   border-color: var(--divider);
 }
+
+/* Горизонтальный жест раздела (свайп в чаты) достаётся странице, а не браузеру */
+.profile {
+  touch-action: pan-y;
+}
