@@ -340,7 +340,10 @@
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones {
   /* Внутри карточки 12 со всех сторон; сетка начинается через 12 под строкой «Иконка»/«Цвет». cqw — ширина содержимого карточки */
+  /* Разделитель 0,5 px под строкой: 12 над ним и 12 под ним */
+  margin-top: var(--space-3);
   padding: var(--space-3) 0 0;
+  border-top: 0.5px solid rgb(107 117 133 / 0.35);
   row-gap: calc((100cqw - var(--cols) * 36px) / (var(--cols) - 1));
 }
 
@@ -398,7 +401,7 @@
   padding: var(--space-3);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: rgb(255 255 255 / 0.92);
+  background: #ffffff;
 }
 
 /* Фона у значка нет: выбираются только значок и его цвет. Плитка в заголовке без заливки, ячейки сетки без заливки и рамки, выбранная — кольцо */
@@ -421,3 +424,8 @@
   max-height: none;
 }
 
+
+/* «Иконка» и «Цвет»: 16 */
+[data-pm] .sheet__toggle-label {
+  font: var(--type-body);
+}
