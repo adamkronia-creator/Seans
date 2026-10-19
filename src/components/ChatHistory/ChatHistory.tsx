@@ -15,7 +15,6 @@ import {
 } from '../icons';
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
-import type { Tone } from '../../utils/tone';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultId, clientResultPath, recordRef } from '../../data/resultLinks';
 import { findClientResult } from '../../data/clientResults';
@@ -46,40 +45,6 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'task', label: 'Задания' },
   { id: 'note', label: 'Заметки' },
 ];
-
-interface StatItem {
-  label: string;
-  value: number;
-  total?: number;
-  /** Цвет типа: над числом метка того же тона, что у круга события и чипса раздела */
-  tone: Tone;
-}
-
-/** Сводка в одну строку: над числом метка цвета типа, число крупно, под ним подпись; у тестов и заданий «выполнено / всего» */
-function Stats({ hasData }: { hasData: boolean }) {
-  const d = useClientData();
-  const n = (value: number) => (hasData ? value : 0);
-  const items: StatItem[] = [
-    { label: 'Сеансы', value: n(countOf(d, 'session')), tone: 'session' },
-    { label: 'Тесты', value: n(doneCount(d, 'test')), total: n(countOf(d, 'test')), tone: 'test' },
-    { label: 'Задания', value: n(doneCount(d, 'task')), total: n(countOf(d, 'task')), tone: 'task' },
-    { label: 'Сведения', value: n(d.caseSections.length), tone: 'info' },
-    { label: 'Заметки', value: n(countOf(d, 'note')), tone: 'note' },
-  ];
-  return (
-    <ul className="hist-stats">
-      {items.map(({ label, value, total, tone }) => (
-        <li key={label} className="hist-stats__item" data-tone={tone} title={total !== undefined ? `${label}: выполнено ${value} из ${total}` : undefined}>
-          <span className="hist-stats__value">
-            {value}
-            {total !== undefined && <span className="hist-stats__total">/{total}</span>}
-          </span>
-          <span className="hist-stats__label">{label}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
@@ -336,6 +301,15 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
 
+  // Число у каждого вида — прямо на чипсе: сеансы и заметки считаются, у тестов и заданий «выполнено / всего»
+  const n = (value: number) => (hasData ? value : 0);
+  const counts: Partial<Record<HistoryFilter, { value: number; total?: number }>> = {
+    session: { value: n(countOf(data, 'session')) },
+    test: { value: n(doneCount(data, 'test')), total: n(countOf(data, 'test')) },
+    task: { value: n(doneCount(data, 'task')), total: n(countOf(data, 'task')) },
+    note: { value: n(countOf(data, 'note')) },
+  };
+
   // Панель чипсов лежит поверх лент (absolute): её высоту отдаём лентам, чтобы они кончались над ней
   useEffect(() => {
     const host = root.current;
@@ -377,20 +351,28 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const foot = (
     <>
       <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
-        {FILTERS.map(({ id, label }, i) => (
-          <Chip
-            key={id}
-            follow
-            tone={id === 'all' ? undefined : id}
-            active={shown === i}
-            onClick={() => setFilter(id)}
-          >
-            {label}
-          </Chip>
-        ))}
+        {FILTERS.map(({ id, label }, i) => {
+          const c = counts[id];
+          return (
+            <Chip
+              key={id}
+              follow
+              tone={id === 'all' ? undefined : id}
+              active={shown === i}
+              onClick={() => setFilter(id)}
+              ariaLabel={c && c.total !== undefined ? `${label}: выполнено ${c.value} из ${c.total}` : c ? `${label}: ${c.value}` : label}
+            >
+              {c && (
+                <span className="hist-chip__n">
+                  {c.value}
+                  {c.total !== undefined && <span className="hist-chip__total">/{c.total}</span>}
+                </span>
+              )}
+              {label}
+            </Chip>
+          );
+        })}
       </div>
-
-      <Stats hasData={hasData} />
     </>
   );
 

@@ -1,6 +1,6 @@
 /*
- * Вкладка «История взаимодействия» на системе мессенджера: сверху лента событий (свежие внизу), под ней стеклянная панель с чипсами-фильтрами
- * и сводкой, ниже нижняя капсула приложения. События — карточки белого стекла, слева круги цвета типа на сплошной линии времени.
+ * Вкладка «История взаимодействия» на системе мессенджера: сверху лента событий (свежие внизу), под ней закреплённый ряд чипсов-фильтров со счётчиками
+ * («6 Сеансы», «5/6 Тесты»), ниже нижняя капсула приложения. События — карточки белого стекла, слева круги цвета типа на сплошной линии времени.
  * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому лента при листании уходит к краю экрана, а не обрезается у поля.
  * Верхний отступ ленты (под шапку) задаёт ChatPage.css. Размеры — токены сетки 4; вне сетки метки и линии (22×6, 20, 1,5).
  */
@@ -40,85 +40,14 @@
   margin-block: auto;
 }
 
-/* Чипсы и сводка закреплены под лентами в стеклянной панели: поля space-4 от краёв экрана, как у нижней капсулы */
+/* Ряд чипсов-счётчиков закреплён внизу поверх лент (над нижней капсулой приложения), как у «Диалогов»; своей панели у него нет: чипсы сами стеклянные */
 .hist-foot {
   position: absolute;
-  right: var(--space-4);
+  right: 0;
   bottom: var(--page-bottom, 0px);
-  left: var(--space-4);
+  left: 0;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
   margin: 0;
-  padding: var(--space-3) var(--space-3) var(--space-2);
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  background: var(--glass-fill-panel);
-  box-shadow: var(--glass-shadow-panel);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
-}
-
-/* Сводка: пять колонок — над числом метка цвета типа, число крупно, под ним подпись; без своей карточки, это часть панели */
-.hist-stats {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  margin: 0;
-  padding: var(--space-1) 0;
-  list-style: none;
-}
-
-.hist-stats__item {
-  --tick: var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-width: 0;
-}
-
-.hist-stats__item[data-tone='session'] {
-  --tick: var(--tone-session);
-}
-
-.hist-stats__item[data-tone='test'] {
-  --tick: var(--tone-test);
-}
-
-.hist-stats__item[data-tone='task'] {
-  --tick: var(--tone-task);
-}
-
-.hist-stats__item[data-tone='info'] {
-  --tick: var(--tone-info);
-}
-
-.hist-stats__item[data-tone='note'] {
-  --tick: var(--tone-note);
-}
-
-.chat .hist-stats__value {
-  display: flex;
-  align-items: baseline;
-  color: var(--text-primary);
-  font: var(--type-title);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-}
-
-.hist-stats__total {
-  margin-left: 1px;
-  color: var(--text-secondary);
-  font: var(--type-caption);
-  line-height: 1;
-}
-
-.hist-stats__label {
-  color: var(--text-secondary);
-  font: var(--type-meta);
-  font-weight: 400;
 }
 
 /* Чипсы фильтров — как в «Диалогах»: отдельные пилюли высотой 32 с зазором space-2, невыбранные — белое стекло, выбранный залит
@@ -128,8 +57,7 @@
 .hist-chips {
   display: flex;
   gap: var(--space-2);
-  margin: calc(var(--space-1) * -1) calc(var(--space-3) * -1);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--space-4);
   overflow-x: hidden;
   scrollbar-width: none;
 }
@@ -493,4 +421,15 @@
 /* Лента заканчивается над закреплённой панелью чипсов: её высоту (--foot-h) замеряет ChatHistory; последняя карточка выше панели на 16 (padding .hist-page) */
 [data-pm] .chat .chat-history {
   padding-bottom: calc(var(--page-bottom, 0px) + var(--foot-h, 0px));
+}
+
+/* Число на чипсе: вид «6 Сеансы», «5/6 Тесты»; цифры одной ширины, «из скольки» бледнее */
+.hist-chips .hist-chip__n {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.hist-chips .hist-chip__total {
+  font-weight: 400;
+  opacity: 0.7;
 }
