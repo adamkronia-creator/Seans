@@ -30,6 +30,11 @@ try {
     localStorage.removeItem('seans-bg-image'); // выбор варианта снимает загруженную картинку
   }
   document.documentElement.dataset.bg = localStorage.getItem('seans-bg') ?? '1';
+  // Размытие фона в px: ?blur=0…60, выбор запоминается
+  const blur = new URLSearchParams(window.location.search).get('blur');
+  if (blur !== null && /^\d{1,2}$/.test(blur) && Number(blur) <= 60) localStorage.setItem('seans-blur', blur);
+  const saved = localStorage.getItem('seans-blur');
+  if (saved !== null) document.documentElement.style.setProperty('--bg-blur', `${saved}px`);
 } catch {
   document.documentElement.dataset.bg = '1';
 }

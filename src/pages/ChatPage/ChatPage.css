@@ -19,7 +19,6 @@
   /* Подсказка стоит над капсулой */
   --toast-bottom: calc(var(--chat-tabs) + var(--space-4));
   position: relative;
-  background: var(--scene);
 }
 
 /* ——— Шапка: фото, имя и подпись слева, справа «назад» и меню ——— */
