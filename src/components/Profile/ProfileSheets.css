@@ -89,3 +89,28 @@
   color: var(--text-secondary, var(--color-text-secondary));
   font: var(--type-label, 600 15px/20px var(--font-family));
 }
+
+/* В окне новой системы сетка — как галерея на странице профиля: поля карточки 12, плитки 4 между собой, скругление 8 (20 минус 12) */
+[data-pm] .pf-grid {
+  gap: var(--space-1);
+  padding: 0;
+}
+
+[data-pm] .pf-tile {
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
+[data-pm] .pf-tile--on {
+  outline-color: var(--action-primary);
+}
+
+[data-pm] .pf-tile--add,
+[data-pm] .pf-check {
+  color: var(--text-link);
+}
+
+[data-pm] .pf-check {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}

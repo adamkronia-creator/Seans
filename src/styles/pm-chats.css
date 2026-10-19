@@ -491,12 +491,12 @@ html:has([data-pm]) body {
   --bg-blur: 24px;
 }
 
-[data-pm] :is(.messages, .chat, .profile) {
+[data-pm] :is(.messages, .chat, .profile, .pe) {
   isolation: isolate;
   overflow: clip;
 }
 
-[data-pm] :is(.messages, .chat, .profile)::before {
+[data-pm] :is(.messages, .chat, .profile, .pe)::before {
   content: '';
   position: absolute;
   inset: calc(var(--bg-blur) * -2);

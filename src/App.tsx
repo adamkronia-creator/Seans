@@ -208,6 +208,7 @@ export default function App() {
     if (path === '/profile/edit') {
       return {
         key: 'profile/edit',
+        pm: true,
         build: () => (
           <main className="app__content">
             <ProfileEditPage />

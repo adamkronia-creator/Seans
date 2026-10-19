@@ -305,3 +305,146 @@
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
+
+/* ——— Редактирование в стиле «Диалогов» (data-pm): стеклянная шапка, карточки с полями 16 и скруглением 20, Inter ——— */
+[data-pm] .pe__header {
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm] .pe__back {
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .pe__back:active {
+  background: var(--bg-subtle);
+}
+
+[data-pm] .pe__title {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
+}
+
+[data-pm] .pe__done {
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+[data-pm] .pe__scroll {
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) calc(var(--space-6) + var(--safe-bottom));
+  scrollbar-width: none;
+}
+
+[data-pm] .pe__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+[data-pm] .pe__card {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+}
+
+[data-pm] .pe__scroll > :first-child {
+  border-top: 1px solid var(--glass-border);
+}
+
+[data-pm] .pe__row {
+  min-height: var(--size-row);
+}
+
+[data-pm] .pe__row + .pe__row::before,
+[data-pm] .pe__input + .pe__input::before {
+  background: var(--border-subtle);
+}
+
+[data-pm] .pe__row[data-pressed] {
+  background: var(--glass);
+}
+
+[data-pm] .pe__row-label {
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+[data-pm] .pe__row-action {
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+[data-pm] .pe__cover-thumb {
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--text-link);
+}
+
+[data-pm] .pe__label {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+[data-pm] .pe__input input,
+[data-pm] .pe__field-label,
+[data-pm] .pe__field-text {
+  color: var(--text-primary);
+  caret-color: var(--action-primary);
+  font: var(--type-body);
+}
+
+[data-pm] .pe__field-label {
+  font-weight: 600;
+}
+
+[data-pm] .pe__input input::placeholder,
+[data-pm] .pe__field-label::placeholder,
+[data-pm] .pe__field-text::placeholder {
+  color: var(--text-secondary);
+}
+
+[data-pm] .pe__group {
+  padding: var(--space-2) var(--space-1) 0;
+}
+
+[data-pm] .pe__group-title,
+[data-pm] .pe__add-title {
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+[data-pm] .pe__hint {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+[data-pm] .pe__field-head {
+  border-bottom-color: var(--border-subtle);
+}
+
+[data-pm] .pe__tool {
+  color: var(--text-secondary);
+}
+
+[data-pm] .pe__tool--danger {
+  color: var(--color-red-text);
+}
+
+[data-pm] .pe__chip {
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-primary);
+  font: var(--type-label);
+}
+
+[data-pm] .pe__chip--own {
+  border-color: transparent;
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
