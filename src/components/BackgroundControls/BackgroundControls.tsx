@@ -1,6 +1,20 @@
 import { useRef, useState } from 'react';
 import './BackgroundControls.css';
-import { getBlur, getInkPref, resetBackground, setBackgroundFromFile, setBlur, setInkPref, type InkPref } from '../../utils/appearance';
+import dawn from '../../assets/bg-dawn.webp';
+import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
+import {
+  currentBackgroundId,
+  getBackgrounds,
+  getBlur,
+  getInkPref,
+  removeBackground,
+  resetBackground,
+  selectBackground,
+  setBackgroundFromFile,
+  setBlur,
+  setInkPref,
+  type InkPref,
+} from '../../utils/appearance';
 
 const INKS: { id: InkPref; label: string }[] = [
   { id: 'auto', label: 'Авто' },
@@ -14,37 +28,87 @@ export function BackgroundControls() {
   const [blur, setBlurState] = useState(getBlur);
   const [ink, setInk] = useState<InkPref>(getInkPref);
   const [failed, setFailed] = useState(false);
+  const [, setTick] = useState(0);
+  const refresh = () => setTick((n) => n + 1);
+  const list = getBackgrounds();
+  const selected = currentBackgroundId();
   return (
     <>
-      <section className="sheet__card bg-sheet__card">
-            <div className="bg-sheet__row">
-              <button type="button" className="bg-sheet__button" onClick={() => file.current?.click()}>
-                Загрузить
-              </button>
+      <section className="sheet__card">
+        <ul className="pf-grid">
+          <li>
+            <button type="button" className="pf-tile pf-tile--add" onClick={() => file.current?.click()}>
+              <IconCamera />
+              <span>Загрузить</span>
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className={`pf-tile${selected === null ? ' pf-tile--on' : ''}`}
+              aria-label="Фон по умолчанию"
+              aria-pressed={selected === null}
+              onClick={() => {
+                resetBackground();
+                refresh();
+              }}
+            >
+              <img src={dawn} alt="" />
+              {selected === null && (
+                <span className="pf-check">
+                  <IconCheck />
+                </span>
+              )}
+            </button>
+          </li>
+          {list.map((bg, i) => (
+            <li key={bg.id}>
               <button
                 type="button"
-                className="bg-sheet__button bg-sheet__button--quiet"
-                onClick={() => {
-                  resetBackground();
-                  setFailed(false);
+                className={`pf-tile${bg.id === selected ? ' pf-tile--on' : ''}`}
+                aria-label={`Мой фон ${i + 1}`}
+                aria-pressed={bg.id === selected}
+                onClick={async () => {
+                  await selectBackground(bg.id);
+                  refresh();
                 }}
               >
-                Сбросить
+                <img src={bg.data} alt="" />
+                {bg.id === selected && (
+                  <span className="pf-check">
+                    <IconCheck />
+                  </span>
+                )}
               </button>
-            </div>
-            {failed && <p className="bg-sheet__note">Не удалось прочитать файл: нужна картинка.</p>}
-            <input
-              ref={file}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={async (e) => {
-                const f = e.target.files?.[0];
-                e.target.value = '';
-                if (f) setFailed(!(await setBackgroundFromFile(f)));
-              }}
-            />
-          </section>
+            </li>
+          ))}
+        </ul>
+        {failed && <p className="bg-sheet__note">Не удалось прочитать файл: нужна картинка.</p>}
+        <input
+          ref={file}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            e.target.value = '';
+            if (f) setFailed(!(await setBackgroundFromFile(f)));
+            refresh();
+          }}
+        />
+      </section>
+      {selected && (
+        <button
+          type="button"
+          className="sheet__card pf-remove"
+          onClick={() => {
+            removeBackground(selected);
+            refresh();
+          }}
+        >
+          Удалить выбранный фон
+        </button>
+      )}
 
           <section className="sheet__card bg-sheet__card">
             <label className="bg-sheet__label" htmlFor="bg-blur">
@@ -88,7 +152,6 @@ export function BackgroundControls() {
                 </button>
               ))}
             </div>
-            <p className="bg-sheet__note">«Авто» выбирает белый текст на тёмном фоне и тёмный на светлом.</p>
           </section>
     </>
   );

@@ -9,6 +9,9 @@ const K_IMAGE = 'seans-bg-image';
 const K_VARIANT = 'seans-bg';
 const K_BLUR = 'seans-blur';
 const K_INK = 'seans-ink';
+/** Список загруженных фонов (JSON: [{id, data}]) и id выбранного */
+const K_LIST = 'seans-bg-list';
+const MAX_SAVED = 8;
 const MAX_SIDE = 1600;
 /** Средняя яркость фона (0…1) ниже этого порога — текст белый */
 const DARK_BELOW = 0.5;
@@ -103,7 +106,63 @@ function show(dataUrl: string) {
 
 export const hasCustomBackground = () => get(K_IMAGE) !== null;
 
-/** Читает файл, уменьшает и включает как фон; false, если это не картинка */
+export interface SavedBackground {
+  id: string;
+  data: string;
+}
+
+/** Загруженные фоны: новые первыми. Прежний одиночный фон (seans-bg-image) входит в список при первом чтении */
+export function getBackgrounds(): SavedBackground[] {
+  let list: SavedBackground[] = [];
+  try {
+    const parsed = JSON.parse(get(K_LIST) ?? '[]');
+    if (Array.isArray(parsed)) list = parsed.filter((b) => b && typeof b.id === 'string' && typeof b.data === 'string');
+  } catch {
+    list = [];
+  }
+  const current = get(K_IMAGE);
+  if (current && !list.some((b) => b.data === current)) list = [{ id: `b${Date.now()}`, data: current }, ...list];
+  return list;
+}
+
+function saveList(list: SavedBackground[]) {
+  // Не влезло в хранилище — убираем самые старые, пока не поместится
+  const next = list.slice(0, MAX_SAVED);
+  for (;;) {
+    try {
+      localStorage.setItem(K_LIST, JSON.stringify(next));
+      return next;
+    } catch {
+      if (next.length <= 1) return next;
+      next.pop();
+    }
+  }
+}
+
+/** id выбранного загруженного фона; null — фон по умолчанию */
+export function currentBackgroundId(): string | null {
+  const current = get(K_IMAGE);
+  return current ? (getBackgrounds().find((b) => b.data === current)?.id ?? null) : null;
+}
+
+/** Выбрать загруженный фон по id */
+export async function selectBackground(id: string) {
+  const found = getBackgrounds().find((b) => b.id === id);
+  if (!found) return;
+  set(K_IMAGE, found.data);
+  show(found.data);
+  await applyInk();
+}
+
+/** Удалить загруженный фон; если он был выбран, возвращается фон по умолчанию */
+export function removeBackground(id: string) {
+  const list = getBackgrounds();
+  const gone = list.find((b) => b.id === id);
+  saveList(list.filter((b) => b.id !== id));
+  if (gone && gone.data === get(K_IMAGE)) resetBackground();
+}
+
+/** Читает файл, уменьшает, запоминает в списке и включает как фон; false, если это не картинка */
 export async function setBackgroundFromFile(file: File): Promise<boolean> {
   if (!file.type.startsWith('image/')) return false;
   try {
@@ -114,6 +173,7 @@ export async function setBackgroundFromFile(file: File): Promise<boolean> {
     canvas.height = Math.round(bitmap.height * k);
     canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     const data = canvas.toDataURL('image/jpeg', 0.85);
+    saveList([{ id: `b${Date.now()}`, data }, ...getBackgrounds()]);
     set(K_IMAGE, data);
     show(data);
     await applyInk();
@@ -123,7 +183,7 @@ export async function setBackgroundFromFile(file: File): Promise<boolean> {
   }
 }
 
-/** Возвращает фон приложения по умолчанию (картинка рассвета) */
+/** Возвращает фон приложения по умолчанию (картинка рассвета); загруженные фоны остаются в списке */
 export function resetBackground() {
   set(K_IMAGE, null);
   set(K_VARIANT, null);
