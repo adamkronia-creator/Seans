@@ -415,12 +415,11 @@ html:has([data-pm]) body {
 
 /* ——— «Диалоги»: матовое стекло (glassmorphism) ———
    Эффект держится на четырёх вещах, и без любой из них стекло выглядит просто белым пятном:
-   1) ЗА стеклом есть что размывать: яркий фон с цветными кругами, края которых проходят под стеклянными элементами;
+   1) ЗА стеклом есть что размывать: цветной фон и строки списка, проезжающие под стеклом;
    2) заливка полупрозрачная (белая 30–45%), чтобы фон просвечивал;
    3) backdrop-filter: размытие и насыщенность того, что лежит позади;
    4) тонкая светлая рамка 1 px: она задаёт край стекла.
-   Нижняя панель — плавающая стеклянная капсула, под которой проезжают строки списка. Шапка без подложки: списку под ней места нет, строки
-   уходят под шапку, потому что шапка закрашена тем же фоном (копия верхней части сцены). Стеклянному элементу нельзя иметь предка с
+   Нижняя панель — плавающая стеклянная капсула, под которой проезжают строки списка; шапка — стеклянная подложка во всю ширину. Стеклянному элементу нельзя иметь предка с
    filter, opacity, mask или clip-path: такой предок становится «корнем фона», и размытие видит только его содержимое. */
 [data-pm] {
   --glass: rgb(255 255 255 / 0.55); /* нажатая строка */
@@ -434,30 +433,39 @@ html:has([data-pm]) body {
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
   --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.82), rgb(38 136 235 / 0.9));
   --glass-border-blue: rgb(255 255 255 / 0.45);
-  /* Фон: цветные круги с мягким краем (16 px) на светлой основе. Верхние круги отсчитываются от верха, нижние от низа, поэтому
-     лежат за шапкой и за панелью на любом экране; верх сцены повторяет шапка (--scene-top), и шва между ними нет */
-  --orbs-top:
-    radial-gradient(circle 84px at -4% 72px, #9bbfff 0, #7399ff calc(84px - 16px), transparent 84px),
-    radial-gradient(circle 76px at 98% 52px, #ffb5cd 0, #ff98b1 calc(76px - 16px), transparent 76px),
-    radial-gradient(circle 46px at 77% 192px, #8fead5 0, #5cc9e8 calc(46px - 16px), transparent 46px),
-    radial-gradient(circle 64px at -3% 252px, #cdb8ff 0, #ef98d8 calc(64px - 16px), transparent 64px);
-  --orbs-bottom:
-    radial-gradient(circle 64px at 18% calc(100% - 30px), #9be9ee 0, #6fb0ff calc(64px - 16px), transparent 64px),
-    radial-gradient(circle 58px at 84% calc(100% - 40px), #ffdca0 0, #ffa3b8 calc(58px - 16px), transparent 58px),
-    radial-gradient(circle 44px at 52% calc(100% - 6px), #d9c7ff 0, #a28fff calc(44px - 16px), transparent 44px);
-  --scene-base: #e6eeff;
-  --scene-top: var(--orbs-top), var(--scene-base);
-  --scene: var(--orbs-top), var(--orbs-bottom), linear-gradient(180deg, var(--scene-base) 0, var(--scene-base) 38%, #f4eefc 72%, #fdeef2 100%);
+  /* Фон — прежний мягкий градиент: шесть цветных пятен на светлой основе */
+  --scene:
+    radial-gradient(55% 30% at 6% 5%, rgb(96 165 250 / 0.6), transparent 72%),
+    radial-gradient(50% 26% at 100% 12%, rgb(255 140 170 / 0.5), transparent 72%),
+    radial-gradient(55% 28% at 94% 46%, rgb(255 190 120 / 0.5), transparent 72%),
+    radial-gradient(60% 30% at 0% 50%, rgb(110 220 200 / 0.45), transparent 72%),
+    radial-gradient(60% 32% at 72% 100%, rgb(170 130 255 / 0.55), transparent 72%),
+    radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
+    linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
+  --glass-fill-header: rgb(255 255 255 / 0.62);
 }
 
 [data-pm] .messages {
   background: var(--scene);
 }
 
-/* Шапка закрашена верхом сцены: строки списка уходят под неё и не видны, а сама шапка сливается с фоном без границы */
+/* Подложка шапки — отдельный слой позади с размытием, а не на самой шапке: предок с backdrop-filter стал бы «корнем фона», и стеклянные
+   кнопки и чипсы внутри видели бы сквозь него только саму шапку. Строки списка уходят под шапку размытыми */
 [data-pm] .chats-header {
-  background: var(--scene-top);
+  background: none;
   border: 0;
+  isolation: isolate;
+}
+
+[data-pm] .chats-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+  pointer-events: none;
 }
 
 /* Белое стекло: кнопки «поиск» и «оповещения», невыбранные чипсы (слой под подписью гаснет там, где её накрывает синяя плашка),
