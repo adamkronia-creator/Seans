@@ -25,8 +25,6 @@
   gap: var(--space-3);
 }
 
-}
-
 .stories__item {
   position: relative;
   display: flex;
