@@ -590,3 +590,14 @@ html:has([data-pm]) body {
     --chat-item-bg: var(--glass);
   }
 }
+
+/* Окно правки: текст и название того же размера, что в карточке заметки или сведений
+   (текст --type-body 16/24, название --type-headline 17/24) */
+[data-pm] .sheet--edit .rich-editor {
+  font: var(--type-body);
+}
+
+[data-pm] .sheet--edit .sheet__preview-input {
+  font: var(--type-headline);
+  letter-spacing: 0;
+}
