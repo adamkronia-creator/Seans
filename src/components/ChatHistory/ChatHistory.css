@@ -83,16 +83,6 @@
   backdrop-filter: var(--glass-filter);
 }
 
-.hist-chips .chip--follow[data-tone]::after {
-  border-color: var(--glass-border);
-  background: var(--chip-bg);
-}
-
-/* Подпись на пастели своего вида чернильная: «чернила на пастели» в новой системе белые (так подписан синий чипс), а белое на розовом и бежевом не читается */
-.hist-chips .chip[data-tone] {
-  --chip-on: var(--text-primary);
-}
-
 /* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 */
 .hist-timeline {
   display: flex;
@@ -160,19 +150,19 @@
 }
 
 .hist-marker--session {
-  --marker-bg: var(--tone-session);
+  --marker-bg: #007aff;
 }
 
 .hist-marker--test {
-  --marker-bg: var(--tone-test);
+  --marker-bg: #ff9f0a;
 }
 
 .hist-marker--task {
-  --marker-bg: var(--tone-task);
+  --marker-bg: #34c759;
 }
 
 .hist-marker--note {
-  --marker-bg: var(--tone-note);
+  --marker-bg: #af52de;
 }
 
 .hist-marker svg {
@@ -184,8 +174,8 @@
 /* Ждёт выполнения: круг бледнее и в кольце цвета типа, внутри часы (на пройденном — знак типа) */
 .hist-marker--pending {
   background: color-mix(in srgb, var(--marker-bg) 38%, #ffffff);
-  box-shadow: inset 0 0 0 1.5px var(--marker-bg);
-  color: var(--text-primary); /* круг бледный: знак на нём остаётся тёмным */
+  box-shadow: inset 0 0 0 2px var(--marker-bg);
+  color: var(--marker-bg); /* круг бледный: знак цвета типа */
 }
 
 .hist-marker__number {
@@ -441,15 +431,4 @@
 /* Лента заканчивается над закреплённой панелью чипсов: её высоту (--foot-h) замеряет ChatHistory; последняя карточка выше панели на 16 (padding .hist-page) */
 [data-pm] .chat .chat-history {
   padding-bottom: calc(var(--page-bottom, 0px) + var(--foot-h, 0px));
-}
-
-/* Число на чипсе: вид «6 Сеансы», «5/6 Тесты»; цифры одной ширины, «из скольки» бледнее */
-.hist-chips .hist-chip__n {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.hist-chips .hist-chip__total {
-  font-weight: 400;
-  opacity: 0.7;
 }

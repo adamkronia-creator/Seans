@@ -359,17 +359,12 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             <Chip
               key={id}
               follow
-              tone={id === 'all' ? undefined : id}
+              tone="chat"
               active={shown === i}
+              count={c ? (c.total ?? c.value) : undefined}
               onClick={() => setFilter(id)}
               ariaLabel={c && c.total !== undefined ? `${label}: выполнено ${c.value} из ${c.total}` : c ? `${label}: ${c.value}` : label}
             >
-              {c && (
-                <span className="hist-chip__n">
-                  {c.value}
-                  {c.total !== undefined && <span className="hist-chip__total">/{c.total}</span>}
-                </span>
-              )}
               {label}
             </Chip>
           );
