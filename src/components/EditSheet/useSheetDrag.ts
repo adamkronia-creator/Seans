@@ -1,5 +1,5 @@
 import { useEffect, useRef, type RefObject } from 'react';
-import { reducedMotion, runSpring, SWIPE_SLOP, VelocityTracker } from '../../utils/swipe';
+import { reducedMotion, runSpring, SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 
 /*
  * Нижнее окно закрывается свайпом вниз, как на телефоне: окно идёт за пальцем, затемнение светлеет. Отпустили ниже порога
@@ -12,12 +12,7 @@ import { reducedMotion, runSpring, SWIPE_SLOP, VelocityTracker } from '../../uti
  */
 
 /** Вертикальное движение должно заметно перевешивать горизонтальное */
-const DOMINANCE = 1.2;
-/** На сколько миллисекунд вперёд «заглядываем» по скорости пальца: короткий быстрый взмах тоже закрывает */
-const PROJECT_MS = 160;
-/** Сколько протянуть вниз, чтобы окно закрылось: доля высоты окна, но не больше этого числа пикселей */
-const COMMIT_RATIO = 0.4;
-const COMMIT_MAX = 160;
+const DOMINANCE = SWIPE_DOMINANCE;
 
 /** Начали в поле ввода (поставить курсор, выделить текст) или там, где жест запрещён: окно не двигаем */
 const NOT_FROM = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe]';
@@ -77,7 +72,7 @@ export function useSheetDrag(overlay: RefObject<HTMLElement>, onClose: () => voi
 
     const finish = (d: Drag, now: number, cancelled: boolean) => {
       const velocity = cancelled ? 0 : d.tracker.velocity(now); // пикселей в миллисекунду
-      const closing = !cancelled && d.offset + velocity * PROJECT_MS > Math.min(d.height * COMMIT_RATIO, COMMIT_MAX);
+      const closing = !cancelled && swipeCommits(d.offset, velocity);
       if (reducedMotion()) {
         if (closing) close.current();
         else clean(d);

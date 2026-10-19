@@ -33,6 +33,11 @@ body {
   text-size-adjust: 100%;
 }
 
+/* Прокрутка внутри блока не передаётся странице: на телефоне она не «тянет» весь экран вместе с закреплёнными панелями */
+* {
+  overscroll-behavior-y: contain;
+}
+
 button,
 input {
   font: inherit;

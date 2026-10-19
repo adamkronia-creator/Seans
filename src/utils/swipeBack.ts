@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useLayer } from './layer';
-import { canScrollSideways, edgeTouch } from './swipe';
+import { canScrollSideways, edgeTouch, SWIPE_DOMINANCE, swipeCommits, VelocityTracker } from './swipe';
 
 /*
  * Свайп в сторону как «назад» на экранах, где листать больше нечего (настройка теста, бланк, пример заключения):
@@ -9,12 +9,7 @@ import { canScrollSideways, edgeTouch } from './swipe';
  * прокручиваются вбок.
  */
 
-/** Сколько пройти пальцем вправо, чтобы это считалось «назад» */
-const DISTANCE = 72;
-/** Горизонтальное движение должно сильно перевешивать вертикальное: иначе это прокрутка с дрожанием пальца */
-const DOMINANCE = 1.8;
-/** Дольше этого движение уже не жест, а медленное перетаскивание */
-const MAX_MS = 900;
+/* Пороги общие для всех свайпов (utils/swipe.ts): перевес над вертикальным 1,2, засчитывается 30% ширины экрана с учётом скорости */
 
 // Кнопки-переключатели (радио, флажки) жест не блокируют: они занимают целые строки бланка
 const NOT_FROM = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-swipe-lock~="right"], [data-hscroll], .sheet, [role="dialog"]';
@@ -29,6 +24,8 @@ export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void
 
   useEffect(() => {
     let start: { x: number; y: number; t: number } | null = null;
+    // Скорость по последним касаниям, как у остальных жестов: быстрый короткий взмах тоже засчитывается
+    let speed = new VelocityTracker();
 
     const onStart = (e: TouchEvent) => {
       start = null;
@@ -42,6 +39,12 @@ export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void
       }
       const t = e.touches[0];
       start = { x: t.clientX, y: t.clientY, t: performance.now() };
+      speed = new VelocityTracker();
+      speed.push(start.t, t.clientX);
+    };
+
+    const onMove = (e: TouchEvent) => {
+      if (start) speed.push(performance.now(), e.touches[0].clientX);
     };
 
     const onEnd = (e: TouchEvent) => {
@@ -52,7 +55,7 @@ export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void
       const dx = t.clientX - s.x;
       const dy = t.clientY - s.y;
       const selecting = window.getSelection()?.isCollapsed === false;
-      if (dx >= DISTANCE && Math.abs(dx) > Math.abs(dy) * DOMINANCE && performance.now() - s.t < MAX_MS && !selecting) {
+      if (dx > 0 && Math.abs(dx) > Math.abs(dy) * SWIPE_DOMINANCE && swipeCommits(dx, speed.velocity(performance.now())) && !selecting) {
         live.current.onBack();
       }
     };
@@ -62,10 +65,12 @@ export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void
     };
 
     document.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove', onMove, { passive: true });
     document.addEventListener('touchend', onEnd, { passive: true });
     document.addEventListener('touchcancel', cancel, { passive: true });
     return () => {
       document.removeEventListener('touchstart', onStart);
+      document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onEnd);
       document.removeEventListener('touchcancel', cancel);
     };

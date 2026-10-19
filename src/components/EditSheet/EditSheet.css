@@ -333,14 +333,15 @@
 }
 
 [data-pm] .sheet__toggle-row {
-  height: var(--space-12);
+  height: var(--space-8);
+  padding: 0;
 }
 
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones {
-  /* Строка «Иконка»/«Цвет» высотой 48 сама оставляет под подписью space-3 (текст 24): сетка начинается сразу под ней */
-  padding: 0 var(--space-4);
-  row-gap: calc((100cqw - var(--space-8) - var(--cols) * 36px) / (var(--cols) - 1));
+  /* Внутри карточки 12 со всех сторон; сетка начинается через 12 под строкой «Иконка»/«Цвет». cqw — ширина содержимого карточки */
+  padding: var(--space-3) 0 0;
+  row-gap: calc((100cqw - var(--cols) * 36px) / (var(--cols) - 1));
 }
 
 [data-pm] .sheet__row {
@@ -356,12 +357,12 @@
 }
 
 [data-pm] .rich-editor {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3);
 }
 
 [data-pm] .rich-editor[data-empty='true']::before {
-  right: var(--space-4);
-  left: var(--space-4);
+  right: var(--space-3);
+  left: var(--space-3);
 }
 
 /* Полосы окна правки — светлое стекло на «зеркале» листа (pm-chats.css), значки и поля в тон */
@@ -375,15 +376,26 @@
   padding-top: var(--space-4);
 }
 
-[data-pm] .sheet__preview,
-[data-pm] .sheet__card {
+/* Все панели одинаковые, как панель заголовка: белая карточка, рамка 1 px, скругление, внутри 12 со всех сторон.
+   Селектор с .sheet: pm-chats.css делает .sheet__card прозрачным, а порядок файлов не гарантирован */
+[data-pm] .sheet .sheet__preview,
+[data-pm] .sheet .sheet__card {
   margin-inline: 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--glass-card);
 }
 
+[data-pm] .sheet .sheet__preview {
+  padding: var(--space-3);
+}
+
+[data-pm] .sheet .sheet__card:not(.sheet__text) {
+  padding: var(--space-3);
+}
+
 [data-pm] .rich-toolbar {
+  padding: var(--space-3);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: rgb(255 255 255 / 0.92);
@@ -409,6 +421,3 @@
   max-height: none;
 }
 
-[data-pm] .sheet__preview {
-  padding-block: var(--space-3);
-}

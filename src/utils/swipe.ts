@@ -46,6 +46,21 @@ export function setSwiping(on: boolean, pointerType = 'touch') {
 /** Сдвиг пальца, после которого это уже движение, а не нажатие; так же считает пузырь сообщения и эффект нажатия */
 export const SWIPE_SLOP = 10;
 
+/*
+ * Единые пороги всех свайпов приложения (листание разделов и лент, «назад» от края и по экрану, закрытие боковой панели и нижних окон),
+ * чтобы любой из них делался с одним усилием и одной скоростью:
+ *  - горизонтальное (или вертикальное, у окон) движение должно перевешивать другое в 1,2 раза;
+ *  - жест засчитывается, если путь пальца и «заглядывание» по его скорости на 160 мс вперёд вместе дали 30% ширины экрана.
+ * Пузырь сообщения (ответ, 56 px) и снимок профиля — не навигация и свои пороги сохраняют.
+ */
+export const SWIPE_DOMINANCE = 1.2;
+export const SWIPE_COMMIT = 0.3;
+export const SWIPE_PROJECT_MS = 160;
+
+/** Путь пальца `distance` (px) и скорость `velocity` (px/мс): засчитывать ли жест; `size` — длина, от которой считается 30% (ширина экрана) */
+export const swipeCommits = (distance: number, velocity: number, size: number = window.innerWidth) =>
+  distance + Math.max(0, velocity) * SWIPE_PROJECT_MS > size * SWIPE_COMMIT;
+
 export const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**

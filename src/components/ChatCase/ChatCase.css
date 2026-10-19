@@ -63,7 +63,7 @@
 
 .case-card__head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
 }
@@ -74,10 +74,10 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--space-8);
-  height: var(--space-8);
-  border-radius: var(--radius-sm);
-  background: var(--head-bg, var(--action-secondary));
+  width: var(--space-6);
+  height: var(--space-6);
+  /* Фона у значка нет: только значок цвета раздела и название */
+  background: none;
   color: var(--head-fg, var(--action-primary));
 }
 
@@ -107,7 +107,9 @@
   justify-content: center;
   width: var(--size-control-sm);
   height: var(--size-control-sm);
-  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0;
+  align-self: flex-start;
+  /* Всегда в верхнем правом углу шапки, на уровне первой строки названия (строка 24, кнопка 32) */
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1) 0 0;
   border-radius: var(--radius-full);
   color: var(--text-icon);
   font-size: var(--size-icon-sm);

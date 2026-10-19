@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import { currentBackHandler } from './backHandler';
-import { edgeTouch, guardClick, reducedMotion, runSpring, setSwiping, SWIPE_SLOP, takeOver, VelocityTracker } from './swipe';
+import { edgeTouch, guardClick, reducedMotion, runSpring, setSwiping, SWIPE_COMMIT, SWIPE_DOMINANCE, SWIPE_PROJECT_MS, SWIPE_SLOP, takeOver, VelocityTracker } from './swipe';
 
 /*
  * Жест «назад» как в приложениях на телефоне: потянули экран от левого края — он едет за пальцем, а под ним уже виден
@@ -15,11 +15,11 @@ import { edgeTouch, guardClick, reducedMotion, runSpring, setSwiping, SWIPE_SLOP
 /** Полоса у левого края приложения, с которой начинается жест; шире — мешало бы листать разделы и пузырям сообщений */
 const EDGE_ZONE = 20;
 /** Горизонтальное движение должно заметно перевешивать вертикальное, иначе это прокрутка вниз с дрожанием пальца */
-const DOMINANCE = 1.2;
+const DOMINANCE = SWIPE_DOMINANCE;
 /** Какую долю ширины нужно протянуть (с учётом взмаха), чтобы вернуться, а не вернуть экран на место */
-const COMMIT = 0.4;
+const COMMIT = SWIPE_COMMIT;
 /** На сколько миллисекунд вперёд «заглядываем» по скорости пальца: быстрый короткий взмах тоже возвращает */
-const PROJECT_MS = 140;
+const PROJECT_MS = SWIPE_PROJECT_MS;
 /** Насколько экран под верхним сдвинут влево в начале (доля его ширины) и насколько затемнён; те же значения у перехода кнопкой */
 const PARALLAX = 0.26;
 /** Сколько пройти пальцем, чтобы сработало вложенное «назад» */

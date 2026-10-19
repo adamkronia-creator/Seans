@@ -11,6 +11,9 @@ import {
   runSpring,
   setPaging,
   setSwiping,
+  SWIPE_COMMIT,
+  SWIPE_DOMINANCE,
+  SWIPE_PROJECT_MS,
   SWIPE_SLOP,
   takeOver,
   VelocityTracker,
@@ -42,11 +45,11 @@ interface SwipePagerProps {
 }
 
 /** Какую долю страницы нужно протянуть (с учётом взмаха), чтобы она перевернулась, а не вернулась обратно */
-const COMMIT = 0.3;
+const COMMIT = SWIPE_COMMIT;
 /** На сколько секунд вперёд «заглядываем» по скорости пальца: короткий быстрый взмах тоже переворачивает страницу */
-const PROJECT = 0.16;
+const PROJECT = SWIPE_PROJECT_MS / 1000;
 /** Горизонтальное движение должно заметно перевешивать вертикальное, иначе это прокрутка вниз с дрожанием пальца */
-const DOMINANCE = 1.2;
+const DOMINANCE = SWIPE_DOMINANCE;
 /** Двумя пальцами по тачпаду: сколько проехать, чтобы страница перевернулась */
 const WHEEL_STEP = 60;
 

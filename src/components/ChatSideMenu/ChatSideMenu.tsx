@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
+import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 import { IconCloseMk, IconSearchMk } from '../ChatItem/ChatIcons';
 import './ChatSideMenu.css';
 
@@ -26,9 +27,7 @@ interface ChatSideMenuProps {
   onSearch?: () => void;
 }
 
-/** Сколько протянуть вправо, чтобы панель закрылась, и какая скорость (px/мс) считается взмахом */
-const CLOSE_DISTANCE = 72;
-const CLOSE_SPEED = 0.5;
+/* Закрытие свайпом вправо — по общим порогам всех жестов (utils/swipe.ts): 30% ширины экрана с учётом скорости */
 
 /**
  * Боковая панель чата: стеклянный лист справа с вкладками (диалог, тесты, задания, заметки, сведения, история).
@@ -72,8 +71,7 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     let start: { id: number; x: number; y: number; t: number } | null = null;
     let dragging = false;
     let dx = 0;
-    let speed = 0;
-    let last = { x: 0, t: 0 };
+    let speed = new VelocityTracker();
 
     const reset = () => {
       start = null;
@@ -86,32 +84,30 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
     const down = (e: PointerEvent) => {
       if (!e.isPrimary) return;
       start = { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp };
-      last = { x: e.clientX, t: e.timeStamp };
+      speed = new VelocityTracker();
     };
     const move = (e: PointerEvent) => {
       if (!start || e.pointerId !== start.id) return;
       const mx = e.clientX - start.x;
       const my = e.clientY - start.y;
       if (!dragging) {
-        if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) {
+        if (Math.abs(my) > SWIPE_SLOP && Math.abs(my) > Math.abs(mx)) {
           start = null; // это прокрутка списка
           return;
         }
-        if (mx < 10 || mx < Math.abs(my) * 1.2) return;
+        if (mx < SWIPE_SLOP || mx < Math.abs(my) * SWIPE_DOMINANCE) return;
         dragging = true;
         host.dataset.dragging = '';
         el.setPointerCapture(e.pointerId);
       }
       dx = Math.max(0, mx);
-      const dt = e.timeStamp - last.t;
-      if (dt > 0) speed = (e.clientX - last.x) / dt;
-      last = { x: e.clientX, t: e.timeStamp };
+      speed.push(e.timeStamp, e.clientX);
       el.style.transform = `translateX(${dx}px)`;
       host.style.setProperty('--drag', String(Math.max(0, 1 - dx / el.offsetWidth)));
     };
     const up = (e: PointerEvent) => {
       if (!start || e.pointerId !== start.id) return;
-      const shouldClose = dragging && (dx > CLOSE_DISTANCE || speed > CLOSE_SPEED);
+      const shouldClose = dragging && swipeCommits(dx, speed.velocity(e.timeStamp));
       reset();
       if (shouldClose) latest.current();
     };
