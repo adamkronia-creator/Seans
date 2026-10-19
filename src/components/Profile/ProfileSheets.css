@@ -121,3 +121,12 @@
   color: var(--text-secondary);
   font: var(--type-label);
 }
+
+/* Между заголовком и первым блоком 4, как между «Фон приложения» и его плитками (иначе заголовок висит в воздухе) */
+[data-pm] .sheet .sheet__header:has(.sheet__heading--quiet) {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet .sheet__header:has(.sheet__heading--quiet) + .sheet__body {
+  padding-top: var(--space-1);
+}

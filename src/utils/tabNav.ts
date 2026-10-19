@@ -1,13 +1,15 @@
 import { useEffect, type RefObject } from 'react';
 import type { TabId } from '../components/TabBar/TabBar';
+import type { TransitionKind } from './transition';
 import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from './swipe';
 
 /** Переключатель разделов нижней панели: его регистрирует App, а жесты экранов вызывают switchTab */
-let handler: ((id: TabId) => void) | null = null;
-export const registerTabSwitch = (fn: (id: TabId) => void) => {
+let handler: ((id: TabId, kind?: TransitionKind) => void) | null = null;
+export const registerTabSwitch = (fn: (id: TabId, kind?: TransitionKind) => void) => {
   handler = fn;
 };
-export const switchTab = (id: TabId) => handler?.(id);
+/** Перейти в раздел; `kind` — как показать переход (по свайпу экраны едут вместе: slide-next влево, slide-prev вправо) */
+export const switchTab = (id: TabId, kind?: TransitionKind) => handler?.(id, kind);
 
 const NOT_FROM = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-hscroll]';
 
@@ -42,7 +44,7 @@ export function useTabSwipe(ref: RefObject<HTMLElement>, dir: 'left' | 'right', 
       if (!s || e.pointerId !== s.id || !s.live) return;
       const dx = (e.clientX - s.x) * sign;
       if (dx > SWIPE_SLOP * 2 && Math.abs(e.clientY - s.y) * SWIPE_DOMINANCE < Math.abs(e.clientX - s.x)) {
-        if (swipeCommits(dx, s.tracker.velocity(e.timeStamp) * sign, el.clientWidth)) switchTab(target);
+        if (swipeCommits(dx, s.tracker.velocity(e.timeStamp) * sign, el.clientWidth)) switchTab(target, dir === 'right' ? 'slide-prev' : 'slide-next');
       }
     };
     const cancel = () => {

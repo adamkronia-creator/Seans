@@ -19,7 +19,7 @@ import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { goBack, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
-import { transition } from './utils/transition';
+import { transition, type TransitionKind } from './utils/transition';
 
 /** Что показывает адрес: key один и тот же, пока на экране тот же экран, поэтому при смене слоёв он не рисуется заново */
 interface Screen {
@@ -83,7 +83,7 @@ export default function App() {
     latest.current = { route, tab };
   });
 
-  const handleTabChange = useCallback((id: TabId) => {
+  const handleTabChange = useCallback((id: TabId, kind?: TransitionKind) => {
     const { route: current, tab: active } = latest.current;
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
     const toRoot = (id === 'messages' || current.startsWith('/tests/') || current.startsWith('/tasks/')) && current !== '/';
@@ -92,7 +92,7 @@ export default function App() {
     transition(() => {
       setTab(id);
       if (toRoot) navigate('/', 'none');
-    }, id === active ? 'back' : 'fade');
+    }, id === active ? 'back' : (kind ?? 'fade'));
   }, []);
   useLayoutEffect(() => {
     registerTabSwitch(handleTabChange);

@@ -13,7 +13,7 @@ import { edgeTouch, guardClick, reducedMotion, runSpring, setSwiping, SWIPE_COMM
  */
 
 /** Полоса у левого края приложения, с которой начинается жест; шире — мешало бы листать разделы и пузырям сообщений */
-const EDGE_ZONE = 20;
+const EDGE_ZONE = 28;
 /** Горизонтальное движение должно заметно перевешивать вертикальное, иначе это прокрутка вниз с дрожанием пальца */
 const DOMINANCE = SWIPE_DOMINANCE;
 /** Какую долю ширины нужно протянуть (с учётом взмаха), чтобы вернуться, а не вернуть экран на место */
@@ -178,7 +178,10 @@ export function useEdgeBack(appRef: RefObject<HTMLElement>, { enabled, onCommit,
       if (fromEdge < 0 || fromEdge > EDGE_ZONE) return;
       const origin = e.target instanceof Element ? e.target : null;
       // В поле ввода жест принадлежит полю; открытое меню и подобное закрывают экран собой (data-no-swipe)
-      if (!origin || origin.closest(NOT_FROM)) return;
+      if (!origin) return;
+      // Касание пальцем «прилипает» к ближайшему полю: если сам палец левее поля, жест у края всё равно наш
+      const field = origin.closest(NOT_FROM);
+      if (field && e.clientX >= field.getBoundingClientRect().left) return;
       edgeTouch.active = true;
       gesture = {
         id: e.pointerId,

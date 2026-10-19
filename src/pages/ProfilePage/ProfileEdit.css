@@ -256,9 +256,9 @@
 .pe__field-text {
   display: block;
   /* Поле отступает от края карточки: у края экрана касание принадлежит жесту «назад», а не полю */
-  width: calc(100% - var(--space-4));
-  margin-inline: var(--space-2);
-  padding: var(--space-3) var(--space-2);
+  width: calc(100% - var(--space-8));
+  margin-inline: var(--space-4);
+  padding: var(--space-3) 0;
   border: 0;
   outline: 0;
   overflow: hidden;

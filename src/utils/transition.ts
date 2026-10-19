@@ -6,11 +6,12 @@ import { flushSync } from 'react-dom';
  *   forward — новый экран выезжает справа поверх прежнего (открыли чат, тест, результат);
  *   back    — текущий экран уезжает вправо, под ним возвращается предыдущий;
  *   fade    — мягкая смена содержимого (вкладки нижней панели); разделы чата листает SwipePager, а не переход;
+ *   slide-next / slide-prev — соседний раздел нижней панели по свайпу: оба экрана едут вместе влево / вправо;
  *   none    — без анимации.
  * Где API нет (старые браузеры), новый экран просто въезжает или проявляется сам, без прежнего под ним.
  * При включённом у человека «уменьшении движения» экраны меняются сразу.
  */
-export type TransitionKind = 'forward' | 'back' | 'fade' | 'none';
+export type TransitionKind = 'forward' | 'back' | 'fade' | 'none' | 'slide-next' | 'slide-prev';
 
 /** Событие на window: анимация перехода закончилась и на экране снова настоящие блоки, а не снимки */
 export const TRANSITION_END = 'app:transition-end';
@@ -31,6 +32,8 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 const ENTER: Partial<Record<TransitionKind, Keyframe[]>> = {
   forward: [{ transform: 'translateX(28px)', opacity: 0 }, { transform: 'none', opacity: 1 }],
   back: [{ transform: 'translateX(-28px)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+  'slide-next': [{ transform: 'translateX(100%)' }, { transform: 'none' }],
+  'slide-prev': [{ transform: 'translateX(-100%)' }, { transform: 'none' }],
   fade: [{ opacity: 0 }, { opacity: 1 }],
 };
 

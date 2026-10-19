@@ -202,3 +202,38 @@ html[data-transition='fade']::view-transition-new(app) {
     animation: none;
   }
 }
+
+/* Свайп между разделами нижней панели: прежний и новый экран едут вместе, как страницы */
+html[data-transition='slide-next']::view-transition-old(app) {
+  animation: vt-slide-out-left var(--vt-duration) var(--ease-ios) both;
+}
+
+html[data-transition='slide-next']::view-transition-new(app) {
+  animation: vt-push-in var(--vt-duration) var(--ease-ios) both;
+}
+
+html[data-transition='slide-prev']::view-transition-old(app) {
+  animation: vt-slide-out-right var(--vt-duration) var(--ease-ios) both;
+}
+
+html[data-transition='slide-prev']::view-transition-new(app) {
+  animation: vt-slide-in-left var(--vt-duration) var(--ease-ios) both;
+}
+
+@keyframes vt-slide-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes vt-slide-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes vt-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
