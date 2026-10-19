@@ -1,10 +1,10 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconBellMk, IconImageMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
 import { StoriesRow } from '../../components/Stories/Stories';
 import { navigate } from '../../router';
-import { setBackgroundFromFile } from '../../utils/customBackground';
+import { BackgroundSheet } from '../../components/BackgroundSheet/BackgroundSheet';
 
 interface ChatsHeaderProps {
   searching: boolean;
@@ -23,7 +23,7 @@ interface ChatsHeaderProps {
 export function ChatsHeader({ searching, onSearching, query, onQuery, chips, storiesRoot }: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
   const input = useRef<HTMLInputElement>(null);
-  const bgInput = useRef<HTMLInputElement>(null);
+  const [bgOpen, setBgOpen] = useState(false);
   useEffect(() => {
     if (searching) input.current?.focus({ preventScroll: true });
   }, [searching]);
@@ -55,21 +55,10 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips, sto
             <span className="chats-header__name">Чаты</span>
             <span className="chats-header__status">Ваши диалоги</span>
           </span>
-          {/* Временная кнопка: загрузить файл и сделать его фоном приложения (долгое нажатие не нужно: сброс — ?bg=0…3) */}
-          <button type="button" className="chats-header__action" aria-label="Загрузить фон" title="Загрузить фон" onClick={() => bgInput.current?.click()}>
+          {/* Временная кнопка: окно «Фон» (картинка, размытие, цвет текста) */}
+          <button type="button" className="chats-header__action" aria-label="Фон" title="Фон" onClick={() => setBgOpen(true)}>
             <IconImageMk />
           </button>
-          <input
-            ref={bgInput}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = '';
-              if (file) void setBackgroundFromFile(file);
-            }}
-          />
           <button type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
             <IconSearchMk />
           </button>
@@ -83,6 +72,7 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips, sto
         <span className="chips-pill" aria-hidden="true" />
         {chips}
       </div>
+      {bgOpen && <BackgroundSheet onClose={() => setBgOpen(false)} />}
     </header>
   );
 }

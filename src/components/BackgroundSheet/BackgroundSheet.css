@@ -1,0 +1,71 @@
+/* Временное окно «Фон»: карточки как в окне правки, поля 16, между ними 16 */
+[data-pm] .sheet .bg-sheet__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.bg-sheet__row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.bg-sheet__button {
+  flex: 1;
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+}
+
+.bg-sheet__button--quiet {
+  background: var(--glass-fill);
+  color: var(--text-primary);
+}
+
+.bg-sheet__label {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.bg-sheet__value {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-sheet__range {
+  width: 100%;
+  accent-color: var(--action-primary);
+}
+
+.bg-sheet__seg {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--bg-subtle);
+}
+
+.bg-sheet__seg-item {
+  flex: 1;
+  height: var(--space-8);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  font: var(--type-label);
+}
+
+.bg-sheet__seg-item.is-on {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+.bg-sheet__note {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-weight: 400;
+}

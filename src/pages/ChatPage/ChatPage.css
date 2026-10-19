@@ -94,7 +94,7 @@
 }
 
 .chat .chat__status--typing {
-  color: var(--action-primary);
+  color: var(--text-link);
 }
 
 /* Стеклянные кнопки: «назад» на месте поиска «Диалогов», меню на месте оповещений */
@@ -202,7 +202,7 @@
   flex-shrink: 0;
   height: var(--size-control);
   padding: 0 var(--space-2);
-  color: var(--action-primary);
+  color: var(--text-link);
   font: var(--type-body);
 }
 
@@ -288,7 +288,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   /* Плотнее обычного стекла: плашка проезжает над синими пузырями, и на прозрачной подписи не прочесть */
-  background: rgb(255 255 255 / 0.78);
+  background: var(--glass-strong);
   color: var(--text-secondary);
   font: var(--type-caption);
   -webkit-backdrop-filter: var(--glass-filter);
@@ -347,7 +347,7 @@
   padding: var(--space-1) 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: rgb(255 255 255 / 0.78);
+  background: var(--glass-strong);
   box-shadow: var(--glass-shadow-panel);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);

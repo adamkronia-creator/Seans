@@ -146,7 +146,7 @@
 }
 
 .bubble__quote-name {
-  color: var(--action-primary);
+  color: var(--text-link);
   font-weight: 600;
 }
 
@@ -314,7 +314,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xs);
   background: var(--glass-bubble-in);
-  color: var(--action-primary);
+  color: var(--text-link);
   font: var(--type-label);
   text-align: center;
   transition: filter 0.15s ease;

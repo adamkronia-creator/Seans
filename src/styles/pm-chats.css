@@ -116,7 +116,7 @@
 
 /* Под приложением (системная панель внизу, края) — тот же фон, что у экрана, а не «жемчужный» стол */
 html:has([data-pm]) body {
-  background: #ffffff;
+  background: var(--body-bg, #ffffff);
 }
 
 /* Заливка выбранного — один подвижный элемент на весь ряд (followChips ставит --pill-x и --pill-w): едет от чипса к чипсу */
@@ -311,7 +311,7 @@ html:has([data-pm]) body {
   border: 1px solid var(--glass-border);
   border-bottom: 0;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  background: rgb(255 255 255 / 0.66);
+  background: var(--glass-sheet);
   box-shadow: 0 calc(var(--space-2) * -1) var(--space-8) rgb(0 0 0 / 0.14);
   color: var(--text-primary);
   -webkit-backdrop-filter: blur(var(--space-8)) saturate(2);
@@ -453,6 +453,13 @@ html:has([data-pm]) body {
     radial-gradient(55% 28% at 8% 100%, rgb(50 173 230 / 0.3), transparent 72%),
     linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
   --glass-fill-header: rgb(255 255 255 / 0.62);
+  --glass-sheet: rgb(255 255 255 / 0.66); /* листы и боковая панель */
+  --glass-strong: rgb(255 255 255 / 0.78); /* плотное стекло: плашка дня, меню сообщения */
+  --glass-menu: rgb(255 255 255 / 0.72); /* панель эмодзи */
+  --glass-tab: rgb(255 255 255 / 0.55); /* выбранный раздел нижней панели */
+  --glass-plain: #ffffff; /* сплошная панель форматирования */
+  --body-bg: #ffffff; /* под приложением */
+  --glass-thread: rgb(255 255 255 / 0.6); /* линия времени */
   /* Пузыри чата: входящие — белое стекло, исходящие — синий градиент акцента (от action-primary к action-primary-pressed, белая подпись держит 3,6–5,5:1) */
   --glass-bubble-in: rgb(255 255 255 / 0.78);
   /* Карточки внутри вкладок чата (тесты, сведения, заметки, события): белое стекло плотнее панелей, без размытия — позади гладкий фон */
@@ -581,7 +588,7 @@ html:has([data-pm]) body {
 }
 
 [data-pm]:is(:has(.messages), :has(.chat)) .tabbar__item--active {
-  background: rgb(255 255 255 / 0.55);
+  background: var(--glass-tab);
 }
 
 /* Разделителей в «Диалогах» нет: ни под шапкой, ни над панелью, ни после «Избранного»; пустой элемент после «Избранного» оставляет промежуток space-2 + поле строки space-2 = 16 */
@@ -644,4 +651,41 @@ html:has([data-pm]) body {
   color: var(--text-icon);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
+}
+
+/* ——— Белый текст: на тёмном фоне (data-ink='light', его ставит utils/appearance.ts по настройке «Цвет текста» или по яркости фона) ———
+   Стекло становится тёмным, текст и значки белыми; цвета действий (синий) те же. */
+:root[data-ink='light'] [data-pm] {
+  --text-primary: #ffffff;
+  --text-secondary: rgb(255 255 255 / 0.82);
+  --text-icon: rgb(255 255 255 / 0.82);
+  --text-chip: rgb(255 255 255 / 0.82);
+  --icon-action: #ffffff;
+  --text-link: #8fc3ff;
+  --action-secondary-text: #8fc3ff;
+  --border-subtle: rgb(255 255 255 / 0.16);
+  --bg-canvas: #1c202b;
+  --bg-bar: #1c202b;
+  --bg-surface: #1c202b;
+  --bg-raised: #1c202b;
+  --bg-warm: #1c202b;
+  --bg-field: rgb(255 255 255 / 0.14);
+  --bg-subtle: rgb(255 255 255 / 0.12);
+  --glass: rgb(255 255 255 / 0.16);
+  --glass-fill: rgb(20 24 34 / 0.34);
+  --glass-fill-panel: rgb(20 24 34 / 0.46);
+  --glass-fill-header: rgb(20 24 34 / 0.5);
+  --glass-solid: rgb(34 38 50 / 0.9);
+  --glass-border: rgb(255 255 255 / 0.2);
+  --glass-bubble-in: rgb(30 34 46 / 0.62);
+  --glass-card: rgb(20 24 34 / 0.5);
+  --glass-sheet: rgb(24 28 38 / 0.8);
+  --glass-strong: rgb(24 28 38 / 0.84);
+  --glass-menu: rgb(24 28 38 / 0.82);
+  --glass-tab: rgb(255 255 255 / 0.2);
+  --glass-plain: #1f2330;
+  --glass-thread: rgb(255 255 255 / 0.3);
+  --body-bg: #12141b;
+  --focus-ring: 0 0 0 2px #1c202b, 0 0 0 4px #8fc3ff;
+  color-scheme: dark;
 }

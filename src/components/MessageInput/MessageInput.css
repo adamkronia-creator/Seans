@@ -173,7 +173,7 @@
   border: 1px solid var(--glass-border);
   border-bottom: 0;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  background: rgb(255 255 255 / 0.72);
+  background: var(--glass-menu);
   box-shadow: var(--glass-shadow-panel);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
