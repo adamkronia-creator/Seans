@@ -201,7 +201,6 @@
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
-  text-wrap: pretty;
 }
 
 .pe__fields {

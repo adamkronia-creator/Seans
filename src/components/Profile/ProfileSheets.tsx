@@ -2,6 +2,7 @@ import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react
 import { setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
 import { Frame } from '../Frame/Frame';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
+import { BackgroundControls } from '../BackgroundControls/BackgroundControls';
 import { IconCamera, IconCheck } from './ProfileIcons';
 import { filesOf, uploadPhotos } from './upload';
 import './ProfileSheets.css';
@@ -94,6 +95,12 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
         </button>
       )}
       <input ref={input} type="file" accept="image/*" hidden onChange={upload} />
+      {!isAvatar && (
+        <>
+          <h3 className="pf-section">Фон приложения</h3>
+          <BackgroundControls />
+        </>
+      )}
     </Frame>
   );
 }

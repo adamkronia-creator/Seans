@@ -491,12 +491,12 @@ html:has([data-pm]) body {
   --bg-blur: 24px;
 }
 
-[data-pm] :is(.messages, .chat) {
+[data-pm] :is(.messages, .chat, .profile) {
   isolation: isolate;
   overflow: clip;
 }
 
-[data-pm] :is(.messages, .chat)::before {
+[data-pm] :is(.messages, .chat, .profile)::before {
   content: '';
   position: absolute;
   inset: calc(var(--bg-blur) * -2);
@@ -569,7 +569,7 @@ html:has([data-pm]) body {
 
 /* Нижняя панель — плавающая стеклянная капсула: отступ space-4 по бокам и space-3 над безопасной зоной, внутри отступ space-1,
    выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми */
-[data-pm]:is(:has(.messages), :has(.chat)) .tabbar {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile)) .tabbar {
   right: var(--space-4);
   bottom: calc(var(--safe-bottom) + var(--space-3));
   left: var(--space-4);
@@ -582,12 +582,12 @@ html:has([data-pm]) body {
   backdrop-filter: var(--glass-filter-panel);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat)) .tabbar__item {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile)) .tabbar__item {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat)) .tabbar__item--active {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile)) .tabbar__item--active {
   background: var(--glass-tab);
 }
 

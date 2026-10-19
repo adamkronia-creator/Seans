@@ -36,7 +36,3 @@ textarea,
   font-variant-numeric: tabular-nums;
 }
 
-/* Абзацы без «висячих» коротких слов в последней строке (где браузер умеет) */
-p {
-  text-wrap: pretty;
-}

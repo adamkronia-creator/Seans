@@ -215,7 +215,7 @@ export default function App() {
         ),
       };
     }
-    return page('profile', <ProfilePage />, at);
+    return page('profile', <ProfilePage />, at, true);
   };
 
   // Построенный экран переиспользуется, пока его вкладка та же: тот же элемент React не перерисовывает, и нижний слой

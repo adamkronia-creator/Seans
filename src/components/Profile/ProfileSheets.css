@@ -80,5 +80,12 @@
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
   text-align: center;
-  text-wrap: pretty;
+}
+
+/* Заголовок группы «Фон приложения» под сеткой обложки */
+.pf-section {
+  margin: var(--space-2) 0 calc(var(--space-2) * -1);
+  padding: 0 var(--space-1);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font: var(--type-label, 600 15px/20px var(--font-family));
 }

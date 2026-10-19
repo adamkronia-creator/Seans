@@ -1,8 +1,5 @@
 import { useRef, useState } from 'react';
-import { SheetOverlay } from '../EditSheet/SheetOverlay';
-import { useSheet } from '../EditSheet/useSheet';
-import '../EditSheet/EditSheet.css';
-import './BackgroundSheet.css';
+import './BackgroundControls.css';
 import { getBlur, getInkPref, resetBackground, setBackgroundFromFile, setBlur, setInkPref, type InkPref } from '../../utils/appearance';
 
 const INKS: { id: InkPref; label: string }[] = [
@@ -11,22 +8,15 @@ const INKS: { id: InkPref; label: string }[] = [
   { id: 'light', label: 'Белый' },
 ];
 
-/** Временное окно «Фон»: загрузить картинку, размытие и цвет текста (авто — по яркости фона) */
-export function BackgroundSheet({ onClose }: { onClose: () => void }) {
-  useSheet(onClose);
+/** Настройки фона приложения: загрузить картинку, размытие и цвет текста (авто — по яркости фона). Стоят в окне выбора обложки профиля */
+export function BackgroundControls() {
   const file = useRef<HTMLInputElement>(null);
   const [blur, setBlurState] = useState(getBlur);
   const [ink, setInk] = useState<InkPref>(getInkPref);
   const [failed, setFailed] = useState(false);
   return (
-    <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label="Фон">
-        <div className="sheet__grab" aria-hidden="true" />
-        <div className="sheet__header">
-          <h2 className="sheet__heading">Фон</h2>
-        </div>
-        <div className="sheet__body">
-          <section className="sheet__card bg-sheet__card">
+    <>
+      <section className="sheet__card bg-sheet__card">
             <div className="bg-sheet__row">
               <button type="button" className="bg-sheet__button" onClick={() => file.current?.click()}>
                 Загрузить
@@ -100,13 +90,6 @@ export function BackgroundSheet({ onClose }: { onClose: () => void }) {
             </div>
             <p className="bg-sheet__note">«Авто» выбирает белый текст на тёмном фоне и тёмный на светлом.</p>
           </section>
-        </div>
-        <div className="sheet__footer">
-          <button type="button" className="sheet__button" onClick={onClose}>
-            Готово
-          </button>
-        </div>
-      </div>
-    </SheetOverlay>
+    </>
   );
 }

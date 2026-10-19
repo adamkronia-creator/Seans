@@ -339,7 +339,6 @@
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
-  text-wrap: pretty;
 }
 
 /* Сведения о тесте: подпись тише, значение справа основным цветом, как в «Общей информации» вкладки «Сведения» */
