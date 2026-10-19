@@ -22,6 +22,14 @@ import { installPressEffect } from './utils/pressEffect';
 
 // Поведение как в приложениях на телефоне: нажатие с пружиной и прокрутка колесом с инерцией (полоса прокрутки — системная);
 // на компьютере у кнопок со значком появляются подсказки при наведении
+// Вариант фона для сравнения: ?bg=0…3 (0 — прежний градиент, 1 — картинка, 2 — под вуалью, 3 — размытая), выбор запоминается; по умолчанию картинка
+try {
+  const asked = new URLSearchParams(window.location.search).get('bg');
+  if (asked !== null && /^[0-3]$/.test(asked)) localStorage.setItem('seans-bg', asked);
+  document.documentElement.dataset.bg = localStorage.getItem('seans-bg') ?? '1';
+} catch {
+  document.documentElement.dataset.bg = '1';
+}
 installPressEffect();
 installInertiaScroll();
 installHoverTitles();

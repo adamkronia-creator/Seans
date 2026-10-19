@@ -461,6 +461,19 @@ html:has([data-pm]) body {
   --glass-bubble-out-to: #007aff;
 }
 
+/* Варианты фона для сравнения: ?bg=0 прежний градиент, 1 картинка, 2 картинка под белой вуалью, 3 размытая картинка (атрибут data-bg ставит main.tsx) */
+:root[data-bg='1'] [data-pm] {
+  --scene: url('../assets/bg-dawn.webp') center / cover no-repeat, #dfe6f0;
+}
+
+:root[data-bg='2'] [data-pm] {
+  --scene: linear-gradient(rgb(255 255 255 / 0.4), rgb(255 255 255 / 0.4)), url('../assets/bg-dawn.webp') center / cover no-repeat, #eef2f8;
+}
+
+:root[data-bg='3'] [data-pm] {
+  --scene: url('../assets/bg-dawn-soft.webp') center / cover no-repeat, #dfe6f0;
+}
+
 [data-pm] .messages {
   background: var(--scene);
 }
