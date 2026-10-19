@@ -19,9 +19,12 @@
   height: 64px;
   margin-bottom: var(--space-2);
   border-radius: var(--radius-full);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  font-size: 28px;
+  /* Как круги «Архивы» и «Избранное»: синий градиент и белый значок */
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue, rgb(255 255 255 / 0.45));
+  background: var(--grad-circle, linear-gradient(135deg, rgb(51 149 255 / 0.96), rgb(0 122 255 / 0.92)));
+  color: #ffffff;
+  font-size: 32px;
 }
 
 .empty-state__title {

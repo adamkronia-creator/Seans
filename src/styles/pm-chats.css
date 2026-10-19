@@ -244,9 +244,12 @@ html:has([data-pm]) body {
   width: var(--space-16);
   height: var(--space-16);
   margin-bottom: var(--space-2);
-  background: var(--action-secondary);
-  color: var(--action-secondary-text);
-  font-size: var(--size-icon-lg);
+  border: 1px solid var(--glass-border-blue);
+  background: var(--grad-circle);
+  color: var(--action-primary-text);
+  font-size: var(--space-8);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 [data-pm] .empty-state .empty-state__title {
