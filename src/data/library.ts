@@ -107,7 +107,7 @@ export const TASK_LIBRARY: LibraryTask[] = [
   { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
   { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
   { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#EAE0C8', categories: ['practice'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);

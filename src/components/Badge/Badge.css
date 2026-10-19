@@ -36,7 +36,7 @@
 
 /* Невыбранный чипс залит жемчужным (--color-bg-fill), поэтому кружок темнее его: чернила 12 % */
 .badge--neutral {
-  background: rgb(23 46 47 / 12%);
+  background: rgb(19 32 58 / 12%);
   color: var(--color-text-secondary);
 }
 
@@ -65,7 +65,7 @@
 /* Уведомления папки выключены: то же число, но в тонком кольце без заливки, тише обычного кружка */
 .badge--quiet {
   background: none;
-  box-shadow: inset 0 0 0 1.5px rgb(23 46 47 / 35%);
+  box-shadow: inset 0 0 0 1.5px rgb(19 32 58 / 35%);
   color: var(--color-text-secondary);
 }
 
@@ -77,6 +77,6 @@
 
 /* Выбранный чипс с тоном залит пастелью: кружок «тихий» на нём кольцом чернил, а не белым */
 .chip[data-tone] .badge--quiet-inverse {
-  box-shadow: inset 0 0 0 1.5px rgb(23 46 47 / 45%);
+  box-shadow: inset 0 0 0 1.5px rgb(19 32 58 / 45%);
   color: var(--color-text-secondary);
 }

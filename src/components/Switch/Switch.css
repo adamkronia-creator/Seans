@@ -17,7 +17,7 @@
   height: 22px;
   border-radius: var(--radius-full);
   background: #fff;
-  box-shadow: 0 1px 3px rgb(23 46 47 / 25%);
+  box-shadow: 0 1px 3px rgb(19 32 58 / 25%);
   transition: transform 0.15s;
 }
 
