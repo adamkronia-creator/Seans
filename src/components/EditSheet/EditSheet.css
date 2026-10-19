@@ -407,14 +407,6 @@
   padding: var(--space-3);
 }
 
-[data-pm] .rich-toolbar {
-  padding: var(--space-3);
-  border: 1px solid var(--glass-border);
-  /* Скруглены только нижние углы: панель — низ карточки с текстом */
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  background: var(--glass-plain, #ffffff);
-}
-
 /* Фона у значка нет: выбираются только значок и его цвет. Плитка в заголовке без заливки, ячейки сетки без заливки и рамки, выбранная — кольцо */
 [data-pm] .sheet__preview-icon {
   background: none;
