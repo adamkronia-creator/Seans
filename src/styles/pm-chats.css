@@ -34,7 +34,7 @@
   --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #2688eb;
   --presence-online: #4bb34b; /* точка «в сети» */
   /* Градиенты: круги «Архивы» и «Избранное» (акцент на 50%) и выбранный чипс; невыбранный чипс без заливки */
-  --grad-circle: linear-gradient(135deg, rgb(38 136 235 / 0.62), rgb(38 136 235 / 0.4));
+  --grad-circle: linear-gradient(135deg, rgb(45 150 245 / 0.96), rgb(20 115 225 / 0.9));
   --grad-chip-active: linear-gradient(135deg, #3f9bf1 0%, #2688eb 100%);
 }
 
@@ -431,7 +431,7 @@ html:has([data-pm]) body {
   --glass-filter-panel: blur(var(--space-6)) saturate(2);
   --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(60 80 160 / 0.2);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
-  --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.82), rgb(38 136 235 / 0.9));
+  --glass-chip-active: linear-gradient(135deg, rgb(45 150 245 / 0.97), rgb(20 115 225 / 0.97));
   --glass-border-blue: rgb(255 255 255 / 0.45);
   /* Фон — прежний мягкий градиент: шесть цветных пятен на светлой основе */
   --scene:
