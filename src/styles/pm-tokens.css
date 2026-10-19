@@ -20,6 +20,7 @@
   --bg-inverse: #484149;
   --bg-scrim: #211e2366;
   --text-primary: #484149;
+  --icon-action: #000000; /* значки кнопок шапок (поиск, назад, меню): чёрные, не --text-primary */
   --text-secondary: #6b6067;
   --text-disabled: #9b8c8b;
   --text-link: #5b5f8d;

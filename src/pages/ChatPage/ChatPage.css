@@ -109,7 +109,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill);
-  color: var(--text-primary);
+  color: var(--icon-action, var(--text-primary));
   font-size: var(--size-icon-lg);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);

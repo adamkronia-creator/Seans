@@ -17,7 +17,7 @@ const DOMINANCE = 1.8;
 const MAX_MS = 900;
 
 // Кнопки-переключатели (радио, флажки) жест не блокируют: они занимают целые строки бланка
-const NOT_FROM = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-hscroll], .sheet, [role="dialog"]';
+const NOT_FROM = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-swipe-lock~="right"], [data-hscroll], .sheet, [role="dialog"]';
 
 /** Пока `enabled`, свайп вправо внутри `scope` (селектор экрана) вызывает `onBack` */
 export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void) {

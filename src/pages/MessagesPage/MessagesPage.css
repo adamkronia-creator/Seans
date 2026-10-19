@@ -84,7 +84,7 @@
   width: var(--size-control);
   height: var(--size-control);
   border-radius: var(--radius-full);
-  color: var(--text-primary);
+  color: var(--icon-action, var(--text-primary));
   font-size: var(--size-icon-lg);
 }
 
@@ -109,6 +109,7 @@
 }
 
 .chats-header .search-field__icon {
+  color: var(--icon-action, var(--text-primary));
   font-size: var(--size-icon);
 }
 

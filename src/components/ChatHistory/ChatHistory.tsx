@@ -369,7 +369,6 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
           <Chip
             key={id}
             follow
-            split
             tone={id === 'all' ? undefined : id}
             active={shown === i}
             onClick={() => setFilter(id)}

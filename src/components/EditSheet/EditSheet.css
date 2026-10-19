@@ -313,7 +313,12 @@
  * Блоки разделяет воздух space-3, строки 48 (space-12), текст редактора с полями 16.
  */
 [data-pm] .sheet__body {
-  gap: var(--space-3);
+  gap: var(--space-4);
+}
+
+/* В строках «Иконка» и «Цвет» значков нет: подпись и переключатель, поле слева 16 */
+[data-pm] .sheet__toggle-icon {
+  display: none;
 }
 
 [data-pm] .sheet__preview,
@@ -335,7 +340,8 @@
 
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones {
-  padding: var(--space-2) var(--space-4);
+  /* Строка «Иконка»/«Цвет» высотой 48 сама оставляет под подписью space-3 (текст 24): сетка начинается сразу под ней */
+  padding: 0 var(--space-4);
   row-gap: calc((100cqw - var(--space-8) - var(--cols) * 36px) / (var(--cols) - 1));
 }
 
@@ -358,4 +364,23 @@
 [data-pm] .rich-editor[data-empty='true']::before {
   right: var(--space-4);
   left: var(--space-4);
+}
+
+/* Полосы окна правки — светлое стекло на «зеркале» листа (pm-chats.css), значки и поля в тон */
+[data-pm] .sheet__preview,
+[data-pm] .sheet__card {
+  background: var(--glass-fill);
+}
+
+[data-pm] .sheet__icon {
+  border-color: var(--glass-border);
+  background: var(--glass-fill);
+}
+
+[data-pm] .sheet__icon--active {
+  border-color: var(--head-fg, var(--color-accent));
+}
+
+[data-pm] .rich-toolbar {
+  background: var(--glass-fill);
 }

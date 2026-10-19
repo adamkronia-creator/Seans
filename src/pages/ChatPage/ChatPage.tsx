@@ -33,6 +33,7 @@ import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
 import { goBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
+import { useSwipeBack } from '../../utils/swipeBack';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
@@ -320,6 +321,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   useEffect(() => setMenuOpen(false), [chatId]);
 
   const index = sections.findIndex((item) => item.id === section);
+
+  // Свайп вправо в диалоге (первая страница, листать влево нечего) возвращает в список чатов, как стрелка в шапке
+  useSwipeBack('.chat', index === 0 && !menuOpen && !searchOpen, () => goBack());
 
   // Сколько записей в разделах: подпись в боковой панели. «Избранное» считает то, что психолог прошёл сам
   const clientData = useClientData();

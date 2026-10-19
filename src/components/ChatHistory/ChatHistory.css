@@ -31,7 +31,8 @@
 }
 
 .hist-page {
-  padding: 0 0 var(--space-4);
+  /* От первого и от последнего события до края ленты по space-4 */
+  padding: var(--space-4) 0;
 }
 
 /* Событий нет: надпись по центру свободного места, а не прижата к панели фильтров */
@@ -117,32 +118,46 @@
   font-weight: 400;
 }
 
-/* Чипсы фильтров: как в «Диалогах» — невыбранные без заливки, выбранный залит цветом своего типа (тот же, что у круга события).
-   Уходят вбок за край панели. Двигает их скрипт (data-hscroll, SwipePager), а не браузер: иначе боковое движение пальца по ним
-   не дошло бы до листания разделов, когда чипсы дошли до края */
+/* Чипсы фильтров — как в «Диалогах»: отдельные пилюли высотой 32 с зазором space-2, невыбранные — белое стекло, выбранный залит
+   СВОИМ цветом (пастель вида, у «Все» — синее стекло) и подпись на нём тёмная/белая. Цвет идёт за листанием лент (followChips).
+   Ряд уходит вбок за край панели; двигает его скрипт (data-hscroll, SwipePager). Сверху и снизу space-1 оставлены кольцу фокуса:
+   ряд обрезает всё, что выходит за него по вертикали */
 .hist-chips {
   display: flex;
-  margin: 0 calc(var(--space-3) * -1);
-  padding: 0 var(--space-3);
+  gap: var(--space-2);
+  margin: calc(var(--space-1) * -1) calc(var(--space-3) * -1);
+  padding: var(--space-1) var(--space-3);
   overflow-x: hidden;
   scrollbar-width: none;
-  /* Подпись невыбранного — тот же серо-синий, что в «Диалогах» (на стекле над цветным фоном светло-серый не читается) */
-  --color-text-secondary: var(--text-chip);
 }
 
-/* Чипсы не «капсула» с раскрывающимися стыками, а обычные пилюли с постоянным зазором space-1 */
 .chat .hist-chips .chip {
-  margin-right: var(--space-1);
-  border-radius: var(--radius-full);
-  font-weight: 500;
-}
-
-.chat .hist-chips .chip:last-child {
   margin-right: 0;
+  border-radius: var(--radius-full);
 }
 
-/* Выбранный чипс вида (сеансы, тесты, задания, заметки) залит пастелью, подпись на ней чернильная: «чернила на пастели» в новой системе белые
-   (так подписан синий чипс «Диалогов»), а белое на розовом и бежевом не читается. У «Все» тона нет, он остаётся синим с белой подписью */
+/* Невыбранный: слой стекла (гаснет по мере выбора), выбранный: слой цвета вида с рамкой 1 px */
+.hist-chips .chip--follow::before {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.hist-chips .chip--follow::after {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
+  background: var(--glass-chip-active);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.hist-chips .chip--follow[data-tone]::after {
+  border-color: var(--glass-border);
+  background: var(--chip-bg);
+}
+
+/* Подпись на пастели своего вида чернильная: «чернила на пастели» в новой системе белые (так подписан синий чипс), а белое на розовом и бежевом не читается */
 .hist-chips .chip[data-tone] {
   --chip-on: var(--text-primary);
 }
@@ -187,11 +202,10 @@
 
 .hist-item__line {
   flex: 1;
-  width: 1.5px;
+  width: 1px;
   min-height: 0;
   margin: var(--space-1) 0;
-  border-radius: 1px;
-  background: rgb(107 117 133 / 35%); /* серо-синяя дымка text-icon: на цветном фоне даёт спокойную линию */
+  background: rgb(255 255 255 / 60%); /* полупрозрачная белая: на цветном фоне сцены даёт спокойную светлую нить */
 }
 
 /* Круг 20 цвета типа события: те же тона, что у чипсов разделов (сеанс — бирюзовый, тест — розовый, задание — зелёный,
@@ -207,7 +221,7 @@
   border-radius: 50%;
   background: var(--marker-bg);
   box-shadow: 0 0 0 1px var(--glass-border);
-  color: var(--text-primary);
+  color: var(--action-primary-text); /* знак на круге белый */
 }
 
 .hist-marker--invite {
@@ -240,6 +254,7 @@
 .hist-marker--pending {
   background: color-mix(in srgb, var(--marker-bg) 38%, #ffffff);
   box-shadow: inset 0 0 0 1.5px var(--marker-bg);
+  color: var(--text-primary); /* круг бледный: знак на нём остаётся тёмным */
 }
 
 .hist-marker__number {
