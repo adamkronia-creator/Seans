@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { Badge } from '../Badge/Badge';
 import { IconCloseMk, IconSearchMk } from '../ChatItem/ChatIcons';
 import './ChatSideMenu.css';
 
@@ -153,7 +154,7 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
             >
               {icon}
               <span className="side-menu__label">{label}</span>
-              {count ? <span className="side-menu__count">{count}</span> : null}
+              {count ? <Badge count={count} ariaLabel={`${count}`} /> : null}
             </button>
           ))}
         </nav>

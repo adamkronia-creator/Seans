@@ -86,9 +86,11 @@
   color: var(--action-primary-text);
 }
 
+/* Невидимая копия времени плавает справа: места в последней строке нет — она опускается и добавляет 16, а не целую строку текста (24) */
 .bubble__meta--ghost {
   position: static;
-  margin-left: var(--space-3);
+  float: right;
+  margin-left: var(--space-2);
   visibility: hidden;
 }
 

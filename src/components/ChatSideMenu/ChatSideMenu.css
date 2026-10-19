@@ -69,7 +69,8 @@
 }
 
 .side-menu__head .avatar {
-  --avatar-size: var(--size-avatar);
+  --avatar-size: var(--size-avatar-sm);
+  --presence-inset: 1.5px;
 }
 
 .side-menu__who {
@@ -82,6 +83,7 @@
 .side-menu__name,
 .side-menu__status {
   overflow: hidden;
+  line-height: var(--space-5);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -154,11 +156,6 @@
   white-space: nowrap;
 }
 
-.side-menu__count {
-  color: var(--text-secondary);
-  font: var(--type-caption);
-  font-variant-numeric: tabular-nums;
-}
 
 .side-menu__item:active {
   background: var(--glass);
@@ -183,9 +180,18 @@
   }
 }
 
-.side-menu__item--active > svg,
-.side-menu__item--active .side-menu__count {
+.side-menu__item--active > svg {
   color: var(--action-primary-text);
+}
+
+/* Счётчик на выбранной вкладке (синее стекло): светлый кружок, как на выбранном чипсе */
+.side-menu__item--active .badge {
+  background: var(--action-primary-text);
+  color: var(--action-primary);
+}
+
+.side-menu__item .badge {
+  flex-shrink: 0;
 }
 
 /* Поиск — действие, а не вкладка: отдельно от списка, без заливки */
@@ -210,4 +216,10 @@
   .side-menu__panel {
     transition: none;
   }
+}
+
+/* Строки по space-5, вдвоём ровно высота фото 40: фото и имя стоят на одном уровне с шапкой чата */
+.side-menu__who .side-menu__name,
+.side-menu__who .side-menu__status {
+  line-height: var(--space-5);
 }

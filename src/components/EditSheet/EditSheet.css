@@ -307,3 +307,55 @@
 .sheet__button:disabled {
   opacity: 0.4;
 }
+
+/*
+ * На системе мессенджера (data-pm): поля 16 с обеих сторон у всего содержимого, без разделителей; расстояния — токены сетки 4.
+ * Блоки разделяет воздух space-3, строки 48 (space-12), текст редактора с полями 16.
+ */
+[data-pm] .sheet__body {
+  gap: var(--space-3);
+}
+
+[data-pm] .sheet__preview,
+[data-pm] .sheet__card,
+[data-pm] .sheet__icons,
+[data-pm] .sheet__tones,
+[data-pm] .sheet__footer,
+[data-pm] .rich-toolbar {
+  border-top: 0;
+}
+
+[data-pm] .sheet__preview {
+  min-height: calc(var(--space-12) + var(--space-2));
+}
+
+[data-pm] .sheet__toggle-row {
+  height: var(--space-12);
+}
+
+[data-pm] .sheet__icons,
+[data-pm] .sheet__tones {
+  padding: var(--space-2) var(--space-4);
+  row-gap: calc((100cqw - var(--space-8) - var(--cols) * 36px) / (var(--cols) - 1));
+}
+
+[data-pm] .sheet__row {
+  min-height: var(--space-12);
+}
+
+[data-pm] .sheet__row + .sheet__row {
+  margin-top: 0;
+}
+
+[data-pm] .sheet__row + .sheet__row::before {
+  display: none;
+}
+
+[data-pm] .rich-editor {
+  padding: var(--space-3) var(--space-4);
+}
+
+[data-pm] .rich-editor[data-empty='true']::before {
+  right: var(--space-4);
+  left: var(--space-4);
+}

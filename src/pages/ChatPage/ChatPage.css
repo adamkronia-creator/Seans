@@ -107,7 +107,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill);
-  color: var(--text-icon);
+  color: var(--text-primary);
   font-size: var(--size-icon-lg);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
@@ -378,6 +378,12 @@
 
 /* Между сообщениями разных авторов 12, одного автора 4 */
 .bubble--in + .bubble--out,
-.bubble--out + .bubble--in {
+.bubble--out + .bubble--in,
+.bubble-group--in + .bubble--out,
+.bubble-group--out + .bubble--in,
+.bubble--in + .bubble-group--out,
+.bubble--out + .bubble-group--in,
+.bubble-group--in + .bubble-group--out,
+.bubble-group--out + .bubble-group--in {
   margin-top: var(--space-1);
 }
