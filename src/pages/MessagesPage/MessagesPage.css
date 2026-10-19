@@ -5,8 +5,8 @@
 .messages {
   /* Шапка: безопасная зона и space-4 до фото, строка с фото (size-avatar-sm), space-4 до чипсов, чипсы (space-8), space-3 и линия, как у нижней панели */
   --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-16) + var(--space-1) + var(--space-4) + var(--space-4) + var(--space-8) + var(--space-3));
-  /* Нижняя панель разделов с безопасной зоной */
-  --pm-bottom: calc(var(--size-bar) + var(--safe-bottom));
+  /* Плавающая нижняя панель: высота, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
+  --pm-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   /* Подсказка (уведомления папки, чат в архиве) стоит над нижней панелью */
   --toast-bottom: calc(var(--pm-bottom) + var(--space-4));
   position: relative;

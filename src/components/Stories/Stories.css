@@ -27,13 +27,15 @@
 
 /* Тонкая черта между «Вы» и собеседниками, по центру круга */
 .stories__divider {
-  width: 2px;
+  box-sizing: border-box;
+  width: var(--space-1);
   height: var(--space-6);
   margin-top: var(--space-5);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(var(--space-3));
-  backdrop-filter: blur(var(--space-3));
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 .stories__item {

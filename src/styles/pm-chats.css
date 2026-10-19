@@ -21,8 +21,8 @@
   --border-subtle: #eeeeef;
   --text-primary: #000000;
   --text-secondary: #818c99; /* текст сообщений, время, подпись статуса */
-  --text-icon: #99a2ad; /* значки поиска и уведомлений, неактивные значки нижней панели */
-  --text-chip: #a0a9b3; /* подпись невыбранного чипса */
+  --text-icon: #6b7585; /* значки поиска и уведомлений, неактивные значки нижней панели (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
+  --text-chip: #6b7585; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
   --text-link: #2688eb;
   --action-primary: #2688eb;
   --action-primary-hover: #1f7ad9;
@@ -413,59 +413,60 @@ html:has([data-pm]) body {
   padding-right: var(--space-3);
 }
 
-/* ——— «Диалоги»: стекло на градиентном фоне ———
-   Фон экрана — мягкий градиент с цветными пятнами. Шапка и нижняя панель — матовое стекло во всю ширину: полупрозрачная заливка и размытие,
-   список прокручивается под ними и просвечивает. Кнопки, чипсы, плитка «добавить историю» и круги «Избранное» и «Архивы» — тоже стекло:
-   плоская полупрозрачная заливка и размытие фона, без бликов, кромок, свечения и теней. */
+/* ——— «Диалоги»: матовое стекло (glassmorphism) ———
+   Эффект держится на четырёх вещах, и без любой из них стекло выглядит просто белым пятном:
+   1) ЗА стеклом есть что размывать: яркий фон с цветными кругами, края которых проходят под стеклянными элементами;
+   2) заливка полупрозрачная (белая 30–45%), чтобы фон просвечивал;
+   3) backdrop-filter: размытие и насыщенность того, что лежит позади;
+   4) тонкая светлая рамка 1 px: она задаёт край стекла.
+   Нижняя панель — плавающая стеклянная капсула, под которой проезжают строки списка. Шапка без подложки: списку под ней места нет, строки
+   уходят под шапку, потому что шапка закрашена тем же фоном (копия верхней части сцены). Стеклянному элементу нельзя иметь предка с
+   filter, opacity, mask или clip-path: такой предок становится «корнем фона», и размытие видит только его содержимое. */
 [data-pm] {
-  --glass: rgb(255 255 255 / 0.55); /* панели */
+  --glass: rgb(255 255 255 / 0.55); /* нажатая строка */
+  --glass-fill: rgb(255 255 255 / 0.34);
+  --glass-fill-panel: rgb(255 255 255 / 0.42);
   --glass-solid: rgb(255 255 255 / 0.92);
-  --glass-line: rgb(255 255 255 / 0.85);
-  --glass-blur: blur(var(--space-6)) saturate(1.8);
-  /* стеклянные объекты: белые (кнопки, чипсы, плитка истории) */
-  --glass-fill: rgb(255 255 255 / 0.5);
-  --glass-filter: blur(var(--space-5)) saturate(1.8);
-  /* стеклянные объекты: синие (выбранный чипс, круги «Избранное» и «Архивы») */
-  --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.88), rgb(38 136 235 / 0.94));
-  --scene:
-    radial-gradient(55% 30% at 6% 5%, rgb(96 165 250 / 0.6), transparent 72%),
-    radial-gradient(50% 26% at 100% 12%, rgb(255 140 170 / 0.5), transparent 72%),
-    radial-gradient(55% 28% at 94% 46%, rgb(255 190 120 / 0.5), transparent 72%),
-    radial-gradient(60% 30% at 0% 50%, rgb(110 220 200 / 0.45), transparent 72%),
-    radial-gradient(60% 32% at 72% 100%, rgb(170 130 255 / 0.55), transparent 72%),
-    radial-gradient(55% 28% at 8% 100%, rgb(100 180 255 / 0.45), transparent 72%),
-    linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
+  --glass-border: rgb(255 255 255 / 0.7);
+  --glass-filter: blur(var(--space-4)) saturate(1.8);
+  --glass-filter-panel: blur(var(--space-6)) saturate(2);
+  --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(60 80 160 / 0.2);
+  /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
+  --glass-chip-active: linear-gradient(135deg, rgb(63 155 241 / 0.82), rgb(38 136 235 / 0.9));
+  --glass-border-blue: rgb(255 255 255 / 0.45);
+  /* Фон: цветные круги с мягким краем (16 px) на светлой основе. Верхние круги отсчитываются от верха, нижние от низа, поэтому
+     лежат за шапкой и за панелью на любом экране; верх сцены повторяет шапка (--scene-top), и шва между ними нет */
+  --orbs-top:
+    radial-gradient(circle 84px at -4% 72px, #9bbfff 0, #7399ff calc(84px - 16px), transparent 84px),
+    radial-gradient(circle 76px at 98% 52px, #ffb5cd 0, #ff98b1 calc(76px - 16px), transparent 76px),
+    radial-gradient(circle 46px at 77% 192px, #8fead5 0, #5cc9e8 calc(46px - 16px), transparent 46px),
+    radial-gradient(circle 64px at -3% 252px, #cdb8ff 0, #ef98d8 calc(64px - 16px), transparent 64px);
+  --orbs-bottom:
+    radial-gradient(circle 64px at 18% calc(100% - 30px), #9be9ee 0, #6fb0ff calc(64px - 16px), transparent 64px),
+    radial-gradient(circle 58px at 84% calc(100% - 40px), #ffdca0 0, #ffa3b8 calc(58px - 16px), transparent 58px),
+    radial-gradient(circle 44px at 52% calc(100% - 6px), #d9c7ff 0, #a28fff calc(44px - 16px), transparent 44px);
+  --scene-base: #e6eeff;
+  --scene-top: var(--orbs-top), var(--scene-base);
+  --scene: var(--orbs-top), var(--orbs-bottom), linear-gradient(180deg, var(--scene-base) 0, var(--scene-base) 38%, #f4eefc 72%, #fdeef2 100%);
 }
 
 [data-pm] .messages {
   background: var(--scene);
 }
 
-/* Стекло шапки и панели — отдельным слоем позади, а не на самом элементе: элемент с backdrop-filter становится «корнем фона», и вложенные
-   стеклянные кнопки и чипсы видели бы сквозь него только саму шапку, а не список под ней */
-[data-pm] .chats-header,
-[data-pm]:has(.messages) .tabbar {
-  background: none;
+/* Шапка закрашена верхом сцены: строки списка уходят под неё и не видны, а сама шапка сливается с фоном без границы */
+[data-pm] .chats-header {
+  background: var(--scene-top);
   border: 0;
-  isolation: isolate;
 }
 
-[data-pm] .chats-header::before,
-[data-pm]:has(.messages) .tabbar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--glass);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  pointer-events: none;
-}
-
-/* Белое стекло: кнопки «поиск» и «оповещения», невыбранные чипсы (слой под подписью гаснет там, где её накрывает синяя плашка), плитка «добавить историю» */
+/* Белое стекло: кнопки «поиск» и «оповещения», невыбранные чипсы (слой под подписью гаснет там, где её накрывает синяя плашка),
+   плитка «добавить историю», поле поиска */
 [data-pm] .chats-header__action,
 [data-pm] .stories__add,
+[data-pm] .chats-header .search-field,
 [data-pm] .screen-header__chips .chip--follow::before {
+  border: 1px solid var(--glass-border);
   background: var(--glass-fill);
   box-shadow: none;
   -webkit-backdrop-filter: var(--glass-filter);
@@ -477,22 +478,52 @@ html:has([data-pm]) body {
   opacity: calc(1 - var(--cover, var(--w)));
 }
 
+[data-pm] .stories__add {
+  border: 1.5px dashed rgb(107 117 133 / 0.55);
+}
+
 [data-pm] .chats-header__action:active {
   background: var(--glass-solid);
 }
 
 /* Синее стекло: выбранный чипс и круги «Избранное» и «Архивы» (заливка круга — прежний градиент акцента на 50%) */
 [data-pm] .chips-pill {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
   background: var(--glass-chip-active);
-  box-shadow: none;
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
 }
 
 [data-pm] .avatar__icon {
-  box-shadow: none;
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
+}
+
+/* Нижняя панель — плавающая стеклянная капсула: отступ space-4 по бокам и space-3 над безопасной зоной, внутри отступ space-1,
+   выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми */
+[data-pm]:has(.messages) .tabbar {
+  right: var(--space-4);
+  bottom: calc(var(--safe-bottom) + var(--space-3));
+  left: var(--space-4);
+  padding: var(--space-1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm]:has(.messages) .tabbar__item {
+  height: calc(var(--size-bar) - var(--space-2));
+  border-radius: var(--radius-full);
+}
+
+[data-pm]:has(.messages) .tabbar__item--active {
+  background: rgb(255 255 255 / 0.55);
 }
 
 /* Разделителей в «Диалогах» нет: ни под шапкой, ни над панелью, ни после «Избранного»; пустой элемент после «Избранного» оставляет промежуток space-2 + поле строки space-2 = 16 */
