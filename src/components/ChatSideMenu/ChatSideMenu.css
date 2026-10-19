@@ -44,7 +44,7 @@
   flex-direction: column;
   gap: var(--space-4);
   /* Левый край панели — на левом краю самых широких исходящих сообщений психолога (пузырь до 85% ширины ленты с полями space-4) */
-  width: calc((100% - var(--space-8)) * 0.85 + var(--space-4));
+  width: calc((100% - var(--space-8)) * 0.85 + var(--space-4) + 1px);
   padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) calc(var(--safe-bottom) + var(--space-4)) var(--space-3);
   border-left: 1px solid var(--glass-border);
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
@@ -135,9 +135,10 @@
   opacity: 0;
 }
 
+.side-menu__close,
 .side-menu__close:active,
 .side-menu__search:active {
-  background: var(--glass-solid);
+  background: var(--glass-solid); /* белый круг, как у кнопки поиска (на затемнении без заливки он сер) */
 }
 
 /* Вкладки: пилюли высотой 48; выбранная залита синим стеклом, как выбранный чипс в «Диалогах» */
@@ -154,7 +155,7 @@
   box-sizing: border-box;
   width: 100%;
   height: var(--size-avatar);
-  padding: 0 var(--space-4) 0 var(--space-3);
+  padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
   color: var(--text-primary);
@@ -164,9 +165,7 @@
 }
 
 .side-menu__item > svg {
-  flex-shrink: 0;
-  color: var(--text-icon);
-  font-size: var(--size-icon-lg);
+  display: none; /* у вкладок значков нет: подпись и число */
 }
 
 .side-menu__label {

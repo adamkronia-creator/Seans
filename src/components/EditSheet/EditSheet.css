@@ -321,8 +321,6 @@
   display: none;
 }
 
-[data-pm] .sheet__preview,
-[data-pm] .sheet__card,
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones,
 [data-pm] .sheet__footer,
@@ -367,20 +365,50 @@
 }
 
 /* Полосы окна правки — светлое стекло на «зеркале» листа (pm-chats.css), значки и поля в тон */
+
+/*
+ * Блоки окна правки (заголовок, иконка, цвет, текст) — белые карточки, как карточки отправленных тестов в чате: --glass-card, рамка 1 px,
+ * скругление radius-lg, поля листа 16 по бокам; между ними 16. Панель форматирования — такая же карточка, плотнее: пока она прилипла
+ * к низу, под ней проходит текст
+ */
+[data-pm] .sheet__body {
+  padding-top: var(--space-4);
+}
+
 [data-pm] .sheet__preview,
 [data-pm] .sheet__card {
-  background: var(--glass-fill);
+  margin-inline: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+}
+
+[data-pm] .rich-toolbar {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.92);
+}
+
+/* Фона у значка нет: выбираются только значок и его цвет. Плитка в заголовке без заливки, ячейки сетки без заливки и рамки, выбранная — кольцо */
+[data-pm] .sheet__preview-icon {
+  background: none;
 }
 
 [data-pm] .sheet__icon {
-  border-color: var(--glass-border);
-  background: var(--glass-fill);
+  border-color: transparent;
+  background: none;
 }
 
 [data-pm] .sheet__icon--active {
   border-color: var(--head-fg, var(--color-accent));
 }
 
-[data-pm] .rich-toolbar {
-  background: var(--glass-fill);
+/* Окно правки поднимается до нижнего края шапки чата (под фото собеседника и подписью): верх листа там, где кончается стеклянная подложка шапки */
+[data-pm] .sheet--edit {
+  height: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3));
+  max-height: none;
+}
+
+[data-pm] .sheet__preview {
+  padding-block: var(--space-3);
 }

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EditSheet } from '../EditSheet/EditSheet';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
@@ -335,6 +335,18 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const data = useClientData();
   const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
+
+  // Панель чипсов лежит поверх лент (absolute): её высоту отдаём лентам, чтобы они кончались над ней
+  useEffect(() => {
+    const host = root.current;
+    const foot = host?.querySelector<HTMLElement>('.hist-foot');
+    if (!host || !foot) return;
+    const apply = () => host.style.setProperty('--foot-h', `${Math.round(foot.getBoundingClientRect().height)}px`);
+    const observer = new ResizeObserver(apply);
+    observer.observe(foot);
+    apply();
+    return () => observer.disconnect();
+  }, []);
 
   const pages = useMemo(
     () =>

@@ -237,18 +237,18 @@
 }
 
 [data-pm] .chat .chat__messages {
-  padding-top: calc(var(--chat-top) + var(--space-2));
-  padding-bottom: var(--page-bottom);
+  padding-top: calc(var(--chat-top) + var(--space-4));
+  padding-bottom: calc(var(--page-bottom) + var(--space-2));
 }
 
 [data-pm] .chat .chat-tests {
-  padding-top: calc(var(--chat-top) + var(--space-3));
-  padding-bottom: var(--page-bottom);
+  padding-top: calc(var(--chat-top) + var(--space-4));
+  padding-bottom: calc(var(--page-bottom) + var(--space-2));
 }
 
 [data-pm] .chat .chat-case {
-  padding-top: var(--chat-top);
-  padding-bottom: var(--page-bottom);
+  padding-top: calc(var(--chat-top) + var(--space-4));
+  padding-bottom: calc(var(--page-bottom) + var(--space-2));
 }
 
 /* История: каждая лента фильтра прокручивается под шапкой; снизу ленту ограничивает панель с чипсами (низ .hist-host занимает капсула) */
@@ -268,6 +268,10 @@
 
 .chat__group + .chat__group {
   margin-top: var(--space-4);
+}
+
+.chat__day + * {
+  margin-top: var(--space-2); /* подпись дня: от сообщений снизу 8 + зазор группы 8 = 16, сверху 16 даёт отступ групп */
 }
 
 .chat__group--typing {
