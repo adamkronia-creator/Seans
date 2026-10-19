@@ -470,6 +470,10 @@ html:has([data-pm]) body {
   --scene: linear-gradient(rgb(255 255 255 / 0.4), rgb(255 255 255 / 0.4)), url('../assets/bg-dawn.webp') center / cover no-repeat, #eef2f8;
 }
 
+:root[data-bg='custom'] [data-pm] {
+  --scene: var(--user-bg) center / cover no-repeat, #dfe6f0;
+}
+
 :root[data-bg='3'] [data-pm] {
   --scene: url('../assets/bg-dawn-soft.webp') center / cover no-repeat, #dfe6f0;
 }

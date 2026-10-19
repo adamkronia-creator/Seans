@@ -1,9 +1,10 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
+import { IconBellMk, IconImageMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
 import { StoriesRow } from '../../components/Stories/Stories';
 import { navigate } from '../../router';
+import { setBackgroundFromFile } from '../../utils/customBackground';
 
 interface ChatsHeaderProps {
   searching: boolean;
@@ -22,6 +23,7 @@ interface ChatsHeaderProps {
 export function ChatsHeader({ searching, onSearching, query, onQuery, chips, storiesRoot }: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
   const input = useRef<HTMLInputElement>(null);
+  const bgInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (searching) input.current?.focus({ preventScroll: true });
   }, [searching]);
@@ -53,6 +55,21 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips, sto
             <span className="chats-header__name">Чаты</span>
             <span className="chats-header__status">Ваши диалоги</span>
           </span>
+          {/* Временная кнопка: загрузить файл и сделать его фоном приложения (долгое нажатие не нужно: сброс — ?bg=0…3) */}
+          <button type="button" className="chats-header__action" aria-label="Загрузить фон" title="Загрузить фон" onClick={() => bgInput.current?.click()}>
+            <IconImageMk />
+          </button>
+          <input
+            ref={bgInput}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (file) void setBackgroundFromFile(file);
+            }}
+          />
           <button type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
             <IconSearchMk />
           </button>

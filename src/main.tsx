@@ -25,11 +25,15 @@ import { installPressEffect } from './utils/pressEffect';
 // Вариант фона для сравнения: ?bg=0…3 (0 — прежний градиент, 1 — картинка, 2 — под вуалью, 3 — размытая), выбор запоминается; по умолчанию картинка
 try {
   const asked = new URLSearchParams(window.location.search).get('bg');
-  if (asked !== null && /^[0-3]$/.test(asked)) localStorage.setItem('seans-bg', asked);
+  if (asked !== null && /^[0-3]$/.test(asked)) {
+    localStorage.setItem('seans-bg', asked);
+    localStorage.removeItem('seans-bg-image'); // выбор варианта снимает загруженную картинку
+  }
   document.documentElement.dataset.bg = localStorage.getItem('seans-bg') ?? '1';
 } catch {
   document.documentElement.dataset.bg = '1';
 }
+import('./utils/customBackground').then((m) => m.applyStoredBackground());
 installPressEffect();
 installInertiaScroll();
 installHoverTitles();
