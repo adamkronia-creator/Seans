@@ -74,7 +74,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--space-6);
+  /* Ширина по значку: центровка в квадрате 24 сдвигала узкий значок вправо от поля 12 */
   height: var(--space-6);
   /* Фона у значка нет: только значок цвета раздела и название */
   background: none;

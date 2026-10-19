@@ -400,7 +400,8 @@
 [data-pm] .rich-toolbar {
   padding: var(--space-3);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  /* Скруглены только нижние углы: панель — низ карточки с текстом */
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   background: #ffffff;
 }
 

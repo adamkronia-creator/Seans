@@ -78,12 +78,12 @@
 
   /* Вид содержимого: каждому свой цвет, везде один и тот же (выбранный чипс раздела, линия времени, значки в списках, плашки записей).
      Заливка — пастель, текст по ней — чернила. soft — та же пастель, разведённая бумагой, для больших полотен */
-  --tone-chat: #AFDAFC;          /* Диалог: Синий-синий иней */
-  --tone-session: #ACE5EE;       /* Сеансы: Снежно-синий */
-  --tone-test: #FFD1DC;          /* Тесты: Пастельно-розовый */
-  --tone-task: #ACE1AF;          /* Задания: Селадон */
-  --tone-info: #DCD0FF;          /* Сведения: Светлая мальва */
-  --tone-note: #FAE7B5;          /* Заметки: Бананомания */
+  --tone-chat: #AFDAFC;          /* Диалог */
+  --tone-session: #A9D2FA;       /* Сеансы: синий */
+  --tone-test: #F8E08E;          /* Тесты (методики): жёлтый */
+  --tone-task: #ACE1AF;          /* Задания: зелёный */
+  --tone-info: #FFD1DC;          /* Сведения: розовый */
+  --tone-note: #DCD0FF;          /* Заметки: фиолетовый */
   --tone-chat-soft: color-mix(in srgb, var(--tone-chat) 38%, var(--color-bg-app));
   --tone-session-soft: color-mix(in srgb, var(--tone-session) 38%, var(--color-bg-app));
   --tone-test-soft: color-mix(in srgb, var(--tone-test) 38%, var(--color-bg-app));

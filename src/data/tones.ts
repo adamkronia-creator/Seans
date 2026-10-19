@@ -17,34 +17,34 @@ export type ToneId =
   | 'gray'
   | 'slate';
 
-// Пастель с палитры (tokens.css) годится для заливок, но не для штрихов значка: на светлой плитке значок рисуется тёмным оттенком того же цвета
-// (≥ 4,8:1), плитка — та же пастель вполсилы на бумаге, а в окне выбора цвета кружок залит самой пастелью
-const tone = (id: ToneId, label: string, token: string, ink: string) => ({
+// Цвета подобраны под синий акцент #2688EB: та же насыщенность, значок и кружок — один цвет (≥ 3:1 на белой карточке);
+// плитка шапки — тот же цвет на 18% на бумаге
+const tone = (id: ToneId, label: string, color: string) => ({
   id,
   label,
-  swatch: `var(--color-${token})`,
-  fg: ink,
-  bg: `color-mix(in srgb, var(--color-${token}) 50%, var(--color-bg-app))`,
+  swatch: color,
+  fg: color,
+  bg: `color-mix(in srgb, ${color} 18%, var(--color-bg-app))`,
 });
 
 // 16 цветов: два ряда по 8 в окне редактирования
 export const TONES = [
-  tone('blue', 'Синий', 'blue', '#0E6091'),
-  tone('cyan', 'Голубой', 'cyan', '#356B74'),
-  tone('teal', 'Бирюзовый', 'teal', '#105556'),
-  tone('mint', 'Мятный', 'mint', '#005C38'),
-  tone('green', 'Зелёный', 'green', '#116223'),
-  tone('lime', 'Салатовый', 'lime', '#566A1B'),
-  tone('yellow', 'Жёлтый', 'yellow', '#854900'),
-  tone('orange', 'Оранжевый', 'orange', '#873300'),
-  tone('coral', 'Коралловый', 'coral', '#913719'),
-  tone('red', 'Красный', 'red', '#892936'),
-  tone('pink', 'Розовый', 'pink', '#815964'),
-  tone('magenta', 'Пурпурный', 'magenta', '#6D576E'),
-  tone('purple', 'Фиолетовый', 'purple', '#514F78'),
-  tone('brown', 'Коричневый', 'brown', '#624F2D'),
-  tone('gray', 'Серо-лиловый', 'gray', '#5C4451'),
-  tone('slate', 'Серо-бирюзовый', 'slate', '#275C5D'),
+  tone('blue', 'Синий', '#2688EB'),
+  tone('cyan', 'Голубой', '#0E9DB8'),
+  tone('teal', 'Бирюзовый', '#0F9488'),
+  tone('mint', 'Мятный', '#12A67A'),
+  tone('green', 'Зелёный', '#2E9E4F'),
+  tone('lime', 'Салатовый', '#6FA51E'),
+  tone('yellow', 'Жёлтый', '#C98A00'),
+  tone('orange', 'Оранжевый', '#E8710A'),
+  tone('coral', 'Коралловый', '#E5583F'),
+  tone('red', 'Красный', '#DC3C46'),
+  tone('pink', 'Розовый', '#E0508F'),
+  tone('magenta', 'Пурпурный', '#B54BBE'),
+  tone('purple', 'Фиолетовый', '#7A56D6'),
+  tone('brown', 'Коричневый', '#96663A'),
+  tone('gray', 'Серый', '#6F7C95'),
+  tone('slate', 'Сине-серый', '#46689A'),
 ];
 
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
