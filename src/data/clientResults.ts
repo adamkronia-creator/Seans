@@ -60,7 +60,7 @@ const RUNS: ClientRun[] = [
   {
     chatId: 'maxim',
     testId: 'gad7',
-    form: '',
+    form: 'Единая',
     pass: { answers: [2, 2, 2, 2, 1, 2, 1], date: '05.09.2026', time: '19:05–19:08', duration: '2 мин. 22 с.' },
   },
   { chatId: 'maxim', testId: 'rses', form: '' },

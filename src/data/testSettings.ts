@@ -414,6 +414,8 @@ const GAD7: TestSettingsData = {
   ],
   questions: 7,
   duration: '2–3 мин.',
+  age: '14+',
+  forms: ['Единая'],
   message: DEFAULT_MESSAGE,
 };
 
