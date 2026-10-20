@@ -238,11 +238,14 @@ html[data-transition='slide-prev']::view-transition-new(app) {
   }
 }
 
-/* Нижняя панель при смене раздела остаётся на месте: она выделена из снимка экрана в отдельный слой. Слой стоит, а не едет вместе с экраном;
+/* Так же при переходе вглубь и назад (тесты, настройки, бланки, события): панель не уезжает и не появляется заново.
+   Нижняя панель при смене раздела остаётся на месте: она выделена из снимка экрана в отдельный слой. Слой стоит, а не едет вместе с экраном;
    показывается уже новая панель (её плашка скользит к новому разделу сама), прежняя в переходе не участвует */
 html[data-transition='slide-next'] .screen[data-layer='top'] .tabbar,
 html[data-transition='slide-prev'] .screen[data-layer='top'] .tabbar,
-html[data-transition='fade'] .screen[data-layer='top'] .tabbar {
+html[data-transition='fade'] .screen[data-layer='top'] .tabbar,
+html[data-transition='forward'] .screen[data-layer='top'] .tabbar,
+html[data-transition='back'] .screen[data-layer='top'] .tabbar {
   view-transition-name: tabbar;
 }
 
