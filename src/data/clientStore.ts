@@ -79,9 +79,6 @@ const TEST_META: Record<string, TestMeta> = {
   phq9: { name: 'PHQ-9', what: 'опросник депрессивного состояния «PHQ-9»' },
 };
 
-/** Сокращение теста («ИТТ», «SCL-90», «GAD-7»); у теста без сокращения в данных — пусто */
-export const testAbbr = (id: string): string | undefined => TEST_META[id]?.name;
-
 const SESSIONS: Session[] = [
   {
     id: 's1',

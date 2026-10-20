@@ -38,7 +38,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
           </span>
         )}
         <div className="test-settings__who">
-          <h1 className="test-settings__name">{hidden ? (client?.title ?? BLIND_FALLBACK_TITLE) : shortTitle(test.title)}</h1>
+          <h1 className="test-settings__name">{hidden ? (client?.title ?? BLIND_FALLBACK_TITLE) : ('abbr' in test && test.abbr ? test.abbr : shortTitle(test.title))}</h1>
           <p className="test-settings__status">{status}</p>
         </div>
       </div>

@@ -251,3 +251,44 @@
 [data-pm] .test-settings__scroll:has(+ .test-settings__cta:not(.test-pass__cta)) {
   padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-3) + var(--size-touch) + var(--space-4));
 }
+
+/* Благодарность после теста: без рамки и заливки карточки; значок с галочкой — как круги «Архивы» и «Избранное», но зелёный */
+[data-pm] .tp__done {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-pm] .tp__done-mark {
+  width: var(--space-16);
+  height: var(--space-16);
+  margin-bottom: var(--space-2);
+  border: 1px solid rgb(120 220 150 / 0.55);
+  background: linear-gradient(135deg, rgb(82 214 120 / 0.96), rgb(52 199 89 / 0.92));
+  color: var(--action-primary-text);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+[data-pm] .tp__done-mark svg {
+  width: var(--space-8);
+  height: var(--space-8);
+}
+
+[data-pm] .tp__done-title {
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+/* Шапка в рамке телефона лежит на том же фоне, что и сам экран: без стеклянной подложки и своей заливки */
+[data-pm] .tp__phone .test-settings__header {
+  padding: var(--space-3) var(--space-4);
+  background: none;
+}
+
+[data-pm] .tp__phone .test-settings__header::before {
+  display: none;
+}
