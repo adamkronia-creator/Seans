@@ -424,6 +424,7 @@ const byOrder = (base: ConclusionData, values: number[]): Record<string, number>
 
 const OSR: ConclusionData = {
   overview: false,
+  noCodes: true,
   flat: true,
   summary: true,
   info: { date: '25.05.2026', time: '19:12–19:19', duration: '6 мин. 48 с.', age: '23 года' },
