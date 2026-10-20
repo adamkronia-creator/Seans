@@ -244,8 +244,8 @@ html[data-transition='slide-prev']::view-transition-new(app) {
 html[data-transition='slide-next'] .screen[data-layer='top'] .tabbar,
 html[data-transition='slide-prev'] .screen[data-layer='top'] .tabbar,
 html[data-transition='fade'] .screen[data-layer='top'] .tabbar,
-html[data-transition='forward'] .screen[data-layer='top'] .tabbar,
-html[data-transition='back'] .screen[data-layer='top'] .tabbar {
+html[data-transition='forward'] .screen[data-layer='top']:not(:has(.swipe-pager__page .tabbar)) .tabbar,
+html[data-transition='back'] .screen[data-layer='top']:not(:has(.swipe-pager__page .tabbar)) .tabbar {
   view-transition-name: tabbar;
 }
 
