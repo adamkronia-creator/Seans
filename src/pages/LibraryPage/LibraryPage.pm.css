@@ -126,8 +126,8 @@
   height: var(--presence-size);
   border: 0;
   border-radius: var(--radius-full);
-  background: var(--glass-solid);
-  box-shadow: none;
+  background: linear-gradient(135deg, #ff6b8a 0%, #ff2d55 100%);
+  box-shadow: 0 1px 3px rgb(255 45 85 / 0.45);
 }
 
 /* Белый (при тёмном тексте) или тёмный (при светлом) круг 22 с красным сердечком 14 по середине */
@@ -135,6 +135,12 @@
   width: 14px;
   height: 14px;
   opacity: 1;
+}
+
+/* Сердечко белое на красном градиентном круге (цвет «Избранного» из системы iOS); вырез в аватаре отделяет круг от значка */
+[data-pm] .lib-card__heart svg path {
+  fill: #fff;
+  stroke: none;
 }
 
 [data-pm] .lib-card__heart[aria-pressed='false'] {
