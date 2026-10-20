@@ -85,7 +85,8 @@
 }
 
 [data-pm] .events__list {
-  padding: var(--pm-top) 0 calc(var(--safe-bottom) + var(--space-8));
+  /* Внизу место под плавающую панель разделов: последнее событие можно прокрутить выше неё */
+  padding: var(--pm-top) 0 calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   background: none;
 }
 

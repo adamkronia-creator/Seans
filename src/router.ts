@@ -40,8 +40,9 @@ const subscribe = (callback: () => void) => {
   return () => listeners.delete(callback);
 };
 
-/** Сам чат (не его тесты и задания): у него своя нижняя панель на каждой странице, и в переходе её нельзя выделять отдельным слоем */
-const isChatRoot = (path: string) => /^\/chat\/[^/]+\/?$/.test(path);
+/** Экраны, где нижней панели нет (папка, архив, правка профиля) или она своя на каждой странице (сам чат): в переходе панель
+ * нельзя выделять отдельным слоем — слой, который есть только «до» или «после», рисуется прямоугольником */
+const isChatRoot = (path: string) => /^\/(chat\/[^/]+|folder\/[^/]+|archive|profile\/edit)\/?$/.test(path);
 
 function show(path: string, kind: TransitionKind, prev: string | undefined) {
   document.documentElement.toggleAttribute('data-vt-chat', isChatRoot(target) || isChatRoot(path));
