@@ -105,7 +105,7 @@ export function JumpSheet({ total, answers, current, rulesLabel, onPick, onRules
 
   return (
     <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label="Все вопросы">
+      <div className="sheet pass-jump-sheet" role="dialog" aria-modal="true" aria-label="Все вопросы">
         <div className="sheet__header">
           <h2 className="sheet__heading">Все вопросы</h2>
         </div>

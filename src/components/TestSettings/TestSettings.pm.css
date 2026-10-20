@@ -223,3 +223,31 @@
 [data-pm] .test-settings__button:disabled {
   opacity: 1;
 }
+
+/* «Все вопросы» не доходит до шапки теста: сверху от её нижней границы ещё 16 */
+[data-pm] .pass-jump-sheet {
+  --sheet-max: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3) - var(--space-4));
+}
+
+/* «Пройти или отправить» парит над капсулой разделов без подложки: страница прокручивается под кнопкой и за ней,
+   а внизу страницы запас на кнопку, чтобы последнее не пряталось под ней. Полоса пропускает нажатия мимо кнопки */
+[data-pm] .test-settings {
+  position: relative;
+}
+
+[data-pm] .test-settings__cta:not(.test-pass__cta) {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+[data-pm] .test-settings__cta:not(.test-pass__cta) .test-settings__cta-button {
+  pointer-events: auto;
+}
+
+[data-pm] .test-settings__scroll:has(+ .test-settings__cta:not(.test-pass__cta)) {
+  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-3) + var(--size-touch) + var(--space-4));
+}

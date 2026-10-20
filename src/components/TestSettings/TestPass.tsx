@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { ResultMode } from '../../data/resultMode';
 import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
@@ -102,6 +102,29 @@ export function TestPass({ testId, blank, form, saveBlank, onDone, client }: Tes
     scrollRef.current?.scrollTo({ top: 0 });
   }, [step, finished]);
 
+  // Свайп листает вопросы: влево — дальше (как «Далее»: только если на этот вопрос есть ответ; с инструкции — «Начать»), вправо — назад.
+  // От левого края жест остаётся «назад» из экрана (edgeBack), в полях и там, где помечено data-no-swipe, не работает
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: TouchEvent) => {
+    const t = e.touches[0];
+    const blocked = (e.target as Element).closest('input, textarea, select, [data-no-swipe]') || t.clientX < 28;
+    touch.current = e.touches.length === 1 && !blocked ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    const s = touch.current;
+    touch.current = null;
+    if (!s || finished || jumpOpen || resetOpen) return;
+    const dx = e.changedTouches[0].clientX - s.x;
+    const dy = e.changedTouches[0].clientY - s.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    if (dx < 0) {
+      if (step < 0) start();
+      else if (step < total - 1 && run.answers[step] !== undefined) goTo(step + 1);
+    } else if (step >= 0) {
+      goTo(step - 1);
+    }
+  };
+
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
 
   const goTo = (target: number) => {
@@ -154,7 +177,7 @@ export function TestPass({ testId, blank, form, saveBlank, onDone, client }: Tes
 
   return (
     <>
-      <div className="test-settings__scroll" key={finished ? 'thanks' : 'pass'} ref={scrollRef}>
+      <div className="test-settings__scroll" key={finished ? 'thanks' : 'pass'} ref={scrollRef} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {finished && client ? (
           <TestDone testId={testId} result={client.result} />
         ) : step < 0 ? (
