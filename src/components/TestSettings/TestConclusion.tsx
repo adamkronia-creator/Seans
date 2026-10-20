@@ -47,7 +47,13 @@ function RowName({ data, scale, index }: { data: ConclusionData; scale: Conclusi
   return (
     <span className="cc-bar__name">
       {data.overview ? `${index + 1}.\u00A0` : ''}
-      {scale.name} <span className="cc-bar__code">({scale.code})</span>
+      {scale.name}
+      {data.scales.length > 1 && (
+        <>
+          {' '}
+          <span className="cc-bar__code">({scale.code})</span>
+        </>
+      )}
     </span>
   );
 }
@@ -175,7 +181,13 @@ function ScaleCharts({
               >
                 <span className="cc-bar__name">
                   {data.overview ? `${i + 1}.\u00A0` : ''}
-                  {s.chartName ?? s.name} <span className="cc-bar__code">({s.code})</span>
+                  {s.chartName ?? s.name}
+                  {scales.length > 1 && (
+                    <>
+                      {' '}
+                      <span className="cc-bar__code">({s.code})</span>
+                    </>
+                  )}
                 </span>
                 <div className="cc-bar">
                   <Bar data={data} scale={s} />

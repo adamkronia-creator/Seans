@@ -436,7 +436,7 @@ const PHQ9: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
-  scales: { main: ['Депрессия (D)'], extra: [] },
+  scales: { main: ['Депрессия'], extra: [] },
   scoring: [
     { range: '0–4', label: 'нет симптомов', tone: 'green' },
     { range: '5–9', label: 'легкая депрессия', tone: 'yellow' },
