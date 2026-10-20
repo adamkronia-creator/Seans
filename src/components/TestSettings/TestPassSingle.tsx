@@ -10,6 +10,9 @@ import './TestPass.css';
 /** Пауза после ответа, прежде чем открыть следующий вопрос: выбранный вариант успевает подсветиться */
 export const ADVANCE_MS = 280;
 
+/** Пояснение к группе длиннее этого на экране вопроса не показывается */
+const HEADING_MAX = 80;
+
 /** Пояснение к группе вопросов («Сейчас, в данный момент:»): в данных оно стоит у первого вопроса группы, а на отдельном экране нужно у каждого */
 function headingOf(data: TestBlankData, index: number): string | undefined {
   for (let i = index; i >= 0; i--) {
@@ -38,7 +41,10 @@ interface PassQuestionProps {
 
 /** Экран одного вопроса: заголовок «Вопрос 12 из 90» со ссылкой на все вопросы, ниже сам вопрос с вариантами ответов */
 export function PassQuestion({ data, index, answer, dir, missing, onChoose, onPick, onOpenAll }: PassQuestionProps) {
-  const heading = headingOf(data, index);
+  const full = headingOf(data, index);
+  // Длинная инструкция («Выберите ответ, который наиболее точно…») клиент уже прочитал перед началом, она доступна в «Все вопросы»;
+  // на каждом экране она съедает пол-экрана, и вопрос с ответами приходится прокручивать. Короткие пояснения («Сейчас, в данный момент:») остаются
+  const heading = full && full.length <= HEADING_MAX ? full : undefined;
   // Время последнего нажатия пальцем или мышью: по нему отличаем нажатие от выбора клавишей
   const pointerAt = useRef(-Infinity);
 
