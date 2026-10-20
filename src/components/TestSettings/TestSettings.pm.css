@@ -292,3 +292,16 @@
 [data-pm] .tp__phone .test-settings__header::before {
   display: none;
 }
+
+/* «Сортировка» в заголовке блока: без плашки и поля справа, текст вплотную к полю карточки (16), как заголовок слева; порядок выбран — цвет ссылки */
+[data-pm] .cc-sort {
+  padding: 0;
+  background: none;
+  color: var(--text-secondary);
+  font: var(--type-label);
+}
+
+[data-pm] .cc-sort--on {
+  background: none;
+  color: var(--text-link);
+}
