@@ -1,4 +1,4 @@
-import type { ComponentType, SVGProps } from 'react';
+import { useEffect, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
 import {
   IconMessages,
   IconProfile,
@@ -24,10 +24,24 @@ interface TabBarProps {
   onChange: (id: TabId) => void;
 }
 
+/** Раздел, на котором панель стояла в прошлый раз: у каждого экрана своя панель, и плашка новой начинает с места прежней и скользит к своему */
+let lastIndex: number | null = null;
+
 export function TabBar({ active, onChange }: TabBarProps) {
   const unread = useUnreadTotal();
+  const target = TABS.findIndex((t) => t.id === active);
+  const [shown, setShown] = useState(lastIndex ?? target);
+  useEffect(() => {
+    lastIndex = target;
+    if (shown === target) return;
+    // Плашка сначала рисуется на старом месте, и только потом получает новое: тогда переход виден
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => setShown(target)));
+    return () => cancelAnimationFrame(id);
+  }, [target, shown]);
   return (
-    <nav className="tabbar" aria-label="Разделы">
+    <nav className="tabbar" aria-label="Разделы" style={{ '--tab-index': shown } as CSSProperties}>
+      {/* Подвижная плашка выбранного раздела (видна у плавающей капсулы, см. pm-chats.css): при смене раздела скользит к новому */}
+      <span className="tabbar__pill" aria-hidden="true" />
       {TABS.map(({ id, label, Icon }) => (
         <button
           key={id}

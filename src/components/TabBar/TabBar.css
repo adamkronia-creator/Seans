@@ -37,3 +37,7 @@
   line-height: 0;
   pointer-events: none;
 }
+
+.tabbar__pill {
+  display: none;
+}

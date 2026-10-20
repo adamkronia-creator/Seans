@@ -62,7 +62,8 @@
   letter-spacing: 0;
 }
 
-[data-pm] .blank-card__badge {
+[data-pm] .blank-card__badge,
+[data-pm] .cc-badge {
   background: var(--bg-subtle);
   color: var(--text-secondary);
   font: var(--type-meta);
@@ -304,4 +305,35 @@
 [data-pm] .cc-sort--on {
   background: none;
   color: var(--text-link);
+}
+
+/* В рамке телефона кнопка стоит у низа экрана без запаса под капсулу разделов приложения */
+[data-pm] .tp__phone .test-settings__cta {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+/* «Сейчас, в данный момент:» и «В последнее время:»: подзаголовок группы вопросов без цветной плашки и курсива, как подписи групп (--type-label, вторичный цвет), над разделителем */
+[data-pm] .blank-heading {
+  background: none;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+/* Сокращение шкалы («Шкала GSI») и число у названия карточки: без плашки и полей, текст вплотную к правому полю карточки (16) */
+[data-pm] .blank-card__badge,
+[data-pm] .cc-badge {
+  padding: 0;
+  background: none;
+}
+
+/* Название в две строки не липнет к разделителю: у заголовка карточки поля сверху и снизу по 12 */
+[data-pm] .blank-card__head {
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+[data-pm] .blank-card__title {
+  text-wrap: balance;
 }
