@@ -41,8 +41,9 @@ export function ProfilePage() {
   const colleagues = chats.filter((chat) => chat.category === 'colleagues').length;
   const shown = expanded ? photos : photos.slice(0, GRID_LIMIT);
 
-  const edit = (target?: string) => {
-    wantEdit(target);
+  // Карандаш просто открывает редактирование с начала: без перехода к полю и без клавиатуры
+  const edit = (_target?: string) => {
+    wantEdit();
     navigate('/profile/edit');
   };
 
