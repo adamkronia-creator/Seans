@@ -158,8 +158,8 @@ test('фильтры: «или» внутри, «и» между, «Не ука�
   assert.deepEqual(new Set(findTests('', f({ domain: ['depression', 'anxiety'] }))), new Set(['bdi', 'phq9', 'bhs', 'itt', 'gad7']));
   assert.deepEqual(new Set(findTests('', f({ domain: ['depression'], time: ['fast'] }))), new Set(['bdi', 'phq9', 'bhs']));
   assert.deepEqual(findTests('', f({ domain: ['depression'], result: ['profile'] })), []);
-  assert.deepEqual(new Set(findTests('', f({ age: [NONE] }))), new Set(['gad7', 'rses']));
-  assert.deepEqual(new Set(findTests('', f({ age: ['14'] }))), new Set(['5pfq', 'scl90']));
+  assert.deepEqual(new Set(findTests('', f({ age: [NONE] }))), new Set(['rses']));
+  assert.deepEqual(new Set(findTests('', f({ age: ['14'] }))), new Set(['5pfq', 'scl90', 'gad7']));
   // Запрос и фильтры вместе
   assert.deepEqual(findTests('тревога', f({ time: ['fast'] })).sort(), ['gad7', 'itt']);
 });
@@ -278,8 +278,8 @@ test('сведения о тестах: у каждого есть област�
   assert.deepEqual(smol.line, [], 'в карточке теста вопросов, времени и возраста нет');
   assert.deepEqual(smol.minutes, [15, 20]);
   assert.deepEqual(smol.facets.age, ['16']);
-  const gad = tests.byId.get('gad7').d;
-  assert.equal(gad.facets.age.length, 0, 'возраст не указан');
+  assert.deepEqual(tests.byId.get('gad7').d.facets.age, ['14']);
+  assert.equal(tests.byId.get('rses').d.facets.age.length, 0, 'возраст не указан');
 });
 
 test('сведения о заданиях совпадают с настройками заданий (taskContent)', () => {
