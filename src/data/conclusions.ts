@@ -55,8 +55,8 @@ export interface ConclusionData {
   info: { date: string; time: string; duration: string; age?: string };
   /** Карточки шкал в виде СМОЛ: полоса с границами диапазонов, расшифровка с «Читать далее» */
   flat?: boolean;
-  /** Сокращения шкал (Дм, Зс…) не показывать: в подписях только полные названия */
-  noCodes?: boolean;
+  /** Сокращения шкал (Дм, Зс…) не показывать: в подписях только полные названия; 'extra' — только у дополнительных шкал */
+  noCodes?: boolean | 'extra';
   /** Показывать ли общие диаграммы основных и дополнительных шкал и метки «Шкала …» */
   overview: boolean;
   /** Максимум шкал с диапазонами */
@@ -82,6 +82,9 @@ export interface ConclusionData {
 }
 
 /** Диапазоны шкалы: свои, если заданы, иначе общие */
+/** Показывать ли сокращение шкалы рядом с названием */
+export const showsCode = (data: ConclusionData, scale: ConclusionScale): boolean => !(data.noCodes === true || (data.noCodes === 'extra' && scale.group === 'extra'));
+
 export const levelsOf = (data: ConclusionData, scale?: ConclusionScale): ConclusionLevel[] => scale?.levels ?? data.levels;
 
 export const levelOf = (data: ConclusionData, score: number, scale?: ConclusionScale): ConclusionLevel => {
@@ -609,6 +612,7 @@ const sclScale = (
  */
 const SCL90: ConclusionData = {
   overview: false,
+  noCodes: 'extra',
   flat: true,
   axisEach: true,
   blocks: [
