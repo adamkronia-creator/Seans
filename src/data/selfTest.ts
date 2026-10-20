@@ -1,13 +1,13 @@
 import { useSyncExternalStore } from 'react';
 import { receiveMessage } from './chatStore';
 import { scoreBdi, scoreBhs } from './beckScoring';
-import { bdiResult, bhsResult, gad7Result, ittResult, osrResult, pfq5Result, phq9Result, scl90Result, smolResult, sqResult, itoResult, type ConclusionData } from './conclusions';
+import { bdiResult, bhsResult, gad7Result, rsesResult, ittResult, osrResult, pfq5Result, phq9Result, scl90Result, smolResult, sqResult, itoResult, type ConclusionData } from './conclusions';
 import { scoreItt } from './ittScoring';
 import { LIBRARY } from './library';
 import { scoreOsr } from './osrScoring';
 import { scorePfq5 } from './pfq5Scoring';
 import { scoreScl90 } from './scl90Scoring';
-import { scoreGad7, scorePhq9 } from './screeningScoring';
+import { scoreGad7, scorePhq9, scoreRses } from './screeningScoring';
 import { scoreIto } from './itoScoring';
 import { scoreSq } from './sqScoring';
 import { scoreSmol } from './smolScoring';
@@ -114,6 +114,7 @@ const SCORERS: Record<string, (answers: number[], form: string, info: Conclusion
   itt: (answers, form, info) => ittResult(scoreItt(answers, form === 'Женская'), info),
   ocr: (answers, _form, info) => osrResult(scoreOsr(answers), info),
   gad7: (answers, _form, info) => gad7Result(scoreGad7(answers), info),
+  rses: (answers, _form, info) => rsesResult(scoreRses(answers), info),
   phq9: (answers, _form, info) => phq9Result(scorePhq9(answers), info),
   sq: (answers, _form, info) => sqResult(scoreSq(answers), info),
   ito: (answers, _form, info) => itoResult(scoreIto(answers), info),
@@ -155,6 +156,7 @@ const PASSED_TEXT: Record<string, string> = {
   itt: 'Вы прошли интегративный тест тревожности «ИТТ»',
   ocr: 'Вы прошли опросник суицидального риска «ОСР»',
   gad7: 'Вы прошли опросник генерализованного тревожного расстройства «GAD-7»',
+  rses: 'Вы прошли шкалу самоуважения М. Розенберга «RSES»',
   phq9: 'Вы прошли опросник депрессивного состояния «PHQ-9»',
   sq: 'Вы прошли опросник Леонгарда-Шмишека «SQ»',
   ito: 'Вы прошли индивидуально-типологический опросник «ИТО»',

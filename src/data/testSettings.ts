@@ -534,6 +534,16 @@ const RSES: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
+  scales: { main: ['Самоуважение'], extra: [] },
+  scoring: [
+    { range: '0–14', label: 'низкое самоуважение', tone: 'red' },
+    { range: '15–25', label: 'нормальное самоуважение', tone: 'green' },
+    { range: '26–30', label: 'высокое самоуважение', tone: 'yellow' },
+  ],
+  questions: 10,
+  duration: '2–3 мин.',
+  age: '14+',
+  forms: ['Единая'],
   message: DEFAULT_MESSAGE,
 };
 

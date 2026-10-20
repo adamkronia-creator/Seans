@@ -28,3 +28,12 @@ export const scorePhq9 = (answers: ReadonlyArray<number | undefined>): Phq9Score
   total: sum(answers),
   suicidal: answers[PHQ9_SUICIDAL_ITEM],
 });
+
+/**
+ * RSES: десять утверждений, четыре ответа («Полностью согласен» … «Полностью не согласен» — номера 0–3).
+ * Пункты 1, 2, 4, 6, 7 прямые: «Полностью согласен» — 3 балла, «Полностью не согласен» — 0.
+ * Пункты 3, 5, 8, 9, 10 обратные: баллы наоборот. Сумма 0–30; неотвеченные баллов не дают.
+ */
+const RSES_REVERSED = new Set([2, 4, 7, 8, 9]); // индексы с 0
+export const scoreRses = (answers: ReadonlyArray<number | undefined>): number =>
+  answers.reduce<number>((total, a, i) => (a === undefined ? total : total + (RSES_REVERSED.has(i) ? a : 3 - a)), 0);

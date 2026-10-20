@@ -31,3 +31,23 @@
   gap: var(--space-2);
   align-items: center;
 }
+
+/* Пояснение под вариантами формы бланка: под разделителем, с теми же полями 16, что у строк */
+.result-choice__note {
+  position: relative;
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.result-choice__note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: var(--space-4);
+  height: 1px;
+  background: var(--divider, var(--color-divider));
+}

@@ -158,16 +158,17 @@ test('фильтры: «или» внутри, «и» между, «Не ука�
   assert.deepEqual(new Set(findTests('', f({ domain: ['depression', 'anxiety'] }))), new Set(['bdi', 'phq9', 'bhs', 'itt', 'gad7']));
   assert.deepEqual(new Set(findTests('', f({ domain: ['depression'], time: ['fast'] }))), new Set(['bdi', 'phq9', 'bhs']));
   assert.deepEqual(findTests('', f({ domain: ['depression'], result: ['profile'] })), []);
-  assert.deepEqual(new Set(findTests('', f({ age: [NONE] }))), new Set(['rses']));
-  assert.deepEqual(new Set(findTests('', f({ age: ['14'] }))), new Set(['5pfq', 'scl90', 'gad7']));
+  assert.deepEqual(new Set(findTests('', f({ age: [NONE] }))), new Set());
+  assert.deepEqual(new Set(findTests('', f({ age: ['14'] }))), new Set(['5pfq', 'scl90', 'gad7', 'rses']));
   // Запрос и фильтры вместе
   assert.deepEqual(findTests('тревога', f({ time: ['fast'] })).sort(), ['gad7', 'itt']);
 });
 
 test('фильтры: пункты строятся из данных, лишние фильтры скрыты', () => {
   const t = Object.fromEntries(tests.facets.map((x) => [x.id, x.options.map((o) => o.id)]));
-  assert.deepEqual(t.age, ['14', '16', NONE]);
-  assert.ok(t.time.includes(NONE) && t.result.includes(NONE));
+  assert.deepEqual(t.age, ['14', '16']);
+  // «Не указано» появляется, только если есть тест без этого сведения (у всех сведения теперь есть)
+  assert.ok(!t.time.includes(NONE));
   assert.ok(!t.domain.includes(NONE));
   const k = Object.fromEntries(tasks.facets.map((x) => [x.id, x.options.map((o) => o.id)]));
   // У всех заданий один возраст — такой фильтр ничего не различает и не показывается
@@ -205,12 +206,11 @@ test('сортировка', () => {
   assert.deepEqual(titles, [...titles].sort((a, b) => a.localeCompare(b, 'ru')));
   const short = findTests('', EMPTY_FILTERS, 'short');
   assert.equal(short.length, 12);
-  assert.equal(short.at(-1), 'rses', 'без сведений о времени — в конце');
-  const maxes = short.slice(0, -1).map((id) => tests.byId.get(id).d.minutes[1]);
+  // Без сведений о времени тест шёл бы в конец; сейчас сведения есть у всех тестов
+  const maxes = short.map((id) => tests.byId.get(id).d.minutes[1]);
   assert.deepEqual(maxes, [...maxes].sort((a, b) => a - b));
   const long = findTests('', EMPTY_FILTERS, 'long');
-  assert.equal(long.at(-1), 'rses');
-  assert.deepEqual(long.slice(0, -1).map((id) => tests.byId.get(id).d.minutes[1]), maxes.slice().sort((a, b) => b - a));
+  assert.deepEqual(long.map((id) => tests.byId.get(id).d.minutes[1]), maxes.slice().sort((a, b) => b - a));
   const fav = new Set(['phq9', 'sq']);
   assert.deepEqual(listIds(tests, view('', EMPTY_FILTERS, 'favorite'), allTests, fav).ids.slice(0, 2).sort(), ['phq9', 'sq']);
   // Без выбора порядка: найденное по убыванию совпадения
@@ -279,7 +279,6 @@ test('сведения о тестах: у каждого есть област�
   assert.deepEqual(smol.minutes, [15, 20]);
   assert.deepEqual(smol.facets.age, ['16']);
   assert.deepEqual(tests.byId.get('gad7').d.facets.age, ['14']);
-  assert.equal(tests.byId.get('rses').d.facets.age.length, 0, 'возраст не указан');
 });
 
 test('сведения о заданиях совпадают с настройками заданий (taskContent)', () => {

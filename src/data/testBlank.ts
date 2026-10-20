@@ -654,6 +654,30 @@ export const GAD7_BLANK: TestBlankData = {
   ],
 };
 
+/** RSES: десять утверждений и один ряд из четырёх ответов. Номер ответа (с 0) хранится как есть; баллы считаются в rsesScoring: у обратных пунктов шкала перевёрнута */
+export const RSES_ANSWERS = ['Полностью согласен', 'Согласен', 'Не согласен', 'Полностью не согласен'];
+
+export const RSES_BLANK: TestBlankData = {
+  numbered: false,
+  rules: [
+    'Ниже приведены утверждения о том, как люди относятся к себе.',
+    'Прочитайте каждое утверждение и выберите вариант, который лучше всего показывает, насколько вы с ним согласны.',
+    'Над ответами долго не думайте: важно первое впечатление.',
+  ],
+  questions: [
+    { prompt: 'Я чувствую, что я достойный человек, по крайней мере, не меньше, чем другие.', answers: RSES_ANSWERS },
+    { prompt: 'Я чувствую, что у меня есть ряд хороших качеств.', answers: RSES_ANSWERS },
+    { prompt: 'Пожалуй, я склонен считать себя неудачником.', answers: RSES_ANSWERS },
+    { prompt: 'Я способен делать всё не хуже большинства других людей.', answers: RSES_ANSWERS },
+    { prompt: 'Мне кажется, что у меня нет оснований гордиться собой.', answers: RSES_ANSWERS },
+    { prompt: 'Я определённо положительно к себе отношусь.', answers: RSES_ANSWERS },
+    { prompt: 'В целом я удовлетворён собой.', answers: RSES_ANSWERS },
+    { prompt: 'Мне хотелось бы относиться к себе с большим уважением.', answers: RSES_ANSWERS },
+    { prompt: 'Порой я определённо чувствую себя бесполезным.', answers: RSES_ANSWERS },
+    { prompt: 'Иногда я думаю, что я во всём нехорош.', answers: RSES_ANSWERS },
+  ],
+};
+
 export const PHQ9_BLANK: TestBlankData = {
   numbered: false,
   rules: [PHQ9_RULE],
@@ -892,6 +916,7 @@ export function testBlank(testId: string): TestBlankData | undefined {
   if (testId === 'itt') return ITT_BLANK;
   if (testId === 'ocr') return OCR_BLANK;
   if (testId === 'gad7') return GAD7_BLANK;
+  if (testId === 'rses') return RSES_BLANK;
   if (testId === 'phq9') return PHQ9_BLANK;
   if (testId === 'sq') return SQ_BLANK;
   if (testId === 'ito') return ITO_BLANK;

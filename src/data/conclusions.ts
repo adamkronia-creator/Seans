@@ -218,6 +218,30 @@ const GAD7: ConclusionData = {
   },
 };
 
+/** RSES: сумма 0–30; границы 0–14 / 15–25 / 26–30 — по адаптации методики */
+const RSES: ConclusionData = {
+  overview: false,
+  flat: true,
+  info: { date: '25.05.2026', time: '19:12–19:14', duration: '2 мин. 10 с.', age: '23 года' },
+  max: 30,
+  ticks: [0, 15, 25, 30],
+  levels: [
+    { key: 'low', from: 0, to: 14, range: '0 — 14', legend: 'Низкое', chip: 'Низкое самоуважение', tone: 'red', verdictPre: 'является ', verdict: 'низким', verdictPost: ' показателем самоуважения, выходящим за рамки нормативного диапазона' },
+    { key: 'norm', from: 15, to: 25, range: '15 — 25', legend: 'Нормальное', chip: 'Нормальное самоуважение', tone: 'green', verdictPre: 'является ', verdict: 'нормальным', verdictPost: ' показателем самоуважения' },
+    { key: 'high', from: 26, to: 30, range: '26 — 30', legend: 'Высокое', chip: 'Высокое самоуважение', tone: 'yellow', verdictPre: 'является ', verdict: 'высоким', verdictPost: ' показателем самоуважения' },
+  ],
+  scales: [
+    { code: 'S', name: 'Самоуважение', group: 'main', score: 19, max: 30, leveled: true, about: 'оценивает общее отношение к себе: принятие себя, ощущение собственной ценности и способностей, удовлетворённость собой.' },
+  ],
+  interpretation: {
+    S: {
+      low: ['Самоуважение снижено: человек склонен сомневаться в собственной ценности, замечать у себя недостатки и переживать себя как несостоятельного. Такой результат стоит обсудить с клиентом и сопоставить с его эмоциональным состоянием и историей отношений.'],
+      norm: ['Самоуважение в пределах нормы: человек в целом принимает себя, признаёт свои достоинства и не склонен ни к самоуничижению, ни к завышенной самооценке.'],
+      high: ['Самоуважение высокое: человек уверен в себе и своих способностях. Стоит уточнить, насколько такая оценка устойчива и соответствует реальности, не защищает ли она от критики и неудач.'],
+    },
+  },
+};
+
 /** PHQ-9: сумма 0–27; границы уровней заданы в настройках теста */
 const PHQ9: ConclusionData = {
   overview: false,
@@ -821,6 +845,10 @@ export function bhsResult(score: number, info: ConclusionData['info']): Conclusi
 }
 
 /** GAD-7: сумма баллов тревожности */
+export function rsesResult(score: number, info: ConclusionData['info']): ConclusionData {
+  return withScores(RSES, { [RSES.scales[0].code]: score }, info);
+}
+
 export function gad7Result(score: number, info: ConclusionData['info']): ConclusionData {
   return withScores(GAD7, { [GAD7.scales[0].code]: score }, info);
 }
@@ -874,6 +902,6 @@ export function pfq5Result(score: Pfq5Scores, info: ConclusionData['info']): Con
 
 /** Пример заключения для теста из библиотеки; у остальных тестов пока нет */
 export function conclusionFor(testId: string): ConclusionData | undefined {
-  const examples: Record<string, ConclusionData> = { smol: SMOL, bdi: BDI, bhs: BHS, itt: ITT, ocr: OSR, gad7: GAD7, phq9: PHQ9, sq: SQ, ito: ITO, scl90: SCL90, '5pfq': PFQ5 };
+  const examples: Record<string, ConclusionData> = { smol: SMOL, bdi: BDI, bhs: BHS, itt: ITT, ocr: OSR, gad7: GAD7, rses: RSES, phq9: PHQ9, sq: SQ, ito: ITO, scl90: SCL90, '5pfq': PFQ5 };
   return examples[testId];
 }
