@@ -1,7 +1,7 @@
-import { useEffect, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import type { TabId } from '../components/TabBar/TabBar';
 import type { TransitionKind } from './transition';
-import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from './swipe';
+import { edgeTouch, SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from './swipe';
 
 /** Переключатель разделов нижней панели: его регистрирует App, а жесты экранов вызывают switchTab */
 let handler: ((id: TabId, kind?: TransitionKind) => void) | null = null;
@@ -18,6 +18,21 @@ const NOT_FROM = 'input, textarea, select, [contenteditable]:not([contenteditabl
  * Касание у левого края принадлежит жесту «назад» и сюда не попадает; в полях ввода и в блоках с боковой прокруткой жест их собственный.
  */
 export function useTabSwipe(ref: RefObject<HTMLElement>, dir: 'left' | 'right', target: TabId) {
+  useSwipeAction(ref, dir, () => switchTab(target, dir === 'right' ? 'slide-prev' : 'slide-next'), 24);
+}
+
+/**
+ * Запасной свайп «назад» для экрана с полями ввода: вправо с любого места, кроме самих полей. Жест у края с перетаскиванием экрана
+ * (utils/edgeBack.ts) остаётся главным; сюда попадает всё, что он не взял (палец начал не у края, касание пришлось рядом с полем).
+ */
+export function useSwipeBack(ref: RefObject<HTMLElement>, back: () => void) {
+  useSwipeAction(ref, 'right', back, 0);
+}
+
+function useSwipeAction(ref: RefObject<HTMLElement>, dir: 'left' | 'right', action: () => void, minX: number) {
+  // Действие читается в момент жеста: новая функция на каждой отрисовке не должна пересоздавать подписку посреди касания
+  const act = useRef(action);
+  act.current = action;
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -27,7 +42,7 @@ export function useTabSwipe(ref: RefObject<HTMLElement>, dir: 'left' | 'right', 
     const down = (e: PointerEvent) => {
       if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
       const origin = e.target instanceof Element ? e.target : null;
-      if (!origin || origin.closest(NOT_FROM) || e.clientX < 24) return;
+      if (!origin || origin.closest(NOT_FROM) || e.clientX < minX || edgeTouch.active) return;
       g = { id: e.pointerId, x: e.clientX, y: e.clientY, live: true, tracker: new VelocityTracker() };
       g.tracker.push(e.timeStamp, e.clientX);
     };
@@ -44,7 +59,7 @@ export function useTabSwipe(ref: RefObject<HTMLElement>, dir: 'left' | 'right', 
       if (!s || e.pointerId !== s.id || !s.live) return;
       const dx = (e.clientX - s.x) * sign;
       if (dx > SWIPE_SLOP * 2 && Math.abs(e.clientY - s.y) * SWIPE_DOMINANCE < Math.abs(e.clientX - s.x)) {
-        if (swipeCommits(dx, s.tracker.velocity(e.timeStamp) * sign, el.clientWidth)) switchTab(target, dir === 'right' ? 'slide-prev' : 'slide-next');
+        if (swipeCommits(dx, s.tracker.velocity(e.timeStamp) * sign, el.clientWidth)) act.current();
       }
     };
     const cancel = () => {
@@ -60,5 +75,5 @@ export function useTabSwipe(ref: RefObject<HTMLElement>, dir: 'left' | 'right', 
       el.removeEventListener('pointerup', up);
       el.removeEventListener('pointercancel', cancel);
     };
-  }, [ref, dir, target]);
+  }, [ref, dir, minX]);
 }

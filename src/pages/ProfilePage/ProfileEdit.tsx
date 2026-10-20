@@ -22,6 +22,7 @@ import {
 } from '../../data/profile';
 import { clearWantedEdit, wantedEdit } from '../../data/profileIntent';
 import { goBack } from '../../router';
+import { useSwipeBack } from '../../utils/tabNav';
 import './ProfileEdit.css';
 
 /** Прокрутить область ровно настолько, чтобы элемент оказался на виду (высокий — верхним краем) */
@@ -48,6 +49,8 @@ export function ProfileEditPage() {
   // К чему перейти при открытии: к полю, которое нажали на странице профиля, или к «Добавить поле»
   const [target] = useState(wantedEdit);
   const scroller = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLElement>(null);
+  useSwipeBack(root, () => goBack('/'));
   const addCard = useRef<HTMLElement>(null);
   /** Что сделать, когда появится новое поле: встать на его название (своё поле) или на текст (из подсказки) */
   const pending = useRef<{ id: string; part: 'label' | 'value' } | null>(null);
@@ -127,7 +130,7 @@ export function ProfileEditPage() {
   };
 
   return (
-    <section className="pe">
+    <section ref={root} className="pe">
       <header className="pe__header">
         <button type="button" className="pe__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
