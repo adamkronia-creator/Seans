@@ -100,6 +100,13 @@ export function ChipMenu({ anchor, opener, items, onClose }: ChipMenuProps) {
               role="menuitem"
               className={`chip-menu__item${danger ? ' chip-menu__item--danger' : ''}`}
               onClick={() => {
+                if (key === 'edit' || key === 'create') {
+                  // Переход на экран папки: меню и затемнение остаются в снимке прежнего экрана и уезжают вместе с ним.
+                  // Если закрыть меню сразу, затемнение исчезает рывком до начала перехода — это и был блик
+                  run();
+                  window.setTimeout(onClose, 500);
+                  return;
+                }
                 onClose();
                 run();
               }}
