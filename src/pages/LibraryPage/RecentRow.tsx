@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { LibraryItem } from '../../data/library';
+import { testAbbr } from '../../data/clientStore';
 import { shortTitle } from '../../components/TestSettings/TestHeader';
 import '../../components/Stories/Stories.css';
 
@@ -18,7 +19,7 @@ export function RecentRow({ items, onOpen }: { items: LibraryItem[]; onOpen: (it
                 <img className="recent-row__icon" src={item.icon} alt="" />
               </span>
             </span>
-            <span className="stories__label">{shortTitle(item.title).split(' ')[0]}</span>
+            <span className="stories__label">{testAbbr(item.id) ?? shortTitle(item.title).split(' ')[0]}</span>
           </button>
         </div>
       ))}

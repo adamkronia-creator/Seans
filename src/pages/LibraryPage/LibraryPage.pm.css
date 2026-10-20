@@ -105,3 +105,28 @@
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
 }
+
+/* «В избранном» — как «в сети» у аватара чата: красная точка 9 на окружности значка (центр дуги в 2,5 от краёв), вокруг неё в значке
+   вырезан прозрачный зазор 2. Серого сердечка нет: избранное меняется в шапке настроек теста */
+[data-pm] .lib-card__heart {
+  top: calc(50% - 24px + var(--presence-inset));
+  left: calc(var(--space-4) + 48px - var(--presence-inset) - var(--presence-size));
+  width: var(--presence-size);
+  height: var(--presence-size);
+  border: 0;
+  background: var(--color-red);
+  box-shadow: none;
+}
+
+[data-pm] .lib-card__heart svg {
+  display: none;
+}
+
+[data-pm] .lib-card__heart[aria-pressed='false'] {
+  background: none;
+}
+
+[data-pm] .lib-card--fav .test-card__avatar {
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+}

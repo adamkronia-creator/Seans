@@ -21,7 +21,7 @@ interface LibraryCardProps {
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», справа сердечко «в избранное» (см. LibraryCard.css) */
 export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, why, marks }: LibraryCardProps) {
   return (
-    <li className="lib-card">
+    <li className={`lib-card${favorite ? ' lib-card--fav' : ''}`}>
       <button type="button" className="test-card" onClick={() => onClick?.(test)}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />

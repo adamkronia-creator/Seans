@@ -356,8 +356,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     const count = listings[i]?.ids.length ?? 0;
     return {
       follow: true,
-      split: true,
-      tone: kind,
+      // В стиле «Диалогов» чипсы — отдельные капсулы с зазором 8, а не склеенная лента
+      split: !chatLike,
+      tone: chatLike ? ('chat' as const) : kind,
       active: shown === i,
       onClick: () => setSection(id),
       onLongPress: id === FAVORITES || id === RECENT ? undefined : (el: HTMLElement) => folderMenu.open(id, el),
