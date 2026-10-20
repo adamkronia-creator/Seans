@@ -72,6 +72,7 @@ export function PassQuestion({ data, index, answer, dir, missing, onChoose, onPi
             answer={answer}
             locked={false}
             numberedPrompt={false}
+            waves
             onChoose={onChoose}
           />
         </div>

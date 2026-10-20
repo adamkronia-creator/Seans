@@ -296,3 +296,75 @@
 .blank-question[id] {
   scroll-margin-top: var(--space-3);
 }
+
+/* ——— 5PFQ при прохождении: пять волнистых зон между утверждениями ——— */
+.wave-scale {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+}
+
+.wave-scale__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Чем ближе зона к утверждению, тем она насыщеннее: «+2» ярче всего, «0» почти прозрачная */
+.wave-scale__band {
+  fill: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  transition: fill 0.15s ease;
+}
+
+.wave-scale__band--1 {
+  fill: color-mix(in srgb, var(--color-accent) 13%, transparent);
+}
+
+.wave-scale__band--0 {
+  fill: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+.wave-scale__band--on {
+  fill: url(#wave-on);
+}
+
+/* Зона — прозрачная кнопка поверх рисунка: высота 52, число по центру */
+.blank-scale__item.wave-scale__zone {
+  position: relative;
+  z-index: 1;
+  flex-direction: row;
+  justify-content: center;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.blank-scale__item.wave-scale__zone:has(.blank-answer__input:checked),
+.blank-scale__item.wave-scale__zone:active {
+  border: 0;
+  background: none;
+}
+
+.wave-scale__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-md);
+}
+
+.wave-scale__zone--on .wave-scale__label {
+  color: #fff;
+  font-weight: var(--font-weight-semibold);
+}
+
+.wave-scale__zone .blank-answer__input:focus-visible ~ .wave-scale__label {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}

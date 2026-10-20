@@ -57,11 +57,74 @@ interface BlankQuestionBodyProps {
   locked: boolean;
   /** Номер перед формулировкой («12.»): в списке нужен, на экране одного вопроса номер уже стоит в заголовке */
   numberedPrompt?: boolean;
+  /** Пара утверждений 5PFQ при прохождении: между утверждениями волны-зоны вместо ряда кнопок */
+  waves?: boolean;
   onChoose: (answer: number) => void;
 }
 
+/** Подписи пяти зон: чем ближе к утверждению, тем сильнее оно выражено */
+const WAVE_LABELS = ['+2', '+1', '0', '+1', '+2'];
+const WAVE_H = 52; // высота зоны
+const WAVE_W = 360; // ширина рисунка (растягивается по ширине карточки)
+const WAVE_A = 5; // размах волны
+
+/** Граница между зонами: волна со сдвигом фазы по номеру границы, точки через 4 */
+function waveY(k: number, x: number): number {
+  return k * WAVE_H + WAVE_A * Math.sin((x / WAVE_W) * Math.PI * 4 + k * 0.9);
+}
+
+/** Контур зоны j: от верхней волны (границы j) вниз до нижней (границы j + 1); у крайних границ линия прямая */
+function bandPath(j: number): string {
+  const edge = (k: number, x: number) => (k === 0 || k === 5 ? k * WAVE_H : waveY(k, x));
+  const top: string[] = [];
+  const bottom: string[] = [];
+  for (let x = 0; x <= WAVE_W; x += 4) {
+    top.push(`${x},${edge(j, x).toFixed(1)}`);
+    bottom.unshift(`${x},${edge(j + 1, x).toFixed(1)}`);
+  }
+  return `M${top.join('L')}L${bottom.join('L')}Z`;
+}
+
+const WAVE_PATHS = [0, 1, 2, 3, 4].map(bandPath);
+
+/**
+ * Шкала 5PFQ при прохождении: пять волнистых зон между двумя утверждениями. Ближайшая к утверждению зона «+2», следующая «+1»,
+ * средняя «0». Зона — большая кнопка (радио): значение хранится номером зоны сверху вниз, как у ряда кнопок.
+ */
+function WaveScale({ name, answer, locked, onChoose }: { name: string; answer: number | undefined; locked: boolean; onChoose: (answer: number) => void }) {
+  return (
+    <div className="wave-scale" role="radiogroup" aria-label="Какое утверждение ближе">
+      <svg className="wave-scale__art" viewBox={`0 0 ${WAVE_W} ${WAVE_H * 5}`} preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="wave-on" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#1a85ff" />
+            <stop offset="1" stopColor="#0071ee" />
+          </linearGradient>
+        </defs>
+        {WAVE_PATHS.map((d, j) => (
+          <path key={j} d={d} className={`wave-scale__band wave-scale__band--${Math.abs(2 - j)}${answer === j ? ' wave-scale__band--on' : ''}`} />
+        ))}
+      </svg>
+      {WAVE_LABELS.map((label, j) => (
+        <label key={j} className={`blank-scale__item wave-scale__zone${answer === j ? ' wave-scale__zone--on' : ''}${locked ? ' blank-answer--locked' : ''}`}>
+          <input
+            type="radio"
+            className="blank-answer__input"
+            name={name}
+            checked={answer === j}
+            disabled={locked}
+            aria-label={`${label}, ${j < 2 ? 'ближе верхнее утверждение' : j > 2 ? 'ближе нижнее утверждение' : 'ни то, ни другое'}`}
+            onChange={() => onChoose(j)}
+          />
+          <span className="wave-scale__label">{label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 /** Вопрос с вариантами ответов: список вариантов или пара утверждений со шкалой (5PFQ) */
-export function BlankQuestionBody({ data, index, answer, locked, numberedPrompt = true, onChoose }: BlankQuestionBodyProps) {
+export function BlankQuestionBody({ data, index, answer, locked, numberedPrompt = true, waves, onChoose }: BlankQuestionBodyProps) {
   const q = data.questions[index];
   const prompt = (
     <p className="blank-question__prompt">
@@ -73,6 +136,16 @@ export function BlankQuestionBody({ data, index, answer, locked, numberedPrompt 
       {q.prompt}
     </p>
   );
+
+  if (q.opposite !== undefined && waves) {
+    return (
+      <>
+        {prompt}
+        <WaveScale name={`blank-q${index}`} answer={answer} locked={locked} onChoose={onChoose} />
+        <p className="blank-question__prompt">{q.opposite}</p>
+      </>
+    );
+  }
 
   if (q.opposite !== undefined) {
     // Пара утверждений (5PFQ): между ними шкала −2 … 2, левые значения тянут к верхнему утверждению, правые — к нижнему
