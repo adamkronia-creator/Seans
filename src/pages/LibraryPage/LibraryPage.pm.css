@@ -114,8 +114,8 @@
 /* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: 14, центр дуги в 3 от краёв, вокруг него в значке
    вырезан прозрачный зазор 2. Серого сердечка нет: избранное меняется в шапке настроек теста */
 [data-pm] .lib-card--fav {
-  --presence-size: 14px;
-  --presence-inset: 1px;
+  --presence-size: 18px;
+  --presence-inset: 0px;
   --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
@@ -125,14 +125,20 @@
   width: var(--presence-size);
   height: var(--presence-size);
   border: 0;
-  background: none;
+  border-radius: var(--radius-full);
+  background: var(--glass-solid);
   box-shadow: none;
 }
 
+/* Белый (при тёмном тексте) или тёмный (при светлом) круг 18 с красным сердечком 10 по середине */
 [data-pm] .lib-card__heart svg {
-  width: 100%;
-  height: 100%;
+  width: 10px;
+  height: 10px;
   opacity: 1;
+}
+
+[data-pm] .lib-card__heart[aria-pressed='false'] {
+  background: none;
 }
 
 [data-pm] .lib-card__heart[aria-pressed='false'] svg {

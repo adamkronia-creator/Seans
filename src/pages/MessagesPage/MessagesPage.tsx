@@ -11,7 +11,7 @@ import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
 import { ChatsHeader } from './ChatsHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import { switchTab } from '../../utils/tabNav';
+import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import type { Chat } from '../../data/chats';
 import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
@@ -202,6 +202,15 @@ export function MessagesPage() {
   );
 
   const index = Math.max(0, filters.indexOf(filter));
+  // Свайп по самим чипсам: с «Все» вправо — в тесты, с последнего чипса влево — в профиль (по списку это делает пейджер)
+  const onChips = (origin: Element) => Boolean(origin.closest('.screen-header__chips'));
+  const atStart = useRef(true);
+  const atEnd = useRef(false);
+  atStart.current = index === 0;
+  atEnd.current = index === filters.length - 1;
+  useChipsDrag(root);
+  useTabSwipe(root, 'right', 'tests', (o) => onChips(o) && atStart.current);
+  useTabSwipe(root, 'left', 'profile', (o) => onChips(o) && atEnd.current);
   const shown = dragIndex ?? index;
 
   const onDrag = useCallback(
@@ -271,7 +280,7 @@ export function MessagesPage() {
         }
       />
 
-      <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={(d) => d > 0 && switchTab('profile', 'slide-next')} />
+      <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={(d) => switchTab(d > 0 ? 'profile' : 'tests', d > 0 ? 'slide-next' : 'slide-prev')} />
 
       {folderMenu.node}
       {rowMenu && <ChipMenu anchor={rowMenu.rect} opener={rowMenu.row} items={menuItems} onClose={() => setRowMenu(null)} />}

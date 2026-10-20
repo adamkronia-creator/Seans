@@ -36,6 +36,7 @@ import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
+import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import { ChatsHeader } from '../MessagesPage/ChatsHeader';
 import '../MessagesPage/MessagesPage.css';
 import { RecentRow } from './RecentRow';
@@ -274,6 +275,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
 
   const index = Math.max(0, sections.indexOf(section));
   const shown = dragIndex ?? index;
+  // Раздел тестов в стиле «Диалогов»: с последнего чипса влево — в чаты (по списку это делает пейджер, по самим чипсам — жест ниже)
+  const atEnd = useRef(false);
+  atEnd.current = index === sections.length - 1;
+  useChipsDrag(root);
+  useTabSwipe(root, 'left', 'messages', (o) => Boolean(chatLike) && Boolean(o.closest('.screen-header__chips')) && atEnd.current);
 
   const tokens = useMemo<FilterToken[]>(
     () =>
@@ -472,7 +478,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       )}
 
       <div className="library-page__body">
-        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} />
+        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => d > 0 && switchTab('messages', 'slide-next') : undefined} />
         {showSuggest && (
           <SuggestPanel
             history={view.history}
