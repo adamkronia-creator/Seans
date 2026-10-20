@@ -138,6 +138,7 @@ export default function App() {
         if (kind === 'result') {
           return {
             key: `chat/${chatId}/result/${id}`,
+            pm: true,
             build: () => (
               <main className="app__content">
                 <ChatResultScreen chatId={chatId} resultId={id} onAppTabChange={handleTabChange} />
