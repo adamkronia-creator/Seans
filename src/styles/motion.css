@@ -247,10 +247,19 @@ html[data-transition='fade'] .screen[data-layer='top'] .tabbar,
 html[data-transition='forward']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar,
 html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar {
   view-transition-name: tabbar;
+  /* Пока панель вынесена в слой, её собственное размытие выключено (его делает слой, см. ниже) */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 ::view-transition-group(tabbar) {
   animation: none;
+  /* Стекло панели. Размытие на самом элементе в снимок не попадает (углы рисуются размытыми прямоугольниками, а строки под панелью
+     просвечивают чёткими), поэтому на время перехода оно переезжает на слой снимка: он размывает то, что едет под ним.
+     Значения те же, что у --glass-filter-panel (переменных тут нет: слой лежит вне разметки), скругление — у капсулы панели */
+  border-radius: 9999px;
+  -webkit-backdrop-filter: blur(24px) saturate(2);
+  backdrop-filter: blur(24px) saturate(2);
 }
 
 ::view-transition-old(tabbar) {
@@ -259,12 +268,4 @@ html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabb
 
 ::view-transition-new(tabbar) {
   animation: none;
-}
-
-/* Панель разделов в слое перехода рисовалась с размытыми прямоугольными углами (размытие подложки не обрезается по скруглению).
-   Пока идёт переход, размытия у неё нет, заливка почти непрозрачная, чтобы строки под ней не просвечивали; по окончании возвращается обычное стекло */
-html[data-transition] .tabbar {
-  background: color-mix(in srgb, var(--glass-solid) 60%, var(--glass-fill-panel)) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
 }
