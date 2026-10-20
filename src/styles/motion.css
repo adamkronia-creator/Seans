@@ -262,9 +262,9 @@ html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabb
 }
 
 /* Панель разделов в слое перехода рисовалась с размытыми прямоугольными углами (размытие подложки не обрезается по скруглению).
-   Пока идёт переход, размытия у неё нет, заливка чуть плотнее; по окончании возвращается обычное стекло */
+   Пока идёт переход, размытия у неё нет, заливка почти непрозрачная, чтобы строки под ней не просвечивали; по окончании возвращается обычное стекло */
 html[data-transition] .tabbar {
-  background: var(--glass-fill-header, var(--glass-fill-panel)) !important;
+  background: color-mix(in srgb, var(--glass-solid) 60%, var(--glass-fill-panel)) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
