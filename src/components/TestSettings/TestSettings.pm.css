@@ -359,3 +359,8 @@
 [data-pm] .test-pass__back:active {
   background: var(--glass);
 }
+
+/* Телефон предпросмотра — свой слой: его шапка (z-index 3) и кнопки не должны подниматься над парящей кнопкой страницы */
+[data-pm] .tp__phone {
+  isolation: isolate;
+}
