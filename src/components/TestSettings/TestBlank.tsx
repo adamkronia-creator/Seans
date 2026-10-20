@@ -87,8 +87,15 @@ function bandPath(j: number): string {
 
 const WAVE_PATHS = [0, 1, 2, 3, 4].map(bandPath);
 
+/** Четыре волнистые линии между зонами */
+const WAVE_LINES = [1, 2, 3, 4].map((k) => {
+  const pts: string[] = [];
+  for (let x = 0; x <= WAVE_W; x += 4) pts.push(`${x},${waveY(k, x).toFixed(1)}`);
+  return `M${pts.join('L')}`;
+});
+
 /**
- * Шкала 5PFQ при прохождении: пять волнистых зон между двумя утверждениями. Ближайшая к утверждению зона «+2», следующая «+1»,
+ * Шкала 5PFQ при прохождении: между двумя утверждениями четыре волнистые линии, между ними пять зон. Ближайшая к утверждению зона «+2», следующая «+1»,
  * средняя «0». Зона — большая кнопка (радио): значение хранится номером зоны сверху вниз, как у ряда кнопок.
  */
 function WaveScale({ name, answer, locked, onChoose }: { name: string; answer: number | undefined; locked: boolean; onChoose: (answer: number) => void }) {
@@ -103,6 +110,9 @@ function WaveScale({ name, answer, locked, onChoose }: { name: string; answer: n
         </defs>
         {WAVE_PATHS.map((d, j) => (
           <path key={j} d={d} className={`wave-scale__band wave-scale__band--${Math.abs(2 - j)}${answer === j ? ' wave-scale__band--on' : ''}`} />
+        ))}
+        {WAVE_LINES.map((d, k) => (
+          <path key={k} d={d} className="wave-scale__line" />
         ))}
       </svg>
       {WAVE_LABELS.map((label, j) => (
