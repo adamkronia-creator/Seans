@@ -443,8 +443,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
                 <div className="ts-scale">
                   <p className="ts-scale__title">Дополнительные шкалы:</p>
                   <ul className="ts-scale__list">
-                    {data.scales.extra.map((s) => (
-                      <li key={s}>
+                    {data.scales.extra.map((s, i) => (
+                      <li key={s} className={data.extraGroup && i > 0 && i % data.extraGroup === 0 ? 'ts-scale__gap' : undefined}>
                         <span className="ts-dot ts-dot--text" />
                         {s}
                       </li>

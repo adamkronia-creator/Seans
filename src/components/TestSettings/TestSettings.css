@@ -584,3 +584,8 @@
 .form-menu__card {
   overflow: hidden;
 }
+
+/* Начало новой группы шкал (5PFQ: пять дополнительных на каждую основную): лишний отступ над первой шкалой группы */
+.ts-scale__list .ts-scale__gap {
+  margin-top: var(--space-3);
+}

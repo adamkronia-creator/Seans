@@ -16,6 +16,8 @@ export interface TestSettingsData {
   lead?: string;
   /** Названия шкал */
   scales?: { main: string[]; extra: string[] };
+  /** Дополнительные шкалы идут группами по стольку шкал (5PFQ: по 5 на каждую основную): между группами отступ */
+  extraGroup?: number;
   /** Система баллов: диапазон, пояснение и цвет точки */
   scoring?: { range: string; label: string; tone: ScoreTone }[];
   /** Отдельная система баллов дополнительных шкал (если отличается от основных) */
@@ -271,6 +273,7 @@ const PFQ5: TestSettingsData = {
     '',
     'Итоговые данные не являются самостоятельным основанием для постановки диагноза.',
   ].join('\n'),
+  extraGroup: 5,
   scales: {
     main: [
       'Экстраверсия — Интроверсия',
