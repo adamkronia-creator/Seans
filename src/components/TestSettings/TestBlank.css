@@ -297,46 +297,32 @@
   scroll-margin-top: var(--space-3);
 }
 
-/* ——— 5PFQ при прохождении: между утверждениями четыре волнистые линии, ответы — в зонах между ними ——— */
+/* ——— 5PFQ при прохождении: между утверждениями пять дуг с «таблеткой» значения посередине ——— */
 .wave-scale {
-  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 2px;
+  padding: 0;
 }
 
-.wave-scale__art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.wave-scale__zone--green {
+  --wave: var(--color-green, #34c759);
 }
 
-/* Зоны без заливки: видны только линии; выбранная зона заливается синим градиентом */
-.wave-scale__band {
-  fill: transparent;
-  transition: fill 0.15s ease;
+.wave-scale__zone--blue {
+  --wave: var(--color-accent, #0a84ff);
 }
 
-.wave-scale__band--on {
-  fill: url(#wave-on);
+.wave-scale__zone--gray {
+  --wave: #8e8e93;
 }
 
-.wave-scale__line {
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-opacity: 0.45;
-  stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-}
-
-/* Зона — прозрачная кнопка поверх рисунка: высота 52, число по центру */
+/* Ряд — прозрачная кнопка: дуга на всю ширину, таблетка по центру */
 .blank-scale__item.wave-scale__zone {
   position: relative;
-  z-index: 1;
   flex-direction: row;
   justify-content: center;
-  height: 52px;
+  height: 38px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -349,20 +335,55 @@
   background: none;
 }
 
-.wave-scale__label {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-md);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-md);
+.wave-scale__arc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.wave-scale__zone--on .wave-scale__label {
-  color: #fff;
+.wave-scale__arc path,
+[data-pm] .wave-scale__arc path {
+  fill: none;
+  stroke: var(--wave);
+  stroke-opacity: 0.55;
+  stroke-width: 4px;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  transition: stroke-opacity 0.15s ease;
+}
+
+.wave-scale__label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 64px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--wave) 30%, white);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.wave-scale__zone:active .wave-scale__label {
+  transform: scale(0.96);
+}
+
+/* Выбранный ряд: таблетка заливается цветом, дуга становится плотной */
+.wave-scale__zone--on .wave-scale__label {
+  background: var(--wave);
+  color: #fff;
+}
+
+.wave-scale__zone--on .wave-scale__arc path {
+  stroke-opacity: 1;
 }
 
 .wave-scale__zone .blank-answer__input:focus-visible ~ .wave-scale__label {
   outline: 2px solid var(--color-accent);
-  outline-offset: 4px;
-  border-radius: var(--radius-sm);
+  outline-offset: 3px;
 }
