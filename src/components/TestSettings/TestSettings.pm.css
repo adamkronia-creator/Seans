@@ -337,3 +337,9 @@
 [data-pm] .blank-card__title {
   text-wrap: balance;
 }
+
+/* Парящая кнопка непрозрачная: прокручиваемое под ней (шапка предпросмотра, текст) не должно просвечивать сквозь надпись */
+[data-pm] .test-settings__cta:not(.test-pass__cta) .test-settings__cta-button {
+  background: var(--grad-chip-active);
+  box-shadow: 0 var(--space-1) var(--space-3) rgb(0 0 0 / 0.12);
+}
