@@ -4,7 +4,7 @@ import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/self
 import type { TestBlankData } from '../../data/testBlank';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
-import { ClientIntro, testFacts } from './ClientParts';
+import { AllQuestionsLink, ClientIntro, testFacts } from './ClientParts';
 import { FillMeter } from './PassParts';
 import { BlankRules, CollapseCard } from './TestBlank';
 import { TestDone } from './TestDone';
@@ -182,9 +182,9 @@ export function TestPass({ testId, blank, form, saveBlank, onDone, client }: Tes
           <TestDone testId={testId} result={client.result} />
         ) : step < 0 ? (
           client ? (
-            <ClientIntro message="" rules={blank.rules} facts={testFacts(total, client.duration)} />
+            <ClientIntro message="" rules={blank.rules} facts={testFacts(total, client.duration)} onOpenAll={openAll} />
           ) : (
-            <CollapseCard title="Инструкция" id="blank-rules">
+            <CollapseCard title="Инструкция" id="blank-rules" badge={<AllQuestionsLink onClick={openAll} />}>
               <BlankRules rules={blank.rules} />
             </CollapseCard>
           )

@@ -496,12 +496,12 @@ html:has([data-pm]) body {
   --bg-blur: 24px;
 }
 
-[data-pm] :is(.messages, .chat, .profile, .pe, .test-settings) {
+[data-pm] :is(.messages, .chat, .profile, .pe, .test-settings, .events, .fp) {
   isolation: isolate;
   overflow: clip;
 }
 
-[data-pm] :is(.messages, .chat, .profile, .pe, .test-settings)::before {
+[data-pm] :is(.messages, .chat, .profile, .pe, .test-settings, .events, .fp)::before {
   content: '';
   position: absolute;
   inset: calc(var(--bg-blur) * -2);
@@ -574,7 +574,7 @@ html:has([data-pm]) body {
 
 /* Нижняя панель — плавающая стеклянная капсула: отступ space-4 по бокам и space-3 над безопасной зоной, внутри отступ space-1,
    выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми */
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar {
   right: var(--space-4);
   bottom: calc(var(--safe-bottom) + var(--space-3));
   left: var(--space-4);
@@ -587,17 +587,17 @@ html:has([data-pm]) body {
   backdrop-filter: var(--glass-filter-panel);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar__item {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar__item--active {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item--active {
   background: none;
 }
 
 /* Плашка выбранного раздела одна на всю панель и скользит к новому разделу: ширина — четверть внутренней ширины, сдвиг — на номер раздела */
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar__pill {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__pill {
   position: absolute;
   top: var(--space-1);
   left: var(--space-1);
@@ -611,12 +611,12 @@ html:has([data-pm]) body {
   pointer-events: none;
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar__item {
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item {
   position: relative;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings)) .tabbar__pill {
+  [data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__pill {
     transition: none;
   }
 }

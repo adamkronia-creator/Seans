@@ -107,8 +107,17 @@ export function taskFacts(data: TaskSettingsData, deadline: string, permanent?: 
   ];
 }
 
+/** Ссылка «Все вопросы» в заголовке карточки: открывает окно со всеми вопросами (то же, что у экрана вопроса) */
+export function AllQuestionsLink({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="pass-q__all" onClick={onClick}>
+      Все вопросы
+    </button>
+  );
+}
+
 /** Первый экран клиента: сообщение специалиста, инструкция и сведения перед началом, каждое своим блоком */
-export function ClientIntro({ message, rules, facts }: { message: string; rules: string[]; facts: ClientFact[] }) {
+export function ClientIntro({ message, rules, facts, onOpenAll }: { message: string; rules: string[]; facts: ClientFact[]; /** Ссылка «Все вопросы» в заголовке инструкции, как у вопроса */ onOpenAll?: () => void }) {
   const paragraphs = message
     .split(/\n{2,}/)
     .map((p) => p.trim())
@@ -124,7 +133,7 @@ export function ClientIntro({ message, rules, facts }: { message: string; rules:
           </div>
         </CollapseCard>
       )}
-      <CollapseCard title="Инструкция" id="blank-rules">
+      <CollapseCard title="Инструкция" id="blank-rules" badge={onOpenAll ? <AllQuestionsLink onClick={onOpenAll} /> : undefined}>
         <BlankRules rules={rules} />
       </CollapseCard>
       <ul className="ts-card tp__facts">

@@ -48,7 +48,7 @@ function RowName({ data, scale, index }: { data: ConclusionData; scale: Conclusi
     <span className="cc-bar__name">
       {data.overview ? `${index + 1}.\u00A0` : ''}
       {scale.name}
-      {data.scales.length > 1 && (
+      {data.scales.length > 1 && !data.noCodes && (
         <>
           {' '}
           <span className="cc-bar__code">({scale.code})</span>
@@ -182,7 +182,7 @@ function ScaleCharts({
                 <span className="cc-bar__name">
                   {data.overview ? `${i + 1}.\u00A0` : ''}
                   {s.chartName ?? s.name}
-                  {scales.length > 1 && (
+                  {scales.length > 1 && !data.noCodes && (
                     <>
                       {' '}
                       <span className="cc-bar__code">({s.code})</span>
@@ -288,7 +288,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
     <CollapseCard
       title={scale.name}
       id={`cc-scale-${scale.code}`}
-      badge={data.overview || data.blocks ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
+      badge={(data.overview || data.blocks) && !data.noCodes ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
     >
       <div className="cc-scale">
         <p className="cc-scale__text">{sentence(scale.about)}</p>

@@ -22,6 +22,7 @@ import {
 } from '../../data/folders';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { goBack } from '../../router';
+import { useSwipeBack } from '../../utils/swipeBack';
 import './FolderPage.css';
 
 /** Строка в списках экрана: что это (чат, тест или задание) и как выглядит */
@@ -185,6 +186,9 @@ export function FolderPage({ scope, id }: FolderPageProps) {
       }, 0);
     };
   }, [scope, id]);
+
+  // Свайп вправо — назад; поля ввода жест не трогает (см. utils/swipeBack.ts)
+  useSwipeBack('.fp', !picking && !asking, () => goBack('/'));
 
   if (!folder) return null;
   const text = TEXTS[scope];

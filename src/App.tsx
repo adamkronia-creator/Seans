@@ -104,6 +104,7 @@ export default function App() {
     if (!id || !getFolder(scope, id)) return null;
     return {
       key: `folder/${id}`,
+      pm: true,
       build: () => (
         <main className="app__content">
           <FolderPage scope={scope} id={id} />
@@ -191,7 +192,7 @@ export default function App() {
           ),
         };
       }
-      return path === '/events' ? page('events', <EventsPage />, at) : page('messages', <MessagesPage />, at, true);
+      return path === '/events' ? page('events', <EventsPage />, at, true) : page('messages', <MessagesPage />, at, true);
     }
     if (at === 'tests') {
       const folder = folderScreen(path, 'tests');

@@ -103,8 +103,8 @@
 
 /* Этапы предпросмотра: стеклянная плашка, выбранный этап светлее */
 [data-pm] .tp__tabs {
+  height: var(--size-touch);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-full);
   background: var(--glass-fill);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
@@ -342,4 +342,19 @@
 [data-pm] .test-settings__cta:not(.test-pass__cta) .test-settings__cta-button {
   background: var(--grad-chip-active);
   box-shadow: 0 var(--space-1) var(--space-3) rgb(0 0 0 / 0.12);
+}
+
+/* «Назад» при прохождении — стеклянная кнопка с обводкой, как остальные кнопки интерфейса, а не надпись над фоном */
+[data-pm] .test-pass__back {
+  height: var(--size-touch);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  color: var(--text-primary);
+  font: var(--type-label);
+}
+
+[data-pm] .test-pass__back:active {
+  background: var(--glass);
 }

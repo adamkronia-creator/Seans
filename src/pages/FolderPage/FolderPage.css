@@ -314,3 +314,122 @@
   border-color: var(--color-accent);
   background: var(--color-accent);
 }
+
+/* ——— Стиль интерфейса (data-pm): фон-сцена, стеклянная шапка, блоки — стеклянные карточки с полями 16 и скруглением 20 ——— */
+[data-pm] .fp {
+  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--space-2) * 2);
+}
+
+[data-pm] .fp__header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  min-height: 0;
+  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--divider);
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm] .fp__back {
+  width: var(--size-touch);
+  height: var(--size-touch);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  color: var(--text-primary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .fp__back:active {
+  background: var(--glass);
+}
+
+[data-pm] .fp__title {
+  margin-left: var(--space-2);
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+/* «Готово» — синяя стеклянная кнопка, а не надпись над фоном */
+[data-pm] .fp__done {
+  height: var(--size-touch);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--glass-border-blue);
+  border-radius: var(--radius-full);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+  font-weight: 600;
+}
+
+[data-pm] .fp__scroll {
+  gap: var(--space-4);
+  padding: calc(var(--pm-top) + var(--space-4)) var(--space-4) calc(var(--space-8) + var(--safe-bottom));
+}
+
+[data-pm] .fp__card {
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  background: var(--glass-card);
+}
+
+[data-pm] .fp__scroll > :first-child {
+  border: 1px solid var(--glass-border);
+}
+
+[data-pm] .fp__heading {
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 600;
+}
+
+[data-pm] .fp__input {
+  color: var(--text-primary);
+  font: var(--type-headline);
+}
+
+[data-pm] .fp__input::placeholder,
+[data-pm] .fp__counter,
+[data-pm] .fp__hint,
+[data-pm] .fp-row__note,
+[data-pm] .fp-pick__note,
+[data-pm] .fp__remove {
+  color: var(--text-secondary);
+}
+
+[data-pm] .fp__add {
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+[data-pm] .fp__add[data-pressed],
+[data-pm] .fp__delete[data-pressed] {
+  background: var(--glass);
+}
+
+[data-pm] .fp-row__title,
+[data-pm] .fp-pick__title {
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+[data-pm] .fp__delete {
+  color: var(--color-red-text);
+  font: var(--type-label);
+  font-weight: 500;
+  text-align: center;
+}
+
+[data-pm] .fp__hint {
+  padding: 0 var(--space-4);
+  font: var(--type-meta);
+}
