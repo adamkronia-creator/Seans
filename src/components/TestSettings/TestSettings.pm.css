@@ -1,0 +1,151 @@
+/* ——— Экраны теста в стиле «Диалогов» (data-pm): настройки, бланк, пример заключения ———
+   Фон-сцена позади (pm-chats.css), стеклянная шапка, блоки — карточки с полями 16 и скруглением 20, разделители --divider, Inter.
+   Селекторы с [data-pm] весомее базовых, поэтому порядок подключения файлов не важен. */
+
+[data-pm] .test-settings__header {
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--divider);
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm] .test-settings__button {
+  border-radius: var(--radius-full);
+  color: var(--icon-action, var(--text-primary));
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .test-settings__button[data-pressed],
+[data-pm] .test-settings__button:active {
+  background: var(--bg-subtle);
+}
+
+[data-pm] .test-settings__name {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
+}
+
+[data-pm] .test-settings__status {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+/* Прокрутка: карточки с зазором 12; снизу место под плавающую капсулу разделов (у настроек под ней ещё кнопка «Пройти или отправить») */
+[data-pm] .test-settings__scroll {
+  --bleed: 0px;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+  scrollbar-width: none;
+}
+
+[data-pm] .test-settings__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+[data-pm] .test-settings__scroll:has(+ .test-settings__cta) {
+  padding-bottom: var(--space-4);
+}
+
+[data-pm] :is(.ts-card, .blank-card, .cc-alert),
+[data-pm] .test-settings__scroll > :first-child:is(.ts-card, .blank-card, .cc-alert) {
+  margin-inline: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+}
+
+[data-pm] .blank-card__title {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
+}
+
+[data-pm] .blank-card__badge {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+/* Кнопка «Пройти или отправить»: над капсулой разделов, без подложки и линии */
+[data-pm] .test-settings__cta {
+  padding: 0 var(--space-4) calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-3));
+  border-top: 0;
+  background: none;
+}
+
+[data-pm] .test-settings__cta-button {
+  height: var(--size-touch);
+  border: 1px solid var(--glass-border-blue);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Кнопка «вниз» поверх капсулы разделов не лежит: страница сообщает её высоту */
+[data-pm] .test-settings {
+  --page-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+}
+
+/* Затухание свёрнутого описания — маской, а не цветом «бумаги»: карточка стеклянная, белое пятно на ней было бы видно */
+[data-pm] .ts-desc__fade {
+  display: none;
+}
+
+[data-pm] .ts-desc__clip:has(.ts-desc__fade:not(.ts-desc__fade--hidden)) {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+}
+
+/* Этапы предпросмотра: стеклянная плашка, выбранный этап светлее */
+[data-pm] .tp__tabs {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+[data-pm] .tp__tab {
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font: var(--type-label);
+}
+
+[data-pm] .tp__tab--on {
+  background: var(--glass-solid);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+/* Ссылки: цвет действий новой системы (на тёмном фоне светлее) */
+[data-pm] .ts-row__link,
+[data-pm] .ts-desc__toggle {
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+/* Окна выбора («Пройти или отправить», получатели): блок — стеклянная карточка с полями окна, а не полоса во всю ширину */
+[data-pm] .sheet .test-actions {
+  margin: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+  overflow: hidden;
+}
+
+[data-pm] .sheet .test-actions > li + li::before {
+  background: var(--divider);
+}
+
+[data-pm] .sheet .test-actions__item--on {
+  background: var(--bg-subtle);
+}
+
+[data-pm] .sheet .test-actions__title {
+  color: var(--text-primary);
+  font: var(--type-body);
+}

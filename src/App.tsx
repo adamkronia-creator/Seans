@@ -156,6 +156,7 @@ export default function App() {
         if (test) {
           return {
             key: `chat/${chatId}/tests/${id}`,
+            pm: true,
             build: () => (
               <main className="app__content">
                 <ChatTestScreen chatId={chatId} test={test} onAppTabChange={handleTabChange} />
@@ -198,7 +199,7 @@ export default function App() {
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
-      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at) : page('tests', <TestsPage />, at);
+      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at, true) : page('tests', <TestsPage />, at);
     }
     if (at === 'tasks') {
       const folder = folderScreen(path, 'tasks');
