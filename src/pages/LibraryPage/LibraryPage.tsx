@@ -239,7 +239,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
   /** Разделы по порядку чипсов: по ним же идут страницы. Папки — после «Все», «Избранного» и «Недавнего» */
-  const sections = useMemo<Section[]>(() => ['all', FAVORITES, RECENT, ...folders.map((f) => f.id)], [folders]);
+  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...folders.map((f) => f.id)], [folders, chatLike]);
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = sections.join('|');
 
@@ -387,7 +387,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     <>
             <Chip {...chip('all', labels.all)}>Все</Chip>
             <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
-            <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>
+            {!chatLike && <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>}
             {folders.map(({ id, name }) => (
               <Chip key={id} {...chip(id, name)}>
                 {name}

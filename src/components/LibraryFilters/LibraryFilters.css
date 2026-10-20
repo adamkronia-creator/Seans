@@ -19,12 +19,25 @@
   gap: var(--space-2);
 }
 
+/* Ряд: прокручиваемые фильтры и справа «Сбросить»; выходит за поля страницы на 16, как чипсы шапки */
+.results-bar__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 calc(var(--space-4) * -1);
+}
+
+.results-bar__row > .filter-token--reset {
+  margin-right: var(--space-4);
+}
+
 /* Выбранные фильтры: прокручиваются вбок и выходят за край, как чипсы шапки */
 .results-bar__tokens {
   display: flex;
+  flex: 1;
+  min-width: 0;
   gap: var(--space-2);
-  margin: 0 calc(var(--space-4) * -1);
-  padding: 0 var(--space-4);
+  padding: 0 0 0 var(--space-4);
   overflow-x: auto;
   scrollbar-width: none;
 }

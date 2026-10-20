@@ -25,13 +25,16 @@ export function ResultsBar({ tokens, onResetFilters, notes }: ResultsBarProps) {
   return (
     <div className="results-bar">
       {tokens.length > 0 && (
-        <div className="results-bar__tokens" role="group" aria-label="Выбранные фильтры">
-          {tokens.map((t) => (
-            <button key={t.key} type="button" className="filter-token" aria-label={`Убрать фильтр: ${t.group} — ${t.label}`} onClick={t.onRemove}>
-              {t.label}
-              <IconClose className="filter-token__close" />
-            </button>
-          ))}
+        <div className="results-bar__row">
+          <div className="results-bar__tokens" role="group" aria-label="Выбранные фильтры">
+            {tokens.map((t) => (
+              <button key={t.key} type="button" className="filter-token" aria-label={`Убрать фильтр: ${t.group} — ${t.label}`} onClick={t.onRemove}>
+                {t.label}
+                <IconClose className="filter-token__close" />
+              </button>
+            ))}
+          </div>
+          {/* «Сбросить» стоит вне прокручиваемого ряда: у правого края, виден при любом числе фильтров */}
           {tokens.length > 1 && (
             <button type="button" className="filter-token filter-token--reset" onClick={onResetFilters}>
               Сбросить
