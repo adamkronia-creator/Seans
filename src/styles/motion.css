@@ -247,19 +247,18 @@ html[data-transition='fade'] .screen[data-layer='top'] .tabbar,
 html[data-transition='forward']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar,
 html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar {
   view-transition-name: tabbar;
-  /* Пока панель вынесена в слой, её собственное размытие выключено (его делает слой, см. ниже) */
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
 }
 
 ::view-transition-group(tabbar) {
   animation: none;
-  /* Стекло панели. Размытие на самом элементе в снимок не попадает (углы рисуются размытыми прямоугольниками, а строки под панелью
-     просвечивают чёткими), поэтому на время перехода оно переезжает на слой снимка: он размывает то, что едет под ним.
-     Значения те же, что у --glass-filter-panel (переменных тут нет: слой лежит вне разметки), скругление — у капсулы панели */
+  /* Стекло панели. Внутренняя панель (она и есть именованный элемент) размытия не имеет: оно у внешней обёртки .tabbar-glass (см. pm-chats.css),
+     а в снимок экрана обёртка попадает размытым пятном (с насыщенностью), которое ездит вместе со страницей. Чтобы под неподвижной панелью
+     всё время было ровное размытие, а не края пятен, на слое снимка стоит ещё одно размытие. Насыщенность второй раз не добавляем:
+     в пятне она уже есть, и цвета стали бы вдвое ярче, чем у живой панели. Размер размытия тот же, что у --glass-filter-panel (переменных
+     тут нет: слой лежит вне разметки), скругление — у капсулы панели */
   border-radius: 9999px;
-  -webkit-backdrop-filter: blur(24px) saturate(2);
-  backdrop-filter: blur(24px) saturate(2);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
 }
 
 ::view-transition-old(tabbar) {

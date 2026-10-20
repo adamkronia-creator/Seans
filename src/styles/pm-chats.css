@@ -573,18 +573,33 @@ html:has([data-pm]) body {
 }
 
 /* Нижняя панель — плавающая стеклянная капсула: отступ space-4 по бокам и space-3 над безопасной зоной, внутри отступ space-1,
-   выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми */
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar {
+   выбранный раздел подсвечен светлой плашкой. Строки списка проезжают под ней и просвечивают размытыми.
+   Капсула из двух слоёв. Внешний (.tabbar-glass) стоит на месте и только размывает всё под собой. Внутренний (.tabbar) — заливка, рамка,
+   тень, значки и плашка, он получает имя при переходе между экранами (motion.css). Размытие нельзя держать на самом внутреннем:
+   у элемента с именем перехода Chrome его не рисует, и пока браузер снимает экран, строки под капсулой проглядывали бы чёткими */
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar-glass {
+  display: block;
+  position: absolute;
   right: var(--space-4);
   bottom: calc(var(--safe-bottom) + var(--space-3));
   left: var(--space-4);
+  z-index: 3;
+  border-radius: var(--radius-full);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: auto;
   padding: var(--space-1);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill-panel);
   box-shadow: var(--glass-shadow-panel);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
 }
 
 [data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item {

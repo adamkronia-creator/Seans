@@ -296,6 +296,6 @@
 }
 
 /* Пока открыт просмотр, нижняя панель разделов не нужна */
-[data-pm]:has(.story-view) .tabbar {
+[data-pm]:has(.story-view) :is(.tabbar, .tabbar-glass) {
   display: none;
 }
