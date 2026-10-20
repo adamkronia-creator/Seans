@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
-import { EMOJI } from '../../data/emoji';
+import { EmojiPanel } from './EmojiPanel';
 import { IconClose, IconReply } from '../ChatParts/ChatIcons';
 import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
 import './MessageInput.css';
@@ -221,20 +221,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
         )}
       </div>
 
-      {emojiOpen && (
-        <div className="emoji-panel" role="group" aria-label="Эмодзи">
-          {EMOJI.map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              className="emoji-panel__item"
-              onClick={() => insertEmoji(emoji)}
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-      )}
+      {emojiOpen && <EmojiPanel onPick={insertEmoji} />}
     </div>
   );
 }
