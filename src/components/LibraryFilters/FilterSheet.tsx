@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
+import { Chip } from '../Chip/Chip';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import { countFilters, facetCounts, listIds, type Catalog, type Filters, type ViewQuery } from '../../data/libraryQuery';
@@ -47,31 +48,22 @@ export function FilterSheet({ catalog, view, scope, favorites, noun, onApply, on
         </div>
         <div className="sheet__body">
           {catalog.facets.map((facet) => (
-            <section key={facet.id} className="sheet__card filter-group" aria-label={facet.label}>
+            <Fragment key={facet.id}>
               <h3 className="filter-group__title">{facet.label}</h3>
-              <div className="filter-group__chips">
-                {facet.options.map((option) => {
-                  const on = (draft[facet.id] ?? []).includes(option.id);
-                  const count = counts[facet.id]?.[option.id] ?? 0;
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      className="filter-chip"
-                      aria-pressed={on}
-                      aria-label={`${option.label}: ${count}`}
-                      disabled={!on && count === 0}
-                      onClick={() => toggle(facet.id, option.id)}
-                    >
-                      {option.label}
-                      <span className="filter-chip__count" aria-hidden="true">
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+              <section className="sheet__card filter-group" aria-label={facet.label}>
+                <div className="filter-group__chips">
+                  {facet.options.map((option) => {
+                    const on = (draft[facet.id] ?? []).includes(option.id);
+                    const count = counts[facet.id]?.[option.id] ?? 0;
+                    return (
+                      <Chip key={option.id} active={on} count={count} ariaLabel={`${option.label}: ${count}`} disabled={!on && count === 0} onClick={() => toggle(facet.id, option.id)}>
+                        {option.label}
+                      </Chip>
+                    );
+                  })}
+                </div>
+              </section>
+            </Fragment>
           ))}
         </div>
         <div className="sheet__footer">

@@ -86,11 +86,10 @@
 }
 
 .filter-group__title {
-  margin: 0 0 var(--space-3);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-sm);
+  margin: var(--space-2) 0 calc(var(--space-2) * -1);
+  padding: 0 var(--space-1);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font: var(--type-label, 600 15px/20px var(--font-family));
 }
 
 .filter-group__chips {

@@ -40,9 +40,11 @@ interface ChipProps {
   split?: boolean;
   /** Вид содержимого: выбранный чипс заливается пастелью этого вида (см. --tone-* в tokens.css), подпись по ней тёмная. Без тона — акцентный */
   tone?: Tone;
+  /** Чипс недоступен (пункт фильтра, который не даст результатов) */
+  disabled?: boolean;
 }
 
-export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone }: ChipProps) {
+export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone, disabled = false }: ChipProps) {
   const press = useRef<{ x: number; y: number; timer: number } | null>(null);
   /** Долгое нажатие уже открыло меню: клик, который придёт, когда палец поднимут, не должен выбирать чипс */
   const opened = useRef(false);
@@ -113,6 +115,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       onPointerCancel={onLongPress ? stop : undefined}
       onPointerLeave={onLongPress ? stop : undefined}
       onContextMenu={onLongPress ? onContextMenu : undefined}
+      disabled={disabled}
       aria-pressed={active}
       aria-label={ariaLabel}
       data-tone={tone}
