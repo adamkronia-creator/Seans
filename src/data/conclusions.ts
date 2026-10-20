@@ -709,6 +709,7 @@ const pfqScale = (block: string, code: string, name: string, score: number, abou
  */
 const PFQ5: ConclusionData = {
   overview: false,
+  noCodes: true,
   flat: true,
   axisEach: true,
   blocks: [
