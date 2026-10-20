@@ -111,7 +111,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4);
+  /* Сверху 12: к ним добавляется пустое место над буквами в строке 22, и до текста выходит столько же, сколько после ответа (16) */
+  padding: var(--space-3) var(--space-4) var(--space-4);
   font-size: var(--font-size-lg);
   line-height: var(--line-height-lg);
 }
