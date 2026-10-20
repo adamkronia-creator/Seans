@@ -327,6 +327,7 @@ const SQ: ConclusionData = {
 /** ИТО: восемь основных шкал и две шкалы достоверности, у всех 0–9 (число совпадений с ключом); границы уровней заданы в настройках теста */
 const ITO: ConclusionData = {
   overview: true,
+  noCodes: true,
   info: { date: '25.05.2026', time: '19:12–19:33', duration: '20 мин. 14 с.', age: '23 года' },
   max: 9,
   ticks: [0, 2, 5, 8, 9],
