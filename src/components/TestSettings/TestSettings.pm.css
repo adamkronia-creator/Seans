@@ -110,8 +110,9 @@
   backdrop-filter: var(--glass-filter);
 }
 
+/* Скругление этапа — скругление плашки минус её поле (рамка 1 + отступ 3), чтобы дуги шли параллельно */
 [data-pm] .tp__tab {
-  border-radius: var(--radius-full);
+  border-radius: calc(var(--radius-md) - 4px);
   color: var(--text-secondary);
   font: var(--type-label);
 }
