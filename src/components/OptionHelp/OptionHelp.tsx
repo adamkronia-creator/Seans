@@ -2,22 +2,11 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 're
 import { IconTestQuestion } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
-import { HELP_SHOT, OPTION_HELP, type OptionHelp as Help, type OptionHelpId } from '../../data/optionHelp';
+import { OPTION_HELP, type OptionHelp as Help, type OptionHelpId } from '../../data/optionHelp';
+import { HelpSceneView, slidesFor, useHelpTest, type HelpTest } from './HelpScenes';
 import { reducedMotion } from '../../utils/swipe';
 import '../EditSheet/EditSheet.css';
 import './OptionHelp.css';
-
-/** Скриншоты подсказки подгружаются заранее, пока человек читает экран: к нажатию на «?» они уже в кеше */
-const preloaded = new Set<string>();
-function preload(help: Help) {
-  help.slides.forEach(({ src }) => {
-    if (preloaded.has(src)) return;
-    preloaded.add(src);
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = src;
-  });
-}
 
 interface OptionHelpProps {
   id: OptionHelpId;
@@ -28,12 +17,7 @@ export function OptionHelp({ id }: OptionHelpProps) {
   const help = OPTION_HELP[id];
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const idle = window.requestIdleCallback ?? ((fn: () => void) => window.setTimeout(fn, 600));
-    const handle = idle(() => preload(help));
-    return () => (window.cancelIdleCallback ?? window.clearTimeout)(handle);
-  }, [help]);
+  const ctx = useHelpTest();
 
   const close = useCallback(() => {
     setOpen(false);
@@ -49,20 +33,19 @@ export function OptionHelp({ id }: OptionHelpProps) {
         className="option-help"
         aria-haspopup="dialog"
         aria-label={`Что это: ${help.title}`}
-        onPointerEnter={() => preload(help)}
         onClick={() => setOpen(true)}
       >
         <IconTestQuestion aria-hidden="true" />
       </button>
-      {open && <HelpSheet help={help} onClose={close} />}
+      {open && ctx && <HelpSheet help={help} ctx={ctx} onClose={close} />}
     </>
   );
 }
 
-/** Окно подсказки: заголовок, карусель из скриншотов, точки, подпись к показанному скриншоту и «Понятно» */
-function HelpSheet({ help, onClose }: { help: Help; onClose: () => void }) {
+/** Окно подсказки: заголовок, карусель из макетов, точки, подпись к показанному скриншоту и «Понятно» */
+function HelpSheet({ help, ctx, onClose }: { help: Help; ctx: HelpTest; onClose: () => void }) {
   useSheet(onClose);
-  const { slides } = help;
+  const slides = slidesFor(help.slides, ctx);
   const [index, setIndex] = useState(0);
   const track = useRef<HTMLUListElement>(null);
   const frame = useRef(0);
@@ -128,11 +111,11 @@ function HelpSheet({ help, onClose }: { help: Help; onClose: () => void }) {
           <h2 className="sheet__heading">{help.title}</h2>
         </div>
         <div className="sheet__body option-help-sheet__body">
-          <div className="oh" role="region" aria-roledescription="карусель" aria-label={`${help.title}: скриншоты`}>
+          <div className="oh" role="region" aria-roledescription="карусель" aria-label={`${help.title}: макеты`}>
             <ul className="oh__track" ref={track} tabIndex={0} data-hscroll onScroll={onScroll} onKeyDown={onKeyDown}>
               {slides.map((slide, i) => (
                 <li
-                  key={slide.src}
+                  key={slide.scene}
                   className="oh__slide"
                   role="group"
                   aria-roledescription="слайд"
@@ -140,22 +123,7 @@ function HelpSheet({ help, onClose }: { help: Help; onClose: () => void }) {
                   onClick={() => i !== index && goTo(i)}
                 >
                   <figure className={`oh__shot${i === index ? ' oh__shot--on' : ''}`}>
-                    <img
-                      className="oh__img"
-                      src={slide.src}
-                      alt={slide.alt}
-                      width={HELP_SHOT.width}
-                      height={HELP_SHOT.height}
-                      draggable={false}
-                      decoding="async"
-                    />
-                    {slide.mark && (
-                      <span
-                        className="oh__mark"
-                        aria-hidden="true"
-                        style={{ left: `${slide.mark.x}%`, top: `${slide.mark.y}%`, width: `${slide.mark.w}%`, height: `${slide.mark.h}%` }}
-                      />
-                    )}
+                    <HelpSceneView slide={slide} ctx={ctx} />
                   </figure>
                 </li>
               ))}
@@ -164,10 +132,10 @@ function HelpSheet({ help, onClose }: { help: Help; onClose: () => void }) {
             <div className="oh__dots">
               {slides.map((slide, i) => (
                 <button
-                  key={slide.src}
+                  key={slide.scene}
                   type="button"
                   className="oh__dot"
-                  aria-label={`Скриншот ${i + 1} из ${slides.length}`}
+                  aria-label={`Слайд ${i + 1} из ${slides.length}`}
                   aria-current={i === index ? 'true' : undefined}
                   onClick={() => goTo(i)}
                 />
@@ -178,7 +146,7 @@ function HelpSheet({ help, onClose }: { help: Help; onClose: () => void }) {
           {/* Подписи лежат друг на друге в одной ячейке: окно не меняет высоту, когда подпись меняется */}
           <div className="oh__captions" aria-hidden="true">
             {slides.map((slide, i) => (
-              <div key={slide.src} className={`oh__caption${i === index ? ' oh__caption--on' : ''}`}>
+              <div key={slide.scene} className={`oh__caption${i === index ? ' oh__caption--on' : ''}`}>
                 <h3 className="oh__title">{slide.title}</h3>
                 <p className="oh__text">{slide.text}</p>
               </div>

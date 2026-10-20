@@ -246,13 +246,16 @@ const splitTitle = (text: string, fallback: string) => {
 };
 
 /**
- * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — первая строка текста, остальное — в заметке (дата — в «Последнем обновлении»).
+ * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — «Заметка от дд/мм/гггг», набранный текст целиком — в заметке (дата — и в «Последнем обновлении»).
  * У клиента (Максима) она попадает и в журнал, то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
  */
 export function addNote(chatId: string, text: string): string | null {
   if (!textToParagraphs(text).some((p) => p.trim())) return null;
-  const { title, body } = splitTitle(text, 'Заметка');
-  const paragraphs = body ? textToParagraphs(body) : [];
+  // Название заметки — дата записи («Заметка от 20/10/2026»), весь набранный текст — её содержимое
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const title = `Заметка от ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+  const paragraphs = textToParagraphs(text);
   const { date } = nowStamp();
   const note: CaseNote = {
     id: `n${data.notes.length + 1}-${Date.now()}`,

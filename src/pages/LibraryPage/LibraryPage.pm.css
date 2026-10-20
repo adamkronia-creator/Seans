@@ -1,0 +1,107 @@
+/* ——— Раздел тестов в стиле «Диалогов» (data-pm): шапка и чипсы общие с чатами (messages.css, pm-chats.css), здесь ряд недавних, список и строки ——— */
+
+/* Недавние тесты: круг 64 с цветом теста (75%), значок внутри 40 */
+.recent-row__avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--space-16);
+  height: var(--space-16);
+  border-radius: var(--radius-full);
+  isolation: isolate;
+}
+
+.recent-row__avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint);
+  opacity: 0.75;
+}
+
+.recent-row__icon {
+  width: var(--space-10);
+  height: var(--space-10);
+}
+
+/* Без недавних тестов ряда нет, и шапка ниже на его высоту */
+.messages.library-page--bare {
+  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
+}
+
+/* Страница списка прокручивается под шапкой и над панелью, как список чатов */
+.library-page.messages .library-page__page {
+  gap: 0;
+  padding: var(--pm-top) 0 var(--pm-bottom);
+  scroll-padding-top: var(--pm-top);
+  background: none;
+  scrollbar-width: none;
+}
+
+.library-page.messages .library-page__page::-webkit-scrollbar {
+  display: none;
+}
+
+.library-page.messages .library-page__list {
+  margin: var(--space-3) 0 0;
+}
+
+.library-page.messages .library-page__page > .results-bar {
+  margin: var(--space-3) var(--space-4) 0;
+}
+
+/* Строки как у чатов: на фоне экрана, без своей заливки; название — имя чата, описание — сообщение */
+[data-pm] .lib-card {
+  background: none;
+}
+
+[data-pm] .lib-card .test-card:active,
+[data-pm] .lib-card .test-card[data-pressed] {
+  background: var(--glass);
+}
+
+[data-pm] .lib-card .test-card__title {
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
+}
+
+[data-pm] .lib-card .test-card__description,
+[data-pm] .lib-card .lib-card__facts,
+[data-pm] .lib-card .lib-card__why {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+[data-pm] .lib-card .lib-card__facts,
+[data-pm] .lib-card .lib-card__why {
+  font: var(--type-caption);
+}
+
+/* Сердечко на значке: стеклянный кружок вместо белого */
+[data-pm] .lib-card__heart {
+  border: 1px solid var(--glass-border);
+  background: var(--glass-solid);
+}
+
+/* Фильтры в шапке: выбранные — синее стекло, с числом выбранного */
+.chats-header__action.library-page__tile--on {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+.chats-header__action.library-page__tile {
+  position: relative;
+}
+
+/* Подсказки под полем лежат под шапкой (она выше), на стекле поверх фона экрана */
+.library-page.messages .suggest {
+  z-index: 2;
+  padding-top: calc(var(--pm-top) + var(--space-3));
+  background: var(--glass-fill-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type KeyboardEvent, type ReactNode, type Ref } from 'react';
 import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
@@ -12,18 +12,49 @@ interface ChatsHeaderProps {
   onQuery: (q: string) => void;
   chips: ReactNode;
   /** Экран, поверх которого открываются истории */
-  storiesRoot: HTMLElement | null;
+  storiesRoot?: HTMLElement | null;
+  /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений и ряд вместо историй */
+  title?: string;
+  status?: string;
+  heading?: string;
+  placeholder?: string;
+  chipsLabel?: string;
+  aside?: ReactNode;
+  belt?: ReactNode;
+  inputRef?: Ref<HTMLInputElement>;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 /**
  * Шапка «Диалогов» по макету: фото специалиста, заголовок «Чаты» с подписью «Ваши диалоги», справа значки поиска и уведомлений,
  * ниже чипсы папок. Значок поиска заменяет верхнюю строку полем с кнопкой «Отмена». Размеры — токены сетки 4 (messages.css).
  */
-export function ChatsHeader({ searching, onSearching, query, onQuery, chips, storiesRoot }: ChatsHeaderProps) {
+export function ChatsHeader({
+  searching,
+  onSearching,
+  query,
+  onQuery,
+  chips,
+  storiesRoot = null,
+  title = 'Чаты',
+  status = 'Ваши диалоги',
+  heading = 'Диалоги',
+  placeholder = 'Поиск по чатам',
+  chipsLabel = 'Фильтр диалогов',
+  aside,
+  belt,
+  inputRef,
+  onFocus,
+  onBlur,
+  onKeyDown,
+}: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
-  const input = useRef<HTMLInputElement>(null);
+  const own = useRef<HTMLInputElement>(null);
+  const input = inputRef ?? own;
   useEffect(() => {
-    if (searching) input.current?.focus({ preventScroll: true });
+    if (searching) (input as { current: HTMLInputElement | null }).current?.focus({ preventScroll: true });
   }, [searching]);
   const close = () => {
     onQuery('');
@@ -31,16 +62,21 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips, sto
   };
   return (
     <header className="chats-header">
-      <h1 className="visually-hidden">Диалоги</h1>
+      <h1 className="visually-hidden">{heading}</h1>
       {searching ? (
         <div className="chats-header__top">
           <SearchField
             value={query}
             onChange={onQuery}
-            placeholder="Поиск по чатам"
+            placeholder={placeholder}
             onClear={() => onQuery('')}
             inputRef={input}
-            onKeyDown={(e) => e.key === 'Escape' && close()}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') close();
+              else onKeyDown?.(e);
+            }}
           />
           <button type="button" className="chats-header__cancel" onClick={close}>
             Отмена
@@ -50,19 +86,21 @@ export function ChatsHeader({ searching, onSearching, query, onQuery, chips, sto
         <div className="chats-header__top">
           {avatar ? <img className="chats-header__avatar" src={avatar} alt="" /> : <span className="chats-header__avatar" />}
           <span className="chats-header__who">
-            <span className="chats-header__name">Чаты</span>
-            <span className="chats-header__status">Ваши диалоги</span>
+            <span className="chats-header__name">{title}</span>
+            <span className="chats-header__status">{status}</span>
           </span>
           <button type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
             <IconSearchMk />
           </button>
-          <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
-            <IconBellMk />
-          </button>
+          {aside ?? (
+            <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
+              <IconBellMk />
+            </button>
+          )}
         </div>
       )}
-      <StoriesRow root={storiesRoot} />
-      <div className="screen-header__chips" role="group" aria-label="Фильтр диалогов">
+      {belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}
+      <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
         <span className="chips-pill" aria-hidden="true" />
         {chips}
       </div>

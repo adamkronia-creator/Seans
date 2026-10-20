@@ -7,6 +7,7 @@ export function TestsPage() {
   return (
     <LibraryPage
       kind="test"
+      chatLike
       title="Диагностика"
       searchPlaceholder="Поиск по тестам"
       items={LIBRARY}

@@ -33,8 +33,17 @@
 
 .option-help-sheet__body {
   gap: 0;
-  /* Верхние 16 панели плавно гаснут (маска .sheet__body): скриншоты начинаются под ними, и верхний край не бледнеет */
-  padding-top: var(--space-4);
+  /* Между заголовком и макетом 4, как между «Фон приложения» и его плитками */
+  padding-top: var(--space-1);
+}
+
+/* Заголовок подсказки по центру окна; у шапки снизу ничего, весь отступ — 4 у тела */
+[data-pm] .sheet.option-help-sheet .sheet__header {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet.option-help-sheet .sheet__heading {
+  text-align: center;
 }
 
 /*
@@ -43,7 +52,7 @@
  * чтобы окно целиком помещалось без прокрутки (350 — всё в окне, кроме скриншота).
  */
 .oh {
-  --slide-w: min(332px, calc(100cqw - 56px), calc((100dvh - 350px) * 786 / 680));
+  --slide-w: min(332px, calc(100cqw - 56px), calc((100dvh - 350px) * 393 / 340));
   container-type: inline-size;
   margin-inline: calc(var(--space-4) * -1);
 }
@@ -81,7 +90,7 @@
 .oh__shot {
   position: relative;
   margin: 0;
-  aspect-ratio: 786 / 680;
+  aspect-ratio: 393 / 340;
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: var(--color-bg-fill);

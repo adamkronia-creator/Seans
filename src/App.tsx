@@ -199,7 +199,7 @@ export default function App() {
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
-      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at, true) : page('tests', <TestsPage />, at);
+      return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at, true) : page('tests', <TestsPage />, at, true);
     }
     if (at === 'tasks') {
       const folder = folderScreen(path, 'tasks');

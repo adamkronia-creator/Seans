@@ -9,7 +9,7 @@ import { TestHeader } from './TestHeader';
 import { ADVANCE_MS, JumpSheet, PassQuestion } from './TestPassSingle';
 import './TestPreview.css';
 
-type Stage = 'start' | 'progress' | 'end';
+export type Stage = 'start' | 'progress' | 'end';
 
 const STAGES: { id: Stage; label: string }[] = [
   { id: 'start', label: 'Начало' },
@@ -26,6 +26,10 @@ interface TestPreviewProps {
   result: ResultMode;
   /** Время выполнения из описания теста («15–20 мин.») */
   duration?: string;
+  /** С какого этапа открыть (в подсказках — нужный экран сразу) */
+  initialStage?: Stage;
+  /** Только экран телефона: без вкладок этапов и кнопок внизу (макеты в подсказках) */
+  bare?: boolean;
 }
 
 /**
@@ -34,10 +38,10 @@ interface TestPreviewProps {
  * вопрос с ответами и завершение. Внутри рамки тот же интерфейс, что у клиента и при прохождении самому.
  * Ответы здесь никуда не сохраняются. При слепом тестировании название и значок теста скрыты.
  */
-export function TestPreview({ test, blank, blind, result, duration }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, result, duration, initialStage = 'start', bare }: TestPreviewProps) {
   // Номер слепого теста в предпросмотре: время открытия настроек; у настоящего теста он ставится при отправке
   const [title] = useState(() => blindTitle());
-  const [stage, setStage] = useState<Stage>('start');
+  const [stage, setStage] = useState<Stage>(initialStage);
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<'next' | 'prev'>('next');
   const [picked, setPicked] = useState<Record<number, number>>({});
@@ -96,14 +100,14 @@ export function TestPreview({ test, blank, blind, result, duration }: TestPrevie
 
   return (
     <>
-            <div id="preview" className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <div className="tp__tabs" role="group" aria-label="Этап прохождения">
+            <div id={bare ? undefined : 'preview'} className={`tp tp--inline${bare ? ' tp--bare' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        {!bare && <div className="tp__tabs" role="group" aria-label="Этап прохождения">
           {STAGES.map(({ id, label }) => (
             <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
               {label}
             </button>
           ))}
-        </div>
+        </div>}
 
         <div className="tp__phone" data-hscroll>
           <div className="tp__status" aria-hidden="true">
@@ -130,7 +134,7 @@ export function TestPreview({ test, blank, blind, result, duration }: TestPrevie
             {stage === 'end' && <TestDone testId={test.id} result={result} />}
           </div>
 
-          {stage !== 'end' && (
+          {stage !== 'end' && !bare && (
             <div className="test-settings__cta test-pass__cta tp__footer">
               <FillMeter label="Отвечено" done={answered} total={total} />
               <div className="test-pass__buttons">

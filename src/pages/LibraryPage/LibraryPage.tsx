@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -35,9 +35,13 @@ import {
 import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, toggleOption, useLibraryView } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
-import { followChips, type PositionVia } from '../../utils/followChips';
+import { followChips, placePill, type PositionVia } from '../../utils/followChips';
+import { ChatsHeader } from '../MessagesPage/ChatsHeader';
+import '../MessagesPage/MessagesPage.css';
+import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
+import './LibraryPage.pm.css';
 
 type Noun = [string, string, string];
 
@@ -52,6 +56,8 @@ interface LibraryPageProps {
   /** Нажатие на карточку (открыть настройку) */
   onOpen?: (item: LibraryItem) => void;
   /** Подписи для экранных читалок и пустых состояний; noun — «тест», «теста», «тестов» */
+  /** Шапка и чипсы как в «Диалогах», над чипсами недавние тесты (раздел «Диагностика») */
+  chatLike?: boolean;
   labels: { all: string; filters: string; emptyRecent: string; noun: Noun; everywhere: string };
 }
 
@@ -214,12 +220,13 @@ function LibraryList(p: ListProps) {
  * Поверх любого раздела работают поиск по словам и фильтры (лист «Фильтры»); выбранные фильтры и пояснения к выдаче стоят над списком.
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
-export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, onOpen, labels }: LibraryPageProps) {
+export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, onOpen, labels, chatLike }: LibraryPageProps) {
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [sheet, setSheet] = useState<null | 'filters'>(null);
   const [focused, setFocused] = useState(false);
+  const [searching, setSearching] = useState(() => readLibraryView(kind).query !== '');
   const client = useClientData();
   const view = useLibraryView(kind);
   const scope = kind === 'test' ? 'tests' : 'tasks';
@@ -375,9 +382,79 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     input.current?.blur();
   };
 
+  const chipNodes = (
+    <>
+            <Chip {...chip('all', labels.all)}>Все</Chip>
+            <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
+            <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>
+            {folders.map(({ id, name }) => (
+              <Chip key={id} {...chip(id, name)}>
+                {name}
+              </Chip>
+            ))}
+    </>
+  );
+  const filterButton = (
+    <button
+      type="button"
+      className={`${chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
+      aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
+      aria-haspopup="dialog"
+      onClick={() => setSheet('filters')}
+    >
+      <IconSliders />
+      {activeCount > 0 && (
+        <span className="library-page__tile-badge">
+          <Badge count={activeCount} />
+        </span>
+      )}
+    </button>
+  );
+  const recentItems = useMemo(() => recent.map((id) => catalog.byId.get(id)?.item).filter((x): x is LibraryItem => Boolean(x)), [recent, catalog]);
+
+  // В покое подвижная заливка стоит под выбранным чипсом (как в «Диалогах»)
+  const keptOrder = useRef('');
+  useLayoutEffect(() => {
+    if (!chatLike) return;
+    const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
+    if (!row) return;
+    const place = () => {
+      const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
+      const kept = row.querySelector<HTMLElement>(':scope > .chips-pill')?.dataset.weights?.split(',').map(Number);
+      placePill(chips, kept && kept.length === chips.length && order === keptOrder.current ? kept : chips.map((_, i) => (i === index ? 1 : 0)));
+      keptOrder.current = order;
+    };
+    place();
+    const watch = new ResizeObserver(place);
+    watch.observe(row);
+    row.querySelectorAll('.chip').forEach((c) => watch.observe(c));
+    void document.fonts?.ready.then(place);
+    return () => watch.disconnect();
+  }, [chatLike, index, order, searching]);
+
   return (
-    <section ref={root} className="library-page">
-      <ScreenHeader
+    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'}>
+      {chatLike ? (
+        <ChatsHeader
+          searching={searching}
+          onSearching={setSearching}
+          query={view.query}
+          onQuery={(value) => setQuery(kind, value)}
+          title="Тесты"
+          status="Ваши опросники"
+          heading={title}
+          placeholder={searchPlaceholder}
+          chipsLabel={labels.filters}
+          aside={filterButton}
+          belt={recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
+          inputRef={input}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          onKeyDown={onKeyDown}
+          chips={chipNodes}
+        />
+      ) : (
+        <ScreenHeader
         title={title}
         searchValue={view.query}
         onSearchChange={(value) => setQuery(kind, value)}
@@ -387,36 +464,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
         onSearchFocus={() => setFocused(true)}
         onSearchBlur={() => setFocused(false)}
         onSearchKeyDown={onKeyDown}
-        searchAside={
-          <button
-            type="button"
-            className={`screen-header__action library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
-            aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
-            aria-haspopup="dialog"
-            onClick={() => setSheet('filters')}
-          >
-            <IconSliders />
-            {activeCount > 0 && (
-              <span className="library-page__tile-badge">
-                <Badge count={activeCount} />
-              </span>
-            )}
-          </button>
-        }
+        searchAside={filterButton}
         chipsLabel={labels.filters}
-        chips={
-          <>
-            <Chip {...chip('all', labels.all)}>Все</Chip>
-            <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
-            <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>
-            {folders.map(({ id, name }) => (
-              <Chip key={id} {...chip(id, name)}>
-                {name}
-              </Chip>
-            ))}
-          </>
-        }
+        chips={chipNodes}
       />
+      )}
 
       <div className="library-page__body">
         <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} />

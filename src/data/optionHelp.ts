@@ -1,36 +1,23 @@
-import blindOff from '../assets/help/blind-off.webp';
-import blindOn from '../assets/help/blind-on.webp';
-import blindChat from '../assets/help/blind-chat.webp';
-import blankOff from '../assets/help/blank-off.webp';
-import blankOn from '../assets/help/blank-on.webp';
-import blankView from '../assets/help/blank-view.webp';
-import resultThanks from '../assets/help/result-thanks.webp';
-import resultScore from '../assets/help/result-score.webp';
-import resultFull from '../assets/help/result-full.webp';
 
 /**
- * Подсказки к настройкам теста («?» справа от названия): окно с каруселью из трёх скриншотов, под ними меняются подписи.
- * Скриншоты снимает скрипт scripts/help-shots.py (см. README), поэтому все они одного размера и снимают одно и то же место экрана.
+ * Подсказки к настройкам теста («?» справа от названия): окно с каруселью из трёх живых макетов, под ними меняются подписи.
+ * Макеты собираются из выбранного теста (components/OptionHelp/HelpScenes.tsx): его название, шкалы и бланк, а не снимки одного теста.
  */
 
 export type OptionHelpId = 'blind' | 'blank' | 'result';
 
-/** Рамка вокруг того, что изменилось на скриншоте: левый верхний угол и размер в процентах от скриншота */
-export interface HelpMark {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+/** Какой макет показан в слайде */
+export type HelpScene = 'blind-off' | 'blind-on' | 'blind-chat' | 'blank-off' | 'blank-on' | 'blank-view' | 'result-thanks' | 'result-score' | 'result-full';
 
 export interface HelpSlide {
-  src: string;
-  /** Что на скриншоте: для экранных читалок */
+  scene: HelpScene;
+  /** Что на макете: для экранных читалок */
   alt: string;
   /** Подпись под скриншотом: короткий заголовок и пояснение */
   title: string;
   text: string;
-  mark?: HelpMark;
+  /** Селектор того, что изменилось на макете: вокруг него рисуется рамка */
+  mark?: string;
 }
 
 export interface OptionHelp {
@@ -39,33 +26,30 @@ export interface OptionHelp {
   slides: HelpSlide[];
 }
 
-/** Размер скриншота (пикселей при плотности 2): окно резервирует под него место, пока картинка грузится */
-export const HELP_SHOT = { width: 786, height: 680 } as const;
+/** Размер макета в пикселях экрана: кадр 393×340, как телефон 393 px, обрезанный сверху */
+export const HELP_SHOT = { width: 393, height: 340 } as const;
 
 export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
   blind: {
     title: 'Слепое тестирование',
     slides: [
       {
-        src: blindOff,
+        scene: 'blind-off',
         alt: 'Экран клиента: в шапке значок и полное название теста',
         title: 'Обычный тест',
         text: 'Клиент видит значок и название методики — он может догадаться, что именно желает проверить специалист.',
-        mark: { x: 18.45, y: 33.09, w: 74.3, h: 12.94 },
       },
       {
-        src: blindOn,
+        scene: 'blind-on',
         alt: 'Экран клиента: в шапке вместо названия «Тест №» с датой и временем отправки',
         title: 'Слепое тестирование',
         text: 'Значок и название методики скрываются для клиента — иногда, когда не знаешь, что выполняешь, ответы честнее.',
-        mark: { x: 18.45, y: 33.09, w: 74.3, h: 12.94 },
       },
       {
-        src: blindChat,
+        scene: 'blind-chat',
         alt: 'Переписка с клиентом: под названием теста пометка «Слепой тест: клиент не видит название»',
         title: 'Что видите вы',
         text: 'В переписке с клиентом остаётся настоящее название методики и пометка «Слепой тест», тестовое заключение остаётся открытым.',
-        mark: { x: 33.93, y: 55, w: 61.49, h: 11.76 },
       },
     ],
   },
@@ -73,20 +57,19 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
     title: 'Сохранить заполненный бланк',
     slides: [
       {
-        src: blankOff,
+        scene: 'blank-off',
         alt: 'Результат теста: после общей информации сразу идут шкалы',
         title: 'Бланк не сохраняется',
         text: 'Если опция «Сохранить бланк» отключена, то посмотреть бланк тестирования, который заполнил клиент, нельзя. Предоставляется только тестовое заключение.',
       },
       {
-        src: blankOn,
+        scene: 'blank-on',
         alt: 'Результат теста: между общей информацией и шкалами строка «Посмотреть бланк тестирования»',
         title: 'Бланк сохраняется',
         text: 'Если сохранение бланка тестирования включено, то в тестовом заключении появляется кнопка «Посмотреть бланк тестирования».',
-        mark: { x: 3.05, y: 77.94, w: 93.89, h: 16.47 },
       },
       {
-        src: blankView,
+        scene: 'blank-view',
         alt: 'Бланк тестирования с отмеченными ответами клиента',
         title: 'Ответы клиента',
         text: 'В бланке тестирования остаются все ответы, которые отметил клиент при прохождении теста. Можно посмотреть ключевые вопросы или сверить ответы с баллами.',
@@ -97,19 +80,19 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
     title: 'Итог для клиента',
     slides: [
       {
-        src: resultThanks,
+        scene: 'result-thanks',
         alt: 'Экран клиента после теста: «Спасибо за прохождение теста!» и больше ничего',
         title: 'Только благодарность',
         text: 'Когда клиент прошёл тест, появляется сообщение «Спасибо за прохождение теста». Тестовое заключение вы можете разобрать при встрече.',
       },
       {
-        src: resultScore,
+        scene: 'result-score',
         alt: 'Экран клиента после теста: под благодарностью баллы по трём шкалам',
         title: 'Только баллы',
         text: 'Помимо благодарности, клиент видит шкалы и баллы. Расшифровки диапазонов баллов нет.',
       },
       {
-        src: resultFull,
+        scene: 'result-full',
         alt: 'Экран клиента после теста: баллы по шкалам с уровнями',
         title: 'Полное заключение',
         text: 'Помимо шкал и баллов, появляется расшифровка диапазонов баллов с подписями «низкий, нормативный или высокий показатель».',

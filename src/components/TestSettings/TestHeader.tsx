@@ -31,9 +31,6 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
   const hidden = Boolean(client?.blind);
   return (
     <header className="test-settings__header">
-      <button type="button" className="test-settings__button" aria-label="Назад" disabled={!onBack} onClick={onBack}>
-        <IconBack />
-      </button>
       <div className="test-settings__peer">
         {!hidden && (
           <span className="test-settings__avatar" style={{ '--tint': test.tint } as CSSProperties}>
@@ -45,6 +42,9 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
           <p className="test-settings__status">{status}</p>
         </div>
       </div>
+      <button type="button" className="test-settings__button" aria-label="Назад" disabled={!onBack} onClick={onBack}>
+        <IconBack />
+      </button>
       {!client && (
         <button
           type="button"

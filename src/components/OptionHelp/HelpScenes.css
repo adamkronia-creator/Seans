@@ -1,0 +1,79 @@
+/* Макет в подсказке: экран 393×340, уменьшенный до ширины слайда; пальцем и клавишей в нём ничего не нажать */
+.hs {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 393 / 340;
+  overflow: hidden;
+  background: var(--bg-canvas, var(--color-bg-panel));
+}
+
+.hs__stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 393px;
+  height: 340px;
+  overflow: hidden;
+  transform: scale(var(--k, 1));
+  transform-origin: 0 0;
+  pointer-events: none;
+  user-select: none;
+  --safe-top: 0px;
+  --safe-bottom: 0px;
+}
+
+.hs__stage .tp,
+.hs__stage .tp__phone {
+  flex: none;
+}
+
+.hs__screen {
+  height: 340px;
+}
+
+.hs__scroll {
+  overflow: hidden;
+  padding-bottom: var(--space-4);
+}
+
+.hs__chat {
+  padding: var(--space-4);
+}
+
+.hs__chat .messages__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Рамка внутри макета рисуется в пикселях экрана и уменьшается вместе с ним */
+.hs__stage .oh__mark {
+  z-index: 5;
+  border-width: 3px;
+  border-radius: 14px;
+}
+
+/* Переписка: пузырь справа, как у отправленного, на фоне сцены */
+.hs__stage:has(.hs__chat) {
+  background: linear-gradient(180deg, var(--bg-subtle), var(--color-bg-fill, var(--bg-subtle)));
+}
+
+.hs__chat {
+  padding-top: var(--space-8);
+}
+
+.hs__chat .bubble-group {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hs__chat .bubble {
+  max-width: 320px;
+  height: auto;
+}
+
+.hs__chat .tcard__text {
+  overflow: visible;
+}

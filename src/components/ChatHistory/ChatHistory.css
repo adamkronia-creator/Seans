@@ -44,11 +44,19 @@
 /* Ряд чипсов-счётчиков закреплён внизу поверх лент (над нижней капсулой приложения), как у «Диалогов»; своей панели у него нет: чипсы сами стеклянные */
 .hist-foot {
   position: absolute;
-  right: 0;
+  right: var(--space-4);
   bottom: var(--page-bottom, 0px);
-  left: 0;
+  left: var(--space-4);
   z-index: 2;
   margin: 0;
+  /* Капсула на ширину экрана с полями 16, как нижняя панель приложения: сама неподвижна, чипсы в ней едут за пальцем */
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
 /* Чипсы фильтров — как в «Диалогах»: отдельные пилюли высотой 32 с зазором space-2, невыбранные — белое стекло, выбранный залит
@@ -58,7 +66,7 @@
 .hist-chips {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1);
   overflow-x: hidden;
   scrollbar-width: none;
 }
@@ -69,19 +77,16 @@
 }
 
 /* Невыбранный: слой стекла (гаснет по мере выбора), выбранный: слой цвета вида с рамкой 1 px */
+/* Невыбранные чипсы без своего стекла: фон им даёт капсула */
 .hist-chips .chip--follow::before {
-  border: 1px solid var(--glass-border);
-  background: var(--glass-fill);
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
+  border: 1px solid transparent;
+  background: none;
 }
 
 .hist-chips .chip--follow::after {
   box-sizing: border-box;
   border: 1px solid var(--glass-border-blue);
   background: var(--glass-chip-active);
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
 }
 
 /* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 */

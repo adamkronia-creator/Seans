@@ -5,6 +5,7 @@ import {
 } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { OptionHelp } from '../OptionHelp/OptionHelp';
+import { HelpContext } from '../OptionHelp/HelpScenes';
 import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
 import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
@@ -45,7 +46,7 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 
 const STATUS: Record<View, string> = {
-  settings: 'Настройка теста',
+  settings: 'Настройка тестирования',
   blank: 'Бланк тестирования',
   conclusion: 'Пример заключения',
   pass: 'Прохождение теста',
@@ -310,6 +311,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
   const live = Boolean(passRequest) && view === 'pass';
 
   return (
+    <HelpContext.Provider value={{ test, blank: blank ?? null, conclusion: conclusion ?? null, form, duration: data.duration }}>
     <section className="test-settings">
       <TestHeader
         test={test}
@@ -539,5 +541,6 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />
       )}
     </section>
+    </HelpContext.Provider>
   );
 }

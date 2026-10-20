@@ -93,3 +93,13 @@
 .tp__footer .test-pass__toast {
   bottom: calc(100% + var(--space-2));
 }
+
+/* Макет в подсказке: экран телефона без рамки, шириной 393 */
+.tp--bare .tp__phone {
+  width: 393px;
+  max-width: none;
+  height: 620px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
