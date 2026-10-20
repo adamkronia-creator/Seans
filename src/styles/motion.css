@@ -244,8 +244,8 @@ html[data-transition='slide-prev']::view-transition-new(app) {
 html[data-transition='slide-next'] .screen[data-layer='top'] .tabbar,
 html[data-transition='slide-prev'] .screen[data-layer='top'] .tabbar,
 html[data-transition='fade'] .screen[data-layer='top'] .tabbar,
-html[data-transition='forward'] .screen[data-layer='top']:not(:has(.swipe-pager__page .tabbar)) .tabbar,
-html[data-transition='back'] .screen[data-layer='top']:not(:has(.swipe-pager__page .tabbar)) .tabbar {
+html[data-transition='forward']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar,
+html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar {
   view-transition-name: tabbar;
 }
 
@@ -259,11 +259,4 @@ html[data-transition='back'] .screen[data-layer='top']:not(:has(.swipe-pager__pa
 
 ::view-transition-new(tabbar) {
   animation: none;
-}
-
-/* В снимке перехода размытие подложки у поля ввода на телефоне рисуется тёмным прямоугольником без скруглений:
-   пока идёт переход, остаётся только полупрозрачная заливка (размытие вернётся по его окончании) */
-html[data-transition] :is(.composer, .reply-bar) {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }

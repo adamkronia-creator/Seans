@@ -40,7 +40,11 @@ const subscribe = (callback: () => void) => {
   return () => listeners.delete(callback);
 };
 
+/** Сам чат (не его тесты и задания): у него своя нижняя панель на каждой странице, и в переходе её нельзя выделять отдельным слоем */
+const isChatRoot = (path: string) => /^\/chat\/[^/]+\/?$/.test(path);
+
 function show(path: string, kind: TransitionKind, prev: string | undefined) {
+  document.documentElement.toggleAttribute('data-vt-chat', isChatRoot(target) || isChatRoot(path));
   target = path;
   transition(() => {
     shown = { path, prev };
