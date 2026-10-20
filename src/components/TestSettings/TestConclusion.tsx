@@ -179,6 +179,13 @@ function ScaleCharts({
                 onClick={() => onOpen(s.code)}
                 onKeyDown={(e) => e.key === 'Enter' && onOpen(s.code)}
               >
+                {data.polar && (s.chartName ?? s.name).includes(' — ') ? (
+                  <span className="cc-bar__name cc-bar__name--polar">
+                    {(s.chartName ?? s.name).split(' — ').map((pole, k) => (
+                      <span key={k}>{pole}</span>
+                    ))}
+                  </span>
+                ) : (
                 <span className="cc-bar__name">
                   {data.overview ? `${i + 1}.\u00A0` : ''}
                   {s.chartName ?? s.name}
@@ -189,6 +196,7 @@ function ScaleCharts({
                     </>
                   )}
                 </span>
+                )}
                 <div className="cc-bar">
                   <Bar data={data} scale={s} />
                 </div>

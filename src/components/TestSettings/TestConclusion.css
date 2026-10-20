@@ -654,3 +654,19 @@
 .cc-chart--flat .cc-row > .cc-axis--flat .cc-axis__scale {
   margin: 0 var(--space-4);
 }
+
+/* Полюса шкалы над столбцом: левая черта у левого края, правая у правого, длинные переносятся внутри своей половины */
+.cc-chart--flat .cc-bar__name--polar {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cc-bar__name--polar > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.cc-bar__name--polar > span:last-child {
+  text-align: right;
+}

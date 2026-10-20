@@ -57,6 +57,8 @@ export interface ConclusionData {
   flat?: boolean;
   /** Сокращения шкал (Дм, Зс…) не показывать: в подписях только полные названия; 'extra' — только у дополнительных шкал */
   noCodes?: boolean | 'extra';
+  /** Шкалы-полюса («Теплота — Равнодушие»): над столбцом левая черта слева, правая справа, без тире */
+  polar?: boolean;
   /** Показывать ли общие диаграммы основных и дополнительных шкал и метки «Шкала …» */
   overview: boolean;
   /** Максимум шкал с диапазонами */
@@ -714,6 +716,7 @@ const pfqScale = (block: string, code: string, name: string, score: number, abou
 const PFQ5: ConclusionData = {
   overview: false,
   noCodes: true,
+  polar: true,
   flat: true,
   axisEach: true,
   blocks: [
