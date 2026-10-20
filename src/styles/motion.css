@@ -260,3 +260,10 @@ html[data-transition='back'] .screen[data-layer='top']:not(:has(.swipe-pager__pa
 ::view-transition-new(tabbar) {
   animation: none;
 }
+
+/* В снимке перехода размытие подложки у поля ввода на телефоне рисуется тёмным прямоугольником без скруглений:
+   пока идёт переход, остаётся только полупрозрачная заливка (размытие вернётся по его окончании) */
+html[data-transition] :is(.composer, .reply-bar) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
