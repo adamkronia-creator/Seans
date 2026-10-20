@@ -44,8 +44,22 @@ const subscribe = (callback: () => void) => {
  * нельзя выделять отдельным слоем — слой, который есть только «до» или «после», рисуется прямоугольником */
 const isChatRoot = (path: string) => /^\/(chat\/[^/]+|folder\/[^/]+|archive|profile\/edit)\/?$/.test(path);
 
+/** Чат и его вложенные экраны (настройка теста, бланк, заключение) того же чата: на обоих внизу одна и та же панель, она остаётся на месте */
+const chatSub = (path: string) => /^\/chat\/([^/]+)(?:\/(?:tests|tasks|result)\/[^/]+)?\/?$/.exec(path)?.[1];
+const sameChat = (a: string, b: string) => chatSub(a) !== undefined && chatSub(a) === chatSub(b);
+
+/** Нажатие на вкладку панели ведёт на корень с той же панелью: если и на уходящем экране она есть, остаётся на месте */
+let tabbarStays: boolean | undefined;
+export function keepTabbarOnNextShow() {
+  tabbarStays = !!document.querySelector('.screen[data-layer="top"] .tabbar');
+  // Флаг нужен уже к снимку прежнего экрана, а show() вызывается позже, внутри перехода
+  document.documentElement.toggleAttribute('data-vt-chat', !tabbarStays);
+}
+
 function show(path: string, kind: TransitionKind, prev: string | undefined) {
-  document.documentElement.toggleAttribute('data-vt-chat', isChatRoot(target) || isChatRoot(path));
+  const chatFlag = tabbarStays !== undefined ? !tabbarStays : (isChatRoot(target) || isChatRoot(path)) && !sameChat(target, path);
+  tabbarStays = undefined;
+  document.documentElement.toggleAttribute('data-vt-chat', chatFlag);
   target = path;
   transition(() => {
     shown = { path, prev };

@@ -16,7 +16,7 @@ import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { ArchivePage } from './pages/ArchivePage/ArchivePage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
-import { goBack, navigate, useRoute } from './router';
+import { goBack, keepTabbarOnNextShow, navigate, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition, type TransitionKind } from './utils/transition';
@@ -89,6 +89,7 @@ export default function App() {
     const toRoot = (id === 'messages' || current.startsWith('/tests/') || current.startsWith('/tasks/')) && current !== '/';
     if (id === active && !toRoot) return;
     // Другая вкладка — мягкая смена содержимого; та же вкладка — возврат к её списку: открытый экран уезжает вправо
+    if (toRoot) keepTabbarOnNextShow();
     transition(() => {
       setTab(id);
       if (toRoot) navigate('/', 'none');
