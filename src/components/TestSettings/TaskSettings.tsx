@@ -7,6 +7,7 @@ import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestAct
 import { CollapseCard } from './TestBlank';
 import { FormMenu } from './FormMenu';
 import { MessageField, Row } from './TestSettings';
+import { HelpContext } from '../OptionHelp/HelpScenes';
 import { TestHeader } from './TestHeader';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
@@ -240,6 +241,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
   const live = Boolean(passRequest) && view === 'pass';
 
   return (
+    <HelpContext.Provider value={{ test: task, task: { data }, blank: null, conclusion: null, form, duration: data.duration }}>
     <section className="test-settings">
       <TestHeader
         test={task}
@@ -344,10 +346,10 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
                     </Row>
                   )
                 )}
-                <Row label="Комментарий клиента">
+                <Row label="Комментарий клиента" help="comment">
                   <Switch checked={comment} onChange={setComment} label="Комментарий клиента" />
                 </Row>
-                <Row label="Оценить состояние">
+                <Row label="Оценить состояние" help="state">
                   <Switch checked={state} onChange={setState} label="Оценить состояние" />
                 </Row>
                 <Row label="Назначить постоянным">
@@ -405,5 +407,6 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
       {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
       {(sheet === 'one' || sheet === 'many') && <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />}
     </section>
+    </HelpContext.Provider>
   );
 }
