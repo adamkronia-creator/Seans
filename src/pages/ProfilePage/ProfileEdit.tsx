@@ -115,15 +115,31 @@ export function ProfileEditPage() {
     moveField(id, step);
   };
 
+  // Поле не пропадает рывком: карточка тает и сворачивается по высоте, и только потом исчезает из данных
+  const [leaving, setLeaving] = useState<string | null>(null);
+  const dismiss = (id: string) => {
+    const li = root.current?.querySelector<HTMLElement>(`[data-field="${id}"]`);
+    if (!li || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      removeField(id);
+      return;
+    }
+    li.style.setProperty('--h', `${li.offsetHeight}px`);
+    setLeaving(id);
+    window.setTimeout(() => {
+      removeField(id);
+      setLeaving(null);
+    }, 280);
+  };
+
   // Пустое поле убирается сразу: терять нечего; с текстом — сначала вопрос
   const askRemove = (field: ProfileField) => {
-    if (!field.label.trim() && !field.value.trim()) removeField(field.id);
+    if (!field.label.trim() && !field.value.trim()) dismiss(field.id);
     else setAsking(field);
   };
 
   const confirmRemove = () => {
     if (asking) {
-      removeField(asking.id);
+      dismiss(asking.id);
       show(`Поле «${titleOf(asking)}» удалено`);
     }
     setAsking(null);
@@ -198,7 +214,7 @@ export function ProfileEditPage() {
         {fields.length > 0 && (
           <ul className="pe__fields">
             {fields.map((field, i) => (
-              <li key={field.id} className="pe__card pe__field" data-field={field.id}>
+              <li key={field.id} className={`pe__card pe__field${leaving === field.id ? ' pe__field--leaving' : ''}`} data-field={field.id}>
                 <div className="pe__field-head">
                   <input
                     className="pe__field-label"
