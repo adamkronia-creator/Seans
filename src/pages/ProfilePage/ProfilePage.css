@@ -75,10 +75,16 @@
   color: var(--color-accent-on);
 }
 
-.profile__badge--cover {
+/* Кнопки в правом нижнем углу обложки: смена обложки, правее — фон приложения */
+.profile__badges {
   position: absolute;
   right: var(--space-3);
   bottom: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.profile__badge--cover {
   width: 32px;
   height: 32px;
   background: rgb(19 32 58 / 52%);

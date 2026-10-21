@@ -2,8 +2,8 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconPin } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
-import { IconCamera, IconImage, IconPencil, IconPlusLine } from '../../components/Profile/ProfileIcons';
-import { PhotoPickSheet } from '../../components/Profile/ProfileSheets';
+import { IconCamera, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
+import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
@@ -28,6 +28,7 @@ export function ProfilePage() {
   const chats = useChats();
   const [viewing, setViewing] = useState<string | null>(null);
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
+  const [pickingBackground, setPickingBackground] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
@@ -71,11 +72,16 @@ export function ProfilePage() {
                 </span>
               )}
             </button>
-            {cover && (
-              <button type="button" className="profile__badge profile__badge--cover" aria-label="Изменить обложку" onClick={() => setPicking('cover')}>
-                <IconCamera />
+            <div className="profile__badges">
+              {cover && (
+                <button type="button" className="profile__badge profile__badge--cover" aria-label="Изменить обложку" onClick={() => setPicking('cover')}>
+                  <IconCamera />
+                </button>
+              )}
+              <button type="button" className="profile__badge profile__badge--cover" aria-label="Изменить фон приложения" onClick={() => setPickingBackground(true)}>
+                <IconWallpaper />
               </button>
-            )}
+            </div>
           </div>
 
           <div className="profile__head">
@@ -204,6 +210,7 @@ export function ProfilePage() {
 
       <input ref={input} type="file" accept="image/*" multiple hidden onChange={onFiles} />
       {toast && <Toast text={toast} />}
+      {pickingBackground && <BackgroundSheet onClose={() => setPickingBackground(false)} />}
       {picking && <PhotoPickSheet kind={picking} onClose={() => setPicking(null)} onNote={show} />}
       {viewing && <PhotoViewer startId={viewing} onClose={() => setViewing(null)} />}
     </section>

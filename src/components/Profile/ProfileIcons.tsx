@@ -50,6 +50,15 @@ export const IconImage = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+/** Фон приложения: телефон с картинкой на экране */
+export const IconWallpaper = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="6.5" y="3" width="11" height="18" rx="3" />
+    <path d="M6.5 15l4-3.5 3 2.5 4-3" />
+    <circle cx="14" cy="8" r="1.1" />
+  </svg>
+);
+
 /** Обложка: широкая рамка с полосой снизу */
 export const IconCover = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>

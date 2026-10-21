@@ -96,12 +96,24 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
         </button>
       )}
       <input ref={input} type="file" accept="image/*" hidden onChange={upload} />
-      {!isAvatar && (
-        <>
-          <h3 className="pf-section">Фон приложения</h3>
-          <BackgroundControls />
-        </>
-      )}
+    </Frame>
+  );
+}
+
+/** Фон приложения: картинка, размытие и цвет текста */
+export function BackgroundSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <Frame
+      title="Фон приложения"
+      quietTitle
+      onClose={onClose}
+      footer={
+        <button type="button" className="sheet__button" onClick={onClose}>
+          Закрыть
+        </button>
+      }
+    >
+      <BackgroundControls />
     </Frame>
   );
 }

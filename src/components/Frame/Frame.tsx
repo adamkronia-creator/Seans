@@ -23,11 +23,19 @@ export function Frame({ title, subtitle, quietTitle, footer, onClose, children }
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
         <div className="sheet__grab" aria-hidden="true" />
-        <div className="sheet__header">
-          <h2 className={`sheet__heading${quietTitle ? ' sheet__heading--quiet' : ''}`}>{title}</h2>
-          {subtitle && <p className="frame-subtitle">{subtitle}</p>}
-        </div>
+        {!quietTitle && (
+          <div className="sheet__header">
+            <h2 className="sheet__heading">{title}</h2>
+            {subtitle && <p className="frame-subtitle">{subtitle}</p>}
+          </div>
+        )}
         <div className="sheet__body" ref={body}>
+          {/* Мелкий заголовок-подпись группы живёт внутри прокручиваемой части и уходит вместе с ней, а не остаётся в затемнении сверху */}
+          {quietTitle && (
+            <h2 className="sheet__heading sheet__heading--quiet">
+              {title}
+            </h2>
+          )}
           {children}
         </div>
         <div className="sheet__footer">{footer}</div>
