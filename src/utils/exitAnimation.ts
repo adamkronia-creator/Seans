@@ -33,7 +33,7 @@ export function useExitAnimation(ref: RefObject<HTMLElement>, where: 'body' | 'p
       // Узел убирают из документа сразу после этой очистки; в режиме разработки React размонтирует «понарошку»,
       // и тогда узел остаётся на месте, копия не нужна
       queueMicrotask(() => {
-        if (node.isConnected || reducedMotion()) return;
+        if (node.isConnected || reducedMotion() || node.hasAttribute('data-no-exit')) return;
         const host = where === 'body' ? document.body : parent;
         if (!host?.isConnected) return;
         const ghost = node.cloneNode(true) as HTMLElement;

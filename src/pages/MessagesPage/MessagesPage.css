@@ -174,9 +174,10 @@
 /* ——— Список: лежит на фоне экрана, сверху поле на высоту шапки, снизу — на нижнюю панель ——— */
 .messages__list {
   flex: 1;
-  padding: var(--pm-top) 0 var(--pm-bottom);
+  /* От шапки до первой строки на space-2 больше, чем у тестов и заданий (там строка выше на поля карточки): аватар первого чата и первого теста стоит на одном расстоянии от шапки */
+  padding: calc(var(--pm-top) + var(--space-2)) 0 var(--pm-bottom);
   overflow-y: auto;
-  scroll-padding-top: var(--pm-top);
+  scroll-padding-top: calc(var(--pm-top) + var(--space-2));
   overflow-x: hidden;
   scrollbar-width: none; /* полос прокрутки в списке чатов нет */
 }

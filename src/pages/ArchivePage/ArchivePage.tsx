@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
-import { ChatItem } from '../../components/ChatItem/ChatItem';
+import { ChatItem, slidOut } from '../../components/ChatItem/ChatItem';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ChipMenu } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
+import { IconArchiveMk } from '../../components/ChatItem/ChatIcons';
 import { IconBack } from '../../components/icons';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -41,7 +42,17 @@ export function ArchivePage() {
       {chats.length > 0 ? (
         <ul className="archive__list">
           {chats.map((chat) => (
-            <ChatItem key={chat.id} chat={chat} onClick={open} onLongPress={openMenu} />
+            <ChatItem key={chat.id} chat={chat} onClick={open} onLongPress={openMenu}
+              swipeAction={{
+                label: 'Вернуть',
+                icon: <IconArchiveMk />,
+                run: (c) => {
+                  slidOut.clear();
+                  setArchived(c.id, false);
+                  say(`«${c.name}» возвращён из архива`);
+                },
+              }}
+            />
           ))}
         </ul>
       ) : (

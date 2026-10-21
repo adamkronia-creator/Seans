@@ -25,8 +25,8 @@
   --text-secondary: #4a4a4f; /* текст сообщений, время, подпись статуса, описания в списках (в макете #818c99 даёт 3,4:1 на белом и 2,9:1 на цветном фоне; был #636366: на середине фона-сцены 3:1, поэтому с аудита 21.10 #4a4a4f, значение справочника: 9:1 на белом, 4,5–5,5:1 на середине фона) */
   --text-icon: #636366; /* значки поиска и уведомлений, неактивные значки нижней панели, плашка дня (темнее макета: на стекле над цветным фоном #99a2ad не читается) */
   --text-chip: #636366; /* подпись невыбранного чипса (по той же причине темнее #a0a9b3) */
-  /* Синий для ссылок и действий: systemBlue iOS. Около 4:1 на белом и 3–3,5:1 на стекле над фоном — ниже AA для мелкого текста (осознанно, как в iOS); для строгого AA годится #0062cc (4,5:1 на стекле), см. аудит 21.10 */
-  --text-link: #007aff;
+  /* Ссылки и мелкий синий текст: #0062cc (нажатое systemBlue iOS) — 4,5:1 и выше на стекле; заливки и кнопки остаются фирменным #007aff (аудит 21.10) */
+  --text-link: #0062cc;
   --action-primary: #007aff;
   --action-primary-hover: #0062cc;
   --action-primary-pressed: #004fa3;
@@ -496,6 +496,16 @@ html:has([data-pm]) body {
   --bg-blur: 24px;
 }
 
+/* Вуаль под списками: нижняя часть обоев тёмная (рассвет), и подписи на ней теряют контраст. Светлая вуаль снизу вверх при тёмном тексте,
+   тёмная при белом; цвета обоев сверху она не меняет. Убрать — --veil: none */
+[data-pm] {
+  --veil: linear-gradient(to bottom, rgb(255 255 255 / 0) 35%, rgb(255 255 255 / 0.5) 100%);
+}
+
+:root[data-ink='light'] [data-pm] {
+  --veil: linear-gradient(to bottom, rgb(0 0 0 / 0) 35%, rgb(0 0 0 / 0.3) 100%);
+}
+
 [data-pm] :is(.messages, .chat, .profile, .pe, .test-settings, .events, .fp, .archive) {
   isolation: isolate;
   overflow: clip;
@@ -506,7 +516,7 @@ html:has([data-pm]) body {
   position: absolute;
   inset: calc(var(--bg-blur) * -2);
   z-index: -1;
-  background: var(--scene);
+  background: var(--veil), var(--scene);
   filter: blur(var(--bg-blur));
   pointer-events: none;
 }
@@ -734,4 +744,18 @@ html:has([data-pm]) body {
   --body-bg: #12141b;
   --focus-ring: 0 0 0 2px #1c202b, 0 0 0 4px #8fc3ff;
   color-scheme: dark;
+}
+
+/*
+ * Зоны нажатия круглых кнопок 40 px доведены до 44 (аудит 21.10): невидимая рамка в 2 px вокруг кнопки, вёрстка не меняется.
+ * Остальные кнопки (боковое меню, «вниз» в чате) уже стоят absolute, им достаточно самой рамки.
+ */
+[data-pm] :is(.composer__round, .composer__emoji, .reply-bar__close, .chat__action, .chats-header__action, .test-settings__button, .story-view__close) {
+  position: relative;
+}
+
+[data-pm] :is(.composer__round, .composer__emoji, .reply-bar__close, .chat__action, .chats-header__action, .test-settings__button, .story-view__close, .side-menu__close, .side-menu__search, .chat__down)::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }

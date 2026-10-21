@@ -1,8 +1,9 @@
-import { useRef, type MouseEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, type MouseEvent, type PointerEvent, type ReactNode, type RefObject } from 'react';
 import type { Chat } from '../../data/chats';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
 import { IconArchiveMk, IconBookmarkMk, IconChevronMk, IconTicksMk } from './ChatIcons';
+import { guardClick, reducedMotion, runSpring, SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 import './ChatItem.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у чипсов и сообщений */
@@ -65,18 +66,110 @@ function useLongPress(onLong: ((el: HTMLElement) => void) | undefined) {
   return { handlers, swallow };
 }
 
+/** Чаты, которые только что ушли свайпом за край: список не показывает их заново при сворачивании места (ChatList) */
+export const slidOut = new Set<string>();
+
+/**
+ * Свайп влево по строке (касание и перо; мышью есть долгое нажатие): строка едет за пальцем, за ней растёт цветное поле с действием;
+ * засчитанный жест (общие пороги из utils/swipe.ts) уводит строку за край и выполняет действие, незасчитанный пружинит назад.
+ * Листание папок пейджером на строке влево отдано строке (data-swipe-lock="left"), вправо листает по-прежнему.
+ */
+function useRowSwipe(li: RefObject<HTMLLIElement>, enabled: boolean, commit: () => void) {
+  const act = useRef(commit);
+  act.current = commit;
+  useEffect(() => {
+    const el = li.current;
+    if (!el || !enabled) return;
+    type G = { id: number; x0: number; y0: number; mode: 'armed' | 'drag' | 'ignore'; x: number; tracker: VelocityTracker; release?: () => void };
+    let g: G | null = null;
+    let stop: (() => void) | null = null;
+    const paint = (x: number) => el.style.setProperty('--row-x', `${x}px`);
+    const rest = () => {
+      el.style.removeProperty('--row-x');
+      el.removeAttribute('data-swiping');
+    };
+
+    const down = (e: globalThis.PointerEvent) => {
+      if (e.pointerType === 'mouse' || !e.isPrimary || stop) return;
+      g = { id: e.pointerId, x0: e.clientX, y0: e.clientY, mode: 'armed', x: 0, tracker: new VelocityTracker() };
+    };
+    const move = (e: globalThis.PointerEvent) => {
+      if (!g || e.pointerId !== g.id || g.mode === 'ignore') return;
+      const dx = e.clientX - g.x0;
+      const dy = e.clientY - g.y0;
+      if (g.mode === 'armed') {
+        if (Math.abs(dx) <= SWIPE_SLOP && Math.abs(dy) <= SWIPE_SLOP) return;
+        if (dx < 0 && Math.abs(dx) >= Math.abs(dy) * SWIPE_DOMINANCE) {
+          g.mode = 'drag';
+          g.release = guardClick();
+          el.setAttribute('data-swiping', '');
+          try {
+            el.setPointerCapture(e.pointerId);
+          } catch {
+            // касание уже ушло
+          }
+        } else {
+          g.mode = 'ignore';
+          return;
+        }
+      }
+      g.tracker.push(e.timeStamp, e.clientX);
+      g.x = Math.max(-el.clientWidth, Math.min(0, dx));
+      paint(g.x);
+    };
+    const end = (e: globalThis.PointerEvent) => {
+      const d = g;
+      g = null;
+      if (!d || e.pointerId !== d.id || d.mode !== 'drag') return;
+      d.release?.();
+      const cancelled = e.type === 'pointercancel';
+      const v = cancelled ? 0 : d.tracker.velocity(e.timeStamp);
+      const yes = !cancelled && swipeCommits(-d.x, -v);
+      const finish = () => {
+        stop = null;
+        if (yes) act.current();
+        else rest();
+      };
+      if (reducedMotion()) {
+        finish();
+        return;
+      }
+      stop = runSpring({ from: d.x, to: yes ? -el.clientWidth : 0, velocity: v * 1000, rest: 0.4, onFrame: paint, onDone: finish });
+    };
+
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    return () => {
+      el.removeEventListener('pointerdown', down);
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', end);
+      el.removeEventListener('pointercancel', end);
+      stop?.();
+    };
+  }, [li, enabled]);
+}
+
 interface ChatItemProps {
   chat: Chat;
   onClick?: (chat: Chat) => void;
   /** Долгое нажатие на строку: меню действий (в архив и обратно) */
   onLongPress?: (chat: Chat, row: HTMLElement) => void;
+  /** Свайп влево по строке: действие с чатом и то, что написано на цветном поле за строкой */
+  swipeAction?: { label: string; icon: ReactNode; run: (chat: Chat) => void };
 }
 
 /**
  * Строка списка чатов (ChatListItem системы мессенджера, раскладка как в Telegram): аватар с присутствием, имя и время,
  * превью и справа счётчик непрочитанных или значок закрепа. Размер аватара, поля и высота строки заданы токенами сетки 4 в ChatItem.css.
  */
-export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
+export function ChatItem({ chat, onClick, onLongPress, swipeAction }: ChatItemProps) {
+  const li = useRef<HTMLLIElement>(null);
+  useRowSwipe(li, Boolean(swipeAction) && chat.favorites !== true, () => {
+    slidOut.add(chat.id);
+    swipeAction?.run(chat);
+  });
   const pinned = chat.favorites === true;
   const cls = ['chat-item', chat.unread > 0 && 'chat-item--unread', pinned && 'chat-item--pinned'].filter(Boolean).join(' ');
   const { handlers, swallow } = useLongPress(onLongPress ? (el) => onLongPress(chat, el) : undefined);
@@ -101,7 +194,13 @@ export function ChatItem({ chat, onClick, onLongPress }: ChatItemProps) {
     );
   }
   return (
-    <li className={cls}>
+    <li ref={li} className={cls} data-chat={chat.id} {...(swipeAction ? { 'data-swipe': '', 'data-swipe-lock': 'left' } : {})}>
+      {swipeAction && (
+        <span className="chat-item__swipe" aria-hidden="true">
+          {swipeAction.icon}
+          <span>{swipeAction.label}</span>
+        </span>
+      )}
       <button type="button" className="chat-item__button" onClick={(e) => !swallow(e) && onClick?.(chat)} {...handlers}>
         <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />
 

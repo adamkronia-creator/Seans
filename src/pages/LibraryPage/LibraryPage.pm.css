@@ -67,10 +67,17 @@
   background: var(--glass);
 }
 
+/* Длинное название идёт в две строки (аудит 21.10), дальше многоточие */
 [data-pm] .lib-card .test-card__title {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 [data-pm] .lib-card .test-card__description,
