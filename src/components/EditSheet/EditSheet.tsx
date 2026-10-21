@@ -8,6 +8,7 @@ import { TONES, toneOf, type ToneId } from '../../data/tones';
 import { AutoTextarea } from './AutoTextarea';
 import { SheetOverlay } from './SheetOverlay';
 import './EditSheet.css';
+import { plainText } from '../../utils/plainText';
 
 export interface EditValues {
   title?: string;
@@ -117,7 +118,7 @@ export function EditSheet({
                 onChange={(v) => setTitle(v.replace(/\n/g, ' '))}
                 placeholder="Заголовок"
                 aria-label="Заголовок"
-                autoComplete="off"
+                {...plainText}
               />
             </div>
           )}
@@ -192,7 +193,7 @@ export function EditSheet({
                     className="sheet__row-input"
                     value={rows[i] ?? ''}
                     onChange={(e) => setRows(rows.map((r, j) => (j === i ? e.target.value : r)))}
-                    autoComplete="off"
+                    {...plainText}
                   />
                 </li>
               ))}

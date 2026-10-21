@@ -24,6 +24,7 @@ import { clearWantedEdit, wantedEdit } from '../../data/profileIntent';
 import { goBack } from '../../router';
 import { useSwipeBack } from '../../utils/tabNav';
 import './ProfileEdit.css';
+import { plainText } from '../../utils/plainText';
 
 /** Прокрутить область ровно настолько, чтобы элемент оказался на виду (высокий — верхним краем) */
 function reveal(scroller: HTMLElement, el: HTMLElement, margin = 16) {
@@ -180,7 +181,7 @@ export function ProfileEditPage() {
               value={name}
               onChange={(e) => updateBasics({ name: e.target.value })}
               placeholder="Как к вам обращаться"
-              autoComplete="name"
+              {...plainText}
               maxLength={80}
             />
           </label>
@@ -190,7 +191,7 @@ export function ProfileEditPage() {
               value={headline}
               onChange={(e) => updateBasics({ headline: e.target.value })}
               placeholder="Например, психолог-консультант"
-              autoComplete="off"
+              {...plainText}
               maxLength={120}
             />
           </label>
@@ -200,7 +201,7 @@ export function ProfileEditPage() {
               value={city}
               onChange={(e) => updateBasics({ city: e.target.value })}
               placeholder="Где вы принимаете"
-              autoComplete="address-level2"
+              {...plainText}
               maxLength={80}
             />
           </label>
@@ -222,7 +223,7 @@ export function ProfileEditPage() {
                     onChange={(e) => updateField(field.id, { label: e.target.value })}
                     placeholder="Название поля"
                     aria-label="Название поля"
-                    autoComplete="off"
+                    {...plainText}
                     maxLength={60}
                   />
                   <button
@@ -253,6 +254,7 @@ export function ProfileEditPage() {
                   value={field.value}
                   onChange={(value) => updateField(field.id, { value })}
                   placeholder="Напишите здесь"
+                  {...plainText}
                   aria-label={`Текст поля «${titleOf(field)}»`}
                   maxLength={3000}
                 />

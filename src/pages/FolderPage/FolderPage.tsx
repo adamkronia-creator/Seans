@@ -31,6 +31,7 @@ import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { goBack } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import './FolderPage.css';
+import { plainText } from '../../utils/plainText';
 
 /** Строка в списках экрана: что это (чат, тест или задание) и как выглядит */
 interface Entry {
@@ -300,7 +301,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
                 className="fp__input"
                 value={name}
                 placeholder="Например, Практика"
-                autoComplete="off"
+                {...plainText}
                 enterKeyHint="done"
                 onFocus={() => setEmojiOpen(false)}
                 onChange={(e) => rename(e.target.value)}
