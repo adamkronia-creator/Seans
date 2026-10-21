@@ -77,8 +77,33 @@
   background: var(--glass);
 }
 
+/* Как шапка открытого чата: название и подпись слева, «назад» справа */
+.events__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+[data-pm] .events__subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+}
+
+[data-pm] .events__who .events__title {
+  margin: 0;
+  overflow: hidden;
+  font: var(--type-headline);
+  line-height: var(--space-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 [data-pm] .events__title {
-  margin: 0 0 0 var(--space-2);
+  margin: 0;
   color: var(--text-primary);
   font: var(--type-title);
   letter-spacing: 0;

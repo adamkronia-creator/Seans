@@ -12,10 +12,13 @@ export function EventsPage() {
   return (
     <section className="events">
       <header className="events__header">
+        <div className="events__who">
+          <h1 className="events__title">События</h1>
+          <p className="events__subtitle">Последние обновления</p>
+        </div>
         <button type="button" className="events__back" aria-label="Назад" onClick={() => goBack()}>
           <IconBack />
         </button>
-        <h1 className="events__title">События</h1>
       </header>
 
       <ul className="events__list">

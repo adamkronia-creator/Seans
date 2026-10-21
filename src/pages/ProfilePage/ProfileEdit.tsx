@@ -148,14 +148,14 @@ export function ProfileEditPage() {
   return (
     <section ref={root} className="pe">
       <header className="pe__header">
+        <div className="pe__who">
+          <h1 className="pe__title" aria-label="Редактирование профиля">
+            Редактирование
+          </h1>
+          <p className="pe__subtitle">Ваш профиль</p>
+        </div>
         <button type="button" className="pe__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
-        </button>
-        <h1 className="pe__title" aria-label="Редактирование профиля">
-          Редактирование
-        </h1>
-        <button type="button" className="pe__done" onClick={() => goBack('/')}>
-          Готово
         </button>
       </header>
 
@@ -277,6 +277,12 @@ export function ProfileEditPage() {
             ))}
           </div>
         </section>
+      </div>
+
+      <div className="pe__footer">
+        <button type="button" className="pe__done" onClick={() => goBack('/')}>
+          Готово
+        </button>
       </div>
 
       {toast && <Toast text={toast} />}
