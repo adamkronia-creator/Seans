@@ -25,6 +25,8 @@ interface ChatsHeaderProps {
   onFocus?: () => void;
   onBlur?: () => void;
   onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
+  /** Идёт выбор чатов: верхняя строка заменена этой (крестик, число, кнопки действий), истории свёрнуты */
+  selection?: ReactNode;
 }
 
 /**
@@ -49,6 +51,7 @@ export function ChatsHeader({
   onFocus,
   onBlur,
   onKeyDown,
+  selection,
 }: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
   const own = useRef<HTMLInputElement>(null);
@@ -63,7 +66,9 @@ export function ChatsHeader({
   return (
     <header className="chats-header">
       <h1 className="visually-hidden">{heading}</h1>
-      {searching ? (
+      {selection ? (
+        <div className="chats-header__top chats-header__top--select">{selection}</div>
+      ) : searching ? (
         <div className="chats-header__top">
           <SearchField
             value={query}
@@ -99,7 +104,9 @@ export function ChatsHeader({
           )}
         </div>
       )}
-      {belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}
+      <div className="chats-header__belt" data-collapsed={selection ? '' : undefined} aria-hidden={selection ? true : undefined} {...({ inert: selection ? '' : undefined } as object)}>
+        <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
+      </div>
       <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
         <span className="chips-pill" aria-hidden="true" />
         {chips}

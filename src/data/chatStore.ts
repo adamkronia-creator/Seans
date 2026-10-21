@@ -53,6 +53,53 @@ export function setArchived(id: string, archived: boolean) {
   emit();
 }
 
+const rank = (c: Chat) => (c.favorites ? 0 : c.pinned ? 1 : 2);
+/** Порядок списка: «Избранное», затем закреплённые, затем остальные (внутри групп порядок прежний) */
+const sorted = (list: Chat[]) => list.map((c, i) => [c, i] as const).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([c]) => c);
+
+/** Действия над несколькими чатами сразу (выбор в списке): «Избранное» в них не участвует, у него нет ни архива, ни удаления */
+const ordinary = (ids: string[]) => new Set(ids.filter((id) => !chats.find((c) => c.id === id)?.favorites));
+
+export function setArchivedMany(ids: string[], archived: boolean) {
+  const set = ordinary(ids);
+  chats = chats.map((c) => (set.has(c.id) ? { ...c, archived } : c));
+  emit();
+}
+
+export function setMutedMany(ids: string[], muted: boolean) {
+  const set = ordinary(ids);
+  chats = chats.map((c) => (set.has(c.id) ? { ...c, muted } : c));
+  emit();
+}
+
+export function setPinnedMany(ids: string[], pinned: boolean) {
+  const set = ordinary(ids);
+  chats = sorted(chats.map((c) => (set.has(c.id) ? { ...c, pinned } : c)));
+  emit();
+}
+
+export function setBlockedMany(ids: string[], blocked: boolean) {
+  const set = ordinary(ids);
+  chats = chats.map((c) => (set.has(c.id) ? { ...c, blocked } : c));
+  emit();
+}
+
+/** Удалить чаты вместе с перепиской */
+export function deleteChats(ids: string[]) {
+  const set = ordinary(ids);
+  chats = chats.filter((c) => !set.has(c.id));
+  messages = Object.fromEntries(Object.entries(messages).filter(([id]) => !set.has(id)));
+  emit();
+}
+
+/** Очистить историю: переписка пустая, в списке остаётся сам чат */
+export function clearHistory(ids: string[]) {
+  const set = ordinary(ids);
+  messages = { ...messages, ...Object.fromEntries([...set].map((id) => [id, [] as MessageGroup[]])) };
+  chats = chats.map((c) => (set.has(c.id) ? { ...c, lastMessage: 'История очищена', outgoing: undefined, unread: 0 } : c));
+  emit();
+}
+
 /** Собеседник «печатает» */
 export function useTyping(chatId: string): boolean {
   return useSyncExternalStore(subscribe, () => !!typing[chatId]);

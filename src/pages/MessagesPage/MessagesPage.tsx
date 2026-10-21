@@ -1,8 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { markRead, setArchived, useChats } from '../../data/chatStore';
+import { markRead, useChats } from '../../data/chatStore';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
-import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
-import { IconArchive } from '../../components/FolderMenu/FolderIcons';
 import { reducedMotion } from '../../utils/swipe';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -11,6 +9,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
 import { ChatsHeader } from './ChatsHeader';
+import { useChatSelection } from './ChatSelection';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import type { Chat } from '../../data/chats';
@@ -34,12 +33,15 @@ const ChatList = memo(function ChatList({
   archived,
   onOpen,
   onMenu,
+  selected,
 }: {
   chats: Chat[];
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
   archived: Chat[];
   onOpen: (chat: Chat) => void;
   onMenu: (chat: Chat, row: HTMLElement) => void;
+  /** Выбранные чаты (режим выбора) */
+  selected: readonly string[];
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
@@ -62,9 +64,8 @@ const ChatList = memo(function ChatList({
     let touched = false;
     const fit = () => {
       if (box.clientHeight === 0) return; // страница ещё не показана
-      const cs = getComputedStyle(box);
-      const inner = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-      list.style.minHeight = `${inner + hiddenHeight()}px`;
+      // Процент от внутренней высоты окна списка (без отступов): когда отступ сверху меняется (выбор чатов), прокрутка не теряется
+      list.style.minHeight = `calc(100% + ${hiddenHeight()}px)`;
       if (!touched) box.scrollTop = hiddenHeight();
     };
     const touch = () => {
@@ -144,7 +145,7 @@ const ChatList = memo(function ChatList({
         {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
         {others.map((chat) => (
-          <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} />
+          <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} selected={selected.includes(chat.id)} />
         ))}
       </ul>
     </div>
@@ -168,7 +169,7 @@ export function MessagesPage() {
   const liveOrder = ['all', ...folders.map((f) => f.id)].join('|');
   const folderMenu = useFolderMenu('chats');
   const [toast, say] = useToast();
-  const [rowMenu, setRowMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
+  const sel = useChatSelection(say);
   const root = useRef<HTMLElement | null>(null);
   // Экран нужен историям (открываются поверх него): после монтирования он попадает в состояние
   const [screen, setScreen] = useState<HTMLElement | null>(null);
@@ -213,24 +214,37 @@ export function MessagesPage() {
 
   const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
 
-  const openMenu = useCallback((chat: Chat, row: HTMLElement) => setRowMenu({ chat, rect: row.getBoundingClientRect(), row }), []);
-  const menuItems: ChipMenuItem[] = rowMenu
-    ? [
-        {
-          key: 'archive',
-          label: rowMenu.chat.archived ? 'Вернуть из архива' : 'В архив',
-          Icon: IconArchive,
-          run: () => {
-            setArchived(rowMenu.chat.id, !rowMenu.chat.archived);
-            say(rowMenu.chat.archived ? `«${rowMenu.chat.name}» возвращён из архива` : `«${rowMenu.chat.name}» перенесён в архив`);
-          },
-        },
-      ]
-    : [];
+  // Долгое нажатие на строку включает выбор, дальше нажатие выбирает и снимает; вне выбора строка открывает чат
+  const { toggle, selecting } = sel;
+  /** Когда выбрали строку долгим нажатием: список тут же сдвигается, и отпускание пальца может попасть в соседнюю строку */
+  const heldAt = useRef(0);
+  const tapChat = useCallback(
+    (chat: Chat) => {
+      if (Date.now() - heldAt.current < 400) return;
+      if (selecting) toggle(chat);
+      else openChat(chat);
+    },
+    [selecting, toggle, openChat],
+  );
+  const holdChat = useCallback(
+    (chat: Chat) => {
+      /** палец ещё на экране: клик, которым закончится нажатие, не считаем; отсчёт от отпускания */
+      heldAt.current = Infinity;
+      const release = () => {
+        heldAt.current = Date.now();
+        window.removeEventListener('pointerup', release, true);
+        window.removeEventListener('pointercancel', release, true);
+      };
+      window.addEventListener('pointerup', release, true);
+      window.addEventListener('pointercancel', release, true);
+      toggle(chat);
+    },
+    [toggle],
+  );
 
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={openChat} onMenu={openMenu} /> })),
-    [filters, lists, archived, openChat, openMenu],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} /> })),
+    [filters, lists, archived, tapChat, holdChat, sel.ids],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -283,13 +297,14 @@ export function MessagesPage() {
   }, [index, order, liveOrder, countsKey, searching]);
 
   return (
-    <section ref={setRoot} className="messages">
+    <section ref={setRoot} className="messages" data-selecting={selecting ? '' : undefined}>
       <ChatsHeader
         searching={searching}
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
         storiesRoot={screen}
+        selection={sel.header(chats)}
         chips={
           <>
             <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
@@ -318,7 +333,6 @@ export function MessagesPage() {
       <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={(d) => switchTab(d > 0 ? 'profile' : 'tests', d > 0 ? 'slide-next' : 'slide-prev')} />
 
       {folderMenu.node}
-      {rowMenu && <ChipMenu anchor={rowMenu.rect} opener={rowMenu.row} items={menuItems} onClose={() => setRowMenu(null)} />}
       {toast && <Toast text={toast} />}
     </section>
   );

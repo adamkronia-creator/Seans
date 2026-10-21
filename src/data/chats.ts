@@ -21,6 +21,12 @@ export interface Chat {
   outgoing?: 'sent' | 'read';
   /** Чат в архиве: не показывается в списке и папках, лежит на экране «Архив чатов» */
   archived?: boolean;
+  /** Закреплён вверху списка (после «Избранного») */
+  pinned?: boolean;
+  /** Уведомления чата выключены */
+  muted?: boolean;
+  /** Собеседник заблокирован */
+  blocked?: boolean;
 }
 
 export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };

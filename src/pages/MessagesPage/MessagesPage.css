@@ -205,3 +205,55 @@
   flex-direction: column;
   padding: var(--pm-top) 0 var(--pm-bottom);
 }
+
+/* Истории сворачиваются, когда идёт выбор чатов: высота плавно уходит в ноль вместе с зазором под ними, список поднимается следом */
+.chats-header__belt {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.26s var(--ease-ios, ease), margin-bottom 0.26s var(--ease-ios, ease), opacity 0.2s;
+}
+
+.chats-header__belt-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chats-header__belt[data-collapsed] {
+  grid-template-rows: 0fr;
+  margin-bottom: calc(var(--space-4) * -1);
+  opacity: 0;
+}
+
+.messages[data-selecting] {
+  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
+}
+
+.messages__list {
+  transition: padding-top 0.26s var(--ease-ios, ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chats-header__belt,
+  .messages__list {
+    transition: none;
+  }
+}
+
+/* Верхняя строка выбора: крестик, число, затем кнопки действий справа */
+.chats-header__top--select {
+  gap: var(--space-1);
+  padding-left: var(--space-2);
+}
+
+.chats-header__count {
+  flex: 1;
+  margin-left: var(--space-3);
+  color: var(--text-primary);
+  font: var(--type-title);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Список не должен «держаться за строки» при сдвиге отступа (выбор чатов): иначе прокрутка сбрасывается и спрятанная строка «Архивы» выезжает */
+.messages__list {
+  overflow-anchor: none;
+}
