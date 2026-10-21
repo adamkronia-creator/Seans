@@ -177,3 +177,8 @@
   background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
   opacity: 0.9;
 }
+
+/* Название и описание теста/задания стоят вплотную, как имя и сообщение в списке чатов: строки 24 и 20 без зазора между ними */
+[data-pm] .lib-card .test-card__body {
+  gap: 0;
+}
