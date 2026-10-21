@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useRef, useSyncExternalStore } from 'react';
 import type { FolderScope } from './folders';
 
 /*
@@ -36,3 +36,13 @@ export const onRemoveFolderAsk = (fn: (scope: FolderScope, id: string) => void) 
     removeAsks.delete(fn);
   };
 };
+
+/**
+ * Значение, которое на время перестановки чипсов не меняется: страницы пейджера не должны перестраиваться на каждом шаге перетаскивания
+ * (это мигало), порядок страниц обновится один раз, когда человек нажмёт «Готово»
+ */
+export function useFrozenWhile<T>(frozen: boolean, value: T): T {
+  const kept = useRef<T>(value);
+  if (!frozen) kept.current = value;
+  return kept.current;
+}

@@ -13,6 +13,7 @@ import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
+import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
 import { useFolders } from '../../data/folders';
 import type { LibraryItem } from '../../data/library';
 import type { Kind } from '../../data/libraryMeta';
@@ -232,6 +233,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const view = useLibraryView(kind);
   const scope = kind === 'test' ? 'tests' : 'tasks';
   const folders = useFolders(scope);
+  // Пока чипсы переставляют, страницы пейджера стоят в прежнем порядке (см. useFrozenWhile); чипсы показывают живой порядок
+  const pagerFolders = useFrozenWhile(useFolderEditing(scope), folders);
   const folderMenu = useFolderMenu(scope);
   const root = useRef<HTMLElement>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -240,7 +243,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
   /** Разделы по порядку чипсов: по ним же идут страницы. Папки — после «Все», «Избранного» и «Недавнего» */
-  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...folders.map((f) => f.id)], [folders, chatLike]);
+  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...pagerFolders.map((f) => f.id)], [pagerFolders, chatLike]);
+  const liveOrder = ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...folders.map((f) => f.id)].join('|');
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = sections.join('|');
 
@@ -372,7 +376,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       // В стиле «Диалогов» чипсы — отдельные капсулы с зазором 8, а не склеенная лента
       split: !chatLike,
       tone: chatLike ? ('chat' as const) : kind,
-      active: shown === i,
+      active: sections[shown] === id,
       onClick: () => setSection(id),
       onLongPress: id === FAVORITES || id === RECENT ? undefined : (el: HTMLElement) => folderMenu.open(id, el),
       ariaLabel: narrowed ? `${label}: найдено ${count}` : id === 'all' ? label : undefined,
@@ -435,8 +439,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     const place = () => {
       const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
       const kept = row.querySelector<HTMLElement>(':scope > .chips-pill')?.dataset.weights?.split(',').map(Number);
-      placePill(chips, kept && kept.length === chips.length && order === keptOrder.current ? kept : chips.map((_, i) => (i === index ? 1 : 0)));
-      keptOrder.current = order;
+      const at = liveOrder.split('|').indexOf(sections[index]);
+      placePill(chips, kept && kept.length === chips.length && liveOrder === keptOrder.current ? kept : chips.map((_, i) => (i === at ? 1 : 0)));
+      keptOrder.current = liveOrder;
     };
     place();
     const watch = new ResizeObserver(place);
@@ -444,7 +449,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     row.querySelectorAll('.chip').forEach((c) => watch.observe(c));
     void document.fonts?.ready.then(place);
     return () => watch.disconnect();
-  }, [chatLike, index, order, searching]);
+  }, [chatLike, index, order, liveOrder, searching]);
 
   return (
     <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'}>

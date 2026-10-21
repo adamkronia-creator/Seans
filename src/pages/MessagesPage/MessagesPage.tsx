@@ -14,6 +14,7 @@ import { ChatsHeader } from './ChatsHeader';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import type { Chat } from '../../data/chats';
+import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
 import { useFolders } from '../../data/folders';
 import { navigate } from '../../router';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
@@ -162,6 +163,9 @@ export function MessagesPage() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const chats = useChats();
   const folders = useFolders('chats');
+  // Пока чипсы переставляют, страницы пейджера стоят в прежнем порядке (см. useFrozenWhile); чипсы показывают живой порядок
+  const pagerFolders = useFrozenWhile(useFolderEditing('chats'), folders);
+  const liveOrder = ['all', ...folders.map((f) => f.id)].join('|');
   const folderMenu = useFolderMenu('chats');
   const [toast, say] = useToast();
   const [rowMenu, setRowMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
@@ -174,7 +178,7 @@ export function MessagesPage() {
   }, []);
 
   /** Фильтры по порядку чипсов: по ним же идут страницы пейджера */
-  const filters = useMemo<Filter[]>(() => ['all', ...folders.map((f) => f.id)], [folders]);
+  const filters = useMemo<Filter[]>(() => ['all', ...pagerFolders.map((f) => f.id)], [pagerFolders]);
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = filters.join('|');
 
@@ -266,8 +270,9 @@ export function MessagesPage() {
       const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
       // Пока страницы идут (жест или пружина), заливка стоит там, где её поставил followChips: прыгать к выбранному нельзя
       const kept = row.querySelector<HTMLElement>(':scope > .chips-pill')?.dataset.weights?.split(',').map(Number);
-      placePill(chips, kept && kept.length === chips.length && order === keptOrder.current ? kept : chips.map((_, i) => (i === index ? 1 : 0)));
-      keptOrder.current = order;
+      const at = liveOrder.split('|').indexOf(filters[index]);
+      placePill(chips, kept && kept.length === chips.length && liveOrder === keptOrder.current ? kept : chips.map((_, i) => (i === at ? 1 : 0)));
+      keptOrder.current = liveOrder;
     };
     place();
     const watch = new ResizeObserver(place);
@@ -275,7 +280,7 @@ export function MessagesPage() {
     row.querySelectorAll('.chip').forEach((c) => watch.observe(c));
     void document.fonts?.ready.then(place);
     return () => watch.disconnect();
-  }, [index, order, countsKey, searching]);
+  }, [index, order, liveOrder, countsKey, searching]);
 
   return (
     <section ref={setRoot} className="messages">
@@ -290,12 +295,12 @@ export function MessagesPage() {
             <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
-            {folders.map(({ id, name, muted, color, ink }, i) => (
+            {folders.map(({ id, name, muted, color, ink }) => (
               <Chip
                 key={id}
                 follow
                 tone="chat"
-                active={shown === i + 1}
+                active={filters[shown] === id}
                 count={countOf(id)}
                 muted={muted}
                 folder={{ scope: 'chats', id }}

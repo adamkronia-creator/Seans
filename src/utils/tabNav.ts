@@ -93,7 +93,8 @@ export function useChipsDrag(ref: RefObject<HTMLElement>) {
       g = row && e.isPrimary && !edgeTouch.active ? { id: e.pointerId, x: e.clientX, left: row.scrollLeft, row } : null;
     };
     const move = (e: PointerEvent) => {
-      if (g && e.pointerId === g.id) g.row.scrollLeft = g.left - (e.clientX - g.x);
+      // Чипс, который переставляют, ряд не прокручивает: палец ведёт чипс (см. useFolderDrag)
+      if (g && e.pointerId === g.id && !g.row.querySelector('.chip--dragging')) g.row.scrollLeft = g.left - (e.clientX - g.x);
     };
     const end = () => {
       g = null;
