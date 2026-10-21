@@ -74,18 +74,26 @@ async function sceneLuminance(): Promise<number> {
   return 0.9; // градиент и вариант под белой вуалью светлые
 }
 
+/** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая */
+function syncChrome() {
+  const light = root().dataset.ink === 'light';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#12141B' : '#FFFFFF');
+  document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', light ? 'dark' : 'only light');
+}
+
 /** Выставляет data-ink по выбору; в режиме «авто» считает по фону */
 export async function applyInk() {
   const pref = getInkPref();
   if (pref !== 'auto') {
     root().dataset.ink = pref;
-    return;
+  } else {
+    try {
+      root().dataset.ink = (await sceneLuminance()) < DARK_BELOW ? 'light' : 'dark';
+    } catch {
+      root().dataset.ink = 'dark';
+    }
   }
-  try {
-    root().dataset.ink = (await sceneLuminance()) < DARK_BELOW ? 'light' : 'dark';
-  } catch {
-    root().dataset.ink = 'dark';
-  }
+  syncChrome();
 }
 
 export function setInkPref(pref: InkPref) {

@@ -23,6 +23,11 @@ html {
   color-scheme: only light;
 }
 
+/* Белый текст приложения (режим «Цвет текста») — тёмная тема системных элементов */
+html[data-ink='light'] {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   background: var(--color-bg-desk);
