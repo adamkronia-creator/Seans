@@ -146,6 +146,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       ) : (
         children
       )}
+      {hasCount && <Badge count={count} variant={muted ? (active ? 'quiet-inverse' : 'quiet') : active ? 'inverse' : 'neutral'} />}
       {editing && folder && (
         <span
           className="chip__x"
@@ -162,7 +163,6 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
           </svg>
         </span>
       )}
-      {hasCount && <Badge count={count} variant={muted ? (active ? 'quiet-inverse' : 'quiet') : active ? 'inverse' : 'neutral'} />}
     </button>
   );
 }

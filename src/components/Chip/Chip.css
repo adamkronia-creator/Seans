@@ -242,7 +242,12 @@
 
 /* Режим «Изменить порядок»: чипс подрагивает, справа значок удаления; удержанный чипс (chip--dragging) идёт за пальцем */
 .chip--editing {
+  padding-right: 14px;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
   touch-action: pan-x;
+  transition: scale 0.16s var(--ease-ios, ease-out), box-shadow 0.16s;
   animation: chip-wiggle 0.34s ease-in-out infinite alternate;
 }
 
@@ -265,6 +270,7 @@
   width: 20px;
   height: 20px;
   margin-right: -6px;
+  margin-left: 2px;
   border-radius: var(--radius-full);
   background: rgb(0 0 0 / 0.14);
   color: inherit;

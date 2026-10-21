@@ -9,6 +9,7 @@ import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { createFolder, deleteFolder, moveFolder, useFolders, type Folder, type FolderScope } from '../../data/folders';
 import { plural } from '../../data/taskValues';
 import { goBack, navigate } from '../../router';
+import { flip } from '../../components/FolderMenu/useFolderDrag';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../FolderPage/FolderPage.css';
 import './FoldersPage.css';
@@ -45,6 +46,7 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
     const y0 = e.clientY;
     const top0 = row.offsetTop;
     row.classList.add('fs-row--dragging');
+    row.style.transition = 'box-shadow 0.16s';
     const place = (y: number) => {
       row.style.transform = `translateY(${top0 + (y - y0) - row.offsetTop}px)`;
     };
@@ -55,18 +57,22 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
       const c = row.offsetTop + (parseFloat(row.style.transform.replace(/[^-\d.]/g, '')) || 0) + ROW / 2;
       const n = rows[at + 1];
       const p = rows[at - 1];
+      const before = new Map(rows.map((el) => [el, el.offsetTop]));
       if (n && c > n.offsetTop + ROW / 2) moveFolder(scope, id, 1);
       else if (p && c < p.offsetTop + ROW / 2) moveFolder(scope, id, -1);
       else return;
       place(ev.clientY);
-      requestAnimationFrame(() => place(ev.clientY));
+      requestAnimationFrame(() => {
+        place(ev.clientY);
+        flip(Array.from(list.current?.querySelectorAll<HTMLElement>('li[data-id]') ?? []).filter((el) => el !== row), before, 'y');
+      });
     };
     const done = () => {
       handle.removeEventListener('pointermove', moveEv);
       handle.removeEventListener('pointerup', done);
       handle.removeEventListener('pointercancel', done);
       row.classList.remove('fs-row--dragging');
-      row.style.transition = 'transform 0.2s ease-out';
+      row.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s';
       row.style.transform = '';
       window.setTimeout(() => (row.style.transition = ''), 240);
     };

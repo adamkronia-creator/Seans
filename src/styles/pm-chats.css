@@ -759,3 +759,26 @@ html:has([data-pm]) body {
   position: absolute;
   inset: -2px;
 }
+
+/* Перетаскиваемый чипс несёт свою заливку: общая плашка выбранного стоит на месте и на время жеста гаснет (иначе уезжал только текст) */
+[data-pm] .chips-pill {
+  transition: opacity 0.16s;
+}
+
+[data-pm] .screen-header__chips:has(.chip--dragging.chip--active) .chips-pill {
+  opacity: 0;
+}
+
+[data-pm] .screen-header__chips .chip--dragging::before {
+  display: block;
+  opacity: 1;
+}
+
+[data-pm] .screen-header__chips .chip--dragging.chip--active::before {
+  border-color: var(--glass-border-blue);
+  background: var(--glass-chip-active);
+}
+
+[data-pm] .screen-header__chips .chip.chip--dragging {
+  z-index: 3;
+}

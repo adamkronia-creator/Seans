@@ -1,6 +1,18 @@
 import { useEffect } from 'react';
 import type { Folder, FolderScope } from '../../data/folders';
 
+/** Соседи, уступившие место, не прыгают, а плавно переезжают: старое место считается до перестановки, переезд играет после неё */
+export function flip(els: HTMLElement[], before: Map<HTMLElement, number>, axis: 'x' | 'y') {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for (const el of els) {
+    const from = before.get(el);
+    const to = axis === 'x' ? el.offsetLeft : el.offsetTop;
+    if (from === undefined || from === to) continue;
+    const d = from - to;
+    el.animate([{ transform: axis === 'x' ? `translateX(${d}px)` : `translateY(${d}px)` }, { transform: 'translate(0)' }], { duration: 220, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', composite: 'add' });
+  }
+}
+
 const HOLD_MS = 220;
 const SLOP = 10;
 
@@ -42,7 +54,7 @@ export function useFolderDrag(scope: FolderScope, editing: boolean, move: (scope
         start.left0 = chip.offsetLeft;
         start.scroll0 = row.scrollLeft;
         chip.classList.add('chip--dragging');
-        chip.style.transition = 'none';
+        chip.style.transition = 'scale 0.16s ease-out, box-shadow 0.16s';
         try {
           chip.setPointerCapture(start.pointer);
         } catch {
@@ -69,12 +81,16 @@ export function useFolderDrag(scope: FolderScope, editing: boolean, move: (scope
       const c = chip.offsetLeft + (parseFloat(chip.style.transform.replace(/[^-\d.]/g, '')) || 0) + chip.offsetWidth / 2;
       const next = all[at + 1];
       const prev = all[at - 1];
+      const before = new Map(all.map((el) => [el, el.offsetLeft]));
       if (next && c > next.offsetLeft + next.offsetWidth / 2) move(scope, id, 1);
       else if (prev && c < prev.offsetLeft + prev.offsetWidth / 2) move(scope, id, -1);
       else return;
       // Чипсы переставлены: положение под пальцем считаем заново от нового места в ряду
       place(e.clientX);
-      requestAnimationFrame(() => place(e.clientX));
+      requestAnimationFrame(() => {
+        place(e.clientX);
+        flip(siblings(row).filter((el) => el !== chip), before, 'x');
+      });
     };
     const end = () => {
       if (!g) return;
@@ -83,9 +99,9 @@ export function useFolderDrag(scope: FolderScope, editing: boolean, move: (scope
       window.clearTimeout(d.timer);
       if (!d.drag) return;
       d.chip.classList.remove('chip--dragging');
-      d.chip.style.transition = 'transform 0.2s ease-out';
+      d.chip.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), scale 0.2s ease-out, box-shadow 0.2s';
       d.chip.style.transform = '';
-      window.setTimeout(() => (d.chip.style.transition = ''), 240);
+      window.setTimeout(() => (d.chip.style.transition = ''), 260);
     };
     // Пока чипс держат, ряд не должен прокручиваться: касание отменяем, если ещё можно
     const touch = (e: TouchEvent) => {
