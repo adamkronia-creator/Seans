@@ -1,12 +1,13 @@
-import { useMemo, useRef, useState } from 'react';
-import { Avatar } from '../../components/Avatar/Avatar';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
-import { IconBack } from '../../components/icons';
+import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
-import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats } from '../../data/chatStore';
+import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/contactShared';
+import { useStoryAuthors } from '../../data/stories';
+import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
 import { roleOf } from '../../data/roles';
 import { goBack } from '../../router';
@@ -26,6 +27,7 @@ import {
   IconUserCheck,
   IconUserPlus,
 } from './ContactIcons';
+import { ContactTabs } from './ContactTabs';
 import '../FolderPage/FolderPage.css';
 import './ContactPage.css';
 
@@ -42,12 +44,64 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
-  const dots = useRef<HTMLButtonElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+  const hero = useRef<HTMLDivElement>(null);
+  const groups = useMessages(chatId);
+  const stories = useStoryAuthors().find((a) => a.id === chatId)?.stories ?? [];
+  const links = useMemo(() => [...linksIn(groups), ...(SHARED_LINKS[chatId] ?? [])], [groups, chatId]);
   const back = () => goBack(`/chat/${chatId}`);
   useSwipeBack('.ct', menu === null && sheet === null, back);
 
+  // Фото на всю ширину сжимается в круг, пока прокручивают первый экран: --p от 0 до 1 пишется в блок прокрутки.
+  // Шапка профиля сжимается по высоте и остаётся на месте, имя из левого нижнего угла фото уходит под круг, в середину
+  const name = chat?.name;
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el || !name) return;
+    const CIRCLE = 112;
+    let frame = 0;
+    const measure = () => {
+      const w = el.clientWidth;
+      const bar = el.parentElement?.querySelector<HTMLElement>('.ct__bar')?.offsetHeight ?? 0;
+      const h0 = w * 1.02;
+      const dist = h0 - 8 - (bar + CIRCLE + 12 + 56);
+      const lines = hero.current?.querySelectorAll<HTMLElement>('.ct__line') ?? [];
+      lines.forEach((line, i) => {
+        // Ширина строки без растяжения: сколько она занимает на самом деле
+        const range = document.createRange();
+        range.selectNodeContents(line);
+        const width = range.getBoundingClientRect().width;
+        el.style.setProperty(i === 0 ? '--dxn' : '--dxs', `${Math.max(0, (w - width) / 2 - 16)}px`);
+      });
+      el.style.setProperty('--w', `${w}px`);
+      el.style.setProperty('--bar', `${bar}px`);
+      el.dataset.dist = String(Math.max(1, dist));
+      update();
+    };
+    const update = () => {
+      frame = 0;
+      const dist = Number(el.dataset.dist) || 1;
+      const lift = Math.min(dist, Math.max(0, el.scrollTop));
+      el.style.setProperty('--p', String(lift / dist));
+      // Шапка стоит на месте, пока сжимается: её отступ сверху растёт ровно на пройденный путь, и содержимое ниже идёт за пальцем 1 к 1
+      el.style.setProperty('--lift', `${lift}px`);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      el.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, [name]);
+
   const materials = useMemo(
-    () => (chatId === 'maxim' ? [['Тесты', countOf(clientData, 'test')], ['Задания', countOf(clientData, 'task')], ['Заметки', clientData.notes.length]] as const : null),
+    () => (chatId === 'maxim' ? [['Сеансы', countOf(clientData, 'session')], ['Тесты', countOf(clientData, 'test')], ['Задания', countOf(clientData, 'task')]] as const : null),
     [chatId, clientData],
   );
 
@@ -128,13 +182,12 @@ export function ContactPage({ chatId }: { chatId: string }) {
 
   return (
     <section className="fp ct">
+      {/* «Назад» и «⋯» справа, как в шапке открытого чата */}
       <header className="fp__header ct__bar">
         <button type="button" className="fp__back" aria-label="Назад" onClick={back}>
-          <IconBack />
+          <IconBackMk />
         </button>
-        <span className="ct__spacer" />
         <button
-          ref={dots}
           type="button"
           className="fp__back"
           aria-label="Меню контакта"
@@ -146,76 +199,83 @@ export function ContactPage({ chatId }: { chatId: string }) {
         </button>
       </header>
 
-      <div className="fp__scroll ct__scroll">
-        <div className="ct__hero">
-          <div className="ct__avatar">
-            <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />
+      <div ref={scroller} className="fp__scroll ct__scroll" style={{ '--p': 0 } as CSSProperties}>
+        <div ref={hero} className="ct__hero">
+          <div className="ct__photo">
+            {chat.avatar ? <img src={chat.avatar} alt="" /> : <span className="ct__photo-empty" />}
+            <span className="ct__shade" aria-hidden="true" />
           </div>
-          <h1 className="ct__name">{chat.name}</h1>
-          <p className="ct__status">
-            {roleOf(chat)} · {chat.online ? 'в сети' : 'был(а) недавно'}
-          </p>
+          <div className="ct__id">
+            <h1 className="ct__name">
+              <span className="ct__line">{chat.name}</span>
+            </h1>
+            <p className="ct__status">
+              <span className="ct__line">
+                {roleOf(chat)} · {chat.online ? 'в сети' : 'был(а) недавно'}
+              </span>
+            </p>
+          </div>
         </div>
 
-        <div className="ct__actions" role="group" aria-label="Действия">
-          <button type="button" className="ct__action" onClick={back}>
-            <IconChatBubble />
-            Чат
-          </button>
-          <button type="button" className="ct__action" aria-pressed={!chat.muted} onClick={toggleMute}>
-            {chat.muted ? <IconBellOff /> : <IconBellOn />}
-            {chat.muted ? 'Без звука' : 'Звук'}
-          </button>
-          <button type="button" className="ct__action" onClick={() => setSheet('role')}>
-            <IconTag />
-            Роль
-          </button>
-          <button type="button" className="ct__action" onClick={share}>
-            <IconShare />
-            Поделиться
-          </button>
-        </div>
+        <div className="ct__body">
+          <div className="ct__actions" role="group" aria-label="Действия">
+            <button type="button" className="ct__action" onClick={back}>
+              <IconChatBubble />
+              Чат
+            </button>
+            <button type="button" className="ct__action" aria-pressed={!chat.muted} onClick={toggleMute}>
+              {chat.muted ? <IconBellOff /> : <IconBellOn />}
+              {chat.muted ? 'Без звука' : 'Звук'}
+            </button>
+            <button type="button" className="ct__action" onClick={() => setSheet('role')}>
+              <IconTag />
+              Роль
+            </button>
+          </div>
 
-        <section className="fp__card ct__card" aria-label="Контакт">
-          <ul className="ct__rows">
-            {rows.map((row) => {
-              const body = (
-                <>
-                  <span className="ct__value">{row.value}</span>
-                  <span className="ct__label">{row.label}</span>
-                  {row.icon && <span className="ct__row-icon">{row.icon}</span>}
-                </>
-              );
-              return (
-                <li key={row.key}>
-                  {row.onClick ? (
-                    <button type="button" className="ct__row ct__row--tap" onClick={row.onClick}>
-                      {body}
-                    </button>
-                  ) : (
-                    <div className="ct__row">{body}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        {materials && (
-          <section className="fp__card ct__card" aria-label="Материалы">
-            <ul className="ct__stats">
-              {materials.map(([label, n]) => (
-                <li key={label} className="ct__stat">
-                  <strong>{n}</strong>
-                  <span>{label}</span>
-                </li>
-              ))}
+          <section className="fp__card ct__card" aria-label="Контакт">
+            <ul className="ct__rows">
+              {rows.map((row) => {
+                const body = (
+                  <>
+                    <span className="ct__value">{row.value}</span>
+                    <span className="ct__label">{row.label}</span>
+                    {row.icon && <span className="ct__row-icon">{row.icon}</span>}
+                  </>
+                );
+                return (
+                  <li key={row.key}>
+                    {row.onClick ? (
+                      <button type="button" className="ct__row ct__row--tap" onClick={row.onClick}>
+                        {body}
+                      </button>
+                    ) : (
+                      <div className="ct__row">{body}</div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
-        )}
+
+          {materials && (
+            <section className="fp__card ct__card" aria-label="Материалы">
+              <ul className="ct__stats">
+                {materials.map(([label, n]) => (
+                  <li key={label} className="ct__stat">
+                    <strong>{n}</strong>
+                    <span>{label}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <ContactTabs stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={links} onCopy={copy} />
+        </div>
       </div>
 
-      {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Меню контакта" onClose={() => setMenu(null)} />}
+      {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Меню контакта" width={272} onClose={() => setMenu(null)} />}
       <ContactSheetsHost chat={chat} sheet={sheet} onClose={() => setSheet(null)} say={say} />
       {toast && <Toast text={toast} />}
     </section>

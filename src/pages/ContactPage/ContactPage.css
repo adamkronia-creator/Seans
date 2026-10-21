@@ -1,65 +1,128 @@
-/* Профиль собеседника: на каркасе экрана «Настроить папку» (.fp), здесь шапка без подложки, фото, кнопки и строки данных */
+/* Профиль собеседника: на каркасе экрана «Настроить папку» (.fp).
+   Шапка без подложки: «назад» и «⋯» справа, отступ от безопасной зоны 16 и поля 16, как у кнопок шапки открытого чата.
+   Фото на всю ширину сжимается в круг при прокрутке: прогресс --p (0…1), ширина блока --w и высота шапки --bar пишет ContactPage. */
 [data-pm] .ct .fp__header.ct__bar {
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) var(--space-2);
   border-bottom: 0;
   background: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  padding-right: var(--space-4);
-}
-
-.ct__spacer {
-  flex: 1;
 }
 
 [data-pm] .ct__scroll {
-  padding-bottom: calc(var(--space-8) + var(--safe-bottom));
+  --h0: calc(var(--w, 412px) * 1.02);
+  gap: 0;
+  padding: 0 0 calc(var(--space-8) + var(--safe-bottom));
+  overflow-anchor: none;
 }
 
-.ct__hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  padding-top: var(--space-2);
-  text-align: center;
-}
-
-.ct__avatar {
-  display: grid;
-  margin-bottom: var(--space-3);
-}
-
-.ct__avatar .avatar {
-  --avatar-size: 112px;
-  --presence-inset: 6px;
-  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
-}
-
-.ct__name {
-  max-width: 100%;
-  margin: 0;
-  overflow-wrap: anywhere;
-  color: var(--text-primary);
-  font: var(--type-title);
-  letter-spacing: 0;
-}
-
-.ct__status {
-  margin: 0;
-  color: var(--text-secondary);
-  font: var(--type-label);
-  font-weight: 400;
-}
-
-/* Первый блок страницы без рамки карточки (её даёт общее правило .fp__scroll > :first-child) */
+.ct__hero,
 [data-pm] .ct .ct__scroll > .ct__hero {
   border: 0;
 }
 
-/* Четыре стеклянные плитки под фото */
+.ct__hero {
+  flex-shrink: 0;
+  /* Опускает шапку на пройденный путь прокрутки: она остаётся на месте, пока сжимается */
+  margin-top: var(--lift, 0px);
+}
+
+/* Фото: на всю ширину и почти квадрат, к концу прокрутки круг 112 под шапкой */
+.ct__photo {
+  position: relative;
+  width: calc(var(--w, 412px) - (var(--w, 412px) - 112px) * var(--p));
+  height: calc(var(--h0) - (var(--h0) - 112px) * var(--p));
+  margin: calc(var(--bar, 72px) * var(--p)) auto 0;
+  overflow: hidden;
+  border-radius: calc(56px * var(--p));
+  background: var(--glass-fill);
+}
+
+.ct__photo img,
+.ct__photo-empty {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Затемнение снизу, чтобы белое имя читалось на любом фото; к кругу исчезает */
+.ct__shade {
+  position: absolute;
+  inset: 40% 0 0;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0), rgb(0 0 0 / 0.6));
+  opacity: calc(1 - var(--p));
+  pointer-events: none;
+}
+
+/* Имя и подпись: на фото слева внизу белые, под кругом по центру цветом текста */
+.ct__id {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 56px;
+  margin-top: calc(var(--p) * 76px - 64px);
+  padding: 0 var(--space-4);
+  text-align: center;
+  --ink: color-mix(in srgb, #fff calc((1 - var(--p)) * 100%), var(--text-primary));
+  --ink-2: color-mix(in srgb, rgb(255 255 255 / 0.85) calc((1 - var(--p)) * 100%), var(--text-secondary));
+}
+
+.ct__name,
+.ct__status {
+  margin: 0;
+  line-height: var(--space-6);
+  white-space: nowrap;
+}
+
+.ct__name {
+  height: var(--space-6);
+  color: var(--ink);
+  font: var(--type-title);
+  line-height: var(--space-6);
+  letter-spacing: 0;
+}
+
+.ct__status {
+  height: var(--space-5);
+  color: var(--ink-2);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+}
+
+.ct__line {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.ct__name .ct__line {
+  transform: translateX(calc(var(--dxn, 0px) * (var(--p) - 1)));
+  text-shadow: 0 1px 8px rgb(0 0 0 / calc(0.45 * (1 - var(--p))));
+}
+
+.ct__status .ct__line {
+  transform: translateX(calc(var(--dxs, 0px) * (var(--p) - 1)));
+  text-shadow: 0 1px 8px rgb(0 0 0 / calc(0.45 * (1 - var(--p))));
+}
+
+/* Всё ниже фото: поля 16, зазор 16 */
+.ct__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+/* Стеклянные плитки под фото */
 .ct__actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2);
 }
 
@@ -163,4 +226,203 @@
   color: var(--text-secondary);
   font: var(--type-label);
   font-weight: 400;
+}
+
+/* ---------- Вкладки «Истории», «Медиа», «Файлы», «Ссылки» ---------- */
+.ct__tabs-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Стеклянная полоса вкладок: одна плашка выбранной вкладки переезжает по --i (как «Цвет текста» в окне фона) */
+.ct__tabs {
+  position: sticky;
+  top: calc(var(--bar, 72px) - var(--space-2));
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  padding: var(--space-1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.ct__tabs::before {
+  content: '';
+  position: absolute;
+  top: var(--space-1);
+  bottom: var(--space-1);
+  left: var(--space-1);
+  width: calc((100% - var(--space-1) * 2) / var(--n));
+  border-radius: var(--radius-pill, 999px);
+  background: var(--glass-chip-active);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 0.28s var(--ease-ios);
+}
+
+.ct__tab {
+  position: relative;
+  height: 36px;
+  min-width: 0;
+  padding: 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color var(--dur-quick, 0.16s) ease;
+}
+
+.ct__tab[aria-selected='true'] {
+  color: var(--text-link);
+}
+
+.ct__panel {
+  min-height: 160px;
+  animation: fade-in var(--dur-base, 0.24s) ease-out backwards;
+}
+
+.ct__tiles,
+.ct__grid,
+.ct__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ct__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-1);
+}
+
+.ct__story {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 3 / 4;
+  padding: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  color: #fff;
+}
+
+.ct__story-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font: var(--type-label);
+  font-weight: 600;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.ct__story-ago {
+  font: var(--type-meta);
+  opacity: 0.85;
+}
+
+.ct__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-1);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.ct__grid li {
+  aspect-ratio: 1;
+}
+
+.ct__grid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ct__list {
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  background: var(--glass-card);
+}
+
+.ct__list > li + li {
+  box-shadow: inset 0 var(--hairline) 0 var(--divider, var(--color-divider));
+}
+
+.ct__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ct__item-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--size-avatar-sm);
+  height: var(--size-avatar-sm);
+  border-radius: var(--radius-md);
+  background: var(--glass-chip-active);
+  color: var(--text-link);
+  font-size: var(--size-icon);
+}
+
+.ct__item-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ct__item-title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-primary);
+  font: var(--type-body);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ct__item-sub,
+.ct__item-url {
+  overflow: hidden;
+  font: var(--type-label);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ct__item-sub {
+  color: var(--text-secondary);
+}
+
+.ct__item-url {
+  color: var(--text-link);
+}
+
+.ct__item-copy {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--size-touch);
+  height: var(--size-touch);
+  margin-right: calc(var(--space-2) * -1);
+  color: var(--text-secondary);
+  font-size: var(--size-icon);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct__tabs::before,
+  .ct__panel {
+    transition: none;
+    animation: none;
+  }
 }

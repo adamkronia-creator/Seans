@@ -97,3 +97,28 @@ export const IconCopyLine = (p: P) => (
     <path d="M15.5 8.5v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" />
   </svg>
 );
+export const IconFile = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M6.5 3.5h7l4.5 4.5v11a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5z" />
+    <path d="M13.5 3.5V8H18M8.5 13h7M8.5 16.5h5" />
+  </svg>
+);
+export const IconImage = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+    <circle cx="9" cy="10" r="1.6" />
+    <path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4" />
+  </svg>
+);
+export const IconLink = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1" />
+  </svg>
+);
+export const IconStory = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="8.5" strokeDasharray="3 2.4" />
+    <circle cx="12" cy="12" r="4" />
+  </svg>
+);

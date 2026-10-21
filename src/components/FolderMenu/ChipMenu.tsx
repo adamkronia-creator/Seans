@@ -26,6 +26,8 @@ interface ChipMenuProps {
   items: ChipMenuItem[];
   /** Название меню для чтения с экрана */
   label?: string;
+  /** Ширина плашки, px (по умолчанию 240) */
+  width?: number;
   onClose: () => void;
 }
 
@@ -34,7 +36,7 @@ interface ChipMenuProps {
  * Плашка не выходит за колонку приложения, на широком экране не растягивается на всё окно. Закрывается нажатием мимо и Escape;
  * с клавиатуры: стрелки и Home/End ходят по пунктам, Tab уводит фокус дальше и закрывает меню.
  */
-export function ChipMenu({ anchor, opener, items, label = 'Меню папки', onClose }: ChipMenuProps) {
+export function ChipMenu({ anchor, opener, items, label = 'Меню папки', width = MENU_W, onClose }: ChipMenuProps) {
   const backdrop = useRef<HTMLDivElement>(null);
   const menu = useRef<HTMLUListElement>(null);
   /**
@@ -45,14 +47,14 @@ export function ChipMenu({ anchor, opener, items, label = 'Меню папки',
   useExitAnimation(backdrop);
 
   const column = document.querySelector('.app')?.getBoundingClientRect();
-  const left = Math.max((column?.left ?? 0) + GAP, Math.min(anchor.left, (column?.right ?? window.innerWidth) - MENU_W - GAP));
+  const left = Math.max((column?.left ?? 0) + GAP, Math.min(anchor.left, (column?.right ?? window.innerWidth) - width - GAP));
   const height = items.length * MENU_ITEM_H + items.filter((i) => i.gap).length * GROUP_GAP + GAP;
   const below = anchor.bottom + GAP + height <= window.innerHeight - GAP;
   const top = below ? anchor.bottom + GAP : Math.max(GAP, anchor.top - GAP - height);
   // Длинное меню на низком экране прокручивается внутри себя, а не уходит за край
   const maxHeight = window.innerHeight - top - GAP;
   // Плашка вырастает из-под чипса: точка отсчёта на его середине
-  const originX = Math.round(Math.min(MENU_W - 16, Math.max(16, anchor.left + anchor.width / 2 - left)));
+  const originX = Math.round(Math.min(width - 16, Math.max(16, anchor.left + anchor.width / 2 - left)));
 
   useEffect(() => {
     const items = () => Array.from(menu.current?.querySelectorAll<HTMLElement>('button') ?? []);
@@ -98,7 +100,7 @@ export function ChipMenu({ anchor, opener, items, label = 'Меню папки',
         className="chip-menu"
         role="menu"
         aria-label={label}
-        style={{ left, top, width: MENU_W, maxHeight, transformOrigin: `${originX}px ${below ? 'top' : 'bottom'}` }}
+        style={{ left, top, width, maxHeight, transformOrigin: `${originX}px ${below ? 'top' : 'bottom'}` }}
         onClick={(e) => e.stopPropagation()}
       >
         {items.map(({ key, label, Icon, run, danger, gap }) => (
