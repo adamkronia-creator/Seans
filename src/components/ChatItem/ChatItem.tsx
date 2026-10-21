@@ -114,12 +114,25 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
 
         <span className="chat-item__body">
           <span className="chat-item__row chat-item__row--top">
-            <span className="chat-item__name">{chat.name}</span>
-            {chat.muted && (
-              <svg className="chat-item__muted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Уведомления выключены">
-                <path d="M18 9a6 6 0 0 0-9.4-4.9M6.2 6.7A6.2 6.2 0 0 0 6 9c0 6.5-2.5 8.5-2.5 8.5h13M18 12.5c.1 2.8.9 4 1.5 5M10.2 20.5a2 2 0 0 0 3.6 0M3 3l18 18" />
-              </svg>
-            )}
+            <span className="chat-item__title">
+              <span className="chat-item__name">{chat.name}</span>
+              {chat.muted && (
+                <svg className="chat-item__mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Уведомления выключены">
+                  <path d="M18 9a6 6 0 0 0-9.4-4.9M6.2 6.7A6.2 6.2 0 0 0 6 9c0 6.5-2.5 8.5-2.5 8.5h13M18 12.5c.1 2.8.9 4 1.5 5M10.2 20.5a2 2 0 0 0 3.6 0M3 3l18 18" />
+                </svg>
+              )}
+              {chat.blocked && (
+                <svg className="chat-item__mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Заблокирован">
+                  <circle cx="12" cy="12" r="8.5" />
+                  <path d="M6 6l12 12" />
+                </svg>
+              )}
+              {chat.pinned && (
+                <svg className="chat-item__mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Закреплён">
+                  <path d="M9 3.5h6l-1 6 3 3.5H7l3-3.5-1-6zM12 13v7.5" />
+                </svg>
+              )}
+            </span>
             <span className="chat-item__time">{chat.time}</span>
           </span>
           <span className="chat-item__row chat-item__row--bottom">
@@ -132,11 +145,6 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
               <span className="chat-item__preview">{chat.lastMessage}</span>
             </span>
             <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
-            {chat.pinned && chat.unread === 0 && (
-              <svg className="chat-item__pin" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Закреплён">
-                <path d="M9 3.5h6l-1 6 3 3.5H7l3-3.5-1-6zM12 13v7.5" />
-              </svg>
-            )}
           </span>
         </span>
       </button>

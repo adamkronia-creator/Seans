@@ -186,14 +186,18 @@
   --chat-item-bg: color-mix(in srgb, var(--action-primary, #0a84ff) 14%, transparent);
 }
 
-.chat-item__muted,
-.chat-item__pin {
-  flex-shrink: 0;
-  color: var(--text-secondary);
+.chat-item__title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
-.chat-item__muted {
-  margin-left: var(--space-1);
+/* Значки закрепа и «без звука» стоят сразу за именем и по высоте под его текст */
+.chat-item__mark {
+  flex-shrink: 0;
+  color: var(--text-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {
