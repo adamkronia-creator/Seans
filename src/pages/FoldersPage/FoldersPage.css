@@ -1,0 +1,128 @@
+/* «Папки с чатами»: на каркасе экрана «Настроить папку» (.fp), здесь только то, чего там нет */
+.fs__lead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-md);
+  text-align: center;
+}
+
+.fs__lead p {
+  margin: 0;
+}
+
+.fs__art {
+  width: 96px;
+  height: 80px;
+}
+
+.fs__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fs-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--space-2) 0 var(--space-4);
+  background: transparent;
+  color: var(--text-primary, inherit);
+  font-size: var(--font-size-md);
+  text-align: left;
+}
+
+.fs__list > li + li {
+  box-shadow: inset 0 var(--hairline) 0 var(--divider, var(--color-divider));
+}
+
+.fs-row--dragging {
+  z-index: 2;
+  background: var(--glass-solid, var(--color-bg-panel));
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.2);
+}
+
+.fs-row__grip {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: calc(var(--space-2) * -1);
+  color: var(--text-secondary, var(--color-text-secondary));
+  touch-action: none;
+}
+
+.fs-row__grip--off {
+  opacity: 0.4;
+}
+
+.fs-row__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.fs-row__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fs-row__body .fs-row__name {
+  flex: none;
+}
+
+.fs-row__count {
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-sm);
+}
+
+.fs-row__more {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 44px;
+  height: 44px;
+  color: var(--text-secondary, var(--color-text-secondary));
+}
+
+.fs-row__more span {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.fs-row--create {
+  color: var(--text-link, var(--color-accent));
+}
+
+.fs-row__plus {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 10px;
+  border-radius: var(--radius-full);
+  background: var(--action-primary, var(--color-accent));
+  color: var(--action-primary-text, var(--color-accent-on));
+  font-size: 16px;
+}
+
+[data-pm] .fs .fp__scroll > .fs__lead {
+  border: 0;
+}

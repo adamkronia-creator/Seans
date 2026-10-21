@@ -401,8 +401,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             <Chip {...chip('all', labels.all)}>Все</Chip>
             <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
             {!chatLike && <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>}
-            {folders.map(({ id, name }) => (
-              <Chip key={id} {...chip(id, name)}>
+            {folders.map(({ id, name, color, ink }) => (
+              <Chip key={id} {...chip(id, name)} folder={{ scope, id }} paint={{ color, ink }}>
                 {name}
               </Chip>
             ))}

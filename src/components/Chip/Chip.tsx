@@ -1,6 +1,8 @@
-import { useRef, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
+import { useRef, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import type { Tone } from '../../utils/tone';
+import { askRemoveFolder, useFolderEditing } from '../../data/folderEdit';
+import type { FolderScope } from '../../data/folders';
 import './Chip.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у сообщений в чате */
@@ -42,9 +44,14 @@ interface ChipProps {
   tone?: Tone;
   /** Чипс недоступен (пункт фильтра, который не даст результатов) */
   disabled?: boolean;
+  /** Чипс папки: в режиме «Изменить порядок» он подрагивает, на нём значок удаления, его можно перетащить */
+  folder?: { scope: FolderScope; id: string };
+  /** Свой цвет заливки выбранного чипса и подписи на ней (настройки папки) */
+  paint?: { color?: string; ink?: string };
 }
 
-export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone, disabled = false }: ChipProps) {
+export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone, disabled = false, folder, paint }: ChipProps) {
+  const editing = useFolderEditing(folder?.scope ?? 'chats') && folder !== undefined;
   const press = useRef<{ x: number; y: number; timer: number } | null>(null);
   /** Долгое нажатие уже открыло меню: клик, который придёт, когда палец поднимут, не должен выбирать чипс */
   const opened = useRef(false);
@@ -53,7 +60,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
 
   // Число в кружке рядом с названием показывается, только если оно не ноль
   const hasCount = count !== undefined && count > 0;
-  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', split && 'chip--split', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
+  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', editing && 'chip--editing', split && 'chip--split', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
 
   const stop = () => {
     if (press.current) window.clearTimeout(press.current.timer);
@@ -63,7 +70,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
   const onPointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     // Новое нажатие: прежняя отметка «меню открыто» устарела, даже если клика после неё не было
     opened.current = false;
-    if (!onLongPress || !e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (editing || !onLongPress || !e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
     stop();
     const chip = e.currentTarget;
     const start = { x: e.clientX, y: e.clientY, timer: 0 };
@@ -84,6 +91,10 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
 
   const onContextMenu = (e: MouseEvent<HTMLButtonElement>) => {
     if (!onLongPress) return;
+    if (editing) {
+      e.preventDefault();
+      return;
+    }
     // Системное меню (долгое касание в Chrome, правая кнопка, клавиша меню) заменяем своим; если своё уже открыто по таймеру, второго не нужно.
     // Клавиша меню работает сколько угодно раз подряд: у неё нет жеста, который мог бы открыть меню раньше
     e.preventDefault();
@@ -101,7 +112,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       return;
     }
     opened.current = false;
-    onClick?.();
+    if (!editing) onClick?.();
   };
 
   return (
@@ -119,6 +130,9 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       aria-pressed={active}
       aria-label={ariaLabel}
       data-tone={tone}
+      style={paint?.color || paint?.ink ? ({ ...(paint.color && { '--chip-bg': paint.color }), ...(paint.ink && { '--chip-on': paint.ink }) } as CSSProperties) : undefined}
+      data-folder-id={editing ? folder?.id : undefined}
+      data-no-swipe={editing ? '' : undefined}
     >
       {icon !== undefined ? (
         <>
@@ -131,6 +145,22 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
         </>
       ) : (
         children
+      )}
+      {editing && folder && (
+        <span
+          className="chip__x"
+          role="button"
+          aria-label={`Удалить папку «${typeof children === 'string' ? children : ''}»`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            askRemoveFolder(folder.scope, folder.id);
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+            <path d="M7 7l10 10M17 7L7 17" />
+          </svg>
+        </span>
       )}
       {hasCount && <Badge count={count} variant={muted ? (active ? 'quiet-inverse' : 'quiet') : active ? 'inverse' : 'neutral'} />}
     </button>

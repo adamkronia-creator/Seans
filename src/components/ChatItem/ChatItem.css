@@ -159,6 +159,11 @@
   font: var(--type-label);
   font-weight: 600;
   white-space: nowrap;
+  visibility: hidden; /* без жеста поле скрыто: у него есть отступ слева, и узкая синяя полоса торчала бы у края */
+}
+
+.chat-item[data-swiping] .chat-item__swipe {
+  visibility: visible;
 }
 
 .chat-item__swipe svg {

@@ -239,3 +239,62 @@
 .chip:disabled {
   opacity: 0.4;
 }
+
+/* Режим «Изменить порядок»: чипс подрагивает, справа значок удаления; удержанный чипс (chip--dragging) идёт за пальцем */
+.chip--editing {
+  touch-action: pan-x;
+  animation: chip-wiggle 0.34s ease-in-out infinite alternate;
+}
+
+.chip--editing:nth-child(even) {
+  animation-delay: -0.17s;
+}
+
+.chip--editing.chip--dragging {
+  z-index: 2;
+  animation: none;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.22);
+  scale: 1.06;
+  touch-action: none;
+}
+
+.chip__x {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: -6px;
+  border-radius: var(--radius-full);
+  background: rgb(0 0 0 / 0.14);
+  color: inherit;
+}
+
+/* Зона нажатия значка шире самого значка */
+.chip__x::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  bottom: -6px;
+  width: 36px;
+}
+
+.chip--editing .chip__x {
+  position: relative;
+}
+
+@keyframes chip-wiggle {
+  from {
+    transform: rotate(-1.4deg);
+  }
+  to {
+    transform: rotate(1.4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip--editing {
+    animation: none;
+  }
+}

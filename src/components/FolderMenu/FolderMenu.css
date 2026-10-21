@@ -145,3 +145,20 @@
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
 }
+
+/* «Готово» в режиме перестановки чипсов: плавает над нижней панелью */
+.folder-edit__done {
+  position: absolute;
+  bottom: calc(var(--pm-bottom, 96px) + var(--space-2));
+  left: 50%;
+  z-index: 15;
+  height: var(--size-control);
+  padding: 0 var(--space-6);
+  transform: translateX(-50%);
+  border-radius: var(--radius-full);
+  background: var(--action-primary, var(--color-accent));
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+  color: var(--action-primary-text, var(--color-accent-on));
+  font: var(--type-body);
+  font-weight: 600;
+}

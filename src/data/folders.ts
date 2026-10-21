@@ -18,6 +18,9 @@ export interface Folder {
   ids: string[];
   /** Уведомления папки выключены: число непрочитанных на её чипсе приглушено (только у чатов) */
   muted: boolean;
+  /** Цвет заливки выбранного чипса и цвет его подписи (#rrggbb); без них чипс обычный */
+  color?: string;
+  ink?: string;
 }
 
 /** Название папки не длиннее: чипсы стоят в один ряд, а длинное название съест его целиком */
@@ -93,6 +96,12 @@ export function renameFolder(scope: FolderScope, id: string, name: string) {
   if (!next) return;
   touched(id);
   patch(scope, id, { name: next });
+}
+
+/** Цвет чипса и цвет подписи на нём; undefined возвращает обычный */
+export function setFolderPaint(scope: FolderScope, id: string, paint: { color?: string; ink?: string }) {
+  touched(id);
+  patch(scope, id, paint);
 }
 
 /** Заменить состав папки (окно выбора) */

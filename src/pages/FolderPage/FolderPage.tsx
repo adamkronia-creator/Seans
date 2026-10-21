@@ -15,6 +15,7 @@ import {
   isFreshFolder,
   removeFromFolder,
   renameFolder,
+  setFolderPaint,
   setFolderItems,
   useFolder,
   type Folder,
@@ -36,6 +37,10 @@ interface Entry {
 const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleagues: 'Коллега', seminars: 'Семинар' };
 
 const VISUAL = 40;
+
+/** Цвета заливки чипса (пастель и два насыщенных) и подписи на нём */
+const FOLDER_COLORS = ['#8CC0F2', '#9AD58F', '#F0C27A', '#EFA08E', '#B3A8F0', '#8ED6CF', '#EE9CB8', '#2F6FDB', '#3A3A44'];
+const FOLDER_INKS = ['#1C1C1E', '#FFFFFF', '#0B3D91', '#7A1F3D', '#1E5E3A'];
 
 /** Всё, что можно положить в папку раздела, в порядке раздела («Избранное» — системный чат, в папки не кладётся) */
 function entriesOf(scope: FolderScope): Entry[] {
@@ -241,6 +246,27 @@ export function FolderPage({ scope, id }: FolderPageProps) {
             </span>
           </label>
         </section>
+
+        <section className="fp__card" aria-label="Цвет папки">
+          <h2 className="fp__heading fp__heading--pad">Цвет чипса</h2>
+          <div className="fp-swatches" role="radiogroup" aria-label="Цвет чипса">
+            <button type="button" role="radio" aria-checked={!folder.color} aria-label="Обычный" className="fp-swatch fp-swatch--auto" onClick={() => setFolderPaint(scope, id, { color: undefined })} />
+            {FOLDER_COLORS.map((c) => (
+              <button key={c} type="button" role="radio" aria-checked={folder.color === c} aria-label={`Цвет ${c}`} className="fp-swatch" style={{ background: c }} onClick={() => setFolderPaint(scope, id, { color: c })} />
+            ))}
+          </div>
+          <h2 className="fp__heading fp__heading--pad">Цвет текста</h2>
+          <div className="fp-swatches" role="radiogroup" aria-label="Цвет текста чипса">
+            <button type="button" role="radio" aria-checked={!folder.ink} aria-label="Обычный" className="fp-swatch fp-swatch--auto" onClick={() => setFolderPaint(scope, id, { ink: undefined })} />
+            {FOLDER_INKS.map((c) => (
+              <button key={c} type="button" role="radio" aria-checked={folder.ink === c} aria-label={`Текст ${c}`} className="fp-swatch" style={{ background: c }} onClick={() => setFolderPaint(scope, id, { ink: c })} />
+            ))}
+          </div>
+          <span className="fp-sample" style={{ background: folder.color ?? 'var(--tone-chat)', color: folder.ink ?? 'var(--color-ink-on-pastel)' }}>
+            {folder.name}
+          </span>
+        </section>
+        <p className="fp__hint">Так выглядит выбранный чипс папки в ряду.</p>
 
         <section className="fp__card" aria-labelledby="fp-selected">
           <h2 id="fp-selected" className="fp__heading fp__heading--pad">

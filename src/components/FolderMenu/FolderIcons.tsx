@@ -75,3 +75,11 @@ export const IconPinned = (p: SVGProps<SVGSVGElement>) => (
     <path d="M12 13v7.5" />
   </svg>
 );
+
+/** Настроить папки: папка с ползунками */
+export const IconFolderCog = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M3.5 7a1.5 1.5 0 0 1 1.5-1.5h4l2 2H19A1.5 1.5 0 0 1 20.5 9v8.5A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z" />
+    <path d="M8.5 13.5h7" />
+  </svg>
+);

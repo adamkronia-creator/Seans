@@ -109,6 +109,8 @@ export function ChipMenu({ anchor, opener, items, onClose }: ChipMenuProps) {
                   window.setTimeout(onClose, 500);
                   return;
                 }
+                // Перестановка чипсов идёт на месте: копия «ухода» меню мелькала бы поверх дрожащих чипсов
+                if (key === 'order') backdrop.current?.setAttribute('data-no-exit', '');
                 onClose();
                 run();
               }}

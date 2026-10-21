@@ -5,6 +5,7 @@ import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { FolderPage } from './pages/FolderPage/FolderPage';
+import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
@@ -101,6 +102,17 @@ export default function App() {
 
   /** Настройки папки на весь экран, без нижней панели (как редактирование профиля); если такой папки нет, экран не строится */
   const folderScreen = (path: string, scope: FolderScope): Resolved | null => {
+    if (path === foldersPath) {
+      return {
+        key: `folders/${scope}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <FoldersPage scope={scope} />
+          </main>
+        ),
+      };
+    }
     const id = path.match(FOLDER_ROUTE)?.[1];
     if (!id || !getFolder(scope, id)) return null;
     return {

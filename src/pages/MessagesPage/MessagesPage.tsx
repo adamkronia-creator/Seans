@@ -301,7 +301,7 @@ export function MessagesPage() {
             <Chip follow tone="chat" active={shown === 0} count={countOf('all')} onClick={() => setFilter('all')} onLongPress={(chip) => folderMenu.open('all', chip)}>
               Все
             </Chip>
-            {folders.map(({ id, name, muted }, i) => (
+            {folders.map(({ id, name, muted, color, ink }, i) => (
               <Chip
                 key={id}
                 follow
@@ -309,6 +309,8 @@ export function MessagesPage() {
                 active={shown === i + 1}
                 count={countOf(id)}
                 muted={muted}
+                folder={{ scope: 'chats', id }}
+                paint={{ color, ink }}
                 onClick={() => setFilter(id)}
                 onLongPress={(chip) => folderMenu.open(id, chip)}
               >
