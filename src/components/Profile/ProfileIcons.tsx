@@ -53,9 +53,9 @@ export const IconImage = (p: SVGProps<SVGSVGElement>) => (
 /** Фон приложения: телефон с картинкой на экране */
 export const IconWallpaper = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
-    <rect x="6.5" y="3" width="11" height="18" rx="3" />
-    <path d="M6.5 15l4-3.5 3 2.5 4-3" />
-    <circle cx="14" cy="8" r="1.1" />
+    <rect x="4.5" y="3.5" width="15" height="17" rx="3.5" />
+    <circle cx="9.5" cy="9" r="1.5" />
+    <path d="M4.5 16l4.5-4 3.5 3 2.5-2 5 4" />
   </svg>
 );
 
