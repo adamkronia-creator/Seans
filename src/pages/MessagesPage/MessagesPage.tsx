@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
-import { reducedMotion } from '../../utils/swipe';
+import { useListMotion } from '../../utils/listMotion';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { Chip } from '../../components/Chip/Chip';
@@ -34,6 +34,7 @@ const ChatList = memo(function ChatList({
   onOpen,
   onMenu,
   selected,
+  view,
 }: {
   chats: Chat[];
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
@@ -42,6 +43,8 @@ const ChatList = memo(function ChatList({
   onMenu: (chat: Chat, row: HTMLElement) => void;
   /** Выбранные чаты (режим выбора) */
   selected: readonly string[];
+  /** Что показано сейчас (поисковый запрос): пока он тот же, перестановка строк — движение, а не замена списка */
+  view: string;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
@@ -111,32 +114,9 @@ const ChatList = memo(function ChatList({
     };
   }, [hasArchive]);
 
-  // Чат, ушедший в архив, оставляет на месте строки «призрак»: пустое место схлопывается плавно, а не рывком
-  const snap = useRef(new Map<string, { html: string; h: number; at: number }>());
-  useLayoutEffect(() => {
-    const list = rows.current;
-    if (!list) return;
-    const now = new Set(chats.map((c) => c.id));
-    const archivedIds = new Set(archived.map((c) => c.id));
-    if (!reducedMotion()) {
-      snap.current.forEach((old, id) => {
-        if (now.has(id) || !archivedIds.has(id)) return;
-        const ghost = document.createElement('li');
-        ghost.className = 'chat-ghost';
-        ghost.setAttribute('aria-hidden', 'true');
-        ghost.style.setProperty('--ghost-h', `${old.h}px`);
-        ghost.innerHTML = old.html;
-        list.insertBefore(ghost, list.children[old.at] ?? null);
-        ghost.addEventListener('animationend', () => ghost.remove());
-        window.setTimeout(() => ghost.remove(), 600);
-      });
-    }
-    snap.current.clear();
-    Array.from(list.children).forEach((li, at) => {
-      const id = (li as HTMLElement).dataset.chat;
-      if (id) snap.current.set(id, { html: li.innerHTML, h: (li as HTMLElement).offsetHeight, at });
-    });
-  });
+  // Чат закрепили, вернули, убрали в архив или в другую папку: строки переезжают на новые места, ушедшая схлопывается на своём (utils/listMotion.ts).
+  // Смена поиска заменяет набор строк целиком, поэтому двигать ничего не нужно
+  useListMotion(rows, { attr: 'data-chat', view, leave: true });
 
   return chats.length > 0 || hasArchive ? (
     <div ref={scroller} className="messages__list">
@@ -243,8 +223,8 @@ export function MessagesPage() {
   );
 
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} /> })),
-    [filters, lists, archived, tapChat, holdChat, sel.ids],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} view={query.trim()} /> })),
+    [filters, lists, archived, tapChat, holdChat, sel.ids, query],
   );
 
   const index = Math.max(0, filters.indexOf(filter));

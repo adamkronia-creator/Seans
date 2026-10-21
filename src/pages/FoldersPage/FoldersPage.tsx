@@ -3,6 +3,7 @@ import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMen
 import { folderPath } from '../../components/FolderMenu/useFolderMenu';
 import { removeFolderText, FOLDER_NOUNS } from '../../components/FolderMenu/folderTexts';
 import { IconTrash } from '../../components/ChatParts/ChatIcons';
+import { Collapse } from '../../components/Collapse/Collapse';
 import { IconBack } from '../../components/icons';
 import { IconPencil, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
@@ -10,7 +11,8 @@ import { useChats } from '../../data/chatStore';
 import { addFolderWith, createFolder, deleteFolder, moveFolder, useFolders, type Folder, type FolderScope } from '../../data/folders';
 import { plural } from '../../data/taskValues';
 import { goBack, navigate } from '../../router';
-import { flip } from '../../components/FolderMenu/useFolderDrag';
+import { flip } from '../../utils/flip';
+import { useListMotion } from '../../utils/listMotion';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../FolderPage/FolderPage.css';
 import './FoldersPage.css';
@@ -45,6 +47,11 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
   const [menu, setMenu] = useState<{ folder: Folder; rect: DOMRect; opener: HTMLElement } | null>(null);
   const [asking, setAsking] = useState<Folder | null>(null);
   const list = useRef<HTMLUListElement>(null);
+  const recList = useRef<HTMLUListElement>(null);
+  // Папку добавили или удалили: строки переезжают, новая проявляется, удалённая схлопывается; рекомендация, которую приняли, тоже уходит плавно.
+  // Пока строку тащат за значок, список двигает сама перестановка (data-motion-off)
+  useListMotion(list, { attr: 'data-id', leave: true });
+  useListMotion(recList, { leave: true, enter: false });
   useSwipeBack('.fs', asking === null, () => goBack('/'));
 
   // Перетаскивание за значок: строка идёт за пальцем, при пересечении середины соседа порядок меняется (как у чипсов)
@@ -57,6 +64,7 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
     const y0 = e.clientY;
     const top0 = row.offsetTop;
     row.classList.add('fs-row--dragging');
+    list.current?.setAttribute('data-motion-off', '');
     row.style.transition = 'box-shadow 0.16s';
     const place = (y: number) => {
       row.style.transform = `translateY(${top0 + (y - y0) - row.offsetTop}px)`;
@@ -83,6 +91,7 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
       handle.removeEventListener('pointerup', done);
       handle.removeEventListener('pointercancel', done);
       row.classList.remove('fs-row--dragging');
+      list.current?.removeAttribute('data-motion-off');
       row.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s';
       row.style.transform = '';
       window.setTimeout(() => (row.style.transition = ''), 240);
@@ -121,12 +130,14 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
           <p>{text.lead}</p>
         </div>
 
-        {recommended.length > 0 && (
+        {/* Блок сворачивается по высоте, когда принята последняя рекомендация (Collapse держит прежнее содержимое, пока уходит) */}
+        <Collapse open={recommended.length > 0} gap="var(--space-4)">
+          {recommended.length > 0 && (
           <section className="fp__card" aria-label="Рекомендованные папки">
             <h2 className="fp__heading fp__heading--pad">Рекомендованные папки</h2>
-            <ul className="fs__rec">
+            <ul ref={recList} className="fs__rec">
               {recommended.map((r) => (
-                <li key={r.name} className="fs-rec">
+                <li key={r.name} className="fs-rec" data-row={r.name}>
                   <span className="fs-rec__text">
                     <span className="fs-rec__name">{r.name}</span>
                     <span className="fs-rec__note">{r.note}</span>
@@ -149,7 +160,8 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
               ))}
             </ul>
           </section>
-        )}
+          )}
+        </Collapse>
 
         <section className="fp__card" aria-label={text.title}>
           <h2 className="fp__heading fp__heading--pad">{text.title}</h2>
@@ -183,7 +195,7 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
                 </button>
               </li>
             ))}
-            <li>
+            <li data-flip>
               <button type="button" className="fs-row fs-row--create" onClick={() => navigate(folderPath(createFolder(scope)))}>
                 <span className="fs-row__plus" aria-hidden="true">
                   <IconPlusLine />

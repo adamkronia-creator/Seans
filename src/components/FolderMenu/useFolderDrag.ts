@@ -1,17 +1,6 @@
 import { useEffect } from 'react';
 import type { Folder, FolderScope } from '../../data/folders';
-
-/** Соседи, уступившие место, не прыгают, а плавно переезжают: старое место считается до перестановки, переезд играет после неё */
-export function flip(els: HTMLElement[], before: Map<HTMLElement, number>, axis: 'x' | 'y') {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  for (const el of els) {
-    const from = before.get(el);
-    const to = axis === 'x' ? el.offsetLeft : el.offsetTop;
-    if (from === undefined || from === to) continue;
-    const d = from - to;
-    el.animate([{ transform: axis === 'x' ? `translateX(${d}px)` : `translateY(${d}px)` }, { transform: 'translate(0)' }], { duration: 220, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', composite: 'add' });
-  }
-}
+import { flip } from '../../utils/flip';
 
 const HOLD_MS = 220;
 const SLOP = 14;

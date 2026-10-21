@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import './BackgroundControls.css';
 import dawn from '../../assets/bg-default.webp';
 import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
@@ -135,7 +135,12 @@ export function BackgroundControls() {
             <div className="bg-sheet__label" id="bg-ink-label">
               <span>Цвет текста</span>
             </div>
-            <div className="bg-sheet__seg" role="radiogroup" aria-labelledby="bg-ink-label">
+            <div
+              className="bg-sheet__seg"
+              role="radiogroup"
+              aria-labelledby="bg-ink-label"
+              style={{ '--seg-i': Math.max(0, INKS.findIndex((x) => x.id === ink)), '--seg-n': INKS.length } as CSSProperties}
+            >
               {INKS.map(({ id, label }) => (
                 <button
                   key={id}

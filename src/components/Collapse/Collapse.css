@@ -1,0 +1,62 @@
+/*
+ * Раскрывающийся по высоте блок (см. Collapse.tsx). Сетка 0fr → 1fr, время и кривая те же, что у сворачивания историй при выборе чата
+ * (--collapse-time, --collapse-ease), поэтому всё, что движется вместе (отступ ленты под плашкой), идёт в такт.
+ */
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    opacity calc(var(--collapse-time) * 0.6) ease-out,
+    visibility 0s linear var(--collapse-time);
+}
+
+/* Пока блок сворачивается, в нём остаются прежние данные: нажимать их уже нельзя */
+.collapse:not(.collapse--open) {
+  pointer-events: none;
+}
+
+.collapse--open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    opacity calc(var(--collapse-time) * 0.6) ease-out;
+}
+
+/* Блок в колонке с промежутками: свёрнутый, он «съедает» свой промежуток отрицательным отступом, раскрываясь — возвращает */
+.collapse--gap {
+  transition:
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    margin-bottom var(--collapse-time) var(--collapse-ease),
+    opacity calc(var(--collapse-time) * 0.6) ease-out,
+    visibility 0s linear var(--collapse-time);
+}
+
+.collapse--gap:not(.collapse--open) {
+  margin-bottom: calc(var(--collapse-gap) * -1);
+}
+
+.collapse--gap.collapse--open {
+  transition:
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    margin-bottom var(--collapse-time) var(--collapse-ease),
+    opacity calc(var(--collapse-time) * 0.6) ease-out;
+}
+
+.collapse__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapse,
+  .collapse--open,
+  .collapse--gap,
+  .collapse--gap.collapse--open {
+    transition: none;
+  }
+}

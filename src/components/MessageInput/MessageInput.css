@@ -122,6 +122,17 @@
   color: var(--action-primary);
 }
 
+/* Кнопка появилась после показа поля (микрофон ↔ «Отправить»): выскакивает с пружинкой */
+.composer__round--pop {
+  animation: pop-in 0.28s var(--ease-spring) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer__round--pop {
+    animation: none;
+  }
+}
+
 /* Отправить: круг синего стекла, как выбранный чипс «Диалогов», со стрелкой */
 .composer__round--send {
   border: 1px solid var(--glass-border-blue);
@@ -174,6 +185,15 @@
   box-shadow: var(--glass-shadow-panel);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
+  /* Выезжает снизу, когда ответ выбран (поле уже на новой высоте, двигается только плашка) */
+  --rise: 8px;
+  animation: rise-in var(--dur-base) var(--ease-ios) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reply-bar {
+    animation: none;
+  }
 }
 
 .reply-bar__icon {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { EmojiPanel } from './EmojiPanel';
 import { IconClose, IconReply } from '../ChatParts/ChatIcons';
 import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
@@ -19,9 +19,22 @@ interface MessageInputProps {
   active?: boolean;
 }
 
+/**
+ * Круглая кнопка справа в поле ввода. Микрофон сменяется на «Отправить», как только появился текст, и наоборот: кнопка, что появилась
+ * после показа поля, выскакивает с пружинкой (класс ставится один раз при её создании), а показанная вместе с полем стоит как стояла.
+ */
+function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { settled: boolean }) {
+  const [pop] = useState(settled);
+  return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
+}
+
 export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const settled = useRef(false);
+  useEffect(() => {
+    settled.current = true;
+  }, []);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   // Последняя позиция курсора в поле: нужна, чтобы вставить эмодзи, когда поле не в фокусе
@@ -204,8 +217,9 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
         </div>
 
         {hasText || !extras ? (
-          <button
-            type="button"
+          <RoundButton
+            key="send"
+            settled={settled.current}
             className="composer__round composer__round--send"
             aria-label="Отправить"
             disabled={!hasText}
@@ -213,11 +227,11 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
             onMouseDown={(e) => e.preventDefault()}
           >
             <IconSend />
-          </button>
+          </RoundButton>
         ) : (
-          <button type="button" className="composer__round" aria-label="Голосовое сообщение">
+          <RoundButton key="mic" settled={settled.current} className="composer__round" aria-label="Голосовое сообщение">
             <IconMicrophone />
-          </button>
+          </RoundButton>
         )}
       </div>
 

@@ -1,7 +1,111 @@
 /*
- * Мелкие движения: появление новых сообщений. Все короткие (до 0,25 с), без «уменьшения движения» отключаются.
+ * Мелкие движения: то, что появляется, уходит или меняет место внутри экрана. Все короткие (до 0,3 с), у тех, кто просит поменьше движения, отключаются.
  * Заливка backwards, а не both: после показа элемент снова подчиняется своему transform (жест «ответить» на пузыре).
+ * Общие кривые и ключевые кадры здесь; движение, привязанное к одному экрану, стоит в его стилях рядом с самим элементом.
+ *   pop-in   — значок «выскакивает» с пружинкой (галочка, закреп, кнопка отправки);
+ *   rise-in  — снизу вверх с проявлением (панели, кнопки действий);
+ *   drop-in  — сверху вниз (строки шапки);
+ *   fade-in  — просто проявление (пустые состояния, подсказки);
+ *   swap-in  — смена текста на месте (лёгкий подъём).
  */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* пружина с лёгким перелётом: то, что «выскакивает» */
+  --dur-quick: 0.16s; /* смена состояния: цвет, подсветка, фокус */
+  --dur-base: 0.24s; /* появление и уход небольших элементов */
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.12;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise, 12px));
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--drop, -6px));
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Строка списка, которая ушла (utils/listMotion.ts): на её месте остаётся копия, она тает и схлопывается по высоте вместе с отступами */
+.row-ghost {
+  height: var(--ghost-h);
+  overflow: hidden;
+  pointer-events: none;
+  animation: row-ghost-out 0.3s var(--ease-ios) forwards;
+}
+
+@keyframes row-ghost-out {
+  to {
+    height: 0;
+    margin-top: 0;
+    margin-bottom: calc(var(--ghost-gap, 0px) * -1);
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    opacity: 0;
+  }
+}
+
+/* ---------- Смена состояния ---------- */
+
+/* Выбранный, включённый и нажатый вид переключается короткой сменой цвета, а не вспышкой (фильтры, вкладки, плитки, значки выбора, сегменты).
+   :where() даёт нулевую специфичность: где у компонента своя transition, действует она, а здесь только запасной вариант */
+:where(
+    .filter-chip,
+    .pf-tile,
+    .tp__tab,
+    .cc-sort,
+    .test-actions__item,
+    .tf-chip,
+    .pe__chip,
+    .rich-toolbar__button,
+    .composer__emoji,
+    .viewer__action,
+    .side-menu__item,
+    .sheet__icon,
+    .sheet__tone,
+    .chats-header__action,
+    .fs-rec__add
+  ) {
+  transition:
+    background-color var(--dur-quick) ease,
+    color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease,
+    box-shadow var(--dur-quick) ease;
+}
+
+/* Пустое состояние проявляется, а не вклеивается: список опустел или поиск ничего не нашёл */
+.empty-state {
+  animation: fade-in 0.3s ease-out backwards;
+}
+
+/* ---------- Новые сообщения ---------- */
 
 /* Новое сообщение в открытой переписке: ChatPage ставит data-live после первого показа, поэтому старые не мигают */
 .chat__messages[data-live] .chat__group > li:not(.chat__day) {
@@ -16,7 +120,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chat__messages[data-live] .chat__group > li:not(.chat__day) {
+  .chat__messages[data-live] .chat__group > li:not(.chat__day),
+  .row-ghost,
+  .empty-state {
     animation: none;
+  }
+
+  .row-ghost {
+    display: none;
   }
 }

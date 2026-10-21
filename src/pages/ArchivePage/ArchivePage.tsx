@@ -13,6 +13,7 @@ import type { Chat } from '../../data/chats';
 import { plural } from '../../data/taskValues';
 import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
+import { useListMotion } from '../../utils/listMotion';
 import './ArchivePage.css';
 
 /**
@@ -33,6 +34,9 @@ export function ArchivePage() {
     setQuery('');
     setSearching(false);
   };
+  const rows = useRef<HTMLUListElement>(null);
+  // Чат вернули из архива: его строка схлопывается на месте, остальные поднимаются; смена поиска заменяет список целиком
+  useListMotion(rows, { attr: 'data-chat', view: q, leave: true });
   const [menu, setMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
   const [toast, say] = useToast();
   // Свайп вправо — назад, как стрелка в шапке (жест от самого края остаётся)
@@ -78,7 +82,7 @@ export function ArchivePage() {
       </header>
 
       {chats.length > 0 ? (
-        <ul className="archive__list">
+        <ul ref={rows} className="archive__list">
           {chats.map((chat) => (
             <ChatItem key={chat.id} chat={chat} onClick={open} onLongPress={openMenu} />
           ))}

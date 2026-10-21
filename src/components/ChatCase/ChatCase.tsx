@@ -1,5 +1,5 @@
 import { ScrollHost } from '../ScrollHost/ScrollHost';
-import { useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import { EmptyState } from '../EmptyState/EmptyState';
@@ -16,6 +16,7 @@ import { toneOf } from '../../data/tones';
 import { CLIENT_CHAT, updateNote, updateSection, useClientData } from '../../data/clientStore';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
+import { useListMotion } from '../../utils/listMotion';
 import { HEAD_ICONS } from './caseIcons';
 import './ChatCase.css';
 
@@ -32,7 +33,7 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
   const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick);
 
   return (
-    <li id={`case-s-${section.id}`} className="case-card case-card--editable" {...doubleTap}>
+    <li id={`case-s-${section.id}`} className="case-card case-card--editable" data-row={section.id} {...doubleTap}>
       <div className="case-card__head" style={toneStyle(section.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -125,7 +126,7 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
   return (
-    <li id={`case-n-${note.id}`} className="case-card case-card--editable" {...doubleTap}>
+    <li id={`case-n-${note.id}`} className="case-card case-card--editable" data-row={note.id} {...doubleTap}>
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -175,6 +176,9 @@ export function ChatNotes({ chatId }: { chatId: string }) {
   const mine = oldestFirst(notes.filter((note) => (note.chatId ?? CLIENT_CHAT) === chatId));
   const [editingId, setEditingId] = useState<string | null>(null);
   const editNote = mine.find((x) => x.id === editingId);
+  // Новая заметка проявляется внизу, а при смене даты правкой карточка плавно переезжает на своё место
+  const cards = useRef<HTMLUListElement>(null);
+  useListMotion(cards, { view: chatId });
 
   return (
     <ScrollHost className="chat-case" anchorEnd>
@@ -182,7 +186,7 @@ export function ChatNotes({ chatId }: { chatId: string }) {
         {mine.length === 0 && (
           <EmptyState icon={<IconTabNotes />} title="Заметок пока нет" text="Напишите первую в поле внизу — она появится здесь." />
         )}
-        <ul className="case-cards" hidden={mine.length === 0}>
+        <ul ref={cards} className="case-cards" hidden={mine.length === 0}>
           {mine.map((note) => (
             <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
           ))}
@@ -222,6 +226,8 @@ export function ChatInfo({ chatId }: { chatId: string }) {
   const mine = oldestFirst(caseSections.filter((section) => (section.chatId ?? CLIENT_CHAT) === chatId));
   const [editingId, setEditingId] = useState<string | null>(null);
   const editSection = mine.find((x) => x.id === editingId);
+  const cards = useRef<HTMLUListElement>(null);
+  useListMotion(cards, { view: chatId });
 
   return (
     <ScrollHost className="chat-case" anchorEnd>
@@ -229,7 +235,7 @@ export function ChatInfo({ chatId }: { chatId: string }) {
         {mine.length === 0 && (
           <EmptyState icon={<IconTabInfo />} title="Сведений пока нет" text="Добавьте первое в поле внизу — оно появится здесь." />
         )}
-        <ul className="case-cards" hidden={mine.length === 0}>
+        <ul ref={cards} className="case-cards" hidden={mine.length === 0}>
           {mine.map((section) => (
             <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
           ))}

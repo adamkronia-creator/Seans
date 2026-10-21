@@ -38,6 +38,7 @@ import {
 import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, toggleOption, useLibraryView } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
+import { useListMotion } from '../../utils/listMotion';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import { taskSettings } from '../../data/taskSettings';
@@ -132,6 +133,7 @@ function LibraryList(p: ListProps) {
   const { catalog, listing, ctx } = p;
   const scroller = useRef<HTMLDivElement>(null);
   const more = useRef<HTMLDivElement>(null);
+  const rows = useRef<HTMLUListElement>(null);
   const [limit, setLimit] = useState(STEP);
   const total = listing.ids.length;
   const shown = Math.min(limit, total);
@@ -151,6 +153,10 @@ function LibraryList(p: ListProps) {
     return () => io.disconnect();
   }, [shown, total]);
 
+  // Закрепили или убрали из выборки (избранное): карточки переезжают и схлопываются на месте, а не прыгают. Новый запрос, фильтр или порядок
+  // заменяют список целиком (resetKey), долистывание добавляет карточки снизу: там ничего двигать не нужно
+  useListMotion(rows, { attr: 'data-item', view: p.resetKey, enter: false, leave: true });
+
   const search = listing.search;
   const notes: string[] = [];
   if (search?.fixes.length) notes.push(search.fixes.map((f) => `Показано для «${f.to}» вместо «${f.from}»`).join('; '));
@@ -162,7 +168,7 @@ function LibraryList(p: ListProps) {
   let body;
   if (total > 0) {
     body = (
-      <ul className="library-page__list">
+      <ul ref={rows} className="library-page__list">
         {listing.ids.slice(0, shown).map((id) => {
           const entry = catalog.byId.get(id);
           if (!entry) return null;

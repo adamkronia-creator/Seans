@@ -133,27 +133,6 @@
   color: var(--action-primary);
 }
 
-/* Строка, чат из которой ушёл в архив: пустое место схлопывается плавно, а не рывком */
-.chat-ghost {
-  height: var(--ghost-h);
-  overflow: hidden;
-  pointer-events: none;
-  animation: chat-ghost-out 0.3s var(--ease-ios) forwards;
-}
-
-@keyframes chat-ghost-out {
-  to {
-    height: 0;
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chat-ghost {
-    display: none;
-  }
-}
-
 /* Выбор чатов (долгое нажатие): выбранная строка залита, на аватаре зелёная галочка */
 .chat-item__button {
   position: relative;
@@ -172,7 +151,7 @@
   color: #ffffff;
   opacity: 0;
   transform: scale(0.4);
-  transition: opacity 0.14s, transform 0.2s var(--ease-ios, ease-out);
+  transition: opacity var(--dur-quick), transform 0.3s var(--ease-spring);
   pointer-events: none;
 }
 

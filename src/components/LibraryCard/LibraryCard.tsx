@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { useLongPress } from '../../utils/useLongPress';
+import { useJustOn } from '../../utils/useJustOn';
 import { IconHeartGray, IconHeartRed } from '../icons';
 import { Highlight } from '../LibraryFilters/Highlight';
 import type { LibraryItem } from '../../data/library';
@@ -28,8 +29,11 @@ interface LibraryCardProps {
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», справа сердечко «в избранное» (см. LibraryCard.css) */
 export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
+  // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
+  const newFav = useJustOn(favorite);
+  const newPin = useJustOn(pinned);
   return (
-    <li className={`lib-card${favorite ? ' lib-card--fav' : ''}${selected ? ' lib-card--selected' : ''}`} data-item={test.id}>
+    <li className={`lib-card${favorite ? ' lib-card--fav' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
       <button type="button" className="test-card" onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />

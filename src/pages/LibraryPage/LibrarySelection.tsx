@@ -7,6 +7,7 @@ import { setFolderItems, useFolders, type FolderScope } from '../../data/folders
 import type { LibraryItem } from '../../data/library';
 import { plural } from '../../data/taskValues';
 import { guardBack } from '../../router';
+import { useExitAnimation } from '../../utils/exitAnimation';
 import { IconHeartGray, IconHeartRed } from '../../components/icons';
 
 /** Окно настроек тянет за собой экраны настройки теста и задания: грузится только когда понадобилось */
@@ -25,6 +26,19 @@ interface Options {
   say: (text: string) => void;
   /** Можно ли отправить материал: у части заданий настроек пока нет */
   canSend: (item: LibraryItem) => boolean;
+}
+
+/** Полоса с кнопкой «Отправить»: выезжает снизу и уходит копией с анимацией (стили в LibraryPage.pm.css) */
+function SendBar({ label, disabled, onClick }: { label: string; disabled: boolean; onClick: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useExitAnimation(ref, 'parent');
+  return (
+    <div ref={ref} className="library-send">
+      <button type="button" className="library-send__button" disabled={disabled} onClick={onClick}>
+        {label}
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -155,19 +169,14 @@ export function useLibrarySelection(o: Options) {
     const sendable = picked.filter(o.canSend);
     return (
       <>
-        <div className="library-send">
-          <button
-            type="button"
-            className="library-send__button"
-            disabled={n === 0}
-            onClick={() => {
-              if (sendable.length === 0) o.say(o.kind === 'task' ? 'У выбранных заданий пока нет настроек для отправки' : 'Выбранное нельзя отправить');
-              else setStage('recipients');
-            }}
-          >
-            {n > 1 ? `Отправить (${n})` : 'Отправить'}
-          </button>
-        </div>
+        <SendBar
+          disabled={n === 0}
+          label={n > 1 ? `Отправить (${n})` : 'Отправить'}
+          onClick={() => {
+            if (sendable.length === 0) o.say(o.kind === 'task' ? 'У выбранных заданий пока нет настроек для отправки' : 'Выбранное нельзя отправить');
+            else setStage('recipients');
+          }}
+        />
         {stage === 'recipients' && (
           <RecipientSheet
             mode="many"

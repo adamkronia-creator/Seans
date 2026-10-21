@@ -16,6 +16,17 @@
 }
 
 /* Вкладки: ряд знаков категорий, выбранная — на светлой подложке; ряд при нехватке места листается вбок */
+.emoji-panel {
+  --rise: 24px;
+  animation: rise-in var(--dur-base) var(--ease-ios) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-panel {
+    animation: none;
+  }
+}
+
 .emoji-panel__tabs {
   display: flex;
   flex-shrink: 0;

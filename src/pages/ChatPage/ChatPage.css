@@ -11,7 +11,15 @@
   min-height: 0;
 }
 
+/* Высота плашки закрепа в шапке. Зарегистрирована, чтобы меняться плавно: лента под шапкой сдвигается в такт с раскрытием плашки (Collapse) */
+@property --chat-pin {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 [data-pm] .chat {
+  transition: --chat-pin var(--collapse-time) var(--collapse-ease);
   /* Шапка: безопасная зона, space-4 до фото, фото (size-avatar-sm), space-3 до низа подложки, как у «Диалогов» без историй и чипсов */
   --chat-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3) + var(--chat-pin, 0px));
   /* Плавающая нижняя капсула приложения: высота панели, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
@@ -316,6 +324,26 @@
   backdrop-filter: var(--glass-filter);
 }
 
+/* Прячется прозрачностью и небольшим сдвигом вниз; после ухода visibility убирает её из фокуса и чтения */
+.chat__down {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(0.85);
+  transition:
+    opacity var(--dur-quick) ease,
+    transform var(--dur-base) var(--ease-ios),
+    visibility 0s linear var(--dur-base);
+  pointer-events: none;
+}
+
+.chat__down[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+  pointer-events: auto;
+}
+
 .chat__down:active {
   background: var(--glass-solid);
 }
@@ -333,6 +361,7 @@
   font: var(--type-caption);
   font-weight: 700;
   text-align: center;
+  animation: pop-in 0.3s var(--ease-spring) backwards;
 }
 
 /* ——— Меню сообщения (долгое нажатие): стеклянный лист ——— */
@@ -446,4 +475,32 @@
   height: var(--space-10);
   color: var(--text-secondary, var(--color-text-secondary));
   font-size: var(--size-icon);
+}
+
+/* Закреплённых несколько: подпись и текст при переходе к следующему всплывают снизу (ключ в разметке пересоздаёт их) */
+.chat__pin-title,
+.chat__pin-text {
+  animation: swap-in var(--dur-base) var(--ease-ios) backwards;
+}
+
+/* Значок закрепа в метке сообщения появляется с пружинкой, когда сообщение закрепили при открытом чате */
+.chat__messages[data-live] .bubble__pin {
+  animation: pop-in 0.34s var(--ease-spring) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pm] .chat,
+  .chat__down {
+    transition: none;
+  }
+
+  .chat__down-badge {
+    animation: none;
+  }
+
+  .chat__pin-title,
+  .chat__pin-text,
+  .chat__messages[data-live] .bubble__pin {
+    animation: none;
+  }
 }

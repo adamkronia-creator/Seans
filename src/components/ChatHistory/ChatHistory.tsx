@@ -128,7 +128,9 @@ function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: str
   const [open, setOpen] = useState(false);
   const { scales } = data;
   const long = scales.length > SCALES_SHOWN;
-  const shown = long && !open ? scales.slice(0, SCALES_SHOWN) : scales;
+  const head = long ? scales.slice(0, SCALES_SHOWN) : scales;
+  // Остальные шкалы всегда в разметке, но свёрнуты по высоте: «Читать далее» раскрывает их плавно, а не вставляет рывком
+  const rest = long ? scales.slice(SCALES_SHOWN) : [];
   return (
     <div className="hist-scales">
       <ul
@@ -139,9 +141,18 @@ function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: str
         onClick={() => navigate(resultPath)}
         onKeyDown={(e) => e.key === 'Enter' && navigate(resultPath)}
       >
-        {shown.map((scale) => (
+        {head.map((scale) => (
           <ScaleRow key={scale.code} data={data} scale={scale} />
         ))}
+        {rest.length > 0 && (
+          <li className={`hist-scales__rest${open ? ' hist-scales__rest--open' : ''}`}>
+            <ul className="hist-scales__list hist-scales__list--rest">
+              {rest.map((scale) => (
+                <ScaleRow key={scale.code} data={data} scale={scale} />
+              ))}
+            </ul>
+          </li>
+        )}
       </ul>
       {long && <hr className="hist-scales__rule" />}
       {long && (

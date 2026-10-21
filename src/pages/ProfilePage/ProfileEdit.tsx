@@ -25,6 +25,7 @@ import { goBack } from '../../router';
 import { useSwipeBack } from '../../utils/tabNav';
 import './ProfileEdit.css';
 import { plainText } from '../../utils/plainText';
+import { flip } from '../../utils/flip';
 
 /** Прокрутить область ровно настолько, чтобы элемент оказался на виду (высокий — верхним краем) */
 function reveal(scroller: HTMLElement, el: HTMLElement, margin = 16) {
@@ -32,6 +33,39 @@ function reveal(scroller: HTMLElement, el: HTMLElement, margin = 16) {
   const rect = el.getBoundingClientRect();
   if (rect.top < box.top + margin || rect.height > box.height - margin * 2) scroller.scrollTop += rect.top - box.top - margin;
   else if (rect.bottom > box.bottom - margin) scroller.scrollTop += rect.bottom - box.bottom + margin;
+}
+
+/** Новое поле не вставляется рывком: карточка вырастает из нуля (зеркало ухода, см. pe-field-out), а область прокрутки идёт за ней, пока она не окажется на виду */
+function growIn(scroller: HTMLElement, el: HTMLElement) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    reveal(scroller, el);
+    return;
+  }
+  const list = el.parentElement as HTMLElement;
+  const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
+  const style = getComputedStyle(el);
+  const border = style.borderTopWidth;
+  const h = el.offsetHeight;
+  // Первое поле: список появляется вместе с отступом до соседних блоков, его тоже раскрываем плавно
+  const first = list.children.length === 1;
+  const options = { duration: 280, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' } as const;
+  el.style.overflow = 'hidden';
+  const grow = el.animate(
+    [
+      { height: '0px', marginTop: first ? '0px' : `${-gap}px`, borderWidth: '0px', opacity: 0, transform: 'scale(0.96)' },
+      { height: `${h}px`, marginTop: '0px', borderWidth: border, opacity: 1, transform: 'scale(1)' },
+    ],
+    options,
+  );
+  if (first) list.animate([{ marginBottom: `${-gap}px` }, { marginBottom: '0px' }], options);
+  const follow = () => {
+    reveal(scroller, el);
+    if (grow.playState === 'running') requestAnimationFrame(follow);
+  };
+  follow();
+  const done = () => el.style.removeProperty('overflow');
+  grow.addEventListener('finish', done);
+  grow.addEventListener('cancel', done);
 }
 
 const titleOf = (field: ProfileField) => field.label.trim() || 'Без названия';
@@ -58,6 +92,8 @@ export function ProfileEditPage() {
   const pending = useRef<{ id: string } | null>(null);
   /** Поле, которое только что переставили: после этого оно остаётся на виду */
   const moved = useRef<string | null>(null);
+  /** Где стояли карточки полей до перестановки: от этих мест они плавно переезжают на новые */
+  const placed = useRef<Map<HTMLElement, number> | null>(null);
 
   const cover = coverSrcOf(profile);
   // Уходящее поле уже не считается занятым: подсказка возвращается в начале анимации, а не скачком в её конце, когда список под ним меняет высоту
@@ -87,7 +123,7 @@ export function ProfileEditPage() {
     pending.current = null;
     const found = card(want.id);
     if (!found) return;
-    reveal(box, found);
+    growIn(box, found);
   }, [fields.length]);
 
   useLayoutEffect(() => {
@@ -96,7 +132,11 @@ export function ProfileEditPage() {
     if (!box || !id) return;
     moved.current = null;
     const found = card(id);
+    // Сначала на виду оказывается конечное положение, затем карточки (переставленная и уступившая место) переезжают к нему плавно
     if (found) reveal(box, found);
+    const before = placed.current;
+    placed.current = null;
+    if (before) flip(Array.from(box.querySelectorAll<HTMLElement>('.pe__fields > li[data-field]')), before, 'y');
   }, [order]);
 
   // Брошенные «Добавить поле» без названия и текста при выходе убираются
@@ -114,6 +154,7 @@ export function ProfileEditPage() {
 
   const move = (id: string, step: -1 | 1) => {
     moved.current = id;
+    placed.current = new Map(Array.from(scroller.current?.querySelectorAll<HTMLElement>('.pe__fields > li[data-field]') ?? []).map((el) => [el, el.offsetTop]));
     moveField(id, step);
   };
 

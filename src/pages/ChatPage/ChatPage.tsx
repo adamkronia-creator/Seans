@@ -12,6 +12,7 @@ import {
 } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChatSideMenu } from '../../components/ChatSideMenu/ChatSideMenu';
+import { Collapse } from '../../components/Collapse/Collapse';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
@@ -232,6 +233,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Карточка отправленного теста, чьи настройки показаны в окне
   const [settingsOf, setSettingsOf] = useState<Message | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
+  const pinShown = pins.length > 0 && section === 'messages' && !searchOpen;
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -427,12 +430,11 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           )}
         </div>
 
-        {(distance > 240 || unseen > 0) && (
-          <button type="button" className="chat__down" aria-label="К последним сообщениям" onClick={() => scrollToBottom(true)}>
-            <IconChevronDown />
-            {unseen > 0 && <span className="chat__down-badge">{unseen}</span>}
-          </button>
-        )}
+        {/* Кнопка всегда в разметке: появляется и прячется плавно (data-shown), скрытая не берёт фокус и касания */}
+        <button type="button" className="chat__down" data-shown={distance > 240 || unseen > 0 ? '' : undefined} aria-label="К последним сообщениям" onClick={() => scrollToBottom(true)}>
+          <IconChevronDown />
+          {unseen > 0 && <span className="chat__down-badge">{unseen}</span>}
+        </button>
       </div>
 
       <MessageInput
@@ -480,7 +482,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   };
 
   return (
-    <section className="chat" data-pinned={pins.length > 0 && section === 'messages' && !searchOpen ? '' : undefined}>
+    <section className="chat" data-pinned={pinShown ? '' : undefined}>
       <header className="chat__header">
         {searchOpen && section === 'messages' ? (
           <div key="search" className="chat__top chat__search">
@@ -545,17 +547,24 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             </button>
           </div>
         )}
-        {pins.length > 0 && section === 'messages' && !searchOpen && (
-          <div className="chat__pin">
-            <button type="button" className="chat__pin-main" onClick={showPin}>
-              <span className="chat__pin-title">{pins.length > 1 ? `Закреплённое сообщение #${pinNow + 1}` : 'Закреплённое сообщение'}</span>
-              <span className="chat__pin-text">{pinPreview(pins[pinNow])}</span>
-            </button>
-            <button type="button" className="chat__pin-off" aria-label="Открепить" onClick={() => setMessagePinned(chatId, pins[pinNow].id, false)}>
-              <IconPinned />
-            </button>
-          </div>
-        )}
+        {/* Плашка раскрывается и сворачивается по высоте (лента под ней сдвигается в такт: --chat-pin в ChatPage.css); при смене закрепа текст всплывает */}
+        <Collapse open={pinShown}>
+          {pins.length > 0 && (
+            <div className="chat__pin">
+              <button type="button" className="chat__pin-main" onClick={showPin}>
+                <span key={`title${pinNow}`} className="chat__pin-title">
+                  {pins.length > 1 ? `Закреплённое сообщение #${pinNow + 1}` : 'Закреплённое сообщение'}
+                </span>
+                <span key={`text${pinNow}`} className="chat__pin-text">
+                  {pinPreview(pins[pinNow])}
+                </span>
+              </button>
+              <button type="button" className="chat__pin-off" aria-label="Открепить" onClick={() => setMessagePinned(chatId, pins[pinNow].id, false)}>
+                <IconPinned />
+              </button>
+            </div>
+          )}
+        </Collapse>
       </header>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />

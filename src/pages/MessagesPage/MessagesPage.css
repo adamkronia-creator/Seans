@@ -253,6 +253,27 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Строка выбора выезжает сверху вместе со сворачиванием историй, обычная после неё проявляется; число при каждом изменении чуть всплывает */
+.chats-header__top--select {
+  animation: drop-in var(--dur-base) var(--ease-ios) backwards;
+}
+
+.chats-header__top--back {
+  animation: fade-in var(--dur-base) ease-out backwards;
+}
+
+.chats-header__count {
+  animation: swap-in var(--dur-quick) ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chats-header__top--select,
+  .chats-header__top--back,
+  .chats-header__count {
+    animation: none;
+  }
+}
+
 /* Список не должен «держаться за строки» при сдвиге отступа (выбор чатов): иначе прокрутка сбрасывается и спрятанная строка «Архивы» выезжает */
 .messages__list {
   overflow-anchor: none;

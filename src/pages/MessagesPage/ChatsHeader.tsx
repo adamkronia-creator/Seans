@@ -63,13 +63,21 @@ export function ChatsHeader({
     onQuery('');
     onSearching(false);
   };
+  // Выбор закончился: обычная верхняя строка проявляется, а не вставляется рывком на место строки выбора (CSS: --back)
+  const wasSelecting = useRef(false);
+  const back = wasSelecting.current && !selection;
+  useEffect(() => {
+    wasSelecting.current = Boolean(selection);
+  });
   return (
     <header className="chats-header">
       <h1 className="visually-hidden">{heading}</h1>
       {selection ? (
-        <div className="chats-header__top chats-header__top--select">{selection}</div>
+        <div key="select" className="chats-header__top chats-header__top--select">
+          {selection}
+        </div>
       ) : searching ? (
-        <div className="chats-header__top">
+        <div key="search" className="chats-header__top">
           <SearchField
             value={query}
             onChange={onQuery}
@@ -88,7 +96,7 @@ export function ChatsHeader({
           </button>
         </div>
       ) : (
-        <div className="chats-header__top">
+        <div key="main" className={`chats-header__top${back ? ' chats-header__top--back' : ''}`}>
           {avatar ? <img className="chats-header__avatar" src={avatar} alt="" /> : <span className="chats-header__avatar" />}
           <span className="chats-header__who">
             <span className="chats-header__name">{title}</span>
