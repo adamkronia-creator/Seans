@@ -1,6 +1,7 @@
-import { EditContactSheet, GiftSheet, ReportSheet, RoleSheet } from '../../components/ContactSheets/ContactSheets';
+import { EditContactSheet, GiftSheet, ReportSheet } from '../../components/ContactSheets/ContactSheets';
+import { RoleSheet } from '../../components/ContactSheets/RoleSheet';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
-import { clearHistory, deleteChats, sendMessage, setBlockedMany, setRole, updateContact } from '../../data/chatStore';
+import { clearHistory, deleteChats, sendMessage, setBlockedMany, updateContact } from '../../data/chatStore';
 import type { Chat } from '../../data/chats';
 import { navigate } from '../../router';
 import type { ContactSheet } from './ContactPage';
@@ -16,7 +17,7 @@ export function ContactSheetsHost({ chat, sheet, onClose, say }: { chat: Chat; s
     case 'edit':
       return <EditContactSheet chat={chat} onClose={onClose} onSave={(v) => done('Контакт сохранён', () => updateContact(chat.id, v))()} />;
     case 'role':
-      return <RoleSheet chat={chat} onClose={onClose} onSave={(role) => done(role.trim() ? `Роль: ${role.trim()}` : 'Роль по папке чата', () => setRole(chat.id, role))()} />;
+      return <RoleSheet chat={chat} onClose={onClose} say={say} />;
     case 'gift':
       return <GiftSheet onClose={onClose} onSend={(text) => done('Подарок отправлен', () => sendMessage(chat.id, text))()} />;
     case 'report':

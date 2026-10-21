@@ -40,7 +40,7 @@ fs.rmSync(dir, { recursive: true, force: true });
 const { limitText, recordsText, permanentNote, PERMANENT_LIMITS, recordRef, clientResultId, clientResultPath } = lib;
 const { itemsWithStatus, readClientData, logStep, historyEvents, appEvents, findClientTaskResult } = lib;
 
-const tasksBy = (status) => itemsWithStatus(readClientData(), 'task').filter((t) => t.status === status);
+const tasksBy = (status) => itemsWithStatus(readClientData(), 'task', 'maxim').filter((t) => t.status === status);
 
 test('тексты правил: «Всего записей» и счётчик записей', () => {
   assert.equal(limitText(), 'Без лимита');
@@ -82,32 +82,32 @@ test('у Максима дневник СМЭР постоянный: в «По�
 
 test('новая отправка постоянного задания: «Записей: 0 из N», прежнее выполнение уходит из завершённых', () => {
   assert.ok(tasksBy('done').some((t) => t.id === 'secret'), 'до отправки «Если никто не узнает» завершено');
-  logStep('task', 'secret', 'sent', { permanent: { limit: 2 } });
+  logStep('maxim', 'task', 'secret', 'sent', { permanent: { limit: 2 } });
   assert.deepEqual(tasksBy('permanent').filter((t) => t.id !== 'evidence').map((t) => [t.id, t.description]), [['secret', 'Записей: 0 из 2'], ['smer', 'Записей: 2 из 10']]);
   assert.ok(!tasksBy('done').some((t) => t.id === 'secret'), 'теперь оно постоянное, а не завершённое');
 });
 
 test('записи клиента: счётчик растёт, при наборе лимита карточка уходит из «Постоянных», записи остаются', () => {
-  logStep('task', 'secret', 'done', { record: 1 });
+  logStep('maxim', 'task', 'secret', 'done', { record: 1 });
   assert.equal(tasksBy('permanent').find((t) => t.id === 'secret').description, 'Записей: 1 из 2');
-  logStep('task', 'secret', 'done', { record: 2 });
+  logStep('maxim', 'task', 'secret', 'done', { record: 2 });
   assert.ok(!tasksBy('permanent').some((t) => t.id === 'secret'), 'лимит набран');
   assert.deepEqual(tasksBy('done').filter((t) => /^secret/.test(t.id)).map((t) => t.id), ['secret-r2', 'secret-r1']);
   // Постоянное без лимита остаётся в «Постоянных» сколько бы записей ни было
-  logStep('task', 'worry', 'sent', { permanent: {} });
-  for (let n = 1; n <= 4; n++) logStep('task', 'worry', 'done', { record: n });
+  logStep('maxim', 'task', 'worry', 'sent', { permanent: {} });
+  for (let n = 1; n <= 4; n++) logStep('maxim', 'task', 'worry', 'done', { record: n });
   assert.equal(tasksBy('permanent').find((t) => t.id === 'worry').description, 'Записей: 4');
 });
 
 test('история и события: запись называется записью и ведёт к своему результату', () => {
-  const events = historyEvents(readClientData()).filter((e) => e.kind === 'task' && e.ref === 'smer');
+  const events = historyEvents(readClientData(), 'maxim').filter((e) => e.kind === 'task' && e.ref === 'smer');
   assert.deepEqual(events.map((e) => e.text), [
     'Вы отправили постоянное психологическое задание «Дневник СМЭР» (всего записей: 10)',
     'Максим добавил запись 1 в психологическое задание «Дневник СМЭР»',
     'Максим добавил запись 2 в психологическое задание «Дневник СМЭР»',
   ]);
   assert.deepEqual(events.map((e) => e.record), [undefined, 1, 2]);
-  const app = appEvents(readClientData()).filter((e) => /СМЭР/.test(e.text));
+  const app = appEvents(readClientData(), (id) => (id === 'maxim' ? { name: 'Максим' } : undefined)).filter((e) => /СМЭР/.test(e.text));
   assert.deepEqual(app.map((e) => [e.text, e.href]), [
     ['Добавил запись 2 в задание «Дневник СМЭР»', '/chat/maxim/result/maxim-smer-r2'],
     ['Добавил запись 1 в задание «Дневник СМЭР»', '/chat/maxim/result/maxim-smer-r1'],

@@ -48,6 +48,27 @@
 
 .test-actions__client .test-actions__title {
   flex: 1;
+  min-width: 0;
+}
+
+/* Человек, который ещё не согласился на приглашение: строка приглушена, под именем причина */
+.test-actions__item--waiting {
+  opacity: 0.7;
+}
+
+.test-actions__wait {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular, 400);
+  line-height: var(--line-height-sm);
+}
+
+.test-actions__hint {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }
 
 .test-actions__mark {

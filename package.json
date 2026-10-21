@@ -11,6 +11,7 @@
     "test:library": "node scripts/test-library.mjs",
     "test:permanent": "node scripts/test-permanent.mjs",
     "test:folders": "node scripts/test-folders.mjs",
+    "test:roles": "node scripts/test-roles.mjs",
     "test:help": "node scripts/test-help.mjs"
   },
   "dependencies": {

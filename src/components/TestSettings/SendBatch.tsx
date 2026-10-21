@@ -83,7 +83,7 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
             ...(to === SELF_ID ? { toSelf: true } : {}),
             testOptions: { blind: t.blind, ...(t.blind ? { blindTitle: blindTitle() } : {}), result: t.result, saveBlank: t.saveBlank, ...(data.forms ? { form: t.form } : {}) },
           });
-          if (to === 'maxim') logStep('test', item.id, 'sent');
+          if (to !== SELF_ID) logStep(to, 'test', item.id, 'sent');
         } else {
           const t = o as TaskOpts;
           const data = taskSettings(item);
@@ -104,7 +104,7 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
               ...(rule ? { permanent: rule } : {}),
             },
           });
-          if (to === 'maxim') logStep('task', item.id, 'sent', rule ? { permanent: rule } : undefined);
+          if (to !== SELF_ID) logStep(to, 'task', item.id, 'sent', rule ? { permanent: rule } : undefined);
         }
       });
     });

@@ -1,12 +1,18 @@
 import { EventItem } from '../../components/EventItem/EventItem';
 import { IconBack } from '../../components/icons';
+import { useChats } from '../../data/chatStore';
 import { appEvents, useClientData } from '../../data/clientStore';
 import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import './EventsPage.css';
 
 export function EventsPage() {
-  const events = appEvents(useClientData());
+  const chats = useChats();
+  // Имя и фото человека берутся из его чата; события тех, чьих чатов уже нет, не показываются
+  const events = appEvents(useClientData(), (id) => {
+    const chat = chats.find((c) => c.id === id);
+    return chat ? { name: chat.name, avatar: chat.avatar } : undefined;
+  });
   // Свайп вправо — назад, как стрелка в шапке (жест от самого края остаётся)
   useSwipeBack('.events', true, () => goBack());
   return (

@@ -11,7 +11,9 @@ import { IconBack, IconEmoji } from '../../components/icons';
 import { EmojiPanel } from '../../components/MessageInput/EmojiPanel';
 import { IconCheck, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
-import { CHATS, type ChatCategory } from '../../data/chats';
+import { getChats } from '../../data/chatStore';
+import { roleLine } from '../../data/roles';
+import { getLinks, roleName } from '../../data/roleStore';
 import {
   FOLDER_NAME_MAX,
   nameLength,
@@ -40,8 +42,6 @@ interface Entry {
   note: string;
   visual: ReactNode;
 }
-
-const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleagues: 'Коллега', seminars: 'Семинар' };
 
 const VISUAL = 40;
 
@@ -89,12 +89,18 @@ function ColorCard({ label, value, palette, onChange }: { label: string; value: 
 /** Всё, что можно положить в папку раздела, в порядке раздела («Избранное» — системный чат, в папки не кладётся) */
 function entriesOf(scope: FolderScope): Entry[] {
   if (scope === 'chats') {
-    return CHATS.filter((chat) => !chat.favorites).map((chat) => ({
-      id: chat.id,
-      title: chat.name,
-      note: chat.category ? ROLES[chat.category] : '',
-      visual: <Avatar src={chat.avatar} size={VISUAL} />,
-    }));
+    return getChats()
+      .filter((chat) => !chat.favorites)
+      .map((chat) => {
+        const links = getLinks(chat.id);
+        return {
+          id: chat.id,
+          title: chat.name,
+          // Под именем роли в этом чате; у человека без ролей строки нет
+          note: links.length ? roleLine(links, roleName) : '',
+          visual: <Avatar src={chat.avatar} name={chat.name} size={VISUAL} />,
+        };
+      });
   }
   return (scope === 'tests' ? LIBRARY : TASK_LIBRARY).map((item) => ({
     id: item.id,

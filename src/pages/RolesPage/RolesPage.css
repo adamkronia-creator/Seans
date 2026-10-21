@@ -1,0 +1,205 @@
+/* «Роли» и экран одной роли: на каркасе «Настроить папку» (.fp), здесь только то, чего там нет */
+
+.rp__lead {
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--text-secondary);
+  font: var(--type-body);
+}
+
+/* Первому ребёнку прокрутки экраны папок дают рамку карточки; вводный абзац — не карточка */
+[data-pm] .rp .fp__scroll > .rp__lead {
+  border: 0;
+}
+
+.rp__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rp__list > li + li,
+.rp__caps > li + li {
+  border-top: 0.5px solid var(--divider);
+}
+
+.rp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+}
+
+.rp-row__text,
+.rp-cap__text,
+.rp__all-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rp-row__title {
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+.rp-row__note,
+.rp-cap__hint,
+.rp__all-hint {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+}
+
+.rp-row__chevron {
+  flex-shrink: 0;
+  color: var(--text-icon);
+  font-size: var(--size-icon-sm);
+}
+
+.rp-row:active {
+  background: var(--glass);
+}
+
+/* Второе поле названия под первым в одной карточке */
+.rp__sep {
+  border-top: 0.5px solid var(--divider);
+}
+
+.rp-error {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-red-text);
+  font: var(--type-caption);
+}
+
+.rp__textarea {
+  display: block;
+  width: 100%;
+  min-height: 24px;
+  margin-top: var(--space-1);
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--text-primary);
+  caret-color: var(--action-primary);
+  font: var(--type-body);
+  resize: none;
+}
+
+.rp__textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+.rp__hint {
+  margin: 0;
+}
+
+/* Селектор с [data-pm]: у .fp__hint в оформлении экранов свой padding, и он сильнее одиночного класса */
+[data-pm] .rp .rp__hint {
+  padding: var(--space-2) var(--space-4) var(--space-3);
+}
+
+[data-pm] .rp .rp__hint--pad {
+  padding-top: 0;
+}
+
+.rp__caps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rp-cap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--size-touch);
+  padding: var(--space-2) var(--space-4);
+}
+
+.rp-cap--soon {
+  opacity: 0.6;
+}
+
+.rp-cap__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+.rp-cap__tag {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+  font-weight: 400;
+}
+
+/* Режим «менять и у тех, у кого роль уже есть» */
+.rp__all {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 0.5px solid var(--divider);
+}
+
+.rp__all-name {
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+/* Папка роли: чипсы выбора */
+.rp__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4) 0;
+}
+
+.rp-chip {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  color: var(--text-primary);
+  font: var(--type-caption);
+}
+
+.rp-chip[aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+}
+
+/* Папка занята другой ролью: видна, но не нажимается; кто её занял, сказано под чипсами */
+.rp-chip:disabled {
+  opacity: 0.4;
+}
+
+.rp__action {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 500;
+  text-align: center;
+}
+
+.rp-row:focus-visible,
+.rp-chip:focus-visible,
+.rp__action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

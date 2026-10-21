@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from 'react';
 import { CHATS, type Chat } from './chats';
-import { ROLE_MAX } from './roles';
 import { MESSAGES, type Message, type MessageGroup } from './messages';
 
 // Общее состояние: список чатов и переписки. Список и открытый чат видят одни и те же данные.
@@ -31,6 +30,10 @@ export function useChats(): Chat[] {
 }
 
 const NO_MESSAGES: MessageGroup[] = [];
+
+/** Текущие чаты и переписка без подписки: для обработчиков и проверок */
+export const getChats = (): Chat[] => chats;
+export const getMessages = (chatId: string): MessageGroup[] => messages[chatId] ?? NO_MESSAGES;
 
 export function useMessages(chatId: string): MessageGroup[] {
   return useSyncExternalStore(subscribe, () => messages[chatId] ?? NO_MESSAGES);
@@ -85,11 +88,20 @@ export function setBlockedMany(ids: string[], blocked: boolean) {
   emit();
 }
 
+const removedListeners = new Set<(ids: string[]) => void>();
+
+/** Подписка на удаление чатов: данные, привязанные к чату (роли), убирают за ним свои записи. Возвращает отписку */
+export function onChatsRemoved(cb: (ids: string[]) => void) {
+  removedListeners.add(cb);
+  return () => removedListeners.delete(cb);
+}
+
 /** Удалить чаты вместе с перепиской */
 export function deleteChats(ids: string[]) {
   const set = ordinary(ids);
   chats = chats.filter((c) => !set.has(c.id));
   messages = Object.fromEntries(Object.entries(messages).filter(([id]) => !set.has(id)));
+  removedListeners.forEach((cb) => cb([...set]));
   emit();
 }
 
@@ -98,13 +110,6 @@ export function clearHistory(ids: string[]) {
   const set = ordinary(ids);
   messages = { ...messages, ...Object.fromEntries([...set].map((id) => [id, [] as MessageGroup[]])) };
   chats = chats.map((c) => (set.has(c.id) ? { ...c, lastMessage: 'История очищена', outgoing: undefined, unread: 0 } : c));
-  emit();
-}
-
-/** Назначить роль собеседнику: подпись под именем в открытом чате. Пустая строка возвращает роль по папке */
-export function setRole(id: string, role: string) {
-  const value = role.trim().slice(0, ROLE_MAX);
-  chats = chats.map((c) => (c.id === id ? { ...c, role: value || undefined } : c));
   emit();
 }
 
@@ -171,6 +176,19 @@ function appendToday(chatId: string, message: Message) {
 export function receiveMessage(chatId: string, content: Pick<Message, 'text' | 'buttons' | 'test' | 'task' | 'testKind'>) {
   appendToday(chatId, { id: String(nextId++), from: 'them', time: clock(), ...content });
   chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
+  setPreview(chatId);
+  emit();
+}
+
+/**
+ * Сообщения, которые пишут роли (roleStore): карточка приглашения и служебная строка по центру ленты.
+ * Приглашение от собеседника (from: 'them', не служебное) считается непрочитанным, служебная строка — нет.
+ */
+export function postRoleMessage(chatId: string, content: { from: 'me' | 'them'; text: string; invite?: string; system?: boolean; id?: string }) {
+  if (!chats.some((c) => c.id === chatId)) return;
+  const { id, ...rest } = content;
+  appendToday(chatId, { id: id ?? String(nextId++), time: clock(), ...rest });
+  if (content.from === 'them' && !content.system) chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
   setPreview(chatId);
   emit();
 }

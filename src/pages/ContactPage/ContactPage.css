@@ -48,6 +48,19 @@
   object-fit: cover;
 }
 
+/* Контакт без фото: на месте фото крупные буквы имени на акцентной подложке, как у аватара в списке */
+.ct__photo-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: calc(var(--w, 412px) * 0.28 - (var(--w, 412px) * 0.28 - 40px) * var(--p));
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
 /* Затемнение снизу, чтобы белое имя читалось на любом фото; к кругу исчезает */
 .ct__shade {
   position: absolute;

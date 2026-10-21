@@ -7,13 +7,11 @@ import type { AppEvent } from './events';
 import { findClientTaskResult } from './clientTaskResults';
 import { clientResultId, clientResultPath, recordRef } from './resultLinks';
 import { recordsText, type PermanentRule } from './taskValues';
-import avatar1 from '../assets/avatars/avatar-1.jpg';
 
 /*
- * Единый источник правды по клиенту (пока только Максим): журнал действий.
- * Из него собираются «История взаимодействия», вкладки «Тесты», «Задания»,
- * «Заметки», «Сведения» и экран «События», поэтому новое действие появляется везде сразу.
- * Новые действия добавляются в конец журнала функциями ниже (addNote, sendTest и т. д.).
+ * Журнал действий по людям: у каждого чата свой (запись помечена чатом, без пометки — Максим, чьи данные заведены с начала).
+ * Из журнала собираются «История взаимодействия», вкладки «Тесты», «Задания», «Заметки», «Сведения» и экран «События»,
+ * поэтому новое действие появляется везде сразу. Новые действия добавляются в конец журнала функциями ниже (addNote, logStep и т. д.).
  */
 
 export type ActivityState = 'assigned' | 'sent' | 'done';
@@ -24,14 +22,29 @@ export interface Session {
   paragraphs: string[];
 }
 
-/** Чат клиента, чьи данные хранятся здесь (пока только Максим) */
+/** Чат, чьи записи без пометки: журнал начинался с Максима */
 export const CLIENT_CHAT = 'maxim';
 
+/** Чем кончилось приглашение в роль: принято, отклонено, пришло к вам, работа завершена */
+export type InviteResult = 'accepted' | 'declined' | 'received' | 'ended';
+
+/** Чат, которому принадлежит запись */
+interface Tagged {
+  chat?: string;
+}
+
 export type Activity =
-  | { id: string; kind: 'invite'; date: string }
-  | { id: string; kind: 'session'; ref: string; date: string }
-  | { id: string; kind: 'note'; ref: string; date: string }
-  | {
+  | ({
+      id: string;
+      kind: 'invite';
+      date: string;
+      /** Название роли и итог; у старой записи Максима их нет, и текст остаётся прежним */
+      role?: string;
+      result?: InviteResult;
+    } & Tagged)
+  | ({ id: string; kind: 'session'; ref: string; date: string } & Tagged)
+  | ({ id: string; kind: 'note'; ref: string; date: string } & Tagged)
+  | ({
       id: string;
       kind: 'test' | 'task';
       ref: string;
@@ -42,7 +55,10 @@ export type Activity =
       permanent?: PermanentRule;
       /** Запись постоянного задания (выполнено): её номер; каждая запись — отдельное действие журнала */
       record?: number;
-    };
+    } & Tagged);
+
+/** Чат записи журнала */
+export const chatOf = (a: Tagged): string => a.chat ?? CLIENT_CHAT;
 
 /** Действие с тестом или заданием */
 type ItemActivity = Extract<Activity, { state: ActivityState }>;
@@ -189,6 +205,9 @@ const SEED: Activity[] = [
   t('test', 'itt', 'sent', '09.10.2026', '09:30'),
   t('task', 'pie', 'sent', '09.10.2026', '09:40'),
   t('task', 'evidence', 'assigned', '09.10.2026', '09:50'),
+  // Вера работает с сентября, ей достаточно записи о роли; Олег прислал приглашение сегодня, ответ ждёт вас в его чате
+  { id: nextId(), kind: 'invite', chat: 'vera', date: '12.09.2026', role: 'Клиент', result: 'accepted' },
+  { id: nextId(), kind: 'invite', chat: 'oleg', date: nowStamp().date, role: 'Клиент', result: 'received' },
 ];
 
 let data: ClientData = {
@@ -218,8 +237,12 @@ export function useClientData(): ClientData {
 /** Текущие данные без подписки: для действий, которым нужно прочитать значение в момент вызова */
 export const readClientData = (): ClientData => data;
 
-const pad = (v: number) => String(v).padStart(2, '0');
+/** Пометка чата для новой записи: у Максима её нет (записи без пометки — его) */
+const tag = (chatId: string): Tagged => (chatId === CLIENT_CHAT ? {} : { chat: chatId });
+
 export function nowStamp() {
+  // pad внутри: функцию вызывает начальный журнал (SEED) при загрузке модуля, раньше, чем объявлены константы ниже
+  const pad = (v: number) => String(v).padStart(2, '0');
   const d = new Date();
   return {
     date: `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`,
@@ -247,7 +270,7 @@ const splitTitle = (text: string, fallback: string) => {
 
 /**
  * Новая заметка из текста, набранного в поле внизу вкладки «Заметки». Название — «Заметка от дд/мм/гггг», набранный текст целиком — в заметке (дата — и в «Последнем обновлении»).
- * У клиента (Максима) она попадает и в журнал, то есть в «Историю взаимодействия»; в остальных чатах заметка живёт только на своей вкладке.
+ * Заметка попадает и в журнал чата, то есть в его «Историю взаимодействия» (если роль её открывает).
  */
 export function addNote(chatId: string, text: string): string | null {
   if (!textToParagraphs(text).some((p) => p.trim())) return null;
@@ -268,7 +291,7 @@ export function addNote(chatId: string, text: string): string | null {
   };
   update({
     notes: [...data.notes, note],
-    ...(chatId === CLIENT_CHAT ? { activity: [...data.activity, { id: nextId(), kind: 'note' as const, ref: note.id, date }] } : {}),
+    activity: [...data.activity, { id: nextId(), kind: 'note' as const, ref: note.id, date, ...tag(chatId) }],
   });
   return note.id;
 }
@@ -321,10 +344,16 @@ export function setComment(activityId: string, text: string) {
   update({ comments });
 }
 
-/** Тест или задание: назначено / отправлено / выполнено; у постоянного задания — правило или номер записи */
-export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState, extra: { permanent?: PermanentRule; record?: number } = {}) {
+/** Тест или задание в чате: назначено / отправлено / выполнено; у постоянного задания — правило или номер записи */
+export function logStep(chatId: string, kind: 'test' | 'task', ref: string, state: ActivityState, extra: { permanent?: PermanentRule; record?: number } = {}) {
   const { date, time } = nowStamp();
-  update({ activity: [...data.activity, { id: nextId(), kind, ref, state, date, time, ...extra }] });
+  update({ activity: [...data.activity, { id: nextId(), kind, ref, state, date, time, ...extra, ...tag(chatId) }] });
+}
+
+/** Роль в чате: приглашение принято или отклонено, пришло к вам, работа завершена. Запись видна в «Истории» и в «Событиях» */
+export function logInvite(chatId: string, role: string, result: InviteResult) {
+  const { date } = nowStamp();
+  update({ activity: [...data.activity, { id: nextId(), kind: 'invite', date, role, result, ...tag(chatId) }] });
 }
 
 // ——— Выборки для экранов ———
@@ -350,22 +379,33 @@ export type HistoryEvent =
 
 export type HistoryFilter = 'all' | 'session' | 'test' | 'task' | 'note';
 
-// Каталог тестов и заданий — библиотеки приложения; статус и дата берутся из журнала клиента
+/** Записи журнала одного чата, в порядке журнала */
+const ofChat = (d: ClientData, chatId: string): Activity[] => d.activity.filter((a) => chatOf(a) === chatId);
+
+// Каталог тестов и заданий — библиотеки приложения; статус и дата берутся из журнала чата
 const catalog = (kind: 'test' | 'task') => (kind === 'test' ? LIBRARY : TASK_LIBRARY);
 const itemName = (kind: 'test' | 'task', ref: string) =>
   kind === 'test'
     ? (TEST_META[ref]?.name ?? (({ abbr, title }) => abbr ?? title)(LIBRARY.find((x) => x.id === ref)!))
     : TASK_LIBRARY.find((x) => x.id === ref)!.title;
 
-function activityText({ kind, ref, state, permanent, record }: ItemActivity): string {
+/**
+ * Текст события. У Максима он написан от его имени («Максим заполнил…»), у остальных — безлично: пол собеседника приложению не известен,
+ * а «заполнил(а)» в журнале читается плохо
+ */
+function activityText({ kind, ref, state, permanent, record, chat }: ItemActivity): string {
+  const maxim = chatOf({ chat }) === CLIENT_CHAT;
   if (kind === 'test') {
     const meta = TEST_META[ref];
     const what = meta?.what ?? `опросник «${itemName('test', ref)}»`;
-    if (state === 'done') return meta?.doneText ?? `Максим заполнил ${what}`;
+    if (state === 'done') return maxim ? (meta?.doneText ?? `Максим заполнил ${what}`) : `Заполнен ${what}`;
     return `Вы отправили ${what}`;
   }
   const name = itemName('task', ref);
-  if (state === 'done') return record ? `Максим добавил запись ${record} в психологическое задание «${name}»` : `Максим выполнил психологическое задание «${name}»`;
+  if (state === 'done') {
+    if (record) return maxim ? `Максим добавил запись ${record} в психологическое задание «${name}»` : `Добавлена запись ${record} в психологическое задание «${name}»`;
+    return maxim ? `Максим выполнил психологическое задание «${name}»` : `Выполнено психологическое задание «${name}»`;
+  }
   if (state === 'sent') {
     return permanent
       ? `Вы отправили постоянное психологическое задание «${name}»${permanent.limit ? ` (всего записей: ${permanent.limit})` : ''}`
@@ -374,17 +414,23 @@ function activityText({ kind, ref, state, permanent, record }: ItemActivity): st
   return `Вы назначили психологическое задание «${name}»`;
 }
 
-export function historyEvents(d: ClientData): HistoryEvent[] {
-  return d.activity.map((a): HistoryEvent => {
+/** Запись о роли в «Истории»: у старой записи Максима прежний текст, у новых — название роли и итог */
+function inviteEvent(a: Extract<Activity, { kind: 'invite' }>): Extract<HistoryEvent, { kind: 'invite' }> {
+  if (!a.role || !a.result) return { id: a.id, kind: 'invite', date: a.date, title: 'Новый клиент', text: 'Максим принял приглашение стать клиентом.' };
+  const text = {
+    accepted: 'Приглашение принято, работа началась.',
+    declined: 'Приглашение отклонено.',
+    received: 'Приглашение получено.',
+    ended: 'Работа завершена. История и ответы остаются.',
+  }[a.result];
+  return { id: a.id, kind: 'invite', date: a.date, title: `Роль «${a.role}»`, text };
+}
+
+export function historyEvents(d: ClientData, chatId: string): HistoryEvent[] {
+  return ofChat(d, chatId).map((a): HistoryEvent => {
     switch (a.kind) {
       case 'invite':
-        return {
-          id: a.id,
-          kind: 'invite',
-          date: a.date,
-          title: 'Новый клиент',
-          text: 'Максим принял приглашение стать клиентом.',
-        };
+        return inviteEvent(a);
       case 'session': {
         const session = d.sessions.find((x) => x.id === a.ref)!;
         return {
@@ -426,16 +472,17 @@ export function historyEvents(d: ClientData): HistoryEvent[] {
 }
 
 /** Сколько элементов у фильтра: тесты и задания считаются по отдельным тестам/заданиям, а не по их отправкам и выполнениям */
-export function countOf(d: ClientData, filter: HistoryFilter): number {
-  if (filter === 'all') return d.activity.length;
+export function countOf(d: ClientData, filter: HistoryFilter, chatId: string): number {
+  const mine = ofChat(d, chatId);
+  if (filter === 'all') return mine.length;
   if (filter === 'test' || filter === 'task') {
-    return new Set(d.activity.flatMap((a) => (a.kind === filter ? [a.ref] : []))).size;
+    return new Set(mine.flatMap((a) => (a.kind === filter ? [a.ref] : []))).size;
   }
-  return d.activity.filter((a) => a.kind === filter).length;
+  return mine.filter((a) => a.kind === filter).length;
 }
 
-export function doneCount(d: ClientData, kind: 'test' | 'task'): number {
-  return new Set(d.activity.flatMap((a) => (a.kind === kind && a.state === 'done' ? [a.ref] : []))).size;
+export function doneCount(d: ClientData, kind: 'test' | 'task', chatId: string): number {
+  return new Set(ofChat(d, chatId).flatMap((a) => (a.kind === kind && a.state === 'done' ? [a.ref] : []))).size;
 }
 
 /**
@@ -443,23 +490,24 @@ export function doneCount(d: ClientData, kind: 'test' | 'task'): number {
  * Постоянное задание, пока записи не набраны, стоит в своём разделе («Записей: 2 из 10»), а каждая запись клиента
  * — отдельная завершённая карточка («Запись 2»): её id — номер результата записи (см. recordRef).
  */
-export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[] {
+export function itemsWithStatus(d: ClientData, kind: 'test' | 'task', chatId: string): PsyTest[] {
+  const journal = ofChat(d, chatId);
   const items: { item: PsyTest; index: number }[] = [];
   catalog(kind).forEach(({ categories: _c, ...base }) => {
     const item = { ...base, status: 'sent' as const, date: '' };
     let last = -1;
     const records: number[] = [];
-    d.activity.forEach((a, i) => {
+    journal.forEach((a, i) => {
       if (a.kind !== kind || a.ref !== item.id) return;
       if (a.record !== undefined) records.push(i);
       else last = i;
     });
     records.forEach((i) => {
-      const a = d.activity[i] as ItemActivity;
+      const a = journal[i] as ItemActivity;
       items.push({ item: { ...item, id: recordRef(item.id, a.record!), description: `Запись ${a.record}`, status: 'done', date: a.date.slice(0, 5) }, index: i });
     });
     if (last < 0) return;
-    const a = d.activity[last] as ItemActivity;
+    const a = journal[last] as ItemActivity;
     if (a.permanent) {
       // Записи этого назначения — те, что сделаны после него
       const mine = records.filter((i) => i > last);
@@ -467,7 +515,7 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
       if (a.permanent.limit && mine.length >= a.permanent.limit) return;
       const newest = Math.max(last, ...mine);
       items.push({
-        item: { ...item, status: 'permanent', date: d.activity[newest].date.slice(0, 5), description: recordsText(mine.length, a.permanent.limit) },
+        item: { ...item, status: 'permanent', date: journal[newest].date.slice(0, 5), description: recordsText(mine.length, a.permanent.limit) },
         index: newest,
       });
       return;
@@ -479,11 +527,12 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
   return items.sort((x, y) => y.index - x.index).map((x) => x.item);
 }
 
-/** Тесты или задания, которые психолог недавно присылал клиенту (или клиент прошёл): id, свежие первыми */
-export function recentIds(d: ClientData, kind: 'test' | 'task', limit = 5): string[] {
+/** Тесты или задания, которые психолог недавно присылал (или человек прошёл): id, свежие первыми. Без чата — по всем чатам */
+export function recentIds(d: ClientData, kind: 'test' | 'task', limit = 5, chatId?: string): string[] {
+  const journal = chatId ? ofChat(d, chatId) : d.activity;
   const seen: string[] = [];
-  for (let i = d.activity.length - 1; i >= 0; i--) {
-    const a = d.activity[i];
+  for (let i = journal.length - 1; i >= 0; i--) {
+    const a = journal[i];
     if (a.kind === kind && !seen.includes(a.ref)) seen.push(a.ref);
   }
   return seen.slice(0, limit);
@@ -492,28 +541,52 @@ export function recentIds(d: ClientData, kind: 'test' | 'task', limit = 5): stri
 /** По какому номеру искать результат: у записи постоянного задания он свой, у остальных — номер теста или задания */
 const resultRef = (a: ItemActivity): string => (a.record ? recordRef(a.ref, a.record) : a.ref);
 
-/** Экран «События»: действия самого клиента (приглашение, пройденные опросники и задания), новые сверху */
-export function appEvents(d: ClientData): AppEvent[] {
-  const maxim = { name: 'Максим Мартынов', avatar: avatar1 };
+/** Кто стоит за записью журнала на экране «События» */
+export type EventPerson = { name: string; avatar?: string };
+
+const INVITE_EVENT_TEXT: Record<InviteResult, (role: string) => string> = {
+  accepted: (role) => `Приглашение принято: роль «${role}»`,
+  declined: (role) => `Приглашение отклонено: роль «${role}»`,
+  received: (role) => `Предлагает роль «${role}»`,
+  ended: (role) => `Работа завершена: роль «${role}»`,
+};
+
+/**
+ * Экран «События»: действия людей (приглашения и ответы на них, пройденные опросники и задания), новые сверху.
+ * Имя и фото берёт у чата `who`; записи тех, кого в списке уже нет, пропускаются.
+ */
+export function appEvents(d: ClientData, who: (chatId: string) => EventPerson | undefined): AppEvent[] {
   const out: AppEvent[] = [];
   d.activity.forEach((a) => {
+    const chat = chatOf(a);
+    const person = who(chat);
+    if (!person) return;
     if (a.kind === 'invite') {
-      out.push({ id: a.id, ...maxim, type: 'invite', text: 'Принял приглашение стать клиентом', date: a.date.slice(0, 5), link: false });
+      // Старая запись Максима без роли: приглашение принято, перехода нет. Остальные ведут в чат, где приглашение лежит карточкой
+      if (!a.role || !a.result) out.push({ id: a.id, ...person, type: 'invite', text: 'Принял приглашение стать клиентом', date: a.date.slice(0, 5), link: false });
+      else out.push({ id: a.id, ...person, type: 'invite', text: INVITE_EVENT_TEXT[a.result](a.role), date: a.date.slice(0, 5), link: true, href: `/chat/${chat}` });
     } else if ((a.kind === 'test' || a.kind === 'task') && a.state === 'done') {
       out.push({
         id: a.id,
-        ...maxim,
+        ...person,
         type: a.kind === 'test' ? 'survey' : 'task',
+        // У Максима текст от мужского лица, у остальных безличный: пол человека приложению не известен
         text:
           a.kind === 'test'
-            ? `Прошёл опросник «${itemName('test', a.ref)}»`
+            ? chat === CLIENT_CHAT
+              ? `Прошёл опросник «${itemName('test', a.ref)}»`
+              : `Опросник «${itemName('test', a.ref)}» пройден`
             : a.record
-              ? `Добавил запись ${a.record} в задание «${itemName('task', a.ref)}»`
-              : `Выполнил задание «${itemName('task', a.ref)}»`,
+              ? chat === CLIENT_CHAT
+                ? `Добавил запись ${a.record} в задание «${itemName('task', a.ref)}»`
+                : `Запись ${a.record} в задании «${itemName('task', a.ref)}»`
+              : chat === CLIENT_CHAT
+                ? `Выполнил задание «${itemName('task', a.ref)}»`
+                : `Задание «${itemName('task', a.ref)}» выполнено`,
         date: a.date.slice(0, 5),
         link: true,
         // Пройденный тест или выполненное задание ведёт к результату клиента (у задания он есть не у всех)
-        ...(a.kind === 'test' || findClientTaskResult(clientResultId('maxim', resultRef(a))) ? { href: clientResultPath('maxim', resultRef(a)) } : {}),
+        ...(a.kind === 'test' || findClientTaskResult(clientResultId(chat, resultRef(a))) ? { href: clientResultPath(chat, resultRef(a)) } : {}),
       });
     }
   });

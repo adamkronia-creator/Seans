@@ -185,8 +185,8 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
           ...(rule ? { permanent: rule } : {}),
         },
       });
-      // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
-      if (id === 'maxim') logStep('task', task.id, 'sent', rule ? { permanent: rule } : undefined);
+      // Журнал действий (история, вкладка «Задания») ведётся по каждому человеку; «Избранное» своего журнала не имеет
+      if (id !== SELF_ID) logStep(id, 'task', task.id, 'sent', rule ? { permanent: rule } : undefined);
     });
     setSheet(null);
     const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
@@ -405,7 +405,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
       {toast && <Toast text={toast} className={view === 'settings' ? 'test-settings__toast--cta' : undefined} />}
 
       {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
-      {(sheet === 'one' || sheet === 'many') && <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />}
+      {(sheet === 'one' || sheet === 'many') && <RecipientSheet kind="task" mode={sheet} onSend={send} onClose={() => setSheet(null)} />}
     </section>
     </HelpContext.Provider>
   );

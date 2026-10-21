@@ -44,9 +44,12 @@ const names = (scope, ids) => ids.map((id) => getFolder(scope, id)?.name);
 /** Порядок чипсов раздела: адреса папок слева направо */
 const row = (scope) => getFolders(scope).map((f) => f.id);
 
-test('начальные папки собраны из прежних категорий, «Избранное» в них не попадает', () => {
-  assert.deepEqual(getFolder('chats', 'clients').ids, CHATS.filter((c) => c.category === 'clients').map((c) => c.id));
-  assert.deepEqual(getFolder('chats', 'colleagues').ids, CHATS.filter((c) => c.category === 'colleagues').map((c) => c.id));
+test('начальные папки заданы явно и связаны с ролями, «Избранное» в них не попадает', () => {
+  assert.deepEqual(getFolder('chats', 'clients').ids, ['maxim', 'vera']);
+  assert.deepEqual(getFolder('chats', 'colleagues').ids, ['vladislav']);
+  assert.deepEqual(getFolder('chats', 'seminars').ids, ['bogdan']);
+  assert.deepEqual(['clients', 'colleagues', 'seminars'].map((id) => getFolder('chats', id).roleId), ['client', 'colleague', 'seminar']);
+  for (const id of ['clients', 'colleagues', 'seminars']) for (const chatId of getFolder('chats', id).ids) assert.ok(CHATS.some((c) => c.id === chatId), `чат ${chatId} есть в списке`);
   for (const id of ['clients', 'colleagues', 'seminars']) assert.ok(!getFolder('chats', id).ids.includes('favorites'));
   assert.deepEqual(names('chats', ['clients', 'colleagues', 'seminars']), ['Клиенты', 'Коллеги', 'Семинар']);
   assert.deepEqual(names('tests', ['training', 'svo']), ['Тренинг', 'СВО']);

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
+import { initialsOf } from '../../components/Avatar/Avatar';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
@@ -9,7 +10,7 @@ import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/co
 import { useStoryAuthors } from '../../data/stories';
 import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
-import { roleOf } from '../../data/roles';
+import { capStatesOf, useLinks, useRoleLine } from '../../data/roleStore';
 import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import {
@@ -42,6 +43,11 @@ export type ContactSheet = 'edit' | 'role' | 'gift' | 'report' | 'delete' | 'cle
 export function ContactPage({ chatId }: { chatId: string }) {
   const chat = useChats().find((c) => c.id === chatId);
   const clientData = useClientData();
+  // Роли чата: подпись под именем, строка «Роль» и видимость итогов по материалам
+  const roleLinks = useLinks(chatId);
+  const roleLine = useRoleLine(chatId);
+  const hasRoles = roleLinks.length > 0;
+  const historyOn = capStatesOf(roleLinks).history !== 'hidden';
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
@@ -58,6 +64,8 @@ export function ContactPage({ chatId }: { chatId: string }) {
   // Фото на всю ширину сжимается в круг, пока прокручивают первый экран: --p от 0 до 1 пишется в блок прокрутки.
   // Шапка профиля сжимается по высоте и остаётся на месте, имя из левого нижнего угла фото уходит под круг, в середину
   const name = chat?.name;
+  // Подпись под именем: роли и присутствие. Меняется при назначении роли, поэтому входит в зависимости замера ниже
+  const statusText = `${hasRoles ? `${roleLine} · ` : ''}${chat?.online ? 'в сети' : 'был(а) недавно'}`;
   useEffect(() => {
     const el = scroller.current;
     if (!el || !name) return;
@@ -101,12 +109,14 @@ export function ContactPage({ chatId }: { chatId: string }) {
       el.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [name]);
+  }, [name, statusText]);
 
-  const materials = useMemo(
-    () => (chatId === 'maxim' ? [['Сеансы', countOf(clientData, 'session')], ['Тесты', countOf(clientData, 'test')], ['Задания', countOf(clientData, 'task')]] as const : null),
-    [chatId, clientData],
-  );
+  // Итоги по материалам: из журнала этого человека; нет записей или история не включена в роли — блока нет
+  const materials = useMemo(() => {
+    if (!historyOn) return null;
+    const rows = [['Сеансы', countOf(clientData, 'session', chatId)], ['Тесты', countOf(clientData, 'test', chatId)], ['Задания', countOf(clientData, 'task', chatId)]] as const;
+    return rows.some(([, n]) => n > 0) ? rows : null;
+  }, [chatId, clientData, historyOn]);
 
   if (!chat) return <section className="fp ct" />;
 
@@ -114,7 +124,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
     void navigator.clipboard?.writeText(text).then(() => say(done), () => say('Не удалось скопировать'));
   };
   const share = () => {
-    const text = [chat.name, roleOf(chat), chat.phone, chat.username].filter(Boolean).join('\n');
+    const text = [chat.name, hasRoles ? roleLine : '', chat.phone, chat.username].filter(Boolean).join('\n');
     if (navigator.share) void navigator.share({ title: chat.name, text }).catch(() => undefined);
     else copy(text, 'Контакт скопирован');
   };
@@ -137,7 +147,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
         say(chat.subscribed ? 'Вы отписались от событий контакта' : 'Вы подписаны на события контакта');
       },
     },
-    { key: 'c-role', label: 'Поменять роль', Icon: IconTag, run: () => setSheet('role') },
+    { key: 'c-role', label: 'Роли', Icon: IconTag, run: () => setSheet('role') },
     { key: 'c-gift', label: 'Отправить подарок', Icon: IconGift, run: () => setSheet('gift') },
     {
       key: 'c-pin',
@@ -180,7 +190,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
     chat.about ? { key: 'about', value: chat.about, label: 'О себе' } : null,
     chat.username ? { key: 'user', value: chat.username, label: 'Имя пользователя', onClick: () => copy(chat.username!, 'Имя скопировано'), icon: <IconCopyLine /> } : null,
     chat.birthday ? { key: 'birth', value: chat.birthday, label: 'День рождения' } : null,
-    { key: 'role', value: roleOf(chat), label: 'Роль', onClick: () => setSheet('role'), icon: <IconTag /> },
+    { key: 'role', value: hasRoles ? roleLine : 'Не назначена', label: roleLinks.length > 1 ? 'Роли' : 'Роль', onClick: () => setSheet('role'), icon: <IconTag /> },
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
   return (
@@ -205,7 +215,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
       <div ref={scroller} className="fp__scroll ct__scroll" style={{ '--p': 0 } as CSSProperties}>
         <div ref={hero} className="ct__hero">
           <div className="ct__photo">
-            {chat.avatar ? <img src={chat.avatar} alt="" /> : <span className="ct__photo-empty" />}
+            {chat.avatar ? <img src={chat.avatar} alt="" /> : <span className="ct__photo-empty" aria-hidden="true">{initialsOf(chat.name)}</span>}
             <span className="ct__shade" aria-hidden="true" />
           </div>
           <div className="ct__id">
@@ -213,9 +223,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
               <span className="ct__line">{chat.name}</span>
             </h1>
             <p className="ct__status">
-              <span className="ct__line">
-                {roleOf(chat)} · {chat.online ? 'в сети' : 'был(а) недавно'}
-              </span>
+              <span className="ct__line">{statusText}</span>
             </p>
           </div>
         </div>

@@ -10,12 +10,15 @@ import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
 import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
+import { RoleEditPage } from './pages/RolesPage/RoleEditPage';
+import { RolesPage, rolesPath } from './pages/RolesPage/RolesPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
 import { CHATS } from './data/chats';
 import { getFolder, type FolderScope } from './data/folders';
+import { getRole } from './data/roleStore';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { ArchivePage } from './pages/ArchivePage/ArchivePage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
@@ -53,6 +56,8 @@ function parentOf(path: string): string | null {
   const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact|profile)/);
   // Профиль собеседника лежит над его карточкой, карточка — над чатом
   if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
+  // Экран роли лежит над списком ролей
+  if (/^\/roles\/[^/]+/.test(path)) return rolesPath;
   return path === '/' ? null : '/';
 }
 
@@ -143,6 +148,30 @@ export default function App() {
 
   /** Что показывает адрес: ключ экрана и как его построить (строится один раз, пока экран на месте) */
   const resolve = (path: string, at: TabId): Resolved => {
+    // /roles и /roles/<роль>: роли на весь экран, без нижней панели (как правка профиля); открываются с любой вкладки, в том числе по прямой ссылке
+    if (path === rolesPath) {
+      return {
+        key: 'roles',
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <RolesPage />
+          </main>
+        ),
+      };
+    }
+    const roleId = path.match(/^\/roles\/([^/]+)/)?.[1];
+    if (roleId && getRole(roleId)) {
+      return {
+        key: `roles/${roleId}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <RoleEditPage id={roleId} />
+          </main>
+        ),
+      };
+    }
     // Открытый чат занимает весь экран, без нижней панели разделов
     const chatRoute = at === 'messages' ? path.match(CHAT_ROUTE) : null;
     if (chatRoute) {
@@ -250,7 +279,8 @@ export default function App() {
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at, true) : page('tasks', <TasksPage />, at, true);
     }
-    // Остался «Профиль». /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
+    // Остался «Профиль».
+    // /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
     if (path === '/profile/edit') {
       return {
         key: 'profile/edit',

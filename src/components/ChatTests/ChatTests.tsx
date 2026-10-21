@@ -78,18 +78,18 @@ function SectionedList({
 
 /** Вкладка «Тесты» в открытом чате: отправленный тест открывает его настройку, завершённый — результат клиента */
 export function ChatTests({
-  hasData,
+  chatId,
   onOpenTest,
   onOpenResult,
 }: {
-  hasData: boolean;
+  chatId: string;
   onOpenTest?: (id: string) => void;
   onOpenResult?: (id: string) => void;
 }) {
   const data = useClientData();
   return (
     <SectionedList
-      items={hasData ? itemsWithStatus(data, 'test') : []}
+      items={itemsWithStatus(data, 'test', chatId)}
       sections={TEST_SECTIONS}
       empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTest?.(t.id))}
@@ -121,18 +121,18 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
  * отдельной карточкой: её можно открыть и посмотреть.
  */
 export function ChatTasks({
-  hasData,
+  chatId,
   onOpenTask,
   onOpenResult,
 }: {
-  hasData: boolean;
+  chatId: string;
   onOpenTask?: (id: string) => void;
   onOpenResult?: (id: string) => void;
 }) {
   const data = useClientData();
   return (
     <SectionedList
-      items={hasData ? itemsWithStatus(data, 'task') : []}
+      items={itemsWithStatus(data, 'task', chatId)}
       sections={TASK_SECTIONS}
       empty={{ kind: 'task', title: 'Заданий пока нет', text: 'Отправьте задание из раздела «Задания» — оно появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTask?.(t.id))}

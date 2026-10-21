@@ -209,8 +209,8 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         ...(id === SELF_ID ? { toSelf: true } : {}),
         testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, ...(data.forms ? { form } : {}) },
       });
-      // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
-      if (id === 'maxim') logStep('test', test.id, 'sent');
+      // Журнал действий (история, вкладка «Тесты») ведётся по каждому человеку; «Избранное» своего журнала не имеет
+      if (id !== SELF_ID) logStep(id, 'test', test.id, 'sent');
     });
     setSheet(null);
     const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
@@ -538,7 +538,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
       {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
       {(sheet === 'one' || sheet === 'many') && (
-        <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />
+        <RecipientSheet kind="test" mode={sheet} onSend={send} onClose={() => setSheet(null)} />
       )}
     </section>
     </HelpContext.Provider>
