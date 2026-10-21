@@ -161,7 +161,7 @@
 
 .chat-item__check {
   position: absolute;
-  top: calc(50% + var(--space-2));
+  top: calc(50% + var(--size-avatar) / 2 - var(--space-5));
   left: calc(var(--space-4) + var(--size-avatar) - var(--space-5));
   display: grid;
   place-items: center;
@@ -169,7 +169,6 @@
   height: var(--space-5);
   border-radius: var(--radius-full);
   background: #34c759;
-  box-shadow: 0 0 0 2px var(--ring, var(--bg-canvas));
   color: #ffffff;
   opacity: 0;
   transform: scale(0.4);
@@ -180,6 +179,13 @@
 .chat-item--selected .chat-item__check {
   opacity: 1;
   transform: none;
+}
+
+/* Галочка стоит в правом нижнем углу аватара, вокруг неё в картинке прозрачный вырез (как у точки присутствия), а не тёмное кольцо */
+.chat-item--selected .avatar__img,
+.chat-item--selected .avatar__icon {
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
 }
 
 .chat-item--selected .chat-item__button {
