@@ -62,7 +62,7 @@ export const APPROACHES: Option[] = [
 
 export const TEST_RESULTS: Option[] = [
   { id: 'score', label: 'Общий балл' },
-  { id: 'profile', label: 'Профиль по шкалам' },
+  { id: 'profile', label: 'Профиль шкал' },
 ];
 
 export const TASK_SHAPES: Option[] = [
@@ -86,7 +86,7 @@ export const FACETS: Record<Kind, FacetDef[]> = {
   test: [
     { id: 'domain', label: 'Что оценивает', options: TEST_DOMAINS },
     { id: 'time', label: 'Время прохождения', options: TIMES },
-    { id: 'result', label: 'Результат', options: TEST_RESULTS },
+    { id: 'result', label: 'Итог тестирования', options: TEST_RESULTS },
     { id: 'age', label: 'Возраст клиента', options: [], dynamic: true, labelOf: ageLabel },
   ],
   task: [

@@ -49,7 +49,7 @@ export function FilterSheet({ catalog, view, scope, favorites, noun, onApply, on
         <div className="sheet__body">
           {catalog.facets.map((facet) => (
             <Fragment key={facet.id}>
-              <h3 className="filter-group__title">{facet.label}</h3>
+              <h3 className="filter-group__title">{facet.label}:</h3>
               <section className="sheet__card filter-group" aria-label={facet.label}>
                 <div className="filter-group__chips">
                   {facet.options.map((option) => {
