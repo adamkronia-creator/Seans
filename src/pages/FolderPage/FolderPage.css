@@ -489,3 +489,90 @@
 .fp-tone--active[data-light] {
   border-color: var(--swatch);
 }
+
+/* ——— Шапка в манере открытого чата и «Готово» внизу ——— */
+.fp__preview {
+  display: inline-flex;
+  flex-shrink: 1;
+  align-items: center;
+  max-width: 40%;
+  height: var(--size-chip-h);
+  padding: 0 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--preview-bg, var(--color-accent));
+  color: var(--preview-ink, var(--color-accent-on));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fp__subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.fp__footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  padding: var(--space-3) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
+  pointer-events: none;
+}
+
+.fp__footer .fp__done {
+  display: block;
+  width: 100%;
+  pointer-events: auto;
+}
+
+[data-pm] .fp__header {
+  gap: var(--space-3);
+  padding-left: var(--space-4);
+  padding-right: var(--space-2);
+}
+
+[data-pm] .fp__preview {
+  border: 1px solid var(--preview-bg, var(--glass-border-blue));
+  background: var(--preview-bg, var(--glass-chip-active));
+  color: var(--preview-ink, var(--action-primary-text));
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+[data-pm] .fp__who .fp__title {
+  margin: 0;
+  overflow: hidden;
+  font: var(--type-headline);
+  line-height: var(--space-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-pm] .fp__subtitle {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+}
+
+[data-pm] .fp__footer .fp__done {
+  height: var(--size-control);
+  font: var(--type-body);
+  font-weight: 600;
+}
+
+[data-pm] .fp__scroll {
+  padding-bottom: calc(var(--size-control) + var(--space-8) + var(--safe-bottom));
+}

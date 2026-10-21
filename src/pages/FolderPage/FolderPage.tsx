@@ -254,12 +254,20 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   return (
     <section className="fp">
       <header className="fp__header">
+        {/* Как шапка открытого чата: слева чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись, справа «назад» */}
+        <span
+          className="fp__preview"
+          style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }) } as CSSProperties}
+          aria-hidden="true"
+        >
+          {folder.name}
+        </span>
+        <div className="fp__who">
+          <h1 className="fp__title">{folder.name}</h1>
+          <p className="fp__subtitle">Настройка папки</p>
+        </div>
         <button type="button" className="fp__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
-        </button>
-        <h1 className="fp__title">{folder.name}</h1>
-        <button type="button" className="fp__done" onClick={() => goBack('/')}>
-          Готово
         </button>
       </header>
 
@@ -325,6 +333,12 @@ export function FolderPage({ scope, id }: FolderPageProps) {
 
         <button type="button" className="fp__card fp__delete" onClick={() => setAsking(true)}>
           Удалить папку
+        </button>
+      </div>
+
+      <div className="fp__footer">
+        <button type="button" className="fp__done" onClick={() => goBack('/')}>
+          Готово
         </button>
       </div>
 
