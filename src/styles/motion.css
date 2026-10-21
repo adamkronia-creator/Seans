@@ -249,17 +249,6 @@ html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabb
   view-transition-name: tabbar;
 }
 
-/* Размытая обёртка панели (.tabbar-glass) в снимок экрана не нужна: на месте стоит именованная панель со своим размытием, а обёртка в снимке
-   ехала бы вместе с экраном и выглядывала из-под неё краем капсулы (мелькание у панели при возврате из «Событий» и т. п.) */
-html[data-transition='slide-next'] .screen[data-layer='top'] .tabbar-glass,
-html[data-transition='slide-prev'] .screen[data-layer='top'] .tabbar-glass,
-html[data-transition='fade'] .screen[data-layer='top'] .tabbar-glass,
-html[data-transition='forward']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar-glass,
-html[data-transition='back']:not([data-vt-chat]) .screen[data-layer='top'] .tabbar-glass {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
 ::view-transition-group(tabbar) {
   animation: none;
   /* Стекло панели. Внутренняя панель (она и есть именованный элемент) размытия не имеет: оно у внешней обёртки .tabbar-glass (см. pm-chats.css),
