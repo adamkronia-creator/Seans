@@ -8,7 +8,8 @@ export function TasksPage() {
   return (
     <LibraryPage
       kind="task"
-      title="Задания"
+      chatLike
+      title="Практика"
       searchPlaceholder="Поиск по заданиям"
       items={TASK_LIBRARY}
       favorites={useTaskFavorites()}

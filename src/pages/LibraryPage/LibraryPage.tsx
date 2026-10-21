@@ -276,10 +276,12 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const index = Math.max(0, sections.indexOf(section));
   const shown = dragIndex ?? index;
   // Раздел тестов в стиле «Диалогов»: с последнего чипса влево — в чаты (по списку это делает пейджер, по самим чипсам — жест ниже)
+  // Следующий раздел нижней панели: после заданий идут тесты, после тестов чаты
+  const nextTab = kind === 'task' ? 'tests' : 'messages';
   const atEnd = useRef(false);
   atEnd.current = index === sections.length - 1;
   useChipsDrag(root);
-  useTabSwipe(root, 'left', 'messages', (o) => Boolean(chatLike) && Boolean(o.closest('.screen-header__chips')) && atEnd.current);
+  useTabSwipe(root, 'left', nextTab, (o) => Boolean(chatLike) && Boolean(o.closest('.screen-header__chips')) && atEnd.current);
 
   const tokens = useMemo<FilterToken[]>(
     () =>
@@ -447,8 +449,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           onSearching={setSearching}
           query={view.query}
           onQuery={(value) => setQuery(kind, value)}
-          title="Тесты"
-          status="Ваши опросники"
+          title={kind === 'task' ? 'Задания' : 'Тесты'}
+          status={kind === 'task' ? 'Ваши практики' : 'Ваши опросники'}
           heading={title}
           placeholder={searchPlaceholder}
           chipsLabel={labels.filters}
@@ -478,7 +480,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       )}
 
       <div className="library-page__body">
-        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => d > 0 && switchTab('messages', 'slide-next') : undefined} />
+        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => d > 0 && switchTab(nextTab, 'slide-next') : undefined} />
         {showSuggest && (
           <SuggestPanel
             history={view.history}

@@ -12,6 +12,7 @@ import { TestBlank } from './TestBlank';
 import { TestHeader } from './TestHeader';
 import { TestConclusion } from './TestConclusion';
 import './TestSettings.css';
+import './TestSettings.pm.css';
 
 interface TestResultProps {
   resultId: string;

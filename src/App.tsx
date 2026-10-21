@@ -149,6 +149,7 @@ export default function App() {
         if (task) {
           return {
             key: `chat/${chatId}/tasks/${id}`,
+            pm: true,
             build: () => (
               <main className="app__content">
                 <ChatTaskScreen chatId={chatId} task={task} onAppTabChange={handleTabChange} />
@@ -210,7 +211,7 @@ export default function App() {
       // /tasks/<задание>: настройка задания из раздела «Задания»
       const taskId = path.match(/^\/tasks\/([^/]+)/)?.[1];
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
-      return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at) : page('tasks', <TasksPage />, at);
+      return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at, true) : page('tasks', <TasksPage />, at, true);
     }
     // Остался «Профиль». /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
     if (path === '/profile/edit') {

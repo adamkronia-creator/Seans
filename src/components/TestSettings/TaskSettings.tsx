@@ -35,6 +35,7 @@ import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
+import './TestSettings.pm.css';
 import './TaskSettings.css';
 
 /** Строка текста для чтения (--line-height-read, editorial.css): описание набрано антиквой 16/25 */

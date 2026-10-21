@@ -9,6 +9,7 @@ import { Paragraphs } from './TaskParts';
 import { CollapseCard } from './TestBlank';
 import { TestHeader } from './TestHeader';
 import './TestSettings.css';
+import './TestSettings.pm.css';
 import './TestConclusion.css';
 
 interface TaskResultProps {
