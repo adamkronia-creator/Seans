@@ -63,11 +63,23 @@
 }
 
 /* Метка «в сети» на окружности фото 40: центр на дуге, 1,5 от краёв (для 48 в списке — 2,5) */
-.chat__top .avatar {
+.chat__top .avatar,
+.chat__peer .avatar {
   --avatar-size: var(--size-avatar-sm);
   --presence-inset: 1.5px;
   /* Центр выреза в фото считается от отступа метки; на этом элементе пересчитывается заново (иначе остаётся от отступа 2,5) */
   --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
+}
+
+.chat__peer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  text-align: left;
 }
 
 .chat__who {

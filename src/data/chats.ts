@@ -27,6 +27,15 @@ export interface Chat {
   muted?: boolean;
   /** Собеседник заблокирован */
   blocked?: boolean;
+  /** Роль, которую назначил психолог («Клиент», «Коллега», своя): подпись под именем в открытом чате. Нет — по папке (category) */
+  role?: string;
+  /** Данные контакта (карточка собеседника) */
+  phone?: string;
+  username?: string;
+  about?: string;
+  birthday?: string;
+  /** Подписка на события контакта */
+  subscribed?: boolean;
 }
 
 export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };
@@ -53,6 +62,10 @@ export const CHATS: Chat[] = [
     avatar: avatar1,
     category: 'clients',
     online: true,
+    phone: '+7 (913) 735-19-37',
+    username: '@maxim_martynov',
+    about: 'Ведём работу с тревогой, сеансы по четвергам',
+    birthday: '14 марта 1991',
     lastMessage: 'Напомню: сеанс состоится 21.04 в 18:00. Кабинет №91.',
     outgoing: 'read',
     time: '00:00',
@@ -63,6 +76,8 @@ export const CHATS: Chat[] = [
     name: 'Вера Филиппова',
     avatar: avatar2,
     category: 'clients',
+    phone: '+7 (905) 412-08-66',
+    username: '@vera_filippova',
     lastMessage: 'Заполнила дневник эмоций :)',
     time: '14:32',
     unread: 2, // не прочитано
@@ -73,6 +88,8 @@ export const CHATS: Chat[] = [
     avatar: avatar3,
     category: 'colleagues',
     online: true,
+    phone: '+7 (922) 310-47-25',
+    about: 'Супервизор, КПТ',
     lastMessage: 'Блин, я не и не знал, что такой опросник есть.',
     time: '12:05',
     unread: 1,

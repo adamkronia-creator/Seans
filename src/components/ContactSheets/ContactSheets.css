@@ -1,0 +1,65 @@
+/* Чипсы выбора (роль, причина жалобы): пилюли, выбранная залита акцентом */
+.ct-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.ct-chip {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--glass-border, var(--color-border));
+  border-radius: var(--radius-pill, 999px);
+  background: var(--glass-fill, var(--color-bg-fill));
+  color: var(--text-primary, var(--color-text-primary));
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  transition: background-color var(--dur-quick, 0.16s) ease, color var(--dur-quick, 0.16s) ease, border-color var(--dur-quick, 0.16s) ease;
+}
+
+.ct-chip[aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--action-primary, var(--color-accent));
+  color: var(--color-accent-on, #fff);
+}
+
+.ct-hint {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+/* Подарки: сетка плиток 3 в ряд */
+.ct-gifts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.ct-gift {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--glass-fill, var(--color-bg-fill));
+  color: var(--text-primary, var(--color-text-primary));
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  transition: background-color var(--dur-quick, 0.16s) ease, border-color var(--dur-quick, 0.16s) ease;
+}
+
+.ct-gift[aria-pressed='true'] {
+  border-color: var(--action-primary, var(--color-accent));
+  background: var(--glass-chip-active, var(--color-bg-fill));
+}
+
+.ct-gift__emoji {
+  font-size: 32px;
+  line-height: 40px;
+}

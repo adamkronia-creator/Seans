@@ -24,6 +24,19 @@
   animation: menu-in 0.2s var(--ease-ios) both;
 }
 
+.chip-menu {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Полоса между группами пунктов (меню профиля собеседника) */
+.chip-menu__gap::before {
+  content: '';
+  display: block;
+  height: 8px;
+  background: rgb(60 60 67 / 0.1);
+}
+
 .chip-menu__backdrop.is-leaving .chip-menu {
   animation: menu-out 0.12s ease-in both;
 }

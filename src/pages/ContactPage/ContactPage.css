@@ -1,0 +1,166 @@
+/* Профиль собеседника: на каркасе экрана «Настроить папку» (.fp), здесь шапка без подложки, фото, кнопки и строки данных */
+[data-pm] .ct .fp__header.ct__bar {
+  border-bottom: 0;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding-right: var(--space-4);
+}
+
+.ct__spacer {
+  flex: 1;
+}
+
+[data-pm] .ct__scroll {
+  padding-bottom: calc(var(--space-8) + var(--safe-bottom));
+}
+
+.ct__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+  text-align: center;
+}
+
+.ct__avatar {
+  display: grid;
+  margin-bottom: var(--space-3);
+}
+
+.ct__avatar .avatar {
+  --avatar-size: 112px;
+  --presence-inset: 6px;
+  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
+}
+
+.ct__name {
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: 0;
+}
+
+.ct__status {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+/* Первый блок страницы без рамки карточки (её даёт общее правило .fp__scroll > :first-child) */
+[data-pm] .ct .ct__scroll > .ct__hero {
+  border: 0;
+}
+
+/* Четыре стеклянные плитки под фото */
+.ct__actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.ct__action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  height: 64px;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+  color: var(--text-link);
+  font: var(--type-meta);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--dur-quick, 0.16s) ease;
+}
+
+.ct__action svg {
+  font-size: var(--size-icon);
+}
+
+.ct__action[aria-pressed='false'] {
+  color: var(--text-secondary);
+}
+
+.ct__rows,
+.ct__stats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ct__rows > li + li {
+  box-shadow: inset 0 var(--hairline) 0 var(--divider, var(--color-divider));
+}
+
+.ct__row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+}
+
+.ct__row--tap:active {
+  background: var(--glass-fill);
+}
+
+.ct__value {
+  padding-right: var(--space-8);
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.ct__label {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+.ct__row-icon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--size-icon);
+  transform: translateY(-50%);
+}
+
+.ct__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ct__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+}
+
+.ct__stat + .ct__stat {
+  box-shadow: inset var(--hairline) 0 0 var(--divider, var(--color-divider));
+}
+
+.ct__stat strong {
+  color: var(--text-primary);
+  font: var(--type-title);
+}
+
+.ct__stat span {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}

@@ -8,11 +8,15 @@ export interface ChipMenuItem {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
   run: () => void;
   danger?: boolean;
+  /** Перед пунктом небольшой отступ: он отделяет группу пунктов от предыдущей */
+  gap?: boolean;
 }
 
 const MENU_W = 240;
 const MENU_ITEM_H = 48;
 const GAP = 8;
+/** Высота полосы между группами пунктов */
+const GROUP_GAP = 8;
 
 interface ChipMenuProps {
   /** Чипс, который удерживали: меню встаёт под ним */
@@ -20,6 +24,8 @@ interface ChipMenuProps {
   /** Сам чипс: по Escape фокус возвращается к нему (с клавиатуры иначе пришлось бы искать место заново) */
   opener?: HTMLElement;
   items: ChipMenuItem[];
+  /** Название меню для чтения с экрана */
+  label?: string;
   onClose: () => void;
 }
 
@@ -28,7 +34,7 @@ interface ChipMenuProps {
  * Плашка не выходит за колонку приложения, на широком экране не растягивается на всё окно. Закрывается нажатием мимо и Escape;
  * с клавиатуры: стрелки и Home/End ходят по пунктам, Tab уводит фокус дальше и закрывает меню.
  */
-export function ChipMenu({ anchor, opener, items, onClose }: ChipMenuProps) {
+export function ChipMenu({ anchor, opener, items, label = 'Меню папки', onClose }: ChipMenuProps) {
   const backdrop = useRef<HTMLDivElement>(null);
   const menu = useRef<HTMLUListElement>(null);
   /**
@@ -40,9 +46,11 @@ export function ChipMenu({ anchor, opener, items, onClose }: ChipMenuProps) {
 
   const column = document.querySelector('.app')?.getBoundingClientRect();
   const left = Math.max((column?.left ?? 0) + GAP, Math.min(anchor.left, (column?.right ?? window.innerWidth) - MENU_W - GAP));
-  const height = items.length * MENU_ITEM_H + GAP;
+  const height = items.length * MENU_ITEM_H + items.filter((i) => i.gap).length * GROUP_GAP + GAP;
   const below = anchor.bottom + GAP + height <= window.innerHeight - GAP;
   const top = below ? anchor.bottom + GAP : Math.max(GAP, anchor.top - GAP - height);
+  // Длинное меню на низком экране прокручивается внутри себя, а не уходит за край
+  const maxHeight = window.innerHeight - top - GAP;
   // Плашка вырастает из-под чипса: точка отсчёта на его середине
   const originX = Math.round(Math.min(MENU_W - 16, Math.max(16, anchor.left + anchor.width / 2 - left)));
 
@@ -89,12 +97,12 @@ export function ChipMenu({ anchor, opener, items, onClose }: ChipMenuProps) {
         ref={menu}
         className="chip-menu"
         role="menu"
-        aria-label="Меню папки"
-        style={{ left, top, width: MENU_W, transformOrigin: `${originX}px ${below ? 'top' : 'bottom'}` }}
+        aria-label={label}
+        style={{ left, top, width: MENU_W, maxHeight, transformOrigin: `${originX}px ${below ? 'top' : 'bottom'}` }}
         onClick={(e) => e.stopPropagation()}
       >
-        {items.map(({ key, label, Icon, run, danger }) => (
-          <li key={key}>
+        {items.map(({ key, label, Icon, run, danger, gap }) => (
+          <li key={key} className={gap ? 'chip-menu__gap' : undefined}>
             <button
               type="button"
               role="menuitem"

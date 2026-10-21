@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { CHATS, type Chat } from './chats';
+import { ROLE_MAX } from './roles';
 import { MESSAGES, type Message, type MessageGroup } from './messages';
 
 // Общее состояние: список чатов и переписки. Список и открытый чат видят одни и те же данные.
@@ -97,6 +98,26 @@ export function clearHistory(ids: string[]) {
   const set = ordinary(ids);
   messages = { ...messages, ...Object.fromEntries([...set].map((id) => [id, [] as MessageGroup[]])) };
   chats = chats.map((c) => (set.has(c.id) ? { ...c, lastMessage: 'История очищена', outgoing: undefined, unread: 0 } : c));
+  emit();
+}
+
+/** Назначить роль собеседнику: подпись под именем в открытом чате. Пустая строка возвращает роль по папке */
+export function setRole(id: string, role: string) {
+  const value = role.trim().slice(0, ROLE_MAX);
+  chats = chats.map((c) => (c.id === id ? { ...c, role: value || undefined } : c));
+  emit();
+}
+
+/** Изменить контакт: имя (пустое не принимается) и телефон */
+export function updateContact(id: string, patch: { name: string; phone: string }) {
+  const name = patch.name.trim();
+  if (!name) return;
+  chats = chats.map((c) => (c.id === id ? { ...c, name, phone: patch.phone.trim() || undefined } : c));
+  emit();
+}
+
+export function setSubscribed(id: string, subscribed: boolean) {
+  chats = chats.map((c) => (c.id === id ? { ...c, subscribed } : c));
   emit();
 }
 

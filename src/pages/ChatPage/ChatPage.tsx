@@ -24,6 +24,7 @@ import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, setMessagePinned, useChats, useMessages, useTyping } from '../../data/chatStore';
+import { roleOf } from '../../data/roles';
 import { addNote, addSection, CLIENT_CHAT, countOf, useClientData } from '../../data/clientStore';
 import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
@@ -63,9 +64,6 @@ function sameRun(a: Message | undefined, b: Message | undefined) {
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
 }
-
-/** Подпись под именем: вид диалога (в сети показывает зелёная точка у фото) */
-const KIND: Record<string, string> = { clients: 'Клиент', colleagues: 'Коллега', seminars: 'Семинар' };
 
 const MENU_W = 196;
 const MENU_ITEM_H = 44;
@@ -467,7 +465,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   }));
 
   // Подпись под именем: в диалоге — состояние собеседника, в остальных вкладках — название вкладки (чипсов разделов в шапке больше нет)
-  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : (KIND[chat.category ?? ''] ?? 'Диалог');
+  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : roleOf(chat);
   const subtitle = section === 'messages' ? status : (sections.find((item) => item.id === section)?.label ?? '');
   const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />;
 
@@ -527,11 +525,24 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           </div>
         ) : (
           <div key="top" className="chat__top">
-            {avatar}
-            <div className="chat__who">
-              <h1 className="chat__name">{chat.name}</h1>
-              <p className={`chat__status${section === 'messages' && typing ? ' chat__status--typing' : ''}`}>{subtitle}</p>
-            </div>
+            {/* Фото и имя открывают профиль собеседника (у «Избранного» профиля нет) */}
+            {chat.favorites ? (
+              <>
+                {avatar}
+                <div className="chat__who">
+                  <h1 className="chat__name">{chat.name}</h1>
+                  <p className="chat__status">{subtitle}</p>
+                </div>
+              </>
+            ) : (
+              <button type="button" className="chat__peer" aria-label={`Профиль: ${chat.name}`} onClick={() => navigate(`/chat/${chatId}/contact`)}>
+                {avatar}
+                <div className="chat__who">
+                  <h1 className="chat__name">{chat.name}</h1>
+                  <p className={`chat__status${section === 'messages' && typing ? ' chat__status--typing' : ''}`}>{subtitle}</p>
+                </div>
+              </button>
+            )}
             <button type="button" className="chat__action" aria-label="Назад" onClick={() => goBack()}>
               <IconBackMk />
             </button>

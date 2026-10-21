@@ -3,6 +3,7 @@ import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { registerTabSwitch } from './utils/tabNav';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
+import { ContactPage } from './pages/ContactPage/ContactPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { FolderPage } from './pages/FolderPage/FolderPage';
 import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
@@ -39,16 +40,16 @@ interface Resolved {
 
 /**
  * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата), /chat/<чат>/tasks/<задание> (настройка задания)
- * и /chat/<чат>/result/<результат> (результат теста или задания)
+ * и /chat/<чат>/result/<результат> (результат теста или задания); /chat/<чат>/contact — профиль собеседника
  */
-const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+))?/;
+const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+)|\/(contact))?/;
 
 /** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
 const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
-  const nested = path.match(/^(\/chat\/[^/]+)\/(?:tests|tasks|result)\//);
+  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact)/);
   if (nested) return nested[1];
   return path === '/' ? null : '/';
 }
@@ -143,10 +144,21 @@ export default function App() {
     // Открытый чат занимает весь экран, без нижней панели разделов
     const chatRoute = at === 'messages' ? path.match(CHAT_ROUTE) : null;
     if (chatRoute) {
-      const [, chatId, kind, id] = chatRoute;
+      const [, chatId, kind, id, contact] = chatRoute;
       if (CHATS.some((chat) => chat.id === chatId)) {
         const test = kind === 'tests' ? LIBRARY.find((t) => t.id === id) : undefined;
         const task = kind === 'tasks' ? TASK_LIBRARY.find((t) => t.id === id) : undefined;
+        if (contact) {
+          return {
+            key: `chat/${chatId}/contact`,
+            pm: true,
+            build: () => (
+              <main className="app__content">
+                <ContactPage chatId={chatId} />
+              </main>
+            ),
+          };
+        }
         if (kind === 'result') {
           return {
             key: `chat/${chatId}/result/${id}`,
