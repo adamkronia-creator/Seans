@@ -676,6 +676,16 @@ html:has([data-pm]) body {
   mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
 }
 
+/* Выбранный чат с точкой присутствия: вырезы под точку и под галочку работают вместе (маска присутствия иначе перекрывала бы маску галочки) */
+[data-pm] .chat-item--selected .avatar:has(> .avatar__presence) > .avatar__img {
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 [data-pm] .chat-item__button:active,
 [data-pm] .chat-item__button[data-pressed] {
   --chat-item-bg: var(--glass);
