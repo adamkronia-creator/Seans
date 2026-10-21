@@ -50,6 +50,7 @@ export function ProfileEditPage() {
   const [target] = useState(wantedEdit);
   const scroller = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLElement>(null);
+  const [leaving, setLeaving] = useState<string | null>(null);
   useSwipeBack(root, () => goBack('/'));
   const addCard = useRef<HTMLElement>(null);
   /** Что сделать, когда появится новое поле: встать на его название (своё поле) или на текст (из подсказки) */
@@ -58,7 +59,8 @@ export function ProfileEditPage() {
   const moved = useRef<string | null>(null);
 
   const cover = coverSrcOf(profile);
-  const used = new Set(fields.map((f) => f.label.trim().toLowerCase()));
+  // Уходящее поле уже не считается занятым: подсказка возвращается в начале анимации, а не скачком в её конце, когда список под ним меняет высоту
+  const used = new Set(fields.filter((f) => f.id !== leaving).map((f) => f.label.trim().toLowerCase()));
   const suggestions = FIELD_SUGGESTIONS.filter((label) => !used.has(label.toLowerCase()));
   const order = fields.map((f) => f.id).join();
 
@@ -116,7 +118,6 @@ export function ProfileEditPage() {
   };
 
   // Поле не пропадает рывком: карточка тает и сворачивается по высоте, и только потом исчезает из данных
-  const [leaving, setLeaving] = useState<string | null>(null);
   const dismiss = (id: string) => {
     const li = root.current?.querySelector<HTMLElement>(`[data-field="${id}"]`);
     if (!li || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

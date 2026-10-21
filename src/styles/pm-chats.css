@@ -390,6 +390,15 @@ html:has([data-pm]) body {
   text-align: left;
 }
 
+/* Вопрос перед удалением: заголовок и текст рядом (8), текст и кнопки (16), кнопки от нижнего края (16 + безопасная зона) */
+[data-pm] .sheet__body:has(> .pf-confirm) {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+[data-pm] .sheet:has(.pf-confirm) .sheet__footer {
+  padding: 0 var(--space-4) calc(var(--space-4) + var(--safe-bottom));
+}
+
 /* Порядок папок: строки до краёв, без разделителей */
 [data-pm] .fo-row {
   min-height: var(--size-bar);
