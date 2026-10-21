@@ -7,6 +7,7 @@ import { ContactPage } from './pages/ContactPage/ContactPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { FolderPage } from './pages/FolderPage/FolderPage';
 import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
+import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
@@ -42,15 +43,16 @@ interface Resolved {
  * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата), /chat/<чат>/tasks/<задание> (настройка задания)
  * и /chat/<чат>/result/<результат> (результат теста или задания); /chat/<чат>/contact — профиль собеседника
  */
-const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+)|\/(contact))?/;
+const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+)|\/(contact|profile))?/;
 
 /** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
 const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
-  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact)/);
-  if (nested) return nested[1];
+  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact|profile)/);
+  // Профиль собеседника лежит над его карточкой, карточка — над чатом
+  if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
   return path === '/' ? null : '/';
 }
 
@@ -148,6 +150,17 @@ export default function App() {
       if (CHATS.some((chat) => chat.id === chatId)) {
         const test = kind === 'tests' ? LIBRARY.find((t) => t.id === id) : undefined;
         const task = kind === 'tasks' ? TASK_LIBRARY.find((t) => t.id === id) : undefined;
+        if (contact === 'profile') {
+          return {
+            key: `chat/${chatId}/profile`,
+            pm: true,
+            build: () => (
+              <main className="app__content">
+                <PersonProfilePage chatId={chatId} />
+              </main>
+            ),
+          };
+        }
         if (contact) {
           return {
             key: `chat/${chatId}/contact`,

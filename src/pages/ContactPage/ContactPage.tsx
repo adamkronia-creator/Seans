@@ -10,7 +10,7 @@ import { useStoryAuthors } from '../../data/stories';
 import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
 import { roleOf } from '../../data/roles';
-import { goBack } from '../../router';
+import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import {
   IconBlock,
@@ -24,6 +24,7 @@ import {
   IconShare,
   IconTag,
   IconTrashLine,
+  IconUser,
   IconUserCheck,
   IconUserPlus,
 } from './ContactIcons';
@@ -224,6 +225,10 @@ export function ContactPage({ chatId }: { chatId: string }) {
             <button type="button" className="ct__action" onClick={back}>
               <IconChatBubble />
               Чат
+            </button>
+            <button type="button" className="ct__action" onClick={() => navigate(`/chat/${chatId}/profile`)}>
+              <IconUser />
+              Профиль
             </button>
             <button type="button" className="ct__action" aria-pressed={!chat.muted} onClick={toggleMute}>
               {chat.muted ? <IconBellOff /> : <IconBellOn />}

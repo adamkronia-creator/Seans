@@ -122,3 +122,9 @@ export const IconStory = (p: P) => (
     <circle cx="12" cy="12" r="4" />
   </svg>
 );
+export const IconUser = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8.5" r="3.8" />
+    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+  </svg>
+);

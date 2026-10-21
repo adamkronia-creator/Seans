@@ -1,0 +1,32 @@
+/* Профиль собеседника на странице «Профиль»: добавлены «назад» справа сверху (как в шапке чата) и размытая обложка из фото */
+.person__back {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--space-4));
+  right: var(--space-4);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control, 40px);
+  height: var(--size-control, 40px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  color: var(--icon-action, var(--text-primary));
+  font-size: var(--size-icon-lg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.person__cover {
+  filter: blur(18px) saturate(1.2);
+  transform: scale(1.3);
+}
+
+[data-pm] .person .profile__scroll {
+  padding-bottom: calc(var(--space-8) + var(--safe-bottom));
+}
+
+.person__field {
+  cursor: default;
+}
