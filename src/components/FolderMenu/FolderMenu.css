@@ -146,19 +146,34 @@
   line-height: var(--line-height-xs);
 }
 
-/* «Готово» в режиме перестановки чипсов: плавает над нижней панелью */
+/* «Готово» в режиме перестановки чипсов: активная кнопка во всю ширину над капсулой разделов, как «Пройти или отправить» */
 .folder-edit__done {
   position: absolute;
-  bottom: calc(var(--pm-bottom, 96px) + var(--space-2));
-  left: 50%;
+  right: var(--space-4);
+  bottom: calc(var(--size-bar, 64px) + var(--safe-bottom, 0px) + var(--space-3) + var(--space-3));
+  left: var(--space-4);
   z-index: 15;
-  height: var(--size-control);
-  padding: 0 var(--space-6);
-  transform: translateX(-50%);
+  height: var(--size-touch, 44px);
+  border: 1px solid var(--glass-border-blue, transparent);
   border-radius: var(--radius-full);
-  background: var(--action-primary, var(--color-accent));
-  box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+  background: var(--glass-chip-active, var(--color-accent));
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   color: var(--action-primary-text, var(--color-accent-on));
-  font: var(--type-body);
+  font: var(--type-label);
   font-weight: 600;
+  animation: folder-done-in 0.22s var(--ease-ios, ease-out) backwards;
+}
+
+@keyframes folder-done-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folder-edit__done {
+    animation: none;
+  }
 }

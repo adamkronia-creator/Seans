@@ -568,9 +568,11 @@
 }
 
 [data-pm] .fp__footer .fp__done {
-  height: var(--size-control);
-  font: var(--type-body);
+  height: var(--size-touch);
+  font: var(--type-label);
   font-weight: 600;
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 [data-pm] .fp__scroll {

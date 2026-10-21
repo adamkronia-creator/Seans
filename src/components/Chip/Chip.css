@@ -246,7 +246,7 @@
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
   user-select: none;
-  touch-action: pan-x;
+  touch-action: none;
   transition: scale 0.16s var(--ease-ios, ease-out), box-shadow 0.16s;
   animation: chip-wiggle 0.34s ease-in-out infinite alternate;
 }

@@ -14,7 +14,7 @@ export function flip(els: HTMLElement[], before: Map<HTMLElement, number>, axis:
 }
 
 const HOLD_MS = 220;
-const SLOP = 10;
+const SLOP = 14;
 
 /**
  * Перестановка чипсов папок в режиме «Изменить порядок»: чипс, который удержали, идёт за пальцем по ряду, а соседи уступают место
@@ -24,6 +24,9 @@ const SLOP = 10;
 export function useFolderDrag(scope: FolderScope, editing: boolean, move: (scope: FolderScope, id: string, step: -1 | 1) => void, folders: (scope: FolderScope) => readonly Folder[]) {
   useEffect(() => {
     if (!editing) return;
+    // Пока идёт перестановка, жесты экрана (листание папок и разделов, «назад») выключены: палец на чипсе — это перестановка
+    const screen = document.querySelector('.screen[data-layer="top"]');
+    screen?.setAttribute('data-no-swipe', '');
     let g: { id: string; chip: HTMLElement; row: HTMLElement; x0: number; y0: number; left0: number; scroll0: number; pointer: number; timer: number; drag: boolean } | null = null;
 
     const siblings = (row: HTMLElement) => Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip[data-folder-id]'));
@@ -119,6 +122,7 @@ export function useFolderDrag(scope: FolderScope, editing: boolean, move: (scope
       document.removeEventListener('pointerup', end);
       document.removeEventListener('pointercancel', end);
       document.removeEventListener('touchmove', touch);
+      screen?.removeAttribute('data-no-swipe');
       end();
     };
   }, [scope, editing, move, folders]);
