@@ -107,10 +107,10 @@ function entriesOf(scope: FolderScope): Entry[] {
   }));
 }
 
-const TEXTS: Record<FolderScope, { selected: string; add: string; hint: string }> = {
-  chats: { selected: 'Выбранные чаты', add: 'Добавить чаты', hint: 'Выберите чаты, которые нужно показывать в этой папке.' },
-  tests: { selected: 'Выбранные тесты', add: 'Добавить тесты', hint: 'Выберите тесты, которые нужно показывать в этой папке.' },
-  tasks: { selected: 'Выбранные задания', add: 'Добавить задания', hint: 'Выберите задания, которые нужно показывать в этой папке.' },
+const TEXTS: Record<FolderScope, { selected: string; add: string }> = {
+  chats: { selected: 'Выбранные чаты', add: 'Добавить чаты' },
+  tests: { selected: 'Выбранные тесты', add: 'Добавить тесты' },
+  tasks: { selected: 'Выбранные задания', add: 'Добавить задания' },
 };
 
 function EntryText({ entry, prefix }: { entry: Entry; prefix: string }) {
@@ -283,8 +283,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           <span className="fp__preview-text">{folder.name}</span>
         </span>
         <div className="fp__who">
-          <h1 className="fp__title">{folder.name}</h1>
-          <p className="fp__subtitle">Настройка папки</p>
+          <h1 className="fp__title">Настройка папки</h1>
         </div>
         <button type="button" className="fp__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
@@ -309,6 +308,9 @@ export function FolderPage({ scope, id }: FolderPageProps) {
                 onBlur={() => setName(getFolder(scope, id)?.name ?? name)}
                 onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
               />
+              <span className="fp__counter" aria-label={`Можно ввести ещё ${FOLDER_NAME_MAX - nameLength(name)}`}>
+                {FOLDER_NAME_MAX - nameLength(name)}
+              </span>
               <button
                 type="button"
                 className="fp__emoji"
@@ -324,16 +326,12 @@ export function FolderPage({ scope, id }: FolderPageProps) {
               >
                 <IconEmoji />
               </button>
-              <span className="fp__counter" aria-label={`Можно ввести ещё ${FOLDER_NAME_MAX - nameLength(name)}`}>
-                {FOLDER_NAME_MAX - nameLength(name)}
-              </span>
             </span>
           </label>
         </section>
 
         <ColorCard label="Цвет чипса" value={folder.color} palette={FOLDER_COLORS} onChange={(color) => setFolderPaint(scope, id, { color })} />
         <ColorCard label="Цвет текста" value={folder.ink} palette={FOLDER_INKS} onChange={(ink) => setFolderPaint(scope, id, { ink })} />
-        <p className="fp__hint">Цвета применяются к чипсу папки в ряду: и выбранному, и нет.</p>
 
         <section className="fp__card" aria-labelledby="fp-selected">
           <h2 id="fp-selected" className="fp__heading fp__heading--pad">
@@ -364,7 +362,6 @@ export function FolderPage({ scope, id }: FolderPageProps) {
             </ul>
           )}
         </section>
-        <p className="fp__hint">{text.hint}</p>
 
         <button type="button" className="fp__card fp__delete" onClick={() => setAsking(true)}>
           Удалить папку

@@ -38,9 +38,9 @@
   scroll-padding-top: var(--pm-top);
   background: none;
   scrollbar-width: none;
-  /* Ряд недавних сворачивается за 0.26 с, как истории при выборе чатов: список поднимается следом тем же ходом, а не прыгает */
+  /* Ряд недавних сворачивается за --collapse-time, как истории при выборе чатов: список поднимается следом тем же ходом, а не прыгает */
   overflow-anchor: none;
-  transition: padding-top 0.26s var(--ease-ios, ease), padding-bottom 0.26s var(--ease-ios, ease);
+  transition: padding-top var(--collapse-time) var(--collapse-ease), padding-bottom var(--collapse-time) var(--collapse-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
