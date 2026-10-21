@@ -7,6 +7,7 @@ import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
 import { IconReadTicks } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
+import { IconPinned } from '../FolderMenu/FolderIcons';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -19,6 +20,7 @@ function Status({ message }: { message: Message }) {
 function Meta({ message }: { message: Message }) {
   return (
     <>
+      {message.pinned && <IconPinned className="bubble__pin" aria-label="Закреплено" role="img" />}
       <span className="bubble__time">{message.time}</span>
       {message.from === 'me' && <Status message={message} />}
     </>

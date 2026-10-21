@@ -13,7 +13,7 @@
 
 [data-pm] .chat {
   /* Шапка: безопасная зона, space-4 до фото, фото (size-avatar-sm), space-3 до низа подложки, как у «Диалогов» без историй и чипсов */
-  --chat-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3));
+  --chat-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3) + var(--chat-pin, 0px));
   /* Плавающая нижняя капсула приложения: высота панели, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
   --chat-tabs: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   /* Подсказка стоит над капсулой */
@@ -393,4 +393,57 @@
 .bubble-group--in + .bubble-group--out,
 .bubble-group--out + .bubble-group--in {
   margin-top: var(--space-1);
+}
+
+/* ——— Плашка закреплённого сообщения под шапкой: синяя черта, подпись и текст в одну строку, справа «открепить» ——— */
+.chat[data-pinned] {
+  --chat-pin: calc(var(--space-3) + var(--space-10));
+}
+
+.chat__pin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--space-10);
+  margin: var(--space-3) var(--space-4) 0;
+}
+
+.chat__pin-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  justify-content: center;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--action-primary, var(--color-accent));
+  text-align: left;
+}
+
+.chat__pin-title {
+  color: var(--text-link, var(--color-accent));
+  font: var(--type-meta);
+  font-weight: 600;
+  line-height: var(--space-4);
+}
+
+.chat__pin-text {
+  overflow: hidden;
+  color: var(--text-primary, var(--color-text-primary));
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat__pin-off {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--size-icon);
 }

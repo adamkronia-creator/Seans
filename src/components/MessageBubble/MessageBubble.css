@@ -410,3 +410,11 @@
   color: inherit;
   opacity: 0.8;
 }
+
+/* Значок закрепа перед временем: тот же 12-пиксельный размер, что у галочек, цвет как у времени */
+.bubble__pin {
+  flex-shrink: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  transform: rotate(35deg);
+}

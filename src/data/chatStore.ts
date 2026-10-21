@@ -201,3 +201,12 @@ export function deleteMessage(chatId: string, id: string) {
   setPreview(chatId);
   emit();
 }
+
+/** Закрепить сообщение в чате или открепить; закреплённых может быть несколько */
+export function setMessagePinned(chatId: string, id: string, pinned: boolean) {
+  messages = {
+    ...messages,
+    [chatId]: (messages[chatId] ?? []).map((g) => ({ ...g, messages: g.messages.map((m) => (m.id === id ? { ...m, pinned: pinned || undefined } : m)) })),
+  };
+  emit();
+}

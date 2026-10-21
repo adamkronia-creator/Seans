@@ -22,7 +22,7 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import { deleteMessage, sendMessage, useChats, useMessages, useTyping } from '../../data/chatStore';
+import { deleteMessage, sendMessage, setMessagePinned, useChats, useMessages, useTyping } from '../../data/chatStore';
 import { addNote, addSection, CLIENT_CHAT, countOf, useClientData } from '../../data/clientStore';
 import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
@@ -32,6 +32,7 @@ import { findClientTaskResult } from '../../data/clientTaskResults';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
 import { goBack, guardBack, navigate } from '../../router';
+import { IconPinned } from '../../components/FolderMenu/FolderIcons';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
@@ -76,6 +77,9 @@ function menuBounds(list: HTMLElement | null) {
   return new DOMRect(rect.left, rect.top + inset, rect.width, rect.height - inset);
 }
 
+/** Текст плашки закреплённого: сообщение одной строкой, у карточки — её вид */
+const pinPreview = (m: Message) => (m.test ? 'Тест' : m.task ? 'Задание' : m.text.replace(/\s*\n\s*/g, ' '));
+
 /** Меню сообщения по долгому нажатию: ответить, копировать, удалить */
 function MessageMenu({
   message,
@@ -83,6 +87,7 @@ function MessageMenu({
   bounds,
   onClose,
   onReply,
+  onPin,
   onDelete,
 }: {
   message: Message;
@@ -90,12 +95,14 @@ function MessageMenu({
   bounds?: DOMRect;
   onClose: () => void;
   onReply: () => void;
+  onPin: () => void;
   onDelete: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
   useExitAnimation(backdropRef);
   const items = [
     { label: 'Ответить', Icon: IconReply, run: onReply },
+    { label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin },
     ...(message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined) }] : []),
     { label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true },
   ];
@@ -211,6 +218,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const section: SectionId = sections.some(({ id }) => id === picked) ? picked : 'messages';
   const groups = useMessages(chatId);
   const typing = useTyping(chatId);
+  // Закреплённые по порядку переписки; плашка под шапкой показывает один и по нажатию переходит к нему, следующее нажатие — к предыдущему
+  const pins = useMemo(() => groups.flatMap((g) => g.messages).filter((m) => m.pinned), [groups]);
+  const [pinAt, setPinAt] = useState<number | undefined>(undefined);
+  const pinNow = pins.length ? Math.min(pinAt ?? pins.length - 1, pins.length - 1) : 0;
   const listRef = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
   const prevCount = useRef(0);
@@ -307,6 +318,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     window.setTimeout(() => el.classList.remove('bubble--flash'), 1200);
   };
 
+  const showPin = () => {
+    if (!pins.length) return;
+    jumpTo(pins[pinNow].id);
+    setPinAt((pinNow - 1 + pins.length) % pins.length);
+  };
+
   const closeSearch = () => {
     setSearchOpen(false);
     setQuery('');
@@ -382,7 +399,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     message={m}
                     replyTarget={m.replyTo ? byId.get(m.replyTo) : undefined}
                     peerName={chat.name.split(' ')[0]}
-                    showMeta={!sameRun(m, next)}
+                    showMeta={!sameRun(m, next) || Boolean(m.pinned)}
                     joinPrev={sameRun(prev, m)}
                     query={q}
                     activeMatch={m.id === activeId}
@@ -463,7 +480,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   };
 
   return (
-    <section className="chat">
+    <section className="chat" data-pinned={pins.length > 0 && section === 'messages' && !searchOpen ? '' : undefined}>
       <header className="chat__header">
         {searchOpen && section === 'messages' ? (
           <div key="search" className="chat__top chat__search">
@@ -528,6 +545,17 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             </button>
           </div>
         )}
+        {pins.length > 0 && section === 'messages' && !searchOpen && (
+          <div className="chat__pin">
+            <button type="button" className="chat__pin-main" onClick={showPin}>
+              <span className="chat__pin-title">{pins.length > 1 ? `Закреплённое сообщение #${pinNow + 1}` : 'Закреплённое сообщение'}</span>
+              <span className="chat__pin-text">{pinPreview(pins[pinNow])}</span>
+            </button>
+            <button type="button" className="chat__pin-off" aria-label="Открепить" onClick={() => setMessagePinned(chatId, pins[pinNow].id, false)}>
+              <IconPinned />
+            </button>
+          </div>
+        )}
       </header>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />
@@ -555,6 +583,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           bounds={menuBounds(listRef.current)}
           onClose={() => setMenu(null)}
           onReply={() => setReplyTo(menu.message)}
+          onPin={() => setMessagePinned(chatId, menu.message.id, !menu.message.pinned)}
           onDelete={() => {
             if (replyTo?.id === menu.message.id) setReplyTo(null);
             deleteMessage(chatId, menu.message.id);
