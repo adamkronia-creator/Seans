@@ -38,6 +38,15 @@
   scroll-padding-top: var(--pm-top);
   background: none;
   scrollbar-width: none;
+  /* Ряд недавних сворачивается за 0.26 с, как истории при выборе чатов: список поднимается следом тем же ходом, а не прыгает */
+  overflow-anchor: none;
+  transition: padding-top 0.26s var(--ease-ios, ease), padding-bottom 0.26s var(--ease-ios, ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .library-page.messages .library-page__page {
+    transition: none;
+  }
 }
 
 .library-page.messages .library-page__page::-webkit-scrollbar {
@@ -279,4 +288,10 @@
 /* История сворачивается: шапка ниже на высоту ряда недавних */
 .messages.library-page[data-selecting] {
   --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
+}
+
+/* Сердечко в шапке выбора — то же, что в карточке теста (серое / красное), крупнее под кнопку 40 */
+.lib-sel__heart {
+  width: var(--space-6);
+  height: var(--space-6);
 }

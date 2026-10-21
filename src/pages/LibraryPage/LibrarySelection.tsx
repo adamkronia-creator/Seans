@@ -7,15 +7,10 @@ import { setFolderItems, useFolders, type FolderScope } from '../../data/folders
 import type { LibraryItem } from '../../data/library';
 import { plural } from '../../data/taskValues';
 import { guardBack } from '../../router';
+import { IconHeartGray, IconHeartRed } from '../../components/icons';
 
 /** Окно настроек тянет за собой экраны настройки теста и задания: грузится только когда понадобилось */
 const SendBatchSheet = lazy(() => import('../../components/TestSettings/SendBatch').then((m) => ({ default: m.SendBatchSheet })));
-
-const IconHeart = () => (
-  <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 20.2S4 15.1 4 9.4A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8 2.4c0 5.7-8 10.8-8 10.8z" />
-  </svg>
-);
 
 interface Options {
   kind: 'test' | 'task';
@@ -120,7 +115,7 @@ export function useLibrarySelection(o: Options) {
             done(allFav ? `Убрано из избранного: ${count(n)}` : `Добавлено в избранное: ${count(n)}`);
           }}
         >
-          <IconHeart />
+          {allFav ? <IconHeartRed className="lib-sel__heart" /> : <IconHeartGray className="lib-sel__heart" />}
         </button>
         <button
           type="button"

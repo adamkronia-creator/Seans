@@ -53,8 +53,8 @@ export function ProfileEditPage() {
   const [leaving, setLeaving] = useState<string | null>(null);
   useSwipeBack(root, () => goBack('/'));
   const addCard = useRef<HTMLElement>(null);
-  /** Что сделать, когда появится новое поле: встать на его название (своё поле) или на текст (из подсказки) */
-  const pending = useRef<{ id: string; part: 'label' | 'value' } | null>(null);
+  /** Новое поле: когда оно появится, его показывают на экране; курсор в него не ставится, клавиатура сама не открывается */
+  const pending = useRef<{ id: string } | null>(null);
   /** Поле, которое только что переставили: после этого оно остаётся на виду */
   const moved = useRef<string | null>(null);
 
@@ -87,7 +87,6 @@ export function ProfileEditPage() {
     const found = card(want.id);
     if (!found) return;
     reveal(box, found);
-    found.querySelector<HTMLElement>(want.part === 'label' ? 'input' : 'textarea')?.focus({ preventScroll: true });
   }, [fields.length]);
 
   useLayoutEffect(() => {
@@ -109,7 +108,7 @@ export function ProfileEditPage() {
   );
 
   const add = (label: string) => {
-    pending.current = { id: addField(label), part: label ? 'value' : 'label' };
+    pending.current = { id: addField(label) };
   };
 
   const move = (id: string, step: -1 | 1) => {
