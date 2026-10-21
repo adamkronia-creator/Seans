@@ -156,6 +156,7 @@ function PickSheet({ scope, folder, entries, onClose }: PickProps) {
 
   return (
     <Frame
+      ruled
       title={text.add}
       subtitle={`Выбрано ${chosen.size} из ${entries.length}`}
       onClose={onClose}

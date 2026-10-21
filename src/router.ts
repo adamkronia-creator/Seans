@@ -75,6 +75,18 @@ let guard: { step: number; onBack: () => void; silent: boolean } | undefined;
 
 /** Ставит запись-«заглушку»; вернёт функцию, снимающую её, когда режим закончился другим способом */
 export function guardBack(onBack: () => void): () => void {
+  if (pending) {
+    // Прежняя заглушка ещё уходит (history.back не отработал): новую ставим после того, как он завершится, иначе «назад» съест не ту запись
+    let released = false;
+    let real: (() => void) | undefined;
+    queued.push(() => {
+      if (!released) real = guardBack(onBack);
+    });
+    return () => {
+      released = true;
+      real?.();
+    };
+  }
   step += 1;
   window.history.pushState({ i: step, prev: target }, '', `#${target}`);
   const mine = { step, onBack, silent: false };
@@ -90,6 +102,7 @@ export function guardBack(onBack: () => void): () => void {
   };
 }
 let pending: { silent: boolean } | undefined;
+const queued: Array<() => void> = [];
 
 /** Браузер сам перешёл по истории (кнопка «назад»/«вперёд», свайп) или поменяли адрес руками */
 function onHistory(event: Event) {
@@ -97,6 +110,7 @@ function onHistory(event: Event) {
     // Заглушку сняли сами: просто возвращаем счётчик шага
     pending = undefined;
     step = readState().i ?? step - 1;
+    queued.splice(0).forEach((run) => run());
     return;
   }
   if (guard && event.type === 'popstate' && (readState().i ?? -1) < guard.step) {

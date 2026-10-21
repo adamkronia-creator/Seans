@@ -126,3 +126,52 @@
 [data-pm] .fs .fp__scroll > .fs__lead {
   border: 0;
 }
+
+/* Рекомендованные папки: название и пояснение слева, «Добавить» справа синей стеклянной кнопкой; строки по сетке 4 */
+.fs__rec {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fs-rec {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--space-16);
+  padding: var(--space-2) var(--space-4);
+}
+
+.fs-rec + .fs-rec {
+  border-top: 1px solid var(--divider);
+}
+
+.fs-rec__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.fs-rec__name {
+  color: var(--text-primary, var(--color-text-primary));
+  font: var(--type-body, inherit);
+}
+
+.fs-rec__note {
+  color: var(--text-secondary, var(--color-text-secondary));
+  font: var(--type-meta, inherit);
+}
+
+.fs-rec__add {
+  flex-shrink: 0;
+  height: var(--space-8);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--glass-border-blue);
+  border-radius: var(--radius-full);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+  font-weight: 600;
+}

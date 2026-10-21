@@ -10,18 +10,20 @@ interface FrameProps {
   subtitle?: string;
   /** Заголовок мелкий, как подпись группы (окна выбора фото и фона) */
   quietTitle?: boolean;
+  /** Заголовок по центру и линия под ним на всю ширину: список режется по ней (окна выбора, отправки) */
+  ruled?: boolean;
   footer: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }
 
 /** Каркас нижнего окна: ручка, заголовок, прокручиваемое содержимое и нижние кнопки */
-export function Frame({ title, subtitle, quietTitle, footer, onClose, children }: FrameProps) {
+export function Frame({ title, subtitle, quietTitle, ruled, footer, onClose, children }: FrameProps) {
   useSheet(onClose);
   const body = useRef<HTMLDivElement>(null);
   return (
     <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
+      <div className={`sheet${ruled ? ' sheet--ruled' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <div className="sheet__grab" aria-hidden="true" />
         {!quietTitle && (
           <div className="sheet__header">

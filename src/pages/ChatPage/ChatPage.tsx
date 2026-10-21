@@ -31,7 +31,7 @@ import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
-import { goBack, navigate } from '../../router';
+import { goBack, guardBack, navigate } from '../../router';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
@@ -317,6 +317,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   // Жест «назад» при открытой боковой панели закрывает её
   useBackHandler(menuOpen, closeMenu);
+  // Системная «назад» (кнопка телефона) при открытой панели закрывает её, а не уводит из чата
+  useEffect(() => (menuOpen ? guardBack(closeMenu) : undefined), [menuOpen, closeMenu]);
+  // Так же с открытым поиском по чату
+  const closeSearchNow = useRef(closeSearch);
+  closeSearchNow.current = closeSearch;
+  useEffect(() => (searchOpen && section === 'messages' ? guardBack(() => closeSearchNow.current()) : undefined), [searchOpen, section]);
   // Чат сменился или закрылся: панель не остаётся открытой
   useEffect(() => setMenuOpen(false), [chatId]);
 

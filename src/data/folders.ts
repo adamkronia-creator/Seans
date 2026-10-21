@@ -92,6 +92,14 @@ export function createFolder(scope: FolderScope): string {
   return id;
 }
 
+/** Папка с готовым составом (рекомендованные папки): добавляется в конец ряда */
+export function addFolderWith(scope: FolderScope, name: string, ids: string[]): string {
+  serial += 1;
+  const id = `folder-${serial}`;
+  commit(scope, [...state[scope], { id, name: cleanFolderName(name), ids, muted: false }]);
+  return id;
+}
+
 /** Переименовать; пустое название игнорируется, чипс без подписи не нужен */
 export function renameFolder(scope: FolderScope, id: string, name: string) {
   const next = cleanFolderName(name);

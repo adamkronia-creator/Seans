@@ -6,7 +6,8 @@ import { IconTrash } from '../../components/ChatParts/ChatIcons';
 import { IconBack } from '../../components/icons';
 import { IconPencil, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
-import { createFolder, deleteFolder, moveFolder, useFolders, type Folder, type FolderScope } from '../../data/folders';
+import { useChats } from '../../data/chatStore';
+import { addFolderWith, createFolder, deleteFolder, moveFolder, useFolders, type Folder, type FolderScope } from '../../data/folders';
 import { plural } from '../../data/taskValues';
 import { goBack, navigate } from '../../router';
 import { flip } from '../../components/FolderMenu/useFolderDrag';
@@ -24,13 +25,23 @@ const TEXTS: Record<FolderScope, { title: string; all: string; lead: string }> =
 
 const ROW = 56;
 
+/** Рекомендованные папки чатов, как в Telegram: название, пояснение и состав на момент добавления */
+const RECOMMENDED: { name: string; note: string; pick: (c: { unread: number; pinned?: boolean }) => boolean }[] = [
+  { name: 'Новые', note: 'Чаты с новыми сообщениями.', pick: (c) => c.unread > 0 },
+  { name: 'Закреплённые', note: 'Чаты, которые вы закрепили.', pick: (c) => c.pinned === true },
+];
+
 /**
  * «Папки с чатами» (как в Telegram, открывается из меню чипса «Все»): все папки списком. Строку можно перетащить за значок слева,
  * у каждой папки меню «Настроить» и «Удалить», внизу «Создать новую папку». «Все» всегда первая и не двигается.
  */
 export function FoldersPage({ scope }: { scope: FolderScope }) {
   const folders = useFolders(scope);
+  const chats = useChats();
   const text = TEXTS[scope];
+  // Рекомендуются только те, которых в ряду ещё нет (по названию)
+  const taken = new Set(folders.map((f) => f.name.trim().toLowerCase()));
+  const recommended = scope === 'chats' ? RECOMMENDED.filter((r) => !taken.has(r.name.toLowerCase())) : [];
   const [menu, setMenu] = useState<{ folder: Folder; rect: DOMRect; opener: HTMLElement } | null>(null);
   const [asking, setAsking] = useState<Folder | null>(null);
   const list = useRef<HTMLUListElement>(null);
@@ -106,6 +117,36 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
           </svg>
           <p>{text.lead}</p>
         </div>
+
+        {recommended.length > 0 && (
+          <section className="fp__card" aria-label="Рекомендованные папки">
+            <h2 className="fp__heading fp__heading--pad">Рекомендованные папки</h2>
+            <ul className="fs__rec">
+              {recommended.map((r) => (
+                <li key={r.name} className="fs-rec">
+                  <span className="fs-rec__text">
+                    <span className="fs-rec__name">{r.name}</span>
+                    <span className="fs-rec__note">{r.note}</span>
+                  </span>
+                  <button
+                    type="button"
+                    className="fs-rec__add"
+                    aria-label={`Добавить папку «${r.name}»`}
+                    onClick={() =>
+                      addFolderWith(
+                        scope,
+                        r.name,
+                        chats.filter((c) => !c.favorites && !c.archived && r.pick(c)).map((c) => c.id),
+                      )
+                    }
+                  >
+                    Добавить
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="fp__card" aria-label={text.title}>
           <h2 className="fp__heading fp__heading--pad">{text.title}</h2>

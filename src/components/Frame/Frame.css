@@ -51,3 +51,20 @@
   background: var(--color-red-text);
   color: var(--color-accent-on);
 }
+
+/* Заголовок по центру, под ним линия на всю ширину окна, как в «Настройках перед отправкой»: список режется по ней, а не тает */
+[data-pm] .sheet--ruled .sheet__header {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--glass-border);
+  text-align: center;
+}
+
+[data-pm] .sheet.sheet--ruled .sheet__heading {
+  text-align: center;
+}
+
+[data-pm] .sheet--ruled .sheet__body {
+  padding-top: var(--space-4);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
