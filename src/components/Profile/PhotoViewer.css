@@ -36,7 +36,7 @@
   flex-shrink: 0;
   align-items: center;
   min-height: var(--size-bar-h);
-  padding: var(--safe-top) var(--space-2) 0;
+  padding: var(--safe-top) var(--space-4) 0;
 }
 
 .viewer__button {

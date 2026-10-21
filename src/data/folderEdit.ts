@@ -1,4 +1,5 @@
 import { useRef, useSyncExternalStore } from 'react';
+import { guardBack } from '../router';
 import type { FolderScope } from './folders';
 
 /*
@@ -15,13 +16,20 @@ const subscribe = (l: () => void) => {
   return () => listeners.delete(l);
 };
 
+/** Снимает запись-«заглушку» истории: системная «назад» во время перестановки закрывает её, а не уводит с экрана */
+let releaseBack: (() => void) | null = null;
+
 export const startFolderEdit = (scope: FolderScope) => {
+  if (editing === null) releaseBack = guardBack(stopFolderEdit);
   editing = scope;
   emit();
 };
 export const stopFolderEdit = () => {
   if (editing === null) return;
   editing = null;
+  const release = releaseBack;
+  releaseBack = null;
+  release?.();
   emit();
 };
 

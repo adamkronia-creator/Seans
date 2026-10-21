@@ -153,13 +153,13 @@
 }
 
 /* Шапка как у открытого чата (ChatPage.css): фото (здесь значок теста) 40, имя и подпись слева, справа стеклянные «назад» и сердечко
-   на месте меню. Поля 16 слева и 8 справа, зазор 12, сверху безопасная зона и 16, снизу 12; подложка стеклянная, линии под ней нет */
+   на месте меню. Поля 16 с обеих сторон, зазор 12, сверху безопасная зона и 16, снизу 12; подложка стеклянная, линии под ней нет */
 [data-pm] .test-settings__header {
   position: relative;
   z-index: 3;
   gap: var(--space-3);
   min-height: 0;
-  padding: calc(var(--safe-top) + var(--space-4)) var(--space-2) var(--space-3) var(--space-4);
+  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) var(--space-3);
   border: 0;
   background: none;
   -webkit-backdrop-filter: none;

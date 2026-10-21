@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-2);
+  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);

@@ -286,8 +286,8 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: 60px;
-  padding: var(--space-2) var(--space-4);
+  min-height: var(--space-16);
+  padding: var(--space-3) var(--space-4);
   text-align: left;
 }
 
@@ -327,7 +327,7 @@
   left: 0;
   z-index: 3;
   min-height: 0;
-  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-2);
+  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
@@ -585,4 +585,32 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ---------- Окно «Добавить …»: отступы по сетке 4 ----------
+   Заголовок и подпись слева, на одной линии с полями 16, зазор между ними 4; до карточки 16. Карточка без внутренних полей по бокам
+   (поля 16 держат сами строки: отметка стоит на 16 от края карточки), сверху и снизу 8. Строка 64 = фото 40 + 12 сверху и снизу.
+   От карточки до кнопок 16. */
+[data-pm] .sheet .sheet__header:has(.frame-subtitle) {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet .frame-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  text-align: left;
+}
+
+[data-pm] .sheet .sheet__card:has(.fp-pick) {
+  padding: var(--space-2) 0;
+}
+
+[data-pm] .sheet:has(.fp-pick) .sheet__body {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet:has(.fp-pick) .sheet__footer {
+  padding-top: var(--space-4);
 }

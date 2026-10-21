@@ -35,7 +35,7 @@
   align-items: center;
   gap: var(--space-3);
   height: var(--size-avatar-sm);
-  padding: 0 var(--space-2) 0 var(--space-4);
+  padding: 0 var(--space-4);
 }
 
 .chats-header__avatar {
@@ -242,7 +242,6 @@
 /* Верхняя строка выбора: крестик, число, затем кнопки действий справа */
 .chats-header__top--select {
   gap: var(--space-1);
-  padding-left: var(--space-2);
 }
 
 .chats-header__count {
