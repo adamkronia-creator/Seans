@@ -27,8 +27,8 @@ const ROW = 56;
 
 /** Рекомендованные папки чатов, как в Telegram: название, пояснение и состав на момент добавления */
 const RECOMMENDED: { name: string; note: string; pick: (c: { unread: number; pinned?: boolean }) => boolean }[] = [
-  { name: 'Новые', note: 'Чаты с новыми сообщениями.', pick: (c) => c.unread > 0 },
-  { name: 'Закреплённые', note: 'Чаты, которые вы закрепили.', pick: (c) => c.pinned === true },
+  { name: 'Новые', note: 'Чаты с новыми сообщениями', pick: (c) => c.unread > 0 },
+  { name: 'Закреплённые', note: 'Чаты, которые вы закрепили', pick: (c) => c.pinned === true },
 ];
 
 /**
@@ -105,7 +105,10 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
         <button type="button" className="fp__back" aria-label="Назад" onClick={() => goBack('/')}>
           <IconBack />
         </button>
-        <h1 className="fp__title">{text.title}</h1>
+        <div className="fp__who">
+          <h1 className="fp__title">{text.title}</h1>
+          <p className="fp__subtitle">Настройка папок</p>
+        </div>
       </header>
       <div className="fp__scroll">
         <div className="fs__lead">
