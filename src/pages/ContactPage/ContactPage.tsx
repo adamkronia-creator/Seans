@@ -44,6 +44,8 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
+  // Экран профиля: на нём лежит просмотр историй
+  const [screen, setScreen] = useState<HTMLElement | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLDivElement>(null);
   const groups = useMessages(chatId);
@@ -181,7 +183,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
   return (
-    <section className="fp ct">
+    <section ref={setScreen} className="fp ct">
       {/* «Назад» и «⋯» справа, как в шапке открытого чата */}
       <header className="fp__header ct__bar">
         <button type="button" className="fp__back" aria-label="Назад" onClick={back}>
@@ -271,7 +273,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
             </section>
           )}
 
-          <ContactTabs stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={links} onCopy={copy} />
+          <ContactTabs author={{ id: chat.id, name: chat.name, avatar: chat.avatar }} root={screen} stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={links} onCopy={copy} />
         </div>
       </div>
 

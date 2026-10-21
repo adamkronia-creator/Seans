@@ -235,48 +235,47 @@
   gap: var(--space-3);
 }
 
-/* Стеклянная полоса вкладок: одна плашка выбранной вкладки переезжает по --i (как «Цвет текста» в окне фона) */
+/* Капсула на всю ширину, как у чипсов «Истории» чата: сама неподвижна, внутри чипсы-пилюли высотой 32 (Chip, выбранный залит синим стеклом).
+   Липнет под шапкой, когда прокрутили до неё */
 .ct__tabs {
   position: sticky;
   top: calc(var(--bar, 72px) - var(--space-2));
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(var(--n), 1fr);
-  padding: var(--space-1);
+  overflow: hidden;
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill, 999px);
-  background: var(--glass-fill-header);
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }
 
-.ct__tabs::before {
-  content: '';
-  position: absolute;
-  top: var(--space-1);
-  bottom: var(--space-1);
-  left: var(--space-1);
-  width: calc((100% - var(--space-1) * 2) / var(--n));
-  border-radius: var(--radius-pill, 999px);
-  background: var(--glass-chip-active);
-  transform: translateX(calc(var(--i) * 100%));
-  transition: transform 0.28s var(--ease-ios);
+.ct__chips {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1);
 }
 
-.ct__tab {
-  position: relative;
-  height: 36px;
+/* Четыре чипса делят ширину поровну */
+.ct__chips .chip {
+  flex: 1 1 0;
+  justify-content: center;
   min-width: 0;
-  padding: 0 var(--space-1);
-  color: var(--text-secondary);
-  font: var(--type-label);
-  font-weight: 600;
-  white-space: nowrap;
-  transition: color var(--dur-quick, 0.16s) ease;
+  margin-right: 0;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
 }
 
-.ct__tab[aria-selected='true'] {
-  color: var(--text-link);
+/* Невыбранные без своего стекла (фон даёт капсула), выбранный — синее стекло с рамкой */
+.ct__chips .chip--follow::before {
+  border: 1px solid transparent;
+  background: none;
+}
+
+.ct__chips .chip--follow::after {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
+  background: var(--glass-chip-active);
 }
 
 .ct__panel {
@@ -300,6 +299,8 @@
 
 .ct__story {
   display: flex;
+  width: 100%;
+  text-align: left;
   flex-direction: column;
   justify-content: space-between;
   aspect-ratio: 3 / 4;
@@ -420,7 +421,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ct__tabs::before,
   .ct__panel {
     transition: none;
     animation: none;

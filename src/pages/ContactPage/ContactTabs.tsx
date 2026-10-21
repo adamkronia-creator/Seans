@@ -1,6 +1,9 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Chip } from '../../components/Chip/Chip';
+import { StoryViewer } from '../../components/Stories/Stories';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
-import { STORY_BACKGROUNDS, type Story } from '../../data/stories';
+import { STORY_BACKGROUNDS, type Story, type StoryAuthor } from '../../data/stories';
 import type { SharedFile, SharedLink, SharedMedia } from '../../data/contactShared';
 import { IconCopyLine, IconFile, IconImage, IconLink, IconStory } from './ContactIcons';
 
@@ -8,6 +11,10 @@ const TABS = ['Истории', 'Медиа', 'Файлы', 'Ссылки'] as c
 type Tab = (typeof TABS)[number];
 
 interface Props {
+  /** Собеседник и его истории: нажатие на плитку открывает просмотр */
+  author: Pick<StoryAuthor, 'id' | 'name' | 'avatar'>;
+  /** Экран профиля: на нём лежит просмотр историй */
+  root: HTMLElement | null;
   stories: Story[];
   media: SharedMedia[];
   files: SharedFile[];
@@ -16,27 +23,43 @@ interface Props {
 }
 
 /** Вкладки профиля, как в Telegram: «Истории», «Медиа», «Файлы», «Ссылки». Выбранная вкладка — плашка, которая переезжает к новой */
-export function ContactTabs({ stories, media, files, links, onCopy }: Props) {
+export function ContactTabs({ author, root, stories, media, files, links, onCopy }: Props) {
   const [tab, setTab] = useState<Tab>('Истории');
-  const index = TABS.indexOf(tab);
+  const [viewing, setViewing] = useState<{ at: number; x: number; y: number } | null>(null);
   return (
     <section className="ct__tabs-block">
-      <div className="ct__tabs" role="tablist" aria-label="Материалы" style={{ '--i': index, '--n': TABS.length } as CSSProperties}>
-        {TABS.map((name) => (
-          <button key={name} type="button" role="tab" id={`ct-tab-${name}`} aria-selected={tab === name} aria-controls="ct-panel" className="ct__tab" onClick={() => setTab(name)}>
-            {name}
-          </button>
-        ))}
+      {/* Чипсы, как в «Диалогах» и «Истории» чата, в стеклянной капсуле */}
+      <div className="ct__tabs">
+        <div className="ct__chips" role="group" aria-label="Материалы">
+          {TABS.map((name) => (
+            <Chip key={name} follow tone="chat" active={tab === name} onClick={() => setTab(name)}>
+              {name}
+            </Chip>
+          ))}
+        </div>
       </div>
 
-      <div key={tab} id="ct-panel" role="tabpanel" aria-labelledby={`ct-tab-${tab}`} className="ct__panel">
+      <div key={tab} className="ct__panel" role="region" aria-label={tab}>
         {tab === 'Истории' &&
           (stories.length ? (
             <ul className="ct__tiles">
-              {stories.map((s) => (
-                <li key={s.id} className="ct__story" style={{ background: STORY_BACKGROUNDS[s.bg % STORY_BACKGROUNDS.length] }}>
-                  <span className="ct__story-text">{s.text}</span>
-                  <span className="ct__story-ago">{s.ago}</span>
+              {stories.map((s, i) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    className="ct__story"
+                    aria-label={`История: ${s.text}`}
+                    style={{ background: STORY_BACKGROUNDS[s.bg % STORY_BACKGROUNDS.length] }}
+                    onClick={(e) => {
+                      // Просмотр вырастает из плитки, на которую нажали
+                      const from = e.currentTarget.getBoundingClientRect();
+                      const to = root?.getBoundingClientRect();
+                      if (root) setViewing({ at: i, x: to ? from.left + from.width / 2 - to.left : 0, y: to ? from.top + from.height / 2 - to.top : 0 });
+                    }}
+                  >
+                    <span className="ct__story-text">{s.text}</span>
+                    <span className="ct__story-ago">{s.ago}</span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -110,6 +133,7 @@ export function ContactTabs({ stories, media, files, links, onCopy }: Props) {
             <EmptyState icon={<IconLink />} title="Ссылок нет" text="Ссылки из переписки появятся здесь." />
           ))}
       </div>
+      {viewing && root && createPortal(<StoryViewer queue={[{ ...author, stories }]} startId={author.id} startStory={viewing.at} origin={viewing} onClose={() => setViewing(null)} />, root)}
     </section>
   );
 }

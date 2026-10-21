@@ -80,10 +80,10 @@ export function StoriesRow({ root }: { root: HTMLElement | null }) {
  * Жесты (useStoryGestures): вниз — закрыть, влево и вправо — следующий и предыдущий человек. Просмотр вырастает из круга, на который
  * нажали, и сжимается при закрытии; новый человек въезжает с той стороны, куда провели.
  */
-function StoryViewer({ queue, startId, origin, onClose }: { queue: StoryAuthor[]; startId: string; origin: { x: number; y: number }; onClose: () => void }) {
+export function StoryViewer({ queue, startId, startStory, origin, onClose }: { queue: StoryAuthor[]; startId: string; /** С какой истории начать (номер); без него — с первой непросмотренной */ startStory?: number; origin: { x: number; y: number }; onClose: () => void }) {
   const [a, setA] = useState(Math.max(0, queue.findIndex((x) => x.id === startId)));
   const first = queue[a].stories.findIndex((s) => !isSeen(s.id));
-  const [s, setS] = useState(Math.max(0, first));
+  const [s, setS] = useState(startStory ?? Math.max(0, first));
   const [paused, setPaused] = useState(false);
   /** Идёт уход (кнопка, Escape, конец историй): ждём конца анимации и только потом убираем просмотр */
   const [closing, setClosing] = useState(false);
