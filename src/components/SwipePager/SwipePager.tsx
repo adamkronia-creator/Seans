@@ -69,8 +69,6 @@ interface Gesture {
   scroller: HTMLElement | null;
   /** Начали на пузыре: вправо там тянет ответ, а не страницу */
   locked: boolean;
-  /** Строка списка со своим свайпом влево (data-swipe-lock="left"): влево жест остаётся у неё, в том числе на кнопке */
-  lockedLeft: boolean;
   width: number;
   /** Положение страницы и палец в момент, когда пейджер взял жест на себя */
   base: number;
@@ -530,7 +528,6 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
         origin,
         scroller,
         locked: Boolean(origin.closest('[data-swipe-lock~="right"]')) && !origin.closest('button, a'),
-        lockedLeft: Boolean(origin.closest('[data-swipe-lock~="left"]')),
         width: el.clientWidth || 1,
         base: 0,
         anchorX: 0,
@@ -564,9 +561,6 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
         if (g.scroller && canScrollSideways(g.scroller, dx)) {
           g.mode = 'inner';
           g.scrollBase = g.scroller.scrollLeft;
-        } else if (g.lockedLeft && dx < 0) {
-          g.mode = 'ignore'; // на строке чата влево — действие строки
-          return;
         } else if (g.locked && dx > 0) {
           g.mode = 'ignore'; // на пузыре вправо — ответ
           return;

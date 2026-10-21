@@ -58,6 +58,19 @@ export function placePill(chips: HTMLElement[], weights: number[]) {
     const overlap = Math.max(0, Math.min(x + w, chip.offsetLeft + chip.offsetWidth) - Math.max(x, chip.offsetLeft));
     chip.style.setProperty('--cover', String(Math.min(1, overlap / chip.offsetWidth)));
   });
+  // Плашка берёт цвет папки у чипса, на котором она стоит (у чипса без своего цвета — обычная синяя)
+  let top = 0;
+  weights.forEach((wt, i) => {
+    if (wt > weights[top]) top = i;
+  });
+  const own = chips[top]?.dataset.paintColor;
+  if (own) {
+    pill.style.setProperty('--pill-fill', `color-mix(in srgb, ${own} 90%, transparent)`);
+    pill.style.setProperty('--pill-border', `color-mix(in srgb, ${own} 60%, white)`);
+  } else {
+    pill.style.removeProperty('--pill-fill');
+    pill.style.removeProperty('--pill-border');
+  }
   pill.style.setProperty('--pill-x', `${x}px`);
   pill.style.setProperty('--pill-w', `${w}px`);
 }

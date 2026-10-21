@@ -36,7 +36,7 @@ interface EditSheetProps {
 }
 
 /** Плавно сворачиваемый блок: высота анимируется от 0 до содержимого */
-function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
+export function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
   return (
     <div className={`sheet__collapse${open ? ' sheet__collapse--open' : ''}`} aria-hidden={!open}>
       <div className="sheet__collapse-inner">{children}</div>

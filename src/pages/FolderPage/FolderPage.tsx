@@ -1,5 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { Collapse } from '../../components/EditSheet/EditSheet';
+import '../../components/EditSheet/EditSheet.css';
+import { Switch } from '../../components/Switch/Switch';
+import { TONES } from '../../data/tones';
 import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
@@ -38,9 +42,46 @@ const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleague
 
 const VISUAL = 40;
 
-/** Цвета заливки чипса (пастель и два насыщенных) и подписи на нём */
-const FOLDER_COLORS = ['#8CC0F2', '#9AD58F', '#F0C27A', '#EFA08E', '#B3A8F0', '#8ED6CF', '#EE9CB8', '#2F6FDB', '#3A3A44'];
-const FOLDER_INKS = ['#1C1C1E', '#FFFFFF', '#0B3D91', '#7A1F3D', '#1E5E3A'];
+/** Цвета чипса — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
+const FOLDER_COLORS = TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
+const FOLDER_INKS = TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: 'Белый', color: '#FFFFFF' } : t.id === 'gray' ? { id: 'black', label: 'Чёрный', color: '#1C1C1E' } : { id: t.id, label: t.label, color: t.swatch }));
+
+type Swatch = { id: string; label: string; color: string };
+
+/** Панель цвета, как у заметок и сведений: строка с переключателем и сетка из 16 цветов (выключено — цвет не задан) */
+function ColorCard({ label, value, palette, onChange }: { label: string; value: string | undefined; palette: Swatch[]; onChange: (color: string | undefined) => void }) {
+  const uid = useId();
+  const last = useRef(value ?? palette[0].color);
+  if (value) last.current = value;
+  const on = value !== undefined;
+  return (
+    <section className="fp__card fp-color" aria-label={label}>
+      <div className="fp-color__row">
+        <span className="fp-color__label" id={`${uid}-l`}>
+          {label}
+        </span>
+        <Switch checked={on} onChange={(next) => onChange(next ? last.current : undefined)} label={label} />
+      </div>
+      <Collapse open={on}>
+        <div className="fp-tones" role="radiogroup" aria-labelledby={`${uid}-l`}>
+          {palette.map((sw) => (
+            <button
+              key={sw.id}
+              type="button"
+              role="radio"
+              aria-checked={sw.color === value}
+              aria-label={sw.label}
+              className={`fp-tone${sw.color === value ? ' fp-tone--active' : ''}`}
+              data-light={sw.color === '#FFFFFF' || undefined}
+              style={{ '--swatch': sw.color } as CSSProperties}
+              onClick={() => onChange(sw.color)}
+            />
+          ))}
+        </div>
+      </Collapse>
+    </section>
+  );
+}
 
 /** Всё, что можно положить в папку раздела, в порядке раздела («Избранное» — системный чат, в папки не кладётся) */
 function entriesOf(scope: FolderScope): Entry[] {
@@ -247,26 +288,9 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           </label>
         </section>
 
-        <section className="fp__card" aria-label="Цвет папки">
-          <h2 className="fp__heading fp__heading--pad">Цвет чипса</h2>
-          <div className="fp-swatches" role="radiogroup" aria-label="Цвет чипса">
-            <button type="button" role="radio" aria-checked={!folder.color} aria-label="Обычный" className="fp-swatch fp-swatch--auto" onClick={() => setFolderPaint(scope, id, { color: undefined })} />
-            {FOLDER_COLORS.map((c) => (
-              <button key={c} type="button" role="radio" aria-checked={folder.color === c} aria-label={`Цвет ${c}`} className="fp-swatch" style={{ background: c }} onClick={() => setFolderPaint(scope, id, { color: c })} />
-            ))}
-          </div>
-          <h2 className="fp__heading fp__heading--pad">Цвет текста</h2>
-          <div className="fp-swatches" role="radiogroup" aria-label="Цвет текста чипса">
-            <button type="button" role="radio" aria-checked={!folder.ink} aria-label="Обычный" className="fp-swatch fp-swatch--auto" onClick={() => setFolderPaint(scope, id, { ink: undefined })} />
-            {FOLDER_INKS.map((c) => (
-              <button key={c} type="button" role="radio" aria-checked={folder.ink === c} aria-label={`Текст ${c}`} className="fp-swatch" style={{ background: c }} onClick={() => setFolderPaint(scope, id, { ink: c })} />
-            ))}
-          </div>
-          <span className="fp-sample" style={{ background: folder.color ?? 'var(--tone-chat)', color: folder.ink ?? 'var(--color-ink-on-pastel)' }}>
-            {folder.name}
-          </span>
-        </section>
-        <p className="fp__hint">Так выглядит выбранный чипс папки в ряду.</p>
+        <ColorCard label="Цвет чипса" value={folder.color} palette={FOLDER_COLORS} onChange={(color) => setFolderPaint(scope, id, { color })} />
+        <ColorCard label="Цвет текста" value={folder.ink} palette={FOLDER_INKS} onChange={(ink) => setFolderPaint(scope, id, { ink })} />
+        <p className="fp__hint">Цвета применяются к чипсу папки в ряду: и выбранному, и нет.</p>
 
         <section className="fp__card" aria-labelledby="fp-selected">
           <h2 id="fp-selected" className="fp__heading fp__heading--pad">

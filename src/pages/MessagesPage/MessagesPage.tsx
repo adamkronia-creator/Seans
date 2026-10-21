@@ -1,9 +1,8 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, setArchived, useChats } from '../../data/chatStore';
-import { ArchiveRow, ChatItem, slidOut } from '../../components/ChatItem/ChatItem';
+import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive } from '../../components/FolderMenu/FolderIcons';
-import { IconArchiveMk } from '../../components/ChatItem/ChatIcons';
 import { reducedMotion } from '../../utils/swipe';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -34,14 +33,12 @@ const ChatList = memo(function ChatList({
   archived,
   onOpen,
   onMenu,
-  onArchive,
 }: {
   chats: Chat[];
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
   archived: Chat[];
   onOpen: (chat: Chat) => void;
   onMenu: (chat: Chat, row: HTMLElement) => void;
-  onArchive: (chat: Chat) => void;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
@@ -123,7 +120,7 @@ const ChatList = memo(function ChatList({
       snap.current.forEach((old, id) => {
         if (now.has(id) || !archivedIds.has(id)) return;
         const ghost = document.createElement('li');
-        ghost.className = `chat-ghost${slidOut.has(id) ? ' chat-ghost--quiet' : ''}`;
+        ghost.className = 'chat-ghost';
         ghost.setAttribute('aria-hidden', 'true');
         ghost.style.setProperty('--ghost-h', `${old.h}px`);
         ghost.innerHTML = old.html;
@@ -132,7 +129,6 @@ const ChatList = memo(function ChatList({
         window.setTimeout(() => ghost.remove(), 600);
       });
     }
-    slidOut.clear();
     snap.current.clear();
     Array.from(list.children).forEach((li, at) => {
       const id = (li as HTMLElement).dataset.chat;
@@ -147,7 +143,7 @@ const ChatList = memo(function ChatList({
         {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
         {others.map((chat) => (
-          <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} swipeAction={{ label: 'В архив', icon: <IconArchiveMk />, run: onArchive }} />
+          <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} />
         ))}
       </ul>
     </div>
@@ -214,13 +210,6 @@ export function MessagesPage() {
   const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
 
   const openMenu = useCallback((chat: Chat, row: HTMLElement) => setRowMenu({ chat, rect: row.getBoundingClientRect(), row }), []);
-  const swipeArchive = useCallback(
-    (chat: Chat) => {
-      setArchived(chat.id, true);
-      say(`«${chat.name}» перенесён в архив`);
-    },
-    [say],
-  );
   const menuItems: ChipMenuItem[] = rowMenu
     ? [
         {
@@ -236,8 +225,8 @@ export function MessagesPage() {
     : [];
 
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={openChat} onMenu={openMenu} onArchive={swipeArchive} /> })),
-    [filters, lists, archived, openChat, openMenu, swipeArchive],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={openChat} onMenu={openMenu} /> })),
+    [filters, lists, archived, openChat, openMenu],
   );
 
   const index = Math.max(0, filters.indexOf(filter));

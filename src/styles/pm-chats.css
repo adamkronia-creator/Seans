@@ -782,3 +782,15 @@ html:has([data-pm]) body {
 [data-pm] .screen-header__chips .chip.chip--dragging {
   z-index: 3;
 }
+
+/* Свой цвет папки: плашка выбранного и невыбранный чипс (оттенок цвета на стекле) */
+[data-pm] .chips-pill {
+  border-color: var(--pill-border, var(--glass-border-blue));
+  background: var(--pill-fill, var(--glass-chip-active));
+  transition: opacity 0.16s, background-color 0.2s, border-color 0.2s;
+}
+
+[data-pm] .screen-header__chips .chip[data-paint-color]::before {
+  background: linear-gradient(color-mix(in srgb, var(--chip-tint) 26%, transparent), color-mix(in srgb, var(--chip-tint) 26%, transparent)), var(--glass-fill);
+  border-color: color-mix(in srgb, var(--chip-tint) 45%, var(--glass-border));
+}

@@ -434,45 +434,58 @@
   font: var(--type-meta);
 }
 
-/* Выбор цвета чипса и подписи: круги 32 с кольцом у выбранного */
-.fp-swatches {
+/* Панель цвета как у заметок и сведений: строка с переключателем, под ней сетка 8 × 2 кругов по 36, выбранный в кольце */
+.fp-color {
+  container-type: inline-size;
+}
+
+.fp-color__row {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-4) var(--space-4);
-}
-
-.fp-swatch {
-  position: relative;
-  width: var(--space-8);
-  height: var(--space-8);
-  border-radius: var(--radius-full);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
-}
-
-.fp-swatch::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-}
-
-.fp-swatch[aria-checked='true'] {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-/* «Обычный»: пустой круг с чертой */
-.fp-swatch--auto {
-  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--color-text-secondary) calc(50% - 1px), var(--color-text-secondary) calc(50% + 1px), transparent calc(50% + 1px)), var(--color-bg-fill);
-}
-
-.fp-sample {
-  display: inline-flex;
   align-items: center;
-  height: var(--size-chip-h);
-  margin: 0 var(--space-4) var(--space-4);
-  padding: 0 14px;
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  gap: var(--space-3);
+  height: var(--space-12);
+  padding: 0 var(--space-4);
+}
+
+.fp-color__label {
+  flex: 1;
+  color: var(--text-primary, inherit);
+  font: var(--type-body);
+}
+
+.fp-tones {
+  --cols: 8;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 36px);
+  justify-content: space-between;
+  row-gap: calc((100cqw - var(--space-6) * 2 - var(--cols) * 36px) / (var(--cols) - 1));
+  margin: 0 var(--space-4);
+  padding: var(--space-3) 0 var(--space-4);
+  border-top: 0.5px solid var(--divider, var(--color-divider));
+}
+
+@container (max-width: 331px) {
+  .fp-tones {
+    --cols: 7;
+  }
+}
+
+.fp-tone {
+  width: 36px;
+  height: 36px;
+  padding: 2px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--swatch);
+  background-clip: content-box;
+}
+
+/* Белому кругу на светлой карточке нужен контур */
+.fp-tone[data-light] {
+  border-color: var(--divider, var(--color-border));
+}
+
+.fp-tone--active,
+.fp-tone--active[data-light] {
+  border-color: var(--swatch);
 }

@@ -130,7 +130,8 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       aria-pressed={active}
       aria-label={ariaLabel}
       data-tone={tone}
-      style={paint?.color || paint?.ink ? ({ ...(paint.color && { '--chip-bg': paint.color }), ...(paint.ink && { '--chip-on': paint.ink }) } as CSSProperties) : undefined}
+      style={paint?.color || paint?.ink ? ({ ...(paint.color && { '--chip-bg': paint.color, '--chip-tint': paint.color }), ...(paint.ink && { '--chip-on': paint.ink, '--text-chip': paint.ink }) } as CSSProperties) : undefined}
+      data-paint-color={paint?.color}
       data-folder-id={editing ? folder?.id : undefined}
       data-no-swipe={editing ? '' : undefined}
     >
