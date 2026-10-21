@@ -614,3 +614,9 @@
 [data-pm] .sheet:has(.fp-pick) .sheet__footer {
   padding-top: var(--space-4);
 }
+
+/* Заголовок окна выбора и счётчик «Выбрано N из M» — по центру */
+[data-pm] .sheet:has(.fp-pick) .sheet__heading,
+[data-pm] .sheet:has(.fp-pick) .frame-subtitle {
+  text-align: center;
+}
