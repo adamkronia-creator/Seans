@@ -20,7 +20,7 @@
   z-index: 3;
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
@@ -53,11 +53,70 @@
   box-shadow: var(--focus-ring);
 }
 
+/* Как шапка открытого чата: название и подпись слева, справа поиск и «назад» */
+.archive__who {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .archive .archive__title {
-  margin: 0 0 0 var(--space-2);
+  margin: 0;
+  overflow: hidden;
   color: var(--text-primary);
-  font: var(--type-title);
-  letter-spacing: 0;
+  font: var(--type-headline);
+  line-height: var(--space-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archive .archive__subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-5);
+}
+
+/* Поиск: поле на всю строку и «Отмена» в 16 от края, как в списке чатов */
+.archive__bar .search-field {
+  flex: 1;
+  min-width: 0;
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  color: var(--text-primary);
+}
+
+.archive__bar .search-field__icon {
+  color: var(--icon-action, var(--text-primary));
+  font-size: var(--size-icon);
+}
+
+.archive__bar .search-field__input {
+  min-width: 0;
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.archive__bar .search-field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+.archive__bar .search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+.archive__cancel {
+  flex-shrink: 0;
+  height: var(--size-control);
+  padding: 0 0 0 var(--space-2);
+  color: var(--action-primary);
+  font: var(--type-body);
 }
 
 .archive__list {

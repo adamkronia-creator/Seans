@@ -47,14 +47,15 @@
   display: flex;
   gap: var(--space-1);
   padding: var(--space-1);
-  border-radius: var(--radius-full);
+  /* Не капсула, а скруглённый прямоугольник; ползунок внутри скруглён на ширину рамки меньше */
+  border-radius: var(--radius-md);
   background: var(--bg-subtle);
 }
 
 .bg-sheet__seg-item {
   flex: 1;
   height: var(--space-8);
-  border-radius: var(--radius-full);
+  border-radius: calc(var(--radius-md) - var(--space-1));
   color: var(--text-primary);
   font: var(--type-label);
 }
