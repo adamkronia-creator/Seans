@@ -260,7 +260,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }) } as CSSProperties}
           aria-hidden="true"
         >
-          {folder.name}
+          <span className="fp__preview-text">{folder.name}</span>
         </span>
         <div className="fp__who">
           <h1 className="fp__title">{folder.name}</h1>

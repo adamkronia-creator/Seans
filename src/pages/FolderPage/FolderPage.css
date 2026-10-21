@@ -576,3 +576,11 @@
 [data-pm] .fp__scroll {
   padding-bottom: calc(var(--size-control) + var(--space-8) + var(--safe-bottom));
 }
+
+/* Длинное название обрезается многоточием внутри чипса, а отступы по краям остаются */
+.fp__preview-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
