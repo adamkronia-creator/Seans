@@ -93,15 +93,12 @@
 
 /* Название в одну строку — headline; под ним описание — label обычного начертания; дата — caption */
 .chat .chat-tests__list .test-card__title {
-  display: -webkit-box;
   overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
-  white-space: normal;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat .chat-tests__list .test-card__description {
