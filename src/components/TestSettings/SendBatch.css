@@ -9,7 +9,21 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 0 var(--space-1);
+  padding: 0;
+}
+
+.sb-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.sb-item__count {
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .sb-item__icon {
@@ -17,8 +31,9 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: var(--space-10);
-  height: var(--space-10);
+  width: var(--space-12);
+  height: var(--space-12);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   isolation: isolate;
 }
@@ -34,8 +49,8 @@
 }
 
 .sb-item__icon img {
-  width: 28px;
-  height: 28px;
+  width: var(--space-8);
+  height: var(--space-8);
 }
 
 .sb-item__title {
@@ -43,3 +58,19 @@
   color: var(--text-primary, var(--color-text-primary));
   font: var(--type-headline, 600 17px/24px var(--font-family));
 }
+
+/* Ритм окна: название к карточкам 12, карточки между собой 12, материал от материала 24 и тонкая линия; под подзаголовком 16 */
+[data-pm] .sheet__body:has(> .sb-item) {
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+[data-pm] .sb-item {
+  gap: var(--space-3);
+}
+
+[data-pm] .sb-item + .sb-item {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--glass-border);
+}
+

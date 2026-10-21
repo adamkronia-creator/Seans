@@ -130,13 +130,20 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
         </>
       }
     >
-      {sendable.map((item) => (
+      {sendable.map((item, index) => (
         <section key={item.id} className="sb-item" aria-label={item.title}>
           <header className="sb-item__head">
             <span className="sb-item__icon" style={{ '--tint': item.tint } as CSSProperties}>
               <img src={item.icon} alt="" />
             </span>
-            <h3 className="sb-item__title">{item.title}</h3>
+            <div className="sb-item__text">
+              {sendable.length > 1 && (
+                <span className="sb-item__count">
+                  {kind === 'test' ? 'Тест' : 'Задание'} {index + 1} из {sendable.length}
+                </span>
+              )}
+              <h3 className="sb-item__title">{item.title}</h3>
+            </div>
           </header>
           {kind === 'test' ? <TestFields item={item} o={opts[item.id] as TestOpts} onChange={(p) => change<TestOpts>(item.id, p)} /> : <TaskFields item={item} o={opts[item.id] as TaskOpts} onChange={(p) => change<TaskOpts>(item.id, p)} />}
         </section>
