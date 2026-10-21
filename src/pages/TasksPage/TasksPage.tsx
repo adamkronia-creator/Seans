@@ -1,4 +1,4 @@
-import { TASK_LIBRARY, toggleTaskFavorite, useTaskFavorites } from '../../data/library';
+import { setTaskFavorites, setTaskPinned, TASK_LIBRARY, toggleTaskFavorite, useTaskFavorites, useTaskPinned } from '../../data/library';
 import { hasTaskSettings } from '../../data/taskValues';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
@@ -14,6 +14,9 @@ export function TasksPage() {
       items={TASK_LIBRARY}
       favorites={useTaskFavorites()}
       onToggleFavorite={toggleTaskFavorite}
+      pinned={useTaskPinned()}
+      onSetFavorites={setTaskFavorites}
+      onSetPinned={setTaskPinned}
       // Настройки пока есть не у всех заданий: остальные карточки без перехода
       onOpen={(t) => hasTaskSettings(t.id) && navigate(`/tasks/${t.id}`)}
       labels={{ all: 'Все задания', filters: 'Фильтр заданий', emptyRecent: 'Вы ещё не присылали задания', noun: ['задание', 'задания', 'заданий'], everywhere: 'Искать во всех заданиях' }}

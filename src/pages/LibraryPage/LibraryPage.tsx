@@ -11,6 +11,8 @@ import { ResultsBar, type FilterToken } from '../../components/LibraryFilters/Re
 import { SuggestPanel, type QuickPick } from '../../components/LibraryFilters/SuggestPanel';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
+import { Toast } from '../../components/Toast/Toast';
+import { useToast } from '../../components/Toast/useToast';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { recentIds, useClientData } from '../../data/clientStore';
 import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
@@ -38,7 +40,9 @@ import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
+import { taskSettings } from '../../data/taskSettings';
 import { ChatsHeader } from '../MessagesPage/ChatsHeader';
+import { useLibrarySelection } from './LibrarySelection';
 import '../MessagesPage/MessagesPage.css';
 import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
@@ -55,6 +59,12 @@ interface LibraryPageProps {
   items: LibraryItem[];
   favorites: ReadonlySet<string>;
   onToggleFavorite: (id: string) => void;
+  /** Закреплённые: идут в списке первыми */
+  pinned: ReadonlySet<string>;
+  /** Добавить в избранное или убрать сразу несколько (выбор в списке) */
+  onSetFavorites: (ids: string[], on: boolean) => void;
+  /** Закрепить или открепить сразу несколько */
+  onSetPinned: (ids: string[], on: boolean) => void;
   /** Нажатие на карточку (открыть настройку) */
   onOpen?: (item: LibraryItem) => void;
   /** Подписи для экранных читалок и пустых состояний; noun — «тест», «теста», «тестов» */
@@ -108,6 +118,9 @@ interface ListProps {
   empty: { title: string; text: string };
   tokens: FilterToken[];
   resetKey: string;
+  pinned: ReadonlySet<string>;
+  selected: readonly string[];
+  onHold: (item: LibraryItem) => void;
   onToggleFavorite: (id: string) => void;
   onOpen: (item: LibraryItem) => void;
   onRelax: (r: Relaxation) => void;
@@ -165,6 +178,9 @@ function LibraryList(p: ListProps) {
               facts={entry.d.line.join(' · ') || undefined}
               why={why}
               marks={search?.words}
+              pinned={p.pinned.has(id)}
+              selected={p.selected.includes(id)}
+              onLongPress={p.onHold}
             />
           );
         })}
@@ -222,12 +238,13 @@ function LibraryList(p: ListProps) {
  * Поверх любого раздела работают поиск по словам и фильтры (лист «Фильтры»); выбранные фильтры и пояснения к выдаче стоят над списком.
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
-export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, onOpen, labels, chatLike }: LibraryPageProps) {
+export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, pinned, onSetFavorites, onSetPinned, onOpen, labels, chatLike }: LibraryPageProps) {
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [sheet, setSheet] = useState<null | 'filters'>(null);
   const [focused, setFocused] = useState(false);
+  const [toast, say] = useToast();
   const [searching, setSearching] = useState(() => readLibraryView(kind).query !== '');
   const client = useClientData();
   const view = useLibraryView(kind);
@@ -272,7 +289,16 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   // Пока человек печатает, список догоняет с небольшим запозданием, а поле остаётся отзывчивым
   const query = useDeferredValue(view.query);
   const q = useMemo<ViewQuery>(() => ({ query, filters: view.filters, sort: SORT }), [query, view.filters]);
-  const listings = useMemo(() => scopes.map((scope) => listIds(catalog, q, scope, favorites)), [catalog, q, scopes, favorites]);
+  const listings = useMemo(
+    () =>
+      scopes.map((scope) => {
+        const listing = listIds(catalog, q, scope, favorites);
+        // Закреплённые стоят первыми, пока нет запроса: при поиске порядок задаёт совпадение
+        if (normalize(query) !== '' || !listing.ids.some((id) => pinned.has(id))) return listing;
+        return { ...listing, ids: [...listing.ids.filter((id) => pinned.has(id)), ...listing.ids.filter((id) => !pinned.has(id))] };
+      }),
+    [catalog, q, scopes, favorites, pinned, query],
+  );
   const narrowed = normalize(query) !== '' || countFilters(view.filters) > 0;
   const activeCount = countFilters(view.filters);
   const resetKey = `${query}|${JSON.stringify(view.filters)}`;
@@ -314,6 +340,28 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     [kind, onOpen],
   );
 
+  const byItem = useMemo(() => new Map(items.map((t) => [t.id, t] as const)), [items]);
+  const sel = useLibrarySelection({
+    kind,
+    scope,
+    byId: byItem,
+    favorites,
+    pinned,
+    onSetFavorites,
+    onSetPinned,
+    say,
+    canSend: (item) => kind === 'test' || Boolean(taskSettings(item)),
+  });
+  // Пока идёт выбор, нажатие на строку выделяет её, а не открывает
+  const tap = useCallback(
+    (item: LibraryItem) => {
+      if (sel.justHeld()) return;
+      if (sel.selecting) sel.toggle(item);
+      else open(item);
+    },
+    [sel.selecting, sel.toggle, sel.justHeld, open],
+  );
+
   const relax = useCallback(
     (r: Relaxation) => {
       if (r.type === 'option') toggleOption(kind, r.facet, r.option);
@@ -341,14 +389,17 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             empty={emptyText(marksOf(id), wholeCatalog(id), labels.emptyRecent)}
             tokens={tokens}
             resetKey={resetKey}
+            pinned={pinned}
+            selected={sel.ids}
+            onHold={sel.hold}
             onToggleFavorite={onToggleFavorite}
-            onOpen={open}
+            onOpen={tap}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, onToggleFavorite, open, relax, kind],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, onToggleFavorite, tap, relax, kind, pinned, sel.ids, sel.hold],
   );
 
   const onDrag = useCallback(
@@ -452,7 +503,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   }, [chatLike, index, order, liveOrder, searching]);
 
   return (
-    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'}>
+    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={searching}
@@ -471,6 +522,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           onBlur={() => setFocused(false)}
           onKeyDown={onKeyDown}
           chips={chipNodes}
+          selection={sel.header()}
         />
       ) : (
         <ScreenHeader
@@ -519,6 +571,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
         />
       )}
       {folderMenu.node}
+      {chatLike && sel.send()}
+      {toast && <Toast text={toast} />}
     </section>
   );
 }

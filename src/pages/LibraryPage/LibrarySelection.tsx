@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconCloseMk } from '../../components/ChatItem/ChatIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconFolderPlus, IconPinned } from '../../components/FolderMenu/FolderIcons';
-import { SendBatchSheet } from '../../components/TestSettings/SendBatch';
 import { RecipientSheet } from '../../components/TestSettings/TestActions';
 import { setFolderItems, useFolders, type FolderScope } from '../../data/folders';
 import type { LibraryItem } from '../../data/library';
 import { plural } from '../../data/taskValues';
 import { guardBack } from '../../router';
+
+/** Окно настроек тянет за собой экраны настройки теста и задания: грузится только когда понадобилось */
+const SendBatchSheet = lazy(() => import('../../components/TestSettings/SendBatch').then((m) => ({ default: m.SendBatchSheet })));
 
 const IconHeart = () => (
   <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -47,6 +49,25 @@ export function useLibrarySelection(o: Options) {
 
   const toggle = useCallback((item: LibraryItem) => setIds((prev) => (prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id])), []);
   const clear = useCallback(() => setIds([]), []);
+
+  /** Долгое нажатие: выбирает строку. Список тут же сдвигается (истории сворачиваются), и отпускание пальца может попасть в соседнюю строку, поэтому
+      клик сразу после него (пока палец на экране и ещё 400 мс после) не считается нажатием */
+  const heldAt = useRef(0);
+  const hold = useCallback(
+    (item: LibraryItem) => {
+      heldAt.current = Infinity;
+      const release = () => {
+        heldAt.current = Date.now();
+        window.removeEventListener('pointerup', release, true);
+        window.removeEventListener('pointercancel', release, true);
+      };
+      window.addEventListener('pointerup', release, true);
+      window.addEventListener('pointercancel', release, true);
+      toggle(item);
+    },
+    [toggle],
+  );
+  const justHeld = useCallback(() => Date.now() - heldAt.current < 400, []);
 
   // Системная «назад» снимает выбор, а не уводит со страницы
   useEffect(() => {
@@ -163,6 +184,7 @@ export function useLibrarySelection(o: Options) {
           />
         )}
         {stage === 'settings' && (
+          <Suspense fallback={null}>
           <SendBatchSheet
             kind={o.kind}
             items={sendable}
@@ -174,10 +196,11 @@ export function useLibrarySelection(o: Options) {
               done(`Отправлено ${who}: ${count(sent)}${skipped > 0 ? `; без настроек пропущено: ${skipped + (n - sendable.length)}` : n > sendable.length ? `; без настроек пропущено: ${n - sendable.length}` : ''}`);
             }}
           />
+          </Suspense>
         )}
       </>
     );
   };
 
-  return { ids, selecting, toggle, clear, header, send };
+  return { ids, selecting, toggle, hold, justHeld, clear, header, send };
 }
