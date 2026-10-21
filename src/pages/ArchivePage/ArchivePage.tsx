@@ -9,16 +9,19 @@ import { useToast } from '../../components/Toast/useToast';
 import { markRead, setArchived, useChats } from '../../data/chatStore';
 import type { Chat } from '../../data/chats';
 import { goBack, navigate } from '../../router';
+import { useSwipeBack } from '../../utils/swipeBack';
 import './ArchivePage.css';
 
 /**
  * «Архивы», как в Telegram: отдельный экран со списком убранных чатов. Строка открывает чат, долгое нажатие возвращает его в список.
- * Экран на новой системе (data-pm): цвета, Inter и сетка 4 из токенов.
+ * Экран на новой системе (data-pm), как «События»: фон-сцена позади, стеклянная шапка и «назад», строки без плашки.
  */
 export function ArchivePage() {
   const chats = useChats().filter((c) => c.archived);
   const [menu, setMenu] = useState<{ chat: Chat; rect: DOMRect; row: HTMLElement } | null>(null);
   const [toast, say] = useToast();
+  // Свайп вправо — назад, как стрелка в шапке (жест от самого края остаётся)
+  useSwipeBack('.archive', menu === null, () => goBack('/'));
 
   const open = useCallback((chat: Chat) => {
     markRead(chat.id);

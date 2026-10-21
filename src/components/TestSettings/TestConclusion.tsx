@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { IconTestChevron, IconTestReportExtra, IconTestReportMain } from '../icons';
 import { levelOf, levelsOf, showsCode, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
+import { useRevealOnce } from '../../utils/useRevealOnce';
 import { ScaleSortButton, type ScaleOrder } from './ScaleSort';
 import { CollapseCard } from './TestBlank';
 import './TestSettings.css';
@@ -90,8 +91,10 @@ function Legend({ data }: { data: ConclusionData }) {
 function Bar({ data, scale, max = scale.max }: { data: ConclusionData; scale: ConclusionScale; max?: number }) {
   const pct = (scale.score / max) * 100;
   const tone = scale.leveled ? levelOf(data, scale.score, scale).tone : 'accent';
+  // Заливка вырастает, когда полоса впервые попала на экран (стили data-reveal в TestConclusion.css)
+  const [track, seen] = useRevealOnce<HTMLSpanElement>();
   return (
-    <span className="cc-track">
+    <span ref={track} className="cc-track" data-reveal={seen ? 'in' : 'out'}>
       {scale.leveled &&
         levelsOf(data, scale)
           .filter((l) => l.from > 0)

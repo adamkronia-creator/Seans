@@ -18,6 +18,11 @@ body {
   overscroll-behavior: none;
 }
 
+/* Только светлая: принудительное затемнение браузера («Затемнять сайты» в Chrome) не должно перекрашивать экраны (см. meta color-scheme) */
+html {
+  color-scheme: only light;
+}
+
 body {
   margin: 0;
   background: var(--color-bg-desk);

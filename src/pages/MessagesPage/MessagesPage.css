@@ -141,6 +141,36 @@
   font: var(--type-body);
 }
 
+/* Поиск раскрывается от кнопки: поле выезжает справа (оттуда, где была кнопка «Поиск»), «Отмена» следом. Закрывается сразу */
+.chats-header .search-field {
+  animation: search-in 0.24s var(--ease-ios) backwards;
+}
+
+.chats-header__cancel {
+  animation: search-cancel-in 0.26s 0.04s var(--ease-ios) backwards;
+}
+
+@keyframes search-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-8));
+  }
+}
+
+@keyframes search-cancel-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-4));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chats-header .search-field,
+  .chats-header__cancel {
+    animation: none;
+  }
+}
+
 /* ——— Список: лежит на фоне экрана, сверху поле на высоту шапки, снизу — на нижнюю панель ——— */
 .messages__list {
   flex: 1;

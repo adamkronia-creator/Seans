@@ -1,4 +1,4 @@
-// Проверка подсказок к настройкам теста («?» у «Слепого тестирования» и «Сохранить заполненный бланк»): npm run test:help
+// Проверка подсказок к настройкам теста и задания («?» у «Слепого тестирования», «Сохранить заполненный бланк», «Комментарий клиента», «Оценить состояние»): npm run test:help
 // Данные не зависят от React, поэтому собираются esbuild и запускаются в Node как есть. Сами макеты собираются в приложении из выбранного теста (HelpScenes.tsx).
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -36,10 +36,12 @@ fs.rmSync(dir, { recursive: true, force: true });
 
 const topics = Object.entries(OPTION_HELP);
 
-const SCENES = ['blind-off', 'blind-on', 'blind-chat', 'blank-off', 'blank-on', 'blank-view', 'result-thanks', 'result-score', 'result-full'];
+const SCENES = ['blind-off', 'blind-on', 'blind-chat', 'blank-off', 'blank-on', 'blank-view', 'result-thanks', 'result-score', 'result-full', 'task-off', 'comment-on', 'comment-result', 'state-on', 'state-result'];
+// Макет задания «до включения» один на «Комментарий клиента» и «Оценить состояние»: у обеих подсказок первый кадр — задание без этой настройки
+const SHARED = ['task-off'];
 
 test('у каждой подсказки три макета с подписями', () => {
-  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind', 'result']);
+  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind', 'comment', 'result', 'state']);
   for (const [id, help] of topics) {
     assert.ok(help.title.length > 0, `${id}: нет названия окна`);
     assert.equal(help.slides.length, 3, `${id}: должно быть три слайда`);
@@ -56,7 +58,7 @@ test('макеты известны и не повторяются; размер
   for (const [id, help] of topics) {
     for (const slide of help.slides) {
       assert.ok(SCENES.includes(slide.scene), `${id}: неизвестный макет ${slide.scene}`);
-      assert.ok(!seen.has(slide.scene), `${id}: макет ${slide.scene} повторяется`);
+      assert.ok(SHARED.includes(slide.scene) || !seen.has(slide.scene), `${id}: макет ${slide.scene} повторяется`);
       seen.add(slide.scene);
     }
   }

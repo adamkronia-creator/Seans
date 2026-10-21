@@ -143,11 +143,18 @@
   stroke: none;
 }
 
+/* Сердечко в списке — только метка «в избранном»: избранное переключается в шапке настройки теста. У теста не в избранном кнопки нет вовсе:
+   невидимая, она с областью нажатия шире кружка на 8 (::after) ловила тап по углу значка и молча добавляла тест в избранное вместо открытия.
+   У отмеченного метка нажатий не принимает, тап по значку открывает тест, как по остальной строке */
 [data-pm] .lib-card__heart[aria-pressed='false'] {
-  background: none;
+  display: none;
 }
 
-[data-pm] .lib-card__heart[aria-pressed='false'] svg {
+[data-pm] .lib-card__heart {
+  pointer-events: none;
+}
+
+[data-pm] .lib-card__heart::after {
   display: none;
 }
 

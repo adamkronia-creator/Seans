@@ -79,19 +79,18 @@
 /* Число непросмотренных историй: на окружности, справа сверху */
 .stories__count {
   position: absolute;
-  top: var(--space-1);
-  right: var(--space-1);
-  min-width: var(--space-4);
-  height: var(--space-4);
+  top: 0;
+  right: 0;
+  min-width: var(--size-badge);
+  height: var(--size-badge);
   padding: 0 var(--space-1);
   border-radius: var(--radius-full);
   background: var(--action-primary);
   box-shadow: 0 0 0 2px var(--glass-solid);
   color: var(--action-primary-text);
-  font: var(--type-caption);
-  font-size: 10px;
+  font: var(--type-meta);
   font-weight: 700;
-  line-height: var(--space-4);
+  line-height: var(--size-badge);
   text-align: center;
 }
 
@@ -129,7 +128,107 @@
   border-radius: var(--radius-md);
 }
 
-/* ——— Просмотр ——— */
+/* ——— Просмотр ———
+   Сцена — чёрная подложка на весь экран, внутри карточка с историей: её двигает жест (useStoryGestures), а подложка светлеет, пока карточку
+   тянут вниз, и открывает список. Карточка вырастает из круга, на который нажали (--story-x, --story-y), и сжимается при закрытии;
+   новый человек въезжает с той стороны, куда провели. Жесты ведёт просмотр, браузеру на сцене отдать нечего (touch-action: none) */
+.story-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgb(0 0 0 / var(--stage-a, 1));
+  animation: story-stage-in 0.2s ease-out backwards;
+}
+
+.screen .story-stage,
+.screen .story-stage * {
+  touch-action: none;
+}
+
+.story-stage--closing {
+  animation: story-stage-out 0.18s ease-in forwards;
+}
+
+.story-stage--closing .story-view {
+  animation: story-card-out 0.18s var(--ease-ios) forwards;
+}
+
+.story-view[data-motion='open'] {
+  transform-origin: var(--story-x, 50%) var(--story-y, 50%);
+  animation: story-card-in 0.28s var(--ease-ios) backwards;
+}
+
+.story-view[data-motion='next'] {
+  animation: story-enter-next 0.26s var(--ease-ios) backwards;
+}
+
+.story-view[data-motion='prev'] {
+  animation: story-enter-prev 0.26s var(--ease-ios) backwards;
+}
+
+@keyframes story-stage-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes story-stage-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes story-card-in {
+  from {
+    border-radius: 40px;
+    opacity: 0;
+    transform: scale(0.12);
+  }
+}
+
+@keyframes story-card-out {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes story-enter-next {
+  from {
+    opacity: 0;
+    transform: translate3d(36%, 0, 0) scale(0.96);
+  }
+}
+
+@keyframes story-enter-prev {
+  from {
+    opacity: 0;
+    transform: translate3d(-36%, 0, 0) scale(0.96);
+  }
+}
+
+/* Другая история того же человека: текст проявляется, а не меняется рывком */
+.story-view__text {
+  animation: story-text-in 0.24s var(--ease-ios) backwards;
+}
+
+@keyframes story-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-stage,
+  .story-stage--closing,
+  .story-stage--closing .story-view,
+  .story-view[data-motion],
+  .story-view__text {
+    animation: none;
+  }
+}
+
 .story-view {
   position: absolute;
   inset: 0;

@@ -275,13 +275,18 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
 
   const index = Math.max(0, sections.indexOf(section));
   const shown = dragIndex ?? index;
-  // Раздел тестов в стиле «Диалогов»: с последнего чипса влево — в чаты (по списку это делает пейджер, по самим чипсам — жест ниже)
-  // Следующий раздел нижней панели: после заданий идут тесты, после тестов чаты
+  // Соседние разделы нижней панели («Задания», «Диагностика», «Диалоги»): с последнего чипса влево — в следующий, с первого вправо — в
+  // предыдущий (перед заданиями раздела нет). По списку это делает пейджер, по самим чипсам — жесты ниже
   const nextTab = kind === 'task' ? 'tests' : 'messages';
+  const prevTab = kind === 'test' ? 'tasks' : null;
+  const atStart = useRef(true);
   const atEnd = useRef(false);
+  atStart.current = index === 0;
   atEnd.current = index === sections.length - 1;
   useChipsDrag(root);
-  useTabSwipe(root, 'left', nextTab, (o) => Boolean(chatLike) && Boolean(o.closest('.screen-header__chips')) && atEnd.current);
+  const onChips = (origin: Element) => Boolean(chatLike) && Boolean(origin.closest('.screen-header__chips'));
+  useTabSwipe(root, 'left', nextTab, (o) => onChips(o) && atEnd.current);
+  useTabSwipe(root, 'right', 'tasks', (o) => prevTab !== null && onChips(o) && atStart.current);
 
   const tokens = useMemo<FilterToken[]>(
     () =>
@@ -480,7 +485,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       )}
 
       <div className="library-page__body">
-        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => d > 0 && switchTab(nextTab, 'slide-next') : undefined} />
+        <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => (d > 0 ? switchTab(nextTab, 'slide-next') : prevTab && switchTab(prevTab, 'slide-prev')) : undefined} />
         {showSuggest && (
           <SuggestPanel
             history={view.history}

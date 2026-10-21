@@ -46,6 +46,43 @@
   color: var(--color-green-text);
 }
 
+/* Подтверждение: круг вырастает с лёгким перелётом, затем галочка вычерчивается (штрих 28 длиннее самой галочки в обоих размерах значка) */
+.tp__done-mark {
+  animation: tp-mark-in 0.5s var(--ease-ios) backwards;
+}
+
+.tp__done-mark path {
+  stroke-dasharray: 28;
+  animation: tp-check-draw 0.34s 0.2s ease-out backwards;
+}
+
+@keyframes tp-mark-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes tp-check-draw {
+  from {
+    opacity: 0;
+    stroke-dashoffset: 28;
+  }
+  1% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp__done-mark,
+  .tp__done-mark path {
+    animation: none;
+  }
+}
+
 .tp__done-title {
   margin: var(--space-2) 0 0;
   font-size: var(--font-size-lg);

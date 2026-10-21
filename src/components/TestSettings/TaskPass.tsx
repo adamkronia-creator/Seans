@@ -6,6 +6,7 @@ import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
 import { ConfirmSheet, FillMeter, taskSteps, unfilledText, type TaskStep } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { BlankRules, CollapseCard } from './TestBlank';
+import { usePassSwipe } from './usePassSwipe';
 import './TestPass.css';
 
 /** Экран клиента: задание, присланное специалистом (или отправленное себе). Прохождение то же, что у специалиста, только с его сообщением и «Спасибо» в конце */
@@ -55,6 +56,18 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
   const [record, setRecord] = useState<number>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number>();
+  /** Куда ушли с прошлого шага: новый выезжает с той стороны (у первого показа и после «Спасибо» — без движения) */
+  const [moved, setMoved] = useState<'next' | 'prev' | null>(null);
+  const goTo = (target: TaskStep) => {
+    const to = steps.indexOf(target);
+    setMoved(to === at ? null : to > at ? 'next' : 'prev');
+    setStep(target);
+  };
+  // Свайп листает шаги, как кнопки «Далее» и «Назад»: влево — дальше, вправо — назад (на последнем шаге «Завершить» свайпом не нажимается)
+  const swipe = usePassSwipe(!finished && sheet === null, (direction) => {
+    if (direction === 'next' && !lastStep) goTo(steps[at + 1]);
+    else if (direction === 'prev' && step !== 'rules') goTo(steps[at - 1]);
+  });
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
   // Новый экран всегда открывается с начала
@@ -86,7 +99,13 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
 
   return (
     <>
-      <div className="test-settings__scroll" key={finished ? 'thanks' : step} ref={scrollRef}>
+      <div
+        className={`test-settings__scroll${moved && !finished ? ` pass-step pass-step--${moved}` : ''}`}
+        key={finished ? 'thanks' : step}
+        ref={scrollRef}
+        onTouchStart={swipe.onTouchStart}
+        onTouchEnd={swipe.onTouchEnd}
+      >
         {finished ? (
           <TaskDone record={record} limit={client?.permanent?.limit} />
         ) : step === 'rules' ? (
@@ -98,7 +117,7 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
             </CollapseCard>
           )
         ) : (
-          <TaskForm data={data} form={form} options={options} only={step} onEntryStep={(sectionId, index) => setStep(`each:${sectionId}:${index}`)} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
+          <TaskForm data={data} form={form} options={options} only={step} onEntryStep={(sectionId, index) => goTo(`each:${sectionId}:${index}`)} values={run.values} onChange={(next) => editTaskRun(taskId, () => next)} />
         )}
       </div>
 
@@ -114,16 +133,16 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
             <FillMeter done={done} total={total} onReset={started ? () => setSheet('reset') : undefined} />
             <div className="test-pass__buttons">
               {step !== 'rules' && (
-                <button type="button" className="test-pass__back" onClick={() => setStep(steps[at - 1])}>
+                <button type="button" className="test-pass__back" onClick={() => goTo(steps[at - 1])}>
                   Назад
                 </button>
               )}
               {step === 'rules' ? (
-                <button type="button" className="test-settings__cta-button" onClick={() => setStep(steps[1])}>
+                <button type="button" className="test-settings__cta-button" onClick={() => goTo(steps[1])}>
                   {started ? 'Продолжить' : 'Начать'}
                 </button>
               ) : !lastStep ? (
-                <button type="button" className="test-settings__cta-button" onClick={() => setStep(steps[at + 1])}>
+                <button type="button" className="test-settings__cta-button" onClick={() => goTo(steps[at + 1])}>
                   Далее
                 </button>
               ) : (
@@ -150,6 +169,7 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
           onConfirm={() => {
             resetTaskRun(taskId);
             setSheet(null);
+            setMoved(null);
             setStep('rules');
           }}
         />

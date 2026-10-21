@@ -126,6 +126,13 @@
   box-shadow: var(--focus-ring);
 }
 
+/* Область нажатия 44 при видимом круге 36 */
+.case-card__edit::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-1) * -1);
+}
+
 /* Общая информация: подпись слева, значение справа; строки разделены только воздухом */
 .case-card__rows {
   margin: 0;

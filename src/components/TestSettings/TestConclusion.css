@@ -131,6 +131,60 @@
   left: 0;
 }
 
+/* Заливка вырастает слева направо, когда полоса впервые на экране (data-reveal ставит Bar); значение проявляется к концу роста.
+   Столбцы одной диаграммы идут с запозданием 40 мс друг за другом (первые шесть) */
+.cc-fill {
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-ios);
+}
+
+.cc-value {
+  transition: opacity 0.3s ease 0.28s;
+}
+
+.cc-track[data-reveal='out'] .cc-fill {
+  transform: scaleX(0);
+}
+
+.cc-track[data-reveal='out'] .cc-value {
+  opacity: 0;
+}
+
+.cc-bars > li:nth-child(2) .cc-fill {
+  transition-delay: 0.04s;
+}
+
+.cc-bars > li:nth-child(3) .cc-fill {
+  transition-delay: 0.08s;
+}
+
+.cc-bars > li:nth-child(4) .cc-fill {
+  transition-delay: 0.12s;
+}
+
+.cc-bars > li:nth-child(5) .cc-fill {
+  transition-delay: 0.16s;
+}
+
+.cc-bars > li:nth-child(6) .cc-fill {
+  transition-delay: 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-fill,
+  .cc-value {
+    transition: none;
+  }
+
+  .cc-track[data-reveal='out'] .cc-fill {
+    transform: none;
+  }
+
+  .cc-track[data-reveal='out'] .cc-value {
+    opacity: 1;
+  }
+}
+
 .cc-fill--green {
   background: var(--color-green);
 }

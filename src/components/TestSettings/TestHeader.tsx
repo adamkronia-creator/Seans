@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
 import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
@@ -29,6 +29,8 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
   const favorite = (kind === 'task' ? taskFavorites : testFavorites).has(test.id);
   const toggle = kind === 'task' ? toggleTaskFavorite : toggleFavorite;
   const hidden = Boolean(client?.blind);
+  // Сердечко «подпрыгивает», когда тест только что добавили в избранное; у уже избранного при открытии экрана и при снятии — без движения
+  const [pop, setPop] = useState(false);
   return (
     <header className="test-settings__header">
       <div className="test-settings__peer">
@@ -48,10 +50,14 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
       {!client && (
         <button
           type="button"
-          className={`test-settings__button${favorite ? '' : ' test-settings__button--muted'}`}
+          className={`test-settings__button${favorite ? '' : ' test-settings__button--muted'}${pop && favorite ? ' is-pop' : ''}`}
           aria-label={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
           aria-pressed={favorite}
-          onClick={() => toggle(test.id)}
+          onAnimationEnd={() => setPop(false)}
+          onClick={() => {
+            setPop(!favorite);
+            toggle(test.id);
+          }}
         >
           {favorite ? <IconHeartRedLg /> : <IconHeartGrayLg />}
         </button>

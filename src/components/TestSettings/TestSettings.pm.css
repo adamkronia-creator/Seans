@@ -204,9 +204,12 @@
 }
 
 [data-pm] .test-settings__status {
+  overflow: hidden;
   font: var(--type-label);
   font-weight: 400;
   line-height: var(--space-5);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 [data-pm] .test-settings__button {
@@ -343,6 +346,33 @@
 [data-pm] .test-settings__cta:not(.test-pass__cta) .test-settings__cta-button {
   background: var(--grad-chip-active);
   box-shadow: 0 var(--space-1) var(--space-3) rgb(0 0 0 / 0.12);
+}
+
+/* «Отвечено: 3 из 30» и «Сбросить» при прохождении лежали прямо на фоне-сцене: серый текст на тёмной нижней части картинки читался на 1,3–1,9:1.
+   Теперь у каждого стеклянная пилюля (белая 62% с размытием), как у кнопок рядом; в разметке и высоте строки ничего не меняется:
+   пилюля на 4 выше и шире текста и заходит в зазоры (отрицательные поля), а область нажатия «Сбросить» остаётся 44 */
+[data-pm] .test-pass__meta > span,
+[data-pm] .test-pass__reset {
+  margin-block: calc(var(--space-1) * -1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  color: var(--text-primary);
+}
+
+[data-pm] .test-pass__reset {
+  position: relative;
+  margin-inline: 0;
+  color: var(--text-link);
+}
+
+[data-pm] .test-pass__reset::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-2) * -1) calc(var(--space-1) * -1);
 }
 
 /* «Назад» при прохождении — стеклянная кнопка с обводкой, как остальные кнопки интерфейса, а не надпись над фоном */
