@@ -70,8 +70,42 @@ function show(path: string, kind: TransitionKind, prev: string | undefined) {
 /** Как показать переход назад, который начали мы сами (кнопка «назад» браузера и свайп сообщают о нём только событием) */
 let forced: { kind: TransitionKind; until: number } | undefined;
 
+/** Временная запись истории: системная «назад» закрывает режим (выбор чатов), а не уводит с экрана */
+let guard: { step: number; onBack: () => void; silent: boolean } | undefined;
+
+/** Ставит запись-«заглушку»; вернёт функцию, снимающую её, когда режим закончился другим способом */
+export function guardBack(onBack: () => void): () => void {
+  step += 1;
+  window.history.pushState({ i: step, prev: target }, '', `#${target}`);
+  const mine = { step, onBack, silent: false };
+  guard = mine;
+  return () => {
+    if (guard !== mine) return;
+    guard = undefined;
+    if (step === mine.step) {
+      mine.silent = true;
+      pending = mine;
+      window.history.back();
+    }
+  };
+}
+let pending: { silent: boolean } | undefined;
+
 /** Браузер сам перешёл по истории (кнопка «назад»/«вперёд», свайп) или поменяли адрес руками */
 function onHistory(event: Event) {
+  if (pending) {
+    // Заглушку сняли сами: просто возвращаем счётчик шага
+    pending = undefined;
+    step = readState().i ?? step - 1;
+    return;
+  }
+  if (guard && event.type === 'popstate' && (readState().i ?? -1) < guard.step) {
+    const g = guard;
+    guard = undefined;
+    step = readState().i ?? step - 1;
+    g.onBack();
+    return;
+  }
   const path = readPath();
   const state = readState();
   let i = state.i;

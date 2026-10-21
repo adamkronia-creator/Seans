@@ -4,6 +4,7 @@ import { IconTrash } from '../../components/ChatParts/ChatIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconBellOff, IconFolderPlus, IconPinned } from '../../components/FolderMenu/FolderIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
+import { guardBack } from '../../router';
 import { clearHistory, deleteChats, setArchivedMany, setBlockedMany, setMutedMany, setPinnedMany } from '../../data/chatStore';
 import type { Chat } from '../../data/chats';
 import { setFolderItems, useFolders } from '../../data/folders';
@@ -50,6 +51,12 @@ export function useChatSelection(say: (text: string) => void) {
     setIds((prev) => (prev.includes(chat.id) ? prev.filter((id) => id !== chat.id) : [...prev, chat.id]));
   }, []);
   const clear = useCallback(() => setIds([]), []);
+
+  /** Системная «назад» снимает выбор, а не уводит со страницы */
+  useEffect(() => {
+    if (!selecting) return;
+    return guardBack(clear);
+  }, [selecting, clear]);
 
   useEffect(() => {
     if (!selecting) return;
