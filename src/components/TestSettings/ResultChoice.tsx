@@ -4,9 +4,9 @@ import { CollapseCard } from './TestBlank';
 import './ResultChoice.css';
 
 /** Блок «Итог для клиента»: что клиент увидит сразу после прохождения. Карточка и строки те же, что у остальных настроек */
-export function ResultChoice({ value, onChange }: { value: ResultMode; onChange: (mode: ResultMode) => void }) {
+export function ResultChoice({ value, onChange, name = 'result-choice' }: { value: ResultMode; onChange: (mode: ResultMode) => void; /** Своё имя группы, когда на экране несколько блоков (отправка нескольких тестов) */ name?: string }) {
   return (
-    <CollapseCard title="Итог для клиента" id="result-choice" help={<OptionHelp id="result" />}>
+    <CollapseCard title="Итог для клиента" id={name === 'result-choice' ? 'result-choice' : undefined} help={<OptionHelp id="result" />}>
       <ul className="ts-rows" role="radiogroup" aria-label="Итог для клиента">
         {RESULT_MODES.map(({ id, title }) => (
           <li key={id} className="ts-row result-choice__row">
@@ -14,7 +14,7 @@ export function ResultChoice({ value, onChange }: { value: ResultMode; onChange:
               <input
                 type="radio"
                 className="blank-answer__input"
-                name="result-choice"
+                name={name}
                 checked={value === id}
                 onChange={() => onChange(id)}
               />

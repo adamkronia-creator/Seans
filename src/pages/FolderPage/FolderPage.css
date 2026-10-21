@@ -182,18 +182,17 @@
   min-width: 0;
 }
 
-/* Название — до двух строк: у тестов оно длинное, и по «Опросник депресси…» на узком экране их не отличить */
+/* Название — в одну строку с многоточием, как в списках тестов и заданий */
 .fp-row__title,
 .fp-pick__title {
-  display: -webkit-box;
+  display: block;
   overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-md);
-  overflow-wrap: anywhere;
 }
 
 .fp-row__note,

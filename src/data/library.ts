@@ -80,12 +80,20 @@ function createFavorites(initial: string[]) {
       favorites = next;
       listeners.forEach((l) => l());
     },
+    /** Добавить в избранное или убрать сразу несколько (выбор в списке) */
+    setMany: (ids: string[], on: boolean) => {
+      const next = new Set(favorites);
+      ids.forEach((id) => (on ? next.add(id) : next.delete(id)));
+      favorites = next;
+      listeners.forEach((l) => l());
+    },
   };
 }
 
 const testFavorites = createFavorites(['smol', 'itt', 'bdi', 'ito', '5pfq', 'scl90']);
 export const useFavorites = testFavorites.use;
 export const toggleFavorite = testFavorites.toggle;
+export const setFavorites = testFavorites.setMany;
 
 // ——— Психологические задания ———
 
@@ -113,3 +121,12 @@ export const TASK_LIBRARY: LibraryTask[] = [
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);
 export const useTaskFavorites = taskFavorites.use;
 export const toggleTaskFavorite = taskFavorites.toggle;
+export const setTaskFavorites = taskFavorites.setMany;
+
+// ——— Закреплённые: идут в списке первыми (тесты и задания закрепляются отдельно) ———
+const testPinned = createFavorites([]);
+export const usePinned = testPinned.use;
+export const setPinned = testPinned.setMany;
+const taskPinned = createFavorites([]);
+export const useTaskPinned = taskPinned.use;
+export const setTaskPinned = taskPinned.setMany;

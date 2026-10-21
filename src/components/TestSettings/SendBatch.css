@@ -1,0 +1,45 @@
+/* Окно «Настройки перед отправкой»: у каждого материала своя группа — значок, название и те же карточки настроек, что на его экране */
+.sb-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sb-item__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-1);
+}
+
+.sb-item__icon {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--space-10);
+  height: var(--space-10);
+  border-radius: var(--radius-full);
+  isolation: isolate;
+}
+
+.sb-item__icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--tint);
+  opacity: 0.75;
+}
+
+.sb-item__icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.sb-item__title {
+  margin: 0;
+  color: var(--text-primary, var(--color-text-primary));
+  font: var(--type-headline, 600 17px/24px var(--font-family));
+}

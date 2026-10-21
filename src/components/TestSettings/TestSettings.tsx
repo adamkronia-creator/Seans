@@ -131,7 +131,7 @@ export function Row({
 }
 
 /** Поле, которое растёт по тексту */
-export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value: string; onChange: (v: string) => void; limit?: number }) {
+export function MessageField({ value, onChange, limit = MESSAGE_LIMIT, id = 'ts-message' }: { value: string; onChange: (v: string) => void; limit?: number; id?: string }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fit = () => {
     const el = ref.current;
@@ -151,7 +151,7 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT }: { value
   return (
     <textarea
       ref={ref}
-      id="ts-message"
+      id={id}
       className="ts-message__input"
       rows={1}
       maxLength={limit}

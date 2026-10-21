@@ -182,3 +182,101 @@
 [data-pm] .lib-card .test-card__body {
   gap: 0;
 }
+
+/* ——— Выбор тестов и заданий (долгое нажатие) ——— */
+
+/* Название, а за ним значок закрепа вплотную: название не растягивается на всю строку */
+[data-pm] .lib-card .lib-card__top {
+  align-items: center;
+  gap: var(--space-1);
+}
+
+[data-pm] .lib-card .test-card__title {
+  flex: 0 1 auto;
+}
+
+.lib-card__pin {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+/* Галочка выбора: в правом нижнем углу значка 48, зелёный круг 20; вокруг него в значке прозрачный вырез (как у метки «в сети») */
+.lib-card__check {
+  position: absolute;
+  top: calc(50% + 4px);
+  left: calc(var(--space-4) + var(--space-8) + var(--space-4) - var(--space-5));
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border-radius: var(--radius-full);
+  background: #34c759;
+  color: #ffffff;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.14s, transform 0.2s var(--ease-ios, ease-out);
+  pointer-events: none;
+}
+
+.lib-card--selected .lib-card__check {
+  opacity: 1;
+  transform: none;
+}
+
+[data-pm] .lib-card--selected .test-card {
+  background: color-mix(in srgb, var(--action-primary, #0a84ff) 14%, transparent);
+}
+
+[data-pm] .lib-card--selected .test-card__avatar {
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+}
+
+/* В избранном и выбран: вырезы под сердечко и под галочку вместе */
+[data-pm] .lib-card--fav.lib-card--selected .test-card__avatar {
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Кнопка «Отправить» при выборе: над капсулой разделов, как «Пройти или отправить» в настройках теста */
+.library-send {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  padding: 0 var(--space-4) calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-3));
+  pointer-events: none;
+}
+
+.library-send__button {
+  width: 100%;
+  height: var(--size-touch);
+  border: 1px solid var(--glass-border-blue);
+  border-radius: var(--radius-md);
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+  font-weight: 600;
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  pointer-events: auto;
+}
+
+.library-send__button:disabled {
+  opacity: 0.5;
+}
+
+/* Пока выбирают, под кнопкой «Отправить» остаётся место: последние строки не прячутся под ней */
+.library-page[data-selecting] .library-page__page {
+  padding-bottom: calc(var(--pm-bottom) + var(--size-touch) + var(--space-4));
+}
+
+/* История сворачивается: шапка ниже на высоту ряда недавних */
+.messages.library-page[data-selecting] {
+  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
+}
