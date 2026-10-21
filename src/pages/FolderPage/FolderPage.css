@@ -619,3 +619,52 @@
 [data-pm] .sheet:has(.fp-pick) .frame-subtitle {
   text-align: center;
 }
+
+/* ---------- Эмодзи в названии папки ---------- */
+.fp__emoji {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-secondary, var(--color-text-caption));
+  font-size: var(--size-icon-lg, 24px);
+}
+
+.fp__emoji svg {
+  width: 1em;
+  height: 1em;
+}
+
+.fp__emoji[aria-expanded='true'] {
+  color: var(--text-link, var(--color-accent));
+}
+
+/* Область нажатия 44 при видимом значке 24 */
+.fp__emoji::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-touch, 44px) - var(--space-6)) / -2);
+}
+
+/* Панель эмодзи у нижнего края экрана поверх всего; под ней прокрутка получает запас, чтобы поля были доступны */
+.fp__emoji-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+}
+
+.fp__emoji-panel .emoji-panel {
+  margin: 0;
+}
+
+.fp[data-emoji] .fp__scroll {
+  padding-bottom: calc(320px + var(--space-4));
+}

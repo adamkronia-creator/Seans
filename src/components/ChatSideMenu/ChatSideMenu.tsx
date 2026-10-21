@@ -229,8 +229,6 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
           )}
         </div>
 
-        <hr className="side-menu__rule" />
-
         <nav className="side-menu__list" aria-label="Разделы">
           {items.map(({ id, label, icon, count }) => (
             <button
@@ -246,12 +244,9 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
             </button>
           ))}
         </nav>
-
-        <hr className="side-menu__rule" />
         <SoonGroup label="О клиенте" items={SOON_CLIENT} />
 
         <div className="side-menu__bottom">
-          <hr className="side-menu__rule" />
           <SoonGroup label="Чат" items={SOON_CHAT} />
         </div>
       </div>

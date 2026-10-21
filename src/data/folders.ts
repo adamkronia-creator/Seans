@@ -70,7 +70,9 @@ export const getFolder = (scope: FolderScope, id: string): Folder | undefined =>
 export const getFolders = (scope: FolderScope): readonly Folder[] => state[scope];
 
 /** Название без лишних пробелов и не длиннее предела; пустое не годится */
-export const cleanFolderName = (name: string) => name.replace(/\s+/g, ' ').trim().slice(0, FOLDER_NAME_MAX).trim();
+/** Длина названия считается знаками, а не кодовыми единицами: эмодзи из двух единиц — один знак, и обрезка не рвёт его пополам */
+export const nameLength = (name: string) => Array.from(name).length;
+export const cleanFolderName = (name: string) => Array.from(name.replace(/\s+/g, ' ').trim()).slice(0, FOLDER_NAME_MAX).join('').trim();
 
 /** Только что созданные папки: пока в них ничего не тронули, при выходе с экрана настроек они убираются */
 const fresh = new Set<string>();

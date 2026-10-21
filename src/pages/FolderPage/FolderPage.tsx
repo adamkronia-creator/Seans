@@ -7,12 +7,14 @@ import { TONES } from '../../data/tones';
 import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
-import { IconBack } from '../../components/icons';
+import { IconBack, IconEmoji } from '../../components/icons';
+import { EmojiPanel } from '../../components/MessageInput/EmojiPanel';
 import { IconCheck, IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { CHATS, type ChatCategory } from '../../data/chats';
 import {
   FOLDER_NAME_MAX,
+  nameLength,
   deleteFolder,
   discardUntouchedFolder,
   getFolder,
@@ -208,6 +210,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
 
   const [name, setName] = useState(folder?.name ?? '');
   const [picking, setPicking] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const [asking, setAsking] = useState(false);
   const [entries] = useState(() => entriesOf(scope));
   const [created] = useState(() => isFreshFolder(id));
@@ -242,8 +245,25 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   const selected = entries.filter((e) => inFolder.has(e.id));
 
   const rename = (value: string) => {
-    setName(value);
-    renameFolder(scope, id, value);
+    // Лишнее за пределом обрезается по знакам: эмодзи не рвётся пополам
+    const cut = Array.from(value).slice(0, FOLDER_NAME_MAX).join('');
+    setName(cut);
+    renameFolder(scope, id, cut);
+  };
+
+  /** Эмодзи встаёт в место курсора (или в конец); если названию не хватает места, не вставляется */
+  const insertEmoji = (emoji: string) => {
+    const el = field.current;
+    const chars = Array.from(name);
+    // Положение курсора в кодовых единицах переводим в знаки
+    const at = el ? Array.from(name.slice(0, el.selectionStart ?? name.length)).length : chars.length;
+    const end = el ? Array.from(name.slice(0, el.selectionEnd ?? name.length)).length : chars.length;
+    const next = [...chars.slice(0, at), emoji, ...chars.slice(end)];
+    if (next.length > FOLDER_NAME_MAX) return;
+    const value = next.join('');
+    rename(value);
+    const caret = [...chars.slice(0, at), emoji].join('').length;
+    window.requestAnimationFrame(() => el?.setSelectionRange(caret, caret));
   };
 
   const remove = () => {
@@ -252,7 +272,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   };
 
   return (
-    <section className="fp">
+    <section className="fp" data-emoji={emojiOpen ? '' : undefined}>
       <header className="fp__header">
         {/* Как шапка открытого чата: слева чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись, справа «назад» */}
         <span
@@ -280,17 +300,32 @@ export function FolderPage({ scope, id }: FolderPageProps) {
                 ref={field}
                 className="fp__input"
                 value={name}
-                maxLength={FOLDER_NAME_MAX}
                 placeholder="Например, Практика"
                 autoComplete="off"
                 enterKeyHint="done"
+                onFocus={() => setEmojiOpen(false)}
                 onChange={(e) => rename(e.target.value)}
                 // Пустое название не сохраняется: поле возвращает последнее сохранённое
                 onBlur={() => setName(getFolder(scope, id)?.name ?? name)}
                 onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
               />
-              <span className="fp__counter" aria-label={`Можно ввести ещё ${FOLDER_NAME_MAX - name.length}`}>
-                {FOLDER_NAME_MAX - name.length}
+              <button
+                type="button"
+                className="fp__emoji"
+                aria-label="Эмодзи"
+                aria-expanded={emojiOpen}
+                // Нажатие не уводит фокус с поля: иначе при потере фокуса название сбрасывалось бы
+                onPointerDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setEmojiOpen((v) => !v);
+                  // Панель вместо клавиатуры: поле остаётся с курсором, но экранную клавиатуру не поднимает
+                  if (!emojiOpen) field.current?.blur();
+                }}
+              >
+                <IconEmoji />
+              </button>
+              <span className="fp__counter" aria-label={`Можно ввести ещё ${FOLDER_NAME_MAX - nameLength(name)}`}>
+                {FOLDER_NAME_MAX - nameLength(name)}
               </span>
             </span>
           </label>
@@ -342,6 +377,11 @@ export function FolderPage({ scope, id }: FolderPageProps) {
         </button>
       </div>
 
+      {emojiOpen && (
+        <div className="fp__emoji-panel">
+          <EmojiPanel onPick={insertEmoji} />
+        </div>
+      )}
       {picking && <PickSheet scope={scope} folder={folder} entries={entries} onClose={() => setPicking(false)} />}
       {asking && (
         <RemoveSheet title="Удалить папку?" text={removeFolderText(scope, folder.name)} confirm="Удалить" onConfirm={remove} onClose={() => setAsking(false)} />
