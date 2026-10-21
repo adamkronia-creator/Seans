@@ -615,3 +615,17 @@
     animation: none;
   }
 }
+
+/* Окно «Форма бланка» по сетке 4: заголовок к карточке 16, карточка к кнопке 16, кнопка от низа 16 (+ безопасная зона) */
+[data-pm] .sheet__body:has(> .form-menu__card) {
+  padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+[data-pm] .sheet:has(.form-menu__card) .sheet__footer {
+  padding: 0 var(--space-4) calc(var(--space-4) + var(--safe-bottom));
+}
+
+/* Строки карточки сами держат поля 16 и высоту 48: общая подкладка 12 только отодвигала текст (28 от края вместо 16) */
+[data-pm] .sheet .sheet__card.form-menu__card:not(.sheet__text) {
+  padding: 0;
+}

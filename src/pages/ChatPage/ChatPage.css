@@ -201,7 +201,8 @@
 .chat__cancel {
   flex-shrink: 0;
   height: var(--size-control);
-  padding: 0 var(--space-2);
+  /* Справа поля нет: текст «Отмена» стоит ровно в 16 от края экрана (их даёт строка шапки) */
+  padding: 0 0 0 var(--space-2);
   color: var(--text-link);
   font: var(--type-body);
 }

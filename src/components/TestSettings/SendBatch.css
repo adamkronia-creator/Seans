@@ -59,10 +59,10 @@
   font: var(--type-headline, 600 17px/24px var(--font-family));
 }
 
-/* Ритм окна: название к карточкам 12, карточки между собой 12, материал от материала 24 и тонкая линия; под подзаголовком 16 */
+/* Ритм окна: название к карточкам 12, карточки между собой 12, материал от материала 16 без линий; от линии под заголовком до первого материала 16 */
 [data-pm] .sheet__body:has(> .sb-item) {
-  gap: var(--space-6);
-  padding-top: var(--space-6);
+  gap: var(--space-4);
+  padding-top: var(--space-4);
   /* Прокручиваемое режется по линии под заголовком, а не тает */
   -webkit-mask-image: none;
   mask-image: none;
@@ -82,10 +82,5 @@
 
 [data-pm] .sb-item {
   gap: var(--space-3);
-}
-
-[data-pm] .sb-item + .sb-item {
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--glass-border);
 }
 
