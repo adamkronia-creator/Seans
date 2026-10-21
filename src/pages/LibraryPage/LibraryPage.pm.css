@@ -165,3 +165,15 @@
   -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
   mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
 }
+
+/* Круглые значки тестов и заданий — как «Избранное» и «Архивы»: светлая рамка 1 px и градиент 135° от осветлённого цвета значка к самому цвету */
+[data-pm] .lib-card .test-card__avatar {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
+}
+
+[data-pm] .lib-card .test-card__avatar::before {
+  inset: -1px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
+  opacity: 0.9;
+}
