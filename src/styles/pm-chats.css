@@ -787,7 +787,7 @@ html:has([data-pm]) body {
 [data-pm] .chips-pill {
   border-color: var(--pill-border, var(--glass-border-blue));
   background: var(--pill-fill, var(--glass-chip-active));
-  transition: opacity 0.16s, background-color 0.2s, border-color 0.2s;
+  transition: opacity 0.16s;
 }
 
 [data-pm] .screen-header__chips .chip[data-paint-color]::before {

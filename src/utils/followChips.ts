@@ -42,6 +42,9 @@ export function followChips(chips: Iterable<HTMLElement>, position: number, via?
  * Ряд с общей подвижной заливкой (элемент `.chips-pill` внутри ряда, как у «Диалогов»): заливка выбранного одна на весь ряд и едет
  * от чипса к чипсу, а не перетекает цветом: положение и ширина — взвешенная сумма положений и ширин чипсов (веса те же, что у --w).
  */
+/** Обычная заливка выбранного чипса одним цветом (середина градиента --glass-chip-active), чтобы смешивать её с цветом папки */
+const DEFAULT_PILL = '#0D7CF2';
+
 export function placePill(chips: HTMLElement[], weights: number[]) {
   const pill = chips[0]?.parentElement?.querySelector<HTMLElement>(':scope > .chips-pill');
   if (!pill) return;
@@ -58,15 +61,20 @@ export function placePill(chips: HTMLElement[], weights: number[]) {
     const overlap = Math.max(0, Math.min(x + w, chip.offsetLeft + chip.offsetWidth) - Math.max(x, chip.offsetLeft));
     chip.style.setProperty('--cover', String(Math.min(1, overlap / chip.offsetWidth)));
   });
-  // Плашка берёт цвет папки у чипса, на котором она стоит (у чипса без своего цвета — обычная синяя)
-  let top = 0;
-  weights.forEach((wt, i) => {
-    if (wt > weights[top]) top = i;
-  });
-  const own = chips[top]?.dataset.paintColor;
-  if (own) {
-    pill.style.setProperty('--pill-fill', `color-mix(in srgb, ${own} 90%, transparent)`);
-    pill.style.setProperty('--pill-border', `color-mix(in srgb, ${own} 60%, white)`);
+  // Плашка берёт цвет папки у чипса, на котором стоит, и перетекает между цветами вместе с положением: цвет — взвешенная смесь
+  // цветов чипсов под ней (у чипса без своего цвета — обычный синий). Если красить нечего, остаётся обычная синяя заливка
+  if (chips.some((c) => c.dataset.paintColor)) {
+    let mix = '';
+    let sum = 0;
+    chips.forEach((chip, i) => {
+      const wt = weights[i];
+      if (wt < 0.001) return;
+      const color = chip.dataset.paintColor ?? DEFAULT_PILL;
+      mix = mix ? `color-mix(in srgb, ${color} ${((wt / (sum + wt)) * 100).toFixed(1)}%, ${mix})` : color;
+      sum += wt;
+    });
+    pill.style.setProperty('--pill-fill', mix);
+    pill.style.setProperty('--pill-border', `color-mix(in srgb, ${mix} 60%, white)`);
   } else {
     pill.style.removeProperty('--pill-fill');
     pill.style.removeProperty('--pill-border');
