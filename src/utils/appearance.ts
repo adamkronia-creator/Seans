@@ -3,12 +3,15 @@
  * Всё хранится в localStorage и применяется при запуске. Цвет текста «авто» считается по яркости фона: на тёмном фоне текст белый,
  * на светлом тёмный (атрибут data-ink на <html>: dark — тёмный текст, light — белый).
  */
-import dawn from '../assets/bg-dawn.webp';
+import dawn from '../assets/bg-default.webp';
+import dawnSoft from '../assets/bg-dawn.webp';
 
 const K_IMAGE = 'seans-bg-image';
 const K_VARIANT = 'seans-bg';
 const K_BLUR = 'seans-blur';
 const K_INK = 'seans-ink';
+/** Отметка: настройки фона сброшены под новый фон по умолчанию */
+const K_RESET = 'seans-bg-default-2';
 /** Список загруженных фонов (JSON: [{id, data}]) и id выбранного */
 const K_LIST = 'seans-bg-list';
 const MAX_SAVED = 8;
@@ -17,7 +20,7 @@ const MAX_SIDE = 1600;
 const DARK_BELOW = 0.5;
 
 export type InkPref = 'auto' | 'dark' | 'light';
-export const DEFAULT_BLUR = 24;
+export const DEFAULT_BLUR = 60;
 
 const root = () => document.documentElement;
 const get = (k: string) => {
@@ -42,7 +45,7 @@ export const getBlur = () => {
 };
 export const getInkPref = (): InkPref => {
   const v = get(K_INK);
-  return v === 'dark' || v === 'light' ? v : 'auto';
+  return v === 'dark' || v === 'light' || v === 'auto' ? v : 'light';
 };
 
 /** Яркость картинки: среднее по уменьшенной копии (формула относительной яркости) */
@@ -68,9 +71,8 @@ async function sceneLuminance(): Promise<number> {
   const custom = get(K_IMAGE);
   if (custom) return luminanceOf(custom);
   const variant = root().dataset.bg;
-  if (variant === '1' || variant === '3') {
-    return luminanceOf(dawn);
-  }
+  if (variant === '1') return luminanceOf(dawn);
+  if (variant === '3') return luminanceOf(dawnSoft);
   return 0.9; // градиент и вариант под белой вуалью светлые
 }
 
@@ -97,7 +99,7 @@ export async function applyInk() {
 }
 
 export function setInkPref(pref: InkPref) {
-  set(K_INK, pref === 'auto' ? null : pref);
+  set(K_INK, pref);
   void applyInk();
 }
 
@@ -202,6 +204,14 @@ export function resetBackground() {
 
 /** Запуск: варианты ?bg=0…3 и ?blur=0…60 из адреса (запоминаются, ?bg снимает свою картинку), затем сохранённые настройки */
 export function initAppearance() {
+  // Фон по умолчанию сменился (портрет, размытие 60, белый текст): один раз сбрасываем прежние локальные настройки; список своих фонов остаётся
+  if (get(K_RESET) !== '1') {
+    set(K_IMAGE, null);
+    set(K_VARIANT, null);
+    set(K_BLUR, null);
+    set(K_INK, null);
+    set(K_RESET, '1');
+  }
   const q = new URLSearchParams(window.location.search);
   const bg = q.get('bg');
   if (bg !== null && /^[0-3]$/.test(bg)) {

@@ -475,7 +475,7 @@ html:has([data-pm]) body {
 
 /* Варианты фона для сравнения: ?bg=0 прежний градиент, 1 картинка, 2 картинка под белой вуалью, 3 размытая картинка (атрибут data-bg ставит main.tsx) */
 :root[data-bg='1'] [data-pm] {
-  --scene: url('../assets/bg-dawn.webp') center / cover no-repeat, #dfe6f0;
+  --scene: url('../assets/bg-default.webp') center / cover no-repeat, #1b1d22;
 }
 
 :root[data-bg='2'] [data-pm] {

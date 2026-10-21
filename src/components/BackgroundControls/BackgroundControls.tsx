@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import './BackgroundControls.css';
-import dawn from '../../assets/bg-dawn.webp';
+import dawn from '../../assets/bg-default.webp';
 import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import {
   currentBackgroundId,
