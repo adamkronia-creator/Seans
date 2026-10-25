@@ -661,10 +661,23 @@
 }
 
 /* Нижний ряд панели: две стеклянные кнопки рядом, как кнопки под сообщениями с тестами (высота 40, акцентная подпись, углы 4) */
+.profile__photos {
+  display: flex;
+  margin: 0 var(--space-4);
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Нижние углы панели почти прямые (4), как у пузыря с кнопками: панель и кнопки читаются одним блоком */
+[data-pm] .profile__card--joined {
+  margin: 0;
+  border-bottom-right-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
 .profile__foot {
   display: flex;
   gap: var(--space-1);
-  padding: var(--space-1) var(--card-pad) var(--card-pad);
 }
 
 .profile__foot-button {
@@ -681,6 +694,14 @@
   font: var(--type-label);
   text-align: center;
   transition: filter 0.15s ease;
+}
+
+.profile__foot-button:first-child {
+  border-bottom-left-radius: var(--radius-lg);
+}
+
+.profile__foot-button:last-child {
+  border-bottom-right-radius: var(--radius-lg);
 }
 
 .profile__foot-button[data-pressed] {
