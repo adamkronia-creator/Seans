@@ -2,7 +2,7 @@ import type { Chat } from '../../data/chats';
 import { useLongPress } from '../../utils/useLongPress';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
-import { IconArchiveMk, IconBookmarkMk, IconChevronMk, IconTicksMk } from './ChatIcons';
+import { IconArchiveMk, IconBookmarkMk, IconTicksMk } from './ChatIcons';
 import './ChatItem.css';
 
 interface ChatItemProps {
@@ -22,7 +22,7 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
   const pinned = chat.favorites === true;
   const cls = ['chat-item', chat.unread > 0 && 'chat-item--unread', pinned && 'chat-item--pinned', selected && 'chat-item--selected'].filter(Boolean).join(' ');
   const { handlers, swallow } = useLongPress(onLongPress ? (el) => onLongPress(chat, el) : undefined);
-  // «Избранное» — компактная строка с шевроном, как в макете: без времени и счётчика
+  // «Избранное» — компактная строка без шеврона: без времени и счётчика
   if (pinned) {
     return (
       <li className={`${cls} chat-item--compact`}>
@@ -37,7 +37,6 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
               <span className="chat-item__preview">{chat.lastMessage}</span>
             </span>
           </span>
-          <IconChevronMk className="chat-item__chevron" />
         </button>
       </li>
     );
