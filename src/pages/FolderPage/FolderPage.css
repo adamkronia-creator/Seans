@@ -452,9 +452,9 @@
   background-clip: content-box;
 }
 
-/* Белому кругу на светлой карточке нужен контур */
+/* Контур у белого круга убран: кольцо только у выбранного цвета */
 .fp-tone[data-light] {
-  border-color: var(--divider, var(--color-border));
+  border-color: transparent;
 }
 
 .fp-tone--active,
@@ -673,11 +673,23 @@
   display: contents;
 }
 
+/* Заголовок блока — строка 48 с текстом по центру, как шапка карточки в личной информации: отступы сверху и снизу равны */
+[data-pm] .fp__heading--pad,
 [data-pm] .fp__field > .fp__heading {
-  padding: var(--space-3) var(--space-4) var(--space-1);
+  display: flex;
+  align-items: center;
+  min-height: var(--row-h);
+  padding: 0 var(--space-4);
 }
 
 [data-pm] .fp__field > .fp__input-row {
+  min-height: var(--row-h);
   margin: 0;
-  padding: var(--space-2) var(--space-4) var(--space-3);
+  padding: 0 var(--space-4);
+}
+
+/* «Добавить чаты»: значок в колонке 24, как «+» в «Создать новую папку» */
+[data-pm] .fp__add-icon {
+  width: var(--space-6);
+  justify-content: flex-start;
 }
