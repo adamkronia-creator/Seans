@@ -84,7 +84,7 @@
   gap: var(--row-gap);
   width: 100%;
   min-height: var(--row-h-2);
-  padding: var(--row-pad-y) var(--row-pad-x);
+  padding: var(--field-pad-y) var(--row-pad-x); /* 12 / 16, как у строк «Контактной информации» */
   text-align: left;
 }
 
@@ -121,8 +121,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--size-avatar);
-  height: var(--size-avatar);
+  width: var(--size-avatar-sm);
+  height: var(--size-avatar-sm);
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-accent-soft);
