@@ -2,7 +2,10 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconPin } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
-import { IconCamera, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
+import { AlbumCover } from '../../components/Profile/AlbumCover';
+import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
+import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
+import { IconAlbum, IconCamera, IconChevronRight, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
@@ -15,8 +18,9 @@ import { navigate } from '../../router';
 import { useTabSwipe } from '../../utils/tabNav';
 import './ProfilePage.css';
 
-/** Сколько фото видно в сетке, пока не нажали «Показать все»: три ряда по три */
-const GRID_LIMIT = 9;
+/** Сколько видно на панели профиля: фото двумя рядами по три, альбомов один ряд; остальное на экране «Посмотреть» */
+const PHOTOS_SHOWN = 6;
+const ALBUMS_SHOWN = 3;
 
 /**
  * Раздел «Профиль» (последняя вкладка нижней панели): обложка, аватар, имя и специализация, сводка, личная информация и фото.
@@ -29,18 +33,19 @@ export function ProfilePage() {
   const [viewing, setViewing] = useState<string | null>(null);
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
   const [pickingBackground, setPickingBackground] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [tab, setTab] = useState<PhotoView>('photos');
+  const [newAlbum, setNewAlbum] = useState(false);
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
   const root = useRef<HTMLElement>(null);
   // Свайп вправо ведёт в чаты (предыдущий раздел нижней панели)
   useTabSwipe(root, 'right', 'messages');
 
-  const { photos, thumbs, uploading, name, headline, city, fields } = profile;
+  const { photos, albums, thumbs, uploading, name, headline, city, fields } = profile;
   const cover = coverSrcOf(profile);
   const clients = chats.filter((chat) => chat.category === 'clients').length;
   const colleagues = chats.filter((chat) => chat.category === 'colleagues').length;
-  const shown = expanded ? photos : photos.slice(0, GRID_LIMIT);
+  const shown = photos.slice(0, PHOTOS_SHOWN);
 
   // Карандаш просто открывает редактирование с начала: без перехода к полю и без клавиатуры
   const edit = (_target?: string) => {
@@ -162,49 +167,70 @@ export function ProfilePage() {
           </button>
         </section>
 
-        <section className="profile__card" aria-labelledby="profile-photos">
-          <header className="profile__card-head">
-            <h2 id="profile-photos" className="profile__card-title">
-              Фото
-              {photos.length > 0 && <span className="profile__count">{photos.length}</span>}
-            </h2>
-            <button type="button" className="profile__card-link" onClick={() => input.current?.click()}>
-              <IconPlusLine />
-              Добавить
-            </button>
+        <section className="profile__card" aria-label="Фото и альбомы">
+          <header className="profile__card-head profile__card-head--tabs">
+            <PhotoTabs value={tab} onChange={setTab} photos={photos.length} albums={albums.length} />
           </header>
 
-          {photos.length + uploading > 0 ? (
-            <ul className="profile__grid">
-              {Array.from({ length: uploading }, (_, i) => (
-                <li key={`wait-${i}`}>
-                  <Skeleton className="profile__wait" width="100%" height="auto" radius="var(--radius-sm)" />
-                </li>
-              ))}
-              {shown.map((photo, i) => (
-                <li key={photo.id}>
-                  {thumbs[photo.id] ? (
-                    <button type="button" className="profile__tile" aria-label={`Фото ${i + 1} из ${photos.length}`} onClick={() => setViewing(photo.id)}>
-                      <img src={thumbs[photo.id]} alt="" loading="lazy" decoding="async" />
-                    </button>
-                  ) : (
-                    <Skeleton className="profile__wait" width="100%" height="auto" radius="var(--radius-sm)" />
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <button type="button" className="profile__drop" onClick={() => input.current?.click()}>
-              <IconImage />
-              <span>Добавьте первое фото</span>
-            </button>
-          )}
+          {tab === 'photos' &&
+            (photos.length + uploading > 0 ? (
+              <ul className="profile__grid">
+                {Array.from({ length: Math.min(uploading, PHOTOS_SHOWN) }, (_, i) => (
+                  <li key={`wait-${i}`}>
+                    <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
+                  </li>
+                ))}
+                {shown.slice(0, Math.max(0, PHOTOS_SHOWN - uploading)).map((photo, i) => (
+                  <li key={photo.id}>
+                    {thumbs[photo.id] ? (
+                      <button type="button" className="profile__tile" aria-label={`Фото ${i + 1} из ${photos.length}`} onClick={() => setViewing(photo.id)}>
+                        <img src={thumbs[photo.id]} alt="" loading="lazy" decoding="async" />
+                      </button>
+                    ) : (
+                      <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <button type="button" className="profile__drop" onClick={() => input.current?.click()}>
+                <IconImage />
+                <span>Добавьте первое фото</span>
+              </button>
+            ))}
 
-          {photos.length > GRID_LIMIT && (
-            <button type="button" className="profile__more" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)}>
-              {expanded ? 'Свернуть' : `Показать все (${photos.length})`}
+          {tab === 'albums' &&
+            (albums.length > 0 ? (
+              <ul className="profile__albums">
+                {albums.slice(0, ALBUMS_SHOWN).map((album) => (
+                  <li key={album.id}>
+                    <button type="button" className="profile__album" onClick={() => navigate(`/profile/photos/album/${album.id}`)}>
+                      <span className="profile__album-cover">
+                        <AlbumCover album={album} />
+                      </span>
+                      <span className="profile__album-name">{album.name}</span>
+                      <span className="profile__album-count">{album.photoIds.length}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <button type="button" className="profile__drop" onClick={() => setNewAlbum(true)}>
+                <IconAlbum />
+                <span>Создайте первый альбом</span>
+              </button>
+            ))}
+
+          <div className="profile__foot">
+            <button type="button" className="profile__foot-button" onClick={() => (tab === 'photos' ? input.current?.click() : setNewAlbum(true))}>
+              <IconPlusLine />
+              {tab === 'photos' ? 'Добавить' : 'Новый альбом'}
             </button>
-          )}
+            <button type="button" className="profile__foot-button" onClick={() => navigate(tab === 'photos' ? '/profile/photos' : '/profile/photos/albums')}>
+              Посмотреть
+              <IconChevronRight />
+            </button>
+          </div>
         </section>
       </div>
 
@@ -212,6 +238,7 @@ export function ProfilePage() {
       {toast && <Toast text={toast} />}
       {pickingBackground && <BackgroundSheet onClose={() => setPickingBackground(false)} />}
       {picking && <PhotoPickSheet kind={picking} onClose={() => setPicking(null)} onNote={show} />}
+      {newAlbum && <AlbumNameSheet onClose={() => setNewAlbum(false)} onSaved={(id) => navigate(`/profile/photos/album/${id}`)} />}
       {viewing && <PhotoViewer startId={viewing} onClose={() => setViewing(null)} />}
     </section>
   );

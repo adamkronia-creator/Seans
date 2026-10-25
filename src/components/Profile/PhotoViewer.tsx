@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, useProfile } from '../../data/profile';
 import { useExitAnimation } from '../../utils/exitAnimation';
@@ -14,6 +14,8 @@ import './PhotoViewer.css';
 interface PhotoViewerProps {
   /** С какого фото начать */
   startId: string;
+  /** Листать только эти фото (альбом); без списка — все фото профиля */
+  ids?: string[];
   onClose: () => void;
 }
 
@@ -22,9 +24,10 @@ interface PhotoViewerProps {
  * к каждому снимку, поэтому свайп работает без своей математики), стрелки на клавиатуре и кнопки по бокам — для компьютера.
  * Внизу подпись и действия: подпись, фото профиля, обложка, удалить.
  */
-export function PhotoViewer({ startId, onClose }: PhotoViewerProps) {
+export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   const profile = useProfile();
-  const { photos, thumbs, fulls } = profile;
+  const { thumbs, fulls } = profile;
+  const photos = useMemo(() => (ids ? profile.photos.filter((p) => ids.includes(p.id)) : profile.photos), [profile.photos, ids]);
   const count = photos.length;
   const [index, setIndex] = useState(() => Math.max(0, photos.findIndex((p) => p.id === startId)));
   const [sheet, setSheet] = useState<'caption' | 'remove' | null>(null);

@@ -68,6 +68,16 @@ function growIn(scroller: HTMLElement, el: HTMLElement) {
   grow.addEventListener('cancel', done);
 }
 
+/** Строка с подписью в карточке: подпись сверху, поле под ней; правки сохраняются сразу */
+function TextInput({ label, value, onChange, placeholder, max, type, inputMode }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
+  return (
+    <label className="pe__input">
+      <span className="pe__label">{label}</span>
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
+    </label>
+  );
+}
+
 const titleOf = (field: ProfileField) => field.label.trim() || 'Без названия';
 
 /**
@@ -77,7 +87,7 @@ const titleOf = (field: ProfileField) => field.label.trim() || 'Без назв�
  */
 export function ProfileEditPage() {
   const profile = useProfile();
-  const { fields, name, headline, city } = profile;
+  const { fields, name, headline, city, username, phone, birthday, family } = profile;
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
   const [asking, setAsking] = useState<ProfileField | null>(null);
   const [toast, show] = useToast();
@@ -202,7 +212,10 @@ export function ProfileEditPage() {
       </header>
 
       <div ref={scroller} className="pe__scroll">
-        <section className="pe__card" aria-label="Фото">
+        <div className="pe__group">
+          <h2 className="pe__group-title">Фотографии и обложки</h2>
+        </div>
+        <section className="pe__card" aria-label="Фотографии и обложки">
           <button type="button" className="pe__row" onClick={() => setPicking('avatar')}>
             <Avatar src={avatarSrcOf(profile)} size={40} />
             <span className="pe__row-label">Фото профиля</span>
@@ -215,42 +228,27 @@ export function ProfileEditPage() {
           </button>
         </section>
 
-        <section className="pe__card" aria-label="Основное">
-          <label className="pe__input">
-            <span className="pe__label">Имя</span>
-            <input
-              value={name}
-              onChange={(e) => updateBasics({ name: e.target.value })}
-              placeholder="Как к вам обращаться"
-              {...plainText}
-              maxLength={80}
-            />
-          </label>
-          <label className="pe__input">
-            <span className="pe__label">Специализация</span>
-            <input
-              value={headline}
-              onChange={(e) => updateBasics({ headline: e.target.value })}
-              placeholder="Например, психолог-консультант"
-              {...plainText}
-              maxLength={120}
-            />
-          </label>
-          <label className="pe__input">
-            <span className="pe__label">Город</span>
-            <input
-              value={city}
-              onChange={(e) => updateBasics({ city: e.target.value })}
-              placeholder="Где вы принимаете"
-              {...plainText}
-              maxLength={80}
-            />
-          </label>
+        <div className="pe__group">
+          <h2 className="pe__group-title">Контактная информация</h2>
+        </div>
+        <section className="pe__card" aria-label="Контактная информация">
+          <TextInput label="Имя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
+          <TextInput label="Никнейм" value={username} onChange={(v) => updateBasics({ username: v.replace(/\s/g, '') })} placeholder="@nickname" max={40} />
+          <TextInput label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: v })} placeholder="+7 (900) 000-00-00" max={24} type="tel" inputMode="tel" />
+        </section>
+
+        <div className="pe__group">
+          <h2 className="pe__group-title">Общая информация</h2>
+        </div>
+        <section className="pe__card" aria-label="Общая информация">
+          <TextInput label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="Например, 14 марта 1991" max={40} />
+          <TextInput label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
+          <TextInput label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
+          <TextInput label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
         </section>
 
         <div className="pe__group">
           <h2 className="pe__group-title">Личная информация</h2>
-          <p className="pe__hint">Показывайте только то, что хотите. Название, текст и порядок полей меняются, ненужные можно убрать.</p>
         </div>
 
         {fields.length > 0 && (
@@ -308,10 +306,9 @@ export function ProfileEditPage() {
           <h2 id="pe-add" className="pe__add-title">
             Добавить поле
           </h2>
-          <p className="pe__hint pe__hint--inside">Выберите подсказку или создайте своё, например «Личный анализ».</p>
           <div className="pe__chips">
             <button type="button" className="pe__chip pe__chip--own" onClick={() => add('')}>
-              Своё поле
+              Создать
             </button>
             {suggestions.map((label) => (
               <button key={label} type="button" className="pe__chip" onClick={() => add(label)}>

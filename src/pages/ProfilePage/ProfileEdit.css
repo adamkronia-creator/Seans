@@ -196,13 +196,6 @@
   letter-spacing: var(--letter-spacing-title);
 }
 
-.pe__hint {
-  margin-top: var(--space-1);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
 .pe__fields {
   display: flex;
   flex-direction: column;
@@ -517,11 +510,6 @@
   color: var(--text-primary);
   font: var(--type-title);
   letter-spacing: 0;
-}
-
-[data-pm] .pe__hint {
-  color: var(--text-secondary);
-  font: var(--type-meta);
 }
 
 [data-pm] .pe__field-head {

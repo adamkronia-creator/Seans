@@ -1,0 +1,113 @@
+/* «Фото и альбомы»: каркас .fp (шапка со стеклянными кнопками, фон-сцена), поля 16 */
+
+/* Фото одной рамкой: плитки впритык, щель 2, скругление внешнее */
+.ph__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  list-style: none;
+}
+
+.ph__tile {
+  --press-scale: 0.97;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--bg-subtle);
+}
+
+.ph__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ph__wait {
+  aspect-ratio: 1;
+}
+
+/* Альбомы: две карточки в ряд, обложка квадратом */
+.ph__albums {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ph__album {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  text-align: left;
+}
+
+.ph__album-cover {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.ph__album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ph__album--new .ph__album-cover {
+  border: 1.5px dashed var(--divider);
+  background: none;
+  color: var(--text-link);
+}
+
+.ph__album-name {
+  overflow: hidden;
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ph__album--new .ph__album-name {
+  color: var(--text-link);
+}
+
+.ph__album-count {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Пустой раздел: большая кнопка добавления */
+.ph__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-4);
+  border: 1.5px dashed var(--divider);
+  border-radius: var(--radius-lg);
+  color: var(--text-link);
+  font-size: var(--size-icon-lg);
+}
+
+.ph__empty span {
+  font: var(--type-label);
+  font-weight: 500;
+}

@@ -9,6 +9,7 @@ import { FolderPage } from './pages/FolderPage/FolderPage';
 import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
 import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
+import { PhotosPage } from './pages/PhotosPage/PhotosPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
@@ -249,6 +250,21 @@ export default function App() {
       const taskId = path.match(/^\/tasks\/([^/]+)/)?.[1];
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at, true) : page('tasks', <TasksPage />, at, true);
+    }
+    // /profile/photos, /profile/photos/albums и /profile/photos/album/<альбом>: фото и альбомы на весь экран; у каждой вкладки свой ключ (экран строится заново)
+    const photosRoute = path.match(/^\/profile\/photos(?:\/(albums)|\/album\/([^/]+))?\/?$/);
+    if (photosRoute) {
+      const albumId = photosRoute[2];
+      const view = albumId ? 'album' : photosRoute[1] ? 'albums' : 'photos';
+      return {
+        key: albumId ? `profile/photos/album/${albumId}` : `profile/photos/${view}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <PhotosPage view={view} albumId={albumId} />
+          </main>
+        ),
+      };
     }
     // Остался «Профиль». /profile/edit: редактирование профиля на весь экран, без нижней панели (как чат)
     if (path === '/profile/edit') {

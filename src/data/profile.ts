@@ -26,15 +26,28 @@ interface ProfilePhoto {
   addedAt: number;
 }
 
+/** Альбом: название и фото в порядке общей ленты. Фото остаётся одно, в альбомах лежат только ссылки на него */
+export interface ProfileAlbum {
+  id: string;
+  name: string;
+  photoIds: string[];
+}
+
 /** То, что хранится в localStorage */
 interface Stored {
   name: string;
   /** Специализация: «Психолог-консультант» */
   headline: string;
   city: string;
+  /** Контакты и общая информация: всё необязательное, пустое не показывается */
+  username: string;
+  phone: string;
+  birthday: string;
+  family: string;
   fields: ProfileField[];
   /** Фото по порядку показа: новые первыми */
   photos: ProfilePhoto[];
+  albums: ProfileAlbum[];
   /** Какое из фото — аватар и обложка; null — стандартные */
   avatarId: string | null;
   coverId: string | null;
@@ -52,26 +65,17 @@ interface ProfileState extends Stored {
 }
 
 /** Подсказки при добавлении поля; уже добавленные не предлагаются, а убранные возвращаются сюда */
-export const FIELD_SUGGESTIONS = [
-  'Личный анализ',
-  'Супервизия',
-  'О себе',
-  'Образование',
-  'Подход',
-  'Опыт работы',
-  'С чем работаю',
-  'Формат работы',
-  'Сертификаты',
-  'Языки',
-  'Интересы',
-  'Контакты',
-];
+export const FIELD_SUGGESTIONS = ['Личный анализ', 'С чем работаю', 'Формат работы', 'Языки', 'Интересы', 'Контакты'];
 
 /** Пример для первого запуска: всё это можно изменить и убрать */
 const SEED: Stored = {
   name: 'Алексей Воронин',
   headline: 'Психолог-консультант',
   city: 'Екатеринбург',
+  username: '',
+  phone: '',
+  birthday: '',
+  family: '',
   fields: [
     {
       id: 'about',
@@ -87,6 +91,7 @@ const SEED: Stored = {
     { id: 'experience', label: 'Опыт работы', value: 'Шесть лет частной практики: индивидуальные консультации очно и онлайн.' },
   ],
   photos: [],
+  albums: [],
   avatarId: null,
   coverId: null,
 };
@@ -114,12 +119,23 @@ function sanitize(raw: unknown): Stored {
         return p && isText(p.id) ? [{ id: p.id, caption: isText(p.caption) ? p.caption : '', addedAt: typeof p.addedAt === 'number' ? p.addedAt : 0 }] : [];
       })
     : [];
+  const albums = Array.isArray(data.albums)
+    ? data.albums.flatMap((item): ProfileAlbum[] => {
+        const a = item as Partial<ProfileAlbum> | null;
+        return a && isText(a.id) && isText(a.name) ? [{ id: a.id, name: a.name, photoIds: Array.isArray(a.photoIds) ? a.photoIds.filter(isText) : [] }] : [];
+      })
+    : [];
   return {
     name: isText(data.name) ? data.name : SEED.name,
     headline: isText(data.headline) ? data.headline : SEED.headline,
     city: isText(data.city) ? data.city : SEED.city,
+    username: isText(data.username) ? data.username : '',
+    phone: isText(data.phone) ? data.phone : '',
+    birthday: isText(data.birthday) ? data.birthday : '',
+    family: isText(data.family) ? data.family : '',
     fields,
     photos,
+    albums,
     avatarId: isId(data.avatarId) ? (data.avatarId ?? null) : null,
     coverId: isId(data.coverId) ? (data.coverId ?? null) : null,
   };
@@ -140,9 +156,9 @@ let saveTimer: number | undefined;
 function flush() {
   window.clearTimeout(saveTimer);
   saveTimer = undefined;
-  const { name, headline, city, fields, photos, avatarId, coverId } = state;
+  const { name, headline, city, username, phone, birthday, family, fields, photos, albums, avatarId, coverId } = state;
   try {
-    window.localStorage.setItem(KEY, JSON.stringify({ name, headline, city, fields, photos, avatarId, coverId } satisfies Stored));
+    window.localStorage.setItem(KEY, JSON.stringify({ name, headline, city, username, phone, birthday, family, fields, photos, albums, avatarId, coverId } satisfies Stored));
   } catch {
     // Нет места или хранилище закрыто: профиль остаётся в памяти до закрытия страницы
   }
@@ -196,7 +212,7 @@ export function coverSrcOf(profile: ProfileState): string | undefined {
 
 // ---------------------------------------------------------------- основное и поля
 
-export function updateBasics(patch: Partial<Pick<Stored, 'name' | 'headline' | 'city'>>) {
+export function updateBasics(patch: Partial<Pick<Stored, 'name' | 'headline' | 'city' | 'username' | 'phone' | 'birthday' | 'family'>>) {
   set(patch);
 }
 
@@ -249,7 +265,8 @@ void (async () => {
   });
   const photos = state.photos.filter((p) => thumbs[p.id]);
   const has = (id: string | null) => (id && photos.some((p) => p.id === id) ? id : null);
-  set({ thumbs, photos, avatarId: has(state.avatarId), coverId: has(state.coverId), ready: true });
+  const albums = state.albums.map((a) => ({ ...a, photoIds: a.photoIds.filter((id) => photos.some((p) => p.id === id)) }));
+  set({ thumbs, photos, albums, avatarId: has(state.avatarId), coverId: has(state.coverId), ready: true });
   if (state.coverId) void ensureFull(state.coverId);
 })();
 
@@ -326,6 +343,7 @@ export function removePhoto(id: string) {
   const { [id]: full, ...fulls } = state.fulls;
   set({
     photos: state.photos.filter((p) => p.id !== id),
+    albums: state.albums.map((a) => (a.photoIds.includes(id) ? { ...a, photoIds: a.photoIds.filter((x) => x !== id) } : a)),
     thumbs,
     fulls,
     avatarId: state.avatarId === id ? null : state.avatarId,
@@ -338,3 +356,28 @@ export function removePhoto(id: string) {
   }, 1000);
   removePhotos([id]).catch(() => undefined);
 }
+
+// ---------------------------------------------------------------- альбомы
+
+/** Новый альбом в начало списка; возвращает его id */
+export function addAlbum(name: string, photoIds: string[] = []): string {
+  const id = uid('a');
+  set({ albums: [{ id, name: name.trim(), photoIds: inFeedOrder(photoIds) }, ...state.albums] });
+  return id;
+}
+
+export function renameAlbum(id: string, name: string) {
+  set({ albums: state.albums.map((a) => (a.id === id ? { ...a, name: name.trim() } : a)) });
+}
+
+/** Состав альбома целиком; фото встают в порядке общей ленты, лишних id (удалённых фото) нет */
+export function setAlbumPhotos(id: string, photoIds: string[]) {
+  set({ albums: state.albums.map((a) => (a.id === id ? { ...a, photoIds: inFeedOrder(photoIds) } : a)) });
+}
+
+/** Сами фото остаются в галерее */
+export function removeAlbum(id: string) {
+  set({ albums: state.albums.filter((a) => a.id !== id) });
+}
+
+const inFeedOrder = (ids: string[]) => state.photos.filter((p) => ids.includes(p.id)).map((p) => p.id);

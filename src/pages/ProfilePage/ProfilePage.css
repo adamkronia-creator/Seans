@@ -267,22 +267,6 @@
   font-size: var(--size-icon-sm);
 }
 
-.profile__card-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  height: 40px;
-  padding: 0 var(--space-2);
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
-}
-
-.profile__card-link svg {
-  font-size: 18px;
-}
-
 /* Личная информация: подпись над значением, строки через линию от поля до края, как в карточках настроек */
 .profile__fields li {
   position: relative;
@@ -335,8 +319,7 @@
   line-height: var(--line-height-sm);
 }
 
-.profile__add,
-.profile__more {
+.profile__add {
   --press-scale: 1;
   display: flex;
   align-items: center;
@@ -361,8 +344,7 @@
 }
 
 .profile__field[data-pressed],
-.profile__add[data-pressed],
-.profile__more[data-pressed] {
+.profile__add[data-pressed] {
   background: var(--color-bg-pressed);
 }
 
@@ -394,10 +376,6 @@
 
 .profile__wait {
   aspect-ratio: 1;
-}
-
-.profile__more {
-  margin-top: 0;
 }
 
 /* Пустая галерея: большая кнопка добавления */
@@ -546,9 +524,7 @@
   color: var(--text-secondary);
 }
 
-[data-pm] .profile__card-link,
 [data-pm] .profile__add,
-[data-pm] .profile__more,
 [data-pm] .profile__drop {
   color: var(--text-link);
   font: var(--type-label);
@@ -569,8 +545,7 @@
 }
 
 [data-pm] .profile__fields li + li::before,
-[data-pm] .profile__add,
-[data-pm] .profile__more {
+[data-pm] .profile__add {
   border-color: var(--divider);
   background-color: transparent;
 }
@@ -580,24 +555,118 @@
 }
 
 [data-pm] .profile__field[data-pressed],
-[data-pm] .profile__add[data-pressed],
-[data-pm] .profile__more[data-pressed] {
+[data-pm] .profile__add[data-pressed] {
   background: var(--glass);
 }
 
+/* Фото одной скруглённой рамкой: плитки впритык, щель 2, закругление у всей сетки */
 [data-pm] .profile__grid {
-  gap: var(--space-1);
-  padding: 0 var(--space-3) var(--space-3);
-  border-top: 0;
+  gap: 2px;
+  margin: 0 var(--space-3);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
 }
 
 [data-pm] .profile__tile {
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   background: var(--bg-subtle);
 }
 
 [data-pm] .profile__drop {
   border-color: var(--divider);
+}
+
+/* Вкладки «Фото» и «Альбомы» вместо заголовка карточки */
+[data-pm] .profile__card-head--tabs {
+  min-height: 0;
+  padding: var(--space-2) var(--space-2) var(--space-3);
+}
+
+/* Альбомы одним рядом: три обложки с названием и числом фото */
+.profile__albums {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-3);
+  list-style: none;
+}
+
+.profile__album {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.profile__album-cover {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  margin-bottom: var(--space-1);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.profile__album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile__album-name {
+  overflow: hidden;
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile__album-count {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Нижний ряд панели: «Добавить» слева, «Посмотреть» справа, между ними тонкая черта */
+.profile__foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--divider);
+}
+
+.profile__foot-button {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 600;
+}
+
+.profile__foot-button + .profile__foot-button {
+  box-shadow: inset 1px 0 0 var(--divider);
+}
+
+.profile__foot-button svg {
+  font-size: var(--size-icon);
+}
+
+.profile__foot-button[data-pressed] {
+  background: var(--glass);
 }
 
 /* Горизонтальный жест раздела (свайп в чаты) достаётся странице, а не браузеру */
