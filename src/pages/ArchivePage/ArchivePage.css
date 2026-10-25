@@ -3,7 +3,6 @@
  * «назад» — стеклянный круг, строки — те же ChatItem без плашки. Размеры только токены сетки 4.
  */
 .archive {
-  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--space-2) * 2);
   --toast-bottom: calc(var(--safe-bottom) + var(--space-8));
   position: relative;
   display: flex;
@@ -19,9 +18,6 @@
   left: 0;
   z-index: 3;
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
@@ -30,11 +26,8 @@
 
 .archive__back {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--size-touch);
-  height: var(--size-touch);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill);

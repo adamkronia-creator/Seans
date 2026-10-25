@@ -1,10 +1,15 @@
 /* «Фото и альбомы»: каркас .fp (шапка со стеклянными кнопками, фон-сцена), поля 16 */
 
+/* Общее правило .fp__scroll > :first-child рисует рамку вокруг первого блока; у вкладок рамки нет */
+[data-pm] .fp__scroll.ph__scroll > :first-child {
+  border: 0;
+}
+
 /* Фото одной рамкой: плитки впритык, щель 2, скругление внешнее */
 .ph__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -36,7 +41,7 @@
 .ph__albums {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4) var(--space-3);
+  gap: var(--block-gap) var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;

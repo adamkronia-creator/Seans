@@ -3,24 +3,23 @@
    Фото на всю ширину; снизу оно растворяется в фоне: светлая дымка при тёмном тексте и тёмная при белом (data-ink), на ней имя и роль. */
 [data-pm] .ct .fp__header.ct__bar {
   justify-content: space-between;
-  gap: var(--space-3);
-  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) var(--space-2);
   border-bottom: 0;
   background: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
-[data-pm] .ct__scroll {
-  /* Высота шапки: безопасная зона + 16 + кнопка 40 + 8; от неё липнут вкладки */
-  --bar: calc(var(--safe-top) + var(--space-16));
+/* Селектор с .ct: перебивает общие правила .fp__scroll из layout.css при любом порядке подключения файлов */
+[data-pm] .ct .ct__scroll {
+  /* Высота шапки (--header-h из layout.css): от неё липнут вкладки */
+  --bar: var(--header-h);
   --ct-haze: rgb(255 255 255 / 0.92);
   gap: 0;
-  padding: 0 0 calc(var(--space-8) + var(--safe-bottom));
+  padding: 0 0 var(--scroll-bottom);
   overflow-anchor: none;
 }
 
-:root[data-ink='light'] [data-pm] .ct__scroll {
+:root[data-ink='light'] [data-pm] .ct .ct__scroll {
   --ct-haze: rgb(8 10 16 / 0.92);
 }
 

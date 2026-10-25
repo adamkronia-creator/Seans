@@ -42,7 +42,6 @@
 
 /* ——— Стиль интерфейса (data-pm): фон-сцена позади, стеклянная шапка, строки без плашки ——— */
 [data-pm] .events {
-  --pm-top: calc(var(--inset-top) + var(--size-touch) + var(--space-2) * 2);
   position: relative;
 }
 
@@ -52,8 +51,6 @@
   right: 0;
   left: 0;
   z-index: 3;
-  min-height: 0;
-  padding: var(--inset-top) var(--space-4) var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
@@ -62,8 +59,6 @@
 
 /* «Назад» — стеклянный круг с обводкой, как кнопки шапок чата и теста */
 [data-pm] .events__back {
-  width: var(--size-touch);
-  height: var(--size-touch);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill);

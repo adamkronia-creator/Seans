@@ -352,12 +352,6 @@
 }
 
 /* Как шапка открытого чата: «назад» слева стеклянным кругом, правее название и подпись */
-[data-pm] .pe__header {
-  gap: var(--space-3);
-  min-height: 0;
-  padding: var(--inset-top) var(--space-4) var(--space-2);
-}
-
 .pe__who {
   display: flex;
   flex: 1;
@@ -366,8 +360,6 @@
 }
 
 [data-pm] .pe__back {
-  width: var(--size-touch);
-  height: var(--size-touch);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   background: var(--glass-fill);
@@ -430,8 +422,6 @@
 }
 
 [data-pm] .pe__scroll {
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-4) calc(var(--size-control) + var(--space-8) + var(--safe-bottom));
   scrollbar-width: none;
 }
 
@@ -443,10 +433,6 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--glass-card);
-}
-
-[data-pm] .pe__scroll > :first-child {
-  border-top: 1px solid var(--glass-border);
 }
 
 [data-pm] .pe__row {
@@ -501,8 +487,10 @@
   color: var(--text-secondary);
 }
 
+/* Заголовок блока принадлежит карточке под ним: до неё 8, от предыдущей 24 (зазор 16 + 8 своего отступа) */
 [data-pm] .pe__group {
   padding: var(--space-2) var(--space-1) 0;
+  margin-bottom: calc(var(--space-2) * -1);
 }
 
 [data-pm] .pe__group-title,

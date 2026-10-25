@@ -1,0 +1,66 @@
+/*
+ * Раскладка экрана: единственное место, где заданы поля, зазоры и геометрия шапки. Новый экран берёт эти токены и не выдумывает свои числа.
+ * Все значения — шаги сетки 4 (space-*, size-*). Подробно — в README, раздел «Правила отступов».
+ *
+ *   поля страницы ............ --page-gutter (16): слева и справа у шапки, у прокручиваемого и у карточек
+ *   зазор между блоками ...... --block-gap (16): между карточками и заголовками блоков на странице
+ *   поля внутри карточки ..... --card-pad (12): вкладки, сетка фото, нижний ряд кнопок — всё на одной вертикали, от края карточки 12
+ *   шапка .................... сверху безопасная зона + 16, снизу 12, между элементами 12, кнопки 40 (--size-control)
+ *   низ прокрутки ............ --scroll-bottom (32 + безопасная зона) или --scroll-bottom-tabbar (под нижнюю капсулу)
+ *
+ * Чтобы изменить отступ у всех экранов сразу, меняют токен здесь. Объявлять padding, gap и размер кнопки шапки в файле компонента нельзя:
+ * они перебьют эти правила, и экран «поедет» относительно остальных. Новому экрану достаточно добавить класс шапки в список ниже.
+ */
+
+[data-pm] {
+  --page-gutter: var(--space-4);
+  --block-gap: var(--space-4);
+  --card-pad: var(--space-3);
+  --header-top: calc(var(--safe-top) + var(--space-4));
+  --header-gap: var(--space-3);
+  --header-bottom: var(--space-3);
+  --header-h: calc(var(--header-top) + var(--size-control) + var(--header-bottom));
+  --scroll-bottom: calc(var(--space-8) + var(--safe-bottom));
+  --scroll-bottom-tabbar: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+}
+
+/* Шапка вложенного экрана: «назад» слева, название, действия справа. Положение (absolute или в потоке) задаёт сам экран */
+[data-pm] :is(.fp__header, .pe__header, .events__header, .archive__bar, .test-settings__header) {
+  align-items: center;
+  gap: var(--header-gap);
+  min-height: 0;
+  padding: var(--header-top) var(--page-gutter) var(--header-bottom);
+}
+
+/* Круглые стеклянные кнопки шапки: «назад», поиск, «+», «⋯» */
+[data-pm] :is(.fp__back, .pe__back, .events__back, .archive__back) {
+  flex-shrink: 0;
+  width: var(--size-control);
+  height: var(--size-control);
+}
+
+/* Парящая шапка: прокручиваемое начинается под ней */
+[data-pm] :is(.fp, .events, .archive) {
+  --pm-top: var(--header-h);
+}
+
+/* Область прокрутки страницы из карточек */
+[data-pm] .fp__scroll {
+  gap: var(--block-gap);
+  padding: calc(var(--header-h) + var(--block-gap)) var(--page-gutter) var(--scroll-bottom);
+}
+
+[data-pm] .pe__scroll {
+  gap: var(--block-gap);
+  padding: var(--block-gap) var(--page-gutter) calc(var(--size-control) + var(--scroll-bottom));
+}
+
+[data-pm] .test-settings__scroll {
+  gap: var(--block-gap);
+  padding: var(--block-gap) var(--page-gutter) var(--scroll-bottom-tabbar);
+}
+
+[data-pm] .profile__scroll {
+  gap: var(--block-gap);
+  padding-bottom: var(--scroll-bottom-tabbar);
+}

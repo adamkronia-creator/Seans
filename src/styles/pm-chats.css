@@ -63,7 +63,6 @@
   --tone-chat: var(--grad-chip-active); /* выбранный чипс — градиент акцента */
   --shadow-float: var(--shadow-lg);
   --ring: var(--bg-canvas); /* кольцо точки присутствия: цвет подложки */
-  --inset-top: max(var(--safe-top), var(--space-2)); /* верх шапки: безопасная зона, в браузере без выреза — space-2 */
   --icon-stroke: 1.5px;
   color: var(--text-primary);
   font-family: var(--font-sans);

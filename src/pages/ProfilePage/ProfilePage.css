@@ -407,8 +407,6 @@
 }
 
 [data-pm] .profile__scroll {
-  gap: var(--space-3);
-  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   scrollbar-width: none;
 }
 
@@ -559,14 +557,14 @@
   background: var(--glass);
 }
 
-/* Фото одной скруглённой рамкой: плитки впритык, щель 2, закругление у всей сетки */
+/* Фото одной скруглённой рамкой: поля от края карточки --card-pad, щель между плитками 4, радиус рамки = радиус карточки − поле (20 − 12 = 8) */
 [data-pm] .profile__grid {
-  gap: 2px;
-  margin: 0 var(--space-3);
+  gap: var(--space-1);
+  margin: var(--card-pad);
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm);
 }
 
 [data-pm] .profile__tile {
@@ -575,29 +573,31 @@
 }
 
 [data-pm] .profile__drop {
+  width: calc(100% - var(--card-pad) * 2);
+  margin: var(--card-pad);
   border-color: var(--divider);
 }
 
 /* Вкладки «Фото» и «Альбомы» вместо заголовка карточки */
 [data-pm] .profile__card-head--tabs {
   min-height: 0;
-  padding: var(--space-2) var(--space-2) var(--space-3);
+  padding: var(--card-pad) var(--card-pad) 0;
 }
 
 /* Альбомы одним рядом: три обложки с названием и числом фото */
 .profile__albums {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0 var(--space-3);
+  gap: var(--space-3);
+  margin: var(--card-pad) 0;
+  padding: 0 var(--card-pad);
   list-style: none;
 }
 
 .profile__album {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-1);
   width: 100%;
   min-width: 0;
   text-align: left;
@@ -607,10 +607,9 @@
   display: grid;
   place-items: center;
   aspect-ratio: 1;
-  margin-bottom: var(--space-1);
   overflow: hidden;
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--bg-subtle);
   color: var(--text-secondary);
   font-size: var(--size-icon-lg);
@@ -641,7 +640,6 @@
 .profile__foot {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: var(--space-3);
   border-top: 1px solid var(--divider);
 }
 
@@ -651,7 +649,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 52px;
+  min-height: var(--space-12);
   color: var(--text-link);
   font: var(--type-label);
   font-weight: 600;

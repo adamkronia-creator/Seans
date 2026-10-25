@@ -3,7 +3,6 @@
    Селекторы с [data-pm] весомее базовых, поэтому порядок подключения файлов не важен. */
 
 [data-pm] .test-settings__header {
-  gap: var(--space-1);
   border-bottom: 1px solid var(--divider);
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
@@ -35,8 +34,6 @@
 /* Прокрутка: карточки с зазором 12; снизу место под плавающую капсулу разделов (у настроек под ней ещё кнопка «Пройти или отправить») */
 [data-pm] .test-settings__scroll {
   --bleed: 0px;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-4) calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   scrollbar-width: none;
 }
 
@@ -157,9 +154,6 @@
 [data-pm] .test-settings__header {
   position: relative;
   z-index: 3;
-  gap: var(--space-3);
-  min-height: 0;
-  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) var(--space-3);
   border: 0;
   background: none;
   -webkit-backdrop-filter: none;
