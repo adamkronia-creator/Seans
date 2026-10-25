@@ -345,7 +345,7 @@
 
 /* ——— Редактирование в стиле «Диалогов» (data-pm): стеклянная шапка, карточки с полями 16 и скруглением 20, Inter ——— */
 [data-pm] .pe__header {
-  border-bottom: 1px solid var(--divider);
+  border-bottom: 0;
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);

@@ -51,7 +51,7 @@
   right: 0;
   left: 0;
   z-index: 3;
-  border-bottom: 1px solid var(--divider);
+  border-bottom: 0;
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
@@ -106,7 +106,7 @@
 
 [data-pm] .events__list {
   /* Внизу место под плавающую панель разделов: последнее событие можно прокрутить выше неё */
-  padding: var(--pm-top) 0 calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+  padding: calc(var(--pm-top) + var(--space-3)) 0 calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
   background: none;
 }
 
@@ -115,7 +115,7 @@
 }
 
 [data-pm] .event-item + .event-item .event-item__inner::before {
-  background: var(--divider);
+  display: none; /* разделителей между событиями нет */
 }
 
 [data-pm] button.event-item__inner:active {

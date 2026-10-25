@@ -314,7 +314,7 @@
   right: 0;
   left: 0;
   z-index: 3;
-  border-bottom: 1px solid var(--divider);
+  border-bottom: 0;
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);

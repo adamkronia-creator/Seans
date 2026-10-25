@@ -3,7 +3,7 @@
    Селекторы с [data-pm] весомее базовых, поэтому порядок подключения файлов не важен. */
 
 [data-pm] .test-settings__header {
-  border-bottom: 1px solid var(--divider);
+  border-bottom: 0;
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
