@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { CATEGORIES, CHATS } from './chats';
 import { LIBRARY, TASK_CATEGORIES, TASK_LIBRARY, TEST_CATEGORIES } from './library';
 
 /*
@@ -20,8 +21,6 @@ export interface Folder {
   /** Цвет заливки выбранного чипса и цвет его подписи (#rrggbb); без них чипс обычный */
   color?: string;
   ink?: string;
-  /** Роль, с которой папка связана (только у чатов): чат, получивший эту роль, ложится в папку сам, а чат, которого в ней положили, получает предложение роли. Роль и папка связаны по адресу: переименование папки связь не рвёт, удаление снимает */
-  roleId?: string;
 }
 
 /** Название папки не длиннее: чипсы стоят в один ряд, а длинное название съест его целиком */
@@ -31,16 +30,9 @@ export const NEW_FOLDER_NAME = 'Новая папка';
 const seed = (categories: { id: string; label: string }[], members: (id: string) => string[]): Folder[] =>
   categories.map(({ id, label }) => ({ id, name: label, ids: members(id), muted: false }));
 
-/** Начальные папки чатов: состав и связь с ролью заданы явно (раньше состав выводился из категории чата) */
-const CHAT_FOLDERS: { id: string; name: string; roleId: string; ids: string[] }[] = [
-  { id: 'clients', name: 'Клиенты', roleId: 'client', ids: ['maxim', 'vera'] },
-  { id: 'colleagues', name: 'Коллеги', roleId: 'colleague', ids: ['vladislav'] },
-  { id: 'seminars', name: 'Семинар', roleId: 'seminar', ids: ['bogdan'] },
-];
-
 let state: Record<FolderScope, Folder[]> = {
   // «Избранное» лежит только в «Все»: это системный чат
-  chats: CHAT_FOLDERS.map(({ id, name, roleId, ids }) => ({ id, name, ids, muted: false, roleId })),
+  chats: seed(CATEGORIES, (id) => CHATS.filter((chat) => !chat.favorites && chat.category === id).map((chat) => chat.id)),
   tests: seed(TEST_CATEGORIES, (id) => LIBRARY.filter((item) => (item.categories as string[]).includes(id)).map((item) => item.id)),
   tasks: seed(TASK_CATEGORIES, (id) => TASK_LIBRARY.filter((item) => (item.categories as string[]).includes(id)).map((item) => item.id)),
 };
@@ -126,30 +118,6 @@ export function setFolderPaint(scope: FolderScope, id: string, paint: { color?: 
 export function setFolderItems(scope: FolderScope, id: string, ids: string[]) {
   touched(id);
   patch(scope, id, { ids });
-}
-
-/** Положить один чат, тест или задание в папку; false, если он там уже лежал или папки нет */
-export function addToFolder(scope: FolderScope, id: string, itemId: string): boolean {
-  const folder = getFolder(scope, id);
-  if (!folder || folder.ids.includes(itemId)) return false;
-  touched(id);
-  patch(scope, id, { ids: [...folder.ids, itemId] });
-  return true;
-}
-
-/** Папка чатов, связанная с ролью (undefined, если связи нет) */
-export const folderOfRole = (roleId: string): Folder | undefined => state.chats.find((f) => f.roleId === roleId);
-
-/** Связать папку чатов с ролью или снять связь (roleId не задан). Роль связана не больше чем с одной папкой: прежняя связь этой роли снимается */
-export function bindFolderRole(id: string, roleId: string | undefined) {
-  if (!getFolder('chats', id)) return;
-  commit(
-    'chats',
-    state.chats.map((f) => {
-      if (f.id === id) return { ...f, roleId };
-      return roleId && f.roleId === roleId ? { ...f, roleId: undefined } : f;
-    }),
-  );
 }
 
 export function removeFromFolder(scope: FolderScope, id: string, itemId: string) {

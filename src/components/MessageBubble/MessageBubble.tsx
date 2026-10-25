@@ -8,7 +8,6 @@ import type { LibraryItem } from '../../data/library';
 import { IconReadTicks } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import { IconPinned } from '../FolderMenu/FolderIcons';
-import { InviteCard } from '../InviteCard/InviteCard';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -73,10 +72,6 @@ interface MessageBubbleProps {
   onTestSettings: (m: Message) => void;
   /** Нажатие на кнопку под сообщением: переход по адресу кнопки */
   onOpenLink: (href: string) => void;
-  /** Карточка приглашения: открыть лист «Что включится» или демо-ответ собеседника */
-  onInviteSheet: (inviteId: string, mode: 'reply' | 'view') => void;
-  /** Короткая подсказка экрану (чат ложится в папку роли) */
-  onNote: (text: string) => void;
 }
 
 export function MessageBubble({
@@ -95,8 +90,6 @@ export function MessageBubble({
   onOpenTask,
   onTestSettings,
   onOpenLink,
-  onInviteSheet,
-  onNote,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
   const [dx, setDx] = useState(0);
@@ -173,32 +166,6 @@ export function MessageBubble({
       <IconReply />
     </span>
   );
-
-  // Служебная строка роли («Роль «Клиент» назначена»): по центру ленты, без меню и жестов
-  if (message.system) {
-    return (
-      <li data-mid={message.id} className="bubble-system">
-        <Highlighted text={message.text} query={query} active={activeMatch} />
-      </li>
-    );
-  }
-
-  // Карточка приглашения в роль: свои жесты ей не нужны (ответить на неё или удалить нельзя: состояние живёт в записи о приглашении)
-  if (message.invite) {
-    return (
-      <li data-mid={message.id} className={`bubble-group bubble-group--${out ? 'out' : 'in'}`}>
-        <InviteCard
-          inviteId={message.invite}
-          fallback={message.text}
-          out={out}
-          peer={peerName}
-          meta={<span className="bubble__time">{message.time}</span>}
-          onSheet={onInviteSheet}
-          onNote={onNote}
-        />
-      </li>
-    );
-  }
 
   // Карточка теста или задания: пузырь с аватаркой, подписью, названием и текстом, под ним кнопка той же ширины (как у ботов в Telegram)
   if (message.test || message.task) {

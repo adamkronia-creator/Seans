@@ -22,13 +22,9 @@ import { SentTaskSheet } from '../../components/MessageBubble/SentTaskSheet';
 import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import { IconChevronDown, IconChevronUp, IconCopy, IconLock, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import { InviteSheet } from '../../components/InviteCard/InviteSheet';
-import { Toast } from '../../components/Toast/Toast';
-import { useToast } from '../../components/Toast/useToast';
+import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, setMessagePinned, useChats, useMessages, useTyping } from '../../data/chatStore';
-import { CAPS, lockNote, type CapId } from '../../data/roles';
-import { capStatesOf, useLinks, useRoleLine } from '../../data/roleStore';
+import { roleOf } from '../../data/roles';
 import { addNote, addSection, CLIENT_CHAT, countOf, useClientData } from '../../data/clientStore';
 import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
@@ -61,18 +57,9 @@ const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
 const FAVORITES_HIDDEN: SectionId[] = ['library'];
 const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
-/** Какая возможность роли стоит за разделом: нет возможности ни в одной роли чата — раздела нет, ждёт согласия собеседника — раздел закрыт замком */
-const SECTION_CAP: Record<Exclude<SectionId, 'messages'>, CapId> = {
-  tests: 'tests',
-  tasks: 'tasks',
-  notes: 'notes',
-  info: 'info',
-  library: 'history',
-};
-
-/** Сообщения одной серии: тот же автор, не карточка, не приглашение, не служебная строка и не сообщение с кнопками, разница меньше 5 минут */
+/** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
-  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons || a.invite || b.invite || a.system || b.system) return false;
+  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons) return false;
   const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
@@ -156,8 +143,7 @@ interface SectionPageProps {
   chatId: string;
   /** Чат «Избранное»: вместо тестов клиента показываются свои */
   favorites: boolean;
-  /** Раздел закрыт замком до согласия собеседника: вместо содержимого объяснение */
-  lock?: { title: string; text: string };
+  hasClientData: boolean;
   /** Раздел сейчас на экране */
   active: boolean;
   onAppTabChange: (id: TabId) => void;
@@ -167,15 +153,7 @@ interface SectionPageProps {
  * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
  * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
  */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, lock, active, onAppTabChange }: SectionPageProps) {
-  if (lock) {
-    return (
-      <>
-        <EmptyState icon={<IconLock />} title={lock.title} text={lock.text} />
-        <TabBar active="messages" onChange={onAppTabChange} />
-      </>
-    );
-  }
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -183,7 +161,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, lock, act
           <SelfTests onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
         ) : (
           <ChatTests
-            chatId={chatId}
+            hasData={hasClientData}
             onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
             onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
           />
@@ -193,7 +171,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, lock, act
           <SelfTasks onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
         ) : (
           <ChatTasks
-            chatId={chatId}
+            hasData={hasClientData}
             onOpenTask={(taskId) => hasTaskSettings(taskId) && navigate(`/chat/${chatId}/tasks/${taskId}`)}
             onOpenResult={(taskId) => findClientTaskResult(clientResultId(chatId, taskId)) && navigate(clientResultPath(chatId, taskId))}
           />
@@ -210,7 +188,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, lock, act
           <MessageInput placeholder="Добавьте сведения" extras={false} active={active} onSend={(text) => void addSection(chatId, text)} />
         </>
       )}
-      {id === 'library' && <ChatHistory chatId={chatId} />}
+      {id === 'library' && <ChatHistory hasData={hasClientData} />}
       {id !== 'notes' && id !== 'info' && <TabBar active="messages" onChange={onAppTabChange} />}
     </>
   );
@@ -231,26 +209,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     listRef.current?.setAttribute('data-live', '');
   }, []);
 
+  // Тесты, задания и история пока есть только у Максима
+  const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);
-  // Какие разделы есть в этом чате, решают его роли: нет возможности — нет раздела, ждёт согласия — раздел закрыт замком
-  const links = useLinks(chatId);
-  const states = capStatesOf(links);
-  const sections = useMemo(
-    () => (chat?.favorites ? FAVORITES_SECTIONS : SECTIONS.filter(({ id }) => id === 'messages' || states[SECTION_CAP[id]] !== 'hidden')),
-    [chat?.favorites, states],
-  );
-  const locks = useMemo(
-    () =>
-      Object.fromEntries(
-        sections.flatMap(({ id }) => (id !== 'messages' && !chat?.favorites && states[SECTION_CAP[id]] === 'locked' ? [[id, lockNote(links, SECTION_CAP[id])]] : [])),
-      ) as Partial<Record<SectionId, { title: string; text: string }>>,
-    [sections, states, links, chat?.favorites],
-  );
-  const soon = useMemo(() => CAPS.filter((cap) => cap.soon && links.some((link) => link.caps.includes(cap.id))).map((cap) => cap.id as string), [links]);
-  const roleLine = useRoleLine(chatId);
-  const [toast, showToast] = useToast();
-  // Лист приглашения (подробности или демо-ответ собеседника): живёт здесь, а не в ленте, чтобы жесты пузыря его не задевали
-  const [inviteView, setInviteView] = useState<{ id: string; mode: 'reply' | 'view' } | null>(null);
+  const sections = chat?.favorites ? FAVORITES_SECTIONS : SECTIONS;
   // Выбранного раздела может не быть в списке (чат сменился на «Избранное»): тогда открыта переписка
   const section: SectionId = sections.some(({ id }) => id === picked) ? picked : 'messages';
   const groups = useMessages(chatId);
@@ -280,7 +242,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const flat = useMemo(() => groups.flatMap((g) => g.messages), [groups]);
   const byId = useMemo(() => new Map(flat.map((m) => [m.id, m])), [flat]);
   const q = query.trim().toLowerCase();
-  const matches = useMemo(() => (q ? flat.filter((m) => !m.invite && m.text.toLowerCase().includes(q)).map((m) => m.id) : []), [flat, q]);
+  const matches = useMemo(() => (q ? flat.filter((m) => m.text.toLowerCase().includes(q)).map((m) => m.id) : []), [flat, q]);
   const activeId = matches[activeIdx];
 
   const scrollToBottom = (smooth = false) => {
@@ -322,10 +284,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     prevCount.current = messageCount;
     if (added <= 0) return;
     const last = flat[flat.length - 1];
-    // Служебные строки роли не считаются новыми сообщениями: на значке «к последним» только то, что написал собеседник
-    const unread = flat.slice(-added).filter((m) => m.from === 'them' && !m.system).length;
     if (last?.from === 'me' || atBottom.current) scrollToBottom(prevCount.current > added);
-    else if (unread) setUnseen((n) => n + unread);
+    else if (last?.from === 'them') setUnseen((n) => n + added);
   }, [messageCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // «Печатает…» тоже держим в поле зрения, если читаешь последнее
@@ -395,15 +355,16 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const selfTasks = useTaskResults();
   const counts = useMemo<Partial<Record<SectionId, number>>>(() => {
     if (chat?.favorites) return { tests: selfTests.length, tasks: selfTasks.length };
-    const mine = (owner?: string) => (owner ?? CLIENT_CHAT) === chatId;
+    if (!hasClientData) return {};
+    const mine = (chatOf?: string) => (chatOf ?? CLIENT_CHAT) === chatId;
     return {
       // Те же числа, что на чипсах «Истории»: считаются тесты и задания, а не карточки (у постоянного задания их несколько: запись = карточка)
-      tests: countOf(clientData, 'test', chatId),
-      tasks: countOf(clientData, 'task', chatId),
+      tests: countOf(clientData, 'test'),
+      tasks: countOf(clientData, 'task'),
       notes: clientData.notes.filter((n) => mine(n.chatId)).length,
       info: clientData.caseSections.filter((x) => mine(x.chatId)).length,
     };
-  }, [chat?.favorites, clientData, selfTests, selfTasks, chatId]);
+  }, [chat?.favorites, hasClientData, clientData, selfTests, selfTasks, chatId]);
 
   if (!chat) {
     return (
@@ -451,8 +412,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onOpenTask={(id) => navigate(`/chat/${chatId}/tasks/${id}`)}
                     onTestSettings={setSettingsOf}
                     onOpenLink={(href) => navigate(href)}
-                    onInviteSheet={(id, mode) => setInviteView({ id, mode })}
-                    onNote={showToast}
                   />
                 );
               })}
@@ -498,7 +457,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           id={id}
           chatId={chatId}
           favorites={Boolean(chat.favorites)}
-          lock={locks[id]}
+          hasClientData={hasClientData}
           active={id === section}
           onAppTabChange={onAppTabChange}
         />
@@ -506,9 +465,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   }));
 
   // Подпись под именем: в диалоге — состояние собеседника, в остальных вкладках — название вкладки (чипсов разделов в шапке больше нет)
-  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : roleLine;
+  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : roleOf(chat);
   const subtitle = section === 'messages' ? status : (sections.find((item) => item.id === section)?.label ?? '');
-  const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} name={chat.name} alt="" presence={chat.online ? 'online' : undefined} />;
+  const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />;
 
   const openSearch = () => {
     setMenuOpen(false);
@@ -627,8 +586,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         avatar={avatar}
         name={chat.name}
         status={status}
-        items={sections.map(({ id, label, icon }) => ({ id, label, icon, count: counts[id], locked: Boolean(locks[id]) }))}
-        soon={soon}
+        items={sections.map(({ id, label, icon }) => ({ id, label, icon, count: counts[id] }))}
         active={section}
         onSelect={(id) => {
           setSection(id as SectionId);
@@ -652,10 +610,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           }}
         />
       )}
-
-      {inviteView && <InviteSheet inviteId={inviteView.id} mode={inviteView.mode} peer={chat.name.split(' ')[0]} onClose={() => setInviteView(null)} onNote={showToast} />}
-
-      {toast && <Toast text={toast} />}
 
       {settingsOf &&
         (settingsOf.task ? (

@@ -4,7 +4,7 @@ import { IconPin } from '../../components/icons';
 import { useChats } from '../../data/chatStore';
 import { SHARED_MEDIA } from '../../data/contactShared';
 import { PERSON_PROFILES } from '../../data/contactProfiles';
-import { useRoleLine } from '../../data/roleStore';
+import { roleOf } from '../../data/roles';
 import { goBack } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../ProfilePage/ProfilePage.css';
@@ -16,13 +16,12 @@ import './PersonProfilePage.css';
  */
 export function PersonProfilePage({ chatId }: { chatId: string }) {
   const chat = useChats().find((c) => c.id === chatId);
-  const roleLine = useRoleLine(chatId);
   const back = () => goBack(`/chat/${chatId}/contact`);
   useSwipeBack('.profile', true, back);
   if (!chat) return <section className="profile" />;
 
   const info = PERSON_PROFILES[chatId];
-  const headline = info?.headline ?? roleLine;
+  const headline = info?.headline ?? roleOf(chat);
   const photos = SHARED_MEDIA[chatId] ?? [];
 
   return (
@@ -39,7 +38,7 @@ export function PersonProfilePage({ chatId }: { chatId: string }) {
             <div className="profile__row">
               <div className="profile__avatar">
                 <span className="profile__avatar-hit">
-                  <Avatar src={chat.avatar} name={chat.name} size={88} />
+                  <Avatar src={chat.avatar} size={88} />
                 </span>
               </div>
             </div>

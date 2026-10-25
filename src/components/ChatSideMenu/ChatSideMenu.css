@@ -228,23 +228,6 @@
   flex-shrink: 0;
 }
 
-/* Закрыта до согласия собеседника: приглушена, справа замок; нажать можно, страница объяснит, чего ждём */
-.side-menu__item--locked:not(.side-menu__item--active) {
-  color: var(--text-secondary);
-}
-
-.side-menu__item--locked:not(.side-menu__item--active) > svg:not(.side-menu__lock) {
-  opacity: 0.7;
-}
-
-.side-menu__item > .side-menu__lock {
-  font-size: var(--size-icon-sm);
-}
-
-.side-menu__item--active > .side-menu__lock {
-  color: var(--action-primary-text);
-}
-
 /* Пока не работает: приглушён, с пометкой «Скоро» */
 .side-menu__item--soon {
   color: var(--text-secondary);

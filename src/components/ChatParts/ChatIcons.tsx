@@ -58,20 +58,3 @@ export const IconTickSingle = (p: SVGProps<SVGSVGElement>) => (
     <path d="M2.5 6.4l2.4 2.4L9.6 3.6" />
   </svg>
 );
-
-/** Замок: вкладка закрыта до согласия собеседника */
-export const IconLock = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <rect x="5" y="10.5" width="14" height="9.5" rx="2.5" />
-    <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
-  </svg>
-);
-
-/** Два силуэта: роли и функции в диалоге */
-export const IconUsers = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <circle cx="9" cy="8.5" r="3.3" />
-    <path d="M3 19.5a6 6 0 0 1 12 0" />
-    <path d="M15.5 5.6a3.3 3.3 0 0 1 0 5.8M17.5 14.2a6 6 0 0 1 3.5 5.3" />
-  </svg>
-);

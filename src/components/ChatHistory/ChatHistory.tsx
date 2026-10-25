@@ -15,7 +15,7 @@ import {
   IconTlFlame,
   IconTlNote,
 } from '../icons';
-import { useChats } from '../../data/chatStore';
+import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { clientResultId, clientResultPath, recordRef } from '../../data/resultLinks';
@@ -48,8 +48,11 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'note', label: 'Заметки' },
 ];
 
-/** Кто сделал: подпись у даты вместо аватарок под значком; client — имя собеседника */
-function authorOf(event: HistoryEvent, client: string) {
+const maxim = CHATS.find((c) => c.id === 'maxim')!;
+
+/** Кто сделал: подпись у даты вместо аватарок под значком */
+function authorOf(event: HistoryEvent) {
+  const client = maxim.name.split(' ')[0];
   if (event.kind === 'invite') return client;
   if (event.kind === 'session') return `Вы и ${client}`;
   if (event.kind === 'note') return 'Вы';
@@ -161,7 +164,7 @@ function ScaleList({ data, resultPath }: { data: ConclusionData; resultPath: str
   );
 }
 
-function Card({ event, onEdit, chatId, client }: { event: HistoryEvent; onEdit: () => void; chatId: string; client: string }) {
+function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
   // Сеанс без текста: только название и дата
@@ -185,10 +188,10 @@ function Card({ event, onEdit, chatId, client }: { event: HistoryEvent; onEdit: 
   // Выполненный клиентом тест или задание открывает его результат (у заданий он есть не у всех); у записи постоянного задания результат свой
   const resultRef = event.kind === 'task' && event.record ? recordRef(event.ref, event.record) : event.kind === 'test' || event.kind === 'task' ? event.ref : '';
   const resultPath =
-    (event.kind === 'test' || (event.kind === 'task' && findClientTaskResult(clientResultId(chatId, resultRef)))) && event.state === 'done'
-      ? clientResultPath(chatId, resultRef)
+    (event.kind === 'test' || (event.kind === 'task' && findClientTaskResult(clientResultId('maxim', resultRef)))) && event.state === 'done'
+      ? clientResultPath('maxim', resultRef)
       : undefined;
-  const scaleData = resultPath && event.kind === 'test' ? findClientResult(clientResultId(chatId, event.ref))?.data : undefined;
+  const scaleData = resultPath && event.kind === 'test' ? findClientResult(clientResultId('maxim', event.ref))?.data : undefined;
   return (
     <div className={`hist-card${bare ? ' hist-card--bare' : ''}`} {...doubleTap}>
       <div className="hist-card__top">
@@ -208,7 +211,7 @@ function Card({ event, onEdit, chatId, client }: { event: HistoryEvent; onEdit: 
         {event.date.split(' ').map((part) => (
           <span key={part}>{part}</span>
         ))}
-        <span>{authorOf(event, client)}</span>
+        <span>{authorOf(event)}</span>
       </p>
       {'text' in event ? (
         <>
@@ -268,7 +271,7 @@ function Card({ event, onEdit, chatId, client }: { event: HistoryEvent; onEdit: 
  * пока событий мало, они лежат у чипсов, а не у верха. У каждого фильтра свой конец и своя прокрутка, поэтому при смене фильтра
  * ничего не сдвигается по вертикали: страницы только скользят вбок.
  */
-const HistoryList = memo(function HistoryList({ events, onEdit, chatId, client }: { events: HistoryEvent[]; onEdit: (id: string) => void; chatId: string; client: string }) {
+const HistoryList = memo(function HistoryList({ events, onEdit }: { events: HistoryEvent[]; onEdit: (id: string) => void }) {
   return (
     <ScrollHost className="chat-history" anchorEnd>
       <div className="hist-page">
@@ -282,7 +285,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit, chatId, client }
                     <Marker event={event} />
                     {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                   </div>
-                  <Card event={event} onEdit={() => onEdit(event.id)} chatId={chatId} client={client} />
+                  <Card event={event} onEdit={() => onEdit(event.id)} />
                 </li>
               );
             })}
@@ -301,23 +304,23 @@ const HistoryList = memo(function HistoryList({ events, onEdit, chatId, client }
  * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
  * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
  */
-export function ChatHistory({ chatId }: { chatId: string }) {
+export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [filter, setFilter] = useState<HistoryFilter>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const data = useClientData();
-  const events = useMemo(() => historyEvents(data, chatId), [chatId, data]);
+  const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
-  const client = useChats().find((c) => c.id === chatId)?.name.split(' ')[0] ?? '';
 
   // Число у каждого вида — прямо на чипсе: сеансы и заметки считаются, у тестов и заданий «выполнено / всего»
+  const n = (value: number) => (hasData ? value : 0);
   const counts: Partial<Record<HistoryFilter, { value: number; total?: number }>> = {
-    session: { value: countOf(data, 'session', chatId) },
-    test: { value: doneCount(data, 'test', chatId), total: countOf(data, 'test', chatId) },
-    task: { value: doneCount(data, 'task', chatId), total: countOf(data, 'task', chatId) },
-    note: { value: countOf(data, 'note', chatId) },
+    session: { value: n(countOf(data, 'session')) },
+    test: { value: n(doneCount(data, 'test')), total: n(countOf(data, 'test')) },
+    task: { value: n(doneCount(data, 'task')), total: n(countOf(data, 'task')) },
+    note: { value: n(countOf(data, 'note')) },
   };
 
   // Панель чипсов лежит поверх лент (absolute): её высоту отдаём лентам, чтобы они кончались над ней
@@ -336,9 +339,9 @@ export function ChatHistory({ chatId }: { chatId: string }) {
     () =>
       FILTERS.map(({ id }) => ({
         key: id,
-        node: <HistoryList events={id === 'all' ? events : events.filter((e) => e.kind === id)} onEdit={setEditingId} chatId={chatId} client={client} />,
+        node: <HistoryList events={id === 'all' ? events : events.filter((e) => e.kind === id)} onEdit={setEditingId} />,
       })),
-    [events, chatId, client],
+    [events],
   );
 
   const index = FILTERS.findIndex((item) => item.id === filter);
@@ -385,7 +388,7 @@ export function ChatHistory({ chatId }: { chatId: string }) {
     <div ref={root} className="hist-host">
       {events.length === 0 ? (
         // Событий нет совсем: подсказка вместо пустых лент и чипсов с нулями
-        <EmptyState icon={<IconTabLibrary />} title="История пока пуста" text="Здесь появятся сеансы, тесты, задания и заметки по этому человеку." />
+        <EmptyState icon={<IconTabLibrary />} title="История пока пуста" text="Здесь появятся сеансы, тесты, задания и заметки по этому клиенту." />
       ) : (
         <>
           <SwipePager

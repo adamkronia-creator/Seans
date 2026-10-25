@@ -12,7 +12,7 @@ interface EventItemProps {
 export function EventItem({ event, onClick }: EventItemProps) {
   const content = (
     <>
-      <Avatar src={event.avatar} name={event.name} size={AVATAR_SIZE} />
+      <Avatar src={event.avatar} size={AVATAR_SIZE} />
       <span className="event-item__body">
         <span className="event-item__top">
           <span className="event-item__name">{event.name}</span>

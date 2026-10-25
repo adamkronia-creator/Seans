@@ -179,7 +179,6 @@ export function useLibrarySelection(o: Options) {
         />
         {stage === 'recipients' && (
           <RecipientSheet
-            kind={o.kind}
             mode="many"
             onClose={() => setStage(null)}
             onSend={(chosen) => {

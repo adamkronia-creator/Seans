@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 import { IconCalendarMk, IconCardMk, IconCloseMk, IconFolderMk, IconGearMk, IconHelpMk, IconSearchMk } from '../ChatItem/ChatIcons';
-import { IconLock } from '../ChatParts/ChatIcons';
 import './ChatSideMenu.css';
 
 export interface SideMenuItem {
@@ -11,8 +10,6 @@ export interface SideMenuItem {
   icon: ReactNode;
   /** Сколько записей в разделе; ноль и «нет» не показываются */
   count?: number;
-  /** Вкладка закрыта до согласия собеседника: рядом замок, нажать можно (откроется страница с объяснением) */
-  locked?: boolean;
 }
 
 interface ChatSideMenuProps {
@@ -30,16 +27,14 @@ interface ChatSideMenuProps {
   onSwitch?: (id: string) => void;
   /** Поиск по сообщениям: кнопка в шапке панели */
   onSearch?: () => void;
-  /** Функции роли, которых в приложении ещё нет: приглушённые пункты «Скоро» (расписание, файлы, оплата) */
-  soon?: readonly string[];
 }
 
-/** Пункты, которых пока нет: показаны приглушёнными с пометкой «Скоро», нажатия не принимают. Ключ — возможность роли (data/roles.ts) */
-const SOON_CAPS: Record<string, { label: string; icon: ReactNode }> = {
-  schedule: { label: 'Расписание', icon: <IconCalendarMk /> },
-  files: { label: 'Файлы', icon: <IconFolderMk /> },
-  payment: { label: 'Оплата', icon: <IconCardMk /> },
-};
+/** Пункты, которых пока нет: показаны приглушёнными с пометкой «Скоро», нажатия не принимают */
+const SOON_CLIENT: { label: string; icon: ReactNode }[] = [
+  { label: 'Расписание', icon: <IconCalendarMk /> },
+  { label: 'Файлы', icon: <IconFolderMk /> },
+  { label: 'Оплата', icon: <IconCardMk /> },
+];
 const SOON_CHAT: { label: string; icon: ReactNode }[] = [
   { label: 'Настройки', icon: <IconGearMk /> },
   { label: 'Помощь', icon: <IconHelpMk /> },
@@ -65,11 +60,11 @@ const SWITCH_DISTANCE = 48;
 /* Закрытие свайпом вправо — по общим порогам всех жестов (utils/swipe.ts): 30% ширины экрана с учётом скорости */
 
 /**
- * Боковая панель чата: стеклянный лист справа с вкладками (диалог, тесты, задания, заметки, сведения, история): какие есть, зависит от ролей чата.
+ * Боковая панель чата: стеклянный лист справа с вкладками (диалог, тесты, задания, заметки, сведения, история).
  * Вкладку можно выбрать здесь или листать страницы чата пальцем, как раньше. Закрывается нажатием на затемнение, крестиком,
  * жестом вправо, Esc и жестом «назад» (его подключает чат через useBackHandler). Всегда в разметке, пока закрыта — недоступна (inert).
  */
-export function ChatSideMenu({ open, onClose, avatar, name, status, items, active, onSelect, onSwitch, onSearch, soon = [] }: ChatSideMenuProps) {
+export function ChatSideMenu({ open, onClose, avatar, name, status, items, active, onSelect, onSwitch, onSearch }: ChatSideMenuProps) {
   const root = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const close = useRef<HTMLButtonElement>(null);
@@ -235,28 +230,21 @@ export function ChatSideMenu({ open, onClose, avatar, name, status, items, activ
         </div>
 
         <nav className="side-menu__list" aria-label="Разделы">
-          {items.map(({ id, label, icon, count, locked }) => (
+          {items.map(({ id, label, icon, count }) => (
             <button
               key={id}
               type="button"
-              className={`side-menu__item${id === active ? ' side-menu__item--active' : ''}${locked ? ' side-menu__item--locked' : ''}`}
+              className={`side-menu__item${id === active ? ' side-menu__item--active' : ''}`}
               aria-current={id === active ? 'page' : undefined}
               onClick={() => onSelect(id)}
             >
               {icon}
               <span className="side-menu__label">{label}</span>
-              {locked ? (
-                <>
-                  <IconLock className="side-menu__lock" />
-                  <span className="visually-hidden">Закрыто до согласия</span>
-                </>
-              ) : count ? (
-                <Badge count={count} ariaLabel={`${count}`} />
-              ) : null}
+              {count ? <Badge count={count} ariaLabel={`${count}`} /> : null}
             </button>
           ))}
         </nav>
-        {soon.some((cap) => SOON_CAPS[cap]) && <SoonGroup label="Скоро" items={soon.flatMap((cap) => (SOON_CAPS[cap] ? [SOON_CAPS[cap]] : []))} />}
+        <SoonGroup label="О клиенте" items={SOON_CLIENT} />
 
         <div className="side-menu__bottom">
           <SoonGroup label="Чат" items={SOON_CHAT} />

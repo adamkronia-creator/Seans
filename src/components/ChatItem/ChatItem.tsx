@@ -45,7 +45,7 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
   return (
     <li className={cls} data-chat={chat.id}>
       <button type="button" className="chat-item__button" onClick={(e) => !swallow(e) && onClick?.(chat)} {...handlers}>
-        <Avatar src={chat.avatar} name={chat.name} alt="" presence={chat.online ? 'online' : undefined} />
+        <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />
         <span className="chat-item__check" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12.5l4.5 4.5L19 7.5" />

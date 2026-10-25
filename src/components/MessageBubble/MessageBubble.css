@@ -348,21 +348,6 @@
   border-bottom-right-radius: var(--radius-xs);
 }
 
-/* Служебная строка роли по центру ленты: плашка, как подпись дня, но без прилипания */
-.bubble-system {
-  align-self: center;
-  max-width: 85%;
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  background: var(--glass-strong);
-  color: var(--text-secondary);
-  font: var(--type-caption);
-  text-align: center;
-  overflow-wrap: anywhere;
-  list-style: none;
-}
-
 /* «Печатает…»: три точки в белом стекле */
 .bubble--typing {
   display: flex;

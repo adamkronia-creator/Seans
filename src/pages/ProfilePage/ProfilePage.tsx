@@ -10,8 +10,6 @@ import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { useChats } from '../../data/chatStore';
 import { avatarSrcOf, coverSrcOf, useProfile } from '../../data/profile';
-import { countWithRole, useAllLinks, useRoles } from '../../data/roleStore';
-import { plural } from '../../data/taskValues';
 import { wantEdit } from '../../data/profileIntent';
 import { navigate } from '../../router';
 import { useTabSwipe } from '../../utils/tabNav';
@@ -40,14 +38,8 @@ export function ProfilePage() {
 
   const { photos, thumbs, uploading, name, headline, city, fields } = profile;
   const cover = coverSrcOf(profile);
-  // Сводка по ролям: считаются люди, с которыми работа идёт (приглашение принято). «Пациент» — тоже клиент для счёта
-  const links = useAllLinks();
-  const peopleIds = chats.filter((chat) => !chat.favorites).map((chat) => chat.id);
-  const clients = countWithRole(links, peopleIds, ['client', 'patient']);
-  const colleagues = countWithRole(links, peopleIds, ['colleague']);
-  const roles = useRoles();
-  // Роли, в которых сейчас кто-то работает: строки карточки «Роли»
-  const busyRoles = roles.map((role) => ({ role, n: countWithRole(links, peopleIds, [role.id]) })).filter(({ n }) => n > 0);
+  const clients = chats.filter((chat) => chat.category === 'clients').length;
+  const colleagues = chats.filter((chat) => chat.category === 'colleagues').length;
   const shown = expanded ? photos : photos.slice(0, GRID_LIMIT);
 
   // Карандаш просто открывает редактирование с начала: без перехода к полю и без клавиатуры
@@ -168,33 +160,6 @@ export function ProfilePage() {
             <IconPlusLine />
             Добавить поле
           </button>
-        </section>
-
-        <section className="profile__card" aria-labelledby="profile-roles">
-          <header className="profile__card-head">
-            <h2 id="profile-roles" className="profile__card-title">
-              Роли
-            </h2>
-            <button type="button" className="profile__card-link" onClick={() => navigate('/roles')}>
-              Настроить
-            </button>
-          </header>
-          {busyRoles.length > 0 ? (
-            <ul className="profile__fields">
-              {busyRoles.map(({ role, n }) => (
-                <li key={role.id}>
-                  <button type="button" className="profile__field" onClick={() => navigate(`/roles/${role.id}`)}>
-                    <span className="profile__field-label">{role.name}</span>
-                    <span className="profile__field-value">
-                      {n} {plural(n, ['человек', 'человека', 'человек'])}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="profile__empty">Роль задаёт, что вы делаете с человеком: присылаете тесты и задания, ведёте заметки. Назначить её можно в карточке контакта.</p>
-          )}
         </section>
 
         <section className="profile__card" aria-labelledby="profile-photos">

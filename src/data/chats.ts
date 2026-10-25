@@ -4,12 +4,15 @@ import avatar3 from '../assets/avatars/avatar-3.jpg';
 import avatar4 from '../assets/avatars/avatar-4.jpg';
 import userAvatar from '../assets/avatars/user-avatar-200.jpg';
 
+export type ChatCategory = 'clients' | 'colleagues' | 'seminars';
+
 export interface Chat {
   id: string;
   name: string;
   avatar?: string;
   /** Закреплённый системный чат «Избранное» */
   favorites?: boolean;
+  category?: ChatCategory;
   online?: boolean;
   lastMessage: string;
   time: string;
@@ -24,6 +27,8 @@ export interface Chat {
   muted?: boolean;
   /** Собеседник заблокирован */
   blocked?: boolean;
+  /** Роль, которую назначил психолог («Клиент», «Коллега», своя): подпись под именем в открытом чате. Нет — по папке (category) */
+  role?: string;
   /** Данные контакта (карточка собеседника) */
   phone?: string;
   username?: string;
@@ -34,6 +39,12 @@ export interface Chat {
 }
 
 export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };
+
+export const CATEGORIES: { id: ChatCategory; label: string }[] = [
+  { id: 'clients', label: 'Клиенты' },
+  { id: 'colleagues', label: 'Коллеги' },
+  { id: 'seminars', label: 'Семинар' },
+];
 
 // Тестовые данные. Тексты и время, кроме первых двух чатов, придуманы.
 export const CHATS: Chat[] = [
@@ -49,6 +60,7 @@ export const CHATS: Chat[] = [
     id: 'maxim',
     name: 'Максим Мартынов',
     avatar: avatar1,
+    category: 'clients',
     online: true,
     phone: '+7 (913) 735-19-37',
     username: '@maxim_martynov',
@@ -63,6 +75,7 @@ export const CHATS: Chat[] = [
     id: 'vera',
     name: 'Вера Филиппова',
     avatar: avatar2,
+    category: 'clients',
     phone: '+7 (905) 412-08-66',
     username: '@vera_filippova',
     about: 'Веду дневник эмоций, пишу по вечерам',
@@ -75,6 +88,7 @@ export const CHATS: Chat[] = [
     id: 'vladislav',
     name: 'Владислав Семёнов',
     avatar: avatar3,
+    category: 'colleagues',
     online: true,
     phone: '+7 (922) 310-47-25',
     username: '@vlad_semenov',
@@ -85,30 +99,10 @@ export const CHATS: Chat[] = [
     unread: 1,
   },
   {
-    id: 'anna',
-    name: 'Анна Лебедева',
-    // Без фото: так выглядит контакт, у которого его нет (буквы на подложке)
-    phone: '+7 (983) 440-26-91',
-    username: '@anna_lebedeva',
-    about: 'Пишет впервые, хочет записаться на консультацию',
-    lastMessage: 'Здравствуйте! Хотела бы записаться на консультацию.',
-    time: '10:12',
-    unread: 1,
-  },
-  {
-    id: 'oleg',
-    name: 'Олег Рябинин',
-    phone: '+7 (913) 118-52-07',
-    username: '@oleg_ryabinin',
-    about: 'Нашёл вас по рекомендации коллеги',
-    lastMessage: 'Приглашение: роль «Клиент»',
-    time: '09:40',
-    unread: 1,
-  },
-  {
     id: 'bogdan',
     name: 'Богдан Ермолаев',
     avatar: avatar4,
+    category: 'seminars',
     phone: '+7 (983) 205-61-40',
     username: '@bogdan_ermolaev',
     about: 'Ведущий семинара по КПТ, группа по четвергам',

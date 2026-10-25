@@ -3,8 +3,7 @@ export type EventType = 'task' | 'survey' | 'invite';
 export interface AppEvent {
   id: string;
   name: string;
-  /** Фото человека; у контакта без фото на его месте буквы имени */
-  avatar?: string;
+  avatar: string;
   type: EventType;
   text: string;
   /** Дата в формате ДД.ММ */
@@ -15,4 +14,4 @@ export interface AppEvent {
   href?: string;
 }
 
-// Список событий собирается из журнала действий (по всем чатам): см. appEvents в clientStore.ts
+// Список событий собирается из журнала действий клиента: см. appEvents в clientStore.ts

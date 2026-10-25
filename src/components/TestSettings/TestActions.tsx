@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Avatar } from '../Avatar/Avatar';
-import { useChats } from '../../data/chatStore';
+import { CHATS } from '../../data/chats';
 import { useAvatarSrc } from '../../data/profile';
-import { can, capState, type CapId } from '../../data/roles';
-import { useAllLinks } from '../../data/roleStore';
 import { IconTestPass, IconTestSend, IconTestSendMany } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
@@ -54,43 +52,21 @@ export function ActionSheet({ onPick, onClose, actions }: ActionSheetProps) {
 }
 
 interface RecipientSheetProps {
-  /** Что отправляем: от этого зависит, у кого включена нужная функция (тесты или задания) */
-  kind: 'test' | 'task';
   mode: 'one' | 'many';
   onSend: (chatIds: string[]) => void;
   onClose: () => void;
 }
 
-/** Получатели: сначала вы сами (тест придет в «Избранное»), затем те, с кем в роли включены тесты или задания */
+/** Получатели: сначала вы сами (тест придет в «Избранное»), затем клиенты */
 export const SELF_ID = 'favorites';
+const CLIENTS = CHATS.filter((c) => c.category === 'clients');
 
-interface Recipient {
-  id: string;
-  name: string;
-  avatar?: string;
-  /** Приглашение ещё без ответа: в списке виден, выбрать нельзя; здесь сказано, чьего ответа ждём */
-  waiting?: string;
-}
-
-/** Выбор получателей (вы сами и те, кому это можно отправить): одного (нажатие заменяет выбор) или нескольких */
-export function RecipientSheet({ kind, mode, onSend, onClose }: RecipientSheetProps) {
+/** Выбор получателей (вы сами и клиенты): одного (нажатие заменяет выбор) или нескольких */
+export function RecipientSheet({ mode, onSend, onClose }: RecipientSheetProps) {
   useSheet(onClose);
   // «Себе» с вашим фото профиля
   const myAvatar = useAvatarSrc();
-  const chats = useChats();
-  const links = useAllLinks();
-  const cap: CapId = kind === 'test' ? 'tests' : 'tasks';
-  // Отправить можно туда, где функция работает; где ждёт согласия — строка видна, но недоступна, чтобы было понятно, почему человека нет
-  const people = chats.flatMap<Recipient>((c) => {
-    const roles = links[c.id];
-    if (c.favorites || c.blocked || !roles) return [];
-    if (can(roles, cap)) return [{ id: c.id, name: c.name, avatar: c.avatar }];
-    if (capState(roles, cap) !== 'locked') return [];
-    // Входящее приглашение ждёт ответа от вас, исходящее — от собеседника
-    const mine = roles.some((l) => l.status === 'pending' && l.dir === 'in' && l.caps.includes(cap));
-    return [{ id: c.id, name: c.name, avatar: c.avatar, waiting: mine ? 'Нужен ваш ответ на приглашение' : 'Ждёт согласия на приглашение' }];
-  });
-  const recipients: Recipient[] = [{ id: SELF_ID, name: 'Себе', avatar: myAvatar }, ...people];
+  const recipients = [{ id: SELF_ID, name: 'Себе', avatar: myAvatar }, ...CLIENTS];
   const [picked, setPicked] = useState<string[]>([]);
   const toggle = (id: string) =>
     setPicked((p) => (mode === 'one' ? [id] : p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -110,26 +86,17 @@ export function RecipientSheet({ kind, mode, onSend, onClose }: RecipientSheetPr
                     type="button"
                     role={mode === 'one' ? 'radio' : 'checkbox'}
                     aria-checked={on}
-                    disabled={!!c.waiting}
-                    className={`test-actions__item test-actions__client${on ? ' test-actions__item--on' : ''}${c.waiting ? ' test-actions__item--waiting' : ''}`}
+                    className={`test-actions__item test-actions__client${on ? ' test-actions__item--on' : ''}`}
                     onClick={() => toggle(c.id)}
                   >
-                    <Avatar src={c.avatar} name={c.id === SELF_ID ? undefined : c.name} alt="" size={40} />
-                    <span className="test-actions__title">
-                      {c.name}
-                      {c.waiting && <span className="test-actions__wait">{c.waiting}</span>}
-                    </span>
-                    {!c.waiting && <span className={`test-actions__mark${on ? ' test-actions__mark--on' : ''}`} aria-hidden="true" />}
+                    <Avatar src={c.avatar} alt="" size={40} />
+                    <span className="test-actions__title">{c.name}</span>
+                    <span className={`test-actions__mark${on ? ' test-actions__mark--on' : ''}`} aria-hidden="true" />
                   </button>
                 </li>
               );
             })}
           </ul>
-          {people.length === 0 && (
-            <p className="test-actions__hint">
-              Пока больше некому: {kind === 'test' ? 'тесты' : 'задания'} включаются в роли собеседника. Откройте его профиль, выберите роль «Клиент» и дождитесь согласия.
-            </p>
-          )}
         </div>
         <div className="sheet__footer">
           <button type="button" className="sheet__button" onClick={onClose}>
