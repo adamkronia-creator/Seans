@@ -71,11 +71,47 @@ async function sceneLuminance(): Promise<number> {
   return luminanceOf(dawn);
 }
 
-/** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая */
-function syncChrome() {
+/** Цвет верха приложения: полоса фона у верхнего края (среднее), поверх неё стекло шапки. Нужен, чтобы строка браузера слилась с приложением */
+async function topColor(): Promise<string | null> {
+  const img = new Image();
+  img.src = get(K_IMAGE) ?? dawn;
+  await img.decode();
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d')!;
+  // Средний цвет верхних 6% картинки: сжатие в один пиксель усредняет
+  ctx.drawImage(img, 0, 0, img.naturalWidth, Math.max(1, img.naturalHeight * 0.06), 0, 0, 1, 1);
+  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+  // Стекло шапки (rgb(... / альфа)) ложится поверх фона
+  // Слой экрана появляется чуть позже запуска: ждём его (до двух секунд)
+  let layer = document.querySelector('[data-pm]');
+  for (let i = 0; !layer && i < 10; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    layer = document.querySelector('[data-pm]');
+  }
+  if (!layer) return null;
+  const fill = getComputedStyle(layer).getPropertyValue('--glass-fill-header');
+  const n = fill.match(/[\d.]+/g)?.map(Number);
+  if (!n || n.length < 3) return null;
+  const alpha = n.length > 3 ? n[3] : 1;
+  const mix = (back: number, front: number) => Math.round(back * (1 - alpha) + front * alpha);
+  return '#' + [mix(r, n[0]), mix(g, n[1]), mix(b, n[2])].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+/** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая.
+ * Строка браузера красится под верх приложения (`theme-color`), чтобы между ними не было ступеньки и светлой черты */
+async function syncChrome() {
   const light = root().dataset.ink === 'light';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#12141B' : '#FFFFFF');
   document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', light ? 'dark' : 'only light');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  meta?.setAttribute('content', light ? '#12141B' : '#FFFFFF');
+  try {
+    const color = await topColor();
+    if (color && root().dataset.ink === (light ? 'light' : 'dark')) meta?.setAttribute('content', color);
+  } catch {
+    // Картинку не прочитать: остаётся цвет по умолчанию
+  }
 }
 
 /** Выставляет data-ink по выбору; в режиме «авто» считает по фону */

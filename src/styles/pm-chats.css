@@ -523,7 +523,7 @@ html:has([data-pm]) body {
   background: var(--glass-solid);
 }
 
-/* Синее стекло: выбранный чипс и круги «Избранное» и «Архивы» (заливка круга — прежний градиент акцента на 50%) */
+/* Синее стекло: выбранный чипс (с рамкой) и круги «Избранное» и «Архивы» (без рамки; заливка круга — градиент акцента на 50%) */
 [data-pm] .chips-pill {
   box-sizing: border-box;
   border: 1px solid var(--glass-border-blue);
@@ -534,7 +534,6 @@ html:has([data-pm]) body {
 
 [data-pm] .avatar__icon {
   box-sizing: border-box;
-  border: 1px solid var(--glass-border-blue);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
 }
