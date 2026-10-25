@@ -63,7 +63,8 @@
 /* Область прокрутки страницы из карточек */
 [data-pm] .fp__scroll {
   gap: var(--block-gap);
-  padding: calc(var(--header-h) + var(--block-gap)) var(--page-gutter) var(--scroll-bottom);
+  /* Конец страницы оставляет место под кнопку «Готово»: от последнего блока до неё 16, как в редактировании профиля */
+  padding: calc(var(--header-h) + var(--block-gap)) var(--page-gutter) calc(var(--size-touch) + var(--space-4) * 2 + var(--safe-bottom));
 }
 
 [data-pm] .pe__scroll {

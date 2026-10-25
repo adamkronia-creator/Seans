@@ -693,3 +693,24 @@
   width: var(--space-6);
   justify-content: flex-start;
 }
+
+/* Сетка цветов лежит на одной подложке: обёртка раскрытия без своего фона, иначе стекло ложится дважды и блок темнее остальных */
+[data-pm] .fp__card.fp-color:not(.fp__delete) > .sheet__collapse {
+  background: none;
+}
+
+/* Подпись блока цвета — как заголовки остальных блоков */
+[data-pm] .fp-color__label {
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 600;
+}
+
+/* Выбранные чаты: без разделителей между строками, «Добавить чаты» той же высоты, что и строка чата */
+[data-pm] .fp__card:not(.fp__delete) > .fp__list {
+  gap: 0;
+}
+
+[data-pm] .fp__add {
+  min-height: var(--row-h-2);
+}
