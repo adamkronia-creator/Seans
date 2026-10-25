@@ -1,7 +1,7 @@
-import avatar1 from '../assets/avatars/avatar-1.jpg';
-import avatar2 from '../assets/avatars/avatar-2.jpg';
-import avatar3 from '../assets/avatars/avatar-3.jpg';
-import avatar4 from '../assets/avatars/avatar-4.jpg';
+import avatarMaxim from '../assets/avatars/maxim.jpg';
+import avatarVera from '../assets/avatars/vera.jpg';
+import avatarVladislav from '../assets/avatars/vladislav.jpg';
+import avatarBogdan from '../assets/avatars/bogdan.jpg';
 import userAvatar from '../assets/avatars/user-avatar-200.jpg';
 
 export type ChatCategory = 'clients' | 'colleagues' | 'seminars';
@@ -59,7 +59,7 @@ export const CHATS: Chat[] = [
   {
     id: 'maxim',
     name: 'Максим Мартынов',
-    avatar: avatar1,
+    avatar: avatarMaxim,
     category: 'clients',
     online: true,
     phone: '+7 (913) 735-19-37',
@@ -74,7 +74,7 @@ export const CHATS: Chat[] = [
   {
     id: 'vera',
     name: 'Вера Филиппова',
-    avatar: avatar2,
+    avatar: avatarVera,
     category: 'clients',
     phone: '+7 (905) 412-08-66',
     username: '@vera_filippova',
@@ -87,7 +87,7 @@ export const CHATS: Chat[] = [
   {
     id: 'vladislav',
     name: 'Владислав Семёнов',
-    avatar: avatar3,
+    avatar: avatarVladislav,
     category: 'colleagues',
     online: true,
     phone: '+7 (922) 310-47-25',
@@ -101,7 +101,7 @@ export const CHATS: Chat[] = [
   {
     id: 'bogdan',
     name: 'Богдан Ермолаев',
-    avatar: avatar4,
+    avatar: avatarBogdan,
     category: 'seminars',
     phone: '+7 (983) 205-61-40',
     username: '@bogdan_ermolaev',

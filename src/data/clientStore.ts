@@ -7,7 +7,7 @@ import type { AppEvent } from './events';
 import { findClientTaskResult } from './clientTaskResults';
 import { clientResultId, clientResultPath, recordRef } from './resultLinks';
 import { recordsText, type PermanentRule } from './taskValues';
-import avatar1 from '../assets/avatars/avatar-1.jpg';
+import avatarMaxim from '../assets/avatars/maxim.jpg';
 
 /*
  * Единый источник правды по клиенту (пока только Максим): журнал действий.
@@ -494,7 +494,7 @@ const resultRef = (a: ItemActivity): string => (a.record ? recordRef(a.ref, a.re
 
 /** Экран «События»: действия самого клиента (приглашение, пройденные опросники и задания), новые сверху */
 export function appEvents(d: ClientData): AppEvent[] {
-  const maxim = { name: 'Максим Мартынов', avatar: avatar1 };
+  const maxim = { name: 'Максим Мартынов', avatar: avatarMaxim };
   const out: AppEvent[] = [];
   d.activity.forEach((a) => {
     if (a.kind === 'invite') {
