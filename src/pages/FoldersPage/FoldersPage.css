@@ -40,12 +40,6 @@
   text-align: left;
 }
 
-/* «Все чаты» — строка в одну строку текста: 48, чтобы отступ от заголовка был как до «Новые» (12) */
-.fs__list > li:first-child .fs-row,
-.fs__list > .fs-row:first-child {
-  min-height: var(--row-h);
-}
-
 .fs-row--dragging {
   z-index: 2;
   background: var(--glass-solid, var(--color-bg-panel));
@@ -117,21 +111,29 @@
   background: currentColor;
 }
 
+/* «Создать новую папку» — как «Добавить поле» в профиле: строка 48 с плюсом без круга, подпись акцентная */
 .fs-row--create {
+  gap: var(--space-2);
   min-height: var(--row-h);
+  padding: 0 var(--row-pad-x);
   color: var(--text-link, var(--color-accent));
+  font: var(--type-label);
 }
 
 .fs-row__plus {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
-  margin: 0;
-  border-radius: var(--radius-full);
-  background: var(--action-primary, var(--color-accent));
-  color: var(--action-primary-text, var(--color-accent-on));
-  font-size: 16px;
+  font-size: var(--size-icon);
+}
+
+/* Строки без разделителей; от последней строки «Создать новую папку» отделяет только просвет 1 px */
+[data-pm] .fp__card:not(.fp__delete) > ul.fs__list,
+[data-pm] .fp__card:not(.fp__delete) > ul.fs__rec {
+  gap: 0;
+}
+
+[data-pm] .fs__list > li:last-child {
+  margin-top: 1px; /* grid:ok — просвет-разделитель 1 px */
 }
 
 [data-pm] .fs .fp__scroll > .fs__lead {
