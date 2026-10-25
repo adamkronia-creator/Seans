@@ -67,15 +67,15 @@ export function ArchivePage() {
           </>
         ) : (
           <>
+            <button type="button" className="archive__back" aria-label="Назад" onClick={() => goBack('/')}>
+              <IconBack />
+            </button>
             <div className="archive__who">
               <h1 className="archive__title">Архивы</h1>
               <p className="archive__subtitle">{archived.length > 0 ? `${archived.length} ${plural(archived.length, ['чат', 'чата', 'чатов'])}` : 'Пока пусто'}</p>
             </div>
             <button type="button" className="archive__back" aria-label="Поиск" onClick={() => setSearching(true)}>
               <IconSearchMk />
-            </button>
-            <button type="button" className="archive__back" aria-label="Назад" onClick={() => goBack('/')}>
-              <IconBack />
             </button>
           </>
         )}

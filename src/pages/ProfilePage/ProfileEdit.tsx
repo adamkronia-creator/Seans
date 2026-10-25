@@ -190,15 +190,15 @@ export function ProfileEditPage() {
   return (
     <section ref={root} className="pe">
       <header className="pe__header">
+        <button type="button" className="pe__back" aria-label="Назад" onClick={() => goBack('/')}>
+          <IconBack />
+        </button>
         <div className="pe__who">
           <h1 className="pe__title" aria-label="Редактирование профиля">
             Редактирование
           </h1>
           <p className="pe__subtitle">Ваш профиль</p>
         </div>
-        <button type="button" className="pe__back" aria-label="Назад" onClick={() => goBack('/')}>
-          <IconBack />
-        </button>
       </header>
 
       <div ref={scroller} className="pe__scroll">

@@ -525,6 +525,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           </div>
         ) : (
           <div key="top" className="chat__top">
+            <button type="button" className="chat__action" aria-label="Назад" onClick={() => goBack()}>
+              <IconBackMk />
+            </button>
             {/* Фото и имя открывают профиль собеседника (у «Избранного» профиля нет) */}
             {chat.favorites ? (
               <>
@@ -543,9 +546,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                 </div>
               </button>
             )}
-            <button type="button" className="chat__action" aria-label="Назад" onClick={() => goBack()}>
-              <IconBackMk />
-            </button>
             <button
               type="button"
               className="chat__action"

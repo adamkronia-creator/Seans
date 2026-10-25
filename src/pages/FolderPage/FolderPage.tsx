@@ -276,7 +276,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   return (
     <section className="fp" data-emoji={emojiOpen ? '' : undefined}>
       <header className="fp__header">
-        {/* Как шапка открытого чата: слева чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись, справа «назад» */}
+        {/* Как шапка открытого чата: слева чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись */}
         <span
           className="fp__preview"
           style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }) } as CSSProperties}
