@@ -1,9 +1,13 @@
 import { useEffect, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
 import {
   IconMessages,
+  IconMessagesBold,
   IconProfile,
+  IconProfileBold,
   IconTasks,
+  IconTasksBold,
   IconTests,
+  IconTestsBold,
 } from '../icons';
 import { Badge } from '../Badge/Badge';
 import { useUnreadTotal } from '../../data/chatStore';
@@ -12,11 +16,11 @@ import './TabBar.css';
 export type TabId = 'messages' | 'tests' | 'tasks' | 'profile';
 
 // label — название для экранных читалок (подписей под значками нет)
-const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
-  { id: 'tasks', label: 'Задания', Icon: IconTasks },
-  { id: 'tests', label: 'Диагностика', Icon: IconTests },
-  { id: 'messages', label: 'Диалоги', Icon: IconMessages },
-  { id: 'profile', label: 'Профиль', Icon: IconProfile },
+const TABS: { id: TabId; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>>; IconOn: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { id: 'tasks', label: 'Задания', Icon: IconTasks, IconOn: IconTasksBold },
+  { id: 'tests', label: 'Диагностика', Icon: IconTests, IconOn: IconTestsBold },
+  { id: 'messages', label: 'Диалоги', Icon: IconMessages, IconOn: IconMessagesBold },
+  { id: 'profile', label: 'Профиль', Icon: IconProfile, IconOn: IconProfileBold },
 ];
 
 interface TabBarProps {
@@ -46,7 +50,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
       <nav className="tabbar" aria-label="Разделы" style={{ '--tab-index': shown } as CSSProperties}>
         {/* Подвижная плашка выбранного раздела (видна у плавающей капсулы, см. pm-chats.css): при смене раздела скользит к новому */}
         <span className="tabbar__pill" aria-hidden="true" />
-        {TABS.map(({ id, label, Icon }) => (
+        {TABS.map(({ id, label, Icon, IconOn }) => (
           <button
             key={id}
             type="button"
@@ -57,7 +61,7 @@ export function TabBar({ active, onChange }: TabBarProps) {
             aria-description={id === 'messages' && unread > 0 ? `Непрочитанных чатов: ${unread}` : undefined}
           >
             <span className="tabbar__icon">
-              <Icon />
+              {id === active ? <IconOn /> : <Icon />}
               {id === 'messages' && unread > 0 && (
                 <span className="tabbar__badge" aria-hidden="true">
                   <Badge count={unread} />

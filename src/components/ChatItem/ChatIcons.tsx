@@ -1,129 +1,16 @@
-import type { SVGProps } from 'react';
-
-/* Значки макета «Диалогов»: сетка 24, линия 1,5 с округлыми концами, цвет — currentColor, размер — кегль (1em) */
-const base = (p: SVGProps<SVGSVGElement>): SVGProps<SVGSVGElement> => ({
-  width: '1em',
-  height: '1em',
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.5,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-  'aria-hidden': true,
-  ...p,
-});
-
-/** Двойная галочка статуса (Check Read): сетка 24, линия 1,5; серая — отправлено, синяя — прочитано */
-export const IconTicksMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M4 12.9L7.14286 16.5L15 7.5" />
-    <path d="M20 7.5625L11.4283 16.5625L11 16" />
-  </svg>
-);
-
-export const IconBellMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M18.7491 9.00497V9.70957C18.7491 10.5552 18.9903 11.3818 19.4422 12.0854L20.5496 13.8095C21.5612 15.3843 20.789 17.5249 19.0296 18.0229C14.4273 19.3257 9.57274 19.3257 4.97036 18.0229C3.21105 17.5249 2.43882 15.3843 3.45036 13.8095L4.5578 12.0854C5.00972 11.3818 5.25087 10.5552 5.25087 9.70957V9.00497C5.25087 5.13623 8.27256 2 12 2C15.7274 2 18.7491 5.13623 18.7491 9.00497Z" />
-    <path d="M7.5 19C8.15503 20.7478 9.92246 22 12 22C14.0775 22 15.845 20.7478 16.5 19" />
-  </svg>
-);
-
-export const IconSearchMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <circle cx="11.5" cy="11.5" r="9.5" />
-    <path d="M18.5 18.5L22 22" />
-  </svg>
-);
-
-/** Закладка: «Избранное» */
-export const IconBookmarkMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M21 11.0975V16.0909C21 19.1875 21 20.7358 20.2659 21.4123C19.9158 21.735 19.4739 21.9377 19.0031 21.9915C18.016 22.1045 16.8633 21.0849 14.5578 19.0458C13.5388 18.1445 13.0292 17.6938 12.4397 17.5751C12.1494 17.5166 11.8506 17.5166 11.5603 17.5751C10.9708 17.6938 10.4612 18.1445 9.44216 19.0458C7.13673 21.0849 5.98402 22.1045 4.99692 21.9915C4.52615 21.9377 4.08421 21.735 3.73411 21.4123C3 20.7358 3 19.1875 3 16.0909V11.0975C3 6.80891 3 4.6646 4.31802 3.3323C5.63604 2 7.75736 2 12 2C16.2426 2 18.364 2 19.682 3.3323C21 4.6646 21 6.80891 21 11.0975Z" />
-    <path d="M15 6H9" />
-  </svg>
-);
-
-/** Коробка архива */
-export const IconArchiveMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M10.5 13.5H13.5C13.9659 13.5 14.1989 13.5 14.3827 13.4239C14.6277 13.3224 14.8224 13.1277 14.9239 12.8827C15 12.6989 15 12.4659 15 12C15 11.5341 15 11.3011 14.9239 11.1173C14.8224 10.8723 14.6277 10.6776 14.3827 10.5761C14.1989 10.5 13.9659 10.5 13.5 10.5H10.5C10.0341 10.5 9.80109 10.5 9.61732 10.5761C9.37229 10.6776 9.17761 10.8723 9.07612 11.1173C9 11.3011 9 11.5341 9 12C9 12.4659 9 12.6989 9.07612 12.8827C9.17761 13.1277 9.37229 13.3224 9.61732 13.4239C9.80109 13.5 10.0341 13.5 10.5 13.5Z" />
-    <path d="M20.5 7V13C20.5 16.7712 20.5 18.6569 19.3284 19.8284C18.1569 21 16.2712 21 12.5 21H11.5C7.72876 21 5.84315 21 4.67157 19.8284C3.5 18.6569 3.5 16.7712 3.5 13V7" />
-    <path d="M4 7H20C20.9428 7 21.4142 7 21.7071 6.70711C22 6.41421 22 5.94281 22 5C22 4.05719 22 3.58579 21.7071 3.29289C21.4142 3 20.9428 3 20 3H4C3.05719 3 2.58579 3 2.29289 3.29289C2 3.58579 2 4.05719 2 5C2 5.94281 2 6.41421 2.29289 6.70711C2.58579 7 3.05719 7 4 7Z" />
-  </svg>
-);
-
-export const IconChevronMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M9 5l7 7-7 7" />
-  </svg>
-);
-
-export const IconPlusMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M12 5V19M5 12H19" />
-  </svg>
-);
-
-export const IconCloseMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M5 5L19 19M19 5L5 19" />
-  </svg>
-);
-
-/** Назад: шеврон влево */
-export const IconBackMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M15 5L8 12L15 19" />
-  </svg>
-);
-
-/** Боковое меню: три линии, нижняя короче */
-export const IconMenuMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M4 7H20M4 12H20M4 17H13" />
-  </svg>
-);
-
-/** Календарь: «Расписание» в боковой панели чата */
-export const IconCalendarMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <rect x="3" y="4.5" width="18" height="16.5" rx="3.5" />
-    <path d="M3 9.5H21" />
-    <path d="M8 2.5V6" />
-    <path d="M16 2.5V6" />
-  </svg>
-);
-
-/** Папка: «Файлы» */
-export const IconFolderMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M3 8.5C3 6.3 3 5.2 3.7 4.5C4.4 3.8 5.5 3.8 7.7 3.8H8.6C9.4 3.8 9.8 3.8 10.2 4C10.6 4.2 10.9 4.5 11.4 5.2L12 6H16.3C18.5 6 19.6 6 20.3 6.7C21 7.4 21 8.5 21 10.7V15.5C21 18.3 21 19.7 20.1 20.6C19.2 21.5 17.8 21.5 15 21.5H9C6.2 21.5 4.8 21.5 3.9 20.6C3 19.7 3 18.3 3 15.5V8.5Z" />
-  </svg>
-);
-
-/** Банковская карта: «Оплата» */
-export const IconCardMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <rect x="2.5" y="5" width="19" height="14" rx="3.5" />
-    <path d="M2.5 10H21.5" />
-    <path d="M6.5 15H10" />
-  </svg>
-);
-
-/** Вопрос в круге: «Помощь» */
-export const IconHelpMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <circle cx="12" cy="12" r="9.5" />
-    <path d="M9.5 9.5C9.5 8.1 10.6 7 12 7C13.4 7 14.5 8.1 14.5 9.4C14.5 11.4 12 11.5 12 13.5" />
-    <path d="M12 16.6V16.7" />
-  </svg>
-);
-
-/** Шестерёнка: «Настройки» (сетка 24, как у остальных значков) */
-export const IconGearMk = (p: SVGProps<SVGSVGElement>) => (
-  <svg {...base(p)}>
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
+// Значки — Solar Icons (480 Design, CC BY 4.0), см. assets/icons/solar. Размер задаётся кеглем (1em), цвет — currentColor.
+export { default as IconTicksMk } from '../../assets/icons/solar/check-read.svg?react';
+export { default as IconBellMk } from '../../assets/icons/solar/bell.svg?react';
+export { default as IconSearchMk } from '../../assets/icons/solar/magnifier.svg?react';
+export { default as IconBookmarkMk } from '../../assets/icons/solar/bookmark.svg?react';
+export { default as IconArchiveMk } from '../../assets/icons/solar/archive.svg?react';
+export { default as IconChevronMk } from '../../assets/icons/solar/alt-arrow-right.svg?react';
+export { default as IconPlusMk } from '../../assets/icons/solar/add.svg?react';
+export { default as IconCloseMk } from '../../assets/icons/solar/close.svg?react';
+export { default as IconBackMk } from '../../assets/icons/solar/alt-arrow-left.svg?react';
+export { default as IconMenuMk } from '../../assets/icons/solar/hamburger-menu.svg?react';
+export { default as IconCalendarMk } from '../../assets/icons/solar/calendar.svg?react';
+export { default as IconFolderMk } from '../../assets/icons/solar/folder.svg?react';
+export { default as IconCardMk } from '../../assets/icons/solar/card.svg?react';
+export { default as IconHelpMk } from '../../assets/icons/solar/question-circle.svg?react';
+export { default as IconGearMk } from '../../assets/icons/solar/settings.svg?react';
