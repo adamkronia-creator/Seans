@@ -137,8 +137,13 @@ html:has([data-pm]) body {
   display: none;
 }
 
-[data-pm] .chip--counted {
+[data-pm] .chip--counted,
+[data-pm] .chip--emoji-end {
   padding-right: var(--space-2);
+}
+
+[data-pm] .chip--emoji-start {
+  padding-left: var(--space-2);
 }
 
 /* Подпись идёт за заливкой вслед за пальцем и меняет цвет там, где заливка уже достаточно насыщенная для подписи выбранного (около 0,6 пути) */
@@ -392,11 +397,6 @@ html:has([data-pm]) body {
 
 [data-pm] .fo-row__text {
   gap: 0;
-}
-
-/* Чипс с числом: поля слева и справа равны, содержимое по центру синей плашки */
-[data-pm] .chip--counted {
-  padding-right: var(--space-3);
 }
 
 /* ——— «Диалоги»: матовое стекло (glassmorphism) ———

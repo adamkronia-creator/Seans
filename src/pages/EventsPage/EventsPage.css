@@ -125,6 +125,7 @@
 [data-pm] .event-item__name {
   color: var(--text-primary);
   font: var(--type-headline);
+  font-weight: 400;
   letter-spacing: 0;
 }
 
@@ -136,4 +137,5 @@
 [data-pm] .event-item__text {
   color: var(--text-secondary);
   font: var(--type-label);
+  font-weight: 400;
 }

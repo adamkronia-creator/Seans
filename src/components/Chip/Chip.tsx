@@ -60,7 +60,11 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
 
   // Число в кружке рядом с названием показывается, только если оно не ноль
   const hasCount = count !== undefined && count > 0;
-  const cls = ['chip', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', editing && 'chip--editing', split && 'chip--split', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
+  // Эмодзи в начале или в конце названия (папки): с этой стороны отступ меньше, как у кружка с числом, чтобы рядом с круглым знаком не было лишнего места
+  const text = typeof children === 'string' ? children.trim() : '';
+  const emojiStart = /^\p{Extended_Pictographic}/u.test(text);
+  const emojiEnd = /\p{Extended_Pictographic}\uFE0F?$/u.test(text);
+  const cls = ['chip', emojiStart && 'chip--emoji-start', emojiEnd && 'chip--emoji-end', active && 'chip--active', follow && 'chip--follow', icon !== undefined && 'chip--tab', editing && 'chip--editing', split && 'chip--split', hasCount && 'chip--counted', className].filter(Boolean).join(' ');
 
   const stop = () => {
     if (press.current) window.clearTimeout(press.current.timer);

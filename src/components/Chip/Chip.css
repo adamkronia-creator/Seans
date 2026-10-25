@@ -19,8 +19,14 @@
 }
 
 /* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 8, меньше, чем 12 слева от названия, потому что кружок круглый */
-.chip--counted {
+.chip--counted,
+.chip--emoji-end {
   padding-right: var(--space-2);
+}
+
+/* Эмодзи в начале названия: слева тоже 8 */
+.chip--emoji-start {
+  padding-left: var(--space-2);
 }
 
 .chip[data-tone] {
