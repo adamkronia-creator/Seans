@@ -11,7 +11,7 @@ import { transition, type TransitionKind } from './utils/transition';
  */
 
 /** Какой экран показан и откуда на него пришли; prev нет, если экран открыт по прямой ссылке */
-export interface Located {
+interface Located {
   path: string;
   prev: string | undefined;
 }

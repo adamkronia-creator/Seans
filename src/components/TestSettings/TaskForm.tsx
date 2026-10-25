@@ -36,7 +36,7 @@ const colorOf = (i: number) => PIE_COLORS[i % PIE_COLORS.length];
 // ——— Поля ———
 
 /** Поле ответа: растет по тексту */
-export function AnswerField({ value, onChange, label, placeholder, rows = 1 }: { value: string; onChange: (v: string) => void; label: string; placeholder?: string; rows?: number }) {
+function AnswerField({ value, onChange, label, placeholder, rows = 1 }: { value: string; onChange: (v: string) => void; label: string; placeholder?: string; rows?: number }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fit = () => {
     const el = ref.current;
@@ -113,12 +113,12 @@ function Slider({
 }
 
 /** Ползунок процентов (0–100, шаг 5) */
-export function PercentSlider({ value, onChange, label, max = 100 }: { value: number | undefined; onChange: (v: number) => void; label: string; max?: number }) {
+function PercentSlider({ value, onChange, label, max = 100 }: { value: number | undefined; onChange: (v: number) => void; label: string; max?: number }) {
   return <Slider value={value} onChange={onChange} label={label} top={100} step={5} cap={max} text={(v) => `${v}%`} />;
 }
 
 /** Кольцо долей: доли факторов серо-голубым, остаток — доля самого клиента акцентным */
-export function PieChart({ factors, ownLabel }: { factors: PieFactor[]; ownLabel: string }) {
+function PieChart({ factors, ownLabel }: { factors: PieFactor[]; ownLabel: string }) {
   const R = 46;
   const C = 2 * Math.PI * R;
   const own = ownShare(factors);
@@ -381,7 +381,7 @@ function Entries({ field, values, onChange }: { field: EntriesField; values: Tas
 }
 
 /** Шкала «Как вы себя чувствуете?» */
-export function StateScale({ labels, value, onChange }: { labels: string[]; value?: number; onChange?: (i: number) => void }) {
+function StateScale({ labels, value, onChange }: { labels: string[]; value?: number; onChange?: (i: number) => void }) {
   return (
     <ul className="blank-answers" role="radiogroup" aria-label="Как вы себя чувствуете">
       {labels.map((label, i) => (
@@ -541,7 +541,7 @@ function FieldBody({ field, number, values, onChange, scope }: FieldProps) {
 }
 
 /** Раздел бланка: каждое поле — вопрос с линией между ними, как в бланке теста */
-export function TaskSectionCard({ section, values, onChange }: { section: TaskSection; values: TaskValues; onChange?: (next: TaskValues) => void }) {
+function TaskSectionCard({ section, values, onChange }: { section: TaskSection; values: TaskValues; onChange?: (next: TaskValues) => void }) {
   let sentence = 0;
   return (
     <CollapseCard title={section.title}>

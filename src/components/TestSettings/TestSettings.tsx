@@ -14,7 +14,6 @@ import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
-import { topicsOf } from '../../data/topics';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { FormMenu } from './FormMenu';
@@ -57,24 +56,6 @@ interface TestSettingsProps {
   /** Чат клиента, из которого открыт тест; без него тест открыт из библиотеки */
   chatId?: string;
   onBack: () => void;
-}
-
-/** Темы материала: теги в конце настроек, только для просмотра */
-export function TopicTags({ id }: { id: string }) {
-  const topics = topicsOf(id);
-  if (topics.length === 0) return null;
-  return (
-    <section className="ts-topics" aria-label="Темы материала">
-      <p className="ts-topics__label">Темы материала</p>
-      <ul className="ts-topics__list">
-        {topics.map((topic) => (
-          <li key={topic} className="ts-topics__tag">
-            {topic}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
 }
 
 /** Название строки с «?» в конце: значок прижат к последнему слову, и при переносе они не расходятся по разным строкам */

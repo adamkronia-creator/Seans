@@ -23,7 +23,7 @@ export function CollapseCard({ title, badge, help, id, children }: { title: stri
 }
 
 /** Прохождение: ответы хранятся снаружи, чтобы можно было посчитать результат */
-export interface BlankFill {
+interface BlankFill {
   answers: Record<number, number>;
   /** Без обработчика бланк показан только для просмотра: отмеченные ответы видны, менять их нельзя */
   onAnswer?: (question: number, answer: number) => void;

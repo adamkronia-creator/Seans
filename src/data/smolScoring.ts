@@ -10,10 +10,10 @@ import { SMOL_ANSWERS } from './testBlank';
  * чтобы их можно было сверить с первоисточником и поправить в одном месте.
  */
 
-export type SmolCode = 'L' | 'F' | 'K' | 'Hs' | 'D' | 'Hy' | 'Pd' | 'Pa' | 'Pt' | 'Sc' | 'Ma';
+type SmolCode = 'L' | 'F' | 'K' | 'Hs' | 'D' | 'Hy' | 'Pd' | 'Pa' | 'Pt' | 'Sc' | 'Ma';
 
 /** Порядок шкал в заключении: восемь основных, затем контрольные */
-export const SMOL_CODES: SmolCode[] = ['Hs', 'D', 'Hy', 'Pd', 'Pa', 'Pt', 'Sc', 'Ma', 'L', 'F', 'K'];
+const SMOL_CODES: SmolCode[] = ['Hs', 'D', 'Hy', 'Pd', 'Pa', 'Pt', 'Sc', 'Ma', 'L', 'F', 'K'];
 
 /** Номера утверждений бланка (с 1); за каждое совпадение шкала получает балл: yes — «Верно», no — «Неверно» */
 const KEY: Record<SmolCode, { yes: number[]; no: number[] }> = {
@@ -70,7 +70,7 @@ const VALIDITY_LIMITS: { code: 'L' | 'F' | 'K'; limit: number; reason: string }[
   { code: 'K', limit: 70, reason: 'K выше 70 — выраженная защитная установка' },
 ];
 
-export interface SmolScores {
+interface SmolScores {
   /** Сырые баллы по ключу */
   raw: Record<SmolCode, number>;
   /** Сырые баллы с поправкой на K */

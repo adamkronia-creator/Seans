@@ -4,7 +4,7 @@
  */
 
 /** id поля или 'add' — блок «Добавить поле» */
-export type EditTarget = string;
+type EditTarget = string;
 
 let wanted: EditTarget | undefined;
 

@@ -9,7 +9,7 @@ import { TestHeader } from './TestHeader';
 import { ADVANCE_MS, JumpSheet, PassQuestion } from './TestPassSingle';
 import './TestPreview.css';
 
-export type Stage = 'start' | 'progress' | 'end';
+type Stage = 'start' | 'progress' | 'end';
 
 const STAGES: { id: Stage; label: string }[] = [
   { id: 'start', label: 'Начало' },

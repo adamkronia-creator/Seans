@@ -7,9 +7,9 @@ import type { LibraryTest } from './library';
  */
 
 /** 'text' — нейтральная чёрная точка: пункт про шкалу, а не про уровень (пишется «Шкала — диапазон») */
-export type ScoreTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred' | 'text';
+type ScoreTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred' | 'text';
 
-export interface TestSettingsData {
+interface TestSettingsData {
   /** Описание теста; пустая строка между абзацами, «●» — маркер списка, как в макете */
   intro: string;
   /** Начало описания, выделенное полужирным (название методики) */

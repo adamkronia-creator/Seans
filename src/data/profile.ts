@@ -20,7 +20,7 @@ export interface ProfileField {
   value: string;
 }
 
-export interface ProfilePhoto {
+interface ProfilePhoto {
   id: string;
   caption: string;
   addedAt: number;
@@ -40,7 +40,7 @@ interface Stored {
   coverId: string | null;
 }
 
-export interface ProfileState extends Stored {
+interface ProfileState extends Stored {
   /** Маленькие копии фото для сетки и аватара: id → адрес в памяти. Пока читаются из хранилища, их нет */
   thumbs: Record<string, string>;
   /** Снимки целиком для просмотра и обложки: подгружаются, когда нужны */

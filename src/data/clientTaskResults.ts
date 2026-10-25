@@ -9,7 +9,7 @@ import { fullValues, type TaskValues } from './taskValues';
  * У постоянного задания каждая запись — отдельный результат (`record` — её номер, в номере результата «…-r2»).
  */
 
-export interface ClientTaskResult {
+interface ClientTaskResult {
   /** «<чат>-<задание>»: см. clientResultId */
   id: string;
   chatId: string;

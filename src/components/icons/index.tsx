@@ -6,7 +6,6 @@ export { default as IconTests } from '../../assets/icons/tabbar/psych-tests.svg?
 export { default as IconTasks } from '../../assets/icons/tabbar/psych-tasks.svg?react';
 export { default as IconProfile } from '../../assets/icons/tabbar/profile.svg?react';
 export { default as IconSearch } from '../../assets/icons/search.svg?react';
-export { default as IconBell } from '../../assets/icons/notifications.svg?react';
 export { default as IconFavorites } from '../../assets/icons/favorites.svg?react';
 export { default as IconBack } from '../../assets/icons/back.svg?react';
 // Значок приглашения (лента истории)
@@ -39,7 +38,6 @@ export { default as IconTabPractices } from '../../assets/icons/chat/tab-practic
 export { default as IconTabNotes } from '../../assets/icons/chat/tab-notes.svg?react';
 export { default as IconTabInfo } from '../../assets/icons/chat/tab-info.svg?react';
 export { default as IconTabLibrary } from '../../assets/icons/chat/tab-library.svg?react';
-export { default as IconSettings } from '../../assets/icons/chat/settings.svg?react';
 export { default as IconAttach } from '../../assets/icons/chat/attach.svg?react';
 export { default as IconEmoji } from '../../assets/icons/chat/emoji.svg?react';
 export { default as IconMicrophone } from '../../assets/icons/chat/microphone.svg?react';
@@ -52,7 +50,6 @@ export { default as IconPin } from '../../assets/icons/pin.svg?react';
 // Карточки вкладок «Заметки» и «Сведения»
 export { default as IconCaseNotePin } from '../../assets/icons/case/note-pin.svg?react';
 export { default as IconCaseEdit } from '../../assets/icons/case/edit.svg?react';
-export { default as IconCaseLock } from '../../assets/icons/case/note-lock.svg?react';
 export { default as IconCaseGeneral } from '../../assets/icons/case/head-general.svg?react';
 export { default as IconCaseAnamnesis } from '../../assets/icons/case/head-anamnesis.svg?react';
 export { default as IconCaseRequest } from '../../assets/icons/case/head-request.svg?react';
@@ -84,11 +81,8 @@ export { default as IconChevron } from '../../assets/icons/history/chevron.svg?r
 // Раздел «Психологические тесты»
 export { default as IconHeartRed } from '../../assets/icons/library/heart-red.svg?react';
 export { default as IconHeartGray } from '../../assets/icons/library/heart-gray.svg?react';
-export { default as IconFilterSettings } from '../../assets/icons/library/settings.svg?react';
 
 // Настройки теста
-export { default as IconTestViewList } from '../../assets/icons/test/view-list.svg?react';
-export { default as IconTestViewSingle } from '../../assets/icons/test/view-single.svg?react';
 export { default as IconTestMic } from '../../assets/icons/test/mic.svg?react';
 export { default as IconTestChevron } from '../../assets/icons/test/chevron-right.svg?react';
 export { default as IconTestPass } from '../../assets/icons/test/pass.svg?react';
@@ -114,6 +108,5 @@ export { default as IconFmtNumbers } from '../../assets/icons/format/list-number
 export { default as IconFmtQuote } from '../../assets/icons/format/quote.svg?react';
 export { default as IconFmtUndo } from '../../assets/icons/format/undo.svg?react';
 export { default as IconFmtRedo } from '../../assets/icons/format/redo.svg?react';
-export { default as IconTestChevronUp } from '../../assets/icons/test/chevron-up.svg?react';
 export { default as IconTestReportMain } from '../../assets/icons/test/report-main.svg?react';
 export { default as IconTestReportExtra } from '../../assets/icons/test/report-extra.svg?react';

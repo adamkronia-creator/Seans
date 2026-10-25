@@ -9,14 +9,14 @@ import { EMPTY_FILTERS, type Filters } from './libraryQuery';
  * «Избранное» и «Недавнее» — разделы страницы (чипсы), а не часть этого состояния; порядка выдачи в интерфейсе нет.
  */
 
-export interface ViewState {
+interface ViewState {
   query: string;
   filters: Filters;
   /** Прошлые запросы, свежие первыми */
   history: string[];
 }
 
-export const HISTORY_LIMIT = 6;
+const HISTORY_LIMIT = 6;
 const STORAGE_KEY = 'seans.library.v1';
 
 type Saved = Partial<Record<Kind, { history?: unknown }>>;

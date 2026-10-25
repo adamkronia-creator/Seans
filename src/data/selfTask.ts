@@ -22,7 +22,7 @@ export interface TaskInfo {
   age?: string;
 }
 
-export interface TaskResult {
+interface TaskResult {
   id: string;
   taskId: string;
   /** Форма бланка, по которой выполняли задание */
@@ -56,7 +56,7 @@ const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener);
 };
 
-export const getTaskRun = (taskId: string): TaskRun => runs.get(taskId) ?? EMPTY;
+const getTaskRun = (taskId: string): TaskRun => runs.get(taskId) ?? EMPTY;
 
 /** Состояние выполнения задания; обновляется при каждой правке */
 export const useTaskRun = (taskId: string): TaskRun => useSyncExternalStore(subscribe, () => getTaskRun(taskId));
@@ -73,7 +73,7 @@ const recordsOf = (assignment: string): number => results.filter((r) => r.assign
 export const useAssignmentRecords = (assignment: string): number => useSyncExternalStore(subscribe, () => (assignment ? recordsOf(assignment) : 0));
 
 /** Номер собственного результата по виду («t1», «t2»…): у результатов тестов номера «r1», у результатов клиентов «<чат>-<задание>» */
-export const isSelfTaskId = (id: string): boolean => /^t\d+$/.test(id);
+const isSelfTaskId = (id: string): boolean => /^t\d+$/.test(id);
 
 /** Номер относится к результату задания: собственному или клиента (остальные номера — результаты тестов) */
 export const isTaskResultId = (id: string): boolean => isSelfTaskId(id) || findClientTaskResult(id) !== undefined;
@@ -139,7 +139,7 @@ export function finishTaskRun(taskId: string, form: string, assignment?: string)
 }
 
 /** Задание, отправленное себе: кнопка «Пройти» в чате открывает его так, как увидит клиент, с теми настройками, с какими оно ушло */
-export interface TaskPassRequest {
+interface TaskPassRequest {
   taskId: string;
   form: string;
   comment: boolean;

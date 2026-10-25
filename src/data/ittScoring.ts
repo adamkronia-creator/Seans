@@ -80,7 +80,7 @@ const stanine = (value: number, limits: Limits): number => {
 
 const PART = 15;
 
-export interface IttScores {
+interface IttScores {
   /** Ситуационная тревожность (СТ-С), стэн 1–9 */
   situational: number;
   /** Компоненты ситуационной тревожности (стэны 1–9): ЭД-С, АСТ-С, ФОБ-С, ОП-С, СЗ-С */

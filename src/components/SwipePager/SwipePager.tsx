@@ -21,7 +21,7 @@ import {
 } from '../../utils/swipe';
 import './SwipePager.css';
 
-export interface PagerPage {
+interface PagerPage {
   key: string;
   node: ReactNode;
 }

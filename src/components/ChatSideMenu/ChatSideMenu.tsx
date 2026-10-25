@@ -4,7 +4,7 @@ import { SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../.
 import { IconCalendarMk, IconCardMk, IconCloseMk, IconFolderMk, IconGearMk, IconHelpMk, IconSearchMk } from '../ChatItem/ChatIcons';
 import './ChatSideMenu.css';
 
-export interface SideMenuItem {
+interface SideMenuItem {
   id: string;
   label: string;
   icon: ReactNode;

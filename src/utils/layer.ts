@@ -5,7 +5,7 @@ import { createContext, useContext } from 'react';
  * и какой у него корневой элемент: оглавление теста, например, должно ездить вместе со своим экраном, а не торчать в каркасе.
  */
 
-export interface LayerInfo {
+interface LayerInfo {
   /** Слой лежит сверху (true) или под другим, выглядывая при жесте «назад» (false) */
   top: boolean;
   /** Корневой элемент слоя. null — слой ещё не нарисован; undefined — компонент вне слоёв */

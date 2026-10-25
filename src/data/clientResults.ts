@@ -9,7 +9,7 @@ import { conclusionFromAnswers } from './selfTest';
  * поэтому выглядит так же и содержит ту же кнопку к бланку со всеми ответами.
  */
 
-export interface ClientResult {
+interface ClientResult {
   /** «<чат>-<тест>»: см. clientResultId */
   id: string;
   chatId: string;

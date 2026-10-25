@@ -24,7 +24,7 @@ import {
 } from '../icons';
 import type { CaseIconId } from '../../data/case';
 
-export type Icon = ComponentType<SVGProps<SVGSVGElement>>;
+type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
 // Иконки шапок карточек; size — размер файла иконки из Figma (22 или 24)
 export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; label: string }> = {

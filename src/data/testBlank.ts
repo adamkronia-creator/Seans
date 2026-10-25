@@ -20,7 +20,7 @@ export interface TestBlankData {
   questions: BlankQuestion[];
 }
 
-export const BDI_BLANK: TestBlankData = {
+const BDI_BLANK: TestBlankData = {
   rules: [
     'Прочитайте внимательно каждую группу утверждений.',
     'Выберите в каждой группе одно утверждение, которое лучше всего описывает ваше состояние за прошедшую неделю, включая сегодняшний день.',
@@ -222,7 +222,7 @@ export const BDI_BLANK: TestBlankData = {
 /** Шкала безнадежности Бека (BHS): 20 утверждений, у каждого один и тот же ряд ответов 1–4 */
 export const BHS_ANSWERS = ['Совсем неверно', 'Скорее неверно', 'Скорее верно', 'Совсем верно'];
 
-export const BHS_BLANK: TestBlankData = {
+const BHS_BLANK: TestBlankData = {
   rules: [
     'Прочитайте каждое утверждение и отметьте, насколько оно верно по отношению к вам: «Совсем неверно», «Скорее неверно», «Скорее верно» или «Совсем верно».',
     'Отвечайте честно, основываясь на своих реальных ощущениях.',
@@ -254,7 +254,7 @@ export const BHS_BLANK: TestBlankData = {
 /** СМОЛ: 71 утверждение, на каждое отвечают «+» (согласен) или «−» (не согласен) */
 export const SMOL_ANSWERS = ['Верно', 'Неверно'];
 
-export const SMOL_BLANK: TestBlankData = {
+const SMOL_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Читайте каждое утверждение и решайте, верно оно или неверно по отношению к вам: отметьте «Верно» или «Неверно».',
@@ -339,7 +339,7 @@ export const SMOL_BLANK: TestBlankData = {
 const ITT_NOW = ['Совсем нет', 'Слабо выражено', 'Выражено', 'Очень выражено'];
 const ITT_LATELY = ['Почти никогда', 'Редко', 'Часто', 'Почти все время'];
 
-export const ITT_BLANK: TestBlankData = {
+const ITT_BLANK: TestBlankData = {
   rules: [
     'В первой части оцените, насколько каждое состояние выражено именно сейчас, в данный момент, сегодня: «Совсем нет», «Слабо выражено», «Выражено», «Очень выражено».',
     'Во второй части оцените, как часто вы испытывали каждое состояние в последнее время (например, на протяжении последнего года): «Почти никогда», «Редко», «Часто», «Почти все время».',
@@ -381,7 +381,7 @@ export const ITT_BLANK: TestBlankData = {
 /** ОСР: 29 утверждений, на каждое отвечают «Верно» (+) или «Неверно» (−) */
 export const OCR_ANSWERS = ['Верно', 'Неверно'];
 
-export const OCR_BLANK: TestBlankData = {
+const OCR_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Вам будут предложены утверждения.',
@@ -423,7 +423,7 @@ export const OCR_BLANK: TestBlankData = {
 /** SQ (Леонгард — Шмишек): 88 вопросов, на каждый отвечают «Да» (+) или «Нет» (−) */
 export const SQ_ANSWERS = ['Да', 'Нет'];
 
-export const SQ_BLANK: TestBlankData = {
+const SQ_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Вам предлагается ответить на 88 вопросов, касающихся различных сторон вашей личности.',
@@ -525,7 +525,7 @@ export const SQ_BLANK: TestBlankData = {
 /** ИТО (Л. Н. Собчик): 91 утверждение, на каждое отвечают «Верно» (+) или «Неверно» (−) */
 export const ITO_ANSWERS = ['Верно', 'Неверно'];
 
-export const ITO_BLANK: TestBlankData = {
+const ITO_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Прочитайте каждое утверждение и решите, верно ли оно по отношению к вам, согласны ли вы с ним.',
@@ -640,7 +640,7 @@ export const FREQUENCY_ANSWERS = [
 const FREQUENCY_RULE = 'Оцените, пожалуйста, насколько часто следующие проблемы беспокоили вас в течение прошедших двух недель.';
 const PHQ9_RULE = 'Как часто за последние 2 недели вас беспокоили следующие проблемы?';
 
-export const GAD7_BLANK: TestBlankData = {
+const GAD7_BLANK: TestBlankData = {
   numbered: false,
   rules: [FREQUENCY_RULE],
   questions: [
@@ -655,9 +655,9 @@ export const GAD7_BLANK: TestBlankData = {
 };
 
 /** RSES: десять утверждений и один ряд из четырёх ответов. Номер ответа (с 0) хранится как есть; баллы считаются в rsesScoring: у обратных пунктов шкала перевёрнута */
-export const RSES_ANSWERS = ['Полностью согласен', 'Согласен', 'Не согласен', 'Полностью не согласен'];
+const RSES_ANSWERS = ['Полностью согласен', 'Согласен', 'Не согласен', 'Полностью не согласен'];
 
-export const RSES_BLANK: TestBlankData = {
+const RSES_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Ниже приведены утверждения о том, как люди относятся к себе.',
@@ -678,7 +678,7 @@ export const RSES_BLANK: TestBlankData = {
   ],
 };
 
-export const PHQ9_BLANK: TestBlankData = {
+const PHQ9_BLANK: TestBlankData = {
   numbered: false,
   rules: [PHQ9_RULE],
   questions: [
@@ -796,7 +796,7 @@ const SCL90_ITEMS = [
   'Мысли о том, что с вашим рассудком творится что-то неладное',
 ];
 
-export const SCL90_BLANK: TestBlankData = {
+const SCL90_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Ниже приведен перечень проблем и жалоб, которые иногда возникают у людей.',
@@ -818,7 +818,7 @@ export const SCL90_BLANK: TestBlankData = {
  * 0 — «−2» (верхнее утверждение выражено сильно), 4 — «2» (нижнее утверждение выражено сильно).
  * Тексты — по методическому пособию А. Б. Хромова «Пятифакторный опросник личности» (2000).
  */
-export const PFQ5_SCALE = ['−2', '−1', '0', '1', '2'];
+const PFQ5_SCALE = ['−2', '−1', '0', '1', '2'];
 
 const PFQ5_ITEMS: [string, string][] = [
   ['Мне нравится заниматься физкультурой', 'Я не люблю физические нагрузки'],
@@ -898,7 +898,7 @@ const PFQ5_ITEMS: [string, string][] = [
   ['Иногда я чувствую, что могу открыть в себе нечто новое', 'Я не хотел бы ничего в себе менять'],
 ];
 
-export const PFQ5_BLANK: TestBlankData = {
+const PFQ5_BLANK: TestBlankData = {
   numbered: false,
   rules: [
     'Прочитайте два противоположных по смыслу утверждения и определите, какое из них больше подходит вам. Оцените все 75 пар.',

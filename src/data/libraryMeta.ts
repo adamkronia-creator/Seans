@@ -36,7 +36,7 @@ export const NONE = 'none';
 
 // ——— Пункты фильтров ———
 
-export const TEST_DOMAINS: Option[] = [
+const TEST_DOMAINS: Option[] = [
   { id: 'depression', label: 'Депрессия', concepts: ['depression'] },
   { id: 'anxiety', label: 'Тревога', concepts: ['anxiety'] },
   { id: 'suicide', label: 'Суицидальный риск', concepts: ['suicide'] },
@@ -45,7 +45,7 @@ export const TEST_DOMAINS: Option[] = [
   { id: 'symptoms', label: 'Общая симптоматика', concepts: ['symptoms'] },
 ];
 
-export const TASK_DOMAINS: Option[] = [
+const TASK_DOMAINS: Option[] = [
   { id: 'anxiety', label: 'Тревога', concepts: ['anxiety'] },
   { id: 'mood', label: 'Депрессия и выгорание', concepts: ['depression', 'burnout', 'activity'] },
   { id: 'guilt', label: 'Вина и ответственность', concepts: ['guilt'] },
@@ -53,25 +53,25 @@ export const TASK_DOMAINS: Option[] = [
   { id: 'values', label: 'Ценности и желания', concepts: ['values'] },
 ];
 
-export const APPROACHES: Option[] = [
+const APPROACHES: Option[] = [
   { id: 'cbt', label: 'КПТ' },
   { id: 'act', label: 'ACT' },
   { id: 'schema', label: 'Схема-терапия' },
   { id: 'psychodynamic', label: 'Психодинамика' },
 ];
 
-export const TEST_RESULTS: Option[] = [
+const TEST_RESULTS: Option[] = [
   { id: 'score', label: 'Общий балл' },
   { id: 'profile', label: 'Профиль шкал' },
 ];
 
-export const TASK_SHAPES: Option[] = [
+const TASK_SHAPES: Option[] = [
   { id: 'short', label: 'Короткий ответ' },
   { id: 'steps', label: 'Пошаговое' },
   { id: 'diary', label: 'Дневник' },
 ];
 
-export const TIMES: Option[] = [
+const TIMES: Option[] = [
   { id: 'fast', label: 'До 5 минут' },
   { id: 'mid', label: '5–15 минут' },
   { id: 'long', label: 'Больше 15 минут' },
@@ -121,7 +121,7 @@ const TEST_META: Record<string, TestMeta> = {
   scl90: { domains: ['symptoms'], aliases: ['SCL90', 'SCL-90-R', 'Дерогатис', 'Derogatis', 'Симптоматический опросник'] },
 };
 
-export interface TaskMeta {
+interface TaskMeta {
   domains: string[];
   approaches: string[];
   /** short — один короткий ответ; steps — несколько шагов с оценками; diary — повторяющиеся записи */
@@ -245,7 +245,7 @@ function conceptsOf(list: Option[], ids: string[]): string[] {
 }
 
 /** «15–20 мин.» → [15, 20]; «5 мин.» → [5, 5] */
-export function parseMinutes(text?: string): [number, number] | undefined {
+function parseMinutes(text?: string): [number, number] | undefined {
   const m = text?.match(/(\d+)(?:\s*[–—-]\s*(\d+))?/);
   return m ? [Number(m[1]), Number(m[2] ?? m[1])] : undefined;
 }

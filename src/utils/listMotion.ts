@@ -19,7 +19,7 @@ interface Snap {
   at: number;
 }
 
-export interface ListMotionOptions {
+interface ListMotionOptions {
   /** Атрибут с id строки */
   attr?: string;
   /** Что сейчас показано (запрос, фильтр): пока значение то же, перестановки считаются движением; когда сменилось — строки просто заменились */

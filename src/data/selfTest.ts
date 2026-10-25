@@ -22,7 +22,7 @@ import { scoreSmol } from './smolScoring';
 /** Чат, куда приходят результаты самостоятельных прохождений */
 export const FAVORITES_CHAT = 'favorites';
 
-export interface SelfResult {
+interface SelfResult {
   id: string;
   testId: string;
   data: ConclusionData;
@@ -34,7 +34,7 @@ export interface SelfResult {
   answers?: Record<number, number>;
 }
 
-export interface SelfRun {
+interface SelfRun {
   /** Номер вопроса (с 0) → номер выбранного ответа */
   answers: Record<number, number>;
   /** Время первого ответа: от него считается длительность */
@@ -54,7 +54,7 @@ const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener);
 };
 
-export const getRun = (testId: string): SelfRun => runs.get(testId) ?? EMPTY;
+const getRun = (testId: string): SelfRun => runs.get(testId) ?? EMPTY;
 
 /** Состояние прохождения теста; обновляется при каждом ответе */
 export const useSelfRun = (testId: string): SelfRun => useSyncExternalStore(subscribe, () => getRun(testId));
@@ -143,9 +143,6 @@ const FORM_HINT: Record<string, string> = {
   itt: 'От формы бланка зависят нормы для перевода баллов в стэны: мужская — для взрослых и юношей, женская — для девушек',
 };
 
-/** Тесты, где форма бланка меняет подсчёт (нормы для мужчин и женщин) */
-export const formAffectsScore = (testId: string) => testId in FORM_HINT;
-
 export const formHint = (testId: string): string => FORM_HINT[testId] ?? '';
 
 /** Текст сообщения в «Избранном» о пройденном тесте */
@@ -202,7 +199,7 @@ export function finishRun(testId: string, total: number, form: string, saveBlank
 }
 
 /** Тест, отправленный себе: кнопка «Пройти» в чате открывает его так, как увидит клиент, с теми настройками, с какими он ушёл */
-export interface PassRequest {
+interface PassRequest {
   testId: string;
   form: string;
   saveBlank: boolean;

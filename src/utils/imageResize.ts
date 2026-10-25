@@ -9,7 +9,7 @@ const FULL_QUALITY = 0.85;
 const THUMB_SIDE = 480;
 const THUMB_QUALITY = 0.8;
 
-export interface PreparedImage {
+interface PreparedImage {
   thumb: Blob;
   full: Blob;
 }

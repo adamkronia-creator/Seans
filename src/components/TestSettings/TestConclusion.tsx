@@ -66,7 +66,7 @@ const rangeText = (range: string) => range.replace(/\s+—\s+/g, '–');
 const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** Склонение: 1 балл, 2–4 балла, 5–20 баллов */
-export function pointsWord(n: number) {
+function pointsWord(n: number) {
   if (!Number.isInteger(n)) return 'балла'; // 3,2 балла
   const last = n % 10;
   if (n % 100 >= 11 && n % 100 <= 14) return 'баллов';

@@ -74,7 +74,7 @@ export function serializeBlocks(blocks: RichBlock[]): string {
 const INLINE = /\\([\\*_~>•\d])|\*\*(?!\s)([^]+?)(?<!\s)\*\*|__(?!\s)([^]+?)(?<!\s)__|~~(?!\s)([^]+?)(?<!\s)~~|\*(?![\s*])([^]*?)(?<!\s)\*/;
 
 /** Разбирает строку с разметкой в узлы; перенос строки — <br> */
-export function renderInline(src: string, key = ''): ReactNode[] {
+function renderInline(src: string, key = ''): ReactNode[] {
   const out: ReactNode[] = [];
   let rest = src;
   let n = 0;

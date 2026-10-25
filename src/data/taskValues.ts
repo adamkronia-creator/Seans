@@ -23,7 +23,6 @@ export type TaskField =
   /** Повторяющаяся запись из нескольких полей (запись дневника, дело плана, беспокойство): сначала показано `count` записей, добавить можно до `max` */
   | { kind: 'entries'; id: string; title: string; addLabel: string; count: number; max: number; groups: EntryGroup[] };
 
-export type TextField = Extract<TaskField, { kind: 'text' }>;
 export type ChoiceField = Extract<TaskField, { kind: 'choice' }>;
 export type ListField = Extract<TaskField, { kind: 'list' }>;
 export type EntriesField = Extract<TaskField, { kind: 'entries' }>;
@@ -171,7 +170,7 @@ export function plural(n: number, [one, few, many]: [string, string, string]): s
 }
 
 /** «10 предложений», «3 решения», «1 фраза»: объём задания для клиента; у заданий с числом записей в форме — выбранное число */
-export const volumeText = (data: TaskSettingsData, form?: string): string => {
+const volumeText = (data: TaskSettingsData, form?: string): string => {
   const n = data.formCount && form ? Number(form) : Number(data.volume.value);
   return `${n} ${plural(n, data.volume.unit)}`;
 };
@@ -180,7 +179,7 @@ export const volumeText = (data: TaskSettingsData, form?: string): string => {
 export const formText = (data: TaskSettingsData, form: string): string => (data.formCount ? volumeText(data, form) : form);
 
 /** Задания, у которых есть экран настройки, бланк и выполнение (остальные пока только в списке) */
-export const TASKS_WITH_SETTINGS = ['should', 'choice', 'phrase', 'secret', 'pie', 'smer', 'worry', 'activation', 'evidence'];
+const TASKS_WITH_SETTINGS = ['should', 'choice', 'phrase', 'secret', 'pie', 'smer', 'worry', 'activation', 'evidence'];
 export const hasTaskSettings = (taskId: string): boolean => TASKS_WITH_SETTINGS.includes(taskId);
 
 // ——— Заполненный бланк ———
@@ -205,10 +204,10 @@ export const listOf = (field: ListField, values: TaskValues): string[] => values
 /** Поля одной записи: из всех групп подряд */
 export const entryFields = (field: EntriesField): TaskField[] => field.groups.flatMap((g) => g.fields);
 
-export const fieldsOf = (sections: TaskSection[]): TaskField[] => sections.flatMap((s) => s.fields);
+const fieldsOf = (sections: TaskSection[]): TaskField[] => sections.flatMap((s) => s.fields);
 
 /** Поле заполнено: есть текст, оценка, выбранный вариант, строка списка, фактор с названием или заполненное поле записи */
-export function isFilled(field: TaskField, values: TaskValues): boolean {
+function isFilled(field: TaskField, values: TaskValues): boolean {
   switch (field.kind) {
     case 'sentence':
     case 'text':
@@ -237,7 +236,7 @@ export const valuesFilled = (v: TaskValues): boolean =>
   Object.values(v.list).some((l) => l.some((t) => t.trim() !== ''));
 
 /** В записи заполнено хотя бы одно поле */
-export const entryFilled = (field: EntriesField, entry: TaskValues): boolean => entryFields(field).some((f) => isFilled(f, entry));
+const entryFilled = (field: EntriesField, entry: TaskValues): boolean => entryFields(field).some((f) => isFilled(f, entry));
 
 /** Заполненные записи поля: пустые в просмотре и в итогах не показываются */
 export const filledEntries = (field: EntriesField, values: TaskValues): TaskValues[] => entriesOf(field, values).filter((entry) => entryFilled(field, entry));

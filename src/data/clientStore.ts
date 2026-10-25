@@ -18,7 +18,7 @@ import avatar1 from '../assets/avatars/avatar-1.jpg';
 
 export type ActivityState = 'assigned' | 'sent' | 'done';
 
-export interface Session {
+interface Session {
   id: string;
   number: number;
   paragraphs: string[];
@@ -27,7 +27,7 @@ export interface Session {
 /** Чат клиента, чьи данные хранятся здесь (пока только Максим) */
 export const CLIENT_CHAT = 'maxim';
 
-export type Activity =
+type Activity =
   | { id: string; kind: 'invite'; date: string }
   | { id: string; kind: 'session'; ref: string; date: string }
   | { id: string; kind: 'note'; ref: string; date: string }
@@ -219,7 +219,7 @@ export function useClientData(): ClientData {
 export const readClientData = (): ClientData => data;
 
 const pad = (v: number) => String(v).padStart(2, '0');
-export function nowStamp() {
+function nowStamp() {
   const d = new Date();
   return {
     date: `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`,

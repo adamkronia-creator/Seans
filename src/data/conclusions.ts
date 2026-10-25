@@ -9,7 +9,7 @@ import { SMOL_INTERPRETATION } from './smolInterpretation';
  * и расшифровка диапазонов, как увидит психолог. Структура общая для всех тестов.
  */
 
-export type LevelTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred';
+type LevelTone = 'green' | 'yellow' | 'orange' | 'red' | 'darkred';
 
 /** Диапазон баллов шкалы: границы, подписи и цвет */
 export interface ConclusionLevel {

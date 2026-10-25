@@ -39,7 +39,7 @@ const FACTORS: Factor[] = [
 
 const STATEMENTS = 29;
 
-export interface OsrScores {
+interface OsrScores {
   /** Вероятность: число ответов «Верно», 0–29 */
   total: number;
   /** Факторы в порядке шкал заключения (Дм … АС): число «Верно» × индекс, с десятыми */

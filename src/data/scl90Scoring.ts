@@ -6,7 +6,7 @@
  */
 
 /** Номера пунктов (с единицы) по шкалам, в порядке шкал в заключении */
-export const SCL90_KEYS: { code: string; items: number[] }[] = [
+const SCL90_KEYS: { code: string; items: number[] }[] = [
   { code: 'Сом', items: [1, 4, 12, 27, 40, 42, 48, 49, 52, 53, 56, 58] },
   { code: 'ОК', items: [3, 9, 10, 28, 38, 45, 46, 51, 55, 65] },
   { code: 'МС', items: [6, 21, 34, 36, 37, 41, 61, 69, 73] },

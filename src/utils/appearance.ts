@@ -20,7 +20,7 @@ const MAX_SIDE = 1600;
 const DARK_BELOW = 0.5;
 
 export type InkPref = 'auto' | 'dark' | 'light';
-export const DEFAULT_BLUR = 60;
+const DEFAULT_BLUR = 60;
 
 const root = () => document.documentElement;
 const get = (k: string) => {
@@ -84,7 +84,7 @@ function syncChrome() {
 }
 
 /** Выставляет data-ink по выбору; в режиме «авто» считает по фону */
-export async function applyInk() {
+async function applyInk() {
   const pref = getInkPref();
   if (pref !== 'auto') {
     root().dataset.ink = pref;
@@ -114,9 +114,7 @@ function show(dataUrl: string) {
   root().dataset.bg = 'custom';
 }
 
-export const hasCustomBackground = () => get(K_IMAGE) !== null;
-
-export interface SavedBackground {
+interface SavedBackground {
   id: string;
   data: string;
 }

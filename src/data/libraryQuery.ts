@@ -49,13 +49,6 @@ export interface ViewQuery {
   sort: SortId;
 }
 
-export const SORTS: { id: SortId; label: string; hint?: string }[] = [
-  { id: 'auto', label: 'По умолчанию' },
-  { id: 'alpha', label: 'По названию', hint: 'От А до Я' },
-  { id: 'short', label: 'Сначала быстрые', hint: 'Меньше времени у клиента' },
-  { id: 'long', label: 'Сначала долгие', hint: 'Подробнее, но дольше' },
-  { id: 'favorite', label: 'Сначала избранное' },
-];
 
 const docOf = ({ item, d }: Entry): IndexDoc => ({
   id: item.id,

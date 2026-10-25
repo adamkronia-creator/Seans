@@ -14,7 +14,7 @@ import { flushSync } from 'react-dom';
 export type TransitionKind = 'forward' | 'back' | 'fade' | 'none' | 'slide-next' | 'slide-prev';
 
 /** Событие на window: анимация перехода закончилась и на экране снова настоящие блоки, а не снимки */
-export const TRANSITION_END = 'app:transition-end';
+const TRANSITION_END = 'app:transition-end';
 
 interface ViewTransitionLike {
   finished: Promise<unknown>;
