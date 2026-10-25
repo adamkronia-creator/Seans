@@ -42,7 +42,7 @@ const subscribe = (callback: () => void) => {
 
 /** Экраны, где нижней панели нет (папка, архив, правка профиля) или она своя на каждой странице (сам чат): в переходе панель
  * нельзя выделять отдельным слоем — слой, который есть только «до» или «после», рисуется прямоугольником */
-const isChatRoot = (path: string) => /^\/(chat\/[^/]+|folder\/[^/]+|archive|profile\/edit|roles(?:\/[^/]+)?|groups|group\/[^/]+|person\/[^/]+)\/?$/.test(path);
+const isChatRoot = (path: string) => /^\/(chat\/[^/]+|folder\/[^/]+|archive|profile\/edit|roles(?:\/[^/]+)?)\/?$/.test(path);
 
 /** Чат и его вложенные экраны (настройка теста, бланк, заключение) того же чата: на обоих внизу одна и та же панель, она остаётся на месте */
 const chatSub = (path: string) => /^\/chat\/([^/]+)(?:\/(?:tests|tasks|result)\/[^/]+)?\/?$/.exec(path)?.[1];
@@ -104,17 +104,6 @@ export function guardBack(onBack: () => void): () => void {
 let pending: { silent: boolean } | undefined;
 const queued: Array<() => void> = [];
 
-/**
- * Выполнить после того, как закрылось нижнее окно. Окно держит в истории свою запись-«заглушку» (guardBack) и снимает её не сразу:
- * переход вглубь, сделанный до этого, оставил бы заглушку посреди истории, и «назад» один раз ничего бы не сделала.
- */
-export function afterSheetClose(run: () => void) {
-  window.setTimeout(() => {
-    if (pending) queued.push(run);
-    else run();
-  }, 0);
-}
-
 /** Браузер сам перешёл по истории (кнопка «назад»/«вперёд», свайп) или поменяли адрес руками */
 function onHistory(event: Event) {
   if (pending) {
@@ -159,9 +148,6 @@ window.addEventListener('hashchange', onHistory);
 export function useRoute(): Located {
   return useSyncExternalStore(subscribe, () => shown);
 }
-
-/** Адрес, на который ведёт приложение сейчас (с учётом перехода, который ещё не отрисован) */
-export const currentPath = (): string => target;
 
 /** Открыть экран по адресу; по умолчанию он выезжает справа, как при переходе вглубь */
 export function navigate(path: string, kind: TransitionKind = 'forward') {

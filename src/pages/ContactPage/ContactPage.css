@@ -166,21 +166,6 @@
   color: var(--text-secondary);
 }
 
-/* Статус доступности и значки групп: одна карточка между кнопками и данными контакта */
-.ct__about {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-}
-
-.ct__availability {
-  margin: 0;
-  color: var(--text-primary);
-  font: var(--type-body);
-  overflow-wrap: anywhere;
-}
-
 .ct__rows,
 .ct__stats {
   margin: 0;

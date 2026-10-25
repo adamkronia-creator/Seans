@@ -14,7 +14,8 @@ import { Paragraphs } from './TaskParts';
 import { TaskPass } from './TaskPass';
 import { TaskPreview } from './TaskPreview';
 import { TaskResult } from './TaskResult';
-import { sendMessage, getChats } from '../../data/chatStore';
+import { CHATS } from '../../data/chats';
+import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTask } from '../../data/library';
 import {
@@ -188,7 +189,7 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
       if (id !== SELF_ID) logStep(id, 'task', task.id, 'sent', rule ? { permanent: rule } : undefined);
     });
     setSheet(null);
-    const names = ids.map((id) => getChats().find((c) => c.id === id)?.name).filter(Boolean);
+    const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
     notify(
       ids.length === 1
         ? ids[0] === SELF_ID

@@ -193,47 +193,6 @@
   font-size: 16px;
 }
 
-/* Статус доступности и значки групп под именем: статус — одна строка-«таблетка», значки — чипсы, которые нажимаются */
-.profile__status {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: fit-content;
-  max-width: 100%;
-  min-height: var(--size-control-sm, 36px);
-  margin-top: var(--space-2);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--glass-border, var(--color-border));
-  border-radius: var(--radius-full);
-  background: var(--glass-fill, var(--color-bg-panel));
-  color: var(--text-primary, var(--color-text-primary));
-  font: var(--type-caption, inherit);
-  overflow-wrap: anywhere;
-}
-
-.profile__status--add {
-  color: var(--text-link, var(--color-accent));
-  font-weight: 600;
-}
-
-.profile__status svg {
-  flex-shrink: 0;
-  font-size: 16px;
-}
-
-button.profile__status:active {
-  background: var(--glass, var(--color-bg-panel));
-}
-
-button.profile__status:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.profile__emblems {
-  margin-top: var(--space-3);
-}
-
 /* Сводка: три равные ячейки, между ними тонкие линии */
 .profile__stats {
   display: grid;
@@ -376,43 +335,6 @@ button.profile__status:focus-visible {
   line-height: var(--line-height-sm);
 }
 
-/* Строка своей группы в карточке «Группы»: значок, название, роль и город */
-.profile__group {
-  --press-scale: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 64px;
-  padding: var(--space-2) var(--space-4);
-  text-align: left;
-}
-
-.profile__group-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.profile__group-name {
-  overflow: hidden;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-md);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile__group-sub {
-  overflow: hidden;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .profile__add,
 .profile__more {
   --press-scale: 1;
@@ -439,7 +361,6 @@ button.profile__status:focus-visible {
 }
 
 .profile__field[data-pressed],
-.profile__group[data-pressed],
 .profile__add[data-pressed],
 .profile__more[data-pressed] {
   background: var(--color-bg-pressed);
@@ -659,21 +580,9 @@ button.profile__status:focus-visible {
 }
 
 [data-pm] .profile__field[data-pressed],
-[data-pm] .profile__group[data-pressed],
 [data-pm] .profile__add[data-pressed],
 [data-pm] .profile__more[data-pressed] {
   background: var(--glass);
-}
-
-[data-pm] .profile__group-name {
-  color: var(--text-primary);
-  font: var(--type-label);
-  font-weight: 500;
-}
-
-[data-pm] .profile__group-sub {
-  color: var(--text-secondary);
-  font: var(--type-caption);
 }
 
 [data-pm] .profile__grid {

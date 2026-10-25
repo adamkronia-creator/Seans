@@ -11,13 +11,6 @@ export const registerTabSwitch = (fn: (id: TabId, kind?: TransitionKind) => void
 /** Перейти в раздел; `kind` — как показать переход (по свайпу экраны едут вместе: slide-next влево, slide-prev вправо) */
 export const switchTab = (id: TabId, kind?: TransitionKind) => handler?.(id, kind);
 
-/** Открыть чат с любого раздела: чаты живут в разделе «Сообщения», поэтому с другого раздела сначала нужно перейти туда. Регистрирует App */
-let chatOpener: ((chatId: string) => void) | null = null;
-export const registerChatOpener = (fn: (chatId: string) => void) => {
-  chatOpener = fn;
-};
-export const openChatAnywhere = (chatId: string) => chatOpener?.(chatId);
-
 const NOT_FROM = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-hscroll]';
 
 /**

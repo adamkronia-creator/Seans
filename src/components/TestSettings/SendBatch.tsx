@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react';
-import { sendMessage, getChats } from '../../data/chatStore';
+import { CHATS } from '../../data/chats';
+import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import { conclusionFor } from '../../data/conclusions';
 import type { LibraryItem } from '../../data/library';
@@ -110,7 +111,7 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
     onSent(sendable.length, items.length - sendable.length);
   };
 
-  const names = recipients.map((id) => (id === SELF_ID ? 'вы' : getChats().find((c) => c.id === id)?.name)).filter(Boolean);
+  const names = recipients.map((id) => (id === SELF_ID ? 'вы' : CHATS.find((c) => c.id === id)?.name)).filter(Boolean);
   const subtitle = `${sendable.length} ${kind === 'test' ? 'тест' : 'задан'}${kind === 'test' ? (sendable.length === 1 ? '' : sendable.length < 5 ? 'а' : 'ов') : sendable.length === 1 ? 'ие' : sendable.length < 5 ? 'ия' : 'ий'} · ${names.length === 1 ? names[0] : `получателей: ${names.length}`}`;
 
   return (

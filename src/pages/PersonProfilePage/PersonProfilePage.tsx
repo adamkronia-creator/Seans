@@ -1,56 +1,29 @@
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { EmblemChips } from '../../components/Emblem/Emblem';
 import { IconPin } from '../../components/icons';
-import { IconChatBubble } from '../ContactPage/ContactIcons';
-import { ensureChat, useChats } from '../../data/chatStore';
+import { useChats } from '../../data/chatStore';
 import { SHARED_MEDIA } from '../../data/contactShared';
-import { useGroupsState, useStatus } from '../../data/groupStore';
-import { personOf, profileOf } from '../../data/people';
+import { PERSON_PROFILES } from '../../data/contactProfiles';
 import { useRoleLine } from '../../data/roleStore';
-import { statusLine } from '../../data/status';
 import { goBack } from '../../router';
-import { openChatAnywhere } from '../../utils/tabNav';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../ProfilePage/ProfilePage.css';
 import './PersonProfilePage.css';
 
-interface PersonProfilePageProps {
-  /** Чат собеседника или человек из каталога специалистов */
-  personId: string;
-  /** Куда вести «назад», если экран открыт по прямой ссылке */
-  backTo: string;
-  /** Кнопка «Написать»: нужна, когда страница открыта не из чата с этим человеком (из группы, поиска) */
-  write?: boolean;
-}
-
 /**
- * Профиль человека: та же страница, что «Профиль» у специалиста (обложка, фото, имя, подпись, сводка, информация и фото), только для просмотра.
- * Адреса: /chat/<чат>/profile (кнопка «Профиль» в карточке контакта) и /person/<человек> (из списка участников группы и из поиска).
- * Под именем: статус доступности и значки групп, в которых человек состоит и разрешил их показывать.
+ * Профиль собеседника (адрес /chat/<чат>/profile): та же страница, что «Профиль» у специалиста (обложка, фото, имя, подпись, сводка,
+ * информация и фото), только для просмотра. Открывается кнопкой «Профиль» в карточке контакта.
  */
-export function PersonProfilePage({ personId, backTo, write = false }: PersonProfilePageProps) {
-  const chats = useChats();
-  const person = personOf(personId, chats);
-  const roleLine = useRoleLine(personId);
-  const status = useStatus(personId);
-  const { members } = useGroupsState();
-  const back = () => goBack(backTo);
+export function PersonProfilePage({ chatId }: { chatId: string }) {
+  const chat = useChats().find((c) => c.id === chatId);
+  const roleLine = useRoleLine(chatId);
+  const back = () => goBack(`/chat/${chatId}/contact`);
   useSwipeBack('.profile', true, back);
-  if (!person) return <section className="profile" />;
+  if (!chat) return <section className="profile" />;
 
-  const info = profileOf(personId);
-  const chat = chats.find((c) => c.id === personId);
-  const headline = info?.headline ?? (chat ? roleLine : '');
-  const photos = SHARED_MEDIA[personId] ?? [];
-  // «Группы» в сводке считаются по живым данным: сколько групп человек разрешил показывать в списках
-  const groups = members.filter((m) => m.personId === personId && m.listed).length;
-  const stats = info?.stats.map(([n, label]) => [label === 'Группы' ? groups : n, label] as const);
-
-  const writeTo = () => {
-    ensureChat({ id: person.id, name: person.name, avatar: person.avatar });
-    openChatAnywhere(person.id);
-  };
+  const info = PERSON_PROFILES[chatId];
+  const headline = info?.headline ?? roleLine;
+  const photos = SHARED_MEDIA[chatId] ?? [];
 
   return (
     <section className="profile person">
@@ -59,36 +32,30 @@ export function PersonProfilePage({ personId, backTo, write = false }: PersonPro
       </button>
       <div className="profile__scroll">
         <div className="profile__top">
-          <div className="profile__cover">{person.avatar && <img className="profile__cover-img person__cover" src={person.avatar} alt="" />}</div>
+          <div className="profile__cover">
+            {chat.avatar && <img className="profile__cover-img person__cover" src={chat.avatar} alt="" />}
+          </div>
           <div className="profile__head">
             <div className="profile__row">
               <div className="profile__avatar">
                 <span className="profile__avatar-hit">
-                  <Avatar src={person.avatar} name={person.name} size={88} />
+                  <Avatar src={chat.avatar} name={chat.name} size={88} />
                 </span>
               </div>
-              {write && (
-                <button type="button" className="profile__edit" onClick={writeTo}>
-                  <IconChatBubble />
-                  Написать
-                </button>
-              )}
             </div>
 
-            <h1 className="profile__name">{person.name}</h1>
-            {headline && <p className="profile__headline">{headline}</p>}
+            <h1 className="profile__name">{chat.name}</h1>
+            <p className="profile__headline">{headline}</p>
             {info?.city && (
               <p className="profile__city">
                 <IconPin />
                 {info.city}
               </p>
             )}
-            {status && <p className="profile__status">{statusLine(status)}</p>}
-            <EmblemChips personId={personId} className="profile__emblems" />
 
-            {stats && (
+            {info && (
               <ul className="profile__stats" aria-label="Сводка">
-                {stats.map(([n, label]) => (
+                {info.stats.map(([n, label]) => (
                   <li key={label} className="profile__stat">
                     <strong>{n}</strong>
                     <span>{label}</span>

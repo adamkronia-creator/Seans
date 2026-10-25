@@ -28,20 +28,6 @@
   opacity: 0.9;
 }
 
-/* Приглашение в группу: значок и название с городом и числом участников */
-.invite__group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: var(--space-2) 0;
-}
-
-.invite__group-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 /* Слова психолога из настроек роли */
 .invite__greeting {
   margin-top: var(--space-1);
@@ -58,8 +44,8 @@
   font-weight: 500;
 }
 
-/* Мелкая кнопка под пузырём: демо и «Подробнее» не спорят с главным действием. Селектор длиннее, чем у общей кнопки (.bubble-button в MessageBubble.css, она идёт позже) */
-.bubble-buttons .bubble-button--quiet {
+/* Мелкая кнопка под пузырём: демо и «Подробнее» не спорят с главным действием */
+.bubble-button--quiet {
   min-height: var(--size-control-sm);
   color: var(--text-secondary);
   font: var(--type-caption);

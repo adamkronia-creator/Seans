@@ -89,20 +89,6 @@
   min-width: 0;
 }
 
-/* Имя и значки групп в одну строку высотой с имя: имя сжимается многоточием, значки остаются */
-.chat .chat__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-width: 0;
-  height: var(--space-5);
-}
-
-.chat .chat__title .chat__name {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-
 /* Имя — headline, подпись — label обычного начертания; строки по space-5, вдвоём ровно высота фото.
    Перекрывает антикву редакционного слоя: в новой системе весь интерфейс набран гарнитурой Inter */
 .chat .chat__name,
