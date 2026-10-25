@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconChevronDown, IconChevronUp, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { AutoTextarea } from '../../components/EditSheet/AutoTextarea';
@@ -113,11 +114,14 @@ function formatBirthday(raw: string): string {
   return `${day} ${MONTHS[month]} ${year} (${age} ${unit})`;
 }
 
-function TextInput({ label, value, onChange, onBlur, placeholder, max, type, inputMode }: { label: string; value: string; onChange: (value: string) => void; onBlur?: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
+function TextInput({ icon, label, value, onChange, onBlur, placeholder, max, type, inputMode }: { icon: ReactNode; label: string; value: string; onChange: (value: string) => void; onBlur?: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
   return (
     <label className="pe__input">
+      <span className="pe__input-icon">{icon}</span>
+      <span className="pe__input-body">
       <span className="pe__label">{label}</span>
       <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur ? (e) => onBlur(e.target.value) : undefined} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
+      </span>
     </label>
   );
 }
@@ -276,19 +280,19 @@ export function ProfileEditPage() {
           <h2 className="pe__group-title">Контактная информация</h2>
         </div>
         <section className="pe__card" aria-label="Контактная информация">
-          <TextInput label="Имя пользователя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
-          <TextInput label="Никнейм" value={username} onChange={(v) => updateBasics({ username: v.replace(/\s/g, '') })} placeholder="@nickname" max={40} />
-          <TextInput label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: formatPhone(v) })} placeholder="+7 (908) 943-38-19" max={18} type="tel" inputMode="tel" />
+          <TextInput icon={FieldIcon.user} label="Имя пользователя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
+          <TextInput icon={FieldIcon.at} label="Никнейм" value={username} onChange={(v) => updateBasics({ username: v.replace(/\s/g, '') })} placeholder="@nickname" max={40} />
+          <TextInput icon={FieldIcon.phone} label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: formatPhone(v) })} placeholder="+7 (908) 943-38-19" max={18} type="tel" inputMode="tel" />
         </section>
 
         <div className="pe__group">
           <h2 className="pe__group-title">Общая информация</h2>
         </div>
         <section className="pe__card" aria-label="Общая информация">
-          <TextInput label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
-          <TextInput label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
-          <TextInput label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
-          <TextInput label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
+          <TextInput icon={FieldIcon.cake} label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
+          <TextInput icon={FieldIcon.badge} label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
+          <TextInput icon={FieldIcon.heart} label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
+          <TextInput icon={FieldIcon.city} label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
         </section>
 
         <div className="pe__group">

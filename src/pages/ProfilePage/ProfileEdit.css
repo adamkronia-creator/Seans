@@ -460,6 +460,27 @@
   display: none;
 }
 
+/* Поле со значком: значок 24 в колонке, до текста 12, как в строках со значком */
+[data-pm] .pe__input {
+  display: flex;
+  align-items: center;
+  gap: var(--row-gap);
+}
+
+[data-pm] .pe__input-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .pe__input-body {
+  flex: 1;
+  min-width: 0;
+}
+
 [data-pm] .pe__input + .pe__input::before {
   display: none;
 }

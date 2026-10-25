@@ -550,8 +550,25 @@
   background-color: transparent;
 }
 
+/* Как в редактировании: заголовок карточки отделён просветом 1 px, через который виден фон, линий между полями нет */
+[data-pm] .profile__card:has(#profile-info) {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  overflow: hidden;
+  background: none;
+}
+
+[data-pm] .profile__card:has(#profile-info) > * {
+  background: var(--glass-card);
+}
+
 [data-pm] .profile__fields li + li::before {
-  background: var(--divider);
+  display: none;
+}
+
+[data-pm] .profile__card:has(#profile-info) .profile__add {
+  border-top: 0;
 }
 
 [data-pm] .profile__field[data-pressed],
