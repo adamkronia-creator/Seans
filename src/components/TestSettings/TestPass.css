@@ -1,12 +1,6 @@
 /* Прохождение теста: форма бланка, счётчик ответов над кнопкой, подтверждение сброса */
 
 /* Выбор формы: поля 16, как у вопросов бланка */
-.test-pass__form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-}
 
 .test-pass__hint {
   margin: 0;

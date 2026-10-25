@@ -12,24 +12,6 @@
 }
 
 /* «Интерпретация задания», строка «Направления»: метки подходов в один ряд с переносом */
-.task-approaches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.task-approaches__tag {
-  padding: 4px var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-sm);
-}
 
 /* Строки «Правил назначения», которые зависят от переключателя «Назначить постоянным»: сворачиваются по высоте.
    Внутри каждая строка отделена линией сверху, даже первая: над ней всегда есть другая строка */

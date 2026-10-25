@@ -31,7 +31,6 @@
 }
 
 /* ——— Число-фигура: крупная цифра, под ней тихая подпись ——— */
-.hist-stats__value,
 .profile__stat strong {
   font-family: var(--font-serif);
   font-size: var(--font-size-figure);

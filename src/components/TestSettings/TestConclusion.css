@@ -95,16 +95,6 @@
   padding: 0 var(--space-4);
 }
 
-.cc-bar__label {
-  flex-shrink: 0;
-  width: 40px;
-  white-space: nowrap;
-}
-
-.cc-single .cc-bar__label {
-  width: 40px;
-}
-
 /* Полное название шкалы над столбцом: поля 16 как у полосы, отступ до полосы 4 — как между полосой и подписью оси */
 .cc-bar__name {
   display: block;
@@ -251,15 +241,6 @@
 }
 
 /* В дополнительных шкалах разделителя над маркерами нет */
-.cc-chart:has(.cc-bars--extra) .cc-legend {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.cc-profile .cc-legend {
-  margin-right: 0;
-  margin-left: 0;
-}
 
 /* Метка уровня: заливка 14% цвета уровня, подпись основным цветом, цвет несёт точка */
 .cc-chip {

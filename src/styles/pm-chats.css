@@ -13,9 +13,7 @@
 [data-pm] {
   --bg-canvas: #ffffff;
   --bg-bar: #ffffff;
-  --bg-surface: #ffffff;
   --bg-raised: #ffffff;
-  --bg-warm: #ffffff;
   --bg-field: #e9e9eb;
   --bg-subtle: #f2f2f7;
   --border-subtle: #e5e5ea;
@@ -28,8 +26,6 @@
   /* Ссылки и мелкий синий текст: #0062cc (нажатое systemBlue iOS) — 4,5:1 и выше на стекле; заливки и кнопки остаются фирменным #007aff (аудит 21.10) */
   --text-link: #0062cc;
   --action-primary: #007aff;
-  --action-primary-hover: #0062cc;
-  --action-primary-pressed: #004fa3;
   --action-primary-text: #ffffff;
   --chat-unread-bg: #007aff;
   --chat-unread-text: #ffffff;
@@ -56,7 +52,6 @@
   --color-text-caption: var(--text-secondary);
   --color-text-placeholder: var(--text-secondary);
   --color-accent: var(--action-primary);
-  --color-accent-strong: var(--action-primary-hover);
   --color-accent-on: var(--action-primary-text);
   --color-accent-soft: var(--action-secondary);
   --color-border: var(--border-subtle);
@@ -228,8 +223,7 @@ html:has([data-pm]) body {
 [data-pm] .tabbar__item:focus-visible,
 [data-pm] .search-field__clear:focus-visible,
 [data-pm] .chip-menu__item:focus-visible,
-[data-pm] .sheet__button:focus-visible,
-[data-pm] .fo-row__tool:focus-visible {
+[data-pm] .sheet__button:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
@@ -400,36 +394,9 @@ html:has([data-pm]) body {
 }
 
 /* Порядок папок: строки до краёв, без разделителей */
-[data-pm] .fo-row {
-  min-height: var(--size-bar);
-  padding: 0 var(--space-2) 0 var(--space-4);
-}
 
 [data-pm] .fo-row__text {
   gap: 0;
-}
-
-[data-pm] .fo-row__name {
-  color: var(--text-primary);
-  font: var(--type-headline);
-}
-
-[data-pm] .fo-row__count {
-  color: var(--text-secondary);
-  font: var(--type-caption);
-}
-
-[data-pm] .fo-row__tool {
-  width: var(--size-touch);
-  height: var(--size-bar);
-  color: var(--text-secondary);
-  font-size: var(--size-icon-lg);
-}
-
-[data-pm] .fo-hint {
-  padding: 0;
-  color: var(--text-secondary);
-  font: var(--type-caption);
 }
 
 /* Чипс с числом: поля слева и справа равны, содержимое по центру синей плашки */
@@ -741,9 +708,7 @@ html:has([data-pm]) body {
   --divider: rgb(255 255 255 / 0.4);
   --bg-canvas: #1c202b;
   --bg-bar: #1c202b;
-  --bg-surface: #1c202b;
   --bg-raised: #1c202b;
-  --bg-warm: #1c202b;
   --bg-field: rgb(255 255 255 / 0.14);
   --bg-subtle: rgb(255 255 255 / 0.12);
   --glass: rgb(255 255 255 / 0.16);

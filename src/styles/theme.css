@@ -31,8 +31,7 @@ textarea,
 .chat-item__time,
 .event-item__date,
 .bubble__meta,
-.badge,
-.chat-tests__count {
+.badge {
   font-variant-numeric: tabular-nums;
 }
 

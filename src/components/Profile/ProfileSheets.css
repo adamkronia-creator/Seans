@@ -83,12 +83,6 @@
 }
 
 /* Заголовок группы «Фон приложения» под сеткой обложки */
-.pf-section {
-  margin: var(--space-2) 0 calc(var(--space-2) * -1);
-  padding: 0 var(--space-1);
-  color: var(--text-secondary, var(--color-text-secondary));
-  font: var(--type-label, 600 15px/20px var(--font-family));
-}
 
 /* В окне новой системы сетка — как галерея на странице профиля: поля карточки 12, плитки 4 между собой, скругление 8 (20 минус 12) */
 [data-pm] .pf-grid {

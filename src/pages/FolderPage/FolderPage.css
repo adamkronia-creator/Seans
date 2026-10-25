@@ -217,13 +217,6 @@
   font-size: var(--size-icon-sm);
 }
 
-.fp__hint {
-  padding: 0 var(--space-4);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
 /* ---------- Удалить ---------- */
 
 .fp__delete {
@@ -396,7 +389,6 @@
 
 [data-pm] .fp__input::placeholder,
 [data-pm] .fp__counter,
-[data-pm] .fp__hint,
 [data-pm] .fp-row__note,
 [data-pm] .fp-pick__note,
 [data-pm] .fp__remove {
@@ -426,11 +418,6 @@
   font: var(--type-label);
   font-weight: 500;
   text-align: center;
-}
-
-[data-pm] .fp__hint {
-  padding: 0 var(--space-4);
-  font: var(--type-meta);
 }
 
 /* Панель цвета как у заметок и сведений: строка с переключателем, под ней сетка 8 × 2 кругов по 36, выбранный в кольце */

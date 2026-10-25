@@ -15,13 +15,11 @@
 .blank-card__head,
 .ts-row,
 .msg-menu__item,
-.cc-row,
-.history__more {
+.cc-row {
   --press-scale: 1;
 }
 
 .blank-card__head[data-pressed],
-.history__more[data-pressed],
 .ts-row--link[data-pressed],
 .msg-menu__item[data-pressed] {
   background: var(--color-bg-pressed);

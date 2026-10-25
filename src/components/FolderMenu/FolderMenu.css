@@ -91,72 +91,12 @@
 
 /* ——— Окно «Порядок папок» ——— */
 
-.fo-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.fo-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 52px;
-  padding: 0 var(--space-2) 0 var(--space-4);
-}
-
-.fo-row + .fo-row::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: var(--space-4);
-  height: 1px;
-  background: var(--color-divider);
-}
-
 .fo-row__text {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-}
-
-.fo-row__name {
-  overflow: hidden;
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fo-row__count {
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
-.fo-row__tool {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 52px;
-  color: var(--color-text-secondary);
-  font-size: var(--size-icon);
-}
-
-.fo-row__tool:disabled {
-  opacity: 0.3;
-}
-
-.fo-hint {
-  padding: 0 var(--space-1);
-  color: var(--color-text-caption);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
 }
 
 /* «Готово» в режиме перестановки чипсов: активная кнопка во всю ширину над капсулой разделов, как «Пройти или отправить» */
