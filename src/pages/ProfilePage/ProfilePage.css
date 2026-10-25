@@ -389,7 +389,8 @@
   margin: 0 var(--space-4) var(--space-4);
   min-height: calc(var(--space-12) * 2); /* 96: рамка высоты не меняет */
   padding: var(--space-4);
-  border: 1px dashed var(--color-border);
+  border: 1px solid transparent;
+  background: var(--glass-fill, var(--color-bg-fill));
   border-radius: var(--radius-md);
   color: var(--color-accent);
   font-size: var(--size-icon);

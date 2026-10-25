@@ -9,7 +9,7 @@
 .ct-chip {
   height: var(--size-chip-h);
   padding: 0 var(--space-3);
-  border: 1px solid var(--glass-border, var(--color-border));
+  border: 1px solid var(--glass-border, transparent);
   border-radius: var(--radius-pill, 999px);
   background: var(--glass-fill, var(--color-bg-fill));
   color: var(--text-primary, var(--color-text-primary));

@@ -69,7 +69,7 @@
   place-items: center;
   width: var(--story-avatar);
   height: var(--story-avatar);
-  border: 1.5px dashed var(--text-icon);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-full);
   background: var(--glass);
   color: var(--text-icon);

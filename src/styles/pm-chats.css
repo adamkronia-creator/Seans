@@ -412,13 +412,13 @@ html:has([data-pm]) body {
   --glass-fill: rgb(255 255 255 / 0.34);
   --glass-fill-panel: rgb(255 255 255 / 0.42);
   --glass-solid: rgb(255 255 255 / 0.92);
-  --glass-border: rgb(255 255 255 / 0.7);
+  --glass-border: transparent; /* обводок нет: края задаёт заливка */
   --glass-filter: blur(var(--space-4)) saturate(1.8);
   --glass-filter-panel: blur(var(--space-6)) saturate(2);
   --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(0 0 0 / 0.14);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
   --glass-chip-active: linear-gradient(135deg, rgb(26 132 255 / 0.97), rgb(0 113 238 / 0.97)); /* белая подпись ≥ 4,9:1 */
-  --glass-border-blue: rgb(255 255 255 / 0.45);
+  --glass-border-blue: transparent;
   /* Фон по умолчанию — картинка рассвета; своя картинка пользователя — :root[data-bg='custom'] ниже */
   --scene: url('../assets/bg-default.webp') center / cover no-repeat, #1b1d22;
   --glass-fill-header: rgb(255 255 255 / 0.62);
@@ -511,7 +511,8 @@ html:has([data-pm]) body {
 }
 
 [data-pm] .stories__add {
-  border: 1.5px dashed rgb(60 60 67 / 0.55);
+  border: 1.5px solid transparent;
+  background: var(--glass-fill);
 }
 
 [data-pm] .chats-header__action:active {
@@ -691,7 +692,7 @@ html:has([data-pm]) body {
   --glass-fill-panel: rgb(20 24 34 / 0.46);
   --glass-fill-header: rgb(20 24 34 / 0.5);
   --glass-solid: rgb(34 38 50 / 0.9);
-  --glass-border: rgb(255 255 255 / 0.2);
+  --glass-border: transparent;
   --glass-bubble-in: rgb(30 34 46 / 0.62);
   --glass-card: rgb(20 24 34 / 0.5);
   --glass-sheet: rgb(24 28 38 / 0.8);
@@ -744,12 +745,12 @@ html:has([data-pm]) body {
 
 /* Свой цвет папки: плашка выбранного и невыбранный чипс (оттенок цвета на стекле) */
 [data-pm] .chips-pill {
-  border-color: var(--pill-border, var(--glass-border-blue));
+  border-color: transparent;
   background: var(--pill-fill, var(--glass-chip-active));
   transition: opacity 0.16s;
 }
 
 [data-pm] .screen-header__chips .chip[data-paint-color]::before {
   background: linear-gradient(color-mix(in srgb, var(--chip-tint) 26%, transparent), color-mix(in srgb, var(--chip-tint) 26%, transparent)), var(--glass-fill);
-  border-color: color-mix(in srgb, var(--chip-tint) 45%, var(--glass-border));
+  border-color: transparent;
 }

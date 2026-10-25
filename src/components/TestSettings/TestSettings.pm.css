@@ -264,7 +264,7 @@
   width: var(--space-16);
   height: var(--space-16);
   margin-bottom: var(--space-2);
-  border: 1px solid rgb(120 220 150 / 0.55);
+  border: 1px solid transparent;
   background: linear-gradient(135deg, rgb(82 214 120 / 0.96), rgb(52 199 89 / 0.92));
   color: var(--action-primary-text);
   -webkit-backdrop-filter: var(--glass-filter);

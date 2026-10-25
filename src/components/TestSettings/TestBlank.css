@@ -159,7 +159,8 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: calc(var(--space-3) - 1px) var(--space-3); /* grid:ok — поле 12 за вычетом рамки 1 px: высота варианта кратна 4 */
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
+  background: var(--color-bg-fill);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
@@ -256,7 +257,8 @@
   align-items: center;
   gap: var(--space-1);
   padding: calc(var(--space-3) - 1px) 0; /* grid:ok — поле 12 за вычетом рамки 1 px */
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
+  background: var(--color-bg-fill);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition:
