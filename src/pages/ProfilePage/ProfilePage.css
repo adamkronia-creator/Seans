@@ -686,6 +686,7 @@
   flex: 1;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   min-height: var(--size-control);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-xs);
@@ -694,6 +695,10 @@
   font: var(--type-label);
   text-align: center;
   transition: filter 0.15s ease;
+}
+
+.profile__foot-button svg {
+  font-size: var(--size-icon);
 }
 
 .profile__foot-button:first-child {

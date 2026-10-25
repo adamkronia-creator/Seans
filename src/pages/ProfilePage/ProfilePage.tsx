@@ -5,7 +5,7 @@ import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
 import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
-import { IconAlbum, IconCamera, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
+import { IconAlbum, IconCamera, IconChevronRight, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
@@ -136,7 +136,8 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <section className="profile__card" aria-labelledby="profile-info">
+        <div className="profile__photos">
+        <section className="profile__card profile__card--joined" aria-labelledby="profile-info">
           <header className="profile__card-head">
             <h2 id="profile-info" className="profile__card-title">
               Личная информация
@@ -161,11 +162,14 @@ export function ProfilePage() {
           ) : (
             <p className="profile__empty">Здесь может быть всё, что вы хотите о себе рассказать: образование, подход, опыт, личный анализ.</p>
           )}
-          <button type="button" className="profile__add" onClick={() => edit('add')}>
-            <IconPlusLine />
-            Добавить поле
-          </button>
         </section>
+          <div className="profile__foot">
+            <button type="button" className="profile__foot-button" onClick={() => edit('add')}>
+              <IconPlusLine />
+              Добавить поле
+            </button>
+          </div>
+        </div>
 
         <div className="profile__photos">
         <section className="profile__card profile__card--joined" aria-label="Фото и альбомы">
@@ -225,10 +229,12 @@ export function ProfilePage() {
         </section>
           <div className="profile__foot">
             <button type="button" className="profile__foot-button" onClick={() => (tab === 'photos' ? input.current?.click() : setNewAlbum(true))}>
+              <IconPlusLine />
               {tab === 'photos' ? 'Добавить' : 'Новый альбом'}
             </button>
             <button type="button" className="profile__foot-button" onClick={() => navigate(tab === 'photos' ? '/profile/photos' : '/profile/photos/albums')}>
               Посмотреть все
+              <IconChevronRight />
             </button>
           </div>
         </div>
