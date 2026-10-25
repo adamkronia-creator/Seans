@@ -45,7 +45,7 @@ const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleague
 
 const VISUAL = 48;
 
-/** Цвета чипса — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
+/** Цвета папки и счётчика — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
 const FOLDER_COLORS = TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
 const FOLDER_INKS = TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: 'Белый', color: '#FFFFFF' } : t.id === 'gray' ? { id: 'black', label: 'Чёрный', color: '#1C1C1E' } : { id: t.id, label: t.label, color: t.swatch }));
 
@@ -332,8 +332,9 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           </label>
         </section>
 
-        <ColorCard label="Цвет чипса" value={folder.color} palette={FOLDER_COLORS} onChange={(color) => setFolderPaint(scope, id, { color })} />
+        <ColorCard label="Цвет папки" value={folder.color} palette={FOLDER_COLORS} onChange={(color) => setFolderPaint(scope, id, { color })} />
         <ColorCard label="Цвет текста" value={folder.ink} palette={FOLDER_INKS} onChange={(ink) => setFolderPaint(scope, id, { ink })} />
+        <ColorCard label="Цвет счётчика" value={folder.badge} palette={FOLDER_COLORS} onChange={(badge) => setFolderPaint(scope, id, { badge })} />
 
         <section className="fp__card" aria-labelledby="fp-selected">
           <h2 id="fp-selected" className="fp__heading fp__heading--pad">

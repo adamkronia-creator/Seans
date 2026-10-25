@@ -21,6 +21,8 @@ export interface Folder {
   /** Цвет заливки выбранного чипса и цвет его подписи (#rrggbb); без них чипс обычный */
   color?: string;
   ink?: string;
+  /** Цвет кружка со счётчиком на чипсе (#rrggbb); без него кружок обычный */
+  badge?: string;
 }
 
 /** Название папки не длиннее: чипсы стоят в один ряд, а длинное название съест его целиком */
@@ -108,8 +110,8 @@ export function renameFolder(scope: FolderScope, id: string, name: string) {
   patch(scope, id, { name: next });
 }
 
-/** Цвет чипса и цвет подписи на нём; undefined возвращает обычный */
-export function setFolderPaint(scope: FolderScope, id: string, paint: { color?: string; ink?: string }) {
+/** Цвет чипса, подписи на нём и кружка-счётчика; undefined возвращает обычный */
+export function setFolderPaint(scope: FolderScope, id: string, paint: { color?: string; ink?: string; badge?: string }) {
   touched(id);
   patch(scope, id, paint);
 }

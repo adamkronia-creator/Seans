@@ -179,6 +179,12 @@ html:has([data-pm]) body {
   color: var(--action-primary);
 }
 
+/* Свой цвет счётчика у папки («Цвет счётчика» в настройке папки): заливка и цифра на любом чипсе, кроме приглушённого */
+[data-pm] .chip[data-paint-badge] .badge:not(.badge--quiet, .badge--quiet-inverse) {
+  background: var(--badge-bg);
+  color: var(--badge-on);
+}
+
 /* Уведомления папки выключены: то же число в кольце без заливки */
 [data-pm] .badge--quiet,
 [data-pm] .chip[data-tone] .badge--quiet-inverse {

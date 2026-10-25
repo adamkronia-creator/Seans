@@ -431,9 +431,9 @@
   grid-template-columns: repeat(var(--cols), var(--size-control-sm));
   justify-content: space-between;
   row-gap: calc((100cqw - var(--space-8) - var(--cols) * var(--size-control-sm)) / (var(--cols) - 1)); /* равен промежутку в ряду: поля 16 × 2 */
-  margin: 0 var(--space-4);
-  padding: var(--space-3) 0 var(--space-4);
-  border-top: 0.5px solid var(--divider, var(--color-divider));
+  margin: 1px 0 0; /* grid:ok — просвет-разделитель 1 px */
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: var(--glass-card);
 }
 
 @container (max-width: 331px) {
@@ -634,4 +634,50 @@
 
 .fp[data-emoji] .fp__scroll {
   padding-bottom: calc(var(--emoji-panel-h) + var(--space-4));
+}
+
+/* Разделители как в личной информации: между частями карточки просвет 1 px, через который виден фон.
+   Заголовок, кнопка «Добавить», строки списка, строки цвета — каждая часть лежит на своей стеклянной подложке */
+[data-pm] .fp__card:not(.fp__delete) {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  overflow: hidden;
+  background: none;
+}
+
+[data-pm] .fp__card:not(.fp__delete) > :not(ul, [data-pressed]),
+[data-pm] .fp__field > .fp__heading,
+[data-pm] .fp__field > .fp__input-row,
+[data-pm] .fp__list > li,
+[data-pm] .fs__list > li:not(.fs-row--dragging),
+[data-pm] .fs__rec > li {
+  background: var(--glass-card);
+}
+
+[data-pm] .fp__card:not(.fp__delete) > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  padding: 0;
+  background: none;
+}
+
+/* Цвет: просвет только когда сетка открыта, поэтому без общего gap */
+[data-pm] .fp-color {
+  gap: 0;
+}
+
+/* Название папки: заголовок и поле — две части карточки с тем же отступом, что у остальных заголовков */
+[data-pm] .fp__field {
+  display: contents;
+}
+
+[data-pm] .fp__field > .fp__heading {
+  padding: var(--space-3) var(--space-4) var(--space-1);
+}
+
+[data-pm] .fp__field > .fp__input-row {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-3);
 }

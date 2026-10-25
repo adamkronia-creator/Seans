@@ -47,7 +47,14 @@ interface ChipProps {
   /** Чипс папки: в режиме «Изменить порядок» он подрагивает, на нём значок удаления, его можно перетащить */
   folder?: { scope: FolderScope; id: string };
   /** Свой цвет заливки выбранного чипса и подписи на ней (настройки папки) */
-  paint?: { color?: string; ink?: string };
+  paint?: { color?: string; ink?: string; badge?: string };
+}
+
+/** Цвет цифры на кружке выбранного цвета: тёмный на светлом, белый на тёмном */
+function inkOn(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.6 ? '#1C1C1E' : '#FFFFFF';
 }
 
 export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone, disabled = false, folder, paint }: ChipProps) {
@@ -134,8 +141,9 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       aria-pressed={active}
       aria-label={ariaLabel}
       data-tone={tone}
-      style={paint?.color || paint?.ink ? ({ ...(paint.color && { '--chip-bg': paint.color, '--chip-tint': paint.color }), ...(paint.ink && { '--chip-on': paint.ink, '--text-chip': paint.ink }) } as CSSProperties) : undefined}
+      style={paint?.color || paint?.ink || paint?.badge ? ({ ...(paint.badge && { '--badge-bg': paint.badge, '--badge-on': inkOn(paint.badge) }), ...(paint.color && { '--chip-bg': paint.color, '--chip-tint': paint.color }), ...(paint.ink && { '--chip-on': paint.ink, '--text-chip': paint.ink }) } as CSSProperties) : undefined}
       data-paint-color={paint?.color}
+      data-paint-badge={paint?.badge}
       data-folder-id={editing ? folder?.id : undefined}
       data-no-swipe={editing ? '' : undefined}
     >
