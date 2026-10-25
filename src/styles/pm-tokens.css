@@ -70,6 +70,4 @@
   --size-icon-sm: 16px;
   --size-icon: 20px;
   --size-avatar-sm: 40px;
-  /* Антиква редакционного слоя (editorial.css) на новой системе не нужна: весь интерфейс набран гарнитурой Inter */
-  --font-serif: var(--font-family);
 }

@@ -58,7 +58,7 @@
   min-height: var(--space-5);
 }
 
-/* Имя — headline; перекрывает антикву редакционного слоя: в новой системе весь интерфейс набран гарнитурой Inter */
+/* Имя — headline; перекрывает ступень name из typography.css */
 .chat-item .chat-item__name {
   overflow: hidden;
   color: var(--text-primary);

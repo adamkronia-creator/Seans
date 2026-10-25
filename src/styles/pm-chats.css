@@ -424,15 +424,8 @@ html:has([data-pm]) body {
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
   --glass-chip-active: linear-gradient(135deg, rgb(26 132 255 / 0.97), rgb(0 113 238 / 0.97)); /* белая подпись ≥ 4,9:1 */
   --glass-border-blue: rgb(255 255 255 / 0.45);
-  /* Фон — прежний мягкий градиент: шесть цветных пятен на светлой основе */
-  --scene:
-    radial-gradient(55% 30% at 6% 5%, rgb(0 122 255 / 0.32), transparent 72%),
-    radial-gradient(50% 26% at 100% 12%, rgb(255 45 85 / 0.26), transparent 72%),
-    radial-gradient(55% 28% at 94% 46%, rgb(255 149 0 / 0.28), transparent 72%),
-    radial-gradient(60% 30% at 0% 50%, rgb(0 199 190 / 0.28), transparent 72%),
-    radial-gradient(60% 32% at 72% 100%, rgb(175 82 222 / 0.3), transparent 72%),
-    radial-gradient(55% 28% at 8% 100%, rgb(50 173 230 / 0.3), transparent 72%),
-    linear-gradient(170deg, #eef3ff 0%, #fff1ee 55%, #f1ecff 100%);
+  /* Фон по умолчанию — картинка рассвета; своя картинка пользователя — :root[data-bg='custom'] ниже */
+  --scene: url('../assets/bg-default.webp') center / cover no-repeat, #1b1d22;
   --glass-fill-header: rgb(255 255 255 / 0.62);
   --glass-sheet: rgb(255 255 255 / 0.66); /* листы и боковая панель */
   --glass-strong: rgb(255 255 255 / 0.78); /* плотное стекло: плашка дня, меню сообщения */
@@ -449,24 +442,12 @@ html:has([data-pm]) body {
   --glass-bubble-out-to: #007aff;
 }
 
-/* Варианты фона для сравнения: ?bg=0 прежний градиент, 1 картинка, 2 картинка под белой вуалью, 3 размытая картинка (атрибут data-bg ставит main.tsx) */
-:root[data-bg='1'] [data-pm] {
-  --scene: url('../assets/bg-default.webp') center / cover no-repeat, #1b1d22;
-}
-
-:root[data-bg='2'] [data-pm] {
-  --scene: linear-gradient(rgb(255 255 255 / 0.4), rgb(255 255 255 / 0.4)), url('../assets/bg-dawn.webp') center / cover no-repeat, #eef2f8;
-}
-
+/* Своя картинка пользователя (data-bg='custom' ставит utils/appearance.ts) */
 :root[data-bg='custom'] [data-pm] {
   --scene: var(--user-bg) center / cover no-repeat, #dfe6f0;
 }
 
-:root[data-bg='3'] [data-pm] {
-  --scene: url('../assets/bg-dawn-soft.webp') center / cover no-repeat, #dfe6f0;
-}
-
-/* Фон «Диалогов» и чата — отдельный слой позади содержимого, размытый на --bg-blur (?blur=0…60, по умолчанию 24): середина экрана
+/* Фон «Диалогов» и чата — отдельный слой позади содержимого, размытый на --bg-blur: середина экрана
    мягкая, как стекло шапки и панели. Слой чуть больше экрана, чтобы размытый край не светлел; лишнее обрезает overflow: clip */
 :root {
   --bg-blur: 24px;

@@ -20,7 +20,7 @@ textarea,
 
 
 /* ——— Типографика: гротеск ———
-   Что набрано антиквой — styles/editorial.css. Здесь остаётся гротеск: подписи, действия, время и числа в таблицах. */
+   Размеры имён, заголовков и записей — styles/typography.css. Здесь остаются подписи, действия, время и числа в таблицах. */
 .chat-tests__remind {
   font-size: var(--font-size-label);
   font-weight: var(--font-weight-semibold);

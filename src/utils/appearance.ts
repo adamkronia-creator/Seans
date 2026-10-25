@@ -4,10 +4,8 @@
  * на светлом тёмный (атрибут data-ink на <html>: dark — тёмный текст, light — белый).
  */
 import dawn from '../assets/bg-default.webp';
-import dawnSoft from '../assets/bg-dawn.webp';
 
 const K_IMAGE = 'seans-bg-image';
-const K_VARIANT = 'seans-bg';
 const K_BLUR = 'seans-blur';
 const K_INK = 'seans-ink';
 /** Отметка: настройки фона сброшены под новый фон по умолчанию */
@@ -66,14 +64,11 @@ async function luminanceOf(src: string): Promise<number> {
   return sum / (d.length / 4);
 }
 
-/** Яркость текущего фона: своя картинка, картинка варианта ?bg или светлый градиент */
+/** Яркость текущего фона: своя картинка или картинка по умолчанию */
 async function sceneLuminance(): Promise<number> {
   const custom = get(K_IMAGE);
   if (custom) return luminanceOf(custom);
-  const variant = root().dataset.bg;
-  if (variant === '1') return luminanceOf(dawn);
-  if (variant === '3') return luminanceOf(dawnSoft);
-  return 0.9; // градиент и вариант под белой вуалью светлые
+  return luminanceOf(dawn);
 }
 
 /** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая */
@@ -194,31 +189,21 @@ export async function setBackgroundFromFile(file: File): Promise<boolean> {
 /** Возвращает фон приложения по умолчанию (картинка рассвета); загруженные фоны остаются в списке */
 export function resetBackground() {
   set(K_IMAGE, null);
-  set(K_VARIANT, null);
   root().style.removeProperty('--user-bg');
   root().dataset.bg = '1';
   void applyInk();
 }
 
-/** Запуск: варианты ?bg=0…3 и ?blur=0…60 из адреса (запоминаются, ?bg снимает свою картинку), затем сохранённые настройки */
+/** Запуск: применяет сохранённые настройки фона */
 export function initAppearance() {
   // Фон по умолчанию сменился (портрет, размытие 60, белый текст): один раз сбрасываем прежние локальные настройки; список своих фонов остаётся
   if (get(K_RESET) !== '1') {
     set(K_IMAGE, null);
-    set(K_VARIANT, null);
     set(K_BLUR, null);
     set(K_INK, null);
     set(K_RESET, '1');
   }
-  const q = new URLSearchParams(window.location.search);
-  const bg = q.get('bg');
-  if (bg !== null && /^[0-3]$/.test(bg)) {
-    set(K_VARIANT, bg);
-    set(K_IMAGE, null);
-  }
-  const blur = q.get('blur');
-  if (blur !== null && /^\d{1,2}$/.test(blur) && Number(blur) <= 60) set(K_BLUR, blur);
-  root().dataset.bg = get(K_VARIANT) ?? '1';
+  root().dataset.bg = '1';
   root().style.setProperty('--bg-blur', `${getBlur()}px`);
   const image = get(K_IMAGE);
   if (image) show(image);

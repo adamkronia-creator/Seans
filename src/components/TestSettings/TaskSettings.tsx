@@ -39,7 +39,7 @@ import './TestSettings.css';
 import './TestSettings.pm.css';
 import './TaskSettings.css';
 
-/** Строка текста для чтения (--line-height-read, editorial.css): описание набрано антиквой 16/25 */
+/** Строка текста для чтения (--line-height-read, typography.css): описание 16/25 */
 const DESC_LINE = 25;
 /** Высота свёрнутого описания: 6 строк и промежуток между абзацами 12, одинаково у всех тестов и заданий */
 const DESC_COLLAPSED = 6 * DESC_LINE + 12;

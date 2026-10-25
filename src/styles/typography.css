@@ -1,21 +1,18 @@
 /*
- * Редакционный слой: типографика ведёт интерфейс. Подключается после theme.css, поэтому одним местом задаёт, что набрано антиквой.
+ * Типографика содержимого: кегль, начертание и интерливы для имён, заголовков, записей и цифр. Подключается после theme.css.
+ * Весь интерфейс набран Inter; иерархию держат размер, начертание, воздух и тонкие линейки между записями, а цвет несёт смысл (тон содержимого, см. tokens.css).
  *
- * Правило одно. Антиква (Literata) — то, что читают и о ком пишут: имена, названия, записи, итоги, цифры.
- * Гротеск (Inter) — то, чем управляют (кнопки, чипсы, поля), подписи, время и сама переписка.
- *
- * Ступени антиквы, от крупной к мелкой (размеры — токены в tokens.css):
+ * Ступени, от крупной к мелкой (размеры — токены в tokens.css):
  *   display 28/34 — имя на странице профиля
  *   figure  24/28 — число-фигура: сводка профиля и истории
  *   heading 20/26 — заголовок раздела внутри экрана, заголовок вложенного экрана и листа
  *   name    17/22 — имя в списке, название карточки и записи
  *   read    16/25 — текст, который читают: записи, сведения, вопросы, описания, пояснения итогов
- * Иерархию держат кегль, начертание, воздух и тонкие линейки между записями; цвет несёт смысл (тон содержимого, см. tokens.css), а не украшает.
  */
 
 /* ——— Имя на странице ——— */
 .profile__name {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-display);
   font-weight: var(--font-weight-serif);
   line-height: var(--line-height-display);
@@ -24,7 +21,7 @@
 
 /* Чем занимается человек — строка под именем, как подзаголовок в журнале */
 .profile__headline {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-read);
   font-style: italic;
   line-height: var(--line-height-name);
@@ -32,7 +29,7 @@
 
 /* ——— Число-фигура: крупная цифра, под ней тихая подпись ——— */
 .profile__stat strong {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-figure);
   font-weight: var(--font-weight-serif);
   line-height: var(--line-height-figure);
@@ -53,7 +50,7 @@
 .empty-state__title,
 .empty-results__title,
 .tp__done-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-heading);
   font-weight: var(--font-weight-serif);
   line-height: var(--line-height-heading);
@@ -73,7 +70,7 @@
 .fp-row__title,
 .fp-pick__title,
 .tf-entry__title {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-name);
   font-weight: var(--font-weight-serif);
   line-height: var(--line-height-name);
@@ -101,7 +98,7 @@
 .rich-editor,
 .task-answer,
 .hist-flow .hist-card__text {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-read);
   line-height: var(--line-height-read);
 }
@@ -113,7 +110,7 @@
 
 /* Подзаголовок группы вопросов («Сейчас, в данный момент:») — как врезка в журнале: курсивом, акцентным цветом, без плашки */
 .blank-heading {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-read);
   font-style: italic;
   font-weight: 500;
@@ -122,13 +119,13 @@
 
 /* Комментарий психолога под событием: курсивом, как пометка на полях */
 .hist-card__comment {
-  font-family: var(--font-serif);
+  font-family: var(--font-family);
   font-size: var(--font-size-read);
   font-style: italic;
   line-height: var(--line-height-read);
 }
 
-/* Узкий экран: имя в шапке делит строку с двумя кнопками, антиква шире гротеска — кегль на ступень меньше, чтобы имя не обрезалось раньше времени */
+/* Узкий экран: имя в шапке делит строку с двумя кнопками, кегль на ступень меньше, чтобы имя не обрезалось раньше времени */
 @media (max-width: 359px) {
   .chat__name,
   .test-settings__name {
