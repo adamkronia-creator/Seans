@@ -5,7 +5,7 @@ import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
 import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
-import { IconAlbum, IconCamera, IconChevronRight, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
+import { IconAlbum, IconCamera, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
@@ -223,12 +223,10 @@ export function ProfilePage() {
 
           <div className="profile__foot">
             <button type="button" className="profile__foot-button" onClick={() => (tab === 'photos' ? input.current?.click() : setNewAlbum(true))}>
-              <IconPlusLine />
               {tab === 'photos' ? 'Добавить' : 'Новый альбом'}
             </button>
             <button type="button" className="profile__foot-button" onClick={() => navigate(tab === 'photos' ? '/profile/photos' : '/profile/photos/albums')}>
-              Посмотреть
-              <IconChevronRight />
+              Посмотреть все
             </button>
           </div>
         </section>

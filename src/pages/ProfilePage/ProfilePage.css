@@ -660,35 +660,31 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Нижний ряд панели: «Добавить» слева, «Посмотреть» справа, между ними тонкая черта */
+/* Нижний ряд панели: две стеклянные кнопки рядом, как кнопки под сообщениями с тестами (высота 40, акцентная подпись, углы 4) */
 .profile__foot {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: 1px solid var(--divider);
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--card-pad) var(--card-pad);
 }
 
 .profile__foot-button {
   --press-scale: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  min-height: var(--space-12);
+  min-height: var(--size-control);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-xs);
+  background: var(--glass-bubble-in);
   color: var(--text-link);
   font: var(--type-label);
-  font-weight: 600;
-}
-
-.profile__foot-button + .profile__foot-button {
-  box-shadow: inset 1px 0 0 var(--divider);
-}
-
-.profile__foot-button svg {
-  font-size: var(--size-icon);
+  text-align: center;
+  transition: filter 0.15s ease;
 }
 
 .profile__foot-button[data-pressed] {
-  background: var(--glass);
+  filter: brightness(0.94);
 }
 
 /* Горизонтальный жест раздела (свайп в чаты) достаётся странице, а не браузеру */
