@@ -7,8 +7,7 @@ import { Switch } from '../Switch/Switch';
 import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { HelpContext } from '../OptionHelp/HelpScenes';
 import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
-import { CHATS } from '../../data/chats';
-import { sendMessage } from '../../data/chatStore';
+import { sendMessage, getChats } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
@@ -213,7 +212,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
       if (id !== SELF_ID) logStep(id, 'test', test.id, 'sent');
     });
     setSheet(null);
-    const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
+    const names = ids.map((id) => getChats().find((c) => c.id === id)?.name).filter(Boolean);
     notify(
       ids.length === 1
         ? ids[0] === SELF_ID

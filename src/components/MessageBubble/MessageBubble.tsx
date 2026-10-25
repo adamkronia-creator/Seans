@@ -9,6 +9,7 @@ import { IconReadTicks } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import { IconPinned } from '../FolderMenu/FolderIcons';
 import { InviteCard } from '../InviteCard/InviteCard';
+import { GroupInviteCard } from '../GroupInviteCard/GroupInviteCard';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -196,6 +197,15 @@ export function MessageBubble({
           onSheet={onInviteSheet}
           onNote={onNote}
         />
+      </li>
+    );
+  }
+
+  // Карточка приглашения в группу: то же, что приглашение в роль, окна открывает общий узел групп
+  if (message.groupInvite) {
+    return (
+      <li data-mid={message.id} className={`bubble-group bubble-group--${out ? 'out' : 'in'}`}>
+        <GroupInviteCard inviteId={message.groupInvite} fallback={message.text} out={out} peer={peerName} meta={<span className="bubble__time">{message.time}</span>} />
       </li>
     );
   }

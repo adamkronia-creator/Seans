@@ -1,0 +1,55 @@
+/* Строки поиска «Люди и группы» в списке чатов: строки те же, что у чатов (ChatItem.css), здесь только заголовки и ряд групп */
+.messages__heading {
+  padding: var(--space-3) var(--space-4) var(--space-1);
+}
+
+.messages__heading h2 {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 600;
+}
+
+/* Ряд популярных групп уходит вбок за край экрана; двигает его скрипт пейджера (data-hscroll). Сверху и снизу space-1 оставлены кольцу фокуса */
+.messages__groups-row {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.messages__groups-row::-webkit-scrollbar {
+  display: none;
+}
+
+.messages__groups-row .emblem-chip {
+  flex-shrink: 0;
+}
+
+/* Под рядом групп до первой строки чата — space-2 */
+.messages__groups {
+  padding-bottom: var(--space-2);
+}
+
+/* «Показать всех · N» под короткой выдачей людей */
+.messages__more {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--size-touch);
+  padding: 0 var(--space-4);
+  color: var(--text-link);
+  font: var(--type-label);
+  font-weight: 500;
+  text-align: left;
+}
+
+.messages__more:active {
+  background: var(--bg-subtle);
+}
+
+.messages__more:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}

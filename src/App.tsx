@@ -1,12 +1,14 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { TabBar, type TabId } from './components/TabBar/TabBar';
-import { registerTabSwitch } from './utils/tabNav';
+import { registerChatOpener, registerTabSwitch } from './utils/tabNav';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { ContactPage } from './pages/ContactPage/ContactPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
 import { FolderPage } from './pages/FolderPage/FolderPage';
 import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
+import { GroupPage } from './pages/GroupPage/GroupPage';
+import { GroupsPage } from './pages/GroupsPage/GroupsPage';
 import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
@@ -14,10 +16,14 @@ import { RoleEditPage } from './pages/RolesPage/RoleEditPage';
 import { RolesPage, rolesPath } from './pages/RolesPage/RolesPage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
+import { GroupSheetHost } from './components/GroupSheets/GroupSheetHost';
+import { groupsPath } from './components/GroupSheets/groupSheets';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
-import { CHATS } from './data/chats';
+import { getChats } from './data/chatStore';
 import { getFolder, type FolderScope } from './data/folders';
+import { getGroup } from './data/groupStore';
+import { ME, personOf } from './data/people';
 import { getRole } from './data/roleStore';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { ArchivePage } from './pages/ArchivePage/ArchivePage';
@@ -56,8 +62,9 @@ function parentOf(path: string): string | null {
   const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact|profile)/);
   // Профиль собеседника лежит над его карточкой, карточка — над чатом
   if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
-  // Экран роли лежит над списком ролей
+  // Экран роли лежит над списком ролей, страница группы — над списком групп
   if (/^\/roles\/[^/]+/.test(path)) return rolesPath;
+  if (/^\/group\/[^/]+/.test(path)) return groupsPath;
   return path === '/' ? null : '/';
 }
 
@@ -107,6 +114,22 @@ export default function App() {
   useLayoutEffect(() => {
     registerTabSwitch(handleTabChange);
   }, [handleTabChange]);
+
+  /** Открыть чат с любого раздела (из профиля человека, группы, поиска): чаты живут в разделе «Сообщения», туда переходим в том же переходе */
+  const openChat = useCallback((chatId: string) => {
+    const path = `/chat/${chatId}`;
+    if (latest.current.tab === 'messages') {
+      navigate(path);
+      return;
+    }
+    transition(() => {
+      setTab('messages');
+      navigate(path, 'none');
+    }, 'forward');
+  }, []);
+  useLayoutEffect(() => {
+    registerChatOpener(openChat);
+  }, [openChat]);
 
   /** Настройки папки на весь экран, без нижней панели (как редактирование профиля); если такой папки нет, экран не строится */
   const folderScreen = (path: string, scope: FolderScope): Resolved | null => {
@@ -172,11 +195,47 @@ export default function App() {
         ),
       };
     }
+    // /groups, /group/<группа> и /person/<человек>: группы и профиль человека на весь экран, без нижней панели; открываются с любой вкладки
+    if (path === groupsPath) {
+      return {
+        key: 'groups',
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <GroupsPage />
+          </main>
+        ),
+      };
+    }
+    const groupId = path.match(/^\/group\/([^/]+)/)?.[1];
+    if (groupId && getGroup(groupId)) {
+      return {
+        key: `group/${groupId}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <GroupPage id={groupId} />
+          </main>
+        ),
+      };
+    }
+    const personId = path.match(/^\/person\/([^/]+)/)?.[1];
+    if (personId && personId !== ME && personOf(personId, getChats())) {
+      return {
+        key: `person/${personId}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <PersonProfilePage personId={personId} backTo="/" write />
+          </main>
+        ),
+      };
+    }
     // Открытый чат занимает весь экран, без нижней панели разделов
     const chatRoute = at === 'messages' ? path.match(CHAT_ROUTE) : null;
     if (chatRoute) {
       const [, chatId, kind, id, contact] = chatRoute;
-      if (CHATS.some((chat) => chat.id === chatId)) {
+      if (getChats().some((chat) => chat.id === chatId)) {
         const test = kind === 'tests' ? LIBRARY.find((t) => t.id === id) : undefined;
         const task = kind === 'tasks' ? TASK_LIBRARY.find((t) => t.id === id) : undefined;
         if (contact === 'profile') {
@@ -185,7 +244,7 @@ export default function App() {
             pm: true,
             build: () => (
               <main className="app__content">
-                <PersonProfilePage chatId={chatId} />
+                <PersonProfilePage personId={chatId} backTo={`/chat/${chatId}/contact`} />
               </main>
             ),
           };
@@ -341,6 +400,7 @@ export default function App() {
           {screen.node}
         </Layer>
       ))}
+      <GroupSheetHost />
     </div>
   );
 }

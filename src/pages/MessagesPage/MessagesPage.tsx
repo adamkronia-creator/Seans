@@ -1,5 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
+import { findPeople, popularGroups, useGroupsState } from '../../data/groupStore';
+import { searchGroups } from '../../data/groups';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
 import { useListMotion } from '../../utils/listMotion';
 import { Toast } from '../../components/Toast/Toast';
@@ -9,6 +11,8 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
 import { ChatsHeader } from './ChatsHeader';
+import { PeopleResults, type Found } from './PeopleResults';
+import type { Group } from '../../data/groups';
 import { useChatSelection } from './ChatSelection';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
@@ -35,6 +39,8 @@ const ChatList = memo(function ChatList({
   onMenu,
   selected,
   view,
+  found,
+  popular,
 }: {
   chats: Chat[];
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
@@ -45,6 +51,10 @@ const ChatList = memo(function ChatList({
   selected: readonly string[];
   /** Что показано сейчас (поисковый запрос): пока он тот же, перестановка строк — движение, а не замена списка */
   view: string;
+  /** Люди и группы, найденные по запросу (только на странице «Все») */
+  found: Found | null;
+  /** Открытый поиск с пустым запросом: ряд популярных групп (только на странице «Все») */
+  popular: Group[] | null;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
@@ -57,6 +67,12 @@ const ChatList = memo(function ChatList({
     const archive = rows.current?.querySelector<HTMLElement>('.chat-item--archive');
     return archive ? (archive.nextElementSibling as HTMLElement | null)?.offsetTop! - archive.offsetTop : 0;
   };
+
+  // Запрос изменился: выдача начинается сверху. Без этого прокрутка, которой прятали «Архивы», оставляла бы первые строки длинной выдачи под шапкой.
+  // С архивом (запроса нет) положение задаёт эффект ниже
+  useLayoutEffect(() => {
+    if (!hasArchive && scroller.current) scroller.current.scrollTop = 0;
+  }, [view, hasArchive]);
 
   // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать. Пока человек список не трогал,
   // строка остаётся спрятанной при любом пересчёте размеров (шрифты, адресная строка, поворот): иначе она бы выглядывала по умолчанию
@@ -118,10 +134,11 @@ const ChatList = memo(function ChatList({
   // Смена поиска заменяет набор строк целиком, поэтому двигать ничего не нужно
   useListMotion(rows, { attr: 'data-chat', view, leave: true });
 
-  return chats.length > 0 || hasArchive ? (
+  return chats.length > 0 || hasArchive || found || popular ? (
     <div ref={scroller} className="messages__list">
       <ul ref={rows} className="messages__rows">
         {hasArchive && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
+        <PeopleResults found={found} popular={popular} chatsFollow={chats.length > 0} />
         {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
         {others.map((chat) => (
@@ -194,6 +211,18 @@ export function MessagesPage() {
 
   const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
 
+  // Люди и группы под запрос (по имени, городу, названию группы, значку) и ряд популярных групп в открытом поиске. Тех, чей чат уже найден, не повторяем
+  const groupsState = useGroupsState();
+  const q = query.trim();
+  const found = useMemo<Found | null>(() => {
+    if (!q) return null;
+    const shown = new Set(lists[0]?.map((c) => c.id));
+    const people = findPeople(groupsState, chats, q).filter((hit) => !shown.has(hit.person.id));
+    const groups = searchGroups(groupsState.groups, q);
+    return people.length > 0 || groups.length > 0 ? { people, groups } : null;
+  }, [groupsState, chats, lists, q]);
+  const popular = useMemo(() => (searching && !q ? popularGroups(groupsState) : null), [groupsState, searching, q]);
+
   // Долгое нажатие на строку включает выбор, дальше нажатие выбирает и снимает; вне выбора строка открывает чат
   const { toggle, selecting } = sel;
   /** Когда выбрали строку долгим нажатием: список тут же сдвигается, и отпускание пальца может попасть в соседнюю строку */
@@ -223,8 +252,23 @@ export function MessagesPage() {
   );
 
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} view={query.trim()} /> })),
-    [filters, lists, archived, tapChat, holdChat, sel.ids, query],
+    () =>
+      filters.map((id, i) => ({
+        key: id,
+        node: (
+          <ChatList
+            chats={lists[i]}
+            archived={id === 'all' ? archived : []}
+            onOpen={tapChat}
+            onMenu={holdChat}
+            selected={sel.ids}
+            view={query.trim()}
+            found={id === 'all' ? found : null}
+            popular={id === 'all' ? popular : null}
+          />
+        ),
+      })),
+    [filters, lists, archived, tapChat, holdChat, sel.ids, query, found, popular],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -283,6 +327,7 @@ export function MessagesPage() {
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
+        placeholder="Чаты, люди, группы"
         storiesRoot={screen}
         selection={sel.header(chats)}
         chips={

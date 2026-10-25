@@ -2,6 +2,7 @@ import type { Chat } from '../../data/chats';
 import { useLongPress } from '../../utils/useLongPress';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
+import { EmblemMarks } from '../Emblem/Emblem';
 import { IconArchiveMk, IconBookmarkMk, IconChevronMk, IconTicksMk } from './ChatIcons';
 import './ChatItem.css';
 
@@ -56,6 +57,7 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
           <span className="chat-item__row chat-item__row--top">
             <span className="chat-item__title">
               <span className="chat-item__name">{chat.name}</span>
+              <EmblemMarks personId={chat.id} />
               {chat.muted && (
                 <svg className="chat-item__mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Уведомления выключены">
                   <path d="M18 9a6 6 0 0 0-9.4-4.9M6.2 6.7A6.2 6.2 0 0 0 6 9c0 6.5-2.5 8.5-2.5 8.5h13M18 12.5c.1 2.8.9 4 1.5 5M10.2 20.5a2 2 0 0 0 3.6 0M3 3l18 18" />

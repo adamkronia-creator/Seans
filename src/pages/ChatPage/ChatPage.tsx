@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { EmblemMarks } from '../../components/Emblem/Emblem';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import {
   IconSearch,
@@ -72,7 +73,7 @@ const SECTION_CAP: Record<Exclude<SectionId, 'messages'>, CapId> = {
 
 /** Сообщения одной серии: тот же автор, не карточка, не приглашение, не служебная строка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
-  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons || a.invite || b.invite || a.system || b.system) return false;
+  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons || a.invite || b.invite || a.groupInvite || b.groupInvite || a.system || b.system) return false;
   const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
@@ -280,7 +281,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const flat = useMemo(() => groups.flatMap((g) => g.messages), [groups]);
   const byId = useMemo(() => new Map(flat.map((m) => [m.id, m])), [flat]);
   const q = query.trim().toLowerCase();
-  const matches = useMemo(() => (q ? flat.filter((m) => !m.invite && m.text.toLowerCase().includes(q)).map((m) => m.id) : []), [flat, q]);
+  const matches = useMemo(() => (q ? flat.filter((m) => !m.invite && !m.groupInvite && m.text.toLowerCase().includes(q)).map((m) => m.id) : []), [flat, q]);
   const activeId = matches[activeIdx];
 
   const scrollToBottom = (smooth = false) => {
@@ -579,7 +580,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
               <button type="button" className="chat__peer" aria-label={`Профиль: ${chat.name}`} onClick={() => navigate(`/chat/${chatId}/contact`)}>
                 {avatar}
                 <div className="chat__who">
-                  <h1 className="chat__name">{chat.name}</h1>
+                  <div className="chat__title">
+                    <h1 className="chat__name">{chat.name}</h1>
+                    <EmblemMarks personId={chatId} />
+                  </div>
                   <p className={`chat__status${section === 'messages' && typing ? ' chat__status--typing' : ''}`}>{subtitle}</p>
                 </div>
               </button>

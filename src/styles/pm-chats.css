@@ -205,6 +205,11 @@ html:has([data-pm]) body {
   font-size: var(--size-icon-lg);
 }
 
+/* Буквы на круге без фото не крупнее половины круга: у аватара 48 они по-прежнему 24, у 36 и 40 (записи канала, участники) уже не выходят за край */
+[data-pm] .avatar__initials {
+  font-size: min(var(--size-icon-lg), calc(var(--avatar-size, 48px) * 0.5));
+}
+
 /* ——— Нижняя панель разделов: значки 24, выбранный — text-link ——— */
 [data-pm] .tabbar__item {
   height: var(--size-bar);

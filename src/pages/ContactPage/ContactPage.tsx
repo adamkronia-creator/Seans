@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { initialsOf } from '../../components/Avatar/Avatar';
+import { EmblemChips } from '../../components/Emblem/Emblem';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
@@ -10,7 +11,9 @@ import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/co
 import { useStoryAuthors } from '../../data/stories';
 import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
+import { useEmblems, useStatus } from '../../data/groupStore';
 import { capStatesOf, useLinks, useRoleLine } from '../../data/roleStore';
+import { statusLine } from '../../data/status';
 import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import {
@@ -48,6 +51,9 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const roleLine = useRoleLine(chatId);
   const hasRoles = roleLinks.length > 0;
   const historyOn = capStatesOf(roleLinks).history !== 'hidden';
+  // Статус доступности и значки групп, которые этот человек разрешил показывать
+  const personStatus = useStatus(chatId);
+  const hasEmblems = useEmblems(chatId).length > 0;
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
@@ -247,6 +253,13 @@ export function ContactPage({ chatId }: { chatId: string }) {
               Роль
             </button>
           </div>
+
+          {(personStatus || hasEmblems) && (
+            <section className="fp__card ct__card ct__about" aria-label="Статус и группы">
+              {personStatus && <p className="ct__availability">{statusLine(personStatus)}</p>}
+              <EmblemChips personId={chatId} />
+            </section>
+          )}
 
           <section className="fp__card ct__card" aria-label="Контакт">
             <ul className="ct__rows">

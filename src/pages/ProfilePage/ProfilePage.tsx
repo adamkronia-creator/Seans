@@ -1,5 +1,8 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { EmblemChips, EmblemTile } from '../../components/Emblem/Emblem';
+import { groupPath, groupsPath, openGroupSheet } from '../../components/GroupSheets/groupSheets';
+import { groupLine } from '../../components/GroupSheets/parts';
 import { IconPin } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { IconCamera, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
@@ -9,6 +12,10 @@ import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { useChats } from '../../data/chatStore';
+import { useGroupsState, useStatus } from '../../data/groupStore';
+import { memberCount, membership, ROLE_LABEL } from '../../data/groups';
+import { ME } from '../../data/people';
+import { statusLine } from '../../data/status';
 import { avatarSrcOf, coverSrcOf, useProfile } from '../../data/profile';
 import { countWithRole, useAllLinks, useRoles } from '../../data/roleStore';
 import { plural } from '../../data/taskValues';
@@ -49,6 +56,10 @@ export function ProfilePage() {
   // Роли, в которых сейчас кто-то работает: строки карточки «Роли»
   const busyRoles = roles.map((role) => ({ role, n: countWithRole(links, peopleIds, [role.id]) })).filter(({ n }) => n > 0);
   const shown = expanded ? photos : photos.slice(0, GRID_LIMIT);
+  // Статус доступности и группы, в которых вы состоите
+  const status = useStatus(ME);
+  const { groups, members } = useGroupsState();
+  const myGroups = groups.filter((group) => membership(members, group.id, ME));
 
   // Карандаш просто открывает редактирование с начала: без перехода к полю и без клавиатуры
   const edit = (_target?: string) => {
@@ -121,6 +132,17 @@ export function ProfilePage() {
                 {city.trim()}
               </p>
             )}
+            <button type="button" className={`profile__status${status ? '' : ' profile__status--add'}`} onClick={() => openGroupSheet({ kind: 'status' })}>
+              {status ? (
+                statusLine(status)
+              ) : (
+                <>
+                  <IconPlusLine />
+                  Добавить статус
+                </>
+              )}
+            </button>
+            <EmblemChips personId={ME} className="profile__emblems" />
 
             <ul className="profile__stats" aria-label="Сводка">
               <li className="profile__stat">
@@ -195,6 +217,41 @@ export function ProfilePage() {
           ) : (
             <p className="profile__empty">Роль задаёт, что вы делаете с человеком: присылаете тесты и задания, ведёте заметки. Назначить её можно в карточке контакта.</p>
           )}
+        </section>
+
+        <section className="profile__card" aria-labelledby="profile-groups">
+          <header className="profile__card-head">
+            <h2 id="profile-groups" className="profile__card-title">
+              Группы
+              {myGroups.length > 0 && <span className="profile__count">{myGroups.length}</span>}
+            </h2>
+            <button type="button" className="profile__card-link" onClick={() => navigate(groupsPath)}>
+              Все группы
+            </button>
+          </header>
+          {myGroups.length > 0 ? (
+            <ul className="profile__fields">
+              {myGroups.map((group) => (
+                <li key={group.id}>
+                  <button type="button" className="profile__group" onClick={() => navigate(groupPath(group.id))}>
+                    <EmblemTile emblem={group.emblem} size="md" />
+                    <span className="profile__group-text">
+                      <span className="profile__group-name">{group.name}</span>
+                      <span className="profile__group-sub">
+                        {ROLE_LABEL[membership(members, group.id, ME)!.role]} · {groupLine(group, memberCount(members, group.id))}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="profile__empty">Группа объединяет коллег. У имени участника появляется её значок, а по значку находят людей и читают канал группы.</p>
+          )}
+          <button type="button" className="profile__add" onClick={() => openGroupSheet({ kind: 'edit' })}>
+            <IconPlusLine />
+            Создать группу
+          </button>
         </section>
 
         <section className="profile__card" aria-labelledby="profile-photos">

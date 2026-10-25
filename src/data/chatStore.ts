@@ -181,15 +181,26 @@ export function receiveMessage(chatId: string, content: Pick<Message, 'text' | '
 }
 
 /**
- * Сообщения, которые пишут роли (roleStore): карточка приглашения и служебная строка по центру ленты.
+ * Сообщения, которые пишут роли (roleStore) и группы (groupStore): карточка приглашения и служебная строка по центру ленты.
  * Приглашение от собеседника (from: 'them', не служебное) считается непрочитанным, служебная строка — нет.
  */
-export function postRoleMessage(chatId: string, content: { from: 'me' | 'them'; text: string; invite?: string; system?: boolean; id?: string }) {
+export function postRoleMessage(chatId: string, content: { from: 'me' | 'them'; text: string; invite?: string; groupInvite?: string; system?: boolean; id?: string }) {
   if (!chats.some((c) => c.id === chatId)) return;
   const { id, ...rest } = content;
   appendToday(chatId, { id: id ?? String(nextId++), time: clock(), ...rest });
   if (content.from === 'them' && !content.system) chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
   setPreview(chatId);
+  emit();
+}
+
+/**
+ * Чат с человеком, которого нашли по значкам групп: если чата ещё нет, он заводится пустым и встаёт вверху списка (после «Избранного»
+ * и закреплённых). Уже есть — ничего не меняется.
+ */
+export function ensureChat(person: { id: string; name: string; avatar?: string; about?: string }) {
+  if (chats.some((c) => c.id === person.id)) return;
+  const chat: Chat = { id: person.id, name: person.name, avatar: person.avatar, about: person.about, lastMessage: 'Нет сообщений', time: clock(), unread: 0 };
+  chats = sorted([chat, ...chats]);
   emit();
 }
 
