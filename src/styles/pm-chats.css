@@ -221,8 +221,9 @@ html:has([data-pm]) body {
   color: var(--text-link);
 }
 
+/* Кружок накладывается на значок справа сверху: центр чуть правее верхнего правого угла и на 6 ниже верха значка */
 [data-pm] .tabbar__badge {
-  bottom: calc(100% - var(--space-2));
+  bottom: calc(100% - var(--space-4));
   left: calc(100% - var(--space-2));
 }
 
