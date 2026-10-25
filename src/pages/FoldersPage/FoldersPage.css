@@ -36,12 +36,18 @@
   padding: 0 0 0 var(--row-pad-x);
   background: transparent;
   color: var(--text-primary, inherit);
-  font-size: var(--font-size-md);
+  font: var(--type-body, var(--font-size-md));
   text-align: left;
 }
 
 .fs__list > li + li {
   box-shadow: inset 0 var(--hairline) 0 var(--divider, var(--color-divider));
+}
+
+/* «Все чаты» — строка в одну строку текста: 48, чтобы отступ от заголовка был как до «Новые» (12) */
+.fs__list > li:first-child .fs-row,
+.fs__list > .fs-row:first-child {
+  min-height: var(--row-h);
 }
 
 .fs-row--dragging {
@@ -53,7 +59,7 @@
 .fs-row__grip {
   display: grid;
   flex-shrink: 0;
-  place-items: center;
+  place-items: center start; /* две черточки начинаются там же, где название блока */
   width: var(--row-h);
   height: var(--row-h);
   color: var(--text-secondary, var(--color-text-secondary));
@@ -117,7 +123,7 @@
   place-items: center;
   width: 24px;
   height: 24px;
-  margin: 0 var(--space-3);
+  margin: 0 var(--space-6) 0 0;
   border-radius: var(--radius-full);
   background: var(--action-primary, var(--color-accent));
   color: var(--action-primary-text, var(--color-accent-on));
@@ -143,8 +149,25 @@
   padding: var(--row-pad-y) var(--row-pad-x);
 }
 
-.fs-rec + .fs-rec {
-  border-top: 1px solid var(--divider);
+/* Разделитель между рекомендованными папками: просвет 1 px, через который виден фон (как в личной информации) */
+[data-pm] .fp__card:has(.fs__rec) {
+  overflow: hidden;
+  background: none;
+}
+
+[data-pm] .fp__card:has(.fs__rec) > .fp__heading,
+[data-pm] .fs-rec {
+  background: var(--glass-card);
+}
+
+[data-pm] .fs__rec {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+}
+
+[data-pm] .fp__card:has(.fs__rec) > .fp__heading {
+  padding-bottom: var(--space-1);
 }
 
 .fs-rec__text {
