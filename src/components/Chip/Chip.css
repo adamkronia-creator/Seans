@@ -5,9 +5,9 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   height: var(--size-chip-h);
-  padding: 0 14px;
+  padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-bg-fill);
@@ -18,9 +18,9 @@
   white-space: nowrap;
 }
 
-/* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 6, как от верха и низа */
+/* Число в кружке (Badge) справа от названия: кружок 20 отступает от края чипса на 8, меньше, чем 12 слева от названия, потому что кружок круглый */
 .chip--counted {
-  padding-right: 6px;
+  padding-right: var(--space-2);
 }
 
 .chip[data-tone] {
@@ -151,8 +151,8 @@
 .chip--tab {
   --cols: 0fr;
   gap: 0;
-  padding: 0 11px;
-  border-radius: 10px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
 }
 
 .chip--tab.chip--active {
@@ -194,7 +194,7 @@
 .chip__icon {
   display: flex;
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: var(--size-icon-sm);
   line-height: 0;
 }
 
@@ -208,7 +208,7 @@
   min-width: 0;
   overflow: hidden;
   /* Отступ от значка — отступом первой строки, а не полем: поле не сжалось бы вместе со столбцом, и у свёрнутой вкладки остался бы зазор */
-  text-indent: 6px;
+  text-indent: var(--space-2);
   opacity: var(--w);
   transition: opacity 200ms ease;
 }
@@ -242,7 +242,7 @@
 
 /* Режим «Изменить порядок»: чипс подрагивает, справа значок удаления; удержанный чипс (chip--dragging) идёт за пальцем */
 .chip--editing {
-  padding-right: 14px;
+  padding-right: var(--space-3);
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
   user-select: none;
@@ -269,8 +269,7 @@
   place-items: center;
   width: 20px;
   height: 20px;
-  margin-right: -6px;
-  margin-left: 2px;
+  margin-right: calc(var(--space-1) * -1);
   border-radius: var(--radius-full);
   background: rgb(0 0 0 / 0.14);
   color: inherit;
@@ -280,9 +279,9 @@
 .chip__x::after {
   content: '';
   position: absolute;
-  top: -6px;
-  right: -6px;
-  bottom: -6px;
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-2) * -1);
+  bottom: calc(var(--space-2) * -1);
   width: 36px;
 }
 

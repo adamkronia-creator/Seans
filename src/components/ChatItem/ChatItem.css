@@ -1,6 +1,6 @@
 /*
- * Строка списка чатов по системе мессенджера (ChatListItem): до краёв экрана, без разделителей, высота size-row = 12 + 48 + 12.
- * Отступы и размеры — только токены сетки 4.
+ * Строка списка чатов по системе мессенджера (ChatListItem): до краёв экрана, без разделителей, высота 64 = 8 + 48 + 8 (--row-h-2).
+ * Отступы и размеры — только токены сетки 4; поля и зазор строки общие с остальными списками (styles/layout.css).
  */
 .chat-item {
   --ring: var(--bg-canvas); /* кольцо точки присутствия — цвет подложки строки */
@@ -10,10 +10,10 @@
 .chat-item__button {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--row-gap);
   width: 100%;
-  min-height: calc(var(--size-avatar) + var(--space-4));
-  padding: var(--space-2) var(--space-4);
+  min-height: var(--row-h-2);
+  padding: var(--row-pad-y) var(--row-pad-x);
   background: var(--chat-item-bg, transparent);
   text-align: left;
 }
@@ -91,9 +91,9 @@
 .chat-item--compact .chat-item__button {
   /* Область нажатия та же, что у обычной строки (48 + по 8 сверху и снизу), а положение строки в списке прежнее: поля уходят в отрицательный отступ.
      border-box: при content-box ширина 100% плюс поля 32 выпирала вправо (время съезжало, у страницы появлялась горизонтальная прокрутка) */
-  min-height: calc(var(--size-avatar) + var(--space-4));
-  margin: calc(var(--space-2) * -1) 0;
-  padding: var(--space-2) var(--space-4);
+  min-height: var(--row-h-2);
+  margin: calc(var(--row-pad-y) * -1) 0;
+  padding: var(--row-pad-y) var(--row-pad-x);
   box-sizing: border-box;
 }
 

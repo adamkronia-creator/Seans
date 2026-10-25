@@ -39,7 +39,7 @@
   place-items: center;
   width: var(--space-16);
   height: var(--space-16);
-  padding: 2px;
+  padding: 2px; /* grid:ok — толщина кольца */
   border-radius: var(--radius-full);
 }
 
@@ -108,8 +108,8 @@
 /* Плюс на круге «Вы», когда свои истории уже есть */
 .stories__plus {
   position: absolute;
-  top: 40px;
-  left: 40px;
+  top: var(--space-10);
+  left: var(--space-10);
   display: grid;
   place-items: center;
   width: var(--space-5);
@@ -247,7 +247,7 @@
 
 .story-view__bar {
   flex: 1;
-  height: 2px;
+  height: 2px; /* grid:ok — толщина полоски */
   overflow: hidden;
   border-radius: var(--radius-full);
   background: rgb(255 255 255 / 0.35);

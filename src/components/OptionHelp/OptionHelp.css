@@ -16,7 +16,7 @@
 .option-help::after {
   content: '';
   position: absolute;
-  inset: -12px -8px;
+  inset: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
 }
 
 .option-help[data-pressed] {
@@ -125,7 +125,7 @@
 .oh__mark {
   position: absolute;
   border: 2px solid var(--color-orange);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   box-shadow: 0 0 0 3px rgb(255 117 20 / 22%);
   opacity: 0;
   pointer-events: none;
@@ -157,7 +157,6 @@
 .oh__dots {
   display: flex;
   justify-content: center;
-  gap: 2px;
   margin-top: var(--space-1);
 }
 

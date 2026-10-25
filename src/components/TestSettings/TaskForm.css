@@ -89,7 +89,7 @@
 
 .tf-sentence__number {
   flex-shrink: 0;
-  min-width: 22px;
+  min-width: var(--space-6);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-lg);
@@ -97,7 +97,7 @@
 
 /* Выбор начала: тот же список, что у «Срока выполнения», но крупнее — в бланке по нему попадают пальцем */
 .tf-starter {
-  height: 36px;
+  height: var(--size-control-sm);
   min-width: 0;
 }
 
@@ -110,12 +110,13 @@
 }
 
 .tf-percent__range {
-  --thumb: 28px;
+  --thumb: var(--space-7);
+  --track: var(--space-2);
   --pos: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--fill, 0) / 100);
 
   flex: 1;
   min-width: 0;
-  height: 44px;
+  height: var(--size-touch);
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -127,16 +128,16 @@
   outline: 0;
 }
 
-/* Дорожка 6: слева от бегунка акцентная, справа серая */
+/* Дорожка 8: слева от бегунка акцентная, справа серая */
 .tf-percent__range::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 3px;
+  height: var(--track);
+  border-radius: var(--radius-xs);
   background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
 }
 
 .tf-percent__range::-moz-range-track {
-  height: 6px;
-  border-radius: 3px;
+  height: var(--track);
+  border-radius: var(--radius-xs);
   background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
 }
 
@@ -144,7 +145,7 @@
 .tf-percent__range::-webkit-slider-thumb {
   width: var(--thumb);
   height: var(--thumb);
-  margin-top: -11px;
+  margin-top: calc((var(--track) - var(--thumb)) / 2); /* бегунок по середине дорожки */
   border: 0;
   border-radius: 50%;
   background: #fff;
@@ -189,7 +190,7 @@
 .tf-percent__value {
   display: block;
   flex-shrink: 0;
-  min-width: 44px;
+  min-width: var(--space-12);
   color: var(--color-accent);
   font-size: var(--font-size-md);
   font-variant-numeric: tabular-nums;
@@ -247,7 +248,7 @@
   flex: 1;
   box-sizing: border-box;
   min-width: 0;
-  height: 40px;
+  height: var(--size-control);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-md);
@@ -263,21 +264,21 @@
   color: var(--color-text-placeholder);
 }
 
-/* Кнопка 40, внутри значок 18; правый край значка выровнен по краю поля */
+/* Кнопка 40, внутри значок 20; правый край значка выровнен по краю поля */
 .tf-factor__remove {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  margin-right: -10px;
+  width: var(--size-control);
+  height: var(--size-control);
+  margin-right: calc((var(--space-5) - var(--size-control)) / 2);
   color: var(--color-text-caption);
 }
 
 .tf-factor__remove svg {
-  width: 18px;
-  height: 18px;
+  width: var(--space-5);
+  height: var(--space-5);
 }
 
 .tf-add {
@@ -285,7 +286,7 @@
   gap: var(--space-2);
   align-items: center;
   justify-content: center;
-  height: 44px;
+  height: var(--size-touch);
   border-radius: var(--radius-md);
   background: var(--color-accent-soft);
   color: var(--color-accent);
@@ -303,7 +304,7 @@
   display: flex;
   gap: var(--space-2);
   align-items: center;
-  min-height: 44px;
+  min-height: var(--size-control);
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
   background: var(--color-bg-app);
@@ -411,13 +412,13 @@
   flex-direction: column;
 }
 
-/* Подписи стоят под дорожкой: справа оставлено место, которое в строке занимает число (44 и промежуток 12) */
+/* Подписи стоят под дорожкой: справа оставлено место, которое в строке занимает число (48 и промежуток 12) */
 .tf-scale__ends {
   display: flex;
   gap: var(--space-3);
   justify-content: space-between;
-  margin-top: -4px;
-  padding-right: 56px;
+  margin-top: calc(var(--space-1) * -1);
+  padding-right: calc(var(--space-12) + var(--space-3));
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
@@ -438,8 +439,8 @@
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  min-height: 36px;
-  padding: 6px 14px;
+  min-height: var(--size-chip-h);
+  padding: var(--space-1) var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-bg-fill);
@@ -459,7 +460,7 @@
 /* В просмотре выбранное — тихая метка, как «направления» в настройках */
 .tf-chip--static {
   min-height: 0;
-  padding: 4px var(--space-3);
+  padding: var(--space-1) var(--space-3);
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
@@ -505,7 +506,7 @@
 
 .tf-bullets li {
   position: relative;
-  padding-left: var(--space-4);
+  padding-left: var(--space-5);
   color: var(--color-accent);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
@@ -516,10 +517,10 @@
 .tf-bullets li::before {
   content: '';
   position: absolute;
-  top: 9px;
-  left: 4px;
-  width: 6px;
-  height: 6px;
+  top: var(--space-2);
+  left: var(--space-1);
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: 50%;
   background: var(--color-accent);
 }
@@ -574,7 +575,7 @@
 .tf-entry__group-title {
   align-self: flex-start;
   margin: 0;
-  padding: 4px var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-accent-soft);
   color: var(--color-accent);

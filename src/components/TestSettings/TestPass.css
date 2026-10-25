@@ -29,8 +29,8 @@
 
 /* Область нажатия шире подписи на 8 со всех сторон, видимые отступы остаются прежними */
 .test-pass__reset {
-  margin: -8px;
-  padding: 8px;
+  margin: calc(var(--space-2) * -1);
+  padding: var(--space-2);
   color: var(--color-accent);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -40,14 +40,14 @@
 .test-pass__bar {
   height: 4px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   background: var(--color-bg-fill-strong);
 }
 
 .test-pass__bar > span {
   display: block;
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   background: var(--color-accent);
   transition: width 0.2s ease;
 }
@@ -102,8 +102,8 @@
 /* Область нажатия шире текста: на 8 по бокам и на 12 сверху и снизу (высота 44), видимые отступы остаются прежними */
 .pass-q__all {
   flex-shrink: 0;
-  margin: -12px -8px;
-  padding: 12px 8px;
+  margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+  padding: var(--space-3) var(--space-2);
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);

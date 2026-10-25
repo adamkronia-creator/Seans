@@ -1,4 +1,4 @@
-/* Строка события: как строка чата — аватар 48, отступы 12 и 16, разделитель от текста */
+/* Строка события: как строка чата (ChatItem.css) — аватар 48, поля 8 и 16, аватар от текста 12 (--row-*, styles/layout.css), разделитель от текста */
 .event-item {
   background: var(--color-bg-row);
 }
@@ -7,9 +7,10 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3);
+  gap: var(--row-gap);
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  min-height: var(--row-h-2);
+  padding: var(--row-pad-y) var(--row-pad-x);
   text-align: left;
 }
 
@@ -18,7 +19,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  left: calc(var(--space-4) + var(--size-avatar-lg) + var(--space-3));
+  left: calc(var(--row-pad-x) + var(--size-avatar-lg) + var(--row-gap));
   height: 1px;
   background: var(--color-divider);
 }
@@ -32,7 +33,6 @@ button.event-item__inner[data-pressed] {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
 }
 

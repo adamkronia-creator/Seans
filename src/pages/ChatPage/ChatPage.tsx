@@ -66,7 +66,9 @@ function sameRun(a: Message | undefined, b: Message | undefined) {
 }
 
 const MENU_W = 196;
-const MENU_ITEM_H = 44;
+const MENU_ITEM_H = 48;
+/** Не ближе к краю ленты, чем поле страницы (--page-gutter), как у меню чипса */
+const MENU_EDGE = 16;
 
 /** Где можно ставить меню сообщения: вся лента, кроме полосы под шапкой (лента лежит под ней, и меню не должно закрывать название и кнопки) */
 function menuBounds(list: HTMLElement | null) {
@@ -106,8 +108,8 @@ function MessageMenu({
     { label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true },
   ];
   const h = items.length * MENU_ITEM_H + 8;
-  const minLeft = (bounds?.left ?? 0) + 8;
-  const maxLeft = (bounds?.right ?? window.innerWidth) - MENU_W - 8;
+  const minLeft = (bounds?.left ?? 0) + MENU_EDGE;
+  const maxLeft = (bounds?.right ?? window.innerWidth) - MENU_W - MENU_EDGE;
   const left = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - MENU_W : rect.left, maxLeft));
   const topLimit = bounds?.top ?? 0;
   const above = rect.top - h - 8 >= topLimit;

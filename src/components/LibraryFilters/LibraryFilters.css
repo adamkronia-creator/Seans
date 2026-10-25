@@ -4,9 +4,9 @@
 
 /* Слова, по которым нашлось: мягкая подложка акцентом, начертание не меняется, строка не прыгает */
 .lib-mark {
-  margin: 0 -1px;
-  padding: 0 1px;
-  border-radius: 4px;
+  margin: 0 -1px; /* grid:ok — подложка выступает на 1 px, а текст не сдвигается */
+  padding: 0 1px; /* grid:ok — то же */
+  border-radius: var(--radius-xs);
   background: var(--color-accent-soft);
   color: inherit;
 }
@@ -50,20 +50,20 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  gap: 6px;
-  height: 28px;
+  gap: var(--space-2);
+  height: var(--size-chip-h);
   padding: 0 var(--space-2) 0 var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 1;
+  line-height: var(--line-height-sm);
   white-space: nowrap;
 }
 
 .filter-token__close {
-  font-size: 14px;
+  font-size: var(--size-icon-sm);
 }
 
 .filter-token--reset {
@@ -86,8 +86,8 @@
 }
 
 .filter-group__title {
-  margin: var(--space-2) 0 calc(var(--space-2) * -1);
-  padding: 0 var(--space-1);
+  margin: var(--heading-top) 0 calc(var(--heading-bottom) * -1);
+  padding: 0 var(--heading-inset);
   color: var(--text-secondary, var(--color-text-secondary));
   font: var(--type-label, 600 15px/20px var(--font-family));
 }
@@ -102,7 +102,7 @@
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   height: var(--size-chip-h);
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
@@ -110,7 +110,7 @@
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  line-height: 1;
+  line-height: var(--line-height-sm);
   white-space: nowrap;
 }
 

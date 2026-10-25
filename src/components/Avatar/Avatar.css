@@ -42,7 +42,7 @@
   background: var(--color-success);
 }
 
-/* Присутствие (цвета и форма — из системы мессенджера): точка 12 с кольцом 2 цвета подложки. Подложку задаёт --ring: у экрана это фон,
+/* Присутствие (цвета и форма — из системы мессенджера): точка с кольцом 2 цвета подложки. Подложку задаёт --ring: у экрана это фон,
    у строки списка под пальцем — цвет нажатия */
 .avatar__presence {
   position: absolute;
@@ -67,19 +67,20 @@
 .avatar__presence--session::after {
   content: '';
   position: absolute;
-  top: 3px;
-  width: 2px;
-  height: 6px;
+  top: 25%;
+  width: 25%;
+  height: 50%;
   border-radius: 1px;
   background: var(--ring, var(--bg-canvas));
 }
 
+/* Две черты паузы в долях точки: при любом размере точки они стоят по её центру */
 .avatar__presence--session::before {
-  left: 3px;
+  left: 12.5%;
 }
 
 .avatar__presence--session::after {
-  right: 3px;
+  right: 12.5%;
 }
 
 /* Не в сети: пустое кольцо */

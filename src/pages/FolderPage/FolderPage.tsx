@@ -43,7 +43,7 @@ interface Entry {
 
 const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleagues: 'Коллега', seminars: 'Семинар' };
 
-const VISUAL = 40;
+const VISUAL = 48;
 
 /** Цвета чипса — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
 const FOLDER_COLORS = TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
@@ -276,7 +276,10 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   return (
     <section className="fp" data-emoji={emojiOpen ? '' : undefined}>
       <header className="fp__header">
-        {/* Как шапка открытого чата: слева чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись */}
+        <button type="button" className="fp__back" aria-label="Назад" onClick={() => goBack('/')}>
+          <IconBack />
+        </button>
+        {/* Как шапка открытого чата: «назад», затем чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись */}
         <span
           className="fp__preview"
           style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }) } as CSSProperties}
@@ -287,9 +290,6 @@ export function FolderPage({ scope, id }: FolderPageProps) {
         <div className="fp__who">
           <h1 className="fp__title">Настройка папки</h1>
         </div>
-        <button type="button" className="fp__back" aria-label="Назад" onClick={() => goBack('/')}>
-          <IconBack />
-        </button>
       </header>
 
       <div className="fp__scroll">

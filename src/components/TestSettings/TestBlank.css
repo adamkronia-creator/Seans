@@ -1,4 +1,4 @@
-/* Полоса бланка: заголовок 52, разделитель 1, содержимое с полями 16. Поля контейнера и линии краёв — в TestSettings.css (.ts-card, .blank-card) */
+/* Полоса бланка: заголовок 48, разделитель 1, содержимое с полями 16. Поля контейнера и линии краёв — в TestSettings.css (.ts-card, .blank-card) */
 .blank-card {
   flex-shrink: 0;
   overflow: hidden;
@@ -11,8 +11,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   width: 100%;
-  min-height: 52px;
-  padding: 0 var(--space-4);
+  min-height: var(--row-h);
+  padding: 0 var(--row-pad-x);
   text-align: left;
 }
 
@@ -60,8 +60,11 @@
 
 /* Число рядом с названием карточки («Вопросы и ответы 21») */
 .blank-card__badge {
+  display: flex;
   flex-shrink: 0;
-  padding: 2px var(--space-2);
+  align-items: center;
+  min-height: var(--size-badge);
+  padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
   background: var(--color-bg-fill);
   color: var(--color-text-secondary);
@@ -70,7 +73,7 @@
   line-height: var(--line-height-xs);
 }
 
-/* Инструкция: абзацы текста 15/22, поля 16, между абзацами 12 */
+/* Инструкция: абзацы текста 16/24, поля 16, между абзацами 12 */
 .blank-rules {
   display: flex;
   flex-direction: column;
@@ -149,13 +152,13 @@
   list-style: none;
 }
 
-/* Вариант ответа: радиокнопка 20 слева, текст 15/22 рядом, перенос идёт под текстом; высота не меньше 44 — удобно попадать пальцем */
+/* Вариант ответа: радиокнопка 20 слева, текст 16/24 рядом, перенос идёт под текстом; строка 48 (поле 12 минус рамка 1 + строка 24) — удобно попадать пальцем */
 .blank-answer {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: 10px var(--space-3);
+  padding: calc(var(--space-3) - 1px) var(--space-3); /* grid:ok — поле 12 за вычетом рамки 1 px: высота варианта кратна 4 */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
@@ -189,15 +192,15 @@
   opacity: 0;
 }
 
-/* Кружок 20 стоит по центру первой строки текста 22 */
+/* Кружок 20 стоит по центру первой строки текста 24 */
 .blank-answer__radio {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
+  width: var(--space-5);
+  height: var(--space-5);
+  margin-top: calc((var(--line-height-md) - var(--space-5)) / 2);
   border: 1.5px solid var(--color-text-placeholder);
   border-radius: var(--radius-full);
   transition: border-color 0.15s ease;
@@ -205,8 +208,8 @@
 
 .blank-answer__radio::after {
   content: '';
-  width: 10px;
-  height: 10px;
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: var(--radius-full);
   background: var(--color-accent);
   transform: scale(0);
@@ -252,7 +255,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  padding: 10px 0;
+  padding: calc(var(--space-3) - 1px) 0; /* grid:ok — поле 12 за вычетом рамки 1 px */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -301,7 +304,6 @@
 .wave-scale {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   padding: 0;
 }
 
@@ -322,7 +324,7 @@
   position: relative;
   flex-direction: row;
   justify-content: center;
-  height: 38px;
+  height: var(--size-control);
   padding: 0;
   border: 0;
   border-radius: 0;

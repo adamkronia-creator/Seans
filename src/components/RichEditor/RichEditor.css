@@ -33,10 +33,10 @@
   opacity: 0.35;
 }
 
-/* Поле: 15/22, отступы 12; пустое показывает подсказку */
+/* Поле: 16/24, отступы 12, не меньше трёх строк; пустое показывает подсказку */
 .rich-editor {
   position: relative;
-  min-height: 66px;
+  min-height: calc(var(--line-height-md) * 3);
   padding: var(--space-3);
   outline: 0;
   box-sizing: content-box;

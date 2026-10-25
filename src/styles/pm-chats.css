@@ -283,7 +283,7 @@ html:has([data-pm]) body {
 }
 
 [data-pm] .chip-menu__item {
-  height: var(--space-12);
+  height: var(--row-h);
   font: var(--type-body);
   color: var(--text-primary);
 }
@@ -331,10 +331,6 @@ html:has([data-pm]) body {
   font: var(--type-title);
   letter-spacing: 0;
   text-align: left;
-}
-
-[data-pm] .sheet__body {
-  gap: var(--space-3);
 }
 
 /* Блок листа на всю ширину, без линий */
@@ -608,12 +604,12 @@ html:has([data-pm]) body {
   background: none;
 }
 
-/* Метка «в сети»: 9 px, центр на окружности аватара (24 · (1 − cos 45°) ≈ 7 от краёв). Кольца нет: фото вокруг метки вырезано
-   полностью прозрачным зазором 2 px, так что между меткой и фото виден только фон экрана */
+/* Метка «в сети»: 8 px в 4 от краёв, центр на окружности аватара (24 · (1 − cos 45°) ≈ 7 от краёв; метка стоит центром в 8, отличие меньше пикселя).
+   Кольца нет: фото вокруг метки вырезано полностью прозрачным зазором 2 px (толщина линии, не отступ), так что между меткой и фото виден только фон экрана */
 [data-pm] {
-  --presence-size: 9px;
+  --presence-size: var(--space-2);
   --presence-gap: 2px;
-  --presence-inset: 2.5px;
+  --presence-inset: var(--space-1);
   --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
@@ -720,7 +716,7 @@ html:has([data-pm]) body {
 [data-pm] :is(.composer__round, .composer__emoji, .reply-bar__close, .chat__action, .chats-header__action, .test-settings__button, .story-view__close, .side-menu__close, .side-menu__search, .chat__down)::after {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: calc((var(--size-control) - var(--size-touch)) / 2);
 }
 
 /* Перетаскиваемый чипс несёт свою заливку: общая плашка выбранного стоит на месте и на время жеста гаснет (иначе уезжал только текст) */

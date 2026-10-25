@@ -105,9 +105,9 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin-top: -22px;
+  width: var(--size-control);
+  height: var(--size-control);
+  margin-top: calc(var(--size-control) / -2);
   border-radius: var(--radius-full);
   background: rgb(255 255 255 / 14%);
   color: var(--color-accent-on);
@@ -159,7 +159,7 @@
 
 /* Длинная подпись прокручивается внутри, а не вытесняет снимок */
 .viewer__caption {
-  max-height: 66px;
+  max-height: calc(var(--line-height-md) * 3); /* три строки */
   margin-bottom: var(--space-3);
   overflow-y: auto;
   font-size: var(--font-size-md);

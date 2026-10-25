@@ -7,16 +7,17 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: calc(var(--block-gap) + var(--heading-top));
   min-height: 0;
-  padding: var(--space-3) var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--page-gutter) var(--space-4);
   overflow-y: auto;
 }
 
+/* Раздел: заголовок, под ним панель через 8; от предыдущего раздела до заголовка 24 (--heading-*, styles/layout.css) */
 .chat-tests__section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--heading-bottom);
 }
 
 /* Заголовок раздела: название и число рядом; «Напомнить» прижато вправо */
@@ -24,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-1);
+  padding: 0 var(--heading-inset);
 }
 
 .chat .chat-tests__title {
@@ -61,7 +62,6 @@
 }
 
 .chat .chat-tests__list .test-card {
-  padding: var(--space-2) var(--space-4);
   border-radius: 0;
   background: none;
 }

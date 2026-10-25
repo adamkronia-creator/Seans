@@ -396,14 +396,14 @@
   list-style: none;
 }
 
-/* Высота строки 44 — по ней чат считает, где поставить меню (MENU_ITEM_H) */
+/* Пункт меню — строка 48, как у меню папки: значок от текста 12, поля 16. Высоту знает и чат, он считает по ней, где поставить меню (MENU_ITEM_H) */
 .msg-menu__item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--row-gap);
   width: 100%;
-  height: var(--size-touch);
-  padding: 0 var(--space-4);
+  height: var(--row-h);
+  padding: 0 var(--row-pad-x);
   color: var(--text-primary);
   font: var(--type-body);
   text-align: left;

@@ -15,6 +15,8 @@ export interface ChipMenuItem {
 const MENU_W = 240;
 const MENU_ITEM_H = 48;
 const GAP = 8;
+/** Не ближе к краю колонки, чем поле страницы (--page-gutter): плашка стоит на одной вертикали с кнопками шапки и карточками */
+const EDGE = 16;
 /** Высота полосы между группами пунктов */
 const GROUP_GAP = 8;
 
@@ -47,7 +49,7 @@ export function ChipMenu({ anchor, opener, items, label = 'Меню папки',
   useExitAnimation(backdrop);
 
   const column = document.querySelector('.app')?.getBoundingClientRect();
-  const left = Math.max((column?.left ?? 0) + GAP, Math.min(anchor.left, (column?.right ?? window.innerWidth) - width - GAP));
+  const left = Math.max((column?.left ?? 0) + EDGE, Math.min(anchor.left, (column?.right ?? window.innerWidth) - width - EDGE));
   const height = items.length * MENU_ITEM_H + items.filter((i) => i.gap).length * GROUP_GAP + GAP;
   const below = anchor.bottom + GAP + height <= window.innerHeight - GAP;
   const top = below ? anchor.bottom + GAP : Math.max(GAP, anchor.top - GAP - height);

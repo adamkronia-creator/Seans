@@ -28,7 +28,7 @@
 .frame-textarea {
   display: block;
   width: 100%;
-  min-height: 22px;
+  min-height: var(--line-height-md);
   padding: 0;
   border: 0;
   outline: 0;

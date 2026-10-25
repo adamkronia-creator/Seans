@@ -123,17 +123,17 @@
   backdrop-filter: var(--glass-filter-panel);
 }
 
-/* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: 14, центр дуги в 3 от краёв, вокруг него в значке
+/* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: круг 20 в углу значка, вокруг него в значке
    вырезан прозрачный зазор 2. Серого сердечка нет: избранное меняется в шапке настроек теста */
 [data-pm] .lib-card--fav {
-  --presence-size: 18px;
+  --presence-size: var(--space-5);
   --presence-inset: 0px;
   --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
 [data-pm] .lib-card__heart {
-  top: calc(50% - 24px + var(--presence-inset));
-  left: calc(var(--space-4) + 48px - var(--presence-inset) - var(--presence-size));
+  top: calc(50% - var(--size-avatar) / 2 + var(--presence-inset));
+  left: calc(var(--row-pad-x) + var(--size-avatar) - var(--presence-inset) - var(--presence-size));
   width: var(--presence-size);
   height: var(--presence-size);
   border: 0;
@@ -142,10 +142,10 @@
   box-shadow: 0 1px 3px rgb(255 45 85 / 0.45);
 }
 
-/* Белый (при тёмном тексте) или тёмный (при светлом) круг 18 с сердечком 11 по середине */
+/* Красный круг 20 с белым сердечком 12 по середине */
 [data-pm] .lib-card__heart svg {
-  width: 11px;
-  height: 11px;
+  width: var(--space-3);
+  height: var(--space-3);
   opacity: 1;
 }
 
@@ -182,14 +182,9 @@
 }
 
 [data-pm] .lib-card .test-card__avatar::before {
-  inset: -1px;
+  inset: -1px; /* grid:ok — перекрывает рамку 1 px */
   background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
   opacity: 0.9;
-}
-
-/* Название и описание теста/задания стоят вплотную, как имя и сообщение в списке чатов: строки 24 и 20 без зазора между ними */
-[data-pm] .lib-card .test-card__body {
-  gap: 0;
 }
 
 /* ——— Выбор тестов и заданий (долгое нажатие) ——— */
@@ -218,8 +213,8 @@
 /* Галочка выбора: в правом нижнем углу значка 48, зелёный круг 20; вокруг него в значке прозрачный вырез (как у метки «в сети») */
 .lib-card__check {
   position: absolute;
-  top: calc(50% + 4px);
-  left: calc(var(--space-4) + var(--space-8) + var(--space-4) - var(--space-5));
+  top: calc(50% + var(--size-avatar) / 2 - var(--space-5));
+  left: calc(var(--row-pad-x) + var(--size-avatar) - var(--space-5));
   display: grid;
   place-items: center;
   width: var(--space-5);

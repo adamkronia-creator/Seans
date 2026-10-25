@@ -62,14 +62,14 @@
   border: 6px solid var(--color-accent);
 }
 
-/* Меню «Пройти или отправить»: три строки 52 со значком в одной полосе, без стрелок — это действия, а не переходы */
+/* Меню «Пройти или отправить»: три строки 48 со значком в одной полосе, без стрелок — это действия, а не переходы */
 .test-actions__card {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  height: 52px;
-  padding: 0 var(--space-4);
+  height: var(--row-h);
+  padding: 0 var(--row-pad-x);
   text-align: left;
 }
 

@@ -100,8 +100,8 @@
 
 .profile__badge--avatar {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
+  right: calc(var(--space-1) * -1); /* вровень с внешним краем кольца аватара 4 */
+  bottom: calc(var(--space-1) * -1);
   width: 28px;
   height: 28px;
   border: 2px solid var(--color-bg-panel);
@@ -134,7 +134,7 @@
 }
 
 .profile__avatar-hit {
-  display: block;
+  display: flex; /* блок, а не строка: иначе под аватаркой остаётся пустое место и нажимаемая область выше неё */
   border-radius: var(--radius-full);
 }
 
@@ -239,7 +239,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 52px;
+  min-height: var(--row-h);
   padding: 0 var(--space-2) 0 var(--space-4);
 }
 
@@ -287,9 +287,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: var(--field-gap);
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--field-pad-y) var(--row-pad-x);
   text-align: left;
 }
 
@@ -350,11 +350,11 @@
 
 /* ---------- Фото ---------- */
 
-/* Галерея идёт от края до края: плитки без скруглений, между ними щель 2 */
+/* Галерея идёт от края до края: плитки без скруглений, между ними щель 4 */
 .profile__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
+  gap: var(--space-1);
   padding: 0;
   border-top: var(--hairline) solid var(--color-divider);
 }
@@ -387,8 +387,9 @@
   gap: var(--space-2);
   width: calc(100% - var(--space-8));
   margin: 0 var(--space-4) var(--space-4);
-  padding: var(--space-6) var(--space-4);
-  border: 1.5px dashed var(--color-border);
+  min-height: calc(var(--space-12) * 2); /* 96: рамка высоты не меняет */
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-accent);
   font-size: var(--size-icon);
@@ -576,6 +577,11 @@
   width: calc(100% - var(--card-pad) * 2);
   margin: var(--card-pad);
   border-color: var(--divider);
+}
+
+/* Значок 20, как у остальных значков действий: шрифт кнопки задаёт подпись 15, и от него значок становился 15 */
+[data-pm] .profile__drop svg {
+  font-size: var(--size-icon);
 }
 
 /* Вкладки «Фото» и «Альбомы» вместо заголовка карточки */

@@ -22,15 +22,14 @@
   display: grid;
   flex-shrink: 0;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  padding: 3px;
+  padding: var(--space-1);
   border-radius: var(--radius-md);
   background: var(--color-bg-fill-strong);
 }
 
 .tp__tab {
-  height: 36px;
-  border-radius: 10px;
+  height: var(--size-control-sm);
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -74,11 +73,11 @@
 
 .tp__notch {
   position: absolute;
-  top: 8px;
+  top: var(--space-2);
   left: 50%;
   width: 72px;
   height: 20px;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   background: #000000;
   transform: translateX(-50%);
 }
@@ -96,7 +95,7 @@
 
 /* Макет в подсказке: экран телефона без рамки, шириной 393 */
 .tp--bare .tp__phone {
-  width: 393px;
+  width: 393px; /* grid:ok — ширина экрана эталонного телефона */
   max-width: none;
   height: 620px;
   border: 0;

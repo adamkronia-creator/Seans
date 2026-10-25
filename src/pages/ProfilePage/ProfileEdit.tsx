@@ -217,7 +217,7 @@ export function ProfileEditPage() {
         </div>
         <section className="pe__card" aria-label="Фотографии и обложки">
           <button type="button" className="pe__row" onClick={() => setPicking('avatar')}>
-            <Avatar src={avatarSrcOf(profile)} size={40} />
+            <Avatar src={avatarSrcOf(profile)} size={48} />
             <span className="pe__row-label">Фото профиля</span>
             <span className="pe__row-action">Изменить</span>
           </button>

@@ -1,10 +1,11 @@
-/* Карточка теста: белая, радиус 16, отступы 12, без тени. Значок 48, название до двух строк, описание в одну */
+/* Строка теста: значок 48, название до двух строк, описание в одну. Поля и зазор общие со строкой чата (--row-*, styles/layout.css): 8 и 16, значок через 12 */
 .test-card {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--row-gap);
   width: 100%;
-  padding: var(--space-3);
+  min-height: var(--row-h-2);
+  padding: var(--row-pad-y) var(--row-pad-x);
   border-radius: var(--radius-lg);
   background: var(--color-bg-panel);
   text-align: left;
@@ -42,7 +43,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
 }
 

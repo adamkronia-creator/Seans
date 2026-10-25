@@ -2,7 +2,7 @@
 .emoji-panel {
   display: flex;
   flex-direction: column;
-  height: 320px;
+  height: var(--emoji-panel-h, 320px);
   margin: 0 calc(var(--space-4) * -1);
   padding-bottom: var(--safe-bottom);
   overflow: hidden;
@@ -30,8 +30,8 @@
 .emoji-panel__tabs {
   display: flex;
   flex-shrink: 0;
-  gap: 2px;
-  padding: var(--space-2) var(--space-2);
+  gap: var(--space-1);
+  padding: var(--space-2);
   overflow-x: auto;
   border-bottom: 1px solid var(--divider);
   scrollbar-width: none;
@@ -97,7 +97,7 @@
   justify-content: center;
   height: var(--size-touch);
   border-radius: var(--radius-md);
-  font-size: 26px;
+  font-size: var(--space-7);
   line-height: 1;
 }
 

@@ -7,7 +7,7 @@
   box-sizing: border-box;
   min-width: var(--size-badge);
   height: var(--size-badge);
-  padding: 0 6px;
+  padding: 0 var(--space-1);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);

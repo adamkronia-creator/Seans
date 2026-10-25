@@ -153,9 +153,9 @@
 .ts-card__list li::before {
   content: '';
   display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 8px 0 2px;
+  width: var(--space-2);
+  height: var(--space-2);
+  margin: 0 var(--space-2) 0 var(--space-1);
   border-radius: 50%;
   background: currentColor;
   vertical-align: middle;
@@ -169,7 +169,7 @@
 
 .ts-card__list--hang li::before {
   flex-shrink: 0;
-  margin: 8px 0 0 2px;
+  margin: var(--space-2) 0 0 var(--space-1);
 }
 
 /* Нумерованный список: номер вместо точки */
@@ -259,8 +259,8 @@
 .ts-desc__toggle {
   display: flex;
   justify-content: center;
-  margin: 0 auto -12px;
-  padding: 12px 24px;
+  margin: 0 auto calc(var(--space-3) * -1);
+  padding: var(--space-3) var(--space-6);
   color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -326,7 +326,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
   padding-block: var(--space-1);
 }
@@ -396,12 +395,12 @@
 .ts-scale__list li {
   display: flex;
   align-items: flex-start; /* длинные названия переносятся, точка остаётся у первой строки */
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 /* Маркер: рамка 8, чёрная точка 6, цветные 8 */
 .ts-scale__list .ts-dot {
-  margin-top: 6px; /* по центру первой строки 20px */
+  margin-top: calc((var(--line-height-sm) - var(--space-2)) / 2); /* по центру первой строки 20 */
 }
 
 .ts-dot {
@@ -470,7 +469,7 @@
   cursor: pointer;
 }
 
-/* Сообщение: текст 15/22, снизу строка со счётчиком и микрофоном */
+/* Сообщение: текст 16/24, снизу строка со счётчиком и микрофоном */
 .ts-message {
   padding: var(--space-3) var(--space-4);
 }
@@ -478,7 +477,7 @@
 .ts-message__input {
   display: block;
   width: 100%;
-  min-height: 22px;
+  min-height: var(--line-height-md);
   padding: 0;
   border: 0;
   outline: 0;
@@ -507,11 +506,11 @@
   line-height: var(--line-height-xs);
 }
 
-/* Область нажатия шире значка на 6 со всех сторон, видимый отступ остаётся прежним */
+/* Область нажатия шире значка на 12 со всех сторон (40), видимый отступ остаётся прежним */
 .ts-message__mic {
   display: flex;
-  margin: -6px;
-  padding: 6px;
+  margin: calc(var(--space-3) * -1);
+  padding: var(--space-3);
   font-size: var(--size-icon-sm);
 }
 
@@ -554,7 +553,7 @@
 .ts-topics__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -564,7 +563,7 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--size-chip-h);
-  padding: 6px 14px;
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--color-bg-fill);
   color: var(--color-text-secondary);

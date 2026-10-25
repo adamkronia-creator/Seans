@@ -13,7 +13,7 @@
   left: 0;
   display: flex;
   flex-direction: column;
-  width: 393px;
+  width: 393px; /* grid:ok — ширина экрана эталонного телефона, макет потом уменьшается */
   height: 340px;
   overflow: hidden;
   transform: scale(var(--k, 1));
@@ -52,7 +52,7 @@
 .hs__stage .oh__mark {
   z-index: 5;
   border-width: 3px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
 }
 
 /* Переписка: пузырь справа, как у отправленного, на фоне сцены */

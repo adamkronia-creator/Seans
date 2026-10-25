@@ -59,14 +59,14 @@
   border-bottom-right-radius: var(--radius-xs);
 }
 
-/* Время в правом нижнем углу (на 6 от низа и на 12 от края) */
+/* Время в правом нижнем углу (на 8 от низа и на 12 от края): ровно в строке, которую занимает его невидимая копия */
 .bubble__meta {
   position: absolute;
   right: var(--space-3);
-  bottom: 6px;
+  bottom: var(--space-2);
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--space-1);
   font: var(--type-meta);
   font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -96,13 +96,13 @@
 
 .bubble__ticks {
   flex-shrink: 0;
-  font-size: 11px; /* галочки 11×6 */
-  transform: translate(1.5px, -0.5px);
+  font-size: var(--space-3); /* галочки 12×6 */
+  transform: translate(1.5px, -0.5px); /* оптическая поправка */
 }
 
 /* Подсветка в поиске по чату */
 .bubble__mark {
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background: rgb(255 207 72 / 55%);
   color: inherit;
 }
@@ -132,11 +132,10 @@
 .bubble__quote {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   max-width: 100%;
   margin: 0 0 var(--space-1);
   padding: 0 0 0 var(--space-2);
-  border-left: 2px solid var(--action-primary);
+  border-left: 2px solid var(--action-primary); /* grid:ok — линия цитаты */
   text-align: left;
   font: var(--type-caption);
 }
@@ -190,8 +189,8 @@
 /* Время в служебных иконках статуса */
 .bubble__ticks--clock,
 .bubble__ticks--single {
-  width: 11px;
-  height: 11px;
+  width: var(--space-3);
+  height: var(--space-3);
 }
 
 .bubble__ticks--single {
@@ -241,7 +240,6 @@
 .tcard__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
 }
 

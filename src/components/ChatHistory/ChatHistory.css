@@ -2,7 +2,7 @@
  * Вкладка «История взаимодействия» на системе мессенджера: сверху лента событий (свежие внизу), под ней закреплённый ряд чипсов-фильтров со счётчиками
  * («6 Сеансы», «5/6 Тесты»), ниже нижняя капсула приложения. События — карточки белого стекла, слева круги цвета типа на сплошной линии времени.
  * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому лента при листании уходит к краю экрана, а не обрезается у поля.
- * Верхний отступ ленты (под шапку) задаёт ChatPage.css. Размеры — токены сетки 4; вне сетки метки и линии (22×6, 20, 1,5).
+ * Верхний отступ ленты (под шапку) задаёт ChatPage.css. Размеры — токены сетки 4; вне сетки только линии в 1 px и рамка комментария 2 px.
  */
 .hist-host {
   --down-gap: var(--space-3); /* кнопка «в конец» над чипсами: 12 + 4 поля ряда = 16 */
@@ -89,8 +89,10 @@
   background: var(--glass-chip-active);
 }
 
-/* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 */
+/* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 (значок 20 и по 16 с каждой стороны) */
 .hist-timeline {
+  --marker-size: var(--space-5);
+  --hist-indent: calc(var(--space-4) * 2 + var(--marker-size));
   display: flex;
   margin: 0;
   padding: 0;
@@ -98,9 +100,10 @@
   flex-direction: column;
 }
 
+/* Карточки событий друг от друга через 16, как карточки на других вкладках чата */
 .hist-item {
   position: relative;
-  padding: 0 var(--space-4) var(--space-3) 52px;
+  padding: 0 var(--space-4) var(--space-4) var(--hist-indent);
 }
 
 .hist-item:last-child {
@@ -110,9 +113,10 @@
 /* Рейка слева от события: значок 20 на уровне названия и под ним линия до значка следующего события.
    Рейка тянется от значка этого события до значка следующего (вниз на отступ значка от верха карточки),
    поэтому линия не обрывается: прерывают её только значки, за 4 px до значка и через 4 px после.
+   Значок стоит по середине первой строки названия: рамка 1 + поле 12 + (строка 24 − значок 20) / 2 = 15.
    У последнего события линии нет */
 .hist-rail {
-  --marker-top: 14px;
+  --marker-top: calc(var(--space-3) + 1px + (var(--space-6) - var(--marker-size)) / 2);
   position: absolute;
   top: var(--marker-top);
   bottom: calc(var(--marker-top) * -1);
@@ -120,7 +124,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 20px;
+  width: var(--marker-size);
 }
 
 .hist-item:last-child .hist-rail {
@@ -143,8 +147,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: var(--marker-size);
+  height: var(--marker-size);
   border-radius: 50%;
   background: var(--marker-bg);
   box-shadow: 0 0 0 1px var(--glass-border);
@@ -173,8 +177,8 @@
 
 .hist-marker svg {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: var(--marker-size);
+  height: var(--marker-size);
 }
 
 /* Ждёт выполнения (отправленный тест или задание): жёлтый круг, внутри белые часы (на пройденном — знак типа) */
@@ -186,8 +190,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: var(--marker-size);
+  height: var(--marker-size);
   font: var(--type-meta);
   font-variant-numeric: proportional-nums;
   font-weight: 600;
@@ -280,7 +284,7 @@
 .hist-card__date {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 6px;
+  gap: 0 var(--space-2);
   margin: 0 0 var(--space-2);
   color: var(--text-secondary);
   font: var(--type-caption);
@@ -290,7 +294,7 @@
 
 .hist-card__date span + span::before {
   content: '·';
-  margin-right: 6px;
+  margin-right: var(--space-2);
 }
 
 .chat .hist-card__text {
@@ -310,7 +314,7 @@
 .chat .hist-card__event + .hist-card__comment {
   margin-top: var(--space-3);
   padding-left: var(--space-2);
-  border-left: 2px solid var(--action-primary);
+  border-left: 2px solid var(--action-primary); /* grid:ok — линия */
   font-style: normal;
   white-space: pre-line;
 }
@@ -457,16 +461,16 @@
 
 .hist-scale__track {
   position: relative;
-  height: 6px;
+  height: var(--space-2);
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background: rgb(60 60 67 / 18%);
 }
 
 .hist-scale__fill {
   position: absolute;
   inset: 0 auto 0 0;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 
 /* Лента заканчивается над закреплённой панелью чипсов: её высоту (--foot-h) замеряет ChatHistory; последняя карточка выше панели на 16 (padding .hist-page) */

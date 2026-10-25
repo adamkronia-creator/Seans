@@ -27,7 +27,7 @@
   width: 36px;
   height: 4px;
   margin: var(--space-2) auto 0;
-  border-radius: 2px;
+  border-radius: var(--radius-pill);
   background: rgb(60 60 67 / 40%);
 }
 
@@ -93,10 +93,10 @@
   height: 32px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--head-bg);
   color: var(--head-fg);
-  font-size: 22px;
+  font-size: var(--size-icon);
 }
 
 .sheet__preview-input {
@@ -134,7 +134,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 48px;
+  height: var(--row-h);
   padding: 0 var(--space-4);
 }
 
@@ -184,10 +184,10 @@
 .sheet__tones {
   --cols: 8;
   display: grid;
-  grid-template-columns: repeat(var(--cols), 36px);
+  grid-template-columns: repeat(var(--cols), var(--size-control-sm));
   justify-content: space-between;
-  row-gap: calc((100cqw - 16px - var(--cols) * 36px) / (var(--cols) - 1));
-  padding: 8px;
+  row-gap: calc((100cqw - var(--space-4) - var(--cols) * var(--size-control-sm)) / (var(--cols) - 1));
+  padding: var(--space-2);
   border-top: 1px solid var(--color-divider);
 }
 
@@ -202,10 +202,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   /* Иконки окрашены в выбранный цвет шапки */
   color: var(--head-fg, var(--color-accent));
 }
@@ -217,9 +217,9 @@
 
 /* Цвет: ячейка 36, как у иконки; кружок 28, выбранный обведён кольцом до границ ячейки */
 .sheet__tone {
-  width: 36px;
-  height: 36px;
-  padding: 2px;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  padding: 2px; /* grid:ok — зазор между кружком и кольцом */
   border: 2px solid transparent;
   border-radius: var(--radius-full);
   background: var(--head-swatch, var(--head-fg));
@@ -236,18 +236,18 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 48px;
+  min-height: var(--row-h);
   padding: 0 var(--space-4);
 }
 
 .sheet__row + .sheet__row {
-  margin-top: 1px;
+  margin-top: 1px; /* grid:ok — место под линию-разделитель */
 }
 
 .sheet__row + .sheet__row::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: -1px; /* grid:ok — линия */
   right: 0;
   left: var(--space-4);
   height: 1px;
@@ -291,7 +291,7 @@
 
 .sheet__button {
   flex: 1;
-  height: 44px;
+  height: var(--size-touch);
   border-radius: var(--radius-md);
   background: var(--color-bg-fill);
   color: var(--color-text-primary);
@@ -310,10 +310,10 @@
 
 /*
  * На системе мессенджера (data-pm): поля 16 с обеих сторон у всего содержимого, без разделителей; расстояния — токены сетки 4.
- * Блоки разделяет воздух space-3, строки 48 (space-12), текст редактора с полями 16.
+ * Блоки разделяет --block-gap (16), как карточки на странице; строки 48 (space-12), текст редактора с полями 16.
  */
 [data-pm] .sheet__body {
-  gap: var(--space-4);
+  gap: var(--block-gap);
 }
 
 /* В строках «Иконка» и «Цвет» значков нет: подпись и переключатель, поле слева 16 */
@@ -354,11 +354,11 @@
   margin-top: var(--space-3);
   padding: var(--space-3) 0 0;
   border-top: 0.5px solid var(--divider);
-  row-gap: calc((100cqw - var(--cols) * 36px) / (var(--cols) - 1));
+  row-gap: calc((100cqw - var(--cols) * var(--size-control-sm)) / (var(--cols) - 1));
 }
 
 [data-pm] .sheet__row {
-  min-height: var(--space-12);
+  min-height: var(--row-h);
 }
 
 [data-pm] .sheet__row + .sheet__row {

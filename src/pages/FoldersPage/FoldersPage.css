@@ -25,14 +25,15 @@
   list-style: none;
 }
 
+/* Строка папки — строка с двумя строками текста: 64, колонка значка 48 (там же ручка и «+»), текст через 12, как у чатов в списке (--row-*) */
 .fs-row {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--row-gap);
   width: 100%;
-  height: 56px;
-  padding: 0 var(--space-2) 0 var(--space-4);
+  min-height: var(--row-h-2);
+  padding: 0 0 0 var(--row-pad-x);
   background: transparent;
   color: var(--text-primary, inherit);
   font-size: var(--font-size-md);
@@ -53,9 +54,8 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-left: calc(var(--space-2) * -1);
+  width: var(--row-h);
+  height: var(--row-h);
   color: var(--text-secondary, var(--color-text-secondary));
   touch-action: none;
 }
@@ -94,9 +94,9 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  width: 44px;
-  height: 44px;
+  gap: var(--space-1);
+  width: var(--row-h);
+  height: var(--row-h);
   color: var(--text-secondary, var(--color-text-secondary));
 }
 
@@ -108,6 +108,7 @@
 }
 
 .fs-row--create {
+  min-height: var(--row-h);
   color: var(--text-link, var(--color-accent));
 }
 
@@ -116,7 +117,7 @@
   place-items: center;
   width: 24px;
   height: 24px;
-  margin: 0 10px;
+  margin: 0 var(--space-3);
   border-radius: var(--radius-full);
   background: var(--action-primary, var(--color-accent));
   color: var(--action-primary-text, var(--color-accent-on));
@@ -137,9 +138,9 @@
 .fs-rec {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  min-height: var(--space-16);
-  padding: var(--space-2) var(--space-4);
+  gap: var(--row-gap);
+  min-height: var(--row-h-2);
+  padding: var(--row-pad-y) var(--row-pad-x);
 }
 
 .fs-rec + .fs-rec {
@@ -150,7 +151,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-1);
   min-width: 0;
 }
 

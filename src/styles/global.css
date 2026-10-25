@@ -54,7 +54,7 @@ input {
   position: absolute;
   width: 1px;
   height: 1px;
-  margin: -1px;
+  margin: -1px; /* grid:ok — скрытый элемент занимает 1 px, а место не берёт */
   padding: 0;
   overflow: hidden;
   border: 0;

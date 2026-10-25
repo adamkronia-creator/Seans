@@ -66,13 +66,11 @@
   align-items: center;
   gap: var(--space-3);
   /* Слева поля как у пунктов (16 и рамка 1): фото стоит над значками. Справа только поле панели: кнопка поиска в 16 от края экрана */
-  padding: 0 0 0 calc(var(--space-4) + 1px);
+  padding: 0 0 0 calc(var(--space-4) + 1px); /* grid:ok — рамка пункта 1 px */
 }
 
 .side-menu__head .avatar {
   --avatar-size: var(--size-avatar-sm);
-  --presence-inset: 1.5px;
-  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
 .side-menu__who {
