@@ -69,11 +69,55 @@ function growIn(scroller: HTMLElement, el: HTMLElement) {
 }
 
 /** Строка с подписью в карточке: подпись сверху, поле под ней; правки сохраняются сразу */
-function TextInput({ label, value, onChange, placeholder, max, type, inputMode }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
+const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+/** Телефон по мере набора: +7 (908) 943-38-19 */
+function formatPhone(raw: string): string {
+  let d = raw.replace(/\D/g, '');
+  if (!d) return '';
+  if (d[0] === '8' || d[0] === '7') d = d.slice(1);
+  d = d.slice(0, 10);
+  let out = '+7';
+  if (d.length > 0) out += ` (${d.slice(0, 3)}`;
+  if (d.length >= 3) out += ')';
+  if (d.length > 3) out += ` ${d.slice(3, 6)}`;
+  if (d.length > 6) out += `-${d.slice(6, 8)}`;
+  if (d.length > 8) out += `-${d.slice(8, 10)}`;
+  return out;
+}
+
+/** «29 июля 1998» или «29.07.1998» → «29 июля 1998 (28 лет)»; текст, который не похож на дату, остаётся как есть */
+function formatBirthday(raw: string): string {
+  const text = raw.replace(/\(.*?\)/g, '').trim().replace(/\s+/g, ' ');
+  let day = 0;
+  let month = -1;
+  let year = 0;
+  const word = /^(\d{1,2}) ([а-яё]+) (\d{4})$/i.exec(text);
+  const num = /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.exec(text);
+  if (word) {
+    day = Number(word[1]);
+    month = MONTHS.indexOf(word[2].toLowerCase());
+    year = Number(word[3]);
+  } else if (num) {
+    day = Number(num[1]);
+    month = Number(num[2]) - 1;
+    year = Number(num[3]);
+  }
+  if (month < 0 || month > 11 || day < 1 || day > 31 || year < 1900) return raw.trim();
+  const now = new Date();
+  let age = now.getFullYear() - year;
+  if (now.getMonth() < month || (now.getMonth() === month && now.getDate() < day)) age -= 1;
+  if (age < 0 || age > 120) return `${day} ${MONTHS[month]} ${year}`;
+  const last = age % 10;
+  const unit = age % 100 >= 11 && age % 100 <= 14 ? 'лет' : last === 1 ? 'год' : last >= 2 && last <= 4 ? 'года' : 'лет';
+  return `${day} ${MONTHS[month]} ${year} (${age} ${unit})`;
+}
+
+function TextInput({ label, value, onChange, onBlur, placeholder, max, type, inputMode }: { label: string; value: string; onChange: (value: string) => void; onBlur?: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
   return (
     <label className="pe__input">
       <span className="pe__label">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
+      <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur ? (e) => onBlur(e.target.value) : undefined} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
     </label>
   );
 }
@@ -232,16 +276,16 @@ export function ProfileEditPage() {
           <h2 className="pe__group-title">Контактная информация</h2>
         </div>
         <section className="pe__card" aria-label="Контактная информация">
-          <TextInput label="Имя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
+          <TextInput label="Имя пользователя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
           <TextInput label="Никнейм" value={username} onChange={(v) => updateBasics({ username: v.replace(/\s/g, '') })} placeholder="@nickname" max={40} />
-          <TextInput label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: v })} placeholder="+7 (900) 000-00-00" max={24} type="tel" inputMode="tel" />
+          <TextInput label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: formatPhone(v) })} placeholder="+7 (908) 943-38-19" max={18} type="tel" inputMode="tel" />
         </section>
 
         <div className="pe__group">
           <h2 className="pe__group-title">Общая информация</h2>
         </div>
         <section className="pe__card" aria-label="Общая информация">
-          <TextInput label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="Например, 14 марта 1991" max={40} />
+          <TextInput label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
           <TextInput label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
           <TextInput label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
           <TextInput label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
@@ -302,10 +346,12 @@ export function ProfileEditPage() {
           </ul>
         )}
 
-        <section ref={addCard} className="pe__card pe__add" aria-labelledby="pe-add">
-          <h2 id="pe-add" className="pe__add-title">
-            Добавить поле
-          </h2>
+        <section ref={addCard} className="pe__card pe__field pe__add" aria-labelledby="pe-add">
+          <div className="pe__field-head">
+            <h2 id="pe-add" className="pe__add-title">
+              Добавить поле
+            </h2>
+          </div>
           <div className="pe__chips">
             <button type="button" className="pe__chip pe__chip--own" onClick={() => add('')}>
               Создать

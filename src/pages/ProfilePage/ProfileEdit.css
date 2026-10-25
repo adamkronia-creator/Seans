@@ -514,10 +514,25 @@
 }
 
 [data-pm] .pe__group-title,
+/* Блок устроен как «Опыт работы»: заголовок 48 и под ним содержимое с полями 12 / 16 */
+[data-pm] .pe__add {
+  padding: 0;
+}
+
 [data-pm] .pe__add-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: var(--row-h);
   color: var(--text-primary);
-  font: var(--type-title);
+  font: var(--type-body);
+  font-weight: 600;
   letter-spacing: 0;
+}
+
+[data-pm] .pe__add .pe__chips {
+  margin-top: 0;
+  padding: var(--space-3) var(--space-4);
 }
 
 [data-pm] .pe__field-head {
