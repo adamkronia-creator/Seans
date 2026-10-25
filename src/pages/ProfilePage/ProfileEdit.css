@@ -435,10 +435,29 @@
   background: var(--glass-card);
 }
 
-/* Между фото профиля и обложкой — полупрозрачная линия во всю ширину; между полями «Контактной» и «Общей информации» линий нет */
+/* Разделитель — просвет в карточке: заливку держит каждая строка, а между строками 1 px, через который виден фон экрана.
+   Так у фото профиля и обложки и у блоков «Личной информации»; между полями «Контактной» и «Общей информации» линий нет */
+[data-pm] .pe__card:has(> .pe__row),
+[data-pm] .pe__field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  overflow: hidden;
+  background: none;
+}
+
+[data-pm] .pe__card:has(> .pe__row) > .pe__row,
+[data-pm] .pe__field > * {
+  background: var(--glass-card);
+}
+
+/* Поле текста отступает от края карточки на 16 (касание у края — жест «назад»), а заливка идёт до краёв: её дорисовывают боковые тени */
+[data-pm] .pe__field > .pe__field-text {
+  box-shadow: calc(var(--space-4) * -1) 0 0 var(--glass-card), var(--space-4) 0 0 var(--glass-card);
+}
+
 [data-pm] .pe__row + .pe__row::before {
-  left: 0;
-  background: color-mix(in srgb, var(--divider) 50%, transparent);
+  display: none;
 }
 
 [data-pm] .pe__input + .pe__input::before {
@@ -502,7 +521,7 @@
 }
 
 [data-pm] .pe__field-head {
-  border-bottom-color: color-mix(in srgb, var(--divider) 50%, transparent);
+  border-bottom: 0;
 }
 
 [data-pm] .pe__tool {
