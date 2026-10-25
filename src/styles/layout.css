@@ -68,7 +68,8 @@
 
 [data-pm] .pe__scroll {
   gap: var(--block-gap);
-  padding: var(--block-gap) var(--page-gutter) calc(var(--size-control) + var(--scroll-bottom));
+  /* Как в «Диалогах»: от шапки до содержимого 12; от содержимого до кнопки «Готово» 16 */
+  padding: var(--space-3) var(--page-gutter) calc(var(--size-touch) + var(--space-4) * 2 + var(--safe-bottom));
 }
 
 [data-pm] .test-settings__scroll {

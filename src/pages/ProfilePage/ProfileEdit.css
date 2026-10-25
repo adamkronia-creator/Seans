@@ -435,9 +435,14 @@
   background: var(--glass-card);
 }
 
-[data-pm] .pe__row + .pe__row::before,
+/* Между фото профиля и обложкой — полупрозрачная линия во всю ширину; между полями «Контактной» и «Общей информации» линий нет */
+[data-pm] .pe__row + .pe__row::before {
+  left: 0;
+  background: color-mix(in srgb, var(--divider) 50%, transparent);
+}
+
 [data-pm] .pe__input + .pe__input::before {
-  background: var(--divider);
+  display: none;
 }
 
 [data-pm] .pe__row[data-pressed] {
@@ -497,7 +502,7 @@
 }
 
 [data-pm] .pe__field-head {
-  border-bottom-color: var(--divider);
+  border-bottom-color: color-mix(in srgb, var(--divider) 50%, transparent);
 }
 
 [data-pm] .pe__tool {
