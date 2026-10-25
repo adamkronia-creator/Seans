@@ -49,19 +49,11 @@
 .fs-row__grip {
   display: grid;
   flex-shrink: 0;
-  position: relative;
-  place-items: center start; /* две черточки начинаются там же, где название блока */
-  width: var(--space-6); /* колонка значка 24, как у «+» в «Создать новую папку»: подписи всех строк на одной линии */
+  place-items: center; /* колонка значка 48 по центру, как колонка аватарок: подписи на одной линии с именами в чатах */
+  width: var(--row-h);
   height: var(--row-h);
   color: var(--text-secondary, var(--color-text-secondary));
   touch-action: none;
-}
-
-/* Зона нажатия шире значка, а раскладку не меняет */
-.fs-row__grip::after {
-  content: '';
-  position: absolute;
-  inset: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
 }
 
 .fs-row__grip--off {
@@ -111,18 +103,19 @@
   background: currentColor;
 }
 
-/* «Создать новую папку» — как «Добавить поле» в профиле: строка 48 с плюсом без круга, подпись акцентная */
+/* «Создать новую папку»: строка 48, плюс без круга по центру колонки 48 (под ручками перестановки), подпись акцентная */
 .fs-row--create {
-  gap: var(--space-2);
   min-height: var(--row-h);
-  padding: 0 var(--row-pad-x);
+  padding: 0 0 0 var(--row-pad-x);
   color: var(--text-link, var(--color-accent));
   font: var(--type-label);
 }
 
 .fs-row__plus {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
+  width: var(--row-h);
   font-size: var(--size-icon);
 }
 
