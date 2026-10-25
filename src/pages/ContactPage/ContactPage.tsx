@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useMemo, useState } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
@@ -35,7 +35,7 @@ import './ContactPage.css';
 export type ContactSheet = 'edit' | 'role' | 'gift' | 'report' | 'delete' | 'clear' | 'block';
 
 /**
- * Профиль собеседника (адрес /chat/<чат>/contact), как в Telegram: фото, имя, роль, кнопки «Чат», «Звук», «Роль», «Поделиться»,
+ * Профиль собеседника (адрес /chat/<чат>/contact): фото во всю ширину, которое внизу растворяется в фоне (светлом или тёмном по цвету текста), имя, роль, кнопки «Чат», «Звук», «Роль», «Поделиться»,
  * данные контакта и итоги по материалам. В шапке «назад» и «⋯»: меню из четырёх групп (контакт; подписка, роль, подарок;
  * закрепить, архив, очистить; заблокировать, пожаловаться). Роль можно выбрать чипсом или написать свою.
  */
@@ -47,61 +47,11 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
   // Экран профиля: на нём лежит просмотр историй
   const [screen, setScreen] = useState<HTMLElement | null>(null);
-  const scroller = useRef<HTMLDivElement>(null);
-  const hero = useRef<HTMLDivElement>(null);
   const groups = useMessages(chatId);
   const stories = useStoryAuthors().find((a) => a.id === chatId)?.stories ?? [];
   const links = useMemo(() => [...linksIn(groups), ...(SHARED_LINKS[chatId] ?? [])], [groups, chatId]);
   const back = () => goBack(`/chat/${chatId}`);
   useSwipeBack('.ct', menu === null && sheet === null, back);
-
-  // Фото на всю ширину сжимается в круг, пока прокручивают первый экран: --p от 0 до 1 пишется в блок прокрутки.
-  // Шапка профиля сжимается по высоте и остаётся на месте, имя из левого нижнего угла фото уходит под круг, в середину
-  const name = chat?.name;
-  useEffect(() => {
-    const el = scroller.current;
-    if (!el || !name) return;
-    const CIRCLE = 112;
-    let frame = 0;
-    const measure = () => {
-      const w = el.clientWidth;
-      const bar = el.parentElement?.querySelector<HTMLElement>('.ct__bar')?.offsetHeight ?? 0;
-      const h0 = w * 1.02;
-      const dist = h0 - 8 - (bar + CIRCLE + 12 + 56);
-      const lines = hero.current?.querySelectorAll<HTMLElement>('.ct__line') ?? [];
-      lines.forEach((line, i) => {
-        // Ширина строки без растяжения: сколько она занимает на самом деле
-        const range = document.createRange();
-        range.selectNodeContents(line);
-        const width = range.getBoundingClientRect().width;
-        el.style.setProperty(i === 0 ? '--dxn' : '--dxs', `${Math.max(0, (w - width) / 2 - 16)}px`);
-      });
-      el.style.setProperty('--w', `${w}px`);
-      el.style.setProperty('--bar', `${bar}px`);
-      el.dataset.dist = String(Math.max(1, dist));
-      update();
-    };
-    const update = () => {
-      frame = 0;
-      const dist = Number(el.dataset.dist) || 1;
-      const lift = Math.min(dist, Math.max(0, el.scrollTop));
-      el.style.setProperty('--p', String(lift / dist));
-      // Шапка стоит на месте, пока сжимается: её отступ сверху растёт ровно на пройденный путь, и содержимое ниже идёт за пальцем 1 к 1
-      el.style.setProperty('--lift', `${lift}px`);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      observer.disconnect();
-      el.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(frame);
-    };
-  }, [name]);
 
   const materials = useMemo(
     () => (chatId === 'maxim' ? [['Сеансы', countOf(clientData, 'session')], ['Тесты', countOf(clientData, 'test')], ['Задания', countOf(clientData, 'task')]] as const : null),
@@ -202,20 +152,15 @@ export function ContactPage({ chatId }: { chatId: string }) {
         </button>
       </header>
 
-      <div ref={scroller} className="fp__scroll ct__scroll" style={{ '--p': 0 } as CSSProperties}>
-        <div ref={hero} className="ct__hero">
+      <div className="fp__scroll ct__scroll">
+        <div className="ct__hero">
           <div className="ct__photo">
             {chat.avatar ? <img src={chat.avatar} alt="" /> : <span className="ct__photo-empty" />}
-            <span className="ct__shade" aria-hidden="true" />
           </div>
           <div className="ct__id">
-            <h1 className="ct__name">
-              <span className="ct__line">{chat.name}</span>
-            </h1>
+            <h1 className="ct__name">{chat.name}</h1>
             <p className="ct__status">
-              <span className="ct__line">
-                {roleOf(chat)} · {chat.online ? 'в сети' : 'был(а) недавно'}
-              </span>
+              {roleOf(chat)} · {chat.online ? 'в сети' : 'был(а) недавно'}
             </p>
           </div>
         </div>

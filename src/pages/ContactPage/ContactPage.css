@@ -1,6 +1,6 @@
 /* Профиль собеседника: на каркасе экрана «Настроить папку» (.fp).
    Шапка без подложки: «назад» и «⋯» справа, отступ от безопасной зоны 16 и поля 16, как у кнопок шапки открытого чата.
-   Фото на всю ширину сжимается в круг при прокрутке: прогресс --p (0…1), ширина блока --w и высота шапки --bar пишет ContactPage. */
+   Фото на всю ширину; снизу оно растворяется в фоне: светлая дымка при тёмном тексте и тёмная при белом (data-ink), на ней имя и роль. */
 [data-pm] .ct .fp__header.ct__bar {
   justify-content: flex-end;
   gap: var(--space-3);
@@ -12,10 +12,16 @@
 }
 
 [data-pm] .ct__scroll {
-  --h0: calc(var(--w, 412px) * 1.02);
+  /* Высота шапки: безопасная зона + 16 + кнопка 40 + 8; от неё липнут вкладки */
+  --bar: calc(var(--safe-top) + var(--space-16));
+  --ct-haze: rgb(255 255 255 / 0.92);
   gap: 0;
   padding: 0 0 calc(var(--space-8) + var(--safe-bottom));
   overflow-anchor: none;
+}
+
+:root[data-ink='light'] [data-pm] .ct__scroll {
+  --ct-haze: rgb(8 10 16 / 0.92);
 }
 
 .ct__hero,
@@ -24,20 +30,28 @@
 }
 
 .ct__hero {
+  position: relative;
   flex-shrink: 0;
-  /* Опускает шапку на пройденный путь прокрутки: она остаётся на месте, пока сжимается */
-  margin-top: var(--lift, 0px);
 }
 
-/* Фото: на всю ширину и почти квадрат, к концу прокрутки круг 112 под шапкой */
+/* Фото: на всю ширину и чуть выше квадрата. Нижняя треть уходит в дымку цвета фона и гаснет до прозрачного, так что граница со сценой незаметна */
 .ct__photo {
   position: relative;
-  width: calc(var(--w, 412px) - (var(--w, 412px) - 112px) * var(--p));
-  height: calc(var(--h0) - (var(--h0) - 112px) * var(--p));
-  margin: calc(var(--bar, 72px) * var(--p)) auto 0;
+  width: 100%;
+  max-height: 64dvh;
+  aspect-ratio: 1 / 1.08;
   overflow: hidden;
-  border-radius: calc(56px * var(--p));
   background: var(--glass-fill);
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+}
+
+.ct__photo::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(to bottom, transparent, var(--ct-haze) 78%);
+  pointer-events: none;
 }
 
 .ct__photo img,
@@ -48,67 +62,36 @@
   object-fit: cover;
 }
 
-/* Затемнение снизу, чтобы белое имя читалось на любом фото; к кругу исчезает */
-.ct__shade {
-  position: absolute;
-  inset: 40% 0 0;
-  background: linear-gradient(to bottom, rgb(0 0 0 / 0), rgb(0 0 0 / 0.6));
-  opacity: calc(1 - var(--p));
-  pointer-events: none;
-}
-
-/* Имя и подпись: на фото слева внизу белые, под кругом по центру цветом текста */
+/* Имя и роль лежат на дымке внизу фото, слева, цветом текста приложения */
 .ct__id {
-  position: relative;
+  position: absolute;
+  right: 0;
+  bottom: var(--space-2);
+  left: 0;
   display: flex;
   flex-direction: column;
-  height: 56px;
-  margin-top: calc(var(--p) * 76px - 64px);
+  gap: var(--space-1);
   padding: 0 var(--space-4);
-  text-align: center;
-  --ink: color-mix(in srgb, #fff calc((1 - var(--p)) * 100%), var(--text-primary));
-  --ink-2: color-mix(in srgb, rgb(255 255 255 / 0.85) calc((1 - var(--p)) * 100%), var(--text-secondary));
 }
 
 .ct__name,
 .ct__status {
   margin: 0;
-  line-height: var(--space-6);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .ct__name {
-  height: var(--space-6);
-  color: var(--ink);
-  font: var(--type-title);
-  line-height: var(--space-6);
+  color: var(--text-primary);
+  font: var(--type-display);
   letter-spacing: 0;
 }
 
 .ct__status {
-  height: var(--space-5);
-  color: var(--ink-2);
+  color: var(--text-secondary);
   font: var(--type-label);
   font-weight: 400;
-  line-height: var(--space-5);
-}
-
-.ct__line {
-  display: inline-block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: top;
-}
-
-.ct__name .ct__line {
-  transform: translateX(calc(var(--dxn, 0px) * (var(--p) - 1)));
-  text-shadow: 0 1px 8px rgb(0 0 0 / calc(0.45 * (1 - var(--p))));
-}
-
-.ct__status .ct__line {
-  transform: translateX(calc(var(--dxs, 0px) * (var(--p) - 1)));
-  text-shadow: 0 1px 8px rgb(0 0 0 / calc(0.45 * (1 - var(--p))));
 }
 
 /* Всё ниже фото: поля 16, зазор 16 */
