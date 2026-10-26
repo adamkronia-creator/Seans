@@ -633,3 +633,45 @@
 .test-settings__button[aria-pressed] svg {
   translate: 0 1px; /* grid:ok — оптическое выравнивание */
 }
+
+/* Отправленный тест: настройки только для просмотра, поверх них водяной знак */
+.test-settings--sent {
+  position: relative;
+}
+
+.test-settings--sent .switch,
+.test-settings--sent .form-menu,
+.test-settings--sent .result-choice__row,
+.test-settings--sent .ts-message__input {
+  pointer-events: none;
+}
+
+.test-settings--sent .ts-message__mic {
+  display: none;
+}
+
+.ts-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ts-watermark span {
+  padding: var(--space-2) var(--space-4);
+  border: 3px solid currentColor; /* grid:ok — рамка штампа */
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  font-size: 28px; /* grid:ok — крупная надпись штампа */
+  font-weight: 700;
+  line-height: 36px; /* grid:ok */
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.22;
+  transform: rotate(-18deg);
+}

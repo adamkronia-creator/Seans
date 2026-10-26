@@ -11,6 +11,7 @@ import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
+import { DEFAULT_SENT_OPTIONS, type Message } from '../../data/messages';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
 import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
@@ -55,6 +56,8 @@ interface TestSettingsProps {
   test: LibraryTest;
   /** Чат клиента, из которого открыт тест; без него тест открыт из библиотеки */
   chatId?: string;
+  /** Отправленная клиенту карточка теста: экран открывается только для просмотра, с теми настройками, с какими тест ушёл */
+  sent?: Message;
   onBack: () => void;
 }
 
@@ -147,18 +150,21 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT, id = 'ts-
  * Экран «Настройка теста»: шапка с названием и сердечком, описание, шкалы, параметры,
  * сообщение клиенту, переключатели и кнопка «Пройти или отправить» над нижней панелью.
  */
-export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
+export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) {
   const data = testSettings(test);
+  const sentOptions = sent ? (sent.testOptions ?? DEFAULT_SENT_OPTIONS) : undefined;
+  const locked = Boolean(sent);
+  const noop = () => undefined;
   // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
   const blankLabel = SAVE_BLANK_LABEL;
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
-  const [form, setForm] = useState(passRequest?.form || (data.forms?.[0] ?? ''));
-  const [message, setMessage] = useState(data.message);
-  const [messageOn, setMessageOn] = useState(true);
-  const [blind, setBlind] = useState(true);
-  const [result, setResult] = useState<ResultMode>('thanks');
-  const [saveBlank, setSaveBlank] = useState(passRequest?.saveBlank ?? true);
+  const [form, setForm] = useState(sentOptions?.form ?? (passRequest?.form || (data.forms?.[0] ?? '')));
+  const [message, setMessage] = useState(sent ? sent.text : data.message);
+  const [messageOn, setMessageOn] = useState(sent ? sent.text.trim() !== '' : true);
+  const [blind, setBlind] = useState(sentOptions?.blind ?? true);
+  const [result, setResult] = useState<ResultMode>(sentOptions?.result ?? 'thanks');
+  const [saveBlank, setSaveBlank] = useState(sentOptions?.saveBlank ?? passRequest?.saveBlank ?? true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
@@ -293,11 +299,11 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
 
   return (
     <HelpContext.Provider value={{ test, blank: blank ?? null, conclusion: conclusion ?? null, form, duration: data.duration }}>
-    <section className="test-settings">
+    <section className={`test-settings${locked ? ' test-settings--sent' : ''}`}>
       <TestHeader
         test={test}
         client={live ? { blind: passRequest?.blind, title: passRequest?.blindTitle } : undefined}
-        status={live ? 'Тест от вашего специалиста' : STATUS[view]}
+        status={live ? 'Тест от вашего специалиста' : locked && view === 'settings' ? 'Отправленный тест' : STATUS[view]}
         onBack={view === 'settings' ? onBack : stepBack}
       />
 
@@ -395,7 +401,7 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               {data.forms && (
                 <Row label="Форма бланка" info value={data.forms.length === 1 ? data.forms[0] : undefined}>
                   {data.forms.length > 1 && (
-                    <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={setForm} />
+                    <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={locked ? noop : setForm} />
                   )}
                 </Row>
               )}
@@ -468,29 +474,29 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
               label="Слепое тестирование"
               help="blind"
             >
-              <Switch checked={blind} onChange={setBlind} label="Слепое тестирование" />
+              <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
             </Row>
             <Row
               label={blankLabel}
               help="blank"
             >
-              <Switch checked={saveBlank} onChange={setSaveBlank} label={blankLabel} />
+              <Switch checked={saveBlank} onChange={locked ? noop : setSaveBlank} label={blankLabel} />
             </Row>
           </ul>
         </CollapseCard>
 
-        {conclusion && <ResultChoice value={result} onChange={setResult} />}
+        {conclusion && <ResultChoice value={result} onChange={locked ? noop : setResult} />}
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
             <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом">
-              <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
+              <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>
           <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
             <div className="blank-card__inner">
               <div className="blank-card__body ts-message">
-                <MessageField value={message} onChange={setMessage} />
+                <MessageField value={message} onChange={locked ? noop : setMessage} />
                 <div className="ts-message__foot">
                   <span className="ts-message__count">
                     {chars} / {MESSAGE_LIMIT}
@@ -507,11 +513,17 @@ export function TestSettings({ test, chatId, onBack }: TestSettingsProps) {
         {blank && <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} />}
       </div>
 
-      <div className="test-settings__cta">
-        <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
-          Пройти или отправить
-        </button>
-      </div>
+      {locked ? (
+        <div className="ts-watermark" aria-hidden="true">
+          <span>Тест отправлен</span>
+        </div>
+      ) : (
+        <div className="test-settings__cta">
+          <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
+            Пройти или отправить
+          </button>
+        </div>
+      )}
       </>
       )}
 

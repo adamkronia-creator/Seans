@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode
 import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { registerTabSwitch } from './utils/tabNav';
 import { ChatPage } from './pages/ChatPage/ChatPage';
-import { ChatResultScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
+import { ChatResultScreen, ChatSentTestScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
 import { ChatTabsPage } from './pages/ChatTabsPage/ChatTabsPage';
 import { ContactPage } from './pages/ContactPage/ContactPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
@@ -45,14 +45,14 @@ interface Resolved {
  * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата), /chat/<чат>/tasks/<задание> (настройка задания)
  * и /chat/<чат>/result/<результат> (результат теста или задания); /chat/<чат>/contact — профиль собеседника; /chat/<чат>/tabs — настройки вкладок чата
  */
-const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result)\/([^/]+)|\/(contact|profile|tabs))?/;
+const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result|sent)\/([^/]+)|\/(contact|profile|tabs))?/;
 
 /** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
 const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
-  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result)\/|contact|profile|tabs)/);
+  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result|sent)\/|contact|profile|tabs)/);
   // Профиль собеседника лежит над его карточкой, карточка — над чатом
   if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
   return path === '/' ? null : '/';
@@ -181,6 +181,17 @@ export default function App() {
             build: () => (
               <main className="app__content">
                 <ContactPage chatId={chatId} />
+              </main>
+            ),
+          };
+        }
+        if (kind === 'sent') {
+          return {
+            key: `chat/${chatId}/sent/${id}`,
+            pm: true,
+            build: () => (
+              <main className="app__content">
+                <ChatSentTestScreen chatId={chatId} messageId={id} onAppTabChange={handleTabChange} />
               </main>
             ),
           };
