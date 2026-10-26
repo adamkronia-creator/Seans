@@ -22,6 +22,7 @@ import './SendBatch.css';
 /** Настройки одного теста перед отправкой: те же, что на экране «Настройка теста» */
 interface TestOpts {
   blind: boolean;
+  shuffle: boolean;
   saveBlank: boolean;
   result: ResultMode;
   form: string;
@@ -44,7 +45,7 @@ type Opts = TestOpts | TaskOpts;
 
 const initialTest = (item: LibraryItem): TestOpts => {
   const data = testSettings(item as never);
-  return { blind: true, saveBlank: true, result: 'thanks', form: data.forms?.[0] ?? '', messageOn: true, message: data.message };
+  return { blind: true, shuffle: false, saveBlank: true, result: 'thanks', form: data.forms?.[0] ?? '', messageOn: true, message: data.message };
 };
 
 const initialTask = (item: LibraryItem): TaskOpts => {
@@ -81,7 +82,7 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
             test: item.id,
             testKind: 'sent',
             ...(to === SELF_ID ? { toSelf: true } : {}),
-            testOptions: { blind: t.blind, ...(t.blind ? { blindTitle: blindTitle() } : {}), result: t.result, saveBlank: t.saveBlank, ...(data.forms ? { form: t.form } : {}) },
+            testOptions: { blind: t.blind, ...(t.blind ? { blindTitle: blindTitle() } : {}), result: t.result, saveBlank: t.saveBlank, shuffle: t.shuffle, ...(data.forms ? { form: t.form } : {}) },
           });
           if (to === 'maxim') logStep('test', item.id, 'sent');
         } else {
@@ -190,6 +191,9 @@ function TestFields({ item, o, onChange }: { item: LibraryItem; o: TestOpts; onC
           )}
           <Row label="Слепое тестирование" help="blind">
             <Switch checked={o.blind} onChange={(blind) => onChange({ blind })} label={`Слепое тестирование: ${item.title}`} />
+          </Row>
+          <Row label="Перемешать вопросы">
+            <Switch checked={o.shuffle} onChange={(shuffle) => onChange({ shuffle })} label={`Перемешать вопросы: ${item.title}`} />
           </Row>
           <Row label={SAVE_BLANK_LABEL} help="blank">
             <Switch checked={o.saveBlank} onChange={(saveBlank) => onChange({ saveBlank })} label={`${SAVE_BLANK_LABEL}: ${item.title}`} />

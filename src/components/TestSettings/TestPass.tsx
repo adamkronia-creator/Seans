@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ResultMode } from '../../data/resultMode';
-import { answerQuestion, finishRun, resetRun, useSelfRun } from '../../data/selfTest';
+import { answerQuestion, finishRun, questionOrder, resetRun, useSelfRun } from '../../data/selfTest';
 import type { TestBlankData } from '../../data/testBlank';
 import { Toast } from '../Toast/Toast';
 import { useSheet } from '../EditSheet/useSheet';
@@ -33,6 +33,8 @@ interface TestPassProps {
   form: string;
   /** Переключатель «Сохранить бланк» из настроек: сохранять ли ответы вместе с результатом */
   saveBlank: boolean;
+  /** «Перемешать вопросы»: вопросы идут в случайном порядке */
+  shuffle?: boolean;
   /** Результат посчитан и сохранён: id результата (у клиента не вызывается: он остаётся на экране «Спасибо») */
   onDone?: (resultId: string) => void;
   client?: TestClient;
@@ -67,9 +69,20 @@ function ResetSheet({ answered, onConfirm, onClose }: { answered: number; onConf
  * Вопросы идут по одному: сначала инструкция, затем вопрос за вопросом с кнопками «Назад» и «Далее».
  * У клиента тот же экран: на первом шаге добавляются сообщение специалиста и сведения, после завершения — «Спасибо».
  */
-export function TestPass({ testId, blank, form, saveBlank, onDone, client }: TestPassProps) {
-  const run = useSelfRun(testId);
-  const total = blank.questions.length;
+export function TestPass({ testId, blank: source, form, saveBlank, shuffle = false, onDone, client }: TestPassProps) {
+  const selfRun = useSelfRun(testId);
+  const total = source.questions.length;
+  // Вопросы показываются по порядку order; ответы и баллы по-прежнему привязаны к исходному номеру вопроса.
+  // Ниже blank и run.answers — уже в порядке показа, поэтому остальной экран о перемешивании не знает
+  const order = useMemo(() => questionOrder(testId, total, shuffle), [testId, total, shuffle, selfRun]);
+  const blank = useMemo<TestBlankData>(
+    () => (shuffle ? { ...source, questions: order.map((q) => ({ ...source.questions[q], heading: undefined })) } : source),
+    [source, shuffle, order],
+  );
+  const run = useMemo(
+    () => ({ ...selfRun, answers: Object.fromEntries(order.flatMap((q, pos) => (selfRun.answers[q] === undefined ? [] : [[pos, selfRun.answers[q]]]))) as Record<number, number> }),
+    [selfRun, order],
+  );
   const answered = Object.keys(run.answers).length;
   // Первый вопрос без ответа (с 0), −1 если ответили на всё
   const firstOpen = blank.questions.findIndex((_, i) => run.answers[i] === undefined);
@@ -148,7 +161,7 @@ export function TestPass({ testId, blank, form, saveBlank, onDone, client }: Tes
 
   const onAnswer = (question: number, answer: number) => {
     if (missing === question) setMissing(null);
-    answerQuestion(testId, question, answer);
+    answerQuestion(testId, order[question], answer);
   };
 
   /** Вариант нажат пальцем или мышью: чуть погодя открываем следующий вопрос; на последнем остаёмся — дальше «Завершить тест» */

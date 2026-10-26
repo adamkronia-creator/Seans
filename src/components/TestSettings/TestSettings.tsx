@@ -38,8 +38,9 @@ import IconRowAge from '../../assets/icons/solar/user.svg?react';
 import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
 import IconRowMain from '../../assets/icons/solar/list.svg?react';
 import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
-import IconRowBlind from '../../assets/icons/solar/face-scan-square.svg?react';
-import IconRowBlank from '../../assets/icons/solar/file.svg?react';
+import IconRowBlind from '../../assets/icons/solar/incognito.svg?react';
+import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
+import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
@@ -175,6 +176,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const [messageOn, setMessageOn] = useState(sent ? sent.text.trim() !== '' : true);
   const [blind, setBlind] = useState(sentOptions?.blind ?? true);
   const [result, setResult] = useState<ResultMode>(sentOptions?.result ?? 'thanks');
+  const [shuffle, setShuffle] = useState(sentOptions?.shuffle ?? passRequest?.shuffle ?? false);
   const [saveBlank, setSaveBlank] = useState(sentOptions?.saveBlank ?? passRequest?.saveBlank ?? true);
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -205,7 +207,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         test: test.id,
         testKind: 'sent',
         ...(id === SELF_ID ? { toSelf: true } : {}),
-        testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, ...(data.forms ? { form } : {}) },
+        testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, shuffle, ...(data.forms ? { form } : {}) },
       });
       // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
       if (id === 'maxim') logStep('test', test.id, 'sent');
@@ -324,6 +326,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           blank={blank}
           form={form}
           saveBlank={saveBlank}
+          shuffle={shuffle}
           client={passRequest ? { message: passRequest.message, result: passRequest.result, duration: data.duration, onExit: onBack } : undefined}
           onDone={(id) => {
             // Заключение открывается сразу; его копия лежит в «Избранное» → «Тесты», в чате — сообщение с кнопкой
@@ -493,6 +496,9 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               help="blind"
             >
               <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
+            </Row>
+            <Row Icon={IconRowShuffle} label="Перемешать вопросы">
+              <Switch checked={shuffle} onChange={locked ? noop : setShuffle} label="Перемешать вопросы" />
             </Row>
             <Row
               Icon={IconRowBlank}

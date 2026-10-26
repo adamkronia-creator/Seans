@@ -72,9 +72,26 @@ export function answerQuestion(testId: string, question: number, answer: number)
   emit();
 }
 
+/** Порядок вопросов «Перемешать вопросы»: свой на каждое прохождение, пока оно не сброшено */
+const orders = new Map<string, number[]>();
+export function questionOrder(testId: string, total: number, shuffle: boolean): number[] {
+  if (!shuffle) return Array.from({ length: total }, (_, i) => i);
+  let order = orders.get(testId);
+  if (!order || order.length !== total) {
+    order = Array.from({ length: total }, (_, i) => i);
+    for (let i = total - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    orders.set(testId, order);
+  }
+  return order;
+}
+
 /** Сбросить начатое прохождение; готовые результаты остаются */
 export function resetRun(testId: string) {
   runs.delete(testId);
+  orders.delete(testId);
   emit();
 }
 
@@ -204,6 +221,7 @@ interface PassRequest {
   form: string;
   saveBlank: boolean;
   blind: boolean;
+  shuffle?: boolean;
   /** Название слепого теста: то же, что в карточке в чате */
   blindTitle?: string;
   result: 'thanks' | 'score' | 'full';

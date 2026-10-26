@@ -332,7 +332,7 @@ export function MessageBubble({
                 }
                 if (message.toSelf) {
                   const o = message.testOptions;
-                  requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, blind: o?.blind ?? true, blindTitle: o?.blindTitle, result: o?.result ?? 'thanks', message: message.text });
+                  requestPass({ testId: message.test!, form: o?.form ?? '', saveBlank: o?.saveBlank ?? true, shuffle: o?.shuffle ?? false, blind: o?.blind ?? true, blindTitle: o?.blindTitle, result: o?.result ?? 'thanks', message: message.text });
                 }
                 onOpenTest(message.test!);
               }}
