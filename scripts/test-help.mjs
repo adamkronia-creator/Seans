@@ -53,7 +53,7 @@ test('у каждой подсказки три макета с подписям
   }
 });
 
-test('макеты известны и не повторяются; размер кадра 393×340', () => {
+test('макеты известны и не повторяются; размер кадра 393×480', () => {
   const seen = new Set();
   for (const [id, help] of topics) {
     for (const slide of help.slides) {
@@ -62,5 +62,5 @@ test('макеты известны и не повторяются; размер
       seen.add(slide.scene);
     }
   }
-  assert.deepEqual(HELP_SHOT, { width: 393, height: 340 });
+  assert.deepEqual(HELP_SHOT, { width: 393, height: 480 });
 });
