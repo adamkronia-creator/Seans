@@ -383,7 +383,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
                     onOpenTask={(id) => navigate(`/chat/${chatId}/tasks/${id}`)}
-                    onTestSettings={(m) => (m.task ? setSettingsOf(m) : navigate(`/chat/${chatId}/sent/${m.id}`))}
+                    onTestSettings={(m) => navigate(`/chat/${chatId}/sent/${m.id}`)}
                     onOpenLink={(href) => navigate(href)}
                   />
                 );

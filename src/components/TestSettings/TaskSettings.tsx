@@ -18,6 +18,7 @@ import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTask } from '../../data/library';
+import type { Message } from '../../data/messages';
 import {
   emptyValues,
   exampleValues,
@@ -95,6 +96,8 @@ interface TaskSettingsProps {
   task: LibraryTask;
   /** Чат клиента, из которого открыто задание; без него задание открыто из раздела «Задания» */
   chatId?: string;
+  /** Отправленная клиенту карточка задания: экран открывается только для просмотра, с теми настройками, с какими задание ушло */
+  sent?: Message;
   onBack: () => void;
 }
 
@@ -104,20 +107,23 @@ interface TaskSettingsProps {
  * (постоянное задание с числом записей, а у обычного срок и напоминание), сообщение клиенту
  * и кнопка «Пройти или отправить» над нижней панелью.
  */
-export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
+export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) {
   const data = taskSettings(task);
+  const so = sent?.taskOptions;
+  const locked = Boolean(sent);
+  const noop = () => undefined;
   // Задание, отправленное себе, открывается сразу выполнением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takeTaskPass(task.id));
-  const [form, setForm] = useState(passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? ''));
-  const [comment, setComment] = useState(passRequest?.comment ?? true);
-  const [state, setState] = useState(passRequest?.state ?? true);
+  const [form, setForm] = useState(so?.form ?? (passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? '')));
+  const [comment, setComment] = useState(so?.comment ?? passRequest?.comment ?? true);
+  const [state, setState] = useState(so?.state ?? passRequest?.state ?? true);
   // Срока выполнения и напоминания в настройках нет: задание уходит без срока
   const deadline = passRequest?.deadline ?? TASK_DEADLINES[0];
   // Правила назначения: постоянное задание и сколько записей всего (0 — без ограничения)
-  const [permanent, setPermanent] = useState(false);
-  const [limit, setLimit] = useState(0);
-  const [messageOn, setMessageOn] = useState(true);
-  const [message, setMessage] = useState(data?.message ?? '');
+  const [permanent, setPermanent] = useState(Boolean(so?.permanent));
+  const [limit, setLimit] = useState(so?.permanent?.limit ?? 0);
+  const [messageOn, setMessageOn] = useState(so ? so.note !== '' : true);
+  const [message, setMessage] = useState(so ? so.note : (data?.message ?? ''));
   const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [view, setView] = useState<View>(passRequest && data ? 'pass' : 'settings');
@@ -242,12 +248,12 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
 
   return (
     <HelpContext.Provider value={{ test: task, task: { data }, blank: null, conclusion: null, form, duration: data.duration }}>
-    <section className="test-settings">
+    <section className={`test-settings${locked ? ' test-settings--sent' : ''}`}>
       <TestHeader
         test={task}
         kind="task"
         client={live ? {} : undefined}
-        status={live ? 'Задание от вашего специалиста' : STATUS[view]}
+        status={live ? 'Задание от вашего специалиста' : locked && view === 'settings' ? 'Отправленное задание' : STATUS[view]}
         onBack={view === 'settings' ? onBack : stepBack}
       />
 
@@ -336,30 +342,30 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
               <ul className="ts-rows">
                 {/* Выбор формы бланка (у заданий с записями — «Количество записей») */}
                 {data.formCount && data.forms ? (
-                  <Row label={formLabel} info>
-                    <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />
+                  <Row label={formLabel} info value={locked ? formText(data, form) : undefined}>
+                    {!locked && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />}
                   </Row>
                 ) : (
                   data.forms && (
-                    <Row label={formLabel} info value={data.forms.length === 1 ? data.forms[0] : undefined}>
-                      {data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
+                    <Row label={formLabel} info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
+                      {!locked && data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
                     </Row>
                   )
                 )}
                 <Row label="Комментарий клиента" help="comment">
-                  <Switch checked={comment} onChange={setComment} label="Комментарий клиента" />
+                  <Switch checked={comment} onChange={locked ? noop : setComment} label="Комментарий клиента" />
                 </Row>
                 <Row label="Оценить состояние" help="state">
-                  <Switch checked={state} onChange={setState} label="Оценить состояние" />
+                  <Switch checked={state} onChange={locked ? noop : setState} label="Оценить состояние" />
                 </Row>
                 <Row label="Назначить постоянным">
-                  <Switch checked={permanent} onChange={setPermanent} label="Назначить постоянным" />
+                  <Switch checked={permanent} onChange={locked ? noop : setPermanent} label="Назначить постоянным" />
                 </Row>
                 <li className={`ts-fold${permanent ? ' ts-fold--open' : ''}`} aria-hidden={!permanent}>
                   <div className="ts-fold__inner">
                     <ul className="ts-rows">
-                      <Row label="Всего записей" info>
-                        {select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
+                      <Row label="Всего записей" info value={locked ? limitText(limit) : undefined}>
+                        {!locked && select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
                       </Row>
                     </ul>
                   </div>
@@ -371,13 +377,13 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             <section className="ts-card ts-message-card">
               <ul className="ts-rows">
                 <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с заданием">
-                  <Switch checked={messageOn} onChange={setMessageOn} label="Сообщение для клиента" />
+                  <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
                 </Row>
               </ul>
               <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
                 <div className="blank-card__inner">
                   <div className="blank-card__body ts-message">
-                    <MessageField value={message} onChange={setMessage} limit={TASK_MESSAGE_LIMIT} />
+                    <MessageField value={message} onChange={locked ? noop : setMessage} limit={TASK_MESSAGE_LIMIT} />
                     <div className="ts-message__foot">
                       <span className="ts-message__count">
                         {message.length} / {TASK_MESSAGE_LIMIT}
@@ -394,11 +400,15 @@ export function TaskSettings({ task, chatId, onBack }: TaskSettingsProps) {
             <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
           </div>
 
-          <div className="test-settings__cta">
-            <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
-              Пройти или отправить
-            </button>
-          </div>
+          {locked ? (
+            <div className="ts-watermark ts-watermark--task" aria-hidden="true" />
+          ) : (
+            <div className="test-settings__cta">
+              <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
+                Пройти или отправить
+              </button>
+            </div>
+          )}
         </>
       )}
 

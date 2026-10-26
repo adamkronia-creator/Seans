@@ -6,7 +6,7 @@ import { TestSettings } from '../../components/TestSettings/TestSettingsLazy';
 import type { LibraryTask, LibraryTest } from '../../data/library';
 import { isTaskResultId } from '../../data/selfTask';
 import { useMessages } from '../../data/chatStore';
-import { LIBRARY } from '../../data/library';
+import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { goBack } from '../../router';
 import './ChatPage.css';
 
@@ -38,14 +38,17 @@ interface ChatSentTestScreenProps {
   onAppTabChange: (id: TabId) => void;
 }
 
-/** Настройки отправленного клиенту теста: тот же экран, только для просмотра, с водяным знаком (адрес /chat/<чат>/sent/<сообщение>) */
+/** Настройки отправленного клиенту теста или задания: тот же экран, только для просмотра, с водяным знаком (адрес /chat/<чат>/sent/<сообщение>) */
 export function ChatSentTestScreen({ chatId, messageId, onAppTabChange }: ChatSentTestScreenProps) {
   const groups = useMessages(chatId);
   const message = groups.flatMap((g) => g.messages).find((m) => m.id === messageId);
   const test = message?.test ? LIBRARY.find((t) => t.id === message.test) : undefined;
+  const task = message?.task ? TASK_LIBRARY.find((t) => t.id === message.task) : undefined;
   return (
     <section className="chat">
-      {message && test ? (
+      {message && task ? (
+        <TaskSettings task={task} chatId={chatId} sent={message} onBack={() => goBack(`/chat/${chatId}`)} />
+      ) : message && test ? (
         <TestSettings test={test} chatId={chatId} sent={message} onBack={() => goBack(`/chat/${chatId}`)} />
       ) : (
         <p className="chat__empty">Сообщение удалено</p>

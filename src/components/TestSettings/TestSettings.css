@@ -660,6 +660,12 @@
   pointer-events: none;
 }
 
+.ts-watermark--task {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='160'%3E%3Ctext x='150' y='80' transform='rotate(-24 150 80)' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='14' font-weight='700' letter-spacing='1.5' fill='white' fill-opacity='0.22'%3EЗАДАНИЕ ОТПРАВЛЕНО%3C/text%3E%3C/svg%3E");
+  background-size: 300px 160px; /* grid:ok — шаг узора */
+  pointer-events: none;
+}
+
 .test-settings--sent > :not(.ts-watermark) {
   position: relative;
   z-index: 1;
