@@ -65,3 +65,9 @@ export async function copyLink(): Promise<boolean> {
     return false;
   }
 }
+
+/** Свой адрес картинки для сообщения: фото можно удалить из профиля, а в переписке оно должно остаться */
+export async function messageImage(id: string, fulls: Record<string, string>, thumbs: Record<string, string>): Promise<string | null> {
+  const file = await fileOf(id, fulls, thumbs, 'photo');
+  return file ? URL.createObjectURL(file) : null;
+}

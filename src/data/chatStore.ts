@@ -14,7 +14,7 @@ function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage'
   const lastGroup = groups?.[groups.length - 1];
   const last = lastGroup?.messages[lastGroup.messages.length - 1];
   if (!last) return undefined;
-  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.test ? 'Тест' : last.task ? 'Задание' : '');
+  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.image ? 'Фото' : last.test ? 'Тест' : last.task ? 'Задание' : '');
   return { lastMessage: text, time: last.time, outgoing: last.from === 'me' ? (last.status === 'read' || !last.status ? 'read' : 'sent') : undefined };
 }
 
@@ -182,7 +182,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded' | 'image'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 
@@ -197,6 +197,12 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
 
   setTimeout(() => patchMessage(chatId, id, { status: 'sent' }), 500);
   setTimeout(() => patchMessage(chatId, id, { status: 'read' }), 1400);
+  // Собеседник иногда отвечает реакцией на ваше сообщение (в «Избранном» собеседника нет)
+  const peer = chats.find((c) => c.id === chatId);
+  if (peer && !peer.favorites && peer.online && !test?.toSelf && Math.random() < 0.6) {
+    const pool = ['❤️', '👍', '🔥', '🥰', '👏', '😁'];
+    setTimeout(() => patchMessage(chatId, id, { theirReaction: pool[Math.floor(Math.random() * pool.length)] }), 3000 + Math.random() * 2500);
+  }
   if (chats.find((c) => c.id === chatId)?.online) {
     if (SIMULATE_TYPING) {
       setTimeout(() => {
@@ -226,8 +232,8 @@ export function setMessageReaction(chatId: string, id: string, emoji: string | n
 /** Переслать сообщение в другие чаты: уходит копия текста с пометкой «Переслано от …»; у карточки теста или задания текст — её название */
 export function forwardMessage(toIds: string[], message: Message, from: string, title?: string) {
   const text = message.text || title || '';
-  if (!text) return;
-  toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from }));
+  if (!text && !message.image) return;
+  toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from, ...(message.image ? { image: message.image } : {}) }));
 }
 
 /** Удаление сообщения; пустые дни убираются, превью списка обновляется */

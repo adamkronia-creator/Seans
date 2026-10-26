@@ -2,8 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, toggleLike, useProfile } from '../../data/profile';
 import { sendMessage } from '../../data/chatStore';
-import { RecipientSheet } from '../TestSettings/TestActions';
-import { copyLink, downloadPhotos, sharePhotos } from '../../utils/photoActions';
+import { ForwardSheet } from '../ForwardSheet/ForwardSheet';
+import { copyLink, downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { ChipMenu, type ChipMenuItem } from '../FolderMenu/ChipMenu';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import { reducedMotion } from '../../utils/swipe';
@@ -189,11 +189,12 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     { key: 'delete', label: 'Удалить фотографию', Icon: IconTrash, danger: true, gap: true, run: () => setSheet('remove') },
   ];
 
-  // Пока в чатах нет картинок, пересылка уходит сообщением «Фото» с описанием
-  const forward = (ids: string[]) => {
-    const text = photo.caption ? `Фото: ${photo.caption}` : 'Фото';
-    ids.forEach((id) => sendMessage(id, text));
+  // В чат уходит картинка со своей копией адреса: удалите фото из профиля, в переписке оно останется
+  const forward = async (ids: string[]) => {
+    const image = await messageImage(photo.id, fulls, thumbs);
     setSheet(null);
+    if (!image) return show('Не удалось переслать');
+    ids.forEach((id) => sendMessage(id, photo.caption, undefined, { image }));
     show(ids.length === 1 ? 'Фото отправлено' : `Фото отправлено: ${ids.length}`);
   };
 
@@ -272,7 +273,7 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
 
       {toast && <Toast text={toast} className="viewer__toast" />}
       {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Действия с фото" width={264} onClose={() => setMenu(null)} />}
-      {sheet === 'forward' && <RecipientSheet mode="many" onSend={forward} onClose={() => setSheet(null)} />}
+      {sheet === 'forward' && <ForwardSheet onSend={(ids) => void forward(ids)} onClose={() => setSheet(null)} />}
       {sheet === 'comments' && <CommentsSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'caption' && <CaptionSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'remove' && (

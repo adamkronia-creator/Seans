@@ -51,13 +51,26 @@ function Highlighted({ text, query, active }: { text: string; query: string; act
 
 const SWIPE_TRIGGER = 56;
 
-/** Реакция под сообщением: эмодзи в плашке; нажатие снимает её */
+/** Реакции под сообщением: ваша (нажатие снимает) и собеседника; одинаковые сливаются в одну плашку с числом */
 function Reaction({ message, onReact }: { message: Message; onReact?: (m: Message, emoji: string | null) => void }) {
-  if (!message.reaction) return null;
+  const mine = message.reaction;
+  const theirs = message.theirReaction;
+  if (!mine && !theirs) return null;
+  const same = mine && mine === theirs;
   return (
-    <button type="button" className="bubble__reaction" aria-label={`Ваша реакция ${message.reaction}: снять`} onClick={() => onReact?.(message, null)}>
-      {message.reaction}
-    </button>
+    <span className="bubble__reactions">
+      {theirs && !same && (
+        <span className="bubble__reaction bubble__reaction--their" aria-label={`Реакция собеседника ${theirs}`}>
+          {theirs}
+        </span>
+      )}
+      {mine && (
+        <button type="button" className="bubble__reaction" aria-label={`Ваша реакция ${mine}: снять`} onClick={() => onReact?.(message, null)}>
+          {mine}
+          {same && <span className="bubble__reaction-count">2</span>}
+        </button>
+      )}
+    </span>
   );
 }
 const LONG_PRESS_MS = 450;
@@ -318,6 +331,7 @@ export function MessageBubble({
           <span className="bubble__quote-text">{replyTarget ? replyTarget.text.replace(/\s*\n\s*/g, ' ') || 'Тест' : 'Сообщение удалено'}</span>
         </button>
       )}
+      {message.image && <img className="bubble__img" src={message.image} alt="Фото" draggable={false} />}
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       <Highlighted text={message.text} query={query} active={activeMatch} />
       <Reaction message={message} onReact={onReact} />

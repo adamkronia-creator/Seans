@@ -7,7 +7,7 @@ import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumMoveSheet, AlbumNameSheet, AlbumPhotosSheet } from '../../components/Profile/AlbumSheets';
 import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
-import { IconAlbum, IconCheck, IconDots, IconDownload, IconFolderMove, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
+import { IconAlbum, IconCheck, IconDots, IconDownload, IconFolderMove, IconForward, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconTrash } from '../../components/ChatParts/ChatIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
@@ -15,8 +15,10 @@ import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
+import { sendMessage } from '../../data/chatStore';
+import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { removeAlbum, removeManyPhotos, setPinned, useProfile } from '../../data/profile';
-import { downloadPhotos, sharePhotos } from '../../utils/photoActions';
+import { downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { useLongPress } from '../../utils/useLongPress';
 import { goBack, navigate, replace } from '../../router';
 import { useSwipeBack } from '../../utils/tabNav';
@@ -84,7 +86,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
   const { photos, albums, thumbs, uploading } = profile;
   const album = view === 'album' ? albums.find((a) => a.id === albumId) : undefined;
   const [viewing, setViewing] = useState<string | null>(null);
-  const [sheet, setSheet] = useState<'new' | 'name' | 'pick' | 'delete' | 'move' | 'remove' | null>(null);
+  const [sheet, setSheet] = useState<'new' | 'name' | 'pick' | 'delete' | 'move' | 'remove' | 'forward' | null>(null);
   /** Выбранные фото; null — обычный режим */
   const [chosen, setChosen] = useState<string[] | null>(null);
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement; id: string | null } | null>(null);
@@ -124,6 +126,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
     const inAlbum = id ? albumOf(id) : undefined;
     const items: ChipMenuItem[] = [
       { key: 'download', label: 'Скачать', Icon: IconDownload, run: () => void doDownload(ids) },
+      { key: 'forward', label: 'Переслать в чат', Icon: IconForward, run: () => { setTarget(ids); setSheet('forward'); } },
       { key: 'share', label: 'Поделиться', Icon: IconShare, run: () => void doShare(ids) },
     ];
     if (inAlbum && view !== 'album') items.push({ key: 'goto', label: 'Перейти к альбому', Icon: IconAlbum, run: () => navigate(`/profile/photos/album/${inAlbum.id}`) });
@@ -301,6 +304,27 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
           onDone={(name) => {
             note(`Перемещено в «${name}»`);
             leave();
+          }}
+        />
+      )}
+      {sheet === 'forward' && (
+        <ForwardSheet
+          onClose={() => setSheet(null)}
+          onSend={(chatIds) => {
+            const ids = target;
+            setSheet(null);
+            void (async () => {
+              let sent = 0;
+              for (const id of ids) {
+                const image = await messageImage(id, profile.fulls, profile.thumbs);
+                if (!image) continue;
+                const caption = photos.find((p) => p.id === id)?.caption ?? '';
+                chatIds.forEach((chatId) => sendMessage(chatId, caption, undefined, { image }));
+                sent += 1;
+              }
+              note(sent ? (sent === 1 ? 'Фото отправлено' : `Отправлено фото: ${sent}`) : 'Не удалось переслать');
+              leave();
+            })();
           }}
         />
       )}

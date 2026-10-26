@@ -589,6 +589,28 @@
 }
 
 /* Реакция под сообщением: плашка с эмодзи, нажатие снимает */
+.bubble__reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.bubble__reaction-count {
+  margin-left: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.bubble__img {
+  display: block;
+  width: 240px; /* grid:ok — ширина фото в сообщении */
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: 0 0 var(--space-1);
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
 .bubble__reaction {
   display: flex;
   width: max-content;
@@ -596,7 +618,6 @@
   justify-content: center;
   min-width: var(--size-control-sm);
   height: var(--size-control-sm);
-  margin-top: var(--space-1);
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
   background: rgb(255 255 255 / 22%);
