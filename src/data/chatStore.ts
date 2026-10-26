@@ -182,7 +182,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 
@@ -209,6 +209,25 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
       }, 5200);
     }
   }
+}
+
+/** Поставить реакцию на сообщение; та же реакция второй раз снимает её, null — снять */
+export function setMessageReaction(chatId: string, id: string, emoji: string | null) {
+  messages = {
+    ...messages,
+    [chatId]: (messages[chatId] ?? []).map((g) => ({
+      ...g,
+      messages: g.messages.map((m) => (m.id === id ? { ...m, reaction: emoji && m.reaction !== emoji ? emoji : undefined } : m)),
+    })),
+  };
+  emit();
+}
+
+/** Переслать сообщение в другие чаты: уходит копия текста с пометкой «Переслано от …»; у карточки теста или задания текст — её название */
+export function forwardMessage(toIds: string[], message: Message, from: string, title?: string) {
+  const text = message.text || title || '';
+  if (!text) return;
+  toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from }));
 }
 
 /** Удаление сообщения; пустые дни убираются, превью списка обновляется */

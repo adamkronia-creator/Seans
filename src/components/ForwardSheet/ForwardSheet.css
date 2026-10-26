@@ -1,0 +1,52 @@
+/* «Переслать»: чаты строками, справа круг выбора */
+.fwd ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — прозрачный разделитель */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fwd__row {
+  display: flex;
+  align-items: center;
+  gap: var(--row-gap);
+  width: 100%;
+  min-height: var(--row-h-2);
+  padding: var(--row-pad-y) var(--row-pad-x);
+  text-align: left;
+}
+
+.fwd__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fwd__name {
+  overflow: hidden;
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fwd__role {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.fwd__mark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-text-placeholder);
+  border-radius: var(--radius-full);
+}
+
+.fwd__mark--on {
+  border-color: var(--color-accent);
+  background: var(--color-accent) radial-gradient(circle, #fff 0 28%, transparent 30%);
+}

@@ -50,6 +50,16 @@ function Highlighted({ text, query, active }: { text: string; query: string; act
 }
 
 const SWIPE_TRIGGER = 56;
+
+/** Реакция под сообщением: эмодзи в плашке; нажатие снимает её */
+function Reaction({ message, onReact }: { message: Message; onReact?: (m: Message, emoji: string | null) => void }) {
+  if (!message.reaction) return null;
+  return (
+    <button type="button" className="bubble__reaction" aria-label={`Ваша реакция ${message.reaction}: снять`} onClick={() => onReact?.(message, null)}>
+      {message.reaction}
+    </button>
+  );
+}
 const LONG_PRESS_MS = 450;
 
 interface MessageBubbleProps {
@@ -64,6 +74,8 @@ interface MessageBubbleProps {
   activeMatch?: boolean;
   test?: LibraryItem;
   onReply: (m: Message) => void;
+  /** Снять свою реакцию, нажав на неё под сообщением */
+  onReact?: (m: Message, emoji: string | null) => void;
   onMenu: (m: Message, rect: DOMRect) => void;
   onQuoteClick: (id: string) => void;
   onOpenTest: (id: string) => void;
@@ -84,6 +96,7 @@ export function MessageBubble({
   activeMatch = false,
   test,
   onReply,
+  onReact,
   onMenu,
   onQuoteClick,
   onOpenTest,
@@ -221,6 +234,7 @@ export function MessageBubble({
               </span>
             </p>
           ) : null}
+          <Reaction message={message} onReact={onReact} />
           <span className="bubble__meta">
             <Meta message={message} />
           </span>
@@ -304,7 +318,9 @@ export function MessageBubble({
           <span className="bubble__quote-text">{replyTarget ? replyTarget.text.replace(/\s*\n\s*/g, ' ') || 'Тест' : 'Сообщение удалено'}</span>
         </button>
       )}
+      {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       <Highlighted text={message.text} query={query} active={activeMatch} />
+      <Reaction message={message} onReact={onReact} />
       {showMeta && (
         <>
           {/* Невидимая копия резервирует место под время в конце последней строки */}

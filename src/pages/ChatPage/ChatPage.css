@@ -516,3 +516,108 @@
     animation: none;
   }
 }
+
+/* ——— Реакции над меню сообщения: стеклянная плашка с быстрыми эмодзи и стрелкой «ещё» ——— */
+.msg-react {
+  position: fixed;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  background: var(--glass-strong);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+  animation: pop-in 0.25s var(--ease-spring) backwards;
+}
+
+.msg-react__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px; /* grid:ok — высота плашки реакций (REACT_BAR_H) */
+  padding: 0 var(--space-2);
+}
+
+.msg-react__emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  font-size: 24px; /* grid:ok — эмодзи крупнее текста */
+  line-height: 1;
+}
+
+.msg-react__emoji--on {
+  background: var(--glass-fill);
+}
+
+.msg-react__emoji:active {
+  transform: scale(1.2);
+}
+
+.msg-react__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  color: var(--text-secondary);
+  font-size: var(--size-icon);
+}
+
+/* Раскрытый список: сетка 7 в ряд, видно пять рядов, дальше прокрутка */
+.msg-react--more {
+  border-radius: var(--radius-lg);
+}
+
+.msg-react__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  max-height: 240px; /* grid:ok — пять рядов по 48 */
+  margin: 0;
+  padding: var(--space-2);
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.msg-react__grid .msg-react__emoji {
+  margin: auto;
+}
+
+/* Реакция под сообщением: плашка с эмодзи, нажатие снимает */
+.bubble__reaction {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  margin-top: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 22%);
+  font-size: 18px; /* grid:ok */
+  line-height: 1;
+  animation: pop-in 0.3s var(--ease-spring) backwards;
+}
+
+.bubble--in .bubble__reaction {
+  background: rgb(0 122 255 / 14%);
+}
+
+.bubble__fwd {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.bubble--out .bubble__fwd {
+  color: rgb(255 255 255 / 85%);
+}

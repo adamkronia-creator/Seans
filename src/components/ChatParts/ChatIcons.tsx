@@ -7,3 +7,4 @@ export { default as IconChevronDown } from '../../assets/icons/solar/alt-arrow-d
 export { default as IconChevronUp } from '../../assets/icons/solar/alt-arrow-up.svg?react';
 export { default as IconClock } from '../../assets/icons/solar/clock-circle.svg?react';
 export { default as IconTickSingle } from '../../assets/icons/solar/check.svg?react';
+export { default as IconForward } from '../../assets/icons/solar/forward.svg?react';

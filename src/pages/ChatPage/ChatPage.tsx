@@ -17,9 +17,11 @@ import { SentTaskSheet } from '../../components/MessageBubble/SentTaskSheet';
 import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import { deleteMessage, sendMessage, setMessagePinned, useChats, useMessages, useTyping } from '../../data/chatStore';
+import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
+import { deleteMessage, forwardMessage, sendMessage, setMessagePinned, setMessageReaction, useChats, useMessages, useTyping } from '../../data/chatStore';
 import { roleOf } from '../../data/roles';
+import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
+import { EMOJI_GROUPS } from '../../data/emojiSet';
 import { addNote, addSection } from '../../data/clientStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
@@ -47,6 +49,12 @@ function sameRun(a: Message | undefined, b: Message | undefined) {
   return d >= 0 && d < 5;
 }
 
+/** Быстрые реакции над меню сообщения; остальные — по стрелке «ещё» */
+const QUICK_REACTIONS = ['❤️', '👍', '👎', '🔥', '🥰', '👏', '😁'];
+/** Все реакции по стрелке: лица, жесты и символы из набора эмодзи */
+const MORE_REACTIONS = [...(EMOJI_GROUPS.find((g) => g.id === 'smileys')?.emojis ?? []), ...(EMOJI_GROUPS.find((g) => g.id === 'people')?.emojis ?? []).slice(0, 40), ...(EMOJI_GROUPS.find((g) => g.id === 'symbols')?.emojis ?? []).slice(0, 0)];
+const REACT_BAR_H = 48;
+const REACT_BAR_W = 328;
 const MENU_W = 196;
 const MENU_ITEM_H = 48;
 /** Не ближе к краю ленты, чем поле страницы (--page-gutter), как у меню чипса */
@@ -72,6 +80,8 @@ function MessageMenu({
   onReply,
   onPin,
   onDelete,
+  onReact,
+  onForward,
 }: {
   message: Message;
   rect: DOMRect;
@@ -80,44 +90,91 @@ function MessageMenu({
   onReply: () => void;
   onPin: () => void;
   onDelete: () => void;
+  onReact: (emoji: string) => void;
+  onForward: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState(false);
   useExitAnimation(backdropRef);
   const items = [
     { label: 'Ответить', Icon: IconReply, run: onReply },
     { label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin },
+    { label: 'Переслать', Icon: IconForward, run: onForward },
     ...(message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined) }] : []),
     { label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true },
   ];
   const h = items.length * MENU_ITEM_H + 8;
   const minLeft = (bounds?.left ?? 0) + MENU_EDGE;
-  const maxLeft = (bounds?.right ?? window.innerWidth) - MENU_W - MENU_EDGE;
+  const right = (bounds?.right ?? window.innerWidth) - MENU_EDGE;
+  const maxLeft = right - MENU_W;
   const left = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - MENU_W : rect.left, maxLeft));
+  const barW = Math.min(REACT_BAR_W, right - minLeft);
+  const barLeft = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - barW : rect.left, right - barW));
+  // Сверху вниз: панель реакций, под ней меню; весь столбик над сообщением или, если там тесно, под ним
+  const stack = REACT_BAR_H + 8 + h;
   const topLimit = bounds?.top ?? 0;
-  const above = rect.top - h - 8 >= topLimit;
-  const top = above ? rect.top - h - 8 : Math.min(rect.bottom + 8, window.innerHeight - h - 8);
+  const above = rect.top - stack - 8 >= topLimit;
+  const stackTop = above ? rect.top - stack - 8 : Math.min(rect.bottom + 8, window.innerHeight - stack - 8);
+  const barTop = stackTop;
+  const top = stackTop + REACT_BAR_H + 8;
   // Меню вырастает от пузыря: над ним — от нижнего края, под ним — от верхнего; сторону задаёт автор сообщения
   const origin = `${above ? 'bottom' : 'top'} ${message.from === 'me' ? 'right' : 'left'}`;
+  const pick = (emoji: string) => {
+    onReact(emoji);
+    onClose();
+  };
   return (
     <div ref={backdropRef} className="msg-menu__backdrop" data-no-swipe onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
-      <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
-        {items.map(({ label, Icon, run, danger }) => (
-          <li key={label}>
-            <button
-              type="button"
-              role="menuitem"
-              className={`msg-menu__item${danger ? ' msg-menu__item--danger' : ''}`}
-              onClick={() => {
-                run();
-                onClose();
-              }}
-            >
-              <Icon />
-              {label}
+      <div
+        className={`msg-react${more ? ' msg-react--more' : ''}`}
+        role="group"
+        aria-label="Реакции"
+        style={{ left: barLeft, top: barTop, width: barW, transformOrigin: origin }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {more ? (
+          <ul className="msg-react__grid">
+            {MORE_REACTIONS.map((emoji) => (
+              <li key={emoji}>
+                <button type="button" className={`msg-react__emoji${message.reaction === emoji ? ' msg-react__emoji--on' : ''}`} onClick={() => pick(emoji)}>
+                  {emoji}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="msg-react__row">
+            {QUICK_REACTIONS.map((emoji) => (
+              <button key={emoji} type="button" className={`msg-react__emoji${message.reaction === emoji ? ' msg-react__emoji--on' : ''}`} aria-label={`Реакция ${emoji}`} onClick={() => pick(emoji)}>
+                {emoji}
+              </button>
+            ))}
+            <button type="button" className="msg-react__more" aria-label="Все реакции" onClick={() => setMore(true)}>
+              <IconChevronDown />
             </button>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      </div>
+      {!more && (
+        <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
+          {items.map(({ label, Icon, run, danger }) => (
+            <li key={label}>
+              <button
+                type="button"
+                role="menuitem"
+                className={`msg-menu__item${danger ? ' msg-menu__item--danger' : ''}`}
+                onClick={() => {
+                  run();
+                  onClose();
+                }}
+              >
+                <Icon />
+                {label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -219,6 +276,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [menu, setMenu] = useState<{ message: Message; rect: DOMRect } | null>(null);
   // Карточка отправленного теста, чьи настройки показаны в окне
   const [settingsOf, setSettingsOf] = useState<Message | null>(null);
+  const [forwarding, setForwarding] = useState<Message | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
   const pinShown = pins.length > 0 && section === 'messages' && !searchOpen;
@@ -380,6 +438,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}
                     onReply={setReplyTo}
                     onMenu={(message, rect) => setMenu({ message, rect })}
+                    onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
                     onOpenTask={(id) => navigate(`/chat/${chatId}/tasks/${id}`)}
@@ -589,9 +648,22 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onClose={() => setMenu(null)}
           onReply={() => setReplyTo(menu.message)}
           onPin={() => setMessagePinned(chatId, menu.message.id, !menu.message.pinned)}
+          onReact={(emoji) => setMessageReaction(chatId, menu.message.id, emoji)}
+          onForward={() => setForwarding(menu.message)}
           onDelete={() => {
             if (replyTo?.id === menu.message.id) setReplyTo(null);
             deleteMessage(chatId, menu.message.id);
+          }}
+        />
+      )}
+
+      {forwarding && (
+        <ForwardSheet
+          onClose={() => setForwarding(null)}
+          onSend={(ids) => {
+            const title = forwarding.test ? LIBRARY.find((t) => t.id === forwarding.test)?.title : forwarding.task ? TASK_LIBRARY.find((t) => t.id === forwarding.task)?.title : undefined;
+            forwardMessage(ids, forwarding, forwarding.from === 'me' ? 'Вы' : chat.name.split(' ')[0], title);
+            setForwarding(null);
           }}
         />
       )}

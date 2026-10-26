@@ -27,6 +27,10 @@ export interface Message {
   testOptions?: SentTestOptions;
   /** Тест отправлен самому себе (в «Избранное»): вместо «Настройки теста» у карточки кнопка «Пройти» */
   toSelf?: boolean;
+  /** Ваша реакция на сообщение (эмодзи) */
+  reaction?: string;
+  /** Сообщение переслано: от кого («Вы» или имя собеседника) */
+  forwarded?: string;
   /** Кнопки под пузырём, как у ботов в Telegram */
   buttons?: MessageButton[];
 }
