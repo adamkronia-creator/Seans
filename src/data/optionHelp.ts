@@ -26,8 +26,8 @@ export interface OptionHelp {
   slides: HelpSlide[];
 }
 
-/** Размер макета в пикселях экрана: кадр 393×340, как телефон 393 px, обрезанный сверху */
-export const HELP_SHOT = { width: 393, height: 340 } as const;
+/** Размер макета в пикселях экрана: кадр 393×480, как телефон 393 px, обрезанный сверху */
+export const HELP_SHOT = { width: 393, height: 480 } as const;
 
 export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
   blind: {

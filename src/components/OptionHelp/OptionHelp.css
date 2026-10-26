@@ -61,7 +61,7 @@
  * чтобы окно целиком помещалось без прокрутки (350 — всё в окне, кроме скриншота).
  */
 .oh {
-  --slide-w: min(332px, calc(100cqw - 56px), calc((100dvh - 350px) * 393 / 340));
+  --slide-w: min(332px, calc(100cqw - 56px), calc((100dvh - 350px) * 393 / 480));
   container-type: inline-size;
   margin-inline: calc(var(--space-4) * -1);
 }

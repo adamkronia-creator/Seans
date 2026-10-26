@@ -188,7 +188,7 @@ function Body({ scene, ctx }: { scene: HelpScene; ctx: HelpTest }) {
   );
 }
 
-/** Макет 393×340: настоящие экраны выбранного теста, уменьшенные до ширины слайда; рамка отмечает то, что меняет настройка */
+/** Макет 393×480: настоящие экраны выбранного теста, уменьшенные до ширины слайда; рамка отмечает то, что меняет настройка */
 export function HelpSceneView({ slide, ctx }: { slide: HelpSlide; ctx: HelpTest }) {
   const host = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);

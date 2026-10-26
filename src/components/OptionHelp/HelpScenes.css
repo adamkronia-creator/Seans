@@ -1,8 +1,8 @@
-/* Макет в подсказке: экран 393×340, уменьшенный до ширины слайда; пальцем и клавишей в нём ничего не нажать */
+/* Макет в подсказке: экран 393×480, уменьшенный до ширины слайда; пальцем и клавишей в нём ничего не нажать */
 .hs {
   position: relative;
   width: 100%;
-  aspect-ratio: 393 / 340;
+  aspect-ratio: 393 / 480;
   overflow: hidden;
   background: #1b1d22;
 }
@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   width: 393px; /* grid:ok — ширина экрана эталонного телефона, макет потом уменьшается */
-  height: 340px;
+  height: 480px;
   overflow: hidden;
   transform: scale(var(--k, 1));
   transform-origin: 0 0;
@@ -30,7 +30,7 @@
 }
 
 .hs__screen {
-  height: 340px;
+  height: 480px;
 }
 
 .hs__scroll {
