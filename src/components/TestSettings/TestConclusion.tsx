@@ -1,4 +1,9 @@
 import { useMemo, useState } from 'react';
+import IconDate from '../../assets/icons/solar/calendar.svg?react';
+import IconTime from '../../assets/icons/solar/clock-circle.svg?react';
+import IconDuration from '../../assets/icons/solar/stopwatch.svg?react';
+import IconAge from '../../assets/icons/solar/user.svg?react';
+import IconForm from '../../assets/icons/solar/document-text.svg?react';
 import { IconTestChevron, IconTestReportExtra, IconTestReportMain } from '../icons';
 import { levelOf, levelsOf, showsCode, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { useRevealOnce } from '../../utils/useRevealOnce';
@@ -301,6 +306,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
       id={`cc-scale-${scale.code}`}
       badge={(data.overview || data.blocks) && showsCode(data, scale) ? <span className="cc-badge">Шкала {scale.code}</span> : undefined}
     >
+      <div className="cc-part">
       <div className="cc-scale">
         <p className="cc-scale__text">{sentence(scale.about)}</p>
         <p className="cc-scale__text">
@@ -338,6 +344,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
         )}
       </div>
       {(flat ? order.slice(0, 1) : order).map(renderLevel)}
+      </div>
       {flat && order.length > 1 && (
         <>
           {/* Свёрнуто — кнопка между диапазоном клиента и остальными; развёрнуто — «Скрыть» в самом конце */}
@@ -388,26 +395,31 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
       <CollapseCard title="Общая информация" id="cc-info">
         <ul className="cc-info">
           <li>
+            <IconDate className="cc-info__icon" />
             <span className="cc-info__label">Дата прохождения</span>
             <span className="cc-info__value">{info.date}</span>
           </li>
           <li>
+            <IconTime className="cc-info__icon" />
             <span className="cc-info__label">Время прохождения</span>
             <span className="cc-info__value">{info.time}</span>
           </li>
           <li>
+            <IconDuration className="cc-info__icon" />
             <span className="cc-info__label">Длительность</span>
             <span className="cc-info__value">{info.duration}</span>
           </li>
           {info.age && (
             <li>
-              <span className="cc-info__label">Возраст</span>
+              <IconAge className="cc-info__icon" />
+            <span className="cc-info__label">Возраст</span>
               <span className="cc-info__value">{info.age}</span>
             </li>
           )}
           {form && (
             <li>
-              <span className="cc-info__label">Форма бланка</span>
+              <IconForm className="cc-info__icon" />
+            <span className="cc-info__label">Форма бланка</span>
               <span className="cc-info__value">{form}</span>
             </li>
           )}
