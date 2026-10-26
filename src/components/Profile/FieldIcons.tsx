@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 /** Значки полей «Контактной» и «Общей информации» в редактировании профиля: набор Solar, начертание Linear (лицензия CC BY 4.0, @iconify-json/solar), 24 на 24, цвет задаёт текст вокруг */
 const svg = (body: string): ReactNode => <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" dangerouslySetInnerHTML={{ __html: body }} />;
 
-export const FieldIcon: Record<'user' | 'at' | 'phone' | 'cake' | 'badge' | 'heart' | 'city', ReactNode> = {
+export const FieldIcon: Record<'user' | 'at' | 'phone' | 'cake' | 'badge' | 'heart' | 'city' | 'about' | 'tag', ReactNode> = {
   // user-linear
   user: svg("<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"6\" r=\"4\"/><path d=\"M20 17.5C20 19.9853 20 22 12 22C4 22 4 19.9853 4 17.5C4 15.0147 7.58172 13 12 13C16.4183 13 20 15.0147 20 17.5Z\"/></g>"),
   // mention-circle-linear
@@ -18,4 +18,8 @@ export const FieldIcon: Record<'user' | 'at' | 'phone' | 'cake' | 'badge' | 'hea
   heart: svg("<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M2 9.1371C2 14 6.01943 16.5914 8.96173 18.9109C10 19.7294 11 20.5 12 20.5C13 20.5 14 19.7294 15.0383 18.9109C17.9806 16.5914 22 14 22 9.1371C22 4.27416 16.4998 0.825464 12 5.50063C7.50016 0.825464 2 4.27416 2 9.1371Z\"/>"),
   // map-point-linear
   city: svg("<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"1.5\"><path d=\"M4 10.1433C4 5.64588 7.58172 2 12 2C16.4183 2 20 5.64588 20 10.1433C20 14.6055 17.4467 19.8124 13.4629 21.6744C12.5343 22.1085 11.4657 22.1085 10.5371 21.6744C6.55332 19.8124 4 14.6055 4 10.1433Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></g>"),
+  // document-text-linear
+  about: svg("<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"1.5\"><path d=\"M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z\"/><path d=\"M8 12H16\"/><path d=\"M8 8H16\"/><path d=\"M8 16H13\"/></g>"),
+  // tag-linear
+  tag: svg("<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-width=\"1.5\"><path d=\"M4.72848 16.1369C3.18295 14.5914 2.41018 13.8186 2.12264 12.816C1.83509 11.8134 2.08083 10.7485 2.57231 8.61875L2.85574 7.39057C3.26922 5.59881 3.47597 4.70292 4.08944 4.08944C4.70292 3.47597 5.59881 3.26922 7.39057 2.85574L8.61875 2.57231C10.7485 2.08083 11.8134 1.83509 12.816 2.12264C13.8186 2.41018 14.5914 3.18295 16.1369 4.72848L17.9665 6.55812C20.6555 9.24711 22 10.5916 22 12.2623C22 13.933 20.6555 15.2775 17.9665 17.9665C15.2775 20.6555 13.933 22 12.2623 22C10.5916 22 9.24711 20.6555 6.55812 17.9665L4.72848 16.1369Z\"/><circle cx=\"8.607\" cy=\"8.879\" r=\"2\" transform=\"rotate(-45 8.607 8.879)\"/><path d=\"M11.5417 18.5L18.5208 11.5208\"/></g>"),
 };

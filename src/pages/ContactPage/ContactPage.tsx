@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
@@ -28,6 +28,7 @@ import {
   IconUserCheck,
   IconUserPlus,
 } from './ContactIcons';
+import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { ContactTabs } from './ContactTabs';
 import '../FolderPage/FolderPage.css';
 import './ContactPage.css';
@@ -125,12 +126,12 @@ export function ContactPage({ chatId }: { chatId: string }) {
     { key: 'c-report', label: 'Пожаловаться', Icon: IconFlag, danger: true, run: () => setSheet('report') },
   ];
 
-  const rows: { key: string; value: string; label: string; onClick?: () => void; icon?: JSX.Element }[] = [
-    chat.phone ? { key: 'phone', value: chat.phone, label: 'Телефон', onClick: () => copy(chat.phone!, 'Номер скопирован'), icon: <IconCopyLine /> } : null,
-    chat.about ? { key: 'about', value: chat.about, label: 'О себе' } : null,
-    chat.username ? { key: 'user', value: chat.username, label: 'Имя пользователя', onClick: () => copy(chat.username!, 'Имя скопировано'), icon: <IconCopyLine /> } : null,
-    chat.birthday ? { key: 'birth', value: chat.birthday, label: 'День рождения' } : null,
-    { key: 'role', value: roleOf(chat), label: 'Роль', onClick: () => setSheet('role'), icon: <IconTag /> },
+  const rows: { key: string; value: string; label: string; onClick?: () => void; icon: ReactNode; action?: JSX.Element }[] = [
+    chat.username ? { key: 'user', value: chat.username, label: 'Никнейм', icon: FieldIcon.at, onClick: () => copy(chat.username!, 'Никнейм скопирован'), action: <IconCopyLine /> } : null,
+    chat.phone ? { key: 'phone', value: chat.phone, label: 'Телефон', icon: FieldIcon.phone, onClick: () => copy(chat.phone!, 'Номер скопирован'), action: <IconCopyLine /> } : null,
+    chat.about ? { key: 'about', value: chat.about, label: 'О себе', icon: FieldIcon.about } : null,
+    chat.birthday ? { key: 'birth', value: chat.birthday, label: 'День рождения', icon: FieldIcon.cake } : null,
+    { key: 'role', value: roleOf(chat), label: 'Роль', icon: FieldIcon.tag, onClick: () => setSheet('role') },
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
   return (
@@ -190,9 +191,14 @@ export function ContactPage({ chatId }: { chatId: string }) {
               {rows.map((row) => {
                 const body = (
                   <>
-                    <span className="ct__value">{row.value}</span>
-                    <span className="ct__label">{row.label}</span>
-                    {row.icon && <span className="ct__row-icon">{row.icon}</span>}
+                    <span className="ct__icon" aria-hidden="true">
+                      {row.icon}
+                    </span>
+                    <span className="ct__text">
+                      <span className="ct__label">{row.label}</span>
+                      <span className="ct__value">{row.value}</span>
+                    </span>
+                    {row.action && <span className="ct__row-icon">{row.action}</span>}
                   </>
                 );
                 return (
