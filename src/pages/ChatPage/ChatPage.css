@@ -526,7 +526,6 @@
   box-shadow: var(--glass-shadow-panel);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
-  animation: pop-in 0.25s var(--ease-spring) backwards;
 }
 
 .msg-react__row {
@@ -601,15 +600,20 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  height: var(--size-control-sm);
-  padding: 0 var(--space-1) 0 var(--space-2);
+  padding: var(--space-1);
   border-radius: var(--radius-pill);
   background: rgb(255 255 255 / 94%);
   color: #1c1c1e;
   animation: pop-in 0.3s var(--ease-spring) backwards;
 }
 
+/* Эмодзи в квадрате 28 — как фото рядом, поэтому поля плашки со всех сторон равны 4 */
 .bubble__reaction-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; /* grid:ok — как фото в плашке */
+  height: 28px; /* grid:ok */
   font-size: 20px; /* grid:ok — эмодзи в плашке */
   line-height: 1;
 }
@@ -638,6 +642,12 @@
   overflow: hidden;
 }
 
+/* Фото в серии: верхний угол у стыка скруглён как у фото, а не острый */
+.bubble--photo.bubble--joined-prev {
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+
 .bubble__img {
   display: block;
   width: 100%;
@@ -660,8 +670,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-2);
-  min-height: var(--size-control-sm);
-  padding: var(--space-1) var(--space-2) var(--space-1);
+  margin-top: var(--space-1);
 }
 
 .bubble__foot .bubble__reactions {
@@ -670,7 +679,7 @@
 
 .bubble__meta--foot {
   position: static;
-  margin-left: auto;
+  margin: 0 var(--space-2) var(--space-1) auto;
 }
 
 .bubble__fwd {

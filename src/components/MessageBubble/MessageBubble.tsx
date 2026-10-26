@@ -135,6 +135,7 @@ export function MessageBubble({
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);
   const out = message.from === 'me';
+  const hasReaction = Boolean(message.reaction || message.theirReaction);
   // Постоянное задание: клиенту ушло правило (сколько записей всего), а у отправленного себе считаются сделанные записи
   const permanent = message.task ? message.taskOptions?.permanent : undefined;
   const selfRecords = useAssignmentRecords(message.toSelf && permanent ? message.id : '');
@@ -192,7 +193,13 @@ export function MessageBubble({
     'data-swipe-lock': 'right',
     onPointerDown,
     onPointerMove,
-    onPointerUp: end,
+    onPointerUp: (e: PointerEvent) => {
+      const g = gesture.current;
+      // Короткое касание без сдвига открывает меню сразу, удерживать не нужно
+      const tap = g?.mode === 'idle' && !(e.target as HTMLElement).closest('button') && Math.hypot(e.clientX - g.x, e.clientY - g.y) < 10;
+      end();
+      if (tap && ref.current) onMenu(message, ref.current.getBoundingClientRect());
+    },
     onPointerCancel: end,
     onContextMenu: (e: React.MouseEvent) => {
       e.preventDefault();
@@ -373,8 +380,15 @@ export function MessageBubble({
       {message.image && <img className="bubble__img" src={message.image} alt="Фото" draggable={false} />}
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       <Highlighted text={message.text} query={query} active={activeMatch} />
-      <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
-      {showMeta && (
+      {hasReaction && (
+        <div className="bubble__foot bubble__foot--text">
+          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
+          <span className="bubble__meta bubble__meta--foot">
+            <Meta message={message} />
+          </span>
+        </div>
+      )}
+      {showMeta && !hasReaction && (
         <>
           {/* Невидимая копия резервирует место под время в конце последней строки */}
           <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">

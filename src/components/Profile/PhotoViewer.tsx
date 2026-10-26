@@ -199,7 +199,7 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     const image = await messageImage(photo.id, fulls, thumbs);
     setSheet(null);
     if (!image) return show('Не удалось переслать');
-    ids.forEach((id) => sendMessage(id, photo.caption, undefined, { image }));
+    ids.forEach((id) => sendMessage(id, '', undefined, { image }));
     if (ids.length === 1) {
       onClose();
       openChat(ids[0], navigate);

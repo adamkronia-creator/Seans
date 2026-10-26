@@ -142,7 +142,8 @@ html[data-transition='fade']::view-transition-new(app) {
 /* ---------- Меню сообщения ---------- */
 
 /* Растёт от края пузыря (точка отсчёта задана в разметке) */
-.msg-menu {
+.msg-menu,
+.msg-react {
   animation: menu-in 0.2s var(--ease-ios) both;
 }
 
@@ -150,7 +151,8 @@ html[data-transition='fade']::view-transition-new(app) {
   pointer-events: none;
 }
 
-.msg-menu__backdrop.is-leaving .msg-menu {
+.msg-menu__backdrop.is-leaving .msg-menu,
+.msg-menu__backdrop.is-leaving .msg-react {
   animation: menu-out 0.12s ease-in both;
 }
 
@@ -198,6 +200,7 @@ html[data-transition='fade']::view-transition-new(app) {
   .sheet-overlay,
   .sheet,
   .msg-menu,
+  .msg-react,
   .test-settings__toast {
     animation: none;
   }

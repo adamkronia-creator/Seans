@@ -231,7 +231,8 @@ export function setMessageReaction(chatId: string, id: string, emoji: string | n
 
 /** Переслать сообщение в другие чаты: уходит копия текста с пометкой «Переслано от …»; у карточки теста или задания текст — её название */
 export function forwardMessage(toIds: string[], message: Message, from: string, title?: string) {
-  const text = message.text || title || '';
+  // У фото подпись не пересылается, уходит только снимок
+  const text = message.image ? '' : message.text || title || '';
   if (!text && !message.image) return;
   toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from, ...(message.image ? { image: message.image } : {}) }));
 }
