@@ -252,10 +252,15 @@
   min-width: 0;
   margin-right: 0;
   padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
 }
 
 /* Невыбранные без своего стекла (фон даёт капсула), выбранный — синее стекло с рамкой */
+.ct__chips .chip--follow::before,
+.ct__chips .chip--follow::after {
+  border-radius: var(--radius-md);
+}
+
 .ct__chips .chip--follow::before {
   border: 1px solid transparent;
   background: none;
