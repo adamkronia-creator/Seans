@@ -21,7 +21,7 @@ import { removeAlbum, removeManyPhotos, setPinned, useProfile } from '../../data
 import { downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { useLongPress } from '../../utils/useLongPress';
 import { goBack, navigate, replace } from '../../router';
-import { useSwipeBack } from '../../utils/tabNav';
+import { openChat, useSwipeBack } from '../../utils/tabNav';
 import '../FolderPage/FolderPage.css';
 import './PhotosPage.css';
 
@@ -322,8 +322,9 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
                 chatIds.forEach((chatId) => sendMessage(chatId, caption, undefined, { image }));
                 sent += 1;
               }
-              note(sent ? (sent === 1 ? 'Фото отправлено' : `Отправлено фото: ${sent}`) : 'Не удалось переслать');
               leave();
+              if (sent && chatIds.length === 1) openChat(chatIds[0], navigate);
+              else note(sent ? (sent === 1 ? 'Фото отправлено' : `Отправлено фото: ${sent}`) : 'Не удалось переслать');
             })();
           }}
         />

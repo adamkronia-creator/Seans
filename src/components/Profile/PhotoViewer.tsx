@@ -2,6 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, toggleLike, useProfile } from '../../data/profile';
 import { sendMessage } from '../../data/chatStore';
+import { navigate } from '../../router';
+import { openChat } from '../../utils/tabNav';
+import { useBackHandler } from '../../utils/backHandler';
 import { ForwardSheet } from '../ForwardSheet/ForwardSheet';
 import { copyLink, downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { ChipMenu, type ChipMenuItem } from '../FolderMenu/ChipMenu';
@@ -41,6 +44,8 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   const root = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   useExitAnimation(root);
+  // Жест и кнопка «назад» закрывают просмотр, а не уводят с экрана фото
+  useBackHandler(!sheet && !menu, onClose);
 
   // Фото могли удалить: номер не выходит за список
   const at = Math.min(index, Math.max(0, count - 1));
@@ -195,7 +200,10 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     setSheet(null);
     if (!image) return show('Не удалось переслать');
     ids.forEach((id) => sendMessage(id, photo.caption, undefined, { image }));
-    show(ids.length === 1 ? 'Фото отправлено' : `Фото отправлено: ${ids.length}`);
+    if (ids.length === 1) {
+      onClose();
+      openChat(ids[0], navigate);
+    } else show(`Фото отправлено: ${ids.length}`);
   };
 
   return createPortal(

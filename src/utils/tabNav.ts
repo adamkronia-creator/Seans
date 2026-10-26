@@ -111,3 +111,9 @@ export function useChipsDrag(ref: RefObject<HTMLElement>) {
     };
   }, [ref]);
 }
+
+/** Открыть чат из любого раздела: сначала вкладка «Диалоги», затем сам чат (после возврата к списку переход в чат встаёт поверх него) */
+export function openChat(id: string, go: (path: string) => void) {
+  switchTab('messages', 'fade');
+  window.setTimeout(() => go(`/chat/${id}`), 380);
+}
