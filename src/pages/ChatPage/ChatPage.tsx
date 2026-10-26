@@ -95,6 +95,12 @@ function MessageMenu({
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState(false);
+  // Меню открывается касанием, и «клик», идущий за ним следом, попал бы уже в меню и закрыл его: первые 350 мс оно сквозное
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setArmed(true), 350);
+    return () => window.clearTimeout(t);
+  }, []);
   useExitAnimation(backdropRef);
   const items = [
     { label: 'Ответить', Icon: IconReply, run: onReply },
@@ -124,7 +130,7 @@ function MessageMenu({
     onClose();
   };
   return (
-    <div ref={backdropRef} className="msg-menu__backdrop" data-no-swipe onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
+    <div ref={backdropRef} className="msg-menu__backdrop" data-no-swipe style={armed ? undefined : { pointerEvents: 'none' }} onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
       <div
         className={`msg-react${more ? ' msg-react--more' : ''}`}
         role="group"
