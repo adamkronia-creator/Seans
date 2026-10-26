@@ -514,9 +514,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
       </div>
 
       {locked ? (
-        <div className="ts-watermark" aria-hidden="true">
-          <span>Тест отправлен</span>
-        </div>
+        <div className="ts-watermark" aria-hidden="true" />
       ) : (
         <div className="test-settings__cta">
           <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>

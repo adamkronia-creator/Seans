@@ -650,28 +650,17 @@
   display: none;
 }
 
+/* Водяной знак лежит между фоном и панелями: сквозь стекло карточек он просвечивает узором из повторяющейся надписи */
 .ts-watermark {
   position: absolute;
   inset: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Ctext x='100' y='60' transform='rotate(-24 100 60)' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-size='15' font-weight='700' letter-spacing='1.5' fill='white' fill-opacity='0.22'%3EТЕСТ ОТПРАВЛЕН%3C/text%3E%3C/svg%3E");
+  background-size: 200px 120px; /* grid:ok — шаг узора */
   pointer-events: none;
 }
 
-.ts-watermark span {
-  padding: var(--space-2) var(--space-4);
-  border: 3px solid currentColor; /* grid:ok — рамка штампа */
-  border-radius: var(--radius-md);
-  color: var(--color-accent);
-  font-size: 28px; /* grid:ok — крупная надпись штампа */
-  font-weight: 700;
-  line-height: 36px; /* grid:ok */
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0.22;
-  transform: rotate(-18deg);
+.test-settings--sent > :not(.ts-watermark) {
+  position: relative;
+  z-index: 1;
 }
