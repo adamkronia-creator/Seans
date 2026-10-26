@@ -41,6 +41,7 @@ export function ForwardSheet({ onSend, onClose }: ForwardSheetProps) {
         <div className="messages__list">
           <ul className="messages__rows">
             {favorites && <ChatItem chat={favorites} onClick={() => toggle(favorites.id)} selected={picked.includes(favorites.id)} />}
+            {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
             {others.map((chat) => (
               <ChatItem key={chat.id} chat={chat} onClick={() => toggle(chat.id)} selected={picked.includes(chat.id)} />
             ))}

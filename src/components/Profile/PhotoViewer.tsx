@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, toggleLike, useProfile } from '../../data/profile';
 import { sendMessage } from '../../data/chatStore';
-import { navigate } from '../../router';
+import { guardBack, navigate } from '../../router';
 import { openChat } from '../../utils/tabNav';
 import { useBackHandler } from '../../utils/backHandler';
 import { ForwardSheet } from '../ForwardSheet/ForwardSheet';
@@ -46,6 +46,13 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   useExitAnimation(root);
   // Жест и кнопка «назад» закрывают просмотр, а не уводят с экрана фото
   useBackHandler(!sheet && !menu, onClose);
+  // Системная «назад» закрывает просмотр. Пока открыто окно или меню, запись истории держат они, а не просмотр
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    if (sheet || menu) return;
+    return guardBack(() => closeRef.current());
+  }, [sheet, menu]);
 
   // Фото могли удалить: номер не выходит за список
   const at = Math.min(index, Math.max(0, count - 1));

@@ -29,6 +29,11 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
         <button type="button" className="chat-item__button" onClick={() => onClick?.(chat)}>
           <span className="visually-hidden">Закреплённый чат. </span>
           <Avatar icon={<IconBookmarkMk />} />
+          <span className="chat-item__check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
           <span className="chat-item__body">
             <span className="chat-item__row chat-item__row--top">
               <span className="chat-item__name">{chat.name}</span>
