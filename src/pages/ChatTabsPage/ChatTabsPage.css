@@ -1,0 +1,25 @@
+/* «Настройки чата»: строки на каркасе «Папок с чатами» (.fs-row), в строке ещё значок вкладки и переключатель справа */
+.ctabs__row {
+  padding-right: var(--row-pad-x);
+}
+
+.ctabs__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.ctabs__name--off {
+  color: var(--text-secondary);
+}
+
+.ctabs__switch {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* У последней строки нет отступа-просвета: он нужен только перед «Создать новую папку» */
+[data-pm] .ctabs .fs__list > li:last-child {
+  margin-top: 0;
+}

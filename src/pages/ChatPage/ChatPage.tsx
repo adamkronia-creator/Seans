@@ -1,17 +1,11 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
-import {
-  IconSearch,
-  IconTabInfo,
-  IconTabLibrary,
-  IconTabMessages,
-  IconTabNotes,
-  IconTabPractices,
-  IconTabTests,
-} from '../../components/icons';
+import { IconSearch, IconTabMessages } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
-import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
+import { ChipMenu } from '../../components/FolderMenu/ChipMenu';
+import { useChatTabs, type SectionId } from '../../data/chatTabs';
+import { SECTION_GROUP, SECTION_ICON, SECTION_LABEL } from './chatSections';
 import { IconGearMk, IconSearchMk as IconSearchMenu } from '../../components/ChatItem/ChatIcons';
 import { Collapse } from '../../components/Collapse/Collapse';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -40,41 +34,10 @@ import { installBubbleGradient } from '../../utils/bubbleGradient';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import './ChatPage.css';
 
-// Разделы карточки собеседника; при открытии чата виден «Диалог»
-type SectionId = 'messages' | 'tests' | 'tasks' | 'notes' | 'info' | 'library';
-
-const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
-  { id: 'messages', label: 'Диалог', icon: <IconTabMessages /> },
-  { id: 'tests', label: 'Тесты', icon: <IconTabTests /> },
-  { id: 'tasks', label: 'Задания', icon: <IconTabPractices /> },
-  { id: 'notes', label: 'Заметки', icon: <IconTabNotes /> },
-  { id: 'info', label: 'Сведения', icon: <IconTabInfo /> },
-  { id: 'library', label: 'История', icon: <IconTabLibrary /> },
-];
-
-/** Значки пунктов меню чата (меню принимает компонент значка, а не готовый элемент) */
-const MENU_ICON: Record<SectionId, ChipMenuItem['Icon']> = {
-  messages: IconTabMessages,
-  tests: IconTabTests,
-  tasks: IconTabPractices,
-  notes: IconTabNotes,
-  info: IconTabInfo,
-  library: IconTabLibrary,
-};
-
-/** Порядок меню чата: поиск, диалог, заметки | тесты, задания | сведения, история | настройки (между группами отступ) */
-const MENU_ORDER: { id: SectionId; gap?: boolean }[] = [
-  { id: 'messages' },
-  { id: 'notes' },
-  { id: 'tests', gap: true },
-  { id: 'tasks' },
-  { id: 'info', gap: true },
-  { id: 'library' },
-];
+// Разделы карточки собеседника; при открытии чата виден «Диалог». Порядок и видимость вкладок настраивает пользователь (data/chatTabs.ts)
 
 /** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
 const FAVORITES_HIDDEN: SectionId[] = ['library'];
-const FAVORITES_SECTIONS = SECTIONS.filter(({ id }) => !FAVORITES_HIDDEN.includes(id));
 
 /** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
 function sameRun(a: Message | undefined, b: Message | undefined) {
@@ -233,7 +196,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Тесты, задания и история пока есть только у Максима
   const hasClientData = chatId === 'maxim';
   const chat = useChats().find((c) => c.id === chatId);
-  const sections = chat?.favorites ? FAVORITES_SECTIONS : SECTIONS;
+  const tabs = useChatTabs();
+  // Вкладки в порядке пользователя, без скрытых им; в «Избранном» ещё и без истории
+  const sections = useMemo(
+    () => tabs.order.filter((id) => !tabs.hidden.includes(id) && !(chat?.favorites && FAVORITES_HIDDEN.includes(id))).map((id) => ({ id, label: SECTION_LABEL[id] })),
+    [tabs, chat?.favorites],
+  );
   // Выбранного раздела может не быть в списке (чат сменился на «Избранное»): тогда открыта переписка
   const section: SectionId = sections.some(({ id }) => id === picked) ? picked : 'messages';
   const groups = useMessages(chatId);
@@ -597,17 +565,18 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onClose={closeMenu}
           items={[
             { key: 'm-search', label: 'Поиск', Icon: IconSearchMenu, run: openSearch },
-            ...MENU_ORDER.filter(({ id }) => sections.some((x) => x.id === id)).map(({ id, gap }) => ({
+            // Порядок меню — порядок вкладок пользователя; отступ там, где меняется смысловая группа
+            ...sections.map(({ id, label }, i) => ({
               key: `m-${id}`,
-              label: sections.find((x) => x.id === id)!.label,
-              Icon: MENU_ICON[id],
-              gap,
+              label,
+              Icon: SECTION_ICON[id],
+              gap: i > 0 && SECTION_GROUP[id] !== SECTION_GROUP[sections[i - 1].id],
               run: () => {
                 setSection(id);
                 setMenuOpen(false);
               },
             })),
-            { key: 'm-settings', label: 'Настройки', Icon: IconGearMk, gap: true, run: () => setMenuOpen(false) },
+            { key: 'm-settings', label: 'Настройки', Icon: IconGearMk, gap: true, run: () => navigate(`/chat/${chatId}/tabs`) },
           ]}
         />
       )}
