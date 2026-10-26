@@ -11,7 +11,8 @@ import {
   IconTabTests,
 } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
-import { ChatSideMenu } from '../../components/ChatSideMenu/ChatSideMenu';
+import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
+import { IconGearMk, IconSearchMk as IconSearchMenu } from '../../components/ChatItem/ChatIcons';
 import { Collapse } from '../../components/Collapse/Collapse';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
@@ -25,9 +26,7 @@ import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
 import { deleteMessage, sendMessage, setMessagePinned, useChats, useMessages, useTyping } from '../../data/chatStore';
 import { roleOf } from '../../data/roles';
-import { addNote, addSection, CLIENT_CHAT, countOf, useClientData } from '../../data/clientStore';
-import { useTaskResults } from '../../data/selfTask';
-import { useSelfResults } from '../../data/selfTest';
+import { addNote, addSection } from '../../data/clientStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -51,6 +50,26 @@ const SECTIONS: { id: SectionId; label: string; icon: ReactNode }[] = [
   { id: 'notes', label: 'Заметки', icon: <IconTabNotes /> },
   { id: 'info', label: 'Сведения', icon: <IconTabInfo /> },
   { id: 'library', label: 'История', icon: <IconTabLibrary /> },
+];
+
+/** Значки пунктов меню чата (меню принимает компонент значка, а не готовый элемент) */
+const MENU_ICON: Record<SectionId, ChipMenuItem['Icon']> = {
+  messages: IconTabMessages,
+  tests: IconTabTests,
+  tasks: IconTabPractices,
+  notes: IconTabNotes,
+  info: IconTabInfo,
+  library: IconTabLibrary,
+};
+
+/** Порядок меню чата: поиск, диалог, заметки | тесты, задания | сведения, история | настройки (между группами отступ) */
+const MENU_ORDER: { id: SectionId; gap?: boolean }[] = [
+  { id: 'messages' },
+  { id: 'notes' },
+  { id: 'tests', gap: true },
+  { id: 'tasks' },
+  { id: 'info', gap: true },
+  { id: 'library' },
 ];
 
 /** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
@@ -238,6 +257,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   // «Поиск по чату» из боковой панели на другой вкладке: сначала едем в диалог, и только потом поиск открывается
   const searchAfterSwitch = useRef(false);
 
@@ -350,23 +370,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
   // Свайп вправо в диалоге (первая страница, листать влево нечего) возвращает в список чатов, как стрелка в шапке
   useSwipeBack('.chat', index === 0 && !menuOpen && !searchOpen, () => goBack());
-
-  // Сколько записей в разделах: подпись в боковой панели. «Избранное» считает то, что психолог прошёл сам
-  const clientData = useClientData();
-  const selfTests = useSelfResults();
-  const selfTasks = useTaskResults();
-  const counts = useMemo<Partial<Record<SectionId, number>>>(() => {
-    if (chat?.favorites) return { tests: selfTests.length, tasks: selfTasks.length };
-    if (!hasClientData) return {};
-    const mine = (chatOf?: string) => (chatOf ?? CLIENT_CHAT) === chatId;
-    return {
-      // Те же числа, что на чипсах «Истории»: считаются тесты и задания, а не карточки (у постоянного задания их несколько: запись = карточка)
-      tests: countOf(clientData, 'test'),
-      tasks: countOf(clientData, 'task'),
-      notes: clientData.notes.filter((n) => mine(n.chatId)).length,
-      info: clientData.caseSections.filter((x) => mine(x.chatId)).length,
-    };
-  }, [chat?.favorites, hasClientData, clientData, selfTests, selfTasks, chatId]);
 
   if (!chat) {
     return (
@@ -554,7 +557,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
               aria-label="Меню чата"
               aria-haspopup="dialog"
               aria-expanded={menuOpen}
-              onClick={() => setMenuOpen(true)}
+              onClick={(e) => {
+                setMenuAnchor({ rect: e.currentTarget.getBoundingClientRect(), opener: e.currentTarget });
+                setMenuOpen(true);
+              }}
             >
               <IconMenuMk />
             </button>
@@ -582,21 +588,29 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />
 
-      <ChatSideMenu
-        open={menuOpen}
-        onClose={closeMenu}
-        avatar={avatar}
-        name={chat.name}
-        status={status}
-        items={sections.map(({ id, label, icon }) => ({ id, label, icon, count: counts[id] }))}
-        active={section}
-        onSelect={(id) => {
-          setSection(id as SectionId);
-          setMenuOpen(false);
-        }}
-        onSwitch={(id) => setSection(id as SectionId)}
-        onSearch={openSearch}
-      />
+      {menuOpen && menuAnchor && (
+        <ChipMenu
+          anchor={menuAnchor.rect}
+          opener={menuAnchor.opener}
+          label="Меню чата"
+          width={240}
+          onClose={closeMenu}
+          items={[
+            { key: 'm-search', label: 'Поиск', Icon: IconSearchMenu, run: openSearch },
+            ...MENU_ORDER.filter(({ id }) => sections.some((x) => x.id === id)).map(({ id, gap }) => ({
+              key: `m-${id}`,
+              label: sections.find((x) => x.id === id)!.label,
+              Icon: MENU_ICON[id],
+              gap,
+              run: () => {
+                setSection(id);
+                setMenuOpen(false);
+              },
+            })),
+            { key: 'm-settings', label: 'Настройки', Icon: IconGearMk, gap: true, run: () => setMenuOpen(false) },
+          ]}
+        />
+      )}
 
       {menu && (
         <MessageMenu
