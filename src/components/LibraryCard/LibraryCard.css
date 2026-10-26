@@ -93,3 +93,8 @@
   -webkit-line-clamp: 2;
   color: var(--color-accent);
 }
+
+/* Сердечко лежит выше оптической середины значка: опускаем на 2, чтобы оно казалось по центру кнопки (translate не мешает анимациям transform) */
+.lib-card__heart svg {
+  translate: 0 2px; /* grid:ok — оптическое выравнивание */
+}

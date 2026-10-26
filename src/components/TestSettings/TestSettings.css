@@ -628,3 +628,8 @@
 [data-pm] .sheet .sheet__card.form-menu__card:not(.sheet__text) {
   padding: 0;
 }
+
+/* Сердечко «Избранного» в шапке: опущено на 2 для оптического центра кнопки (translate не мешает heart-pop) */
+.test-settings__button[aria-pressed] svg {
+  translate: 0 2px; /* grid:ok — оптическое выравнивание */
+}
