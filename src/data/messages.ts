@@ -1,6 +1,7 @@
 import type { ResultMode } from './resultMode';
 import { clientResultPath, recordRef } from './resultLinks';
 import type { PermanentRule } from './taskValues';
+import { GROUP_MESSAGES } from './groupMessages';
 
 export interface Message {
   id: string;
@@ -39,6 +40,18 @@ export interface Message {
   forwarded?: string;
   /** Кнопки под пузырём, как у ботов в Telegram */
   buttons?: MessageButton[];
+  /** В группе: кто написал (id контакта); у ваших сообщений поля нет */
+  author?: string;
+  /** Служебная запись («Вы создали группу», «Анна добавила Игоря»): по центру, без пузыря */
+  service?: boolean;
+  /** Пост канала: сколько раз просмотрен */
+  views?: number;
+  /** Пост канала: подпись автора (если в канале включены подписи) */
+  signature?: string;
+  /** Реакции других участников группы или канала: эмодзи → сколько человек поставили */
+  counts?: Record<string, number>;
+  /** Сообщение изменено после отправки */
+  edited?: boolean;
 }
 
 /** Настройки, с которыми тест ушёл клиенту (то, что стояло на экране «Настройка теста» в момент отправки) */
@@ -93,6 +106,7 @@ export interface MessageGroup {
 // Тестовая переписка с Максимом, как в макете. Переносы строк («\n») повторяют
 // переносы из макета; в рабочем приложении текст будет переноситься сам.
 export const MESSAGES: Record<string, MessageGroup[]> = {
+  ...GROUP_MESSAGES,
   maxim: [
     {
       label: '3 сентября, чт',

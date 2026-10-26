@@ -7,10 +7,11 @@ import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/contactShared';
 import { useStoryAuthors } from '../../data/stories';
-import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChats, useMessages } from '../../data/chatStore';
+import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChat, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
 import { roleOf } from '../../data/roles';
 import { goBack, navigate } from '../../router';
+import { heroAvatar } from '../../utils/initialsAvatar';
 import { useSwipeBack } from '../../utils/swipeBack';
 import {
   IconBlock,
@@ -41,7 +42,7 @@ export type ContactSheet = 'edit' | 'role' | 'gift' | 'report' | 'delete' | 'cle
  * закрепить, архив, очистить; заблокировать, пожаловаться). Роль можно выбрать чипсом или написать свою.
  */
 export function ContactPage({ chatId }: { chatId: string }) {
-  const chat = useChats().find((c) => c.id === chatId);
+  const chat = useChat(chatId);
   const clientData = useClientData();
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
@@ -156,7 +157,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
       <div className="fp__scroll ct__scroll">
         <div className="ct__hero">
           <div className="ct__photo">
-            {chat.avatar ? <img src={chat.avatar} alt="" /> : <span className="ct__photo-empty" />}
+            {chat.avatar ? <img src={heroAvatar(chat.avatar)} alt="" /> : <span className="ct__photo-empty" />}
           </div>
           <div className="ct__id">
             <h1 className="ct__name">{chat.name}</h1>

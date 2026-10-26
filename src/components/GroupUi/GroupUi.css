@@ -1,0 +1,550 @@
+/*
+ * Экраны групп и каналов (gu-*): надстройка над каркасом .fp («Настроить папку», профиль контакта).
+ * Все размеры — токены сетки 4 из layout.css и tokens.css; своих отступов и высот тут нет, кроме линий в 1 px.
+ * Строки лежат прямо в карточке .fp__card: просвет 1 px между ними и стеклянную подложку даёт правило из FolderPage.css.
+ */
+
+/* Подсказка встаёт над кнопкой внизу, а на странице без кнопки — над нижним краем */
+.gu-page {
+  --toast-bottom: calc(var(--size-touch) + var(--space-4) * 2 + var(--safe-bottom));
+}
+
+.gu-page--bare {
+  --toast-bottom: calc(var(--space-8) + var(--safe-bottom));
+}
+
+/* Страница без кнопки внизу: запас прокрутки, как у остальных экранов */
+[data-pm] .fp.gu-page--bare .fp__scroll {
+  padding-bottom: var(--scroll-bottom);
+}
+
+/* Блоки страницы лежат в колонке с зазором --block-gap; у обёрток нет своей рамки, иначе первая вышла бы уже остальных на 2 px */
+.gu-block,
+.gu-search,
+.gu-photo {
+  flex-shrink: 0;
+}
+
+[data-pm] .fp .fp__scroll > :is(.gu-block, .gu-search, .gu-photo, .gu-hint) {
+  border: 0;
+}
+
+.gu-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Пояснение под карточкой: по левому краю текста внутри, мелким вторым цветом */
+.gu-hint {
+  margin: 0;
+  padding: 0 var(--space-4);
+  color: var(--text-secondary);
+  font: 400 var(--font-size-label) / var(--line-height-label) var(--font-sans);
+  overflow-wrap: anywhere;
+}
+
+.gu-hint--alone {
+  flex-shrink: 0;
+  margin-top: calc(var(--space-2) - var(--block-gap));
+}
+
+/* ---------- Строка ---------- */
+
+.gu-row {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--row-gap);
+  width: 100%;
+  min-height: var(--row-h);
+  padding: var(--row-pad-y) var(--row-pad-x);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.gu-row--tall {
+  min-height: var(--row-h-2);
+}
+
+.gu-row--top {
+  align-items: flex-start;
+}
+
+[data-pm] .gu-row[data-pressed] {
+  background: var(--glass);
+}
+
+.gu-row:disabled {
+  opacity: 0.5;
+}
+
+.gu-row__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.gu-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gu-row__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font: var(--type-label);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.gu-row__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gu-row__note {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Строка с аватаром: статус в одну строку, длинное обрезается */
+.gu-row:has(.avatar) .gu-row__note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gu-row__value {
+  flex-shrink: 0;
+  max-width: 50%;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gu-row__chevron {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-sm);
+}
+
+/* Строки-действия: синяя подпись («Добавить участников») и красная («Покинуть группу») */
+.gu-row--link,
+.gu-row--link .gu-row__icon {
+  color: var(--text-link);
+}
+
+.gu-row--danger,
+.gu-row--danger .gu-row__icon {
+  color: var(--error-text);
+}
+
+/* Метка рядом с именем: «Владелец», «Админ», подпись администратора */
+.gu-pill {
+  flex-shrink: 0;
+  height: var(--space-5);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  font: var(--type-meta);
+  line-height: var(--space-5);
+  white-space: nowrap;
+}
+
+.gu-pill--quiet {
+  color: var(--text-secondary);
+}
+
+.gu-pill--accent {
+  color: var(--text-link);
+}
+
+/* Точка выбора одного варианта */
+.gu-radio {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: border-color 0.12s;
+}
+
+.gu-radio--on {
+  border-color: var(--action-primary);
+  background: radial-gradient(circle, var(--action-primary) 0 45%, transparent 50%);
+}
+
+/* ---------- Выбор людей ---------- */
+
+/* Выбранные — одна строка, прокручивается вбок: высота не меняется, когда выбирают первого и десятого, и список под ней не прыгает */
+.gu-chosen {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: calc(var(--size-chip-h) + var(--space-3) * 2);
+  padding: 0 var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gu-chosen::-webkit-scrollbar {
+  display: none;
+}
+
+.gu-chosen__none {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+.gu-chosen__chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-chip-h);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.gu-chosen__chip svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--space-4);
+}
+
+.gu-chosen__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Поиск: стеклянное поле, как в шапке «Диалогов» */
+.gu-search .search-field {
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  color: var(--text-primary);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+.gu-search .search-field__icon {
+  color: var(--icon-action, var(--text-primary));
+  font-size: var(--size-icon);
+}
+
+.gu-search .search-field__input {
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+.gu-search .search-field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+.gu-search .search-field:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+.gu-search .search-field__clear {
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  font-size: var(--size-icon-sm);
+}
+
+.gu-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  color: var(--text-secondary);
+  font: var(--type-body);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Поля ---------- */
+
+.gu-status {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  overflow-wrap: anywhere;
+}
+
+.gu-status--error {
+  color: var(--error-text);
+}
+
+.gu-status--ok {
+  color: var(--presence-online);
+}
+
+.gu-status--info {
+  color: var(--text-secondary);
+}
+
+.gu-prefix {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font: var(--type-headline);
+}
+
+/* Описание: несколько строк, поле растёт по тексту; счётчик внизу справа */
+[data-pm] .fp__field > .fp__input-row.gu-input-row--multi {
+  align-items: flex-end;
+  padding: var(--space-3) var(--space-4);
+}
+
+[data-pm] .fp__input.gu-textarea {
+  height: auto;
+  min-height: var(--space-16);
+  padding: 0;
+  font: var(--type-body);
+  resize: none;
+}
+
+/* ---------- Фото ---------- */
+
+.gu-photo {
+  display: flex;
+  justify-content: center;
+}
+
+.gu-photo__frame {
+  position: relative;
+  width: var(--size-avatar-xl);
+  height: var(--size-avatar-xl);
+}
+
+.gu-photo__button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--glass-card);
+  color: var(--text-link);
+  font-size: var(--space-8);
+}
+
+.gu-photo__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gu-photo__camera {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Значок камеры в нижнем углу круга: нажатие проходит сквозь него на круг */
+.gu-photo__badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-size: var(--space-5);
+  pointer-events: none;
+}
+
+/* ---------- Нижнее окно ---------- */
+
+.gu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+[data-pm] .gu-list > * {
+  background: var(--glass-card);
+}
+
+[data-pm] .gu-list > [data-pressed] {
+  background: var(--glass);
+}
+
+/* ---------- Кнопка внизу, пока нельзя продолжить: приглушённое стекло, а не светлая плашка ---------- */
+
+[data-pm] .fp__footer .fp__done.gu-done:disabled {
+  border-color: var(--glass-border);
+  background: var(--glass-solid);
+  color: var(--text-secondary);
+}
+
+/* Подсказка в пустом поле: тоньше и бледнее введённого, иначе её не отличить от текста */
+[data-pm] .gu-block .fp__input::placeholder {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* ---------- QR-код ссылки ---------- */
+
+.gu-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-4);
+}
+
+.gu-qr__box {
+  width: 240px; /* grid:ok — стороны QR-кода: 240 при кратных 4 */
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: #fff;
+}
+
+.gu-qr__code {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.gu-qr__url {
+  margin: 0;
+  padding: 0 var(--space-4);
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Страница группы: тот же вид, что у профиля собеседника (ContactPage.css) ---------- */
+
+/* Кнопок под фото столько, сколько действий доступно (--tiles задаёт страница) */
+.gu-info .ct__actions {
+  grid-template-columns: repeat(var(--tiles, 4), 1fr);
+}
+
+/* Описание группы: переносы строк сохраняются */
+.gu-about {
+  white-space: pre-line;
+}
+
+/* Подсказка и карточки внутри колонки под фото: тот же зазор, что у остальных блоков */
+.gu-info .ct__body .gu-block {
+  flex-shrink: 0;
+}
+
+/* ---------- Эмодзи в строке, кнопки «принять» и «отклонить» ---------- */
+
+.gu-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  font-size: var(--space-6);
+  line-height: 1;
+}
+
+.gu-ibtns {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.gu-ibtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass);
+  font-size: var(--size-icon);
+}
+
+.gu-ibtn--ok {
+  color: var(--presence-online);
+}
+
+.gu-ibtn--no {
+  color: var(--error-text);
+}
+
+.gu-ibtn:active {
+  background: var(--glass-fill);
+}
+
+/* ---------- Страница вступления ---------- */
+
+.gu-join {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) 0;
+  text-align: center;
+}
+
+.gu-join__name {
+  margin: var(--space-2) 0 0;
+  font: var(--type-title);
+  overflow-wrap: anywhere;
+}
+
+.gu-join__meta {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+/* Описание внутри карточки */
+.gu-text {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  font: var(--type-body);
+  overflow-wrap: anywhere;
+}
+
+.gu-empty__title {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+  font: var(--type-headline);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useChats } from '../../data/chatStore';
+import { canWrite, getGroup } from '../../data/groups';
 import { guardBack } from '../../router';
 import { Badge } from '../Badge/Badge';
 import { ChatItem } from '../ChatItem/ChatItem';
@@ -16,7 +17,8 @@ interface ForwardSheetProps {
 
 /** «Переслать»: список чатов, как в «Диалогах», с уже открытым поиском и без историй; чаты отмечаются галочкой (можно несколько), внизу «Отправить» */
 export function ForwardSheet({ onSend, onClose }: ForwardSheetProps) {
-  const all = useChats().filter((c) => !c.archived);
+  // В канал, где вы только подписчик, и в группу, где писать запрещено, переслать нельзя
+  const all = useChats().filter((c) => !c.archived && (!c.kind || canWrite(getGroup(c.id))));
   const [picked, setPicked] = useState<string[]>([]);
   const [query, setQuery] = useState('');
   // Системная «назад» и Escape закрывают окно, а не уводят с экрана под ним

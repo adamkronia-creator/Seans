@@ -1,6 +1,10 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
+import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
+import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
+import { Toast } from '../../components/Toast/Toast';
+import { useToast } from '../../components/Toast/useToast';
 import { IconSearch, IconTabMessages } from '../../components/icons';
 import { ChatHistory } from '../../components/ChatHistory/ChatHistory';
 import { ChipMenu } from '../../components/FolderMenu/ChipMenu';
@@ -18,7 +22,9 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import { deleteMessage, forwardMessage, sendMessage, setMessagePinned, setMessageReaction, useChats, useMessages, useTyping } from '../../data/chatStore';
+import { deleteMessage, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useMessages, useTyping } from '../../data/chatStore';
+import { firstNameOf, nameOf } from '../../data/contacts';
+import { can, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { EMOJI_GROUPS } from '../../data/emojiSet';
@@ -28,7 +34,7 @@ import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { clientResultId, clientResultPath } from '../../data/resultLinks';
 import { hasTaskSettings } from '../../data/taskValues';
-import { goBack, guardBack, navigate } from '../../router';
+import { goBack, goBackBy, guardBack, navigate } from '../../router';
 import { IconPinned } from '../../components/FolderMenu/FolderIcons';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -41,9 +47,12 @@ import './ChatPage.css';
 /** В «Избранном» нет истории взаимодействия: взаимодействовать не с кем */
 const FAVORITES_HIDDEN: SectionId[] = ['library'];
 
-/** Сообщения одной серии: тот же автор, не карточка и не сообщение с кнопками, разница меньше 5 минут */
-function sameRun(a: Message | undefined, b: Message | undefined) {
-  if (!a || !b || a.from !== b.from || a.test || b.test || a.task || b.task || a.buttons || b.buttons) return false;
+/**
+ * Сообщения одной серии: тот же автор (в группе — тот же участник), не карточка и не сообщение с кнопками, не служебная запись,
+ * разница меньше 5 минут. Посты канала каждый сами по себе
+ */
+function sameRun(a: Message | undefined, b: Message | undefined, kind?: 'group' | 'channel') {
+  if (!a || !b || kind === 'channel' || a.service || b.service || a.from !== b.from || a.author !== b.author || a.test || b.test || a.task || b.task || a.buttons || b.buttons) return false;
   const mins = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
   const d = mins(b.time) - mins(a.time);
   return d >= 0 && d < 5;
@@ -71,13 +80,33 @@ function menuBounds(list: HTMLElement | null) {
 /** Текст плашки закреплённого: сообщение одной строкой, у карточки — её вид */
 const pinPreview = (m: Message) => (m.test ? 'Тест' : m.task ? 'Задание' : m.text.replace(/\s*\n\s*/g, ' '));
 
-/** Меню сообщения по долгому нажатию: ответить, копировать, удалить */
+/** Что в меню сообщения разрешено: в обычном чате всё, в группе и канале — по правам и настройкам */
+interface MenuPerms {
+  reply: boolean;
+  edit: boolean;
+  pin: boolean;
+  forward: boolean;
+  copy: boolean;
+  remove: boolean;
+  /** Реакции, которые можно поставить; null — любые (обычный чат); пустой список — реакции выключены */
+  reactions: string[] | null;
+}
+
+const FULL_PERMS: MenuPerms = { reply: true, edit: false, pin: true, forward: true, copy: true, remove: true, reactions: null };
+
+/** В меню есть что показать: реакции или хотя бы одно действие */
+const hasMenu = (p: MenuPerms) => p.reactions === null || p.reactions.length > 0 || p.reply || p.edit || p.pin || p.forward || p.copy || p.remove;
+
+/** Меню сообщения по долгому нажатию: реакции, ответить, изменить, закрепить, переслать, копировать, удалить */
 function MessageMenu({
   message,
   rect,
   bounds,
+  perms,
+  mine,
   onClose,
   onReply,
+  onEdit,
   onPin,
   onDelete,
   onReact,
@@ -86,8 +115,12 @@ function MessageMenu({
   message: Message;
   rect: DOMRect;
   bounds?: DOMRect;
+  perms: MenuPerms;
+  /** Сообщение справа (ваше в обычном чате и группе): меню встаёт по правому краю */
+  mine: boolean;
   onClose: () => void;
   onReply: () => void;
+  onEdit: () => void;
   onPin: () => void;
   onDelete: () => void;
   onReact: (emoji: string) => void;
@@ -103,34 +136,42 @@ function MessageMenu({
   }, []);
   useExitAnimation(backdropRef);
   const items = [
-    { label: 'Ответить', Icon: IconReply, run: onReply },
-    { label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin },
-    { label: 'Переслать', Icon: IconForward, run: onForward },
-    ...(message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined) }] : []),
-    { label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true },
+    ...(perms.reply ? [{ label: 'Ответить', Icon: IconReply, run: onReply, danger: false }] : []),
+    ...(perms.edit ? [{ label: 'Изменить', Icon: IconPenNew, run: onEdit, danger: false }] : []),
+    ...(perms.pin ? [{ label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin, danger: false }] : []),
+    ...(perms.forward ? [{ label: 'Переслать', Icon: IconForward, run: onForward, danger: false }] : []),
+    ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined), danger: false }] : []),
+    ...(perms.remove ? [{ label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true }] : []),
   ];
-  const h = items.length * MENU_ITEM_H + 8;
+  // Панель реакций: в группе и канале только те, что разрешил владелец, и без стрелки «ещё»; если реакции выключены, панели нет
+  const quick = perms.reactions ?? QUICK_REACTIONS;
+  const reactable = quick.length > 0;
+  const expandable = perms.reactions === null;
+  const barH = reactable ? REACT_BAR_H + 8 : 0;
+  const h = items.length * MENU_ITEM_H + (items.length ? 8 : 0);
   const minLeft = (bounds?.left ?? 0) + MENU_EDGE;
   const right = (bounds?.right ?? window.innerWidth) - MENU_EDGE;
   const maxLeft = right - MENU_W;
-  const left = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - MENU_W : rect.left, maxLeft));
-  const barW = Math.min(REACT_BAR_W, right - minLeft);
-  const barLeft = Math.max(minLeft, Math.min(message.from === 'me' ? rect.right - barW : rect.left, right - barW));
+  const left = Math.max(minLeft, Math.min(mine ? rect.right - MENU_W : rect.left, maxLeft));
+  // 16 — поля плашки, 40 — кнопка реакции, 32 — стрелка «ещё»
+  const barW = Math.min(expandable ? REACT_BAR_W : 16 + quick.length * 40, right - minLeft);
+  const barLeft = Math.max(minLeft, Math.min(mine ? rect.right - barW : rect.left, right - barW));
   // Сверху вниз: панель реакций, под ней меню; весь столбик над сообщением или, если там тесно, под ним
-  const stack = REACT_BAR_H + 8 + h;
+  const stack = barH + h;
   const topLimit = bounds?.top ?? 0;
   const above = rect.top - stack - 8 >= topLimit;
   const stackTop = above ? rect.top - stack - 8 : Math.min(rect.bottom + 8, window.innerHeight - stack - 8);
   const barTop = stackTop;
-  const top = stackTop + REACT_BAR_H + 8;
+  const top = stackTop + barH;
   // Меню вырастает от пузыря: над ним — от нижнего края, под ним — от верхнего; сторону задаёт автор сообщения
-  const origin = `${above ? 'bottom' : 'top'} ${message.from === 'me' ? 'right' : 'left'}`;
+  const origin = `${above ? 'bottom' : 'top'} ${mine ? 'right' : 'left'}`;
   const pick = (emoji: string) => {
     onReact(emoji);
     onClose();
   };
   return (
     <div ref={backdropRef} className="msg-menu__backdrop" data-no-swipe style={armed ? undefined : { pointerEvents: 'none' }} onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }}>
+      {reactable && (
       <div
         className={`msg-react${more ? ' msg-react--more' : ''}`}
         role="group"
@@ -150,18 +191,21 @@ function MessageMenu({
           </ul>
         ) : (
           <div className="msg-react__row">
-            {QUICK_REACTIONS.map((emoji) => (
+            {quick.map((emoji) => (
               <button key={emoji} type="button" className={`msg-react__emoji${message.reaction === emoji ? ' msg-react__emoji--on' : ''}`} aria-label={`Реакция ${emoji}`} onClick={() => pick(emoji)}>
                 {emoji}
               </button>
             ))}
-            <button type="button" className="msg-react__more" aria-label="Все реакции" onClick={() => setMore(true)}>
-              <IconChevronDown />
-            </button>
+            {expandable && (
+              <button type="button" className="msg-react__more" aria-label="Все реакции" onClick={() => setMore(true)}>
+                <IconChevronDown />
+              </button>
+            )}
           </div>
         )}
       </div>
-      {!more && (
+      )}
+      {!more && items.length > 0 && (
         <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
           {items.map(({ label, Icon, run, danger }) => (
             <li key={label}>
@@ -258,13 +302,19 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
 
   // Тесты, задания и история пока есть только у Максима
   const hasClientData = chatId === 'maxim';
-  const chat = useChats().find((c) => c.id === chatId);
+  const chat = useChat(chatId);
+  // Группа или канал: участники, права и настройки лежат в data/groups.ts; у обычного диалога info нет
+  const groupInfo = useGroup(chatId);
+  const info = chat?.kind ? groupInfo : undefined;
+  const kind = info?.kind;
+  const slow = useSlowLeft(chatId);
+  const [toast, say] = useToast();
   const tabs = useChatTabs();
-  // Вкладки в порядке пользователя, без скрытых им; в «Избранном» ещё и без истории
-  const sections = useMemo(
-    () => tabs.order.filter((id) => !tabs.hidden.includes(id) && !(chat?.favorites && FAVORITES_HIDDEN.includes(id))).map((id) => ({ id, label: SECTION_LABEL[id] })),
-    [tabs, chat?.favorites],
-  );
+  // Вкладки в порядке пользователя, без скрытых им; в «Избранном» ещё и без истории; в группе и канале вкладок собеседника нет — только переписка
+  const sections = useMemo(() => {
+    const all = tabs.order.filter((id) => !tabs.hidden.includes(id) && !(chat?.favorites && FAVORITES_HIDDEN.includes(id)));
+    return (kind ? (['messages'] as SectionId[]) : all).map((id) => ({ id, label: SECTION_LABEL[id] }));
+  }, [tabs, chat?.favorites, kind]);
   // Выбранного раздела может не быть в списке (чат сменился на «Избранное»): тогда открыта переписка
   const section: SectionId = sections.some(({ id }) => id === picked) ? picked : 'messages';
   const groups = useMessages(chatId);
@@ -279,6 +329,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [distance, setDistance] = useState(0);
   const [unseen, setUnseen] = useState(0);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
+  // Сообщение группы или канала, которое правится в поле ввода
+  const [editing, setEditing] = useState<Message | null>(null);
+  const [leaving, setLeaving] = useState(false);
   const [menu, setMenu] = useState<{ message: Message; rect: DOMRect } | null>(null);
   // Карточка отправленного теста, чьи настройки показаны в окне
   const [settingsOf, setSettingsOf] = useState<Message | null>(null);
@@ -317,6 +370,14 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     atBottom.current = true;
     setUnseen(0);
     setReplyTo(null);
+    setEditing(null);
+  }, [chatId]);
+
+  // Открытый чат: входящие в нём сразу прочитаны (новое сообщение группы не копит счётчик, пока читаешь)
+  useEffect(() => {
+    setOpenChat(chatId);
+    markRead(chatId);
+    return () => setOpenChat(null);
   }, [chatId]);
 
   // Листая разделы, переписку не теряем: прокрутка, набранный текст и ответ остаются на месте. Закрывается только поиск
@@ -411,6 +472,56 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     );
   }
 
+  // ---- Группа и канал: что можно вам, как подписаны авторы, что стоит вместо поля ввода
+  const writer = canWrite(info);
+  const toggleMute = () => {
+    setMutedMany([chatId], !chat.muted);
+    say(chat.muted ? 'Звук включён' : 'Звук отключён');
+  };
+  /** Подпись автора рядом с именем в группе: владелец, администратор (со своей подписью, если она есть) */
+  const authorTitle = (m: Message) => {
+    const mem = info && m.author ? memberOf(info, m.author) : undefined;
+    return mem?.role === 'owner' ? 'владелец' : mem?.role === 'admin' ? mem.title || 'админ' : undefined;
+  };
+  /** Чьё сообщение: «Вы», имя участника группы или собеседника */
+  const replyFrom = (m: Message) => (m.from === 'me' ? 'Вы' : kind === 'group' && m.author ? firstNameOf(m.author) : chat.name.split(' ')[0]);
+  const permsFor = (m: Message): MenuPerms => {
+    if (!info) return FULL_PERMS;
+    const mine = m.from === 'me';
+    const channel = info.kind === 'channel';
+    return {
+      reply: writer,
+      edit: mine && !m.image && !m.file && Boolean(m.text) && (channel ? can(info, 'postMessages') : true),
+      pin: canPin(info),
+      forward: !info.protectContent,
+      copy: !info.protectContent && Boolean(m.text),
+      remove: mine ? (channel ? can(info, 'postMessages') : true) : canDeleteOthers(info),
+      reactions: info.reactions,
+    };
+  };
+  const mmss = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+  let composerBar: ReactNode;
+  if (info && !writer) {
+    composerBar =
+      kind === 'channel' ? (
+        <button type="button" className="composer__bar" onClick={toggleMute}>
+          {chat.muted ? <IconBellLine /> : <IconBellOffLine />}
+          {chat.muted ? 'Включить звук' : 'Отключить звук'}
+        </button>
+      ) : (
+        <p className="composer__bar composer__bar--note" role="status">
+          {myMember(info)?.silenced ? 'Администратор запретил вам писать' : 'Писать здесь могут только администраторы'}
+        </p>
+      );
+  } else if (info && slow > 0) {
+    composerBar = (
+      <p className="composer__bar composer__bar--note" role="status">
+        <IconHourglass />
+        Медленный режим: {mmss(slow)}
+      </p>
+    );
+  }
+
   // Переписка: лента и панель ввода. Меню сообщения стоит вне страниц (ему нужен весь экран, а не сдвинутая страница)
   const messagesPage = (
     <>
@@ -420,11 +531,19 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             <EmptyState
               icon={<IconTabMessages />}
               title="Пока нет сообщений"
-              text={chat.favorites ? 'Здесь будут тесты и задания, которые вы отправляете себе.' : 'Напишите первое сообщение — оно появится здесь.'}
+              text={
+                chat.favorites
+                  ? 'Здесь будут тесты и задания, которые вы отправляете себе.'
+                  : kind === 'channel'
+                    ? writer
+                      ? 'Опубликуйте первый пост — подписчики увидят его здесь.'
+                      : 'В канале ещё нет публикаций.'
+                    : 'Напишите первое сообщение — оно появится здесь.'
+              }
             />
           )}
           {groups.map((group) => (
-            <ul className="chat__group" key={group.label}>
+            <ul className={`chat__group${kind ? ` chat__group--${kind === 'group' ? 'grp' : 'chan'}` : ''}`} key={group.label}>
               <li className="chat__day">
                 <span>{group.label}</span>
               </li>
@@ -438,13 +557,17 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     replyTarget={m.replyTo ? byId.get(m.replyTo) : undefined}
                     peerName={chat.name.split(' ')[0]}
                     peerAvatar={chat.avatar}
-                    showMeta={!sameRun(m, next) || Boolean(m.pinned)}
-                    joinPrev={sameRun(prev, m)}
+                    showMeta={!sameRun(m, next, kind) || Boolean(m.pinned)}
+                    joinPrev={sameRun(prev, m, kind)}
+                    chatKind={kind}
+                    showAuthor={!sameRun(prev, m, kind)}
+                    showAvatar={!sameRun(m, next, kind)}
+                    authorTitle={authorTitle(m)}
                     query={q}
                     activeMatch={m.id === activeId}
                     test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}
-                    onReply={setReplyTo}
-                    onMenu={(message, rect) => setMenu({ message, rect })}
+                    onReply={(message) => writer && !message.service && setReplyTo(message)}
+                    onMenu={(message, rect) => hasMenu(permsFor(message)) && setMenu({ message, rect })}
                     onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
@@ -475,7 +598,16 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       </div>
 
       <MessageInput
+        placeholder={kind === 'channel' ? 'Опубликовать' : 'Сообщение'}
+        bar={composerBar}
+        noAttach={!canSendMedia(info)}
         onSend={(text) => {
+          // Правка заменяет текст, новое сообщение не появляется; «изм.» только если текст правда изменился
+          if (editing) {
+            if (text && text !== editing.text) updateMessage(chatId, editing.id, { text, edited: true });
+            setEditing(null);
+            return;
+          }
           sendMessage(chatId, text, replyTo?.id);
           setReplyTo(null);
         }}
@@ -487,8 +619,15 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           })
         }
         onLayoutChange={() => atBottom.current && scrollToBottom()}
-        reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.task ? 'Задание' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
-        onCancelReply={() => setReplyTo(null)}
+        edit={editing ? { key: editing.id, text: editing.text } : undefined}
+        reply={
+          editing
+            ? { name: '', text: editing.text.replace(/\s*\n\s*/g, ' '), edit: true }
+            : replyTo
+              ? { name: replyFrom(replyTo), text: replyTo.test ? 'Тест' : replyTo.task ? 'Задание' : replyTo.text.replace(/\s*\n\s*/g, ' ') }
+              : undefined
+        }
+        onCancelReply={() => (editing ? setEditing(null) : setReplyTo(null))}
       />
     </>
   );
@@ -511,9 +650,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   }));
 
   // Подпись под именем: в диалоге — состояние собеседника, в остальных вкладках — название вкладки (чипсов разделов в шапке больше нет)
-  const status = chat.favorites ? 'Только для вас' : typing ? 'печатает…' : roleOf(chat);
+  const status = info ? subtitleOf(info) : chat.favorites ? 'Только для вас' : typing ? 'печатает…' : roleOf(chat);
   const subtitle = section === 'messages' ? status : (sections.find((item) => item.id === section)?.label ?? '');
-  const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />;
+  const avatar = chat.favorites ? <Avatar icon={<IconBookmarkMk />} /> : <Avatar src={chat.avatar} alt="" presence={chat.online && !info ? 'online' : undefined} />;
 
   const openSearch = () => {
     setMenuOpen(false);
@@ -584,7 +723,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                 </div>
               </>
             ) : (
-              <button type="button" className="chat__peer" aria-label={`Профиль: ${chat.name}`} onClick={() => navigate(`/chat/${chatId}/contact`)}>
+              <button
+                type="button"
+                className="chat__peer"
+                aria-label={info ? `${kind === 'channel' ? 'О канале' : 'О группе'}: ${chat.name}` : `Профиль: ${chat.name}`}
+                onClick={() => navigate(info ? `/chat/${chatId}/g` : `/chat/${chatId}/contact`)}
+              >
                 {avatar}
                 <div className="chat__who">
                   <h1 className="chat__name">{chat.name}</h1>
@@ -619,9 +763,11 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                   {pinPreview(pins[pinNow])}
                 </span>
               </button>
-              <button type="button" className="chat__pin-off" aria-label="Открепить" onClick={() => setMessagePinned(chatId, pins[pinNow].id, false)}>
-                <IconPinned />
-              </button>
+              {canPin(info) && (
+                <button type="button" className="chat__pin-off" aria-label="Открепить" onClick={() => setMessagePinned(chatId, pins[pinNow].id, false)}>
+                  <IconPinned />
+                </button>
+              )}
             </div>
           )}
         </Collapse>
@@ -636,7 +782,23 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           label="Меню чата"
           width={240}
           onClose={closeMenu}
-          items={[
+          items={
+            info
+              ? [
+                  { key: 'm-search', label: 'Поиск', Icon: IconSearchMenu, run: openSearch },
+                  { key: 'm-info', label: kind === 'channel' ? 'О канале' : 'О группе', Icon: IconInfo, run: () => navigate(`/chat/${chatId}/g`) },
+                  { key: 'm-mute', label: chat.muted ? 'Включить звук' : 'Отключить звук', Icon: chat.muted ? IconBellLine : IconBellOffLine, run: toggleMute },
+                  ...(canInvite(info) ? [{ key: 'm-add', label: kind === 'channel' ? 'Добавить подписчиков' : 'Добавить участников', Icon: IconUserPlus, run: () => navigate(`/chat/${chatId}/g/add`) }] : []),
+                  {
+                    key: 'm-leave',
+                    label: myMember(info)?.role === 'owner' ? (kind === 'channel' ? 'Удалить канал' : 'Удалить группу') : kind === 'channel' ? 'Отписаться' : 'Покинуть группу',
+                    Icon: IconLeave,
+                    danger: true,
+                    gap: true,
+                    run: () => setLeaving(true),
+                  },
+                ]
+              : [
             { key: 'm-search', label: 'Поиск', Icon: IconSearchMenu, run: openSearch },
             // Порядок меню — порядок вкладок пользователя; отступ там, где меняется смысловая группа
             ...sections.map(({ id, label }, i) => ({
@@ -650,7 +812,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
               },
             })),
             { key: 'm-settings', label: 'Настройки', Icon: IconGearMk, gap: true, run: () => navigate(`/chat/${chatId}/tabs`) },
-          ]}
+          ]
+          }
         />
       )}
 
@@ -659,13 +822,23 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           message={menu.message}
           rect={menu.rect}
           bounds={menuBounds(listRef.current)}
+          perms={permsFor(menu.message)}
+          mine={menu.message.from === 'me' && kind !== 'channel'}
           onClose={() => setMenu(null)}
-          onReply={() => setReplyTo(menu.message)}
+          onReply={() => {
+            setEditing(null);
+            setReplyTo(menu.message);
+          }}
+          onEdit={() => {
+            setReplyTo(null);
+            setEditing(menu.message);
+          }}
           onPin={() => setMessagePinned(chatId, menu.message.id, !menu.message.pinned)}
           onReact={(emoji) => setMessageReaction(chatId, menu.message.id, emoji)}
           onForward={() => setForwarding(menu.message)}
           onDelete={() => {
             if (replyTo?.id === menu.message.id) setReplyTo(null);
+            if (editing?.id === menu.message.id) setEditing(null);
             deleteMessage(chatId, menu.message.id);
           }}
         />
@@ -676,11 +849,26 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onClose={() => setForwarding(null)}
           onSend={(ids) => {
             const title = forwarding.test ? LIBRARY.find((t) => t.id === forwarding.test)?.title : forwarding.task ? TASK_LIBRARY.find((t) => t.id === forwarding.task)?.title : undefined;
-            forwardMessage(ids, forwarding, forwarding.from === 'me' ? 'Вы' : chat.name.split(' ')[0], title);
+            forwardMessage(ids, forwarding, kind === 'channel' ? chat.name : forwarding.from === 'me' ? 'Вы' : kind === 'group' && forwarding.author ? nameOf(forwarding.author) : chat.name.split(' ')[0], title);
             setForwarding(null);
           }}
         />
       )}
+
+      {leaving && info && (
+        <LeaveSheet
+          group={info}
+          onClose={() => setLeaving(false)}
+          onConfirm={() => {
+            setLeaving(false);
+            // Сначала экран уезжает в список (с учётом записи истории самого окна), и только потом чат исчезает из него: иначе на уходящем экране мелькнуло бы «Чат не найден»
+            goBackBy(1);
+            window.setTimeout(() => leaveGroup(chatId), 450);
+          }}
+        />
+      )}
+
+      {toast && <Toast text={toast} />}
 
       {settingsOf &&
         (settingsOf.task ? (

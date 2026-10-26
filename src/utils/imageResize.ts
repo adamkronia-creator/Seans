@@ -76,3 +76,26 @@ export async function prepareImage(file: Blob): Promise<PreparedImage> {
     image.close();
   }
 }
+
+/**
+ * Квадратное фото для аватарки группы или канала: середина снимка, не больше side по стороне, JPEG в адресе data:
+ * (ровно так фото лежит в чатах и профиле, отдельного хранилища для него не нужно). Бросает ошибку, если файл не картинка.
+ */
+export async function squareAvatar(file: Blob, side = 256): Promise<string> {
+  const image = await decode(file);
+  try {
+    const crop = Math.min(image.width, image.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = side;
+    canvas.height = side;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Холст недоступен');
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, side, side);
+    context.imageSmoothingQuality = 'high';
+    context.drawImage(image.source, (image.width - crop) / 2, (image.height - crop) / 2, crop, crop, 0, 0, side, side);
+    return canvas.toDataURL('image/jpeg', 0.85);
+  } finally {
+    image.close();
+  }
+}

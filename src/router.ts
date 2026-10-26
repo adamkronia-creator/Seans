@@ -40,9 +40,9 @@ const subscribe = (callback: () => void) => {
   return () => listeners.delete(callback);
 };
 
-/** Экраны, где нижней панели нет (папка, архив, правка профиля) или она своя на каждой странице (сам чат): в переходе панель
+/** Экраны, где нижней панели нет (папка, архив, правка профиля, создание группы, страницы группы и канала, вступление по ссылке) или она своя на каждой странице (сам чат): в переходе панель
  * нельзя выделять отдельным слоем — слой, который есть только «до» или «после», рисуется прямоугольником */
-const isChatRoot = (path: string) => /^\/(chat\/[^/]+|folder\/[^/]+|archive|profile\/edit|profile\/photos(?:\/albums|\/album\/[^/]+)?)\/?$/.test(path);
+const isChatRoot = (path: string) => /^\/(chat\/[^/]+(?:\/g(?:\/[^/]+)*)?|folder\/[^/]+|archive|new(?:\/[^/]+)*|join\/[^/]+|profile\/edit|profile\/photos(?:\/albums|\/album\/[^/]+)?)\/?$/.test(path);
 
 /** Чат и его вложенные экраны (настройка теста, бланк, заключение) того же чата: на обоих внизу одна и та же панель, она остаётся на месте */
 const chatSub = (path: string) => /^\/chat\/([^/]+)(?:\/(?:tests|tasks|result)\/[^/]+)?\/?$/.exec(path)?.[1];
@@ -192,6 +192,57 @@ export function navigate(path: string, kind: TransitionKind = 'forward') {
     window.history.pushState({ i: step, prev }, '', `#${path}`);
   }
   show(path, kind, prev);
+}
+
+/**
+ * Открыть экран поверх начала цепочки: `depth` пройденных экранов (шаги создания группы, список контактов) уходят из истории,
+ * и «назад» с нового экрана ведёт на тот, с которого цепочку начали (`start`), а не по шагам мастера, как в Telegram.
+ */
+export function navigateOver(path: string, depth: number, kind: TransitionKind = 'forward', start = '/') {
+  if (pending) {
+    // Прежняя заглушка ещё уходит: начинаем, когда history.back отработает
+    queued.push(() => navigateOver(path, depth, kind, start));
+    return;
+  }
+  const drop = Math.min(guards.length + depth, step);
+  popped = false;
+  if (drop <= 0) {
+    // Истории нет (экран открыт по прямой ссылке): запись меняется на месте
+    window.history.replaceState({ i: step, prev: start }, '', `#${path}`);
+    show(path, kind, start);
+    return;
+  }
+  guards.splice(0).forEach((g) => (g.silent = true));
+  pending = { silent: true };
+  queued.push(() => {
+    // Переход считается от экрана, где цепочка началась
+    target = start;
+    navigate(path, kind);
+  });
+  window.history.go(-drop);
+}
+
+/**
+ * Вернуться на `depth` экранов разом, минуя промежуточные: выход из группы на экране «О группе» (чат уже удалён) ведёт сразу в список.
+ * Записи истории позади остаются как были, браузер встаёт на нужную, и экран уезжает «назад» одной анимацией.
+ */
+export function goBackBy(depth: number, fallback = '/') {
+  if (pending) {
+    queued.push(() => goBackBy(depth, fallback));
+    return;
+  }
+  const drop = Math.min(guards.length + depth, step);
+  if (drop <= 0) {
+    goBack(fallback);
+    return;
+  }
+  guards.splice(0).forEach((g) => (g.silent = true));
+  pending = { silent: true };
+  queued.push(() => {
+    popped = true;
+    show(readPath(), 'back', readState().prev);
+  });
+  window.history.go(-drop);
 }
 
 /** Сменить адрес на месте, без новой записи в истории (вкладки внутри экрана: «назад» уходит с экрана, а не по вкладкам) */

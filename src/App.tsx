@@ -16,11 +16,14 @@ import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
 import { TestSettings } from './components/TestSettings/TestSettingsLazy';
-import { CHATS } from './data/chats';
+import { getChat } from './data/chatStore';
 import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { ArchivePage } from './pages/ArchivePage/ArchivePage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
+import { NewChatPage, type NewStep } from './pages/NewChatPage/NewChatPage';
+import { GroupScreen, groupParentOf, groupSubOf } from './pages/GroupPages/GroupRoute';
+import { JoinPage } from './pages/GroupPages/JoinPage';
 import { goBack, keepTabbarOnNextShow, navigate, useRoute, wasPopped } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
@@ -47,11 +50,34 @@ interface Resolved {
  */
 const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result|sent)\/([^/]+)|\/(contact|profile|tabs))?/;
 
+/** Мастер нового чата: /new (контакты), /new/group, /new/group/info, /new/channel, /new/channel/type, /new/channel/members */
+const NEW_STEPS: Record<string, NewStep> = {
+  '/new': 'start',
+  '/new/group': 'group',
+  '/new/group/info': 'group-info',
+  '/new/channel': 'channel',
+  '/new/channel/type': 'channel-type',
+  '/new/channel/members': 'channel-members',
+};
+const newStepOf = (path: string): NewStep | undefined => NEW_STEPS[path.replace(/\/$/, '')];
+
+/** Вступление по ссылке-приглашению или адресу @имя: /join/<код> */
+const JOIN_ROUTE = /^\/join\/([^/]+)\/?$/;
+
 /** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
 const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
+  // Мастер нового чата: шаг ведёт на предыдущий, первый — в список
+  if (newStepOf(path)) {
+    const steps: Record<NewStep, string> = { start: '/', group: '/new', 'group-info': '/new/group', channel: '/new', 'channel-type': '/new/channel', 'channel-members': '/new/channel/type' };
+    return steps[newStepOf(path)!];
+  }
+  // Страницы группы и канала: каждая ведёт на страницу выше (ссылка → список ссылок → управление → группа → чат)
+  const grp = groupSubOf(path);
+  if (grp) return groupParentOf(grp.chatId, grp.sub);
+  if (JOIN_ROUTE.test(path)) return '/';
   const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result|sent)\/|contact|profile|tabs)/);
   // Профиль собеседника лежит над его карточкой, карточка — над чатом
   if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
@@ -162,11 +188,25 @@ export default function App() {
 
   /** Что показывает адрес: ключ экрана и как его построить (строится один раз, пока экран на месте) */
   const resolve = (path: string, at: TabId): Resolved => {
+    // Страницы группы или канала (/chat/<чат>/g…) раньше самого чата: его адрес устроен как начало этого
+    const groupRoute = at === 'messages' ? groupSubOf(path) : null;
+    if (groupRoute && getChat(groupRoute.chatId)) {
+      const { chatId, sub } = groupRoute;
+      return {
+        key: `chat/${chatId}/g/${sub}`,
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <GroupScreen chatId={chatId} sub={sub} />
+          </main>
+        ),
+      };
+    }
     // Открытый чат занимает весь экран, без нижней панели разделов
     const chatRoute = at === 'messages' ? path.match(CHAT_ROUTE) : null;
     if (chatRoute) {
       const [, chatId, kind, id, contact] = chatRoute;
-      if (CHATS.some((chat) => chat.id === chatId)) {
+      if (getChat(chatId)) {
         const test = kind === 'tests' ? LIBRARY.find((t) => t.id === id) : undefined;
         const task = kind === 'tasks' ? TASK_LIBRARY.find((t) => t.id === id) : undefined;
         if (contact === 'tabs') {
@@ -261,6 +301,31 @@ export default function App() {
     if (at === 'messages') {
       const folder = folderScreen(path, 'chats');
       if (folder) return folder;
+      const join = path.match(JOIN_ROUTE);
+      if (join) {
+        const code = decodeURIComponent(join[1]);
+        return {
+          key: `join/${code}`,
+          pm: true,
+          build: () => (
+            <main className="app__content">
+              <JoinPage code={code} />
+            </main>
+          ),
+        };
+      }
+      const step = newStepOf(path);
+      if (step) {
+        return {
+          key: `new/${step}`,
+          pm: true,
+          build: () => (
+            <main className="app__content">
+              <NewChatPage step={step} />
+            </main>
+          ),
+        };
+      }
       // /archive: «Архив чатов» на весь экран, без нижней панели
       if (path === '/archive') {
         return {

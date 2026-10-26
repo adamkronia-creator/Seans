@@ -73,6 +73,8 @@ export function useChatSelection(say: (text: string) => void) {
     const n = ids.length;
     const allMuted = picked.length > 0 && picked.every((c) => c.muted);
     const allPinned = picked.length > 0 && picked.every((c) => c.pinned);
+    // Среди выбранных есть группа или канал: заблокировать их нельзя (из них выходят), а удаление — это выход
+    const hasGroups = picked.some((c) => c.kind);
     const done = (text: string) => {
       say(text);
       clear();
@@ -90,16 +92,20 @@ export function useChatSelection(say: (text: string) => void) {
       },
       { key: 'folder', label: 'Добавить в папку', Icon: IconFolderPlus, run: () => more('folder', menu?.opener ?? document.body) },
       { key: 'clear', label: 'Очистить историю', Icon: IconBroom, run: () => setAsk('clear') },
-      {
-        key: 'block',
-        label: 'Заблокировать',
-        Icon: IconBlock,
-        danger: true,
-        run: () => {
-          setBlockedMany(ids, true);
-          done(n === 1 ? `«${picked[0]?.name ?? 'Чат'}» заблокирован` : `Заблокировано: ${count(n)}`);
-        },
-      },
+      ...(hasGroups
+        ? []
+        : [
+            {
+              key: 'block',
+              label: 'Заблокировать',
+              Icon: IconBlock,
+              danger: true,
+              run: () => {
+                setBlockedMany(ids, true);
+                done(n === 1 ? `«${picked[0]?.name ?? 'Чат'}» заблокирован` : `Заблокировано: ${count(n)}`);
+              },
+            },
+          ]),
     ];
     const folderItems: ChipMenuItem[] = folders.map((f) => ({
       key: `folder-${f.id}`,
@@ -150,7 +156,7 @@ export function useChatSelection(say: (text: string) => void) {
         {ask === 'delete' && (
           <RemoveSheet
             title={`Удалить ${count(n)}?`}
-            text="Чаты вместе с перепиской будут удалены без возможности восстановления."
+            text={hasGroups ? 'Переписка будет удалена без возможности восстановления. Из групп и каналов вы выйдете, а созданные вами будут удалены у всех участников.' : 'Чаты вместе с перепиской будут удалены без возможности восстановления.'}
             confirm="Удалить"
             onClose={() => setAsk(null)}
             onConfirm={() => {

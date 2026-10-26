@@ -12,10 +12,12 @@
     "test:library": "node scripts/test-library.mjs",
     "test:permanent": "node scripts/test-permanent.mjs",
     "test:folders": "node scripts/test-folders.mjs",
-    "test:help": "node scripts/test-help.mjs"
+    "test:help": "node scripts/test-help.mjs",
+    "test:groups": "node scripts/test-groups.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
+    "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

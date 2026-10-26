@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
+import { countText, isMember, useAllGroups } from '../../data/groups';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
 import { useListMotion } from '../../utils/listMotion';
 import { Toast } from '../../components/Toast/Toast';
@@ -35,8 +36,13 @@ const ChatList = memo(function ChatList({
   onMenu,
   selected,
   view,
+  found,
+  onOpenFound,
 }: {
   chats: Chat[];
+  /** Публичные группы и каналы, в которых вас нет, под строкой поиска: нажатие открывает страницу вступления */
+  found: Chat[];
+  onOpenFound: (chat: Chat) => void;
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
   archived: Chat[];
   onOpen: (chat: Chat) => void;
@@ -81,6 +87,9 @@ const ChatList = memo(function ChatList({
     return () => {
       watch.disconnect();
       for (const type of ['pointerdown', 'wheel', 'keydown'] as const) box.removeEventListener(type, touch);
+      // Строки «Архивы» больше нет (начали искать): список снова начинается с первой строки, а не со сдвига под шапку
+      list.style.minHeight = '';
+      box.scrollTop = 0;
     };
   }, [hasArchive]);
 
@@ -118,7 +127,7 @@ const ChatList = memo(function ChatList({
   // Смена поиска заменяет набор строк целиком, поэтому двигать ничего не нужно
   useListMotion(rows, { attr: 'data-chat', view, leave: true });
 
-  return chats.length > 0 || hasArchive ? (
+  return chats.length > 0 || hasArchive || found.length > 0 ? (
     <div ref={scroller} className="messages__list">
       <ul ref={rows} className="messages__rows">
         {hasArchive && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
@@ -126,6 +135,14 @@ const ChatList = memo(function ChatList({
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
         {others.map((chat) => (
           <ChatItem key={chat.id} chat={chat} onClick={onOpen} onLongPress={onMenu} selected={selected.includes(chat.id)} />
+        ))}
+        {found.length > 0 && (
+          <li className="messages__found" role="presentation">
+            Публичные группы и каналы
+          </li>
+        )}
+        {found.map((chat) => (
+          <ChatItem key={`found-${chat.id}`} chat={chat} onClick={onOpenFound} />
         ))}
       </ul>
     </div>
@@ -194,6 +211,20 @@ export function MessagesPage() {
 
   const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
 
+  // Поиск находит и публичные группы и каналы, в которых вас нет: по названию или адресу @имя
+  const publicGroups = useAllGroups();
+  const found = useMemo<Chat[]>(() => {
+    const q = query.trim().toLowerCase().replace(/^@/, '');
+    if (!q) return [];
+    return publicGroups
+      .filter((g) => g.isPublic && !isMember(g) && (g.name.toLowerCase().includes(q) || g.username.toLowerCase().includes(q)))
+      .map((g) => ({ id: g.chatId, name: g.name, avatar: g.avatar, kind: g.kind, lastMessage: `@${g.username}, ${countText(g)}`, time: '', unread: 0 }));
+  }, [publicGroups, query]);
+  const openFound = useCallback((chat: Chat) => {
+    const username = publicGroups.find((g) => g.chatId === chat.id)?.username;
+    if (username) navigate(`/join/@${username}`);
+  }, [publicGroups]);
+
   // Долгое нажатие на строку включает выбор, дальше нажатие выбирает и снимает; вне выбора строка открывает чат
   const { toggle, selecting } = sel;
   /** Когда выбрали строку долгим нажатием: список тут же сдвигается, и отпускание пальца может попасть в соседнюю строку */
@@ -223,8 +254,8 @@ export function MessagesPage() {
   );
 
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} view={query.trim()} /> })),
-    [filters, lists, archived, tapChat, holdChat, sel.ids, query],
+    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} view={query.trim()} found={id === 'all' ? found : []} onOpenFound={openFound} /> })),
+    [filters, lists, archived, tapChat, holdChat, sel.ids, query, found, openFound],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -284,6 +315,7 @@ export function MessagesPage() {
         query={query}
         onQuery={setQuery}
         storiesRoot={screen}
+        onCompose={() => navigate('/new')}
         selection={sel.header(chats)}
         chips={
           <>

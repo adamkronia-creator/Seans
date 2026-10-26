@@ -199,6 +199,14 @@
   background: var(--divider);
 }
 
+/* Заголовок найденных публичных групп и каналов под своими чатами */
+.messages__found {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--row-pad-x);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
 /* Пустой раздел: пустое состояние стоит по центру места между шапкой и нижней панелью */
 .messages__empty {
   display: flex;

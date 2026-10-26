@@ -210,6 +210,9 @@ if (typeof window !== 'undefined') {
 
 export const useProfile = (): ProfileState => useSyncExternalStore(subscribe, () => state);
 
+/** Имя профиля вне разметки: подпись постов канала, запись в журнале группы */
+export const getProfileName = (): string => state.name;
+
 /** Адрес аватара: фото профиля, стандартное или пустая строка, пока фото ещё читается из хранилища (чтобы не мелькало стандартное) */
 export function avatarSrcOf(profile: ProfileState): string {
   if (!profile.avatarId) return CURRENT_USER.avatar;

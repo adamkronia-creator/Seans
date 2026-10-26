@@ -1,5 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent, type ReactNode, type Ref } from 'react';
-import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
+import { IconBellMk, IconPlusMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
 import { StoriesRow } from '../../components/Stories/Stories';
@@ -20,6 +20,8 @@ interface ChatsHeaderProps {
   placeholder?: string;
   chipsLabel?: string;
   aside?: ReactNode;
+  /** Кнопка «+» справа от уведомлений: новый чат, группа или канал */
+  onCompose?: () => void;
   belt?: ReactNode;
   inputRef?: Ref<HTMLInputElement>;
   onFocus?: () => void;
@@ -46,6 +48,7 @@ export function ChatsHeader({
   placeholder = 'Поиск по чатам',
   chipsLabel = 'Фильтр диалогов',
   aside,
+  onCompose,
   belt,
   inputRef,
   onFocus,
@@ -108,6 +111,11 @@ export function ChatsHeader({
           {aside ?? (
             <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
               <IconBellMk />
+            </button>
+          )}
+          {onCompose && (
+            <button type="button" className="chats-header__action" aria-label="Новый чат" onClick={onCompose}>
+              <IconPlusMk />
             </button>
           )}
         </div>

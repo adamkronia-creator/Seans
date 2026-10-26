@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { CHATS, type Chat } from './chats';
 import { ROLE_MAX } from './roles';
 import { MESSAGES, type Message, type MessageGroup } from './messages';
+import { firstNameOf, type Contact } from './contacts';
 
 // Общее состояние: список чатов и переписки. Список и открытый чат видят одни и те же данные.
 let messages: Record<string, MessageGroup[]> = MESSAGES;
@@ -9,16 +10,23 @@ let nextId = 1000;
 let typing: Record<string, boolean> = {};
 const listeners = new Set<() => void>();
 
-/** Превью чата в списке берётся из последнего сообщения переписки */
-function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage' | 'time' | 'outgoing'> | undefined {
+/**
+ * Превью чата в списке берётся из последнего сообщения переписки. В группе перед текстом имя автора («Анна: …», у своих «Вы: …»);
+ * у групп и каналов галочек доставки нет.
+ */
+function previewOf(groups: MessageGroup[] | undefined, kind?: Chat['kind']): Pick<Chat, 'lastMessage' | 'time' | 'outgoing' | 'lastAuthor'> | undefined {
   const lastGroup = groups?.[groups.length - 1];
   const last = lastGroup?.messages[lastGroup.messages.length - 1];
   if (!last) return undefined;
   const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.image ? 'Фото' : last.file ? last.file.name : last.test ? 'Тест' : last.task ? 'Задание' : '');
-  return { lastMessage: text, time: last.time, outgoing: last.from === 'me' ? (last.status === 'read' || !last.status ? 'read' : 'sent') : undefined };
+  if (kind) {
+    const lastAuthor = kind === 'group' && !last.service ? (last.from === 'me' ? 'Вы' : firstNameOf(last.author ?? '')) : undefined;
+    return { lastMessage: text, time: last.time, outgoing: undefined, lastAuthor };
+  }
+  return { lastMessage: text, time: last.time, outgoing: last.from === 'me' ? (last.status === 'read' || !last.status ? 'read' : 'sent') : undefined, lastAuthor: undefined };
 }
 
-let chats: Chat[] = CHATS.map((c) => ({ ...c, ...previewOf(MESSAGES[c.id]) }));
+let chats: Chat[] = CHATS.map((c) => ({ ...c, ...previewOf(MESSAGES[c.id], c.kind) }));
 
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
@@ -26,9 +34,27 @@ const subscribe = (cb: () => void) => {
 };
 const emit = () => listeners.forEach((cb) => cb());
 
-export function useChats(): Chat[] {
-  return useSyncExternalStore(subscribe, () => chats);
+/** Чаты, которые видны в списке: без только что созданных пустых (их показывает первое сообщение) */
+let listedMemo: { chats: Chat[]; list: Chat[] } | null = null;
+function listedOf(all: Chat[]): Chat[] {
+  if (listedMemo?.chats !== all) listedMemo = { chats: all, list: all.some((c) => c.empty) ? all.filter((c) => !c.empty) : all };
+  return listedMemo.list;
 }
+
+export function useChats(): Chat[] {
+  return useSyncExternalStore(subscribe, () => listedOf(chats));
+}
+
+/** Один чат по номеру, в том числе ещё пустой (открыт из контактов, но без сообщений) */
+export function useChat(id: string): Chat | undefined {
+  return useSyncExternalStore(subscribe, () => chats.find((c) => c.id === id));
+}
+
+/** Все чаты без подписки: для адресов и проверок вне разметки (есть ли такой чат) */
+export const getChats = (): Chat[] => chats;
+export const getChat = (id: string): Chat | undefined => chats.find((c) => c.id === id);
+/** Переписка чата без подписки: для проверок вне разметки */
+export const getMessages = (chatId: string): MessageGroup[] => messages[chatId] ?? NO_MESSAGES;
 
 const NO_MESSAGES: MessageGroup[] = [];
 
@@ -88,9 +114,19 @@ export function setBlockedMany(ids: string[], blocked: boolean) {
 /** Удалить чаты вместе с перепиской */
 export function deleteChats(ids: string[]) {
   const set = ordinary(ids);
+  const gone = chats.filter((c) => set.has(c.id));
   chats = chats.filter((c) => !set.has(c.id));
   messages = Object.fromEntries(Object.entries(messages).filter(([id]) => !set.has(id)));
   emit();
+  // Группы и каналы при этом покидаются: об этом знает хранилище групп
+  if (gone.length) removedListeners.forEach((cb) => cb(gone));
+}
+
+const removedListeners = new Set<(gone: Chat[]) => void>();
+/** Подписка на удаление чатов из списка (хранилище групп выходит из удалённых групп и каналов) */
+export function onChatsRemoved(cb: (gone: Chat[]) => void) {
+  removedListeners.add(cb);
+  return () => removedListeners.delete(cb);
 }
 
 /** Очистить историю: переписка пустая, в списке остаётся сам чат */
@@ -134,8 +170,31 @@ export function markRead(id: string) {
 }
 
 function setPreview(chatId: string) {
-  const p = previewOf(messages[chatId]);
+  const p = previewOf(messages[chatId], chats.find((c) => c.id === chatId)?.kind);
   if (p) chats = chats.map((c) => (c.id === chatId ? { ...c, ...p } : c));
+}
+
+/** Первое сообщение делает созданный из контактов пустой чат видимым в списке: он встаёт вверх, под закреплёнными */
+function reveal(chatId: string) {
+  const chat = chats.find((c) => c.id === chatId && c.empty);
+  if (chat) chats = sorted([{ ...chat, empty: undefined }, ...chats.filter((c) => c.id !== chatId)]);
+}
+
+/** Личный чат с контактом из записной книжки: если переписки ещё нет, создаётся пустой чат (в списке его не видно, пока не появится первое сообщение) */
+export function ensureContactChat(contact: Contact) {
+  if (chats.some((c) => c.id === contact.id)) return;
+  chats = [
+    ...chats,
+    { id: contact.id, name: contact.name, avatar: contact.avatar, category: contact.category, online: contact.online, username: contact.username, lastMessage: '', time: '', unread: 0, empty: true },
+  ];
+  messages = { ...messages, [contact.id]: [] };
+  emit();
+}
+
+/** Чат, который открыт на экране: входящие в нём сразу прочитаны */
+let openChat: string | null = null;
+export function setOpenChat(id: string | null) {
+  openChat = id;
 }
 
 function patchMessage(chatId: string, id: string, patch: Partial<Message>) {
@@ -170,8 +229,56 @@ function appendToday(chatId: string, message: Message) {
  */
 export function receiveMessage(chatId: string, content: Pick<Message, 'text' | 'buttons' | 'test' | 'task' | 'testKind'>) {
   appendToday(chatId, { id: String(nextId++), from: 'them', time: clock(), ...content });
+  reveal(chatId);
   chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
   setPreview(chatId);
+  emit();
+}
+
+/** Что хранилище групп добавляет к отправляемому сообщению (просмотры и подпись поста) и что делает после отправки (ответы участников) */
+interface SendHooks {
+  decorate: (chatId: string) => Partial<Message>;
+  after: (chatId: string, id: string, text: string) => void;
+}
+let sendHooks: SendHooks | null = null;
+export function registerSendHooks(hooks: SendHooks) {
+  sendHooks = hooks;
+}
+
+/** Служебная запись в переписке группы («Вы добавили Анну»): по центру, без пузыря */
+export function postService(chatId: string, text: string) {
+  appendToday(chatId, { id: String(nextId++), from: 'me', service: true, text, time: clock() });
+  reveal(chatId);
+  setPreview(chatId);
+  emit();
+}
+
+/** Сообщение участника группы или пост канала от другого человека. Если чат открыт, оно сразу прочитано */
+export function postIncoming(chatId: string, content: Pick<Message, 'text' | 'author' | 'views' | 'signature' | 'counts'>) {
+  appendToday(chatId, { id: String(nextId++), from: 'them', time: clock(), ...content });
+  reveal(chatId);
+  if (openChat !== chatId) chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
+  setPreview(chatId);
+  emit();
+}
+
+/** Изменить поля сообщения (правка текста, счётчики реакций и просмотров) */
+export function updateMessage(chatId: string, id: string, patch: Partial<Message>) {
+  patchMessage(chatId, id, patch);
+  setPreview(chatId);
+  emit();
+}
+
+/** Изменить сведения о чате (название, фото) */
+export function patchChat(id: string, patch: Partial<Chat>) {
+  chats = chats.map((c) => (c.id === id ? { ...c, ...patch } : c));
+  emit();
+}
+
+/** Новый чат: встаёт в начало списка (после «Избранного» и закреплённых), с готовой перепиской */
+export function addChat(chat: Chat, history: MessageGroup[] = []) {
+  messages = { ...messages, [chat.id]: history };
+  chats = sorted([{ ...chat, ...previewOf(history, chat.kind) }, ...chats.filter((c) => c.id !== chat.id)]);
   emit();
 }
 
@@ -187,7 +294,8 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
   if (!text && !test) return;
 
   const id = String(nextId++);
-  appendToday(chatId, { id, from: 'me', text, time: clock(), status: 'sending', ...(replyTo ? { replyTo } : {}), ...test });
+  appendToday(chatId, { id, from: 'me', text, time: clock(), status: 'sending', ...sendHooks?.decorate(chatId), ...(replyTo ? { replyTo } : {}), ...test });
+  reveal(chatId);
   // Тест или задание, отправленные себе («Избранное»), приходят как входящие: в чате счётчик, на вкладке «Диалоги» значок
   if (test?.toSelf && (test.test || test.task) && chats.find((c) => c.id === chatId)?.favorites) {
     chats = chats.map((c) => (c.id === chatId ? { ...c, unread: c.unread + 1 } : c));
@@ -197,6 +305,7 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
 
   setTimeout(() => patchMessage(chatId, id, { status: 'sent' }), 500);
   setTimeout(() => patchMessage(chatId, id, { status: 'read' }), 1400);
+  sendHooks?.after(chatId, id, text);
   // Собеседник иногда отвечает реакцией на ваше сообщение (в «Избранном» собеседника нет)
   const peer = chats.find((c) => c.id === chatId);
   if (peer && !peer.favorites && peer.online && !test?.toSelf && Math.random() < 0.6) {

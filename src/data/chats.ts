@@ -3,6 +3,7 @@ import avatarVera from '../assets/avatars/vera.jpg';
 import avatarVladislav from '../assets/avatars/vladislav.jpg';
 import avatarBogdan from '../assets/avatars/bogdan.jpg';
 import userAvatar from '../assets/avatars/user-avatar-200.jpg';
+import { initialsAvatar } from '../utils/initialsAvatar';
 
 export type ChatCategory = 'clients' | 'colleagues' | 'seminars';
 
@@ -36,6 +37,12 @@ export interface Chat {
   birthday?: string;
   /** Подписка на события контакта */
   subscribed?: boolean;
+  /** Группа или канал; у обычного диалога поля нет. Участники, ссылки и права лежат в data/groups.ts */
+  kind?: 'group' | 'channel';
+  /** В группе: кто написал последнее сообщение (имя перед превью, у своих «Вы») */
+  lastAuthor?: string;
+  /** Чат создан, но в нём ещё нет сообщений: в списке его не видно, пока не появится первое */
+  empty?: boolean;
 }
 
 export const CURRENT_USER = { name: 'Вы', avatar: userAvatar };
@@ -85,6 +92,15 @@ export const CHATS: Chat[] = [
     unread: 2, // не прочитано
   },
   {
+    id: 'supervision',
+    name: 'Супервизия КПТ',
+    avatar: initialsAvatar('Супервизия КПТ', 'supervision'),
+    kind: 'group',
+    lastMessage: '',
+    time: '',
+    unread: 3,
+  },
+  {
     id: 'vladislav',
     name: 'Владислав Семёнов',
     avatar: avatarVladislav,
@@ -96,6 +112,15 @@ export const CHATS: Chat[] = [
     birthday: '27 ноября 1988',
     lastMessage: 'Блин, я не и не знал, что такой опросник есть.',
     time: '12:05',
+    unread: 1,
+  },
+  {
+    id: 'psy-myths',
+    name: 'Психология без мифов',
+    avatar: initialsAvatar('Психология без мифов', 'psy-myths'),
+    kind: 'channel',
+    lastMessage: '',
+    time: '',
     unread: 1,
   },
   {

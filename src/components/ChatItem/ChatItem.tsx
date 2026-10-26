@@ -2,6 +2,7 @@ import type { Chat } from '../../data/chats';
 import { useLongPress } from '../../utils/useLongPress';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
+import { IconStation, IconUsersGroup } from '../GroupUi/GroupIcons';
 import { IconArchiveMk, IconBookmarkMk, IconTicksMk } from './ChatIcons';
 import './ChatItem.css';
 
@@ -59,6 +60,11 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
         <span className="chat-item__body">
           <span className="chat-item__row chat-item__row--top">
             <span className="chat-item__title">
+              {chat.kind && (
+                <span className="chat-item__kind" role="img" aria-label={chat.kind === 'group' ? 'Группа' : 'Канал'}>
+                  {chat.kind === 'group' ? <IconUsersGroup /> : <IconStation />}
+                </span>
+              )}
               <span className="chat-item__name">{chat.name}</span>
               {chat.muted && (
                 <svg className="chat-item__mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Уведомления выключены">
@@ -86,7 +92,10 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
                   <IconTicksMk />
                 </span>
               )}
-              <span className="chat-item__preview">{chat.lastMessage}</span>
+              <span className="chat-item__preview">
+                {chat.lastAuthor && <span className="chat-item__author">{chat.lastAuthor}: </span>}
+                {chat.lastMessage}
+              </span>
             </span>
             <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
           </span>

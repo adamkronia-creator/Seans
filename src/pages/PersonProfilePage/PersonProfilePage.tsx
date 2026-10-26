@@ -1,7 +1,7 @@
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconPin } from '../../components/icons';
-import { useChats } from '../../data/chatStore';
+import { useChat } from '../../data/chatStore';
 import { SHARED_MEDIA } from '../../data/contactShared';
 import { PERSON_PROFILES } from '../../data/contactProfiles';
 import { roleOf } from '../../data/roles';
@@ -15,7 +15,7 @@ import './PersonProfilePage.css';
  * информация и фото), только для просмотра. Открывается кнопкой «Профиль» в карточке контакта.
  */
 export function PersonProfilePage({ chatId }: { chatId: string }) {
-  const chat = useChats().find((c) => c.id === chatId);
+  const chat = useChat(chatId);
   const back = () => goBack(`/chat/${chatId}/contact`);
   useSwipeBack('.profile', true, back);
   if (!chat) return <section className="profile" />;

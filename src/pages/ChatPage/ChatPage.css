@@ -754,3 +754,38 @@
 .bubble--tcard-bare:has(.bubble__foot) {
   padding-bottom: var(--space-2);
 }
+
+/* ——— Группы и каналы ——— */
+
+/* Цвета имён авторов: семь оттенков, как в Telegram; на светлом стекле темнее, на тёмном (белый текст приложения) светлее */
+[data-pm] {
+  --author-0: #c42b3a;
+  --author-1: #b35900;
+  --author-2: #6d4bd8;
+  --author-3: #1e8a3c;
+  --author-4: #00857f;
+  --author-5: #1a6fd1;
+  --author-6: #b8368f;
+}
+
+:root[data-ink='light'] [data-pm] {
+  --author-0: #ff8f8a;
+  --author-1: #ffb46b;
+  --author-2: #b4a0ff;
+  --author-3: #7edb8b;
+  --author-4: #5adbd0;
+  --author-5: #7dbbff;
+  --author-6: #f29ad8;
+}
+
+/* В группе у входящих слева место под фото автора; пузырь немного уже, чтобы справа оставался воздух */
+.chat__group--grp > .bubble--in,
+.chat__group--grp > .bubble-group--in {
+  margin-left: calc(var(--size-avatar-sm) + var(--space-2));
+  max-width: calc(100% - var(--size-avatar-sm) - var(--space-2) - var(--space-8));
+}
+
+/* Пост канала шире обычного пузыря */
+.chat__group--chan > .bubble {
+  max-width: 92%;
+}

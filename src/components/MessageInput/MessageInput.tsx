@@ -1,16 +1,19 @@
-import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ClipboardEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { EmojiPanel } from './EmojiPanel';
 import { IconClose, IconReply } from '../ChatParts/ChatIcons';
 import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
+import { IconPenNew } from '../GroupUi/GroupIcons';
 import './MessageInput.css';
 
 interface MessageInputProps {
   onSend: (text: string) => void;
   /** Высота панели поменялась (открылась панель эмодзи): ленту нужно удержать внизу */
   onLayoutChange?: () => void;
-  /** Сообщение, на которое пишется ответ */
-  reply?: { name: string; text: string };
+  /** Сообщение, на которое пишется ответ; с edit — сообщение, которое правится (плашка «Редактирование») */
+  reply?: { name: string; text: string; edit?: boolean };
   onCancelReply?: () => void;
+  /** Правка: текст сообщения встаёт в поле, отправка заменяет его (key меняется — поле заполняется заново; пропал — поле очищается) */
+  edit?: { key: string; text: string };
   /** Подпись пустого поля и название поля для экранных читалок */
   placeholder?: string;
   /** Кнопки «Прикрепить» и «Голосовое сообщение»: у поля заметки их нет, а кнопка «Отправить» стоит всегда и ждёт текста */
@@ -19,6 +22,10 @@ interface MessageInputProps {
   active?: boolean;
   /** Выбраны файлы кнопкой «Прикрепить» */
   onAttach?: (files: File[]) => void;
+  /** Кнопки «Прикрепить» нет (в группе запрещены фото и файлы); микрофон остаётся */
+  noAttach?: boolean;
+  /** Писать нельзя: вместо поля стоит эта строка («Отключить звук» у подписчика канала, «Медленный режим: 0:24») */
+  bar?: ReactNode;
 }
 
 /**
@@ -30,7 +37,7 @@ function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTML
   return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false, onAttach }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const settled = useRef(false);
@@ -88,6 +95,31 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
     inputRef.current?.focus();
     requestAnimationFrame(() => onLayoutChange?.());
   }, [reply]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Правка сообщения: его текст встаёт в поле с курсором в конце; когда правку закрыли, поле снова пустое
+  const editing = useRef(false);
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    if (edit) {
+      editing.current = true;
+      el.textContent = edit.text;
+      setText(edit.text);
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      savedRange.current = range.cloneRange();
+      requestAnimationFrame(() => onLayoutChange?.());
+    } else if (editing.current) {
+      editing.current = false;
+      el.textContent = '';
+      setText('');
+    }
+  }, [edit?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setPanel = (open: boolean) => {
     setEmojiOpen(open);
@@ -158,23 +190,31 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
     setPanel(!emojiOpen);
   };
 
+  if (bar) {
+    return (
+      <div ref={wrapRef} className="composer-wrap">
+        <div className="composer composer--bar">{bar}</div>
+      </div>
+    );
+  }
+
   return (
     <div ref={wrapRef} className={`composer-wrap${emojiOpen ? ' composer-wrap--panel' : ''}`}>
       {reply && (
         <div className="reply-bar">
-          <IconReply className="reply-bar__icon" />
+          {reply.edit ? <IconPenNew className="reply-bar__icon" /> : <IconReply className="reply-bar__icon" />}
           <div className="reply-bar__text">
-            <span className="reply-bar__name">Ответ: {reply.name}</span>
+            <span className="reply-bar__name">{reply.edit ? 'Редактирование' : `Ответ: ${reply.name}`}</span>
             <span className="reply-bar__quote">{reply.text}</span>
           </div>
-          <button type="button" className="reply-bar__close" aria-label="Отменить ответ" onClick={onCancelReply}>
+          <button type="button" className="reply-bar__close" aria-label={reply.edit ? 'Отменить правку' : 'Отменить ответ'} onClick={onCancelReply}>
             <IconClose />
           </button>
         </div>
       )}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className="composer">
-        {extras && (
+        {extras && !noAttach && (
           <>
             <input
               ref={fileRef}
