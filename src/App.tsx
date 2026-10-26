@@ -21,7 +21,7 @@ import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
 import { ArchivePage } from './pages/ArchivePage/ArchivePage';
 import { MessagesPage } from './pages/MessagesPage/MessagesPage';
-import { goBack, keepTabbarOnNextShow, navigate, useRoute } from './router';
+import { goBack, keepTabbarOnNextShow, navigate, useRoute, wasPopped } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition, type TransitionKind } from './utils/transition';
@@ -82,17 +82,12 @@ export default function App() {
   const { path: route, prev } = useRoute();
   const appRef = useRef<HTMLDivElement>(null);
 
-  // Какому разделу принадлежит экран адреса: кнопка «назад» возвращает на открытый тест или фото вместе с его разделом.
-  // Папки в списке нет: адрес один на «Тесты» и «Задания», раздел там определяет вкладка
-  const tabOfRoute = useRef(new Map<string, TabId>());
-  const known = /^\/(tests|tasks|profile)\//.test(route) ? tabOfRoute.current.get(route) : undefined;
+  // «Назад» браузера возвращает на экран вместе с его разделом: раздел виден по началу адреса (/tests/…, /tasks/…, /profile/…)
+  const prefixTab = /^\/(tests|tasks|profile)\//.exec(route)?.[1] as TabId | undefined;
+  const known = prefixTab && wasPopped() ? prefixTab : undefined;
   const tab = known ?? tabState;
   useLayoutEffect(() => {
-    if (known) {
-      if (known !== tabState) setTab(known);
-    } else if (/^\/(tests|tasks|profile)\//.test(route)) {
-      tabOfRoute.current.set(route, tabState);
-    }
+    if (known && known !== tabState) setTab(known);
   });
 
   // Открытое в каждом разделе: уходишь в другой раздел и возвращаешься — на том же экране, а не в списке

@@ -122,6 +122,10 @@ export function guardBack(onBack: () => void): () => void {
 let pending: { silent: boolean } | undefined;
 const queued: Array<() => void> = [];
 
+/** Последний переход сделал сам браузер (кнопка «назад»), а не приложение: тогда разделом экрана считается тот, где он был открыт */
+let popped = false;
+export const wasPopped = () => popped;
+
 /** Браузер сам перешёл по истории (кнопка «назад»/«вперёд», свайп) или поменяли адрес руками */
 function onHistory(event: Event) {
   if (pending) {
@@ -157,7 +161,10 @@ function onHistory(event: Event) {
   if ((event as PopStateEvent & { hasUAVisualTransition?: boolean }).hasUAVisualTransition) kind = 'none';
   if (forced && forced.until > performance.now()) kind = forced.kind;
   forced = undefined;
-  if (path !== target) show(path, kind, prev);
+  if (path !== target) {
+    popped = true;
+    show(path, kind, prev);
+  }
 }
 
 window.addEventListener('popstate', onHistory);
@@ -170,6 +177,7 @@ export function useRoute(): Located {
 /** Открыть экран по адресу; по умолчанию он выезжает справа, как при переходе вглубь */
 export function navigate(path: string, kind: TransitionKind = 'forward') {
   if (target === path) return;
+  popped = false;
   const prev = target;
   if (guards.length) {
     // Окна и режимы ещё держат свои записи истории: сперва они уходят, и только потом новый экран ложится сверху,
@@ -189,6 +197,7 @@ export function navigate(path: string, kind: TransitionKind = 'forward') {
 /** Сменить адрес на месте, без новой записи в истории (вкладки внутри экрана: «назад» уходит с экрана, а не по вкладкам) */
 export function replace(path: string, kind: TransitionKind = 'none') {
   if (target === path) return;
+  popped = false;
   const prev = readState().prev;
   window.history.replaceState({ i: step, prev }, '', `#${path}`);
   show(path, kind, prev);
