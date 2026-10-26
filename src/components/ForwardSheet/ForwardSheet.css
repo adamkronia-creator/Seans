@@ -1,27 +1,13 @@
-/* «Переслать…»: экран на весь телефон, как в Telegram; чаты строками, справа круг выбора */
+/* «Переслать»: экран-список чатов на весь телефон. Шапка, фон и строки те же, что у «Диалогов» (MessagesPage.css), поиск открыт, историй и папок нет */
 .fwd-page {
   position: fixed;
   inset: 0;
   z-index: 95;
   display: flex;
   flex-direction: column;
-  padding-top: var(--safe-top);
-  overflow: clip;
-  isolation: isolate;
   color: var(--text-primary);
   font-family: var(--font-family);
   animation: fwd-in 0.24s var(--ease-ios) both;
-}
-
-/* Тот же размытый фон, что у остальных экранов */
-.fwd-page::before {
-  content: '';
-  position: absolute;
-  inset: calc(var(--bg-blur) * -2);
-  z-index: -1;
-  background: var(--veil), var(--scene);
-  filter: blur(var(--bg-blur));
-  pointer-events: none;
 }
 
 @keyframes fwd-in {
@@ -31,70 +17,30 @@
   }
 }
 
-.fwd-page__header {
-  display: flex;
-  align-items: center;
-  gap: var(--header-gap);
-  padding: var(--space-4) var(--page-gutter) var(--space-3);
+.fwd-page__in {
+  /* Шапка без историй и папок: только строка поиска */
+  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3));
+  --pm-bottom: calc(var(--safe-bottom) + var(--space-4));
 }
 
-.fwd-page__back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-control);
-  height: var(--size-control);
-  border-radius: var(--radius-full);
-  background: var(--glass-fill);
-  color: var(--text-primary);
-  font-size: var(--size-icon);
-}
-
-.fwd-page__title {
-  margin: 0;
-  font: var(--type-headline);
-}
-
-.fwd-page__search {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  height: var(--size-control);
-  margin: 0 var(--page-gutter) var(--space-3);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-pill);
-  background: var(--glass-fill);
-  color: var(--text-secondary);
-}
-
-.fwd-page__search input,
-.fwd-page__search input:focus {
-  flex: 1;
-  padding: 0;
-  border: 0;
-  outline: none;
-  box-shadow: none;
-  min-width: 0;
-  background: none;
-  color: var(--text-primary);
-  font: var(--type-body);
-}
-
-.fwd-page__list {
-  flex: 1;
-  margin: 0;
-  padding: 0 0 var(--scroll-bottom);
-  overflow-y: auto;
-  list-style: none;
+.fwd-page .chats-header__belt,
+.fwd-page .screen-header__chips {
+  display: none;
 }
 
 .fwd-page__empty {
+  margin: 0;
   padding: var(--space-8) var(--page-gutter);
   color: var(--text-secondary);
   text-align: center;
 }
 
 .fwd-page__bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
   padding: var(--space-3) var(--page-gutter) calc(var(--space-3) + var(--safe-bottom));
   background: var(--glass-strong);
   -webkit-backdrop-filter: var(--glass-filter-panel);
@@ -109,47 +55,4 @@
   background: var(--glass-chip-active, var(--color-accent));
   color: #fff;
   font-weight: var(--font-weight-medium);
-}
-
-.fwd__row {
-  display: flex;
-  align-items: center;
-  gap: var(--row-gap);
-  width: 100%;
-  min-height: var(--row-h-2);
-  padding: var(--row-pad-y) var(--row-pad-x);
-  text-align: left;
-}
-
-.fwd__text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.fwd__name {
-  overflow: hidden;
-  font-weight: var(--font-weight-medium);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fwd__role {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
-.fwd__mark {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--color-text-placeholder);
-  border-radius: var(--radius-full);
-}
-
-.fwd__mark--on {
-  border-color: var(--color-accent);
-  background: var(--color-accent) radial-gradient(circle, #fff 0 28%, transparent 30%);
 }

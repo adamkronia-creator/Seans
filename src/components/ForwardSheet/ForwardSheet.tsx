@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useChats } from '../../data/chatStore';
-import { roleOf } from '../../data/roles';
-import { useBackHandler } from '../../utils/backHandler';
-import { Avatar } from '../Avatar/Avatar';
-import { IconBackMk, IconBookmarkMk, IconSearchMk } from '../ChatItem/ChatIcons';
+import { guardBack } from '../../router';
+import { ChatItem } from '../ChatItem/ChatItem';
+import { ChatsHeader } from '../../pages/MessagesPage/ChatsHeader';
+import '../../pages/MessagesPage/MessagesPage.css';
 import './ForwardSheet.css';
 
 interface ForwardSheetProps {
@@ -13,52 +13,48 @@ interface ForwardSheetProps {
   onClose: () => void;
 }
 
-/** «Переслать…»: отдельный экран, как в Telegram. Вверху «назад» и поиск, ниже чаты с выбором (можно отметить несколько), внизу «Отправить» */
+/** «Переслать»: список чатов, как в «Диалогах», с уже открытым поиском и без историй; чаты отмечаются галочкой (можно несколько), внизу «Отправить» */
 export function ForwardSheet({ onSend, onClose }: ForwardSheetProps) {
   const all = useChats().filter((c) => !c.archived);
   const [picked, setPicked] = useState<string[]>([]);
   const [query, setQuery] = useState('');
-  useBackHandler(true, onClose);
+  // Системная «назад» и Escape закрывают окно, а не уводят с экрана под ним
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    const release = guardBack(onClose);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      release();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const q = query.trim().toLowerCase();
   const chats = q ? all.filter((c) => c.name.toLowerCase().includes(q)) : all;
+  const favorites = chats.find((c) => c.favorites);
+  const others = chats.filter((c) => !c.favorites);
   const toggle = (id: string) => setPicked((now) => (now.includes(id) ? now.filter((x) => x !== id) : [...now, id]));
   return createPortal(
     <div className="fwd-page" data-pm role="dialog" aria-modal="true" aria-label="Переслать">
-      <header className="fwd-page__header">
-        <button type="button" className="fwd-page__back" aria-label="Назад" onClick={onClose}>
-          <IconBackMk />
-        </button>
-        <h2 className="fwd-page__title">Переслать…</h2>
-      </header>
-      <label className="fwd-page__search">
-        <IconSearchMk aria-hidden="true" />
-        <input type="search" placeholder="Поиск чатов" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Поиск чатов" autoComplete="off" />
-      </label>
-      <ul className="fwd-page__list" role="group" aria-label="Кому переслать">
-        {chats.map((chat) => {
-          const on = picked.includes(chat.id);
-          return (
-            <li key={chat.id}>
-              <button type="button" role="checkbox" aria-checked={on} className="fwd__row" onClick={() => toggle(chat.id)}>
-                {chat.favorites ? <Avatar icon={<IconBookmarkMk />} size={48} /> : <Avatar src={chat.avatar} alt="" size={48} />}
-                <span className="fwd__text">
-                  <span className="fwd__name">{chat.favorites ? 'Избранное' : chat.name}</span>
-                  <span className="fwd__role">{chat.favorites ? 'Сохранить на память' : roleOf(chat)}</span>
-                </span>
-                <span className={`fwd__mark${on ? ' fwd__mark--on' : ''}`} aria-hidden="true" />
-              </button>
-            </li>
-          );
-        })}
-        {chats.length === 0 && <li className="fwd-page__empty">Ничего не найдено</li>}
-      </ul>
-      {picked.length > 0 && (
-        <div className="fwd-page__bar">
-          <button type="button" className="fwd-page__send" onClick={() => onSend(picked)}>
-            Отправить ({picked.length})
-          </button>
+      <section className="messages fwd-page__in">
+        <ChatsHeader searching onSearching={(on) => !on && onClose()} query={query} onQuery={setQuery} placeholder="Кому переслать" heading="Переслать" belt={null} chips={null} />
+        <div className="messages__list">
+          <ul className="messages__rows">
+            {favorites && <ChatItem chat={favorites} onClick={() => toggle(favorites.id)} selected={picked.includes(favorites.id)} />}
+            {others.map((chat) => (
+              <ChatItem key={chat.id} chat={chat} onClick={() => toggle(chat.id)} selected={picked.includes(chat.id)} />
+            ))}
+          </ul>
+          {chats.length === 0 && <p className="fwd-page__empty">Ничего не найдено</p>}
         </div>
-      )}
+        {picked.length > 0 && (
+          <div className="fwd-page__bar">
+            <button type="button" className="fwd-page__send" onClick={() => onSend(picked)}>
+              Отправить ({picked.length})
+            </button>
+          </div>
+        )}
+      </section>
     </div>,
     document.body,
   );

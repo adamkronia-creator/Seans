@@ -669,19 +669,19 @@
    пузыря, у текста и у фото одинаково: у текстового пузыря поля 8/12, поэтому по бокам минус 4, у фото поля 4, поэтому внутри плюс 4 */
 .bubble__foot {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-2);
   margin-top: var(--space-2);
 }
 
+/* Слева вровень с реакцией (8), справа и снизу время стоит, как у обычного сообщения: в 12 от края и в 8 от низа */
 .bubble__foot--text {
-  margin-right: calc(var(--space-1) * -1);
   margin-left: calc(var(--space-1) * -1);
 }
 
 .bubble--photo .bubble__foot {
-  padding: 0 var(--space-1) var(--space-1);
+  padding: 0 var(--space-2) var(--space-1) var(--space-1);
 }
 
 .bubble__foot .bubble__reactions {
@@ -691,6 +691,7 @@
 .bubble__meta--foot {
   position: static;
   margin-left: auto;
+  line-height: var(--space-4);
 }
 
 /* Файл в сообщении */
