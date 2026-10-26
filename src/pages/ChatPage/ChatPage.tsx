@@ -431,6 +431,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     message={m}
                     replyTarget={m.replyTo ? byId.get(m.replyTo) : undefined}
                     peerName={chat.name.split(' ')[0]}
+                    peerAvatar={chat.avatar}
                     showMeta={!sameRun(m, next) || Boolean(m.pinned)}
                     joinPrev={sameRun(prev, m)}
                     query={q}

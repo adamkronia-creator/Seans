@@ -596,38 +596,81 @@
   margin-top: var(--space-1);
 }
 
-.bubble__reaction-count {
-  margin-left: var(--space-1);
-  font-size: var(--font-size-sm);
+/* Реакция, как в Telegram: белая плашка — эмодзи и фото того, кто его поставил */
+.bubble__reaction {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-1) 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 94%);
+  color: #1c1c1e;
+  animation: pop-in 0.3s var(--ease-spring) backwards;
+}
+
+.bubble__reaction-emoji {
+  font-size: 20px; /* grid:ok — эмодзи в плашке */
+  line-height: 1;
+}
+
+.bubble__reaction-faces {
+  display: flex;
+}
+
+.bubble__reaction-faces img,
+.bubble__reaction-face--empty {
+  width: 28px; /* grid:ok — фото в плашке реакции */
+  height: 28px; /* grid:ok */
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgb(120 120 128 / 30%);
+}
+
+.bubble__reaction-faces > * + * {
+  margin-left: -8px; /* grid:ok — фото внахлёст */
+}
+
+/* Фото в сообщении: пузырь по размеру картинки, кайма 4, картинка с настоящими пропорциями */
+.bubble--photo {
+  width: min(85%, 320px); /* grid:ok */
+  padding: var(--space-1);
+  overflow: hidden;
 }
 
 .bubble__img {
   display: block;
-  width: 240px; /* grid:ok — ширина фото в сообщении */
-  max-width: 100%;
-  aspect-ratio: 4 / 3;
-  margin: 0 0 var(--space-1);
-  border-radius: var(--radius-md);
+  width: 100%;
+  max-height: 360px; /* grid:ok */
+  border-radius: calc(var(--radius-lg) - var(--space-1));
   object-fit: cover;
 }
 
-.bubble__reaction {
-  display: flex;
-  width: max-content;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--size-control-sm);
-  height: var(--size-control-sm);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 22%);
-  font-size: 18px; /* grid:ok */
-  line-height: 1;
-  animation: pop-in 0.3s var(--ease-spring) backwards;
+.bubble__caption {
+  margin: var(--space-2) var(--space-2) 0;
 }
 
-.bubble--in .bubble__reaction {
-  background: rgb(0 122 255 / 14%);
+.bubble__fwd--photo {
+  margin: var(--space-1) var(--space-2) var(--space-2);
+}
+
+/* Низ пузыря с фото: реакции слева, время справа */
+.bubble__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--size-control-sm);
+  padding: var(--space-1) var(--space-2) var(--space-1);
+}
+
+.bubble__foot .bubble__reactions {
+  margin-top: 0;
+}
+
+.bubble__meta--foot {
+  position: static;
+  margin-left: auto;
 }
 
 .bubble__fwd {

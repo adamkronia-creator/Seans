@@ -3,6 +3,7 @@ import { requestTaskPass, useAssignmentRecords } from '../../data/selfTask';
 import { recordsText, TASK_DEADLINES } from '../../data/taskValues';
 import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
 import { useRef, useState, type PointerEvent } from 'react';
+import { useAvatarSrc } from '../../data/profile';
 import type { Message } from '../../data/messages';
 import type { LibraryItem } from '../../data/library';
 import { IconReadTicks } from '../icons';
@@ -51,25 +52,35 @@ function Highlighted({ text, query, active }: { text: string; query: string; act
 
 const SWIPE_TRIGGER = 56;
 
-/** Реакции под сообщением: ваша (нажатие снимает) и собеседника; одинаковые сливаются в одну плашку с числом */
-function Reaction({ message, onReact }: { message: Message; onReact?: (m: Message, emoji: string | null) => void }) {
+/** Реакции под сообщением, как в Telegram: белая плашка, эмодзи и фото того, кто его поставил; у одинаковых реакций два фото рядом */
+function Reaction({ message, peerAvatar, onReact }: { message: Message; peerAvatar?: string; onReact?: (m: Message, emoji: string | null) => void }) {
+  const myAvatar = useAvatarSrc();
   const mine = message.reaction;
   const theirs = message.theirReaction;
   if (!mine && !theirs) return null;
-  const same = mine && mine === theirs;
+  const chip = (emoji: string, avatars: Array<string | undefined>, own: boolean) => {
+    const body = (
+      <>
+        <span className="bubble__reaction-emoji">{emoji}</span>
+        <span className="bubble__reaction-faces">
+          {avatars.map((src, i) => (src ? <img key={i} src={src} alt="" /> : <span key={i} className="bubble__reaction-face--empty" />))}
+        </span>
+      </>
+    );
+    return own ? (
+      <button key={emoji} type="button" className="bubble__reaction" aria-label={`Ваша реакция ${emoji}: снять`} onClick={() => onReact?.(message, null)}>
+        {body}
+      </button>
+    ) : (
+      <span key={emoji} className="bubble__reaction" aria-label={`Реакция собеседника ${emoji}`}>
+        {body}
+      </span>
+    );
+  };
   return (
     <span className="bubble__reactions">
-      {theirs && !same && (
-        <span className="bubble__reaction bubble__reaction--their" aria-label={`Реакция собеседника ${theirs}`}>
-          {theirs}
-        </span>
-      )}
-      {mine && (
-        <button type="button" className="bubble__reaction" aria-label={`Ваша реакция ${mine}: снять`} onClick={() => onReact?.(message, null)}>
-          {mine}
-          {same && <span className="bubble__reaction-count">2</span>}
-        </button>
-      )}
+      {theirs && theirs !== mine && chip(theirs, [peerAvatar], false)}
+      {mine && chip(mine, mine === theirs ? [peerAvatar, myAvatar] : [myAvatar], true)}
     </span>
   );
 }
@@ -80,6 +91,8 @@ interface MessageBubbleProps {
   /** Сообщение, на которое это — ответ (undefined, если удалено) */
   replyTarget?: Message;
   peerName: string;
+  /** Фото собеседника: на плашке его реакции */
+  peerAvatar?: string;
   /** Время и статус показываются только у последнего сообщения серии */
   showMeta: boolean;
   joinPrev: boolean;
@@ -103,6 +116,7 @@ export function MessageBubble({
   message,
   replyTarget,
   peerName,
+  peerAvatar,
   showMeta,
   joinPrev,
   query = '',
@@ -247,7 +261,7 @@ export function MessageBubble({
               </span>
             </p>
           ) : null}
-          <Reaction message={message} onReact={onReact} />
+          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
           <span className="bubble__meta">
             <Meta message={message} />
           </span>
@@ -319,6 +333,31 @@ export function MessageBubble({
     );
   }
 
+  // Фото: пузырь по размеру картинки с узкой каймой, подпись под ней; внизу плашка реакций слева и время справа
+  if (message.image) {
+    return (
+      <li
+        {...common}
+        className={`bubble bubble--photo bubble--${out ? 'out' : 'in'}${joinPrev ? ' bubble--joined-prev' : ''}${showMeta ? ' bubble--last' : ''}${activeMatch ? ' bubble--match' : ''}`}
+      >
+        {swipeHint}
+        {message.forwarded && <span className="bubble__fwd bubble__fwd--photo">Переслано от {message.forwarded}</span>}
+        <img className="bubble__img" src={message.image} alt="Фото" draggable={false} />
+        {message.text && (
+          <p className="bubble__caption">
+            <Highlighted text={message.text} query={query} active={activeMatch} />
+          </p>
+        )}
+        <div className="bubble__foot">
+          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
+          <span className="bubble__meta bubble__meta--foot">
+            <Meta message={message} />
+          </span>
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li
       {...common}
@@ -334,7 +373,7 @@ export function MessageBubble({
       {message.image && <img className="bubble__img" src={message.image} alt="Фото" draggable={false} />}
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       <Highlighted text={message.text} query={query} active={activeMatch} />
-      <Reaction message={message} onReact={onReact} />
+      <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
       {showMeta && (
         <>
           {/* Невидимая копия резервирует место под время в конце последней строки */}
