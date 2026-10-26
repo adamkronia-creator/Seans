@@ -1,5 +1,5 @@
 import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
-import { setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
+import { addToNamedAlbum, setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
 import { Frame } from '../Frame/Frame';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { BackgroundControls } from '../BackgroundControls/BackgroundControls';
@@ -46,7 +46,11 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
     if (files.length === 0) return;
     onClose();
     const { added, ok } = await uploadPhotos(files.slice(0, 1), onNote);
-    if (added[0]) apply(added[0]);
+    if (added[0]) {
+      apply(added[0]);
+      // Загруженное для аватарки или обложки складывается в свой альбом и потом доступно для выбора
+      addToNamedAlbum(isAvatar ? 'Фото профиля' : 'Обложки', added.slice(0, 1));
+    }
     if (ok && added[0]) onNote(done);
   };
 

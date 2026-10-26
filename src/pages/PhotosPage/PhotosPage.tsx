@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react';
 
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { IconBack } from '../../components/icons';
+import { IconCamera } from '../../components/Profile/ProfileIcons';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumMoveSheet, AlbumNameSheet, AlbumPhotosSheet } from '../../components/Profile/AlbumSheets';
 import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
@@ -145,6 +146,14 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
             <Skeleton className="ph__wait" width="100%" height="auto" radius="0" />
           </li>
         ))}
+      {view === 'photos' && !selecting && (
+        <li>
+          <button type="button" className="ph__tile ph__tile--add" onClick={() => input.current?.click()}>
+            <IconCamera />
+            <span>Загрузить</span>
+          </button>
+        </li>
+      )}
       {photoList.map((photo, i) => (
         <li key={photo.id}>
           {thumbs[photo.id] ? (

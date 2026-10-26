@@ -374,6 +374,13 @@ export function addToAlbum(albumId: string, ids: string[]) {
   if (album) setAlbumPhotos(albumId, [...album.photoIds, ...ids]);
 }
 
+/** Служебный альбом по названию («Обложки», «Фото профиля»): создаётся при первой загрузке, дальше фото просто добавляются в него */
+export function addToNamedAlbum(name: string, ids: string[]) {
+  const album = state.albums.find((a) => a.name === name);
+  if (album) addToAlbum(album.id, ids);
+  else addAlbum(name, ids);
+}
+
 export function removeManyPhotos(ids: string[]) {
   ids.forEach(removePhoto);
 }
