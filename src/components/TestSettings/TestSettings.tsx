@@ -40,6 +40,8 @@ import IconRowMain from '../../assets/icons/solar/list.svg?react';
 import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
 import IconRowBlind from '../../assets/icons/solar/face-scan-square.svg?react';
 import IconRowBlank from '../../assets/icons/solar/file.svg?react';
+import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
+import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
@@ -378,6 +380,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               onClick={openBlank}
               onKeyDown={(e) => e.key === 'Enter' && openBlank()}
             >
+              <IconLinkBlank className="ts-row__icon" />
               <span className="ts-row__link">Бланк тестирования</span>
               <IconTestChevron className="ts-row__chevron" />
             </li>
@@ -389,6 +392,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                 onClick={openConclusion}
                 onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
               >
+                <IconLinkConclusion className="ts-row__icon" />
                 <span className="ts-row__link">Пример заключения</span>
                 <IconTestChevron className="ts-row__chevron" />
               </li>
@@ -504,7 +508,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
-            <Row Icon={IconRowMessage} label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом">
+            <Row Icon={IconRowMessage} label="Сообщение для клиента">
               <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>

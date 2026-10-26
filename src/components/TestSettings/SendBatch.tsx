@@ -153,11 +153,11 @@ export function SendBatchSheet({ kind, items, recipients, onBack, onSent }: Prop
 }
 
 /** Сообщение клиенту: переключатель и поле, как в настройках */
-function MessageCard({ id, hint, o, limit, onChange }: { id: string; hint: string; o: { messageOn: boolean; message: string }; limit: number; onChange: (p: { messageOn?: boolean; message?: string }) => void }) {
+function MessageCard({ id, o, limit, onChange }: { id: string; o: { messageOn: boolean; message: string }; limit: number; onChange: (p: { messageOn?: boolean; message?: string }) => void }) {
   return (
     <section className="ts-card ts-message-card">
       <ul className="ts-rows">
-        <Row label="Сообщение для клиента" hint={hint}>
+        <Row label="Сообщение для клиента">
           <Switch checked={o.messageOn} onChange={(v) => onChange({ messageOn: v })} label={`Сообщение для клиента: ${id}`} />
         </Row>
       </ul>
@@ -197,7 +197,7 @@ function TestFields({ item, o, onChange }: { item: LibraryItem; o: TestOpts; onC
         </ul>
       </CollapseCard>
       {conclusionFor(item.id) && <ResultChoice name={`result-${item.id}`} value={o.result} onChange={(result) => onChange({ result })} />}
-      <MessageCard id={item.id} hint="Короткое пояснение придет вместе с тестом" o={o} limit={MESSAGE_LIMIT} onChange={onChange} />
+      <MessageCard id={item.id} o={o} limit={MESSAGE_LIMIT} onChange={onChange} />
     </>
   );
 }
@@ -244,7 +244,7 @@ function TaskFields({ item, o, onChange }: { item: LibraryItem; o: TaskOpts; onC
           </li>
         </ul>
       </CollapseCard>
-      <MessageCard id={item.id} hint="Короткое пояснение придет вместе с заданием" o={o} limit={TASK_MESSAGE_LIMIT} onChange={onChange} />
+      <MessageCard id={item.id} o={o} limit={TASK_MESSAGE_LIMIT} onChange={onChange} />
     </>
   );
 }

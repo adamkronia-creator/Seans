@@ -421,7 +421,7 @@
   margin-top: -1px; /* grid:ok — отрицательный просвет */
 }
 
-/* Строки внутри блока: тот же просвет между ними, заливка у каждой своя */
+/* Строки внутри блока идут сплошной заливкой, без разделителей между пунктами: просвет только под названием блока */
 [data-pm] .blank-card__body:has(> .ts-rows) {
   background: none;
 }
@@ -429,7 +429,6 @@
 [data-pm] .ts-rows {
   display: flex;
   flex-direction: column;
-  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
 }
 
 [data-pm] .ts-rows > .ts-row {

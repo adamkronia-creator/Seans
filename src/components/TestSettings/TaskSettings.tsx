@@ -38,6 +38,8 @@ import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
 import './TestSettings.pm.css';
+import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
+import IconLinkExample from '../../assets/icons/solar/notebook.svg?react';
 import './TaskSettings.css';
 
 /** Строка текста для чтения (--line-height-read, typography.css): описание 16/25 */
@@ -215,12 +217,16 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
     else setSheet(action);
   };
 
-  const link = (label: string, next: View) => (
+  const link = (label: string, next: View) => {
+    const Icon = next === 'blank' ? IconLinkBlank : IconLinkExample;
+    return (
     <li className="ts-row ts-row--link" role="button" tabIndex={0} onClick={() => openView(next)} onKeyDown={(e) => e.key === 'Enter' && openView(next)}>
+      <Icon className="ts-row__icon" />
       <span className="ts-row__link">{label}</span>
       <IconTestChevron className="ts-row__chevron" />
     </li>
-  );
+    );
+  };
 
   const select = (label: string, value: string, values: string[], onChange: (v: string) => void) => (
     <label className="ts-select">
@@ -377,7 +383,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
             <section className="ts-card ts-message-card">
               <ul className="ts-rows">
-                <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с заданием">
+                <Row label="Сообщение для клиента">
                   <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
                 </Row>
               </ul>
