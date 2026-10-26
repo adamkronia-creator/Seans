@@ -17,7 +17,7 @@ export { default as IconComment } from '../../assets/icons/solar/chat-round-dots
 export { default as IconDots } from '../../assets/icons/solar/menu-dots-vertical.svg?react';
 export { default as IconPin } from '../../assets/icons/solar/pin.svg?react';
 export { default as IconLink } from '../../assets/icons/solar/link.svg?react';
-export { default as IconFolderMove } from '../../assets/icons/solar/folder.svg?react';
-export { default as IconSelect } from '../../assets/icons/solar/checklist-minimalistic-bold.svg?react';
+export { default as IconFolderMove } from '../../assets/icons/solar/folder-move.svg?react';
+export { default as IconSelect } from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 export { default as IconUser } from '../../assets/icons/solar/user-rounded.svg?react';
 export { default as IconForward } from '../../assets/icons/solar/forward.svg?react';
