@@ -510,3 +510,12 @@
 [data-pm] .cc-rest:not(.cc-rest--open) {
   margin-top: calc(-1 * var(--space-1));
 }
+
+/* Развёрнутые диапазоны продолжают текст без разрыва, а внизу нет линии: просвет остаётся только перед «Скрыть» */
+[data-pm] .cc-rest--open {
+  margin-top: calc(-1 * var(--space-1));
+}
+
+[data-pm] .cc-rest .cc-level--flat:last-child {
+  border-bottom: 0;
+}
