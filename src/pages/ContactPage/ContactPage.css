@@ -65,7 +65,7 @@
 .ct__id {
   position: absolute;
   right: 0;
-  bottom: var(--space-2);
+  bottom: 0;
   left: 0;
   display: flex;
   flex-direction: column;
@@ -224,31 +224,25 @@
 }
 
 /* ---------- Вкладки «Истории», «Медиа», «Файлы», «Ссылки» ---------- */
+/* Вкладки и их содержимое — один стеклянный контейнер, как «Фото и альбомы» в профиле: чипсы сверху, под ними содержимое с полем 12 */
 .ct__tabs-block {
   display: flex;
   flex-direction: column;
-  gap: var(--block-gap);
+  gap: var(--card-pad);
+  padding: var(--card-pad);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
 }
 
-/* Капсула на всю ширину, как у чипсов «Истории» чата: сама неподвижна, внутри чипсы-пилюли высотой 32 (Chip, выбранный залит синим стеклом).
-   Липнет под шапкой, когда прокрутили до неё */
+/* Чипсы на всю ширину контейнера: четыре делят её поровну (своя капсула им больше не нужна: фон даёт контейнер) */
 .ct__tabs {
-  position: sticky;
-  top: calc(var(--bar, 72px) - var(--space-2));
-  z-index: 2;
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-full);
-  background: var(--glass-fill-panel);
-  box-shadow: var(--glass-shadow-panel);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
+  position: relative;
 }
 
 .ct__chips {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-1);
 }
 
 /* Четыре чипса делят ширину поровну */
@@ -274,7 +268,6 @@
 }
 
 .ct__panel {
-  min-height: 160px;
   animation: fade-in var(--dur-base, 0.24s) ease-out backwards;
 }
 
@@ -324,7 +317,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-1);
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm);
 }
 
 .ct__grid li {
