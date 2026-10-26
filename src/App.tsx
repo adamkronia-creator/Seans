@@ -78,9 +78,25 @@ function Layer({ top, pm, children }: { top: boolean; pm?: boolean; children: Re
 }
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>('messages');
+  const [tabState, setTab] = useState<TabId>('messages');
   const { path: route, prev } = useRoute();
   const appRef = useRef<HTMLDivElement>(null);
+
+  // Какому разделу принадлежит экран адреса: кнопка «назад» возвращает на открытый тест или фото вместе с его разделом.
+  // Папки в списке нет: адрес один на «Тесты» и «Задания», раздел там определяет вкладка
+  const tabOfRoute = useRef(new Map<string, TabId>());
+  const known = /^\/(tests|tasks|profile)\//.test(route) ? tabOfRoute.current.get(route) : undefined;
+  const tab = known ?? tabState;
+  useLayoutEffect(() => {
+    if (known) {
+      if (known !== tabState) setTab(known);
+    } else if (/^\/(tests|tasks|profile)\//.test(route)) {
+      tabOfRoute.current.set(route, tabState);
+    }
+  });
+
+  // Открытое в каждом разделе: уходишь в другой раздел и возвращаешься — на том же экране, а не в списке
+  const savedRoute = useRef<Partial<Record<TabId, string>>>({});
 
   // Обработчики экранов живут дольше одного кадра (нижний слой не перерисовывается при каждой смене адреса),
   // поэтому свежие значения они берут отсюда, а не из замыкания
@@ -91,14 +107,20 @@ export default function App() {
 
   const handleTabChange = useCallback((id: TabId, kind?: TransitionKind) => {
     const { route: current, tab: active } = latest.current;
+    const inChat = current.startsWith('/chat/') || current === '/events';
+    const deep = current !== '/' && !inChat;
     // Нажатие на «Сообщения» ведёт на список чатов; открытая настройка теста закрывается
     const toRoot = (id === 'messages' || current.startsWith('/tests/') || current.startsWith('/tasks/')) && current !== '/';
     if (id === active && !toRoot) return;
+    // Уходя из раздела, запоминаем, что в нём открыто; вернувшись, открываем это же
+    if (id !== active) savedRoute.current[active] = deep ? current : undefined;
+    const restore = id !== active ? savedRoute.current[id] : undefined;
+    const dest = restore ?? (toRoot || (id !== active && deep) ? '/' : null);
     // Другая вкладка — мягкая смена содержимого; та же вкладка — возврат к её списку: открытый экран уезжает вправо
-    if (toRoot) keepTabbarOnNextShow();
+    if (dest) keepTabbarOnNextShow();
     transition(() => {
       setTab(id);
-      if (toRoot) navigate('/', 'none');
+      if (dest && dest !== current) navigate(dest, 'none');
     }, id === active ? 'back' : (kind ?? 'fade'));
   }, []);
   useLayoutEffect(() => {
