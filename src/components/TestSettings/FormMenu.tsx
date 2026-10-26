@@ -5,6 +5,7 @@ import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
 import './TestSettings.css';
 import './ResultChoice.css';
+import './TestBlank.css';
 
 interface FormSheetProps {
   forms: string[];
@@ -17,7 +18,7 @@ interface FormSheetProps {
   onClose: () => void;
 }
 
-/** Окно выбора формы бланка: варианты («Мужская» / «Женская») и пояснение, зачем форма нужна */
+/** Окно выбора формы бланка: пояснение, зачем форма нужна, как вопрос и варианты («Мужская» / «Женская») как ответы */
 function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormSheetProps) {
   useSheet(onClose);
   return (
@@ -29,20 +30,21 @@ function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormS
         </div>
         <div className="sheet__body">
           <section className="sheet__card form-menu__card">
-            <ul className="ts-rows" role="radiogroup" aria-label={title}>
-              {forms.map((f) => (
-                <li key={f} className="ts-row result-choice__row">
-                  <label className="result-choice__label">
-                    <input type="radio" className="blank-answer__input" name="form-menu" checked={value === f} onChange={() => onPick(f)} />
-                    <span className="blank-answer__radio" aria-hidden="true" />
-                    <span className="ts-row__text">
-                      <span className="ts-row__label">{format(f)}</span>
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-            {hint && <p className="result-choice__note">{hint}</p>}
+            {/* Как вопрос и ответы при прохождении: подпись (если есть) — вопрос, варианты — радиокнопки в рамке выбора */}
+            <div className="form-menu__question">
+              {hint && <p className="blank-question__prompt">{hint}</p>}
+              <ul className="blank-answers" role="radiogroup" aria-label={title}>
+                {forms.map((f) => (
+                  <li key={f}>
+                    <label className="blank-answer">
+                      <input type="radio" className="blank-answer__input" name="form-menu" checked={value === f} onChange={() => onPick(f)} />
+                      <span className="blank-answer__radio" aria-hidden="true" />
+                      <span className="blank-answer__text">{format(f)}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
         </div>
         <div className="sheet__footer">

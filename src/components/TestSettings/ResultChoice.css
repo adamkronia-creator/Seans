@@ -51,3 +51,11 @@
   height: 1px;
   background: var(--divider, var(--color-divider));
 }
+
+/* Окно выбора формы бланка: вопрос и варианты с теми же полями 16 и отступом 12, что у вопросов бланка */
+.form-menu__question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}

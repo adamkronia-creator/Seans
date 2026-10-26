@@ -21,6 +21,36 @@
   font-family: var(--font-family);
 }
 
+/* Кнопка отмены справа вверху окна: круг 36 с крестиком, на одной линии с заголовком; заголовок остаётся по центру, поля под кнопки по 56 */
+.sheet {
+  position: relative;
+}
+
+.sheet__close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-3);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill, rgb(120 120 128 / 16%));
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--size-icon-sm);
+}
+
+.sheet__close[data-pressed] {
+  background: var(--glass, rgb(120 120 128 / 28%));
+}
+
+.sheet > .sheet__header {
+  padding-right: calc(var(--space-12) + var(--space-2));
+  padding-left: calc(var(--space-12) + var(--space-2));
+}
+
 /* Ручка 36×4: сверху 8 */
 .sheet__grab {
   flex-shrink: 0;

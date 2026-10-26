@@ -33,17 +33,17 @@
 
 .option-help-sheet__body {
   gap: 0;
-  /* Между заголовком и макетом 4, как между «Фон приложения» и его плитками */
-  padding-top: var(--space-1);
+  padding-top: 0;
 }
 
-/* Заголовок подсказки по центру окна; у шапки снизу ничего, весь отступ — 4 у тела */
-[data-pm] .sheet.option-help-sheet .sheet__header {
-  padding-bottom: 0;
+/* Макеты лежат на цветной подложке во всю ширину окна (сверху место под крестик); у окна нет ни ручки, ни заголовка: название — подпись слайда */
+[data-pm] .sheet.option-help-sheet {
+  overflow: hidden;
 }
 
-[data-pm] .sheet.option-help-sheet .sheet__heading {
-  text-align: center;
+[data-pm] .option-help-sheet .oh {
+  padding: var(--space-12) 0 var(--space-2);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--action-primary, var(--color-accent)) 38%, transparent), color-mix(in srgb, var(--action-primary, var(--color-accent)) 12%, transparent));
 }
 
 /*
@@ -183,7 +183,7 @@
 }
 
 .oh__dot[aria-current='true']::before {
-  width: 20px;
+  width: 8px;
   background: var(--color-accent);
   opacity: 1;
 }
@@ -191,7 +191,7 @@
 /* Подписи лежат друг на друге в одной ячейке: высота окна равна самой длинной, и при смене подписи ничего не прыгает */
 .oh__captions {
   display: grid;
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
   padding: 0 var(--space-2);
   text-align: center;
 }
@@ -213,7 +213,7 @@
 
 .oh__title {
   margin: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl, var(--font-size-lg));
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-lg);
   letter-spacing: var(--letter-spacing-title);

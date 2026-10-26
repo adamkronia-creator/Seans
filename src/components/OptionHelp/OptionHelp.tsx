@@ -42,7 +42,7 @@ export function OptionHelp({ id }: OptionHelpProps) {
   );
 }
 
-/** Окно подсказки: заголовок, карусель из макетов, точки, подпись к показанному скриншоту и «Понятно» */
+/** Окно подсказки, как у Telegram: сверху карусель макетов на цветной подложке (крестик справа), под ней крупная подпись, точки и «Понятно» */
 function HelpSheet({ help, ctx, onClose }: { help: Help; ctx: HelpTest; onClose: () => void }) {
   useSheet(onClose);
   const slides = slidesFor(help.slides, ctx);
@@ -106,10 +106,6 @@ function HelpSheet({ help, ctx, onClose }: { help: Help; ctx: HelpTest; onClose:
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet option-help-sheet" role="dialog" aria-modal="true" aria-label={help.title} onKeyDown={keepFocus}>
-        <div className="sheet__grab" aria-hidden="true" />
-        <div className="sheet__header">
-          <h2 className="sheet__heading">{help.title}</h2>
-        </div>
         <div className="sheet__body option-help-sheet__body">
           <div className="oh" role="region" aria-roledescription="карусель" aria-label={`${help.title}: макеты`}>
             <ul className="oh__track" ref={track} tabIndex={0} data-hscroll onScroll={onScroll} onKeyDown={onKeyDown}>

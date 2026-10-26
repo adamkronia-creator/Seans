@@ -1,5 +1,6 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { IconClose } from '../ChatParts/ChatIcons';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import { useSheetDrag } from './useSheetDrag';
 import './EditSheet.css';
@@ -11,6 +12,9 @@ import './EditSheet.css';
 export function SheetOverlay({ onClose, children }: { onClose: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   useExitAnimation(ref);
+  // Кнопка отмены справа вверху есть у каждой нижней панели: кладётся в само окно (.sheet), чтобы стоять на его углу
+  const [sheet, setSheet] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => setSheet(ref.current?.querySelector<HTMLElement>('.sheet') ?? null), []);
   useSheetDrag(ref, onClose);
   // Экранная клавиатура: окно и панель форматирования поднимаются над ней и остаются на виду
   useEffect(() => {
@@ -59,6 +63,13 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
   return createPortal(
     <div ref={ref} className="sheet-overlay" data-pm={pm ? '' : undefined} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       {children}
+      {sheet &&
+        createPortal(
+          <button type="button" className="sheet__close" aria-label="Закрыть" onMouseDown={(e) => e.stopPropagation()} onClick={onClose}>
+            <IconClose />
+          </button>,
+          sheet,
+        )}
     </div>,
     document.body,
   );
