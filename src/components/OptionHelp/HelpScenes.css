@@ -4,7 +4,7 @@
   width: 100%;
   aspect-ratio: 393 / 340;
   overflow: hidden;
-  background: var(--bg-canvas, var(--color-bg-panel));
+  background: #1b1d22;
 }
 
 .hs__stage {
@@ -76,4 +76,49 @@
 
 .hs__chat .tcard__text {
   overflow: visible;
+}
+
+/* Макет клиента: тот же экран, что в приложении, — на обоях (их рисует .test-settings::before), без своей рамки телефона и «островка» */
+.hs__stage .tp--bare .tp__phone {
+  background: transparent;
+}
+
+.hs__stage .tp--bare .tp__status {
+  display: none;
+}
+
+.hs__stage .tp--bare .tp__screen {
+  background: transparent;
+}
+
+.hs__stage .tp--bare {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Окно чата в макете: лента занимает место между шапкой и полем ввода */
+.hs__stage .chat.hs__screen .chat__feed {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hs__stage .chat.hs__screen .chat__messages {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: calc(var(--space-16) + var(--space-2));
+  overflow: hidden;
+}
+
+/* Шапка в макете без затенения: обои идут до самого верха кадра */
+.hs__stage .test-settings__header,
+.hs__stage .chat__header {
+  background: none;
+  box-shadow: none;
+}
+
+.hs__stage .chat.hs__screen .chat__day {
+  position: static;
 }

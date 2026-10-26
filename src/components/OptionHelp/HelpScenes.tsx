@@ -9,6 +9,13 @@ import { TestPreview } from '../TestSettings/TestPreview';
 import { TestConclusion } from '../TestSettings/TestConclusion';
 import { TestBlank } from '../TestSettings/TestBlank';
 import { TaskForm } from '../TestSettings/TaskForm';
+import { Avatar } from '../Avatar/Avatar';
+import { IconBackMk, IconMenuMk } from '../ChatItem/ChatIcons';
+import { MessageBubble } from '../MessageBubble/MessageBubble';
+import { MessageInput } from '../MessageInput/MessageInput';
+import { CHATS } from '../../data/chats';
+import type { Message } from '../../data/messages';
+import { roleOf } from '../../data/roles';
 import './HelpScenes.css';
 
 /** Тест, к настройкам которого открыта подсказка: макеты в окне собираются из него, а не из снимков одного теста */
@@ -80,39 +87,93 @@ function TaskBody({ scene, ctx }: { scene: HelpScene; ctx: HelpTest }) {
 /** Первый вопрос бланка с отмеченными ответами: чередуем первый и второй варианты */
 const sampleAnswers = (blank: TestBlankData) => Object.fromEntries(blank.questions.map((_, i) => [i, i % 2]));
 
+const NOOP = () => undefined;
+
+/** Окно чата специалиста с клиентом, как в приложении: шапка, лента с отправленным тестом и поле ввода */
+function ChatScene({ test }: { test: LibraryTest }) {
+  const chat = CHATS.find((c) => c.id === 'maxim') ?? CHATS[0];
+  const messages: Message[] = [
+    {
+      id: 'hs3',
+      from: 'me',
+      text: 'Пройдите, пожалуйста, до сеанса.',
+      time: '09:31',
+      status: 'read',
+      test: test.id,
+      testKind: 'sent',
+      testOptions: { blind: true, result: 'thanks', saveBlank: true },
+    },
+  ];
+  return (
+    <section className="chat hs__screen">
+      <header className="chat__header">
+        <div className="chat__top">
+          <span className="chat__action">
+            <IconBackMk />
+          </span>
+          <span className="chat__peer">
+            <Avatar src={chat.avatar} alt="" presence={chat.online ? 'online' : undefined} />
+            <span className="chat__who">
+              <span className="chat__name">{chat.name}</span>
+              <span className="chat__status">{roleOf(chat)}</span>
+            </span>
+          </span>
+          <span className="chat__action">
+            <IconMenuMk />
+          </span>
+        </div>
+      </header>
+      <div className="chat__feed">
+        <div className="chat__messages">
+          <ul className="chat__group">
+            <li className="chat__day">
+              <span>Сегодня</span>
+            </li>
+            {messages.map((m, i) => (
+              <MessageBubble
+                key={m.id}
+                message={m}
+                peerName={chat.name.split(' ')[0]}
+                showMeta={messages[i + 1]?.from !== m.from}
+                joinPrev={messages[i - 1]?.from === m.from}
+                test={m.test ? test : undefined}
+                onReply={NOOP}
+                onMenu={NOOP}
+                onQuoteClick={NOOP}
+                onOpenTest={NOOP}
+                onOpenTask={NOOP}
+                onTestSettings={NOOP}
+                onOpenLink={NOOP}
+              />
+            ))}
+          </ul>
+        </div>
+      </div>
+      <MessageInput onSend={NOOP} />
+    </section>
+  );
+}
+
 function Body({ scene, ctx }: { scene: HelpScene; ctx: HelpTest }) {
   if (TASK_SCENES.includes(scene) && ctx.task) return <TaskBody scene={scene} ctx={ctx} />;
   const { blank, conclusion, form, duration } = ctx;
   const test = ctx.test as LibraryTest;
   if (scene === 'blind-off' || scene === 'blind-on') {
-    return blank ? <TestPreview test={test} blank={blank} blind={scene === 'blind-on'} result="thanks" duration={duration} bare /> : null;
+    return blank ? (
+      <section className="test-settings hs__screen">
+        <TestPreview test={test} blank={blank} blind={scene === 'blind-on'} result="thanks" duration={duration} bare />
+      </section>
+    ) : null;
   }
   if (scene === 'result-thanks' || scene === 'result-score' || scene === 'result-full') {
     const result = scene === 'result-thanks' ? 'thanks' : scene === 'result-score' ? 'score' : 'full';
-    return blank ? <TestPreview test={test} blank={blank} blind={false} result={result} duration={duration} initialStage="end" bare /> : null;
+    return blank ? (
+      <section className="test-settings hs__screen">
+        <TestPreview test={test} blank={blank} blind={false} result={result} duration={duration} initialStage="end" bare />
+      </section>
+    ) : null;
   }
-  if (scene === 'blind-chat') {
-    return (
-      <div className="hs__chat">
-        <ul className="messages__list">
-          <li className="bubble-group bubble-group--card bubble-group--out">
-            <div className="bubble bubble--out bubble--last bubble--with-buttons bubble--tcard bubble--tcard-bare">
-              <div className="tcard">
-                <span className="tcard__icon" style={{ background: test.tint }}>
-                  <img src={test.icon} alt="" />
-                </span>
-                <span className="tcard__text">
-                  <span className="tcard__label">Отправленный тест</span>
-                  <span className="tcard__title">{test.title}</span>
-                  <span className="tcard__note">Слепой тест: клиент не видит название</span>
-                </span>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    );
-  }
+  if (scene === 'blind-chat') return <ChatScene test={test} />;
   // Остальные макеты — экраны специалиста под шапкой теста
   return (
     <section className="test-settings hs__screen">

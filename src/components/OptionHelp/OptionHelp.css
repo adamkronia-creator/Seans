@@ -301,3 +301,14 @@
 [data-pm] .sheet.option-help-sheet > .option-help-sheet__body {
   padding-top: 0;
 }
+
+/* У верхнего края окна подсказки тени нет */
+[data-pm] .sheet.option-help-sheet {
+  box-shadow: none;
+}
+
+/* Затухание у верхнего края прокручиваемой части здесь не нужно: иллюстрация идёт вплотную к верху */
+[data-pm] .sheet.option-help-sheet > .option-help-sheet__body {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
