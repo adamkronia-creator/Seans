@@ -10,29 +10,20 @@ import './ResultChoice.css';
 export function ResultChoice({ value, onChange, name = 'result-choice' }: { value: ResultMode; onChange: (mode: ResultMode) => void; /** Своё имя группы, когда на экране несколько блоков (отправка нескольких тестов) */ name?: string }) {
   return (
     <CollapseCard title="Итог для клиента" id={name === 'result-choice' ? 'result-choice' : undefined} help={<OptionHelp id="result" />}>
-      <ul className="ts-rows" role="radiogroup" aria-label="Итог для клиента">
-        {RESULT_MODES.map(({ id, title }) => {
+      <div className="result-seg" role="radiogroup" aria-label="Итог для клиента">
+        {RESULT_MODES.map(({ id, title, short }) => {
           const Icon = id === 'thanks' ? IconThanks : id === 'score' ? IconScore : IconFull;
           return (
-          <li key={id} className="ts-row result-choice__row">
-            <label className="result-choice__label">
-              <Icon className="ts-row__icon" />
-              <input
-                type="radio"
-                className="blank-answer__input"
-                name={name}
-                checked={value === id}
-                onChange={() => onChange(id)}
-              />
-              <span className="blank-answer__radio" aria-hidden="true" />
-              <span className="ts-row__text">
-                <span className="ts-row__label">{title}</span>
+            <label key={id} className="result-seg__item">
+              <input type="radio" className="result-seg__input" name={name} checked={value === id} aria-label={title} onChange={() => onChange(id)} />
+              <span className="result-seg__face">
+                <Icon className="result-seg__icon" aria-hidden="true" />
+                <span className="result-seg__text">{short}</span>
               </span>
             </label>
-          </li>
           );
         })}
-      </ul>
+      </div>
     </CollapseCard>
   );
 }

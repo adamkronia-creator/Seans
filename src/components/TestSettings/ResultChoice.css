@@ -59,3 +59,70 @@
   gap: var(--space-3);
   padding: var(--space-4);
 }
+
+/* Итог для клиента: три кнопки в ряд (значок над названием), выбранная подсвечена */
+.result-seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.result-seg__item {
+  display: flex;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.result-seg__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.result-seg__face {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: 1px solid var(--glass-border, var(--color-border));
+  border-radius: var(--radius-md, 12px);
+  background: var(--glass-bubble-in, transparent);
+  color: var(--text-secondary, var(--color-text-secondary));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+  text-align: center;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.result-seg__icon {
+  flex-shrink: 0;
+  font-size: var(--size-icon-lg, 24px);
+}
+
+.result-seg__text {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.result-seg__input:checked + .result-seg__face {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.result-seg__input:focus-visible + .result-seg__face {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

@@ -519,3 +519,8 @@
 [data-pm] .cc-rest .cc-level--flat:last-child {
   border-bottom: 0;
 }
+
+/* «Итог для клиента»: кнопки лежат на прозрачном фоне блока, как строки настроек — на стеклянной заливке */
+[data-pm] .blank-card__body:has(> .result-seg) {
+  background: var(--glass-card);
+}
