@@ -388,3 +388,78 @@
 [data-pm] .tp__phone {
   isolation: isolate;
 }
+
+
+/* ——— Прозрачные разделители, как в «Личной информации» профиля ———
+   Заливку держит каждая часть (заголовок, строка, содержимое), а между ними просвет 1 px, через который виден фон экрана.
+   Линий нет ни под названием блока, ни между строками: ни полных, ни от поля до края */
+[data-pm] .blank-card,
+[data-pm] .ts-card.ts-message-card,
+[data-pm] ul.ts-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  list-style: none;
+}
+
+[data-pm] .blank-card__head,
+[data-pm] .blank-card__body,
+[data-pm] ul.ts-card > .ts-row {
+  background: var(--glass-card);
+}
+
+[data-pm] .blank-card__body {
+  border-top: 0;
+}
+
+/* Свёрнутое содержимое не оставляет просвета: он съедается отрицательным отступом */
+[data-pm] .blank-card__collapse:not(.blank-card__collapse--open) {
+  margin-top: -1px; /* grid:ok — отрицательный просвет */
+}
+
+/* Строки внутри блока: тот же просвет между ними, заливка у каждой своя */
+[data-pm] .blank-card__body:has(> .ts-rows) {
+  background: none;
+}
+
+[data-pm] .ts-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+}
+
+[data-pm] .ts-rows > .ts-row {
+  background: var(--glass-card);
+}
+
+[data-pm] .ts-row + .ts-row::before {
+  display: none;
+}
+
+/* Значок строки: колонка 24, до текста 12, как в «Контактной информации» */
+[data-pm] .ts-row__icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .ts-row {
+  gap: var(--row-gap);
+}
+
+[data-pm] .ts-row--top .ts-row__icon {
+  margin-top: var(--space-1);
+}
+
+[data-pm] .ts-row--top .ts-scale {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-pm] .result-choice__row {
+  background: var(--glass-card);
+}

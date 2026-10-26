@@ -217,7 +217,6 @@
 /* Текст → 12 → разделитель по ширине текста → 12 → кнопка → 12 до конца блока */
 .ts-desc__clip {
   position: relative;
-  padding-bottom: var(--space-1);
 }
 
 /* Короткое описание без кнопки: нижний отступ даёт сама карточка */
@@ -252,15 +251,30 @@
   display: none; /* вместо линии между текстом и кнопкой щель 4 */
 }
 
-/* «Читать далее» — отдельная кнопка внизу карточки, как «Посмотреть» в профиле: плитка стекла во всю ширину, щель 4 от текста */
+/* «Читать далее» — отдельная плитка под карточкой описания, как «Посмотреть» в профиле: во всю ширину, между ними просвет 4 */
+.ts-desc-unit {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+[data-pm] .ts-desc-unit > .blank-card {
+  border: 0;
+  border-radius: 0;
+}
+
 .ts-desc__toggle {
   --press-scale: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% + var(--space-8));
+  width: 100%;
   min-height: var(--row-h);
-  margin: 0 calc(var(--space-4) * -1) calc(var(--space-3) * -1);
+  margin: 0;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-xs);
   background: var(--glass-bubble-in);

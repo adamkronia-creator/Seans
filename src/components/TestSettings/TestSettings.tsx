@@ -32,6 +32,15 @@ import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
+import IconRowQuestions from '../../assets/icons/solar/list-ordered.svg?react';
+import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
+import IconRowAge from '../../assets/icons/solar/user.svg?react';
+import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowMain from '../../assets/icons/solar/list.svg?react';
+import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
+import IconRowBlind from '../../assets/icons/solar/face-scan-square.svg?react';
+import IconRowBlank from '../../assets/icons/solar/file.svg?react';
+import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
 
@@ -336,6 +345,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
       ) : (
       <>
       <div className="test-settings__scroll">
+        <div className="ts-desc-unit">
         <CollapseCard title="Описание теста">
           <div className="ts-desc">
             <div className="ts-desc__clip">
@@ -345,19 +355,19 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
               {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
             </div>
-            {descLong && <hr className="ts-desc__rule" />}
-            {descLong && (
-              <button
-                type="button"
-                className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
-                aria-expanded={descOpen}
-                onClick={() => setDescOpen(!descOpen)}
-              >
-                {descOpen ? 'Скрыть' : 'Читать далее'}
-              </button>
-            )}
           </div>
         </CollapseCard>
+        {descLong && (
+          <button
+            type="button"
+            className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
+            aria-expanded={descOpen}
+            onClick={() => setDescOpen(!descOpen)}
+          >
+            {descOpen ? 'Скрыть' : 'Читать далее'}
+          </button>
+        )}
+        </div>
 
         {(data.scales || blank) && (
           <ul className="ts-card">
@@ -390,16 +400,16 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           <CollapseCard title="Тестовая информация">
             <ul className="ts-rows">
               {data.questions !== undefined && (
-                <Row label="Количество вопросов" value={data.questions} />
+                <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
               )}
               {data.duration && (
-                <Row label="Время выполнения" value={data.duration} />
+                <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
               )}
               {data.age && (
-                <Row label="Возраст" value={data.age} />
+                <Row Icon={IconRowAge} label="Возраст" value={data.age} />
               )}
               {data.forms && (
-                <Row label="Форма бланка" info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
+                <Row Icon={IconRowForm} label="Форма бланка" info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
                   {!locked && data.forms.length > 1 && (
                     <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={locked ? noop : setForm} />
                   )}
@@ -413,6 +423,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           <CollapseCard title="Шкалы и баллы">
             <ul className="ts-rows">
               <li className="ts-row ts-row--top">
+                <IconRowMain className="ts-row__icon" />
                 <div className="ts-scale">
                   <p className="ts-scale__title">Основные шкалы:</p>
                   <ul className="ts-scale__list">
@@ -427,6 +438,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               </li>
               {data.scales.extra.length > 0 && (
               <li className="ts-row ts-row--top">
+                <IconRowQuestions className="ts-row__icon" />
                 <div className="ts-scale">
                   <p className="ts-scale__title">Дополнительные шкалы:</p>
                   <ul className="ts-scale__list">
@@ -449,6 +461,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                 ([items, title]) =>
                   items && (
                     <li key={title} className="ts-row ts-row--top">
+                      <IconRowPoints className="ts-row__icon" />
                       <div className="ts-scale">
                         <p className="ts-scale__title">{title}</p>
                         <ul className="ts-scale__list">
@@ -471,12 +484,14 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           <ul className="ts-rows">
             {/* Строки без описаний, пояснения в подсказке «?» со скриншотами */}
             <Row
+              Icon={IconRowBlind}
               label="Слепое тестирование"
               help="blind"
             >
               <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
             </Row>
             <Row
+              Icon={IconRowBlank}
               label={blankLabel}
               help="blank"
             >
@@ -489,7 +504,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
-            <Row label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом">
+            <Row Icon={IconRowMessage} label="Сообщение для клиента" hint="Короткое пояснение придет вместе с тестом">
               <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
             </Row>
           </ul>

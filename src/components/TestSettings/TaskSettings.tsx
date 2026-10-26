@@ -288,6 +288,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
       ) : (
         <>
           <div className="test-settings__scroll">
+            <div className="ts-desc-unit">
             <CollapseCard title="Описание задания">
               <div className="ts-desc">
                 <div className="ts-desc__clip">
@@ -296,14 +297,14 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
                   </div>
                   {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
                 </div>
-                {descLong && <hr className="ts-desc__rule" />}
-                {descLong && (
-                  <button type="button" className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`} aria-expanded={descOpen} onClick={() => setDescOpen(!descOpen)}>
-                    {descOpen ? 'Скрыть' : 'Читать далее'}
-                  </button>
-                )}
               </div>
             </CollapseCard>
+            {descLong && (
+              <button type="button" className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`} aria-expanded={descOpen} onClick={() => setDescOpen(!descOpen)}>
+                {descOpen ? 'Скрыть' : 'Читать далее'}
+              </button>
+            )}
+            </div>
 
             <ul className="ts-card">
               {link('Бланк задания', 'blank')}
