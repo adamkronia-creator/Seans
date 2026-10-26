@@ -283,6 +283,9 @@ void (async () => {
   const albums = state.albums.map((a) => ({ ...a, photoIds: a.photoIds.filter((id) => photos.some((p) => p.id === id)) }));
   set({ thumbs, photos, albums, avatarId: has(state.avatarId), coverId: has(state.coverId), ready: true });
   if (state.coverId) void ensureFull(state.coverId);
+  // Уже выбранные аватарка и обложка тоже попадают в свои альбомы
+  if (state.avatarId) inNamedAlbum('Фото профиля', state.avatarId);
+  if (state.coverId) inNamedAlbum('Обложки', state.coverId);
 })();
 
 /** Подгрузить снимок целиком (просмотр, обложка); повторные вызовы ничего не делают */
@@ -385,13 +388,23 @@ export function removeManyPhotos(ids: string[]) {
   ids.forEach(removePhoto);
 }
 
+/** Фото, ставшее аватаркой или обложкой, лежит в своём альбоме («Фото профиля», «Обложки»), откуда его можно выбрать снова */
+function inNamedAlbum(name: string, id: string) {
+  const album = state.albums.find((a) => a.name === name);
+  if (!album?.photoIds.includes(id)) addToNamedAlbum(name, [id]);
+}
+
 export function setAvatar(id: string | null) {
   set({ avatarId: id });
+  if (id) inNamedAlbum('Фото профиля', id);
 }
 
 export function setCover(id: string | null) {
   set({ coverId: id });
-  if (id) void ensureFull(id);
+  if (id) {
+    void ensureFull(id);
+    inNamedAlbum('Обложки', id);
+  }
 }
 
 export function removePhoto(id: string) {
