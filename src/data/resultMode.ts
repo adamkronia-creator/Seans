@@ -2,7 +2,7 @@
 export type ResultMode = 'thanks' | 'score' | 'full';
 
 export const RESULT_MODES: { id: ResultMode; title: string; value: string; /** Короткое название для кнопки */ short: string }[] = [
-  { id: 'thanks', title: 'Только благодарность', value: 'Только благодарность', short: 'Благодарность' },
+  { id: 'thanks', title: 'Только благодарность', value: 'Только благодарность', short: 'Спасибо' },
   { id: 'score', title: 'Только баллы', value: 'Только баллы', short: 'Баллы' },
   { id: 'full', title: 'Полное заключение', value: 'Полное заключение', short: 'Заключение' },
 ];

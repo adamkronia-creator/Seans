@@ -54,7 +54,7 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
     ],
   },
   blank: {
-    title: 'Сохранить заполненный бланк',
+    title: 'Сохранить бланк',
     slides: [
       {
         scene: 'blank-off',
@@ -147,5 +147,5 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
   },
 };
 
-/** Название настройки «Сохранить заполненный бланк» на экране теста и в окне настроек отправленного теста */
-export const SAVE_BLANK_LABEL = 'Сохранить заполненный бланк';
+/** Название настройки «Сохранить бланк» на экране теста и в окне настроек отправленного теста */
+export const SAVE_BLANK_LABEL = 'Сохранить бланк';

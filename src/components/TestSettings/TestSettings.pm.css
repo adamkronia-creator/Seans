@@ -394,6 +394,7 @@
    Заливку держит каждая часть (заголовок, строка, содержимое), а между ними просвет 1 px, через который виден фон экрана.
    Линий нет ни под названием блока, ни между строками: ни полных, ни от поля до края */
 [data-pm] .blank-card,
+[data-pm] .test-settings__scroll > :is(.blank-card, ul.ts-card):first-child,
 [data-pm] .ts-card.ts-message-card,
 [data-pm] ul.ts-card {
   display: flex;
