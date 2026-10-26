@@ -169,14 +169,15 @@
 }
 
 .viewer__actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  gap: var(--space-4);
 }
 
 .viewer__action {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-1);
   min-width: var(--size-touch);
   min-height: var(--size-touch);
@@ -231,4 +232,9 @@
 .viewer[data-pm] .viewer__action--like,
 .viewer[data-pm] .viewer__action--like span {
   color: #ff4d5e;
+}
+
+.viewer[data-pm] .viewer__action--like svg {
+  color: #ff4d5e;
+  opacity: 1;
 }

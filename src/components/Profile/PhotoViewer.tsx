@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { ensureFull, removePhoto, setAvatar, setCover, toggleLike, useProfile } from '../../data/profile';
-import { navigate } from '../../router';
+import { sendMessage } from '../../data/chatStore';
+import { RecipientSheet } from '../TestSettings/TestActions';
 import { copyLink, downloadPhotos, sharePhotos } from '../../utils/photoActions';
 import { ChipMenu, type ChipMenuItem } from '../FolderMenu/ChipMenu';
 import { useExitAnimation } from '../../utils/exitAnimation';
@@ -11,7 +12,7 @@ import { IconBack } from '../icons';
 import { Toast } from '../Toast/Toast';
 import { useToast } from '../Toast/useToast';
 import { CommentsSheet } from './CommentsSheet';
-import { IconAlbum, IconCaption, IconComment, IconCover, IconDots, IconDownload, IconHeartFill, IconHeartLine, IconLink, IconShare, IconUser } from './ProfileIcons';
+import { IconCaption, IconComment, IconCover, IconDots, IconDownload, IconForward, IconHeartFill, IconHeartLine, IconLink, IconShare, IconUser } from './ProfileIcons';
 import { CaptionSheet, RemoveSheet } from './ProfileSheets';
 import './PhotoViewer.css';
 
@@ -34,7 +35,7 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   const photos = useMemo(() => (ids ? profile.photos.filter((p) => ids.includes(p.id)) : profile.photos), [profile.photos, ids]);
   const count = photos.length;
   const [index, setIndex] = useState(() => Math.max(0, photos.findIndex((p) => p.id === startId)));
-  const [sheet, setSheet] = useState<'caption' | 'remove' | 'comments' | null>(null);
+  const [sheet, setSheet] = useState<'caption' | 'remove' | 'comments' | 'forward' | null>(null);
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [toast, show] = useToast();
   const root = useRef<HTMLDivElement>(null);
@@ -169,26 +170,32 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     show(isCover ? 'Обложка убрана' : 'Обложка обновлена');
   };
 
-  const album = profile.albums.find((a) => a.photoIds.includes(photo.id));
   const doShare = async () => {
     if (!(await sharePhotos([photo.id], fulls, thumbs))) show('Поделиться здесь нельзя: скачайте фото');
   };
   const items: ChipMenuItem[] = [
     { key: 'caption', label: 'Редактировать описание', Icon: IconCaption, run: () => setSheet('caption') },
-    { key: 'avatar', label: isAvatar ? 'Убрать из профиля' : 'Установить в профиль', Icon: IconUser, run: toggleAvatar },
+    { key: 'avatar', label: isAvatar ? 'Убрать фото профиля' : 'Сделать фото профиля', Icon: IconUser, run: toggleAvatar },
     { key: 'cover', label: isCover ? 'Убрать обложку' : 'Сделать обложкой', Icon: IconCover, run: toggleCover },
+    { key: 'forward', label: 'Переслать в чат', Icon: IconForward, gap: true, run: () => setSheet('forward') },
+    { key: 'share', label: 'Поделиться', Icon: IconShare, run: () => void doShare() },
+    { key: 'link', label: 'Скопировать ссылку', Icon: IconLink, run: () => void copyLink().then((ok) => show(ok ? 'Ссылка скопирована' : 'Не удалось скопировать')) },
     {
       key: 'download',
       label: 'Скачать',
       Icon: IconDownload,
       run: () => void downloadPhotos([photo.id], fulls, thumbs).then((n) => show(n ? 'Фото скачано' : 'Не удалось скачать')),
     },
-  ];
-  if (album) items.push({ key: 'album', label: 'Перейти к альбому', Icon: IconAlbum, run: () => { onClose(); navigate(`/profile/photos/album/${album.id}`); } });
-  items.push(
-    { key: 'link', label: 'Скопировать ссылку', Icon: IconLink, run: () => void copyLink().then((ok) => show(ok ? 'Ссылка скопирована' : 'Не удалось скопировать')) },
     { key: 'delete', label: 'Удалить фотографию', Icon: IconTrash, danger: true, gap: true, run: () => setSheet('remove') },
-  );
+  ];
+
+  // Пока в чатах нет картинок, пересылка уходит сообщением «Фото» с описанием
+  const forward = (ids: string[]) => {
+    const text = photo.caption ? `Фото: ${photo.caption}` : 'Фото';
+    ids.forEach((id) => sendMessage(id, text));
+    setSheet(null);
+    show(ids.length === 1 ? 'Фото отправлено' : `Фото отправлено: ${ids.length}`);
+  };
 
   return createPortal(
     <div ref={root} className="viewer" data-pm role="dialog" aria-modal="true" aria-label="Просмотр фото">
@@ -257,14 +264,15 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
             <IconComment />
             {photo.comments.length > 0 && <span>{photo.comments.length}</span>}
           </button>
-          <button type="button" className="viewer__action" aria-label="Поделиться" onClick={() => void doShare()}>
-            <IconShare />
+          <button type="button" className="viewer__action" aria-label="Переслать в чат" onClick={() => setSheet('forward')}>
+            <IconForward />
           </button>
         </div>
       </footer>
 
       {toast && <Toast text={toast} className="viewer__toast" />}
       {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Действия с фото" width={264} onClose={() => setMenu(null)} />}
+      {sheet === 'forward' && <RecipientSheet mode="many" onSend={forward} onClose={() => setSheet(null)} />}
       {sheet === 'comments' && <CommentsSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'caption' && <CaptionSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'remove' && (
