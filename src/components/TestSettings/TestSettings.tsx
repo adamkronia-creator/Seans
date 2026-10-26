@@ -399,8 +399,8 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                 <Row label="Возраст" value={data.age} />
               )}
               {data.forms && (
-                <Row label="Форма бланка" info value={data.forms.length === 1 ? data.forms[0] : undefined}>
-                  {data.forms.length > 1 && (
+                <Row label="Форма бланка" info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
+                  {!locked && data.forms.length > 1 && (
                     <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={locked ? noop : setForm} />
                   )}
                 </Row>
