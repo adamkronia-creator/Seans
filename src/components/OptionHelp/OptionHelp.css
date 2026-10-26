@@ -42,8 +42,17 @@
 }
 
 [data-pm] .option-help-sheet .oh {
-  padding: var(--space-12) 0 var(--space-2);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--action-primary, var(--color-accent)) 38%, transparent), color-mix(in srgb, var(--action-primary, var(--color-accent)) 12%, transparent));
+  padding: 0 0 var(--space-2);
+  background:
+    radial-gradient(circle at 12% 18%, rgb(255 255 255 / 22%) 0 8%, transparent 9%),
+    radial-gradient(circle at 90% 62%, rgb(255 255 255 / 16%) 0 6%, transparent 7%),
+    radial-gradient(circle at 6% 74%, rgb(255 255 255 / 14%) 0 5%, transparent 6%),
+    linear-gradient(160deg, #8d7dff 0%, #6f8cff 52%, #5ea2f2 100%);
+}
+
+/* Окно выше и доходит до верха: иллюстрация вплотную к скруглённому краю, как у Telegram */
+[data-pm] .sheet.option-help-sheet {
+  max-height: 88dvh;
 }
 
 /*
@@ -90,10 +99,13 @@
 .oh__shot {
   position: relative;
   margin: 0;
-  aspect-ratio: 393 / 340;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-fill);
+  /* Телефон обрезан сверху (экран продолжается за край окна), внизу виден корпус */
+  border: 6px solid #14141b; /* grid:ok — корпус телефона */
+  border-top: 0;
+  border-bottom-width: 16px; /* grid:ok — нижняя рамка корпуса */
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: #14141b;
   opacity: 0.55;
   transform: scale(0.95);
   transition:
@@ -111,14 +123,53 @@
   cursor: pointer;
 }
 
-/* Тонкая рамка поверх картинки: светлые экраны не сливаются с фоном окна */
-.oh__shot::after {
-  content: '';
+/* Нажатие пальцем: кружок появляется на отмеченном месте, вдавливается и расходится кольцом */
+.oh__tap {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgb(19 32 58 / 10%);
+  z-index: 6;
+  width: 56px; /* grid:ok — в пикселях экрана макета, уменьшается вместе с ним */
+  height: 56px; /* grid:ok */
+  margin: -28px 0 0 -28px; /* grid:ok */
+  border-radius: 50%;
+  background: rgb(255 255 255 / 55%);
+  box-shadow: 0 0 0 2px rgb(120 120 140 / 35%);
+  opacity: 0;
   pointer-events: none;
+}
+
+.oh__shot--on .oh__tap {
+  animation: oh-tap 2.4s 0.7s ease-in-out infinite both;
+}
+
+.is-leaving .oh__tap {
+  animation: none;
+}
+
+@keyframes oh-tap {
+  0% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  32% {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+
+  55% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
 }
 
 /* Рамка вокруг того, что изменилось: появляется, когда скриншот встал по центру. Оранжевая: на синих пузырях синяя пропала бы */
@@ -239,4 +290,14 @@
     animation: none;
     opacity: 1;
   }
+
+  .oh__shot--on .oh__tap {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Иллюстрация вплотную к верху окна */
+[data-pm] .sheet.option-help-sheet > .option-help-sheet__body {
+  padding-top: 0;
 }

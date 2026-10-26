@@ -183,6 +183,8 @@ export function HelpSceneView({ slide, ctx }: { slide: HelpSlide; ctx: HelpTest 
       <div className="hs__stage" ref={stage} aria-hidden="true" {...{ inert: '' }} style={{ '--k': k } as CSSProperties}>
         <Body scene={slide.scene} ctx={ctx} />
         {mark && <span className="oh__mark" style={mark} />}
+        {/* Нажатие пальцем по отмеченному месту: кружок «вдавливается» и расходится кольцом, пока слайд открыт */}
+        {mark && <span className="oh__tap" style={{ left: mark.left + mark.width * 0.86, top: mark.top + mark.height / 2 }} />}
       </div>
     </div>
   );
