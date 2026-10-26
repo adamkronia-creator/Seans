@@ -27,7 +27,19 @@
   background: var(--bg-subtle);
 }
 
+.ph__tile {
+  position: relative;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.ph__tile--on img {
+  transform: scale(0.88);
+  border-radius: var(--radius-sm);
+}
+
 .ph__tile img {
+  transition: transform 0.15s var(--ease-ios);
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -117,4 +129,62 @@
 .ph__empty span {
   font: var(--type-label);
   font-weight: 500;
+}
+
+/* Отметка выбора: кружок в правом верхнем углу плитки */
+.ph__check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-accent-on);
+  border-radius: var(--radius-full);
+  background: rgb(0 0 0 / 24%);
+  color: var(--color-accent-on);
+  font-size: var(--size-icon);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
+}
+
+.ph__check--on {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+/* Закреплённое фото помечено булавкой */
+.ph__pin {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: rgb(0 0 0 / 40%);
+  color: var(--color-accent-on);
+  font-size: 12px; /* grid:ok — мелкая метка */
+}
+
+/* «Отмена» вместо стрелки назад в режиме выбора */
+[data-pm] .ph__cancel {
+  display: flex;
+  align-items: center;
+  height: var(--size-control);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+[data-pm] .fp__back:disabled {
+  opacity: 0.4;
 }

@@ -9,3 +9,14 @@ export { default as IconCover } from '../../assets/icons/solar/gallery-wide.svg?
 export { default as IconCaption } from '../../assets/icons/solar/align-left.svg?react';
 export { default as IconAlbum } from '../../assets/icons/solar/album.svg?react';
 export { default as IconChevronRight } from '../../assets/icons/solar/alt-arrow-right.svg?react';
+export { default as IconDownload } from '../../assets/icons/solar/download.svg?react';
+export { default as IconHeartLine } from '../../assets/icons/solar/heart.svg?react';
+export { default as IconHeartFill } from '../../assets/icons/solar/heart-bold.svg?react';
+export { default as IconShare } from '../../assets/icons/solar/share.svg?react';
+export { default as IconComment } from '../../assets/icons/solar/chat-round-dots.svg?react';
+export { default as IconDots } from '../../assets/icons/solar/menu-dots-vertical.svg?react';
+export { default as IconPin } from '../../assets/icons/solar/pin.svg?react';
+export { default as IconLink } from '../../assets/icons/solar/link.svg?react';
+export { default as IconFolderMove } from '../../assets/icons/solar/folder.svg?react';
+export { default as IconSelect } from '../../assets/icons/solar/checklist-minimalistic-bold.svg?react';
+export { default as IconUser } from '../../assets/icons/solar/user-rounded.svg?react';

@@ -129,7 +129,7 @@ export function CaptionSheet({ photoId, onClose }: { photoId: string; onClose: (
   };
   return (
     <Frame
-      title="Подпись к фото"
+      title="Редактировать описание"
       onClose={onClose}
       footer={
         <>
@@ -144,7 +144,7 @@ export function CaptionSheet({ photoId, onClose }: { photoId: string; onClose: (
     >
       <section className="sheet__card frame-card">
         <label className="frame-label" htmlFor={`${uid}-caption`}>
-          Подпись
+          Описание фотографии
         </label>
         <AutoTextarea
           id={`${uid}-caption`}
@@ -152,7 +152,7 @@ export function CaptionSheet({ photoId, onClose }: { photoId: string; onClose: (
           rows={2}
           value={text}
           onChange={setText}
-          placeholder="Что на этом фото"
+          placeholder="Добавьте описание"
           maxLength={300}
         />
       </section>

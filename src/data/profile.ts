@@ -20,10 +20,21 @@ export interface ProfileField {
   value: string;
 }
 
+export interface PhotoComment {
+  id: string;
+  text: string;
+  at: number;
+}
+
 interface ProfilePhoto {
   id: string;
   caption: string;
   addedAt: number;
+  /** Отмечено сердечком */
+  liked: boolean;
+  /** Закреплённые фото стоят в начале ленты */
+  pinned: boolean;
+  comments: PhotoComment[];
 }
 
 /** Альбом: название и фото в порядке общей ленты. Фото остаётся одно, в альбомах лежат только ссылки на него */
@@ -116,7 +127,11 @@ function sanitize(raw: unknown): Stored {
   const photos = Array.isArray(data.photos)
     ? data.photos.flatMap((item): ProfilePhoto[] => {
         const p = item as Partial<ProfilePhoto> | null;
-        return p && isText(p.id) ? [{ id: p.id, caption: isText(p.caption) ? p.caption : '', addedAt: typeof p.addedAt === 'number' ? p.addedAt : 0 }] : [];
+        if (!p || !isText(p.id)) return [];
+        const comments = Array.isArray(p.comments)
+          ? p.comments.flatMap((c): PhotoComment[] => (c && isText(c.id) && isText(c.text) ? [{ id: c.id, text: c.text, at: typeof c.at === 'number' ? c.at : 0 }] : []))
+          : [];
+        return [{ id: p.id, caption: isText(p.caption) ? p.caption : '', addedAt: typeof p.addedAt === 'number' ? p.addedAt : 0, liked: p.liked === true, pinned: p.pinned === true, comments }];
       })
     : [];
   const albums = Array.isArray(data.albums)
@@ -307,7 +322,7 @@ export async function addPhotos(files: File[]): Promise<{ added: string[]; faile
     }
     const { thumb, full } = prepared;
     const id = uid('p');
-    const photo: ProfilePhoto = { id, caption: '', addedAt: Date.now() };
+    const photo: ProfilePhoto = { id, caption: '', addedAt: Date.now(), liked: false, pinned: false, comments: [] };
     const at = added.length;
     added.push(id);
     set({
@@ -327,6 +342,40 @@ export async function addPhotos(files: File[]): Promise<{ added: string[]; faile
 
 export function setCaption(id: string, caption: string) {
   set({ photos: state.photos.map((p) => (p.id === id ? { ...p, caption } : p)) });
+}
+
+const patchPhoto = (id: string, patch: Partial<ProfilePhoto>) => set({ photos: state.photos.map((p) => (p.id === id ? { ...p, ...patch } : p)) });
+
+export function toggleLike(id: string) {
+  const photo = state.photos.find((p) => p.id === id);
+  if (photo) patchPhoto(id, { liked: !photo.liked });
+}
+
+export function addComment(id: string, text: string) {
+  const photo = state.photos.find((p) => p.id === id);
+  const clean = text.trim();
+  if (photo && clean) patchPhoto(id, { comments: [...photo.comments, { id: uid('c'), text: clean, at: Date.now() }] });
+}
+
+export function removeComment(id: string, commentId: string) {
+  const photo = state.photos.find((p) => p.id === id);
+  if (photo) patchPhoto(id, { comments: photo.comments.filter((c) => c.id !== commentId) });
+}
+
+/** Закрепить или открепить сразу несколько фото: закреплённые уходят в начало, остальной порядок сохраняется */
+export function setPinned(ids: string[], pinned: boolean) {
+  const photos = state.photos.map((p) => (ids.includes(p.id) ? { ...p, pinned } : p));
+  set({ photos: [...photos.filter((p) => p.pinned), ...photos.filter((p) => !p.pinned)] });
+}
+
+/** Добавить фото в альбом (уже лежащие там не повторяются) */
+export function addToAlbum(albumId: string, ids: string[]) {
+  const album = state.albums.find((a) => a.id === albumId);
+  if (album) setAlbumPhotos(albumId, [...album.photoIds, ...ids]);
+}
+
+export function removeManyPhotos(ids: string[]) {
+  ids.forEach(removePhoto);
 }
 
 export function setAvatar(id: string | null) {

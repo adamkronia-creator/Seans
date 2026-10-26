@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { addAlbum, renameAlbum, setAlbumPhotos, useProfile } from '../../data/profile';
+import { addAlbum, addToAlbum, renameAlbum, setAlbumPhotos, useProfile } from '../../data/profile';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { Frame } from '../Frame/Frame';
 import { IconCheck } from './ProfileIcons';
@@ -112,6 +112,44 @@ export function AlbumPhotosSheet({ albumId, onClose }: { albumId: string; onClos
         </section>
       ) : (
         <p className="pf-note">В галерее пока нет фото. Добавьте их на вкладке «Фото», и их можно будет положить в альбом</p>
+      )}
+    </Frame>
+  );
+}
+
+/** «В альбом»: выбрать, куда положить отмеченные фото. Из прежних альбомов они не убираются, а повторов в альбоме не бывает */
+export function AlbumMoveSheet({ ids, onClose, onDone }: { ids: string[]; onClose: () => void; onDone: (albumName: string) => void }) {
+  const { albums } = useProfile();
+  const put = (albumId: string, name: string) => {
+    addToAlbum(albumId, ids);
+    onClose();
+    onDone(name);
+  };
+  return (
+    <Frame
+      title="В альбом"
+      onClose={onClose}
+      footer={
+        <button type="button" className="sheet__button" onClick={onClose}>
+          Отмена
+        </button>
+      }
+    >
+      {albums.length > 0 ? (
+        <section className="sheet__card pf-albums">
+          <ul>
+            {albums.map((a) => (
+              <li key={a.id}>
+                <button type="button" className="pf-album" onClick={() => put(a.id, a.name)}>
+                  <span className="pf-album__name">{a.name}</span>
+                  <span className="pf-album__count">{a.photoIds.length}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <p className="pf-note">Альбомов пока нет. Создайте первый на вкладке «Альбомы»</p>
       )}
     </Frame>
   );

@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { ensureFull, removePhoto, setAvatar, setCover, useProfile } from '../../data/profile';
+import { ensureFull, removePhoto, setAvatar, setCover, toggleLike, useProfile } from '../../data/profile';
+import { navigate } from '../../router';
+import { copyLink, downloadPhotos, sharePhotos } from '../../utils/photoActions';
+import { ChipMenu, type ChipMenuItem } from '../FolderMenu/ChipMenu';
 import { useExitAnimation } from '../../utils/exitAnimation';
 import { reducedMotion } from '../../utils/swipe';
-import { IconClose, IconTrash } from '../ChatParts/ChatIcons';
-import { IconBack, IconProfile } from '../icons';
+import { IconTrash } from '../ChatParts/ChatIcons';
+import { IconBack } from '../icons';
 import { Toast } from '../Toast/Toast';
 import { useToast } from '../Toast/useToast';
-import { IconCaption, IconCover } from './ProfileIcons';
+import { CommentsSheet } from './CommentsSheet';
+import { IconAlbum, IconCaption, IconComment, IconCover, IconDots, IconDownload, IconHeartFill, IconHeartLine, IconLink, IconShare, IconUser } from './ProfileIcons';
 import { CaptionSheet, RemoveSheet } from './ProfileSheets';
 import './PhotoViewer.css';
 
@@ -30,7 +34,8 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   const photos = useMemo(() => (ids ? profile.photos.filter((p) => ids.includes(p.id)) : profile.photos), [profile.photos, ids]);
   const count = photos.length;
   const [index, setIndex] = useState(() => Math.max(0, photos.findIndex((p) => p.id === startId)));
-  const [sheet, setSheet] = useState<'caption' | 'remove' | null>(null);
+  const [sheet, setSheet] = useState<'caption' | 'remove' | 'comments' | null>(null);
+  const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [toast, show] = useToast();
   const root = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -140,7 +145,7 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
 
   useEffect(() => {
     // Пока открыто окно (подпись, удаление), клавиши принадлежат ему
-    if (sheet) return;
+    if (sheet || menu) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
       else if (event.key === 'ArrowLeft') go(-1);
@@ -148,7 +153,7 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [sheet, go, onClose]);
+  }, [sheet, menu, go, onClose]);
 
   if (!photo) return null;
   const isAvatar = profile.avatarId === photo.id;
@@ -164,15 +169,44 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
     show(isCover ? 'Обложка убрана' : 'Обложка обновлена');
   };
 
+  const album = profile.albums.find((a) => a.photoIds.includes(photo.id));
+  const doShare = async () => {
+    if (!(await sharePhotos([photo.id], fulls, thumbs))) show('Поделиться здесь нельзя: скачайте фото');
+  };
+  const items: ChipMenuItem[] = [
+    { key: 'caption', label: 'Редактировать описание', Icon: IconCaption, run: () => setSheet('caption') },
+    { key: 'avatar', label: isAvatar ? 'Убрать из профиля' : 'Установить в профиль', Icon: IconUser, run: toggleAvatar },
+    { key: 'cover', label: isCover ? 'Убрать обложку' : 'Сделать обложкой', Icon: IconCover, run: toggleCover },
+    {
+      key: 'download',
+      label: 'Скачать',
+      Icon: IconDownload,
+      run: () => void downloadPhotos([photo.id], fulls, thumbs).then((n) => show(n ? 'Фото скачано' : 'Не удалось скачать')),
+    },
+  ];
+  if (album) items.push({ key: 'album', label: 'Перейти к альбому', Icon: IconAlbum, run: () => { onClose(); navigate(`/profile/photos/album/${album.id}`); } });
+  items.push(
+    { key: 'link', label: 'Скопировать ссылку', Icon: IconLink, run: () => void copyLink().then((ok) => show(ok ? 'Ссылка скопирована' : 'Не удалось скопировать')) },
+    { key: 'delete', label: 'Удалить фотографию', Icon: IconTrash, danger: true, gap: true, run: () => setSheet('remove') },
+  );
+
   return createPortal(
-    <div ref={root} className="viewer" role="dialog" aria-modal="true" aria-label="Просмотр фото">
+    <div ref={root} className="viewer" data-pm role="dialog" aria-modal="true" aria-label="Просмотр фото">
       <header className="viewer__bar">
         <button type="button" className="viewer__button" aria-label="Закрыть" onClick={onClose} autoFocus>
-          <IconClose />
+          <IconBack />
         </button>
         <p className="viewer__count" aria-live="polite">
           {at + 1} из {count}
         </p>
+        <button
+          type="button"
+          className="viewer__button viewer__button--end"
+          aria-label="Ещё"
+          onClick={(e) => setMenu({ rect: e.currentTarget.getBoundingClientRect(), opener: e.currentTarget })}
+        >
+          <IconDots />
+        </button>
       </header>
 
       <div
@@ -215,26 +249,23 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
         )}
         {photo.caption && <p className="viewer__caption">{photo.caption}</p>}
         <div className="viewer__actions" role="group" aria-label="Действия с фото">
-          <button type="button" className="viewer__action" onClick={() => setSheet('caption')}>
-            <IconCaption />
-            <span>Подпись</span>
+          <button type="button" className={`viewer__action${photo.liked ? ' viewer__action--like' : ''}`} aria-pressed={photo.liked} aria-label="Нравится" onClick={() => toggleLike(photo.id)}>
+            {photo.liked ? <IconHeartFill /> : <IconHeartLine />}
+            {photo.liked && <span>1</span>}
           </button>
-          <button type="button" className={`viewer__action${isAvatar ? ' viewer__action--on' : ''}`} aria-pressed={isAvatar} onClick={toggleAvatar}>
-            <IconProfile />
-            <span>Фото профиля</span>
+          <button type="button" className="viewer__action" aria-label="Комментарии" onClick={() => setSheet('comments')}>
+            <IconComment />
+            {photo.comments.length > 0 && <span>{photo.comments.length}</span>}
           </button>
-          <button type="button" className={`viewer__action${isCover ? ' viewer__action--on' : ''}`} aria-pressed={isCover} onClick={toggleCover}>
-            <IconCover />
-            <span>Обложка</span>
-          </button>
-          <button type="button" className="viewer__action" onClick={() => setSheet('remove')}>
-            <IconTrash />
-            <span>Удалить</span>
+          <button type="button" className="viewer__action" aria-label="Поделиться" onClick={() => void doShare()}>
+            <IconShare />
           </button>
         </div>
       </footer>
 
       {toast && <Toast text={toast} className="viewer__toast" />}
+      {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Действия с фото" width={264} onClose={() => setMenu(null)} />}
+      {sheet === 'comments' && <CommentsSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'caption' && <CaptionSheet photoId={photo.id} onClose={() => setSheet(null)} />}
       {sheet === 'remove' && (
         <RemoveSheet

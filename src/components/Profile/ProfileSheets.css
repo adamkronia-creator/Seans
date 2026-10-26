@@ -117,3 +117,77 @@
   font: var(--type-label);
 }
 
+
+/* «В альбом»: список альбомов строками */
+.pf-albums ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — прозрачный разделитель */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-album {
+  display: flex;
+  align-items: center;
+  gap: var(--row-gap);
+  width: 100%;
+  min-height: var(--row-h);
+  padding: var(--row-pad-y) var(--row-pad-x);
+  text-align: left;
+}
+
+.pf-album__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pf-album__count {
+  color: var(--color-text-secondary);
+}
+
+/* Комментарии к фото */
+.pf-comments ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* grid:ok — прозрачный разделитель */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pf-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--row-gap);
+  padding: var(--row-pad-y) var(--row-pad-x);
+}
+
+.pf-comment__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pf-comment__text {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.pf-comment__time {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-sm);
+}
+
+.pf-comment__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  color: var(--color-text-secondary);
+}

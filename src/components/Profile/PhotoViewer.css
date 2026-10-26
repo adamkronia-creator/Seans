@@ -169,34 +169,30 @@
 }
 
 .viewer__actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
 }
 
 .viewer__action {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  min-width: 0;
-  padding: var(--space-2) 0;
-  color: rgb(255 255 255 / 72%);
-  font-size: var(--size-icon);
+  min-width: var(--size-touch);
+  min-height: var(--size-touch);
+  color: rgb(255 255 255 / 88%);
+  font-size: var(--size-icon-lg);
 }
 
-/* На узком экране «Фото профиля» не помещается в колонку: подпись переносится на вторую строку, а не обрезается */
 .viewer__action span {
-  max-width: 100%;
-  font-size: var(--font-size-2xs);
-  line-height: var(--line-height-2xs);
-  overflow-wrap: anywhere;
-  text-align: center;
-  text-wrap: balance;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Нажато (это фото сейчас на аватаре или обложке) */
-.viewer__action--on {
-  color: var(--color-accent);
+/* Сердечко отмечено */
+.viewer__action--like {
+  color: #ff4d5e;
 }
 
 /* Подсказка на тёмном фоне: светлая плашка, у верхнего края, чтобы не закрывать подпись и действия.
@@ -215,4 +211,24 @@
   .viewer.is-leaving {
     animation: none;
   }
+}
+
+.viewer__button--end {
+  margin-left: auto;
+}
+
+/* data-pm нужен меню и окнам внутри просмотра; фон просмотра остаётся тёмным */
+.viewer[data-pm] {
+  background: #05070c;
+  color: #fff;
+}
+
+.viewer[data-pm] .viewer__button,
+.viewer[data-pm] .viewer__nav {
+  color: #fff;
+}
+
+.viewer[data-pm] .viewer__action--like,
+.viewer[data-pm] .viewer__action--like span {
+  color: #ff4d5e;
 }
