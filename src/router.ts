@@ -70,8 +70,16 @@ function show(path: string, kind: TransitionKind, prev: string | undefined) {
 /** Как показать переход назад, который начали мы сами (кнопка «назад» браузера и свайп сообщают о нём только событием) */
 let forced: { kind: TransitionKind; until: number } | undefined;
 
-/** Временная запись истории: системная «назад» закрывает режим (выбор чатов), а не уводит с экрана */
-let guard: { step: number; onBack: () => void; silent: boolean } | undefined;
+/** Временные записи истории: системная «назад» закрывает режим (выбор чатов, нижнее окно, просмотр фото), а не уводит с экрана.
+ * Их может быть несколько, вложенных (просмотр фото, а поверх него окно): «назад» закрывает самое верхнее. Запись ставится только по
+ * касанию человека: браузер пропускает записи, добавленные без него, и «назад» ушла бы с сайта */
+interface Guard {
+  step: number;
+  onBack: () => void;
+  silent: boolean;
+  dead?: boolean;
+}
+const guards: Guard[] = [];
 
 /** Ставит запись-«заглушку»; вернёт функцию, снимающую её, когда режим закончился другим способом */
 export function guardBack(onBack: () => void): () => void {
@@ -89,16 +97,26 @@ export function guardBack(onBack: () => void): () => void {
   }
   step += 1;
   window.history.pushState({ i: step, prev: target }, '', `#${target}`);
-  const mine = { step, onBack, silent: false };
-  guard = mine;
+  const mine: Guard = { step, onBack, silent: false };
+  guards.push(mine);
   return () => {
-    if (guard !== mine) return;
-    guard = undefined;
-    if (step === mine.step) {
-      mine.silent = true;
-      pending = mine;
-      window.history.back();
+    const at = guards.indexOf(mine);
+    if (at < 0) return;
+    if (at !== guards.length - 1) {
+      // Снимают ту, что лежит под другими: запись остаётся, пока до неё не дойдут, и тогда уйдёт молча
+      mine.dead = true;
+      mine.onBack = () => undefined;
+      return;
     }
+    guards.pop();
+    let drop = 1;
+    while (guards.length && guards[guards.length - 1].dead) {
+      guards.pop();
+      drop += 1;
+    }
+    mine.silent = true;
+    pending = mine;
+    window.history.go(-drop);
   };
 }
 let pending: { silent: boolean } | undefined;
@@ -113,11 +131,11 @@ function onHistory(event: Event) {
     queued.splice(0).forEach((run) => run());
     return;
   }
-  if (guard && event.type === 'popstate' && (readState().i ?? -1) < guard.step) {
-    const g = guard;
-    guard = undefined;
+  const top = guards[guards.length - 1];
+  if (top && event.type === 'popstate' && (readState().i ?? -1) < top.step) {
+    guards.pop();
     step = readState().i ?? step - 1;
-    g.onBack();
+    top.onBack();
     return;
   }
   const path = readPath();
@@ -153,11 +171,14 @@ export function useRoute(): Located {
 export function navigate(path: string, kind: TransitionKind = 'forward') {
   if (target === path) return;
   const prev = target;
-  if (guard && guard.step === step) {
-    // Нижнее окно (или режим выбора) ещё держит свою запись истории: новый экран занимает её место, а не ложится сверху,
-    // иначе «назад» сначала вернёт на пустую запись того же экрана
-    guard = undefined;
-    window.history.replaceState({ i: step, prev }, '', `#${path}`);
+  if (guards.length) {
+    // Окна и режимы ещё держат свои записи истории: сперва они уходят, и только потом новый экран ложится сверху,
+    // иначе «назад» сначала вернёт на пустые записи того же экрана
+    const drop = guards.length;
+    guards.splice(0).forEach((g) => (g.silent = true));
+    pending = { silent: true };
+    queued.push(() => navigate(path, kind));
+    window.history.go(-drop);
   } else {
     step += 1;
     window.history.pushState({ i: step, prev }, '', `#${path}`);

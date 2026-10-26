@@ -49,6 +49,10 @@
 }
 
 .fwd-page__send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   width: 100%;
   height: var(--size-control);
   border-radius: var(--radius-pill);

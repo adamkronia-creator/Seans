@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { IconArchiveMk, IconBellMk, IconCloseMk } from '../../components/ChatItem/ChatIcons';
+import { Badge } from '../../components/Badge/Badge';
 import { IconTrash } from '../../components/ChatParts/ChatIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconBellOff, IconFolderPlus, IconPinned } from '../../components/FolderMenu/FolderIcons';
@@ -114,8 +115,8 @@ export function useChatSelection(say: (text: string) => void) {
         <button type="button" className="chats-header__action" aria-label="Отменить выбор" onClick={clear}>
           <IconCloseMk />
         </button>
-        <span key={n} className="chats-header__count" aria-live="polite">
-          {n}
+        <span className="chats-header__count" aria-live="polite" aria-label={`Выбрано: ${n}`}>
+          <Badge count={n} />
         </span>
         <button
           type="button"

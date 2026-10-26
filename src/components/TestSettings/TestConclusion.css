@@ -322,6 +322,14 @@
   color: var(--color-darkred);
 }
 
+/* На тёмном стекле (белый текст) текст уровня того же цвета, что и точка, а не тусклее её: светлым оттенкам на тёмном читаемости хватает */
+:root[data-ink='light'] .cc-tone--yellow,
+:root[data-ink='light'] .cc-tone--green,
+:root[data-ink='light'] .cc-tone--orange,
+:root[data-ink='light'] .cc-tone--red {
+  color: var(--tone-dot);
+}
+
 /* Метка «Шкала Hs» в заголовке карточки */
 .cc-badge {
   display: flex;
@@ -435,6 +443,8 @@
 }
 
 .cc-level__dot {
+  position: relative;
+  top: -1px; /* grid:ok — оптический центр: заглавные и цифры стоят выше середины строки */
   width: var(--space-2);
   height: var(--space-2);
   border-radius: var(--radius-full);
@@ -646,8 +656,8 @@
 
 /* «Читать далее» между диапазоном клиента и остальными: разделитель, кнопка, свёрнутые диапазоны */
 .cc-more {
-  margin: 0 var(--space-4);
-  border-top: 1px solid var(--color-divider);
+  margin: 0;
+  padding-top: var(--space-1);
 }
 
 .cc-more--end {
@@ -655,7 +665,7 @@
 }
 
 .cc-more .ts-desc__toggle {
-  margin: var(--space-1) auto;
+  margin: 0;
 }
 
 .cc-rest {

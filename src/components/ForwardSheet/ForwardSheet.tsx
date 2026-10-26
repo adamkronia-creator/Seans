@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useChats } from '../../data/chatStore';
 import { guardBack } from '../../router';
+import { Badge } from '../Badge/Badge';
 import { ChatItem } from '../ChatItem/ChatItem';
 import { ChatsHeader } from '../../pages/MessagesPage/ChatsHeader';
 import '../../pages/MessagesPage/MessagesPage.css';
@@ -51,7 +52,8 @@ export function ForwardSheet({ onSend, onClose }: ForwardSheetProps) {
         {picked.length > 0 && (
           <div className="fwd-page__bar">
             <button type="button" className="fwd-page__send" onClick={() => onSend(picked)}>
-              Отправить ({picked.length})
+              Отправить
+              <Badge count={picked.length} variant="inverse" />
             </button>
           </div>
         )}

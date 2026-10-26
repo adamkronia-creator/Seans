@@ -46,13 +46,13 @@ export function PhotoViewer({ startId, ids, onClose }: PhotoViewerProps) {
   useExitAnimation(root);
   // Жест и кнопка «назад» закрывают просмотр, а не уводят с экрана фото
   useBackHandler(!sheet && !menu, onClose);
-  // Системная «назад» закрывает просмотр. Пока открыто окно или меню, запись истории держат они, а не просмотр
+  // Системная «назад» закрывает просмотр; окно и меню над ним ставят свои записи истории поверх, и «назад» закрывает сперва их
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
+  useEffect(() => guardBack(() => closeRef.current()), []);
   useEffect(() => {
-    if (sheet || menu) return;
-    return guardBack(() => closeRef.current());
-  }, [sheet, menu]);
+    if (menu) return guardBack(() => setMenu(null));
+  }, [menu]);
 
   // Фото могли удалить: номер не выходит за список
   const at = Math.min(index, Math.max(0, count - 1));

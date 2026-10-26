@@ -217,7 +217,7 @@
 /* Текст → 12 → разделитель по ширине текста → 12 → кнопка → 12 до конца блока */
 .ts-desc__clip {
   position: relative;
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-1);
 }
 
 /* Короткое описание без кнопки: нижний отступ даёт сама карточка */
@@ -249,22 +249,29 @@
 }
 
 .ts-desc__rule {
-  height: 0;
-  margin: 0;
-  border: 0;
-  border-top: 1px solid var(--color-divider);
+  display: none; /* вместо линии между текстом и кнопкой щель 4 */
 }
 
-/* Область нажатия 12 сверху и снизу (высота 44): видимые отступы 12 сверху (разделитель) и 12 снизу (конец блока) */
+/* «Читать далее» — отдельная кнопка внизу карточки, как «Посмотреть» в профиле: плитка стекла во всю ширину, щель 4 от текста */
 .ts-desc__toggle {
+  --press-scale: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin: 0 auto calc(var(--space-3) * -1);
-  padding: var(--space-3) var(--space-6);
-  color: var(--color-accent);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-sm);
+  width: calc(100% + var(--space-8));
+  min-height: var(--row-h);
+  margin: 0 calc(var(--space-4) * -1) calc(var(--space-3) * -1);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-xs);
+  background: var(--glass-bubble-in);
+  color: var(--text-link);
+  font: var(--type-label);
+  text-align: center;
+  transition: filter 0.15s ease;
+}
+
+.ts-desc__toggle[data-pressed] {
+  filter: brightness(0.94);
 }
 
 .ts-desc strong {

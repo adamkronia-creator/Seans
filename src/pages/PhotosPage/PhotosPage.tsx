@@ -16,6 +16,7 @@ import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { sendMessage } from '../../data/chatStore';
+import { Badge } from '../../components/Badge/Badge';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { removeAlbum, removeManyPhotos, setPinned, useProfile } from '../../data/profile';
 import { downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
@@ -239,7 +240,17 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
             <IconBack />
           </button>
         )}
-        <h1 className="fp__title">{selecting ? (chosen.length > 0 ? `Выбрано: ${chosen.length}` : 'Выберите фото') : title}</h1>
+        <h1 className="fp__title">{selecting ? (
+            chosen.length > 0 ? (
+              <>
+                Выбрано <Badge count={chosen.length} />
+              </>
+            ) : (
+              'Выберите фото'
+            )
+          ) : (
+            title
+          )}</h1>
         {selecting ? (
           <button
             type="button"

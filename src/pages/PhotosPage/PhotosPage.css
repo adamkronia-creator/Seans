@@ -206,3 +206,9 @@
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-xs);
 }
+
+/* Число выбранных в кружке рядом с названием */
+.fp__title .badge {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
