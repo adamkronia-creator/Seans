@@ -9,6 +9,7 @@ import type { LibraryItem } from '../../data/library';
 import { IconReadTicks } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import { IconPinned } from '../FolderMenu/FolderIcons';
+import { IconDownload as IconDownloadFile } from '../Profile/ProfileIcons';
 import './MessageBubble.css';
 
 function Status({ message }: { message: Message }) {
@@ -51,6 +52,29 @@ function Highlighted({ text, query, active }: { text: string; query: string; act
 }
 
 const SWIPE_TRIGGER = 56;
+
+const fileSize = (n: number) => (n < 1024 ? `${n} Б` : n < 1024 * 1024 ? `${Math.round(n / 1024)} КБ` : `${(n / 1024 / 1024).toFixed(1).replace('.', ',')} МБ`);
+
+/** Файл в сообщении: значок, название, размер; нажатие на значок скачивает */
+function FileBlock({ file }: { file: NonNullable<Message['file']> }) {
+  const download = () => {
+    const a = document.createElement('a');
+    a.href = file.url;
+    a.download = file.name;
+    a.click();
+  };
+  return (
+    <span className="bubble__file">
+      <button type="button" className="bubble__file-icon" aria-label={`Скачать ${file.name}`} onClick={download}>
+        <IconDownloadFile />
+      </button>
+      <span className="bubble__file-text">
+        <span className="bubble__file-name">{file.name}</span>
+        <span className="bubble__file-size">{fileSize(file.size)}</span>
+      </span>
+    </span>
+  );
+}
 
 /** Реакции под сообщением, как в Telegram: белая плашка, эмодзи и фото того, кто его поставил; у одинаковых реакций два фото рядом */
 function Reaction({ message, peerAvatar, onReact }: { message: Message; peerAvatar?: string; onReact?: (m: Message, emoji: string | null) => void }) {
@@ -135,7 +159,7 @@ export function MessageBubble({
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);
   const out = message.from === 'me';
-  const hasReaction = Boolean(message.reaction || message.theirReaction);
+  const hasReaction = Boolean(message.reaction || message.theirReaction || message.file);
   // Постоянное задание: клиенту ушло правило (сколько записей всего), а у отправленного себе считаются сделанные записи
   const permanent = message.task ? message.taskOptions?.permanent : undefined;
   const selfRecords = useAssignmentRecords(message.toSelf && permanent ? message.id : '');
@@ -268,10 +292,18 @@ export function MessageBubble({
               </span>
             </p>
           ) : null}
-          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
-          <span className="bubble__meta">
-            <Meta message={message} />
-          </span>
+          {message.reaction || message.theirReaction ? (
+            <div className="bubble__foot bubble__foot--text">
+              <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} />
+              <span className="bubble__meta bubble__meta--foot">
+                <Meta message={message} />
+              </span>
+            </div>
+          ) : (
+            <span className="bubble__meta">
+              <Meta message={message} />
+            </span>
+          )}
         </div>
         <ul className="bubble-buttons">
           <li>
@@ -379,6 +411,7 @@ export function MessageBubble({
       )}
       {message.image && <img className="bubble__img" src={message.image} alt="Фото" draggable={false} />}
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
+      {message.file && <FileBlock file={message.file} />}
       <Highlighted text={message.text} query={query} active={activeMatch} />
       {hasReaction && (
         <div className="bubble__foot bubble__foot--text">

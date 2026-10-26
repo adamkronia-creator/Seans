@@ -665,12 +665,23 @@
 }
 
 /* Низ пузыря с фото: реакции слева, время справа */
+/* Низ пузыря: реакции слева, время справа, в одной строке и по центру друг друга. Реакции стоят в 8 от левого, нижнего и (время) правого края
+   пузыря, у текста и у фото одинаково: у текстового пузыря поля 8/12, поэтому по бокам минус 4, у фото поля 4, поэтому внутри плюс 4 */
 .bubble__foot {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  margin-top: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.bubble__foot--text {
+  margin-right: calc(var(--space-1) * -1);
+  margin-left: calc(var(--space-1) * -1);
+}
+
+.bubble--photo .bubble__foot {
+  padding: 0 var(--space-1) var(--space-1);
 }
 
 .bubble__foot .bubble__reactions {
@@ -679,7 +690,51 @@
 
 .bubble__meta--foot {
   position: static;
-  margin: 0 var(--space-2) var(--space-1) auto;
+  margin-left: auto;
+}
+
+/* Файл в сообщении */
+.bubble__file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 200px; /* grid:ok — чтобы название не сжималось в точку */
+}
+
+.bubble__file-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-touch);
+  height: var(--size-touch);
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 22%);
+  color: inherit;
+  font-size: var(--size-icon);
+}
+
+.bubble--in .bubble__file-icon {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.bubble__file-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bubble__file-name {
+  overflow: hidden;
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bubble__file-size {
+  font: var(--type-meta);
+  opacity: 0.8;
 }
 
 .bubble__fwd {
@@ -693,4 +748,8 @@
 
 .bubble--out .bubble__fwd {
   color: rgb(255 255 255 / 85%);
+}
+
+.bubble--tcard-bare:has(.bubble__foot) {
+  padding-bottom: var(--space-2);
 }

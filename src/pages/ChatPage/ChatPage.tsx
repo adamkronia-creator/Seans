@@ -479,6 +479,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           sendMessage(chatId, text, replyTo?.id);
           setReplyTo(null);
         }}
+        onAttach={(files) =>
+          files.forEach((f) => {
+            const url = URL.createObjectURL(f);
+            // Картинка уходит фото, остальное — файлом с названием и размером
+            sendMessage(chatId, '', undefined, f.type.startsWith('image/') ? { image: url } : { file: { name: f.name, size: f.size, url } });
+          })
+        }
         onLayoutChange={() => atBottom.current && scrollToBottom()}
         reply={replyTo ? { name: replyTo.from === 'me' ? 'Вы' : chat.name.split(' ')[0], text: replyTo.test ? 'Тест' : replyTo.task ? 'Задание' : replyTo.text.replace(/\s*\n\s*/g, ' ') } : undefined}
         onCancelReply={() => setReplyTo(null)}

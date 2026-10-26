@@ -14,7 +14,7 @@ function previewOf(groups: MessageGroup[] | undefined): Pick<Chat, 'lastMessage'
   const lastGroup = groups?.[groups.length - 1];
   const last = lastGroup?.messages[lastGroup.messages.length - 1];
   if (!last) return undefined;
-  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.image ? 'Фото' : last.test ? 'Тест' : last.task ? 'Задание' : '');
+  const text = last.text.replace(/\s*\n\s*/g, ' ') || (last.image ? 'Фото' : last.file ? last.file.name : last.test ? 'Тест' : last.task ? 'Задание' : '');
   return { lastMessage: text, time: last.time, outgoing: last.from === 'me' ? (last.status === 'read' || !last.status ? 'read' : 'sent') : undefined };
 }
 
@@ -182,7 +182,7 @@ const SIMULATE_TYPING = true;
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
  * С `test` уходит карточка теста: текст в ней необязателен.
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded' | 'image'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded' | 'image' | 'file'>) {
   const text = rawText.trim();
   if (!text && !test) return;
 
@@ -233,8 +233,8 @@ export function setMessageReaction(chatId: string, id: string, emoji: string | n
 export function forwardMessage(toIds: string[], message: Message, from: string, title?: string) {
   // У фото подпись не пересылается, уходит только снимок
   const text = message.image ? '' : message.text || title || '';
-  if (!text && !message.image) return;
-  toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from, ...(message.image ? { image: message.image } : {}) }));
+  if (!text && !message.image && !message.file) return;
+  toIds.forEach((id) => sendMessage(id, text, undefined, { forwarded: from, ...(message.image ? { image: message.image } : {}), ...(message.file ? { file: message.file } : {}) }));
 }
 
 /** Удаление сообщения; пустые дни убираются, превью списка обновляется */

@@ -17,6 +17,8 @@ interface MessageInputProps {
   extras?: boolean;
   /** Страница с полем сейчас на экране: на компьютере (с мышью) курсор сразу встаёт в поле, на телефоне — нет, чтобы не выезжала клавиатура */
   active?: boolean;
+  /** Выбраны файлы кнопкой «Прикрепить» */
+  onAttach?: (files: File[]) => void;
 }
 
 /**
@@ -28,13 +30,14 @@ function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTML
   return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, placeholder = 'Сообщение', extras = true, active = false, onAttach }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const settled = useRef(false);
   useEffect(() => {
     settled.current = true;
   }, []);
+  const fileRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   // Последняя позиция курсора в поле: нужна, чтобы вставить эмодзи, когда поле не в фокусе
@@ -172,9 +175,22 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, pla
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className="composer">
         {extras && (
-          <button type="button" className="composer__round" aria-label="Прикрепить">
-            <IconAttach />
-          </button>
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              hidden
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? []);
+                e.target.value = '';
+                if (files.length) onAttach?.(files);
+              }}
+            />
+            <button type="button" className="composer__round" aria-label="Прикрепить файл" onClick={() => fileRef.current?.click()}>
+              <IconAttach />
+            </button>
+          </>
         )}
 
         <div className="composer__field">
