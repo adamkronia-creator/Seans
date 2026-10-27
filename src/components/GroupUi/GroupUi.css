@@ -859,3 +859,17 @@
   box-sizing: border-box;
   padding-block: var(--space-4);
 }
+
+/* Переключатель без значка, как выбор типа канала: название и подпись слева, переключатель справа на уровне названия */
+[data-pm] .gu-row--switch-plain {
+  align-items: flex-start;
+  padding-block: var(--space-3);
+}
+
+[data-pm] .gu-row--switch-plain .gu-row__text {
+  gap: var(--space-1);
+}
+
+[data-pm] .gu-row--switch-plain .switch {
+  margin-block: -2px; /* grid:ok — переключатель 28 по центру строки названия 24 */
+}

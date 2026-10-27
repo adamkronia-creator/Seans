@@ -174,7 +174,7 @@ interface SwitchRowProps {
 /** Строка с переключателем: нажатие на любую её часть меняет значение */
 export function SwitchRow({ icon, title, note, checked, onChange, disabled }: SwitchRowProps) {
   return (
-    <button type="button" role="switch" aria-checked={checked} disabled={disabled} className="gu-row gu-row--tall gu-row--switch" onClick={() => onChange(!checked)}>
+    <button type="button" role="switch" aria-checked={checked} disabled={disabled} className={`gu-row gu-row--tall gu-row--switch${icon ? '' : ' gu-row--switch-plain'}`} onClick={() => onChange(!checked)}>
       {icon && <span className="gu-row__icon" aria-hidden="true">{icon}</span>}
       <span className="gu-row__text">
         <span className="gu-row__title">{title}</span>

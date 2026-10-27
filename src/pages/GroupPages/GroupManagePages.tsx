@@ -110,7 +110,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
 
   return (
     <SubPage
-      title={channel ? 'Управление каналом' : 'Управление группой'}
+      title={channel ? 'Настройки канала' : 'Настройки общего чата'}
       subtitle={info.name}
       onBack={() => goBack(gPath(chatId))}
       toast={toast}
@@ -134,10 +134,9 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
       )}
 
       {hasToggles && (
-        <Card hint={channel ? 'Под постами канала будет подпись автора. Защита содержимого запрещает пересылать и копировать публикации.' : 'Защита содержимого запрещает пересылать и копировать сообщения. История показывает новым участникам прежнюю переписку.'}>
+        <Card>
           {channel && adminInfo && (
             <SwitchRow
-              icon={<IconShieldUser />}
               title="Подписи авторов"
               note="Под постами будет имя автора"
               checked={info.signatures}
@@ -149,7 +148,6 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
           )}
           {owner && (
             <SwitchRow
-              icon={<IconLock />}
               title="Защита содержимого"
               note="Запретить пересылать и копировать"
               checked={info.protectContent}
@@ -161,9 +159,8 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
           )}
           {owner && !channel && (
             <SwitchRow
-              icon={<IconHistory />}
-              title="История для новых участников"
-              note="Новые участники видят прежнюю переписку"
+              title="Показывать историю"
+              note="Показывать приглашенным прошлые сообщения"
               checked={info.historyVisible}
               onChange={(v) => {
                 setSetting(chatId, { historyVisible: v });
