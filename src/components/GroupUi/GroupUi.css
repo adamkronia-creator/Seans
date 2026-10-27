@@ -696,7 +696,7 @@
   font-size: var(--size-icon-lg);
 }
 
-/* «Создать общий чат» и «Создать канал» — как «Фото профиля» и «Обложка» в редактировании профиля: просвет 1 px между строками, строка 64, поля 12 / 16, подпись обычным белым текстом */
+/* «Создать общий чат» и «Создать канал» — как «Фото профиля» и «Обложка» в редактировании профиля: просвет 1 px между строками, строка 64, поля 12 / 16, подпись прежняя, акцентная */
 [data-pm] .fp__card:not(.fp__delete) > .gu-rows.gu-rows--split {
   gap: 1px; /* grid:ok — просвет-разделитель 1 px */
   background: none;
@@ -706,10 +706,4 @@
   min-height: var(--row-h-2);
   padding: var(--field-pad-y) var(--row-pad-x);
   background: var(--glass-card);
-}
-
-[data-pm] .gu-rows--split .gu-row__title {
-  color: var(--text-primary);
-  font: var(--type-body);
-  font-weight: var(--font-weight-medium);
 }

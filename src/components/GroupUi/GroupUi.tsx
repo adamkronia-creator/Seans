@@ -344,15 +344,15 @@ interface PickerProps {
   empty?: string;
 }
 
-/** Выбор контактов: поиск, выбранные чипсами и список с отметками */
+/** Выбор контактов: поиск, под ним выбранные чипсами (или подсказка) и список с отметками */
 export function ContactPicker({ contacts, chosen, onToggle, none = 'Все ваши контакты уже здесь.', empty }: PickerProps) {
   const [query, setQuery] = useState('');
   return (
     <>
-      <ChosenChips ids={chosen} onRemove={onToggle} none={empty} />
       <div className="gu-search">
         <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       </div>
+      <ChosenChips ids={chosen} onRemove={onToggle} none={empty} />
       <ContactList contacts={contacts} chosen={chosen} onPick={(c) => onToggle(c.id)} none={none} query={query} />
     </>
   );
