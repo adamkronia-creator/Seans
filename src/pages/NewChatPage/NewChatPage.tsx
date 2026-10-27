@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
+import { Frame } from '../../components/Frame/Frame';
 import { Card, ContactList, ContactPicker, Field, Hint, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
-import { IconGlobal, IconLock, IconStation, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { IconGlobal, IconLock, IconQr, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useToast } from '../../components/Toast/useToast';
 import { ensureContactChat } from '../../data/chatStore';
-import { CONTACTS } from '../../data/contacts';
+import { addContact, useContacts } from '../../data/contacts';
 import { USERNAME_TEXT, createGroup, usernameStatus, type GroupKind } from '../../data/groups';
 import { patchDraft, startDraft, toggleDraftMember, useDraft } from '../../data/newChat';
 import { goBack, navigate, navigateOver } from '../../router';
@@ -44,10 +45,13 @@ export function NewChatPage({ step }: { step: NewStep }) {
 
 /** Контакты и две кнопки создания; нажатие на контакт открывает личный чат с ним */
 function StartScreen() {
+  const contacts = useContacts();
+  const [toast, say] = useToast();
+  const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState('');
   const searching = query.trim() !== '';
   const open = (id: string) => {
-    const contact = CONTACTS.find((c) => c.id === id);
+    const contact = contacts.find((c) => c.id === id);
     if (!contact) return;
     ensureContactChat(contact);
     navigateOver(`/chat/${id}`, DEPTH.start);
@@ -57,7 +61,7 @@ function StartScreen() {
     navigate(kind === 'group' ? '/new/group' : '/new/channel');
   };
   return (
-    <SubPage title="Новый чат" subtitle="Выберите контакт или создайте группу" onBack={() => goBack('/')}>
+    <SubPage title="Новый чат" subtitle="Выберите контакт или создайте группу" onBack={() => goBack('/')} swipe={!adding} toast={toast}>
       <div className="gu-search">
         <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       </div>
@@ -69,13 +73,80 @@ function StartScreen() {
           </div>
         </Card>
       )}
-      <ContactList contacts={CONTACTS} query={query} onPick={(c) => open(c.id)} />
+      <ContactList contacts={contacts} query={query} onPick={(c) => open(c.id)} />
+      <button type="button" className="gu-fab" aria-label="Новый контакт" onClick={() => setAdding(true)}>
+        <IconUserPlus />
+      </button>
+      {adding && (
+        <NewContactSheet
+          onClose={() => setAdding(false)}
+          onQr={() => say('Сканирование QR-кода появится позже')}
+          onCreate={(name, surname, phone) => {
+            addContact(name, surname, phone);
+            setAdding(false);
+            say('Контакт создан');
+          }}
+        />
+      )}
     </SubPage>
+  );
+}
+
+/** Окно «Новый контакт»: имя (обязательно), фамилия, телефон с кодом +7, синхронизация, добавление по QR */
+function NewContactSheet({ onClose, onCreate, onQr }: { onClose: () => void; onCreate: (name: string, surname: string, phone: string) => void; onQr: () => void }) {
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [phone, setPhone] = useState('');
+  const [sync, setSync] = useState(false);
+  const digits = phone.replace(/\D/g, '').slice(0, 10);
+  const shown = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6)].filter(Boolean).join(' ');
+  const ready = name.trim() !== '';
+  return (
+    <Frame
+      title="Новый контакт"
+      onClose={onClose}
+      footer={
+        <button type="button" className="sheet__button" disabled={!ready} onClick={() => onCreate(name, surname, digits)}>
+          Создать контакт
+        </button>
+      }
+    >
+      <section className="sheet__card frame-card">
+        <label className="frame-label" htmlFor="nc-name">
+          Имя (обязательно)
+        </label>
+        <input id="nc-name" className="frame-textarea" value={name} maxLength={64} autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)} />
+      </section>
+      <section className="sheet__card frame-card">
+        <label className="frame-label" htmlFor="nc-surname">
+          Фамилия (необязательно)
+        </label>
+        <input id="nc-surname" className="frame-textarea" value={surname} maxLength={64} autoComplete="off" onChange={(e) => setSurname(e.target.value)} />
+      </section>
+      <section className="sheet__card frame-card">
+        <label className="frame-label" htmlFor="nc-phone">
+          Номер телефона
+        </label>
+        <div className="gu-phone">
+          <span className="gu-phone__code">+7</span>
+          <input id="nc-phone" className="frame-textarea" type="tel" inputMode="tel" placeholder="000 000 0000" value={shown} autoComplete="off" onChange={(e) => setPhone(e.target.value)} />
+        </div>
+      </section>
+      <button type="button" className="sheet__card gu-sync" role="checkbox" aria-checked={sync} onClick={() => setSync(!sync)}>
+        <RadioDot on={sync} />
+        <span>Синхронизировать с телефоном</span>
+      </button>
+      <button type="button" className="sheet__card gu-qr" onClick={onQr}>
+        <IconQr />
+        <span>Добавить по QR-коду</span>
+      </button>
+    </Frame>
   );
 }
 
 /** Шаг 1 группы: выбрать участников, хотя бы одного */
 function GroupMembers() {
+  const contacts = useContacts();
   const draft = useDraft();
   const n = draft.members.length;
   return (
@@ -85,7 +156,7 @@ function GroupMembers() {
       onBack={() => goBack('/new')}
       footer={{ label: 'Далее', disabled: n === 0, onClick: () => navigate('/new/group/info') }}
     >
-      <ContactPicker contacts={CONTACTS} chosen={draft.members} onToggle={toggleDraftMember} empty="Отметьте участников в списке ниже" />
+      <ContactPicker contacts={contacts} chosen={draft.members} onToggle={toggleDraftMember} empty="Отметьте участников в списке ниже" />
     </SubPage>
   );
 }
@@ -187,6 +258,7 @@ function ChannelType() {
 
 /** Шаг 3 канала: добавить подписчиков (можно пропустить) и создать */
 function ChannelMembers() {
+  const contacts = useContacts();
   const draft = useDraft();
   const busy = useRef(false);
   const n = draft.members.length;
@@ -198,7 +270,7 @@ function ChannelMembers() {
   };
   return (
     <SubPage title="Подписчики" subtitle={n ? `Выбрано: ${n}` : 'Можно добавить позже'} onBack={() => goBack('/new/channel/type')} footer={{ label: n ? 'Создать' : 'Пропустить', onClick: create }}>
-      <ContactPicker contacts={CONTACTS} chosen={draft.members} onToggle={toggleDraftMember} empty="Подписчиков можно добавить и позже" />
+      <ContactPicker contacts={contacts} chosen={draft.members} onToggle={toggleDraftMember} empty="Подписчиков можно добавить и позже" />
     </SubPage>
   );
 }

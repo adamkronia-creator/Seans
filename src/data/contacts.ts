@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react';
 import { CHATS, CURRENT_USER, type ChatCategory } from './chats';
 import { authorIndex, initialsAvatar } from '../utils/initialsAvatar';
 
@@ -10,6 +11,8 @@ export interface Contact {
   name: string;
   avatar: string;
   username?: string;
+  /** Десять цифр после +7, если номер указан при создании */
+  phone?: string;
   /** Когда был в сети: «в сети», «был(а) недавно», «был(а) вчера в 19:40» */
   status: string;
   online: boolean;
@@ -68,6 +71,30 @@ const order = new Map(CONTACTS.map((c, i) => [c.id, i]));
 
 /** Номер цвета имени автора в группе (0…6): по месту в записной книжке, чтобы у соседей цвета не совпадали; у остальных — по идентификатору */
 export const authorColor = (id: string): number => ((order.get(id) ?? authorIndex(id)) % 7);
+
+/** Новый контакт из окна «Новый контакт»: ложится в конец записной книжки, у него цветные инициалы и статус «был(а) недавно» */
+let snapshot: Contact[] = [...CONTACTS];
+const listeners = new Set<() => void>();
+export function addContact(name: string, surname: string, phone: string): Contact {
+  const full = [name, surname].map((t) => t.trim()).filter(Boolean).join(' ');
+  const id = `contact-${CONTACTS.length}-${Date.now().toString(36)}`;
+  const contact: Contact = { id, name: full, avatar: initialsAvatar(full, id), status: 'был(а) недавно', online: false, phone: phone || undefined };
+  order.set(id, CONTACTS.length);
+  CONTACTS.push(contact);
+  byId.set(id, contact);
+  snapshot = [...CONTACTS];
+  listeners.forEach((l) => l());
+  return contact;
+}
+/** Записная книжка, которая перерисовывает экран, когда в ней появился новый контакт */
+export const useContacts = (): Contact[] =>
+  useSyncExternalStore(
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
+    () => snapshot,
+  );
 
 export const contactOf = (id: string): Contact | undefined => byId.get(id);
 

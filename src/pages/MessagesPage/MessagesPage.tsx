@@ -17,7 +17,7 @@ import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import type { Chat } from '../../data/chats';
 import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
 import { useFolders } from '../../data/folders';
-import { navigate } from '../../router';
+import { guardBack, navigate } from '../../router';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
 import './MessagesPage.css';
@@ -157,6 +157,14 @@ const ChatList = memo(function ChatList({
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  // Системная «назад» закрывает поиск, а не уводит с вкладки
+  useEffect(() => {
+    if (!searching) return;
+    return guardBack(() => {
+      setQuery('');
+      setSearching(false);
+    });
+  }, [searching]);
   const [filter, setFilter] = useState<Filter>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный фильтр
   const [dragIndex, setDragIndex] = useState<number | null>(null);

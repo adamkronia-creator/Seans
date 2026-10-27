@@ -11,7 +11,7 @@ import { useToast } from '../../components/Toast/useToast';
 import { markRead, setArchived, useChats } from '../../data/chatStore';
 import type { Chat } from '../../data/chats';
 import { plural } from '../../data/taskValues';
-import { goBack, navigate } from '../../router';
+import { goBack, guardBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { useListMotion } from '../../utils/listMotion';
 import './ArchivePage.css';
@@ -34,6 +34,7 @@ export function ArchivePage() {
     setQuery('');
     setSearching(false);
   };
+  useEffect(() => (searching ? guardBack(closeSearch) : undefined), [searching]);
   const rows = useRef<HTMLUListElement>(null);
   // Чат вернули из архива: его строка схлопывается на месте, остальные поднимаются; смена поиска заменяет список целиком
   useListMotion(rows, { attr: 'data-chat', view: q, leave: true });

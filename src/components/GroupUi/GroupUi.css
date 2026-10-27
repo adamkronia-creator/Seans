@@ -554,3 +554,60 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Круглая кнопка «Новый контакт» справа над краем экрана, как в Telegram; размер и отступы те же, что у кнопки нового чата */
+.gu-fab {
+  position: absolute;
+  right: var(--space-4);
+  bottom: calc(var(--space-4) + var(--safe-bottom));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-bar);
+  height: var(--size-bar);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  color: #fff; /* grid:ok — белый знак на синем круге */
+  font-size: var(--size-icon-lg);
+  box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.2);
+}
+
+.gu-fab:active {
+  transform: scale(0.94);
+}
+
+/* Окно «Новый контакт»: код страны слева от номера, строки синхронизации и QR как строки списка */
+.gu-phone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gu-phone__code {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+}
+
+.gu-sync,
+.gu-qr {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  flex-direction: row;
+  min-height: var(--size-touch);
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  text-align: left;
+}
+
+.gu-qr {
+  color: var(--action-primary);
+}
+
+.gu-qr svg {
+  font-size: var(--size-icon-lg);
+}

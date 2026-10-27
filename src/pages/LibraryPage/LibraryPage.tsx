@@ -1,3 +1,4 @@
+import { guardBack } from '../../router';
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
@@ -252,6 +253,14 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const [focused, setFocused] = useState(false);
   const [toast, say] = useToast();
   const [searching, setSearching] = useState(() => readLibraryView(kind).query !== '');
+  // Системная «назад» закрывает поиск, а не уводит с вкладки
+  useEffect(() => {
+    if (!searching) return;
+    return guardBack(() => {
+      setQuery(kind, '');
+      setSearching(false);
+    });
+  }, [searching, kind]);
   const client = useClientData();
   const view = useLibraryView(kind);
   const scope = kind === 'test' ? 'tests' : 'tasks';
