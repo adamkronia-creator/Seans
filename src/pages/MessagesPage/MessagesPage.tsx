@@ -9,6 +9,7 @@ import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
+import { IconComposeMk } from '../../components/ChatItem/ChatIcons';
 import { ChatsHeader } from './ChatsHeader';
 import { useChatSelection } from './ChatSelection';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
@@ -315,7 +316,6 @@ export function MessagesPage() {
         query={query}
         onQuery={setQuery}
         storiesRoot={screen}
-        onCompose={() => navigate('/new')}
         selection={sel.header(chats)}
         chips={
           <>
@@ -342,6 +342,11 @@ export function MessagesPage() {
         }
       />
 
+      {!selecting && !searching && (
+        <button type="button" className="messages__fab" aria-label="Новый чат" onClick={() => navigate('/new')}>
+          <IconComposeMk />
+        </button>
+      )}
       <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setFilter(filters[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={(d) => switchTab(d > 0 ? 'profile' : 'tests', d > 0 ? 'slide-next' : 'slide-prev')} />
 
       {folderMenu.node}

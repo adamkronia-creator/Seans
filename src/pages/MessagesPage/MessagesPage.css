@@ -285,3 +285,26 @@
 .messages__list {
   overflow-anchor: none;
 }
+
+/* Новый чат: круглая кнопка справа над нижней панелью, как в Telegram (низ = верх панели + space-4) */
+.messages__fab {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--pm-bottom);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-bar);
+  height: var(--size-bar);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  color: #fff; /* grid:ok — белый знак на синем круге */
+  font-size: var(--size-icon-lg);
+  box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.2);
+  animation: fade-in var(--dur-base) ease-out backwards;
+}
+
+.messages__fab:active {
+  transform: scale(0.94);
+}

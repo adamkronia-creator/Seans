@@ -14,3 +14,4 @@ export { default as IconFolderMk } from '../../assets/icons/solar/folder.svg?rea
 export { default as IconCardMk } from '../../assets/icons/solar/card.svg?react';
 export { default as IconHelpMk } from '../../assets/icons/solar/question-circle.svg?react';
 export { default as IconGearMk } from '../../assets/icons/solar/settings.svg?react';
+export { default as IconComposeMk } from '../../assets/icons/solar/pen-new-round.svg?react';
