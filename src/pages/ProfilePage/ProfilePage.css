@@ -728,3 +728,26 @@
 .profile {
   touch-action: pan-y;
 }
+
+/* Строки «Контактной» и «Общей информации» со значком слева, как в редактировании: значок по центру строки, подпись и значение рядом */
+.profile__field--icon {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--row-gap);
+}
+
+.profile__field-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.profile__field-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--field-gap);
+  min-width: 0;
+}

@@ -1,5 +1,6 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
@@ -22,7 +23,7 @@ const PHOTOS_SHOWN = 6;
 const ALBUMS_SHOWN = 3;
 
 /** Карточка с основными сведениями: строки как у личной информации, нажатие открывает редактирование */
-function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows: { label: string; value: string }[]; onEdit: () => void }) {
+function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows: { label: string; value: string; icon: ReactNode }[]; onEdit: () => void }) {
   return (
     <section className="profile__card" aria-labelledby={id}>
       <header className="profile__card-head">
@@ -36,9 +37,14 @@ function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows
       <ul className="profile__fields">
         {rows.map((row) => (
           <li key={row.label}>
-            <button type="button" className="profile__field" onClick={onEdit}>
-              <span className="profile__field-label">{row.label}</span>
-              <span className={`profile__field-value${row.value.trim() ? '' : ' profile__field-value--empty'}`}>{row.value.trim() || 'Не заполнено'}</span>
+            <button type="button" className="profile__field profile__field--icon" onClick={onEdit}>
+              <span className="profile__field-icon" aria-hidden="true">
+                {row.icon}
+              </span>
+              <span className="profile__field-text">
+                <span className="profile__field-label">{row.label}</span>
+                <span className={`profile__field-value${row.value.trim() ? '' : ' profile__field-value--empty'}`}>{row.value.trim() || 'Не заполнено'}</span>
+              </span>
             </button>
           </li>
         ))}
@@ -158,8 +164,8 @@ export function ProfilePage() {
           id="profile-contacts"
           title="Контактная информация"
           rows={[
-            { label: 'Никнейм', value: username },
-            { label: 'Телефон', value: phone },
+            { label: 'Никнейм', value: username, icon: FieldIcon.at },
+            { label: 'Телефон', value: phone, icon: FieldIcon.phone },
           ]}
           onEdit={() => edit()}
         />
@@ -167,11 +173,11 @@ export function ProfilePage() {
           id="profile-general"
           title="Общая информация"
           rows={[
-            { label: 'Дата рождения', value: birthday },
-            { label: 'Специализация', value: headline },
-            { label: 'Город', value: city },
-            { label: 'Семейное положение', value: family },
-            { label: 'Пол', value: gender },
+            { label: 'Дата рождения', value: birthday, icon: FieldIcon.cake },
+            { label: 'Специализация', value: headline, icon: FieldIcon.badge },
+            { label: 'Город', value: city, icon: FieldIcon.city },
+            { label: 'Семейное положение', value: family, icon: FieldIcon.heart },
+            { label: 'Пол', value: gender, icon: FieldIcon.user },
           ]}
           onEdit={() => edit()}
         />

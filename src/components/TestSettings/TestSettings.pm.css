@@ -123,6 +123,7 @@
 /* Ссылки: цвет действий новой системы (на тёмном фоне светлее) */
 [data-pm] .ts-row__link,
 [data-pm] .ts-desc__toggle {
+  background: var(--glass-card); /* тот же тон, что у карточек вокруг: подложка пузыря чата (--glass-bubble-in) на цветном фоне выходила темнее */
   color: var(--text-link);
   font: var(--type-label);
 }
