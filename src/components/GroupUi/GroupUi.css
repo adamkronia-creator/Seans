@@ -704,7 +704,7 @@
 
 [data-pm] .gu-rows--split > .gu-row {
   min-height: var(--row-h-2);
-  padding: var(--field-pad-y) var(--row-pad-x);
+  padding: var(--space-2) var(--row-pad-x); /* 48 круг + 8 + 8 = 64, как строка контакта */
   background: var(--glass-card);
 }
 
@@ -742,4 +742,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Значок строки стоит в круге размером с аватар контакта (48): значок вровень с аватарами, подпись вровень с именами */
+[data-pm] .gu-rows--split .gu-row__icon {
+  align-items: center;
+  justify-content: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-full);
+  background: var(--bg-raised);
 }
