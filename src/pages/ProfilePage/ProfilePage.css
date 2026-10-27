@@ -443,8 +443,8 @@
 }
 
 [data-pm] .profile__avatar {
-  border: 4px solid var(--glass-solid);
-  background: var(--glass-solid);
+  border: 4px solid transparent;
+  background: none;
 }
 
 [data-pm] .profile__edit {
