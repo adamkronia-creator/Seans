@@ -827,3 +827,8 @@
 .gu-invite__btn svg {
   font-size: var(--size-icon);
 }
+
+/* Тип канала: между названием и подписью 4 */
+[data-pm] .gu-row--top:has(.gu-radio) .gu-row__text {
+  gap: var(--space-1);
+}
