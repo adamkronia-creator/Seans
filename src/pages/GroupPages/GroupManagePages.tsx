@@ -279,7 +279,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
             hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этому адресу можно найти и открыть ' + (channel ? 'канал.' : 'общий чат.')}
           />
           {!channel && (
-            <Card hint="Новые участники вступают после вашего одобрения: заявки лежат в разделе «Заявки на вступление».">
+            <Card hint="Приглашенные пользователи добавляются в общий чат после вашего одобрения.">
               <SwitchRow icon={<IconUserCheck />} title="Вступление по заявкам" checked={approval} onChange={setApproval} />
             </Card>
           )}
