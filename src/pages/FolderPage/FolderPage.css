@@ -695,6 +695,9 @@
 
 [data-pm] .fp__add-icon {
   width: var(--size-avatar);
+  height: var(--size-avatar);
+  border-radius: var(--radius-full);
+  background: var(--bg-raised); /* непрозрачный круг размером с аватар, как у «Создать общий чат» */
 }
 
 /* Между «Добавить чаты» и добавленными чатами разделителя нет */
