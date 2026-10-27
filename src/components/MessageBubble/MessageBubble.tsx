@@ -181,6 +181,8 @@ interface MessageBubbleProps {
   showAvatar?: boolean;
   /** Подпись автора рядом с именем: «владелец», «Куратор» */
   authorTitle?: string;
+  /** Нажатие на фото автора: профиль человека */
+  onOpenAuthor?: (id: string) => void;
 }
 
 export function MessageBubble({
@@ -205,6 +207,7 @@ export function MessageBubble({
   showAuthor = false,
   showAvatar = false,
   authorTitle,
+  onOpenAuthor,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
   const [dx, setDx] = useState(0);
@@ -225,9 +228,17 @@ export function MessageBubble({
     </span>
   );
   const authorFace = authored && showAvatar && (
-    <span className="bubble__avatar" aria-hidden="true">
+    <button
+      type="button"
+      className="bubble__avatar"
+      aria-label={`Профиль: ${nameOf(message.author!)}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpenAuthor?.(message.author!);
+      }}
+    >
       <Avatar src={avatarOf(message.author!)} size={36} />
-    </span>
+    </button>
   );
   // Постоянное задание: клиенту ушло правило (сколько записей всего), а у отправленного себе считаются сделанные записи
   const permanent = message.task ? message.taskOptions?.permanent : undefined;

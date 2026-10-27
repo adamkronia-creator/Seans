@@ -182,7 +182,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
           </Card>
 
           <Card>
-            <Row icon={<IconHistory />} title="Журнал действий" chevron onClick={() => open('log')} />
+            <Row icon={<IconHistory />} title="Недавние действия" value={info.log.length ? <Badge count={info.log.length} /> : undefined} chevron onClick={() => open('log')} />
           </Card>
         </>
       )}
@@ -548,9 +548,9 @@ export function GroupRequestsPage({ chatId }: { chatId: string }) {
 /** Журнал: кто и что менял в группе или канале, свежее выше (хранится последние 200 записей) */
 export function GroupLogPage({ chatId }: { chatId: string }) {
   const { info } = useGroupOf(chatId);
-  if (!info) return <SubPage title="Журнал действий" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
+  if (!info) return <SubPage title="Недавние действия" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
   return (
-    <SubPage title="Журнал действий" subtitle={info.name} onBack={() => goBack(gPath(chatId, 'edit'))}>
+    <SubPage title="Недавние действия" subtitle={info.name} onBack={() => goBack(gPath(chatId, 'edit'))}>
       {info.log.length === 0 ? (
         <Card>
           <Empty>Действий пока нет</Empty>
@@ -562,7 +562,7 @@ export function GroupLogPage({ chatId }: { chatId: string }) {
           ))}
         </Card>
       )}
-      <Hint>В журнале хранятся последние 200 действий администраторов.</Hint>
+      <Hint>В истории {info.kind === 'channel' ? 'канала' : 'общего чата'} хранятся последние 200 действий администраторов.</Hint>
     </SubPage>
   );
 }

@@ -22,8 +22,8 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import { deleteMessage, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useMessages, useTyping } from '../../data/chatStore';
-import { firstNameOf, nameOf } from '../../data/contacts';
+import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useMessages, useTyping } from '../../data/chatStore';
+import { ME, contactOf, firstNameOf, nameOf } from '../../data/contacts';
 import { can, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
@@ -563,6 +563,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     showAuthor={!sameRun(prev, m, kind)}
                     showAvatar={!sameRun(m, next, kind)}
                     authorTitle={authorTitle(m)}
+                    onOpenAuthor={(who) => {
+                      const person = contactOf(who);
+                      if (!person || who === ME) return;
+                      ensureContactChat(person);
+                      navigate(`/chat/${who}/contact`);
+                    }}
                     query={q}
                     activeMatch={m.id === activeId}
                     test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}

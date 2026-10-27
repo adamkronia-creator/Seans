@@ -500,3 +500,12 @@
   background: var(--action-primary);
   color: var(--action-primary-text);
 }
+
+/* Фото автора — кнопка: открывает профиль человека */
+button.bubble__avatar {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
