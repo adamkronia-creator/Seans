@@ -209,3 +209,16 @@ html.is-grabbing * {
   hyphens: none;
   -webkit-hyphens: none;
 }
+
+/* Однострочное поле на textarea (components/LineInput): шрифт как у обычного поля, без ручки изменения размера и полос прокрутки */
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.line-input {
+  display: block;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+}

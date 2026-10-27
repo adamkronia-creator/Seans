@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { LineInput } from '../../components/LineInput/LineInput';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { IconChevronDown, IconChevronUp, IconTrash } from '../../components/ChatParts/ChatIcons';
@@ -114,13 +115,13 @@ function formatBirthday(raw: string): string {
   return `${day} ${MONTHS[month]} ${year} (${age} ${unit})`;
 }
 
-function TextInput({ icon, label, value, onChange, onBlur, placeholder, max, type, inputMode }: { icon: ReactNode; label: string; value: string; onChange: (value: string) => void; onBlur?: (value: string) => void; placeholder: string; max: number; type?: string; inputMode?: 'tel' }) {
+function TextInput({ icon, label, value, onChange, onBlur, placeholder, max, type, inputMode }: { icon: ReactNode; label: string; value: string; onChange: (value: string) => void; onBlur?: (value: string) => void; placeholder: string; max: number; type?: 'text' | 'tel'; inputMode?: 'tel' }) {
   return (
     <label className="pe__input">
       <span className="pe__input-icon">{icon}</span>
       <span className="pe__input-body">
       <span className="pe__label">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur ? (e) => onBlur(e.target.value) : undefined} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
+      <LineInput value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur ? (e) => onBlur(e.target.value) : undefined} placeholder={placeholder} {...plainText} type={type} inputMode={inputMode} maxLength={max} />
       </span>
     </label>
   );
@@ -291,9 +292,9 @@ export function ProfileEditPage() {
         <section className="pe__card" aria-label="Общая информация">
           <TextInput icon={FieldIcon.cake} label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
           <TextInput icon={FieldIcon.badge} label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
-          <TextInput icon={FieldIcon.user} label="Пол" value={gender} onChange={(v) => updateBasics({ gender: v })} placeholder="Например, женский" max={30} />
-          <TextInput icon={FieldIcon.heart} label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
           <TextInput icon={FieldIcon.city} label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
+          <TextInput icon={FieldIcon.heart} label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
+          <TextInput icon={FieldIcon.user} label="Пол" value={gender} onChange={(v) => updateBasics({ gender: v })} placeholder="Например, женский" max={30} />
         </section>
 
         <div className="pe__group">
@@ -305,7 +306,7 @@ export function ProfileEditPage() {
             {fields.map((field, i) => (
               <li key={field.id} className={`pe__card pe__field${leaving === field.id ? ' pe__field--leaving' : ''}`} data-field={field.id}>
                 <div className="pe__field-head">
-                  <input
+                  <LineInput
                     className="pe__field-label"
                     value={field.label}
                     onChange={(e) => updateField(field.id, { label: e.target.value })}

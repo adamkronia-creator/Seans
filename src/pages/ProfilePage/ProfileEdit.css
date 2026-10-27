@@ -163,7 +163,8 @@
   line-height: var(--line-height-xs);
 }
 
-.pe__input input {
+.pe__input input,
+.pe__input textarea {
   display: block;
   width: 100%;
   padding: 0;
@@ -178,6 +179,7 @@
 }
 
 .pe__input input::placeholder,
+.pe__input textarea::placeholder,
 .pe__field-label::placeholder,
 .pe__field-text::placeholder {
   color: var(--color-text-caption);
@@ -511,6 +513,7 @@
 }
 
 [data-pm] .pe__input input,
+[data-pm] .pe__input textarea,
 [data-pm] .pe__field-label,
 [data-pm] .pe__field-text {
   color: var(--text-primary);
@@ -523,6 +526,7 @@
 }
 
 [data-pm] .pe__input input::placeholder,
+[data-pm] .pe__input textarea::placeholder,
 [data-pm] .pe__field-label::placeholder,
 [data-pm] .pe__field-text::placeholder {
   color: var(--text-secondary);

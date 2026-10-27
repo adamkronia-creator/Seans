@@ -1,4 +1,5 @@
 import { useEffect, useId, useState, type CSSProperties } from 'react';
+import { LineInput } from '../LineInput/LineInput';
 import { HEAD_ICONS } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
 import { RichEditor } from '../RichEditor/RichEditor';
@@ -187,7 +188,7 @@ export function EditSheet({
                   <label className="sheet__row-label" htmlFor={`${uid}-row-${i}`}>
                     {label}
                   </label>
-                  <input
+                  <LineInput
                     id={`${uid}-row-${i}`}
                     className="sheet__row-input"
                     value={rows[i] ?? ''}

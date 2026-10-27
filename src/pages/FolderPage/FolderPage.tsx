@@ -1,4 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { LineInput } from '../../components/LineInput/LineInput';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Collapse } from '../../components/EditSheet/EditSheet';
 import '../../components/EditSheet/EditSheet.css';
@@ -219,7 +220,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
   const [asking, setAsking] = useState(false);
   const [entries] = useState(() => entriesOf(scope));
   const [created] = useState(() => isFreshFolder(id));
-  const field = useRef<HTMLInputElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
 
   // Новая папка: сразу пишем название поверх «Новая папка»
   useLayoutEffect(() => {
@@ -303,7 +304,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           <label className="fp__field">
             <span className="fp__heading">Название папки</span>
             <span className="fp__input-row">
-              <input
+              <LineInput
                 ref={field}
                 className="fp__input"
                 value={name}

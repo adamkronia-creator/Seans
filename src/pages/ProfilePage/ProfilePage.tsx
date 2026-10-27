@@ -169,9 +169,9 @@ export function ProfilePage() {
           rows={[
             { label: 'Дата рождения', value: birthday },
             { label: 'Специализация', value: headline },
-            { label: 'Пол', value: gender },
-            { label: 'Семейное положение', value: family },
             { label: 'Город', value: city },
+            { label: 'Семейное положение', value: family },
+            { label: 'Пол', value: gender },
           ]}
           onEdit={() => edit()}
         />

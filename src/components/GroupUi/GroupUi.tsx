@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { LineInput } from '../LineInput/LineInput';
 import { createPortal } from 'react-dom';
 import { CATEGORIES } from '../../data/chats';
 import { ME, avatarOf, byName, contactOf, firstNameOf, nameOf, type Contact } from '../../data/contacts';
@@ -387,7 +388,7 @@ interface FieldProps {
 export function Field({ label, value, onChange, placeholder, max, multiline, autoFocus, status, hint, prefix, inputMode = 'text', emoji, onEnter }: FieldProps) {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const host = emojiOpen ? box.current?.closest('.fp') ?? null : null;
   useEffect(() => {
     if (!host) return;
@@ -411,7 +412,7 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
   const input = multiline ? (
     <AutoTextarea className="fp__input gu-textarea" value={value} placeholder={placeholder} rows={3} autoFocus={autoFocus} {...plainText} onChange={set} />
   ) : (
-    <input
+    <LineInput
       ref={inputRef}
       className="fp__input"
       value={value}

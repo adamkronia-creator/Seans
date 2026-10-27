@@ -9,6 +9,7 @@ import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/co
 import { useStoryAuthors } from '../../data/stories';
 import { setArchived, setBlockedMany, setMutedMany, setPinnedMany, setSubscribed, useChat, useMessages } from '../../data/chatStore';
 import { countOf, useClientData } from '../../data/clientStore';
+import { PERSON_PROFILES } from '../../data/contactProfiles';
 import { roleOf } from '../../data/roles';
 import { goBack, navigate } from '../../router';
 import { heroAvatar } from '../../utils/initialsAvatar';
@@ -32,6 +33,7 @@ import {
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { ContactTabs } from './ContactTabs';
 import '../FolderPage/FolderPage.css';
+import '../ProfilePage/ProfilePage.css';
 import './ContactPage.css';
 
 export type ContactSheet = 'edit' | 'role' | 'gift' | 'report' | 'delete' | 'clear' | 'block';
@@ -47,6 +49,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const [toast, say] = useToast();
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
+  const [readMore, setReadMore] = useState(false);
   // Экран профиля: на нём лежит просмотр историй
   const [screen, setScreen] = useState<HTMLElement | null>(null);
   const groups = useMessages(chatId);
@@ -61,6 +64,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   );
 
   if (!chat) return <section className="fp ct" />;
+  const personal = PERSON_PROFILES[chatId]?.fields ?? [];
 
   const copy = (text: string, done: string) => {
     void navigator.clipboard?.writeText(text).then(() => say(done), () => say('Не удалось скопировать'));
@@ -128,11 +132,9 @@ export function ContactPage({ chatId }: { chatId: string }) {
   ];
 
   const rows: { key: string; value: string; label: string; onClick?: () => void; icon: ReactNode; action?: JSX.Element }[] = [
-    chat.username ? { key: 'user', value: chat.username, label: 'Никнейм', icon: FieldIcon.at, onClick: () => copy(chat.username!, 'Никнейм скопирован'), action: <IconCopyLine /> } : null,
     chat.phone ? { key: 'phone', value: chat.phone, label: 'Телефон', icon: FieldIcon.phone, onClick: () => copy(chat.phone!, 'Номер скопирован'), action: <IconCopyLine /> } : null,
-    chat.about ? { key: 'about', value: chat.about, label: 'О себе', icon: FieldIcon.about } : null,
+    chat.username ? { key: 'user', value: chat.username, label: 'Никнейм', icon: FieldIcon.at, onClick: () => copy(chat.username!, 'Никнейм скопирован'), action: <IconCopyLine /> } : null,
     chat.birthday ? { key: 'birth', value: chat.birthday, label: 'День рождения', icon: FieldIcon.cake } : null,
-    { key: 'role', value: roleOf(chat), label: 'Роль', icon: FieldIcon.tag, onClick: () => setSheet('role') },
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
   return (
@@ -216,6 +218,31 @@ export function ContactPage({ chatId }: { chatId: string }) {
               })}
             </ul>
           </section>
+
+          {personal.length > 0 && (
+            <section className="profile__card" aria-labelledby="contact-info">
+              <header className="profile__card-head">
+                <h2 id="contact-info" className="profile__card-title">
+                  Личная информация
+                </h2>
+              </header>
+              <ul className="profile__fields">
+                {(readMore ? personal : personal.slice(0, 1)).map((field) => (
+                  <li key={field.label}>
+                    <div className="profile__field person__field">
+                      <span className="profile__field-label">{field.label}</span>
+                      <span className="profile__field-value">{field.value}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              {personal.length > 1 && (
+                <button type="button" className="profile__add" aria-expanded={readMore} onClick={() => setReadMore(!readMore)}>
+                  {readMore ? 'Свернуть' : 'Читать далее'}
+                </button>
+              )}
+            </section>
+          )}
 
           {materials && (
             <section className="fp__card ct__card" aria-label="Материалы">

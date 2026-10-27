@@ -637,7 +637,8 @@
   color: var(--action-primary);
 }
 
-.nc-field input {
+.nc-field input,
+.nc-field textarea {
   flex: 1;
   min-width: 0;
   height: var(--size-bar);
@@ -651,12 +652,14 @@
   font: var(--type-body);
 }
 
-.nc-field input::placeholder {
+.nc-field input::placeholder,
+.nc-field textarea::placeholder {
   color: var(--text-secondary);
 }
 
 /* В фокусе подпись уже стоит на рамке, подсказка внутри не нужна (у телефона она остаётся: это образец номера) */
-.nc-field:not(.nc-field--always) input:focus::placeholder {
+.nc-field:not(.nc-field--always) input:focus::placeholder,
+.nc-field:not(.nc-field--always) textarea:focus::placeholder {
   color: transparent;
 }
 
@@ -849,4 +852,10 @@
 /* Тип канала: между названием и подписью 4 */
 [data-pm] .gu-row--top:has(.gu-radio) .gu-row__text {
   gap: var(--space-1);
+}
+
+/* Поле в рамке — textarea в одну строку: высота 56 как у input, текст по центру */
+.nc-field textarea {
+  box-sizing: border-box;
+  padding-block: var(--space-4);
 }
