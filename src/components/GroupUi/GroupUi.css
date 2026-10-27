@@ -753,3 +753,8 @@
   border-radius: var(--radius-full);
   background: var(--glass-icon-disc);
 }
+
+/* Отступ от разделителя до первой строки и от последней до края панели — как между строками (аватары 48 в строках 64: просвет 16) */
+[data-pm] .gu-rows--inset {
+  padding-block: var(--space-2);
+}

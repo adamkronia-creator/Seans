@@ -67,7 +67,7 @@ function StartScreen() {
       </div>
       {!searching && (
         <Card label="Создать">
-          <div className="gu-rows gu-rows--split">
+          <div className="gu-rows gu-rows--split gu-rows--inset">
             <Row tone="link" icon={<IconUsersGroup />} title="Создать общий чат" onClick={() => begin('group')} />
             <Row tone="link" icon={<IconStation />} title="Создать канал" onClick={() => begin('channel')} />
           </div>

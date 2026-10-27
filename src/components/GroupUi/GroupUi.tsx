@@ -322,7 +322,7 @@ export function ContactList({ contacts, chosen, onPick, none = 'Контакто
       {groupContacts(shown).map((section) => (
         <section key={section.key} className="fp__card" aria-label={section.label}>
           <h2 className="fp__heading fp__heading--pad">{section.label}</h2>
-          <div className="gu-rows">
+          <div className="gu-rows gu-rows--inset">
             {section.items.map((c) => (
               <PersonRow key={c.id} id={c.id} check={chosen ? chosen.includes(c.id) : undefined} note={c.status} onClick={() => onPick(c)} />
             ))}
