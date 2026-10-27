@@ -725,3 +725,28 @@
 [data-pm] .fp__add {
   min-height: var(--row-h-2);
 }
+
+/* Счётчик в превью чипса: заливка и цифра по «Цвету счётчика», как на чипсе в ряду */
+[data-pm] .fp__preview {
+  gap: var(--space-2);
+}
+
+[data-pm] .fp__preview[data-paint-badge] .badge {
+  background: var(--badge-bg);
+  color: var(--badge-on);
+}
+
+/* «Выбранные чаты»: отступ сверху до «Добавить» и снизу после последней строки — 8, как в списках контактов (просвет между аватарами 16) */
+[data-pm] .fp__card:not(.fp__delete) > .fp__add {
+  min-height: calc(var(--row-h-2) + var(--space-2));
+  padding-top: var(--space-2);
+}
+
+[data-pm] .fp__card:not(.fp__delete) > .fp__add:last-child {
+  min-height: calc(var(--row-h-2) + var(--space-2));
+  padding-bottom: var(--space-2);
+}
+
+[data-pm] .fp__list > li:last-child {
+  padding-bottom: var(--space-4); /* 8 строки + 8 отступа: аватар на 16 от края карточки */
+}

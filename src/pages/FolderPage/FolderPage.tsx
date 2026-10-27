@@ -2,6 +2,8 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Collapse } from '../../components/EditSheet/EditSheet';
 import '../../components/EditSheet/EditSheet.css';
+import { Badge } from '../../components/Badge/Badge';
+import { inkOn } from '../../components/Chip/Chip';
 import { Switch } from '../../components/Switch/Switch';
 import { TONES } from '../../data/tones';
 import { Frame } from '../../components/Frame/Frame';
@@ -283,10 +285,13 @@ export function FolderPage({ scope, id }: FolderPageProps) {
         {/* Как шапка открытого чата: «назад», затем чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись */}
         <span
           className="fp__preview"
-          style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }) } as CSSProperties}
+          style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }), ...(folder.badge && { '--badge-bg': folder.badge, '--badge-on': inkOn(folder.badge) }) } as CSSProperties}
+          data-paint-badge={folder.badge}
           aria-hidden="true"
         >
           <span className="fp__preview-text">{folder.name}</span>
+          {/* Пример счётчика: 12 непрочитанных, чтобы цвет счётчика было видно сразу */}
+          <Badge count={12} variant="inverse" />
         </span>
         <div className="fp__who">
           <h1 className="fp__title">Настройка папки</h1>
