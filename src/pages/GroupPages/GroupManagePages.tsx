@@ -276,7 +276,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
             inputMode="url"
             placeholder="psy_group"
             status={status === 'empty' ? null : { tone: status === 'free' ? 'ok' : 'error', text: USERNAME_TEXT[status] }}
-            hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этому адресу можно найти и открыть ' + (channel ? 'канал.' : 'общий чат.')}
+            hint={status === 'empty' ? USERNAME_TEXT.empty : undefined}
           />
           {!channel && (
             <Card hint="Приглашенные пользователи добавляются в общий чат после вашего одобрения.">
