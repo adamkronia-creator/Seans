@@ -577,37 +577,107 @@
   transform: scale(0.94);
 }
 
-/* Окно «Новый контакт»: код страны слева от номера, строки синхронизации и QR как строки списка */
-.gu-phone {
+/* Окно «Новый контакт» как в Telegram: поле — рамка, подпись в ней; пока поле пусто и не в фокусе, подпись стоит внутри как подсказка,
+   а когда в нём пишут или есть текст, она переезжает на рамку (разрыв в линии даёт legend) */
+.nc-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.nc-field {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.12s, border-color 0.12s;
 }
 
-.gu-phone__code {
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+.nc-field legend {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-4);
+  white-space: nowrap;
 }
 
-.gu-sync,
-.gu-qr {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  flex-direction: row;
-  min-height: var(--size-touch);
-  padding: var(--space-2) var(--space-4);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  text-align: left;
+.nc-field:focus-within legend,
+.nc-field:has(input:not(:placeholder-shown)) legend,
+.nc-field--always legend {
+  width: auto;
+  padding: 0 var(--space-1);
 }
 
-.gu-qr {
+.nc-field:focus-within {
+  border-color: var(--action-primary);
+  box-shadow: inset 0 0 0 1px var(--action-primary);
+}
+
+.nc-field:focus-within legend {
   color: var(--action-primary);
 }
 
-.gu-qr svg {
+.nc-field input {
+  flex: 1;
+  min-width: 0;
+  height: var(--size-bar);
+  margin-top: calc(var(--space-2) * -1);
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--text-primary);
+  caret-color: var(--action-primary);
+  font: var(--type-body);
+}
+
+.nc-field input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* В фокусе подпись уже стоит на рамке, подсказка внутри не нужна (у телефона она остаётся: это образец номера) */
+.nc-field:not(.nc-field--always) input:focus::placeholder {
+  color: transparent;
+}
+
+.nc-field__code {
+  flex-shrink: 0;
+  margin-top: calc(var(--space-2) * -1);
+  padding-right: var(--space-3);
+  border-right: 1px solid color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  margin-right: var(--space-3);
+  color: var(--text-primary);
+  font: var(--type-body);
+  line-height: var(--space-8);
+}
+
+.nc-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--size-touch);
+  padding: 0 var(--space-1);
+  color: var(--text-primary);
+  font: var(--type-body);
+  text-align: left;
+}
+
+/* Добавление по QR: под линией, по центру, акцентным цветом */
+.nc-row--qr {
+  justify-content: center;
+  border-top: var(--hairline) solid var(--divider);
+  border-radius: 0;
+  color: var(--action-primary);
+}
+
+.nc-row--qr svg {
   font-size: var(--size-icon-lg);
 }

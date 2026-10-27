@@ -106,37 +106,31 @@ function NewContactSheet({ onClose, onCreate, onQr }: { onClose: () => void; onC
       title="Новый контакт"
       onClose={onClose}
       footer={
-        <button type="button" className="sheet__button" disabled={!ready} onClick={() => onCreate(name, surname, digits)}>
+        <button type="button" className="sheet__button sheet__button--primary" disabled={!ready} onClick={() => onCreate(name, surname, digits)}>
           Создать контакт
         </button>
       }
     >
-      <section className="sheet__card frame-card">
-        <label className="frame-label" htmlFor="nc-name">
-          Имя (обязательно)
-        </label>
-        <input id="nc-name" className="frame-textarea" value={name} maxLength={64} autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)} />
-      </section>
-      <section className="sheet__card frame-card">
-        <label className="frame-label" htmlFor="nc-surname">
-          Фамилия (необязательно)
-        </label>
-        <input id="nc-surname" className="frame-textarea" value={surname} maxLength={64} autoComplete="off" onChange={(e) => setSurname(e.target.value)} />
-      </section>
-      <section className="sheet__card frame-card">
-        <label className="frame-label" htmlFor="nc-phone">
-          Номер телефона
-        </label>
-        <div className="gu-phone">
-          <span className="gu-phone__code">+7</span>
-          <input id="nc-phone" className="frame-textarea" type="tel" inputMode="tel" placeholder="000 000 0000" value={shown} autoComplete="off" onChange={(e) => setPhone(e.target.value)} />
-        </div>
-      </section>
-      <button type="button" className="sheet__card gu-sync" role="checkbox" aria-checked={sync} onClick={() => setSync(!sync)}>
+      <div className="nc-fields">
+        <fieldset className="nc-field">
+          <legend>Имя (обязательно)</legend>
+          <input aria-label="Имя" placeholder="Имя (обязательно)" value={name} maxLength={64} autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)} />
+        </fieldset>
+        <fieldset className="nc-field">
+          <legend>Фамилия</legend>
+          <input aria-label="Фамилия" placeholder="Фамилия (необязательно)" value={surname} maxLength={64} autoComplete="off" onChange={(e) => setSurname(e.target.value)} />
+        </fieldset>
+        <fieldset className="nc-field nc-field--always">
+          <legend>Номер телефона</legend>
+          <span className="nc-field__code">+7</span>
+          <input aria-label="Номер телефона" type="tel" inputMode="tel" placeholder="000 000 0000" value={shown} autoComplete="off" onChange={(e) => setPhone(e.target.value)} />
+        </fieldset>
+      </div>
+      <button type="button" className="nc-row" role="checkbox" aria-checked={sync} onClick={() => setSync(!sync)}>
         <RadioDot on={sync} />
         <span>Синхронизировать с телефоном</span>
       </button>
-      <button type="button" className="sheet__card gu-qr" onClick={onQr}>
+      <button type="button" className="nc-row nc-row--qr" onClick={onQr}>
         <IconQr />
         <span>Добавить по QR-коду</span>
       </button>
