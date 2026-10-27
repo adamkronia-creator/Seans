@@ -5,11 +5,16 @@
  */
 const FIELDS = 'input:not([type=hidden]):not([type=file]):not([type=checkbox]):not([type=radio]), textarea';
 
+let seq = 0;
+
 function mark(field: Element) {
   if (field.hasAttribute('data-autofill-off')) return;
   field.setAttribute('data-autofill-off', '');
-  if (!field.hasAttribute('autocomplete')) field.setAttribute('autocomplete', 'off');
-  if (!field.hasAttribute('name')) field.setAttribute('name', 'plain-text');
+  // «off» Chrome для адресов, имён и телефонов игнорирует; незнакомое значение он за подсказку для автозаполнения не считает.
+  // Имя у каждого поля своё и ничего не значит, иначе по имени и подписи поле опознаётся как «имя», «телефон» и т. д.
+  field.setAttribute('autocomplete', 'nope');
+  field.setAttribute('name', `f-${(seq += 1)}-${Math.random().toString(36).slice(2, 7)}`);
+  field.setAttribute('aria-autocomplete', 'none');
   field.setAttribute('data-form-type', 'other');
   field.setAttribute('data-lpignore', 'true');
   field.setAttribute('data-1p-ignore', 'true');

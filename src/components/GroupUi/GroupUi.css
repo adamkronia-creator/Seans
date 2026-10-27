@@ -755,8 +755,26 @@
 }
 
 /* Отступ от разделителя до первой строки и от последней до края панели — как между строками (аватары 48 в строках 64: просвет 16) */
-[data-pm] .gu-rows--inset {
-  padding-block: var(--space-2);
+[data-pm] .gu-rows--inset::before,
+[data-pm] .gu-rows--inset::after {
+  content: '';
+  flex-shrink: 0;
+  height: var(--space-2);
+}
+
+/* Блок «Создать»: строки лежат на своей подложке, поэтому отступ тоже — иначе скругление карточки пропадает */
+[data-pm] .gu-rows--split.gu-rows--inset::before,
+[data-pm] .gu-rows--split.gu-rows--inset::after {
+  background: var(--glass-card);
+}
+
+/* Просвет 1 px между строками не должен появляться между отступом и строкой */
+[data-pm] .gu-rows--inset::before {
+  margin-bottom: -1px; /* grid:ok — убирает просвет-разделитель 1 px */
+}
+
+[data-pm] .gu-rows--inset::after {
+  margin-top: -1px; /* grid:ok — убирает просвет-разделитель 1 px */
 }
 
 /* Выбор типа канала: радио на одной линии с названием, подпись под названием */

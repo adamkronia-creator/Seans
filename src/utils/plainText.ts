@@ -5,8 +5,8 @@
  * исправление слов и подсказки клавиатуры остаются включёнными.
  */
 export const plainText = {
-  name: 'plain-text',
-  autoComplete: 'off',
+  name: 'plain-text', // при показе заменяется на уникальное (utils/noAutofill.ts)
+  autoComplete: 'nope',
   'data-form-type': 'other',
   'data-lpignore': 'true',
   'data-1p-ignore': 'true',

@@ -35,13 +35,13 @@ export function EditContactSheet({ chat, onSave, onClose }: { chat: Chat; onSave
         <label className="frame-label" htmlFor={`${uid}-name`}>
           Имя
         </label>
-        <input id={`${uid}-name`} className="frame-textarea" value={name} maxLength={40} autoComplete="off" name="contact-name" onChange={(e) => setName(e.target.value)} placeholder="Имя и фамилия" />
+        <input id={`${uid}-name`} className="frame-textarea" value={name} maxLength={40} autoComplete="nope" name="contact-name" onChange={(e) => setName(e.target.value)} placeholder="Имя и фамилия" />
       </section>
       <section className="sheet__card frame-card">
         <label className="frame-label" htmlFor={`${uid}-phone`}>
           Телефон
         </label>
-        <input id={`${uid}-phone`} className="frame-textarea" type="tel" inputMode="tel" autoComplete="off" name="contact-phone" value={phone} maxLength={20} onChange={(e) => setPhone(e.target.value)} placeholder="+7 (900) 000-00-00" />
+        <input id={`${uid}-phone`} className="frame-textarea" type="tel" inputMode="tel" autoComplete="nope" name="contact-phone" value={phone} maxLength={20} onChange={(e) => setPhone(e.target.value)} placeholder="+7 (900) 000-00-00" />
       </section>
     </Frame>
   );
@@ -80,7 +80,7 @@ export function RoleSheet({ chat, onSave, onClose }: { chat: Chat; onSave: (role
           className="frame-textarea"
           value={value}
           maxLength={ROLE_MAX}
-          autoComplete="off"
+          autoComplete="nope"
           name="contact-role"
           onChange={(e) => setValue(e.target.value)}
           placeholder="Например, студент"

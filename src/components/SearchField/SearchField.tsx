@@ -34,7 +34,7 @@ export function SearchField({ value, onChange, placeholder, trailing, onClear, i
         onKeyDown={onKeyDown}
         name="dialog-search"
         enterKeyHint="search"
-        autoComplete="off"
+        autoComplete="nope"
         data-lpignore="true"
         data-1p-ignore="true"
         data-form-type="other"
