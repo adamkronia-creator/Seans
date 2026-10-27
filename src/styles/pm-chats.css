@@ -421,6 +421,7 @@ html:has([data-pm]) body {
 [data-pm] {
   --glass: rgb(255 255 255 / 0.55); /* нажатая строка */
   --glass-fill: rgb(255 255 255 / 0.34);
+  --glass-icon-disc: rgb(255 255 255 / 0.7); /* круг под значком строки на карточке: светлее карточки, как стеклянные кнопки */
   --glass-fill-panel: rgb(255 255 255 / 0.42);
   --glass-solid: rgb(255 255 255 / 0.92);
   --glass-border: transparent; /* обводок нет: края задаёт заливка */
@@ -701,6 +702,7 @@ html:has([data-pm]) body {
   --bg-subtle: rgb(255 255 255 / 0.12);
   --glass: rgb(255 255 255 / 0.16);
   --glass-fill: rgb(20 24 34 / 0.34);
+  --glass-icon-disc: rgb(255 255 255 / 0.12);
   --glass-fill-panel: rgb(20 24 34 / 0.46);
   --glass-fill-header: rgb(20 24 34 / 0.5);
   --glass-solid: rgb(34 38 50 / 0.9);

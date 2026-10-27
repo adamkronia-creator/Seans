@@ -751,5 +751,5 @@
   width: var(--space-12);
   height: var(--space-12);
   border-radius: var(--radius-full);
-  background: var(--bg-raised);
+  background: var(--glass-icon-disc);
 }
