@@ -80,7 +80,7 @@ export function ChatTabsPage({ chatId }: { chatId: string }) {
       </header>
       <div className="fp__scroll">
         <div className="fs__lead">
-          <p>Меняйте порядок вкладок и отключайте те, которыми не пользуетесь. Меню чата и листание страниц следуют вашему выбору.</p>
+          <p>Меняйте порядок вкладок для более комфортного взаимодействия, свайп разделов подстроится автоматически.</p>
         </div>
 
         <section className="fp__card" aria-label="Вкладки чата">
