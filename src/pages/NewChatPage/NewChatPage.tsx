@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Frame } from '../../components/Frame/Frame';
-import { Card, ContactList, ContactPicker, Field, Hint, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
-import { IconGlobal, IconLock, IconQr, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { Card, ContactList, ContactPicker, Field, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
+import { IconQr, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useToast } from '../../components/Toast/useToast';
 import { ensureContactChat } from '../../data/chatStore';
@@ -207,32 +207,28 @@ function ChannelType() {
   const status = usernameStatus(draft.username);
   const ok = !draft.isPublic || status === 'free';
   return (
-    <SubPage title="Тип канала" subtitle="Как люди смогут его найти" onBack={() => goBack('/new/channel')} footer={{ label: 'Далее', disabled: !ok, onClick: () => navigate('/new/channel/members') }}>
+    <SubPage title="Настройки канала" subtitle="Выбор формата" onBack={() => goBack('/new/channel')} footer={{ label: 'Далее', disabled: !ok, onClick: () => navigate('/new/channel/members') }}>
       <Card label="Тип канала">
         <Row
-          tall
-          icon={<IconLock />}
-          title="Частный"
-          note="Подписаться можно только по ссылке-приглашению"
-          role="radio"
-          checked={!draft.isPublic}
-          end={<RadioDot on={!draft.isPublic} />}
-          onClick={() => patchDraft({ isPublic: false })}
-        />
-        <Row
-          tall
-          icon={<IconGlobal />}
-          title="Публичный"
-          note="Его находят через поиск и открывают по адресу"
+          lead={<RadioDot on={draft.isPublic} />}
+          title="Открытый канал"
+          note="Открытый канал можно найти с помощью поиска и подписаться может любой человек"
           role="radio"
           checked={draft.isPublic}
-          end={<RadioDot on={draft.isPublic} />}
           onClick={() => patchDraft({ isPublic: true })}
         />
+        <Row
+          lead={<RadioDot on={!draft.isPublic} />}
+          title="Частный канал"
+          note="Частный канал является закрытым, подписаться можно только с помощью приглашения"
+          role="radio"
+          checked={!draft.isPublic}
+          onClick={() => patchDraft({ isPublic: false })}
+        />
       </Card>
-      {draft.isPublic ? (
+      {draft.isPublic && (
         <Field
-          label="Адрес канала"
+          label="Ссылка на канал"
           prefix="@"
           value={draft.username}
           onChange={(v) => patchDraft({ username: v.replace(/[\s@]/g, '') })}
@@ -240,10 +236,8 @@ function ChannelType() {
           inputMode="url"
           placeholder="psy_channel"
           status={status === 'empty' ? null : { tone: status === 'free' ? 'ok' : 'error', text: USERNAME_TEXT[status] }}
-          hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этому адресу канал можно найти и открыть.'}
+          hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этой ссылке канал можно найти и открыть.'}
         />
-      ) : (
-        <Hint>Ссылку-приглашение вы получите, когда канал будет создан: её можно скопировать или отправить в чат.</Hint>
       )}
     </SubPage>
   );
