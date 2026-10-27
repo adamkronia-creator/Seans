@@ -162,6 +162,17 @@ html:has([data-pm]) body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Число выбранных в шапке (чаты, тесты, задания): цифра на таком же круге 40, как под кнопками рядом, и размером со значки;
+   заливка и рамка общие с кнопками (правило «Белое стекло» ниже); три знака растягивают круг в пилюлю */
+[data-pm] .badge.badge--select {
+  min-width: var(--size-control);
+  height: var(--size-control);
+  padding: 0 var(--space-2);
+  color: var(--icon-action, var(--text-primary));
+  font-size: var(--size-icon-lg);
+  font-weight: var(--font-weight-medium);
+}
+
 [data-pm] .badge--accent {
   background: var(--chat-unread-bg);
   color: var(--chat-unread-text);
@@ -502,6 +513,7 @@ html:has([data-pm]) body {
 /* Белое стекло: кнопки «поиск» и «оповещения», невыбранные чипсы (слой под подписью гаснет там, где её накрывает синяя плашка),
    плитка «добавить историю», поле поиска */
 [data-pm] .chats-header__action,
+[data-pm] .badge--select,
 [data-pm] .stories__add,
 [data-pm] .chats-header .search-field,
 [data-pm] .screen-header__chips .chip--follow::before {

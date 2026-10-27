@@ -122,7 +122,7 @@ export function useChatSelection(say: (text: string) => void) {
           <IconCloseMk />
         </button>
         <span className="chats-header__count" aria-live="polite" aria-label={`Выбрано: ${n}`}>
-          <Badge count={n} />
+          <Badge count={n} variant="select" />
         </span>
         <button
           type="button"

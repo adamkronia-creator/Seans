@@ -1,3 +1,4 @@
+import { Badge } from '../../components/Badge/Badge';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { IconCloseMk } from '../../components/ChatItem/ChatIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
@@ -117,8 +118,8 @@ export function useLibrarySelection(o: Options) {
         <button type="button" className="chats-header__action" aria-label="Отменить выбор" onClick={clear}>
           <IconCloseMk />
         </button>
-        <span key={n} className="chats-header__count" aria-live="polite">
-          {n}
+        <span className="chats-header__count" aria-live="polite" aria-label={`Выбрано: ${n}`}>
+          <Badge count={n} variant="select" showZero />
         </span>
         <button
           type="button"

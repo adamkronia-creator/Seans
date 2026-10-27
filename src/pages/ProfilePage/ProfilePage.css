@@ -479,14 +479,25 @@
 /* Сводка: стеклянная карточка из трёх ячеек */
 [data-pm] .profile__stats {
   margin-top: var(--space-4);
-  padding: var(--space-3) 0;
+  padding: 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--glass-card);
 }
 
+/* Разделители, как в карточке контакта: тонкая полупрозрачная линия на всю высоту ячейки */
+[data-pm] .profile__stat {
+  padding: var(--space-3) 0;
+}
+
 [data-pm] .profile__stat + .profile__stat {
-  border-left-color: var(--divider);
+  border-left: 0;
+  box-shadow: inset var(--hairline) 0 0 var(--divider);
+}
+
+/* Зазор до «Личной информации» тот же, что между блоками ниже: 16 */
+[data-pm] .profile__head {
+  padding-bottom: 0;
 }
 
 [data-pm] .profile__stat strong {
