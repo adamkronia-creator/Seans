@@ -173,20 +173,34 @@
   color: var(--text-link);
 }
 
-/* Точка выбора одного варианта */
+/* Точка выбора одного варианта: кольцо меняет цвет, а точка внутри вырастает с пружинкой (выбор виден по движению, а не только по цвету) */
 .gu-radio {
+  position: relative;
   flex-shrink: 0;
   box-sizing: border-box;
   width: var(--space-6);
   height: var(--space-6);
   border: 2px solid var(--text-secondary);
   border-radius: var(--radius-full);
-  transition: border-color 0.12s;
+  transition: border-color var(--dur-quick, 0.16s) ease;
+}
+
+.gu-radio::after {
+  content: '';
+  position: absolute;
+  inset: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  scale: 0;
+  transition: scale var(--dur-base, 0.24s) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
 .gu-radio--on {
   border-color: var(--action-primary);
-  background: radial-gradient(circle, var(--action-primary) 0 45%, transparent 50%);
+}
+
+.gu-radio--on::after {
+  scale: 1;
 }
 
 /* ---------- Выбор людей ---------- */
@@ -219,6 +233,8 @@
   background: var(--glass-card);
   color: var(--text-primary);
   font: var(--type-body);
+  /* Выбранный человек выскакивает в ряд чипсов с пружинкой */
+  animation: pop-in 0.28s var(--ease-spring) backwards;
 }
 
 .gu-chosen__name {
@@ -250,6 +266,17 @@
   background: var(--presence-online);
   color: #fff; /* grid:ok — белая галочка на зелёном круге */
   font-size: var(--space-3);
+  /* Отметка вырастает с пружинкой, когда человека выбрали, и сжимается, когда убрали; у выбранных при показе экрана она стоит сразу */
+  scale: 0;
+  opacity: 0;
+  transition:
+    scale var(--dur-base, 0.24s) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    opacity var(--dur-quick, 0.16s) ease;
+}
+
+.gu-pick__badge[data-on] {
+  scale: 1;
+  opacity: 1;
 }
 
 /* Поиск: стеклянное поле, как в шапке «Диалогов» */
@@ -304,10 +331,15 @@
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
   overflow-wrap: anywhere;
+  /* Состояние поля («доступно», «занято») при смене всплывает, а не подменяется: разметка с key пересоздаёт надпись */
+  animation: swap-in var(--dur-base, 0.24s) var(--ease-ios, ease-out) backwards;
 }
 
 .gu-status--error {
   color: var(--error-text);
+  animation:
+    swap-in var(--dur-base, 0.24s) var(--ease-ios, ease-out) backwards,
+    shake 0.36s 0.12s ease-in-out;
 }
 
 .gu-status--ok {
@@ -875,4 +907,18 @@
   margin-inline: 0;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
+}
+
+/* Тем, кто просит поменьше движения, точка выбора и отметка на аватаре возникают сразу */
+@media (prefers-reduced-motion: reduce) {
+  .gu-radio::after,
+  .gu-pick__badge {
+    transition: none;
+  }
+
+  .gu-chosen__chip,
+  .gu-status,
+  .gu-status--error {
+    animation: none;
+  }
 }

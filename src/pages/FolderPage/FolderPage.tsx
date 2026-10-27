@@ -183,7 +183,7 @@ function PickSheet({ scope, folder, entries, onClose }: PickProps) {
               <li key={entry.id}>
                 <button type="button" role="checkbox" aria-checked={on} className="fp-pick__row" onClick={() => toggle(entry.id)}>
                   <span className={`fp-pick__box${on ? ' fp-pick__box--on' : ''}`} aria-hidden="true">
-                    {on && <IconCheck />}
+                    <IconCheck />
                   </span>
                   {entry.visual}
                   <EntryText entry={entry} prefix="fp-pick" />

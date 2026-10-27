@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Card, ContactPicker, Empty, Field, Hint, PersonRow, Row, SubPage, SwitchRow } from '../../components/GroupUi/GroupUi';
 import { IconLinkRound, IconShieldKey, IconUserCross, IconUserPlus } from '../../components/GroupUi/GroupIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
@@ -22,6 +22,7 @@ import {
   type AdminRights,
 } from '../../data/groups';
 import { goBack, navigate, navigateOver } from '../../router';
+import { useListMotion } from '../../utils/listMotion';
 import { gPath, rolePills, roleName, useMemberActions } from './shared';
 
 /*
@@ -39,6 +40,9 @@ export function GroupMembersPage({ chatId }: { chatId: string }) {
   const [toast, say] = useToast();
   const people = useMemberActions(info, say);
   const [query, setQuery] = useState('');
+  // Исключили, заблокировали, назначили администратором: строки уходят и переезжают плавно, а не прыгают
+  const rows = useRef<HTMLDivElement>(null);
+  useListMotion(rows, { view: query, leave: true });
   const back = () => goBack(gPath(chatId));
   if (!info) return <SubPage title="Пользователи" onBack={back}>{null}</SubPage>;
   const channel = info.kind === 'channel';
@@ -68,7 +72,7 @@ export function GroupMembersPage({ chatId }: { chatId: string }) {
           <Empty>Никого не нашли</Empty>
         </Card>
       ) : (
-        <Card>
+        <Card listRef={rows}>
           {list.map((m) => (
             <PersonRow key={m.id} id={m.id} pills={rolePills(m)} note={m.silenced ? 'Нельзя писать' : undefined} onClick={m.id === ME ? undefined : () => people.open(m.id)} />
           ))}
@@ -120,6 +124,8 @@ export function GroupAddMembersPage({ chatId }: { chatId: string }) {
 /** Администраторы: владелец и назначенные; нажатие открывает права, кнопка сверху ведёт к выбору нового */
 export function GroupAdminsPage({ chatId }: { chatId: string }) {
   const info = useGroup(chatId);
+  const rows = useRef<HTMLDivElement>(null);
+  useListMotion(rows, { leave: true });
   const back = () => goBack(gPath(chatId, 'edit'));
   if (!info) return <SubPage title="Администраторы" onBack={back}>{null}</SubPage>;
   const staff = sortedMembers(info).filter((m) => m.role !== 'member');
@@ -141,7 +147,7 @@ export function GroupAdminsPage({ chatId }: { chatId: string }) {
           </li>
         </ul>
       )}
-      <Card>
+      <Card listRef={rows}>
         {staff.map((m) => (
           <PersonRow
             key={m.id}

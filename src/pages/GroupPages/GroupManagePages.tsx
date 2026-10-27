@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActionSheet, Card, CheckMark, Empty, Field, Hint, PersonAvatar, PersonRow, PhotoField, RadioDot, Row, SubPage, SwitchRow } from '../../components/GroupUi/GroupUi';
 import {
   IconCheckMark,
   IconCloseLine,
-  IconCopyLine,
   IconDotsV,
   IconShareLine,
   IconGlobal,
@@ -18,6 +17,7 @@ import {
   IconUserCheck,
   IconUsersGroup,
 } from '../../components/GroupUi/GroupIcons';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, useLinkTools } from '../../components/GroupUi/LinkTools';
@@ -54,6 +54,7 @@ import {
   type GroupInfo,
 } from '../../data/groups';
 import { goBack, goBackBy, navigate } from '../../router';
+import { useListMotion } from '../../utils/listMotion';
 import { gPath, useMemberActions } from './shared';
 
 /*
@@ -297,7 +298,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
               </div>
               <div className="gu-invite__btns">
                 <button type="button" className="gu-invite__btn" onClick={() => tools.copy(targetOfLink(primary).url)}>
-                  <IconCopyLine />
+                  <CopyIcon />
                   Скопировать
                 </button>
                 <button type="button" className="gu-invite__btn" onClick={() => tools.share(targetOfLink(primary))}>
@@ -420,6 +421,8 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
   const { info } = useGroupOf(chatId);
   const [toast, say] = useToast();
   const [who, setWho] = useState<string | null>(null);
+  const rows = useRef<HTMLDivElement>(null);
+  useListMotion(rows, { leave: true });
   if (!info) return <SubPage title="Заблокированные" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
   return (
     <SubPage title="Заблокированные" subtitle={info.banned.length ? `Заблокировано: ${info.banned.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={who === null}>
@@ -428,7 +431,7 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
           <Empty>Заблокированных нет</Empty>
         </Card>
       ) : (
-        <Card heading={`Заблокировано: ${info.banned.length}`} hint="Нажмите на человека, чтобы разблокировать.">
+        <Card listRef={rows} heading={`Заблокировано: ${info.banned.length}`} hint="Нажмите на человека, чтобы разблокировать.">
           {info.banned.map((id) => (
             <PersonRow key={id} id={id} presence={false} note="Заблокирован" onClick={() => setWho(id)} />
           ))}
@@ -463,6 +466,9 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
 export function GroupRequestsPage({ chatId }: { chatId: string }) {
   const { info } = useGroupOf(chatId);
   const [toast, say] = useToast();
+  // Заявку приняли или отклонили: строка сворачивается, а те, что ниже, подъезжают
+  const rows = useRef<HTMLDivElement>(null);
+  useListMotion(rows, { leave: true });
   if (!info) return <SubPage title="Заявки" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
   const channel = info.kind === 'channel';
   const noteOf = (r: GroupInfo['requests'][number]) => {
@@ -501,7 +507,7 @@ export function GroupRequestsPage({ chatId }: { chatId: string }) {
               />
             </Card>
           )}
-          <Card heading={`Заявки: ${info.requests.length}`}>
+          <Card listRef={rows} heading={`Заявки: ${info.requests.length}`}>
             {info.requests.map((r) => (
               <PersonRow
                 key={r.id}

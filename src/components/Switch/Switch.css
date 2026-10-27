@@ -5,9 +5,11 @@
   height: 28px;
   border-radius: var(--radius-pill);
   background: var(--color-bg-fill-strong);
-  transition: background 0.15s;
+  transition: background-color var(--dur-base, 0.24s) ease;
 }
 
+/* Ползунок переезжает с пружинкой, чуть проскакивая край (в зазоре 2 px это незаметно, но живо), а под пальцем вытягивается, как на телефоне.
+   Включённый вытягивается влево, чтобы правый край стоял на месте */
 .switch::after {
   content: '';
   position: absolute;
@@ -15,10 +17,12 @@
   left: 2px; /* grid:ok — зазор бегунка */
   width: 24px;
   height: 24px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   background: #fff;
   box-shadow: 0 1px 3px rgb(19 32 58 / 25%);
-  transition: transform 0.15s;
+  transition:
+    transform 0.34s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    width var(--dur-quick, 0.16s) var(--ease-ios, ease-out);
 }
 
 .switch--on {
@@ -27,4 +31,22 @@
 
 .switch--on::after {
   transform: translateX(16px); /* 44 − 24 − 2 × 2 */
+}
+
+/* Нажатая строка или сам переключатель: ползунок шире на 4 px (у включённого сдвиг на столько же меньше) */
+.switch:active::after,
+:active > .switch::after {
+  width: 28px; /* grid:ok — вытянутый под пальцем ползунок */
+}
+
+.switch--on:active::after,
+:active > .switch--on::after {
+  transform: translateX(12px); /* grid:ok — 16 − 4: правый край на месте */
+}
+
+/* Тем, кто просит поменьше движения, ползунок встаёт на место сразу, а цвет дорожки всё так же меняется плавно */
+@media (prefers-reduced-motion: reduce) {
+  .switch::after {
+    transition: none;
+  }
 }

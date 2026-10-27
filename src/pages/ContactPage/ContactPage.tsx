@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
@@ -13,11 +13,12 @@ import { PERSON_PROFILES } from '../../data/contactProfiles';
 import { roleOf } from '../../data/roles';
 import { goBack, navigate } from '../../router';
 import { heroAvatar } from '../../utils/initialsAvatar';
+import { copyText } from '../../utils/clipboard';
+import { useChangePulse } from '../../utils/pulse';
 import { useSwipeBack } from '../../utils/swipeBack';
 import {
   IconBlock,
   IconChatBubble,
-  IconCopyLine,
   IconDotsV,
   IconEraser,
   IconFlag,
@@ -32,6 +33,7 @@ import {
 } from './ContactIcons';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { ContactTabs } from './ContactTabs';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
 import '../FolderPage/FolderPage.css';
 import '../ProfilePage/ProfilePage.css';
 import '../../components/TestSettings/TestSettings.css';
@@ -59,6 +61,9 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const links = useMemo(() => [...linksIn(groups), ...(SHARED_LINKS[chatId] ?? [])], [groups, chatId]);
   const back = () => goBack(`/chat/${chatId}`);
   useSwipeBack('.ct', menu === null && sheet === null, back);
+  // Колокольчик в кнопке «Звук» звенит, когда звук включили, и сжимается, когда выключили
+  const actionsRef = useRef<HTMLDivElement>(null);
+  useChangePulse(actionsRef, chat?.muted, chat?.muted ? 'pop' : 'ring', '[data-tile="mute"] svg');
 
   const materials = useMemo(
     () => (chatId === 'maxim' ? [['Сеансы', countOf(clientData, 'session')], ['Тесты', countOf(clientData, 'test')], ['Задания', countOf(clientData, 'task')]] as const : null),
@@ -69,7 +74,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const personal = PERSON_PROFILES[chatId]?.fields ?? [];
 
   const copy = (text: string, done: string) => {
-    void navigator.clipboard?.writeText(text).then(() => say(done), () => say('Не удалось скопировать'));
+    void copyText(text).then((ok) => say(ok ? done : 'Не удалось скопировать'));
   };
   const share = () => {
     const text = [chat.name, roleOf(chat), chat.phone, chat.username].filter(Boolean).join('\n');
@@ -134,8 +139,8 @@ export function ContactPage({ chatId }: { chatId: string }) {
   ];
 
   const rows: { key: string; value: string; label: string; onClick?: () => void; icon: ReactNode; action?: JSX.Element }[] = [
-    chat.phone ? { key: 'phone', value: chat.phone, label: 'Телефон', icon: FieldIcon.phone, onClick: () => copy(chat.phone!, 'Номер скопирован'), action: <IconCopyLine /> } : null,
-    chat.username ? { key: 'user', value: chat.username, label: 'Никнейм', icon: FieldIcon.at, onClick: () => copy(chat.username!, 'Никнейм скопирован'), action: <IconCopyLine /> } : null,
+    chat.phone ? { key: 'phone', value: chat.phone, label: 'Телефон', icon: FieldIcon.phone, onClick: () => copy(chat.phone!, 'Номер скопирован'), action: <CopyIcon /> } : null,
+    chat.username ? { key: 'user', value: chat.username, label: 'Никнейм', icon: FieldIcon.at, onClick: () => copy(chat.username!, 'Никнейм скопирован'), action: <CopyIcon /> } : null,
     chat.birthday ? { key: 'birth', value: chat.birthday, label: 'День рождения', icon: FieldIcon.cake } : null,
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
@@ -172,7 +177,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
         </div>
 
         <div className="ct__body">
-          <div className="ct__actions" role="group" aria-label="Действия">
+          <div ref={actionsRef} className="ct__actions" role="group" aria-label="Действия">
             <button type="button" className="ct__action" onClick={back}>
               <IconChatBubble />
               Чат
@@ -181,7 +186,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
               <IconUser />
               Профиль
             </button>
-            <button type="button" className="ct__action" aria-pressed={!chat.muted} onClick={toggleMute}>
+            <button type="button" className="ct__action" data-tile="mute" aria-pressed={!chat.muted} onClick={toggleMute}>
               {chat.muted ? <IconBellOff /> : <IconBellOn />}
               {chat.muted ? 'Без звука' : 'Звук'}
             </button>

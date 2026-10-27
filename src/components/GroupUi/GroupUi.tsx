@@ -1,4 +1,4 @@
-import { Children, useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { Children, useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type RefObject, type SVGProps } from 'react';
 import { LineInput } from '../LineInput/LineInput';
 import { createPortal } from 'react-dom';
 import { CATEGORIES } from '../../data/chats';
@@ -91,17 +91,25 @@ interface CardProps {
   label?: string;
   /** false: содержимое со своей подложкой (ссылка-приглашение) без отступов у краёв и просветов */
   inset?: boolean;
+  /** Список строк, который меняется на глазах (люди, заявки): строки уходят, приходят и переезжают плавно (utils/listMotion.ts; у строк есть data-row) */
+  listRef?: RefObject<HTMLDivElement>;
   children: ReactNode;
 }
 
 /** Блок страницы: стеклянная карточка с заголовком строкой и пояснением под ней. Строки лежат прямо в карточке: между ними просвет 1 px */
-export function Card({ heading, hint, label, inset = true, children }: CardProps) {
+export function Card({ heading, hint, label, inset = true, listRef, children }: CardProps) {
   return (
     <div className="gu-block">
       <section className="fp__card" aria-label={label ?? (typeof heading === 'string' ? heading : undefined)}>
         {heading && <h2 className="fp__heading fp__heading--pad">{heading}</h2>}
         {/* Пункты лежат на одной подложке: линия только под заголовком, между пунктами её нет; у одиночной строки без заголовка обёртка не нужна */}
-        {inset && (heading || Children.toArray(children).length > 1) ? <div className="gu-rows gu-rows--inset">{children}</div> : children}
+        {inset && (heading || listRef || Children.toArray(children).length > 1) ? (
+          <div ref={listRef} className="gu-rows gu-rows--inset">
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </section>
       {hint && <p className="gu-hint">{hint}</p>}
     </div>
@@ -134,10 +142,12 @@ interface RowProps {
   role?: 'checkbox' | 'radio';
   checked?: boolean;
   ariaLabel?: string;
+  /** Номер строки в списке, который двигается (data-row, см. Card listRef) */
+  rowId?: string;
 }
 
 /** Строка карточки: значок или аватар, название, пояснение, значение и стрелка справа. С onClick это кнопка */
-export function Row({ icon, lead, title, note, value, end, chevron, tone, onClick, disabled, tall, top, role, checked, ariaLabel }: RowProps) {
+export function Row({ icon, lead, title, note, value, end, chevron, tone, onClick, disabled, tall, top, role, checked, ariaLabel, rowId }: RowProps) {
   const cls = `gu-row${tone ? ` gu-row--${tone}` : ''}${tall || lead ? ' gu-row--tall' : ''}${top ? ' gu-row--top' : ''}`;
   const body = (
     <>
@@ -156,11 +166,13 @@ export function Row({ icon, lead, title, note, value, end, chevron, tone, onClic
     </>
   );
   return onClick ? (
-    <button type="button" className={cls} role={role} aria-checked={role ? Boolean(checked) : undefined} aria-label={ariaLabel} disabled={disabled} onClick={onClick}>
+    <button type="button" className={cls} data-row={rowId} role={role} aria-checked={role ? Boolean(checked) : undefined} aria-label={ariaLabel} disabled={disabled} onClick={onClick}>
       {body}
     </button>
   ) : (
-    <div className={cls}>{body}</div>
+    <div className={cls} data-row={rowId}>
+      {body}
+    </div>
   );
 }
 
@@ -191,7 +203,7 @@ export function SwitchRow({ icon, title, note, checked, onChange, disabled }: Sw
 export function CheckMark({ on }: { on: boolean }) {
   return (
     <span className={`fp-pick__box${on ? ' fp-pick__box--on' : ''}`} aria-hidden="true">
-      {on && <IconCheck />}
+      <IconCheck />
     </span>
   );
 }
@@ -245,14 +257,15 @@ export function PersonRow({ id, note, pills, check, end, chevron, onClick, prese
   return (
     <Row
       tall
+      rowId={id}
       role={check === undefined ? undefined : 'checkbox'}
       checked={check}
       ariaLabel={check === undefined ? undefined : name}
       lead={
         <span className="gu-pick">
           <PersonAvatar id={id} presence={presence && !check} />
-          {check && (
-            <span className="gu-pick__badge" aria-hidden="true">
+          {check !== undefined && (
+            <span className="gu-pick__badge" data-on={check || undefined} aria-hidden="true">
               <IconCheck />
             </span>
           )}
@@ -463,7 +476,7 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
           </span>
         </label>
         {status && (
-          <p className={`gu-status gu-status--${status.tone}`} role="status">
+          <p key={status.tone} className={`gu-status gu-status--${status.tone}`} role="status">
             {status.text}
           </p>
         )}

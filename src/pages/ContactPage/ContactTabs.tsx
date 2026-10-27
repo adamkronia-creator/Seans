@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Chip } from '../../components/Chip/Chip';
 import { StoryViewer } from '../../components/Stories/Stories';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
+import { useHeightMorph } from '../../utils/heightMorph';
 import { STORY_BACKGROUNDS, type Story, type StoryAuthor } from '../../data/stories';
 import type { SharedFile, SharedLink, SharedMedia } from '../../data/contactShared';
-import { IconCopyLine, IconFile, IconImage, IconLink, IconStory } from './ContactIcons';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
+import { IconFile, IconImage, IconLink, IconStory } from './ContactIcons';
 
 const TABS = ['Истории', 'Медиа', 'Файлы', 'Ссылки'] as const;
 type Tab = (typeof TABS)[number];
@@ -28,13 +30,26 @@ interface Props {
 export function ContactTabs({ author, root, stories, media, files, links, onCopy, whose = 'собеседника' }: Props) {
   const [tab, setTab] = useState<Tab>('Истории');
   const [viewing, setViewing] = useState<{ at: number; x: number; y: number } | null>(null);
+  // Вкладки разной высоты: блок не прыгает, а плавно растёт или сжимается, и всё, что ниже, едет вместе с ним
+  const block = useRef<HTMLElement>(null);
+  const remember = useHeightMorph(block, tab);
   return (
-    <section className="ct__tabs-block">
+    <section ref={block} className="ct__tabs-block">
       {/* Чипсы, как в «Диалогах» и «Истории» чата, в стеклянной капсуле */}
       <div className="ct__tabs">
         <div className="ct__chips" role="group" aria-label="Материалы">
           {TABS.map((name) => (
-            <Chip key={name} follow tone="chat" active={tab === name} onClick={() => setTab(name)}>
+            <Chip
+              key={name}
+              follow
+              tone="chat"
+              active={tab === name}
+              onClick={() => {
+                if (name === tab) return;
+                remember();
+                setTab(name);
+              }}
+            >
               {name}
             </Chip>
           ))}
@@ -125,7 +140,7 @@ export function ContactTabs({ author, root, stories, media, files, links, onCopy
                         onCopy(l.url, 'Ссылка скопирована');
                       }}
                     >
-                      <IconCopyLine />
+                      <CopyIcon />
                     </button>
                   </a>
                 </li>

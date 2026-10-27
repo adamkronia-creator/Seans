@@ -29,6 +29,38 @@
   opacity: 0.55;
 }
 
+/* Подсветка нажатого появляется сразу, а гаснет не рывком, а за --dur-release: как в системных списках.
+   :where() даёт нулевую специфичность: где у элемента есть своя transition, действует она. Во время нажатия длительность нулевая,
+   поэтому подсветка включается мгновенно, а плавно уходит только после отпускания */
+:where(
+    .chat-item__button,
+    .lib-card .test-card,
+    .chat .chat-tests__list .test-card,
+    .event-item__inner,
+    .blank-card__head,
+    .ts-row--link,
+    .msg-menu__item,
+    .chip-menu__item,
+    .gu-row,
+    .gu-list > *,
+    .fp__add,
+    .fp__delete,
+    .fp-pick__row,
+    .pe__row,
+    .profile__field,
+    .profile__add,
+    .sheet__close,
+    .hist-card__event--link
+  ) {
+  transition:
+    background-color var(--dur-release) ease-out,
+    opacity var(--dur-release) ease-out;
+}
+
+:where([data-pressed]) {
+  transition-duration: 0s;
+}
+
 /* Долгое нажатие на кнопку не выделяет текст и не вызывает системное меню (Safari на iPhone) */
 button,
 [role='button'],

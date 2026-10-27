@@ -10,6 +10,10 @@
   font-size: var(--size-icon-lg);
 }
 
+.ctabs .fs-row__name {
+  transition: color var(--dur-base, 0.24s) ease;
+}
+
 .ctabs__name--off {
   color: var(--text-secondary);
 }

@@ -299,12 +299,28 @@
   border-radius: var(--radius-full);
   color: var(--color-accent-on);
   font-size: 16px;
-  transition: background 0.12s, border-color 0.12s;
+  transition:
+    background-color var(--dur-quick, 0.16s) ease,
+    border-color var(--dur-quick, 0.16s) ease;
 }
 
 .fp-pick__box--on {
   border-color: var(--color-accent);
   background: var(--color-accent);
+}
+
+/* Галочка не появляется рывком: вырастает с пружинкой, а когда выбор сняли, сжимается */
+.fp-pick__box svg {
+  scale: 0.4;
+  opacity: 0;
+  transition:
+    scale var(--dur-base, 0.24s) var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    opacity var(--dur-quick, 0.16s) ease;
+}
+
+.fp-pick__box--on svg {
+  scale: 1;
+  opacity: 1;
 }
 
 /* ——— Стиль интерфейса (data-pm): фон-сцена, стеклянная шапка, блоки — стеклянные карточки с полями 16 и скруглением 20 ——— */
@@ -749,4 +765,11 @@
 
 [data-pm] .fp__list > li:last-child {
   padding-bottom: var(--space-4); /* 8 строки + 8 отступа: аватар на 16 от края карточки */
+}
+
+/* Тем, кто просит поменьше движения, галочка возникает сразу */
+@media (prefers-reduced-motion: reduce) {
+  .fp-pick__box svg {
+    transition: none;
+  }
 }

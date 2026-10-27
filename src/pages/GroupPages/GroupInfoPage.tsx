@@ -1,8 +1,9 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useRef, useState, type CSSProperties } from 'react';
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellOff, IconBellOn } from '../../components/FolderMenu/FolderIcons';
 import { HeaderButton, Card, PersonRow, Row } from '../../components/GroupUi/GroupUi';
-import { IconCopyLine, IconLeave, IconLinkRound, IconPenNew, IconUserCheck } from '../../components/GroupUi/GroupIcons';
+import { IconLeave, IconLinkRound, IconPenNew, IconUserCheck } from '../../components/GroupUi/GroupIcons';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, targetOfPublic, useLinkTools } from '../../components/GroupUi/LinkTools';
 import { IconChatBubble } from '../ContactPage/ContactIcons';
@@ -19,6 +20,8 @@ import { setMutedMany, useChat, useMessages } from '../../data/chatStore';
 import { canChangeInfo, canInvite, can, countWord, leaveGroup, myMember, shortUrl, sortedMembers, subtitleOf, useGroup } from '../../data/groups';
 import { goBack, goBackBy, navigate } from '../../router';
 import { heroAvatar } from '../../utils/initialsAvatar';
+import { useListMotion } from '../../utils/listMotion';
+import { useChangePulse } from '../../utils/pulse';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../FolderPage/FolderPage.css';
 import '../ContactPage/ContactPage.css';
@@ -49,6 +52,12 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
   const sharedLinks = useMemo(() => [...linksIn(groups), ...(SHARED_LINKS[chatId] ?? [])], [groups, chatId]);
   const back = () => goBack(`/chat/${chatId}`);
   useSwipeBack('.ct', !leaving && !tools.open && !people.active, back);
+  // Колокольчик в кнопке «Звук» звенит, когда звук включили, и сжимается, когда выключили
+  const actionsRef = useRef<HTMLDivElement>(null);
+  // Пользователей на странице пять: исключили или добавили — строки уходят, приходят и переезжают плавно
+  const peopleRef = useRef<HTMLDivElement>(null);
+  useListMotion(peopleRef, { leave: true });
+  useChangePulse(actionsRef, chat?.muted, chat?.muted ? 'pop' : 'ring', '[data-tile="mute"] svg');
   if (!chat || !info) return <section className="fp ct" />;
 
   const channel = info.kind === 'channel';
@@ -76,7 +85,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
         say(chat.muted ? 'Звук включён' : 'Звук отключён');
       },
     },
-    ...(link ? [{ key: 'link', label: 'Ссылка', icon: <IconCopyLine />, onClick: () => tools.copy(link.url) }] : []),
+    ...(link ? [{ key: 'link', label: 'Ссылка', icon: <CopyIcon />, onClick: () => tools.copy(link.url) }] : []),
   ];
   const leave = () => {
     setLeaving(false);
@@ -110,9 +119,9 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
         </div>
 
         <div className="ct__body">
-          <div className="ct__actions" role="group" aria-label="Действия" style={{ '--tiles': tiles.length } as CSSProperties}>
+          <div ref={actionsRef} className="ct__actions" role="group" aria-label="Действия" style={{ '--tiles': tiles.length } as CSSProperties}>
             {tiles.map((t) => (
-              <button key={t.key} type="button" className="ct__action" aria-pressed={t.pressed} onClick={t.onClick}>
+              <button key={t.key} type="button" className="ct__action" data-tile={t.key} aria-pressed={t.pressed} onClick={t.onClick}>
                 {t.icon}
                 {t.label}
               </button>
@@ -133,7 +142,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
                         <span className="ct__value">{shortUrl(link.url)}</span>
                       </span>
                       <span className="ct__row-icon">
-                        <IconCopyLine />
+                        <CopyIcon />
                       </span>
                     </button>
                   </li>
@@ -193,7 +202,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
             <div className="ts-desc-unit">
               <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Пользователи'}>
                 <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Пользователи'}: ${info.members.length}`}</h2>
-                <div className="gu-rows gu-rows--inset">
+                <div ref={peopleRef} className="gu-rows gu-rows--inset">
                   {mayInvite && (
                     <button type="button" className="fp__add" onClick={() => navigate(gPath(chatId, 'add'))}>
                       <span className="fp__add-icon" aria-hidden="true">

@@ -496,9 +496,17 @@
   font-variant-numeric: tabular-nums;
 }
 
-.bubble__reaction--mine {
+/* Два класса: общая плашка из ChatPage.css подключается позже и иначе перекрашивала бы и вашу реакцию в белый */
+.bubble__reaction.bubble__reaction--mine {
   background: var(--action-primary);
   color: var(--action-primary-text);
+}
+
+/* Ваша реакция включается и выключается сменой цвета, а не вспышкой */
+.bubble__reaction--count {
+  transition:
+    background-color var(--dur-quick, 0.16s) ease,
+    color var(--dur-quick, 0.16s) ease;
 }
 
 /* Фото автора — кнопка: открывает профиль человека */

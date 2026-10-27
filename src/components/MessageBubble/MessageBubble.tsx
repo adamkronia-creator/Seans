@@ -2,7 +2,7 @@ import { requestPass } from '../../data/selfTest';
 import { requestTaskPass, useAssignmentRecords } from '../../data/selfTask';
 import { recordsText, TASK_DEADLINES } from '../../data/taskValues';
 import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
-import { useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useAvatarSrc } from '../../data/profile';
 import { avatarOf, firstNameOf, nameOf } from '../../data/contacts';
 import type { Message } from '../../data/messages';
@@ -13,6 +13,7 @@ import type { LibraryItem } from '../../data/library';
 import { IconReadTicks } from '../icons';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import { IconPinned } from '../FolderMenu/FolderIcons';
+import { reducedMotion } from '../../utils/swipe';
 import { IconDownload as IconDownloadFile } from '../Profile/ProfileIcons';
 import './MessageBubble.css';
 
@@ -92,6 +93,40 @@ function FileBlock({ file }: { file: NonNullable<Message['file']> }) {
   );
 }
 
+/**
+ * Плашка реакции со счётчиком (группа и канал). Когда число меняется на глазах, плашка коротко «подпрыгивает», а цифра выезжает снизу (прибавилось)
+ * или сверху (убавилось); при первом показе чата ничего не играет. Подпрыгивание начинается с текущего размера: нажатие уже сжимало плашку (utils/pressEffect.ts).
+ */
+function CountReaction({ emoji, n, mine, onToggle }: { emoji: string; n: number; mine: boolean; onToggle: () => void }) {
+  const chip = useRef<HTMLButtonElement>(null);
+  const digits = useRef<HTMLSpanElement>(null);
+  const last = useRef(n);
+  useEffect(() => {
+    if (last.current === n) return;
+    const grew = n > last.current;
+    last.current = n;
+    if (reducedMotion() || !chip.current || !digits.current) return;
+    const from = parseFloat(getComputedStyle(chip.current).scale) || 1;
+    chip.current.animate([{ scale: from }, { scale: 1.16 }, { scale: 1 }], { duration: 320, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
+    digits.current.animate([{ opacity: 0, transform: `translateY(${grew ? 8 : -8}px)` }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)' });
+  }, [n]);
+  return (
+    <button
+      ref={chip}
+      type="button"
+      className={`bubble__reaction bubble__reaction--count${mine ? ' bubble__reaction--mine' : ''}`}
+      aria-pressed={mine}
+      aria-label={`Реакция ${emoji}: ${n}`}
+      onClick={onToggle}
+    >
+      <span className="bubble__reaction-emoji">{emoji}</span>
+      <span ref={digits} className="bubble__reaction-count">
+        {n}
+      </span>
+    </button>
+  );
+}
+
 /** Реакции под сообщением, как в Telegram: белая плашка, эмодзи и фото того, кто его поставил; у одинаковых реакций два фото рядом */
 function Reaction({ message, peerAvatar, onReact, counted }: { message: Message; peerAvatar?: string; onReact?: (m: Message, emoji: string | null) => void; counted?: boolean }) {
   const myAvatar = useAvatarSrc();
@@ -105,17 +140,7 @@ function Reaction({ message, peerAvatar, onReact, counted }: { message: Message;
     return (
       <span className="bubble__reactions">
         {[...totals].map(([emoji, n]) => (
-          <button
-            key={emoji}
-            type="button"
-            className={`bubble__reaction bubble__reaction--count${emoji === mine ? ' bubble__reaction--mine' : ''}`}
-            aria-pressed={emoji === mine}
-            aria-label={`Реакция ${emoji}: ${n}`}
-            onClick={() => onReact?.(message, emoji === mine ? null : emoji)}
-          >
-            <span className="bubble__reaction-emoji">{emoji}</span>
-            <span className="bubble__reaction-count">{n}</span>
-          </button>
+          <CountReaction key={emoji} emoji={emoji} n={n} mine={emoji === mine} onToggle={() => onReact?.(message, emoji === mine ? null : emoji)} />
         ))}
       </span>
     );

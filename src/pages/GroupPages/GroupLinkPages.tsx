@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, Field, Hint, Row, RadioDot, SubPage, SwitchRow } from '../../components/GroupUi/GroupUi';
-import { IconCopyLine, IconLinkRound, IconQr, IconRestart, IconShareLine, IconTrashLine, IconPenNew, IconUserCheck, IconGlobal, IconCloseCircle } from '../../components/GroupUi/GroupIcons';
+import { IconLinkRound, IconQr, IconRestart, IconShareLine, IconTrashLine, IconPenNew, IconUserCheck, IconGlobal, IconCloseCircle } from '../../components/GroupUi/GroupIcons';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
 import { targetOfLink, targetOfPublic, useLinkTools, type LinkTarget } from '../../components/GroupUi/LinkTools';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { useToast } from '../../components/Toast/useToast';
@@ -23,7 +24,7 @@ type Tools = ReturnType<typeof useLinkTools>;
 function LinkActions({ target, title, tools }: { target: LinkTarget; title: string; tools: Tools }) {
   return (
     <>
-      <Row icon={<IconCopyLine />} title="Копировать ссылку" onClick={() => tools.copy(target.url)} />
+      <Row icon={<CopyIcon />} title="Копировать ссылку" onClick={() => tools.copy(target.url)} />
       <Row icon={<IconShareLine />} title="Отправить ссылку" onClick={() => tools.share(target)} />
       <Row icon={<IconQr />} title="QR-код" onClick={() => tools.showQr(target.url, title)} />
     </>
@@ -49,7 +50,7 @@ export function GroupLinksPage({ chatId }: { chatId: string }) {
     <SubPage title="Ссылки-приглашения" subtitle={info.name} onBack={back} toast={toast} swipe={!tools.open && !resetting}>
       {info.isPublic && (
         <Card heading="Публичный адрес" hint="Адрес не меняется: по нему канал или общий чат находит поиск.">
-          <Row icon={<IconGlobal />} title={`@${info.username}`} note={shortUrl(targetOfPublic(info).url)} end={<IconCopyLine />} onClick={() => tools.copy(targetOfPublic(info).url)} />
+          <Row icon={<IconGlobal />} title={`@${info.username}`} note={shortUrl(targetOfPublic(info).url)} end={<CopyIcon />} onClick={() => tools.copy(targetOfPublic(info).url)} />
           <LinkActions target={targetOfPublic(info)} title={info.name} tools={tools} />
         </Card>
       )}

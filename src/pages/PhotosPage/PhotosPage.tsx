@@ -265,7 +265,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
 
       <div className="fp__scroll ph__scroll">
         {view !== 'album' && (
-          <PhotoTabs value={view} onChange={(next) => replace(next === 'albums' ? ALBUMS_PATH : PHOTOS_PATH)} photos={photos.length} albums={albums.length} />
+          <PhotoTabs value={view} onChange={(next) => replace(next === 'albums' ? ALBUMS_PATH : PHOTOS_PATH, 'fade')} photos={photos.length} albums={albums.length} />
         )}
         {body}
       </div>

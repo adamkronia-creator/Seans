@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { LineInput } from '../../components/LineInput/LineInput';
 import { Frame } from '../../components/Frame/Frame';
 import { Card, ContactList, ContactPicker, Field, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
-import { IconCopyLine, IconDotsV, IconQr, IconShareLine, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { IconDotsV, IconQr, IconShareLine, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
 import { IconTestChevron } from '../../components/icons';
 import '../../components/TestSettings/TestSettings.css';
 import '../../components/TestSettings/TestSettings.pm.css';
@@ -264,7 +265,7 @@ function ChannelType() {
             </div>
             <div className="gu-invite__btns">
               <button type="button" className="gu-invite__btn" onClick={copy}>
-                <IconCopyLine />
+                <CopyIcon />
                 Скопировать
               </button>
               <button type="button" className="gu-invite__btn" onClick={share}>
