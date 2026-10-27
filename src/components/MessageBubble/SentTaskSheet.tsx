@@ -52,7 +52,6 @@ export function SentTaskSheet({ message, task, onClose }: SentTaskSheetProps) {
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Настройки задания">
-        <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__header">
           <h2 className="sheet__heading">Настройки задания</h2>
           {task && <p className="sent-sheet__subtitle">{task.title}</p>}

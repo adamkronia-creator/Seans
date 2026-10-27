@@ -114,16 +114,16 @@ function NewContactSheet({ onClose, onCreate, onQr }: { onClose: () => void; onC
       <div className="nc-fields">
         <fieldset className="nc-field">
           <legend>Имя (обязательно)</legend>
-          <input aria-label="Имя" placeholder="Имя (обязательно)" value={name} maxLength={64} autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)} />
+          <input aria-label="Имя" placeholder="Имя (обязательно)" value={name} maxLength={64} autoFocus name="nc-x" autoComplete="off" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setName(e.target.value)} />
         </fieldset>
         <fieldset className="nc-field">
           <legend>Фамилия</legend>
-          <input aria-label="Фамилия" placeholder="Фамилия (необязательно)" value={surname} maxLength={64} autoComplete="off" onChange={(e) => setSurname(e.target.value)} />
+          <input aria-label="Фамилия" placeholder="Фамилия (необязательно)" value={surname} maxLength={64} name="nc-x" autoComplete="off" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setSurname(e.target.value)} />
         </fieldset>
         <fieldset className="nc-field nc-field--always">
           <legend>Номер телефона</legend>
           <span className="nc-field__code">+7</span>
-          <input aria-label="Номер телефона" type="tel" inputMode="tel" placeholder="000 000 0000" value={shown} autoComplete="off" onChange={(e) => setPhone(e.target.value)} />
+          <input aria-label="Номер телефона" type="text" inputMode="tel" placeholder="000 000 0000" value={shown} name="nc-x" autoComplete="off" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setPhone(e.target.value)} />
         </fieldset>
       </div>
       <button type="button" className="nc-row" role="checkbox" aria-checked={sync} onClick={() => setSync(!sync)}>

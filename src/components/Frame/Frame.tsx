@@ -24,7 +24,6 @@ export function Frame({ title, subtitle, quietTitle, ruled, footer, onClose, chi
   return (
     <SheetOverlay onClose={onClose}>
       <div className={`sheet${ruled ? ' sheet--ruled' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
-        <div className="sheet__grab" aria-hidden="true" />
         {!quietTitle && (
           <div className="sheet__header">
             <h2 className="sheet__heading">{title}</h2>

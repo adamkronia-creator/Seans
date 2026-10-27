@@ -593,7 +593,7 @@
   padding: 0 var(--space-4);
   border: 1px solid color-mix(in srgb, var(--text-secondary) 55%, transparent);
   border-radius: var(--radius-md);
-  transition: box-shadow 0.12s, border-color 0.12s;
+  transition: border-color 0.12s;
 }
 
 .nc-field legend {
@@ -615,8 +615,10 @@
 }
 
 .nc-field:focus-within {
+  /* 2 px настоящей рамкой (не тенью), чтобы линия расступалась под подписью; отрицательный отступ оставляет размер прежним */
+  margin: -1px; /* grid:ok — компенсирует рамку 2 px, 1 px вне сетки */
+  border-width: 2px;
   border-color: var(--action-primary);
-  box-shadow: inset 0 0 0 1px var(--action-primary);
 }
 
 .nc-field:focus-within legend {

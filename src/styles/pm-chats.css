@@ -339,13 +339,6 @@ html:has([data-pm]) body {
   backdrop-filter: blur(var(--space-8)) saturate(2);
 }
 
-[data-pm] .sheet__grab {
-  width: var(--space-10);
-  height: var(--space-1);
-  border-radius: var(--radius-full);
-  background: rgb(60 60 67 / 0.4);
-}
-
 [data-pm] .sheet__header {
   padding: var(--space-4) var(--space-4) var(--space-2);
 }

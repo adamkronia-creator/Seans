@@ -42,7 +42,6 @@ export function FilterSheet({ catalog, view, scope, favorites, noun, onApply, on
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet sheet--ruled" role="dialog" aria-modal="true" aria-label="Фильтры">
-        <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__header">
           <h2 className="sheet__heading">Фильтры</h2>
         </div>

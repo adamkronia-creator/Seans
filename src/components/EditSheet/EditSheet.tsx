@@ -98,7 +98,6 @@ export function EditSheet({
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet sheet--edit" role="dialog" aria-modal="true" aria-label={heading}>
-        <div className="sheet__grab" aria-hidden="true" />
 
         <div className="sheet__body">
           {hasTitle && (

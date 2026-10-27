@@ -24,6 +24,8 @@
 /* Кнопка отмены справа вверху окна: круг 36 с крестиком, на одной линии с заголовком; заголовок остаётся по центру, поля под кнопки по 56 */
 .sheet {
   position: relative;
+  /* Ручки наверху нет; отступ сверху прежний (ручка с полями занимала 12) */
+  padding-top: var(--space-3);
 }
 
 .sheet__close {
@@ -49,16 +51,6 @@
 .sheet > .sheet__header {
   padding-right: calc(var(--space-12) + var(--space-2));
   padding-left: calc(var(--space-12) + var(--space-2));
-}
-
-/* Ручка 36×4: сверху 8 */
-.sheet__grab {
-  flex-shrink: 0;
-  width: 36px;
-  height: 4px;
-  margin: var(--space-2) auto 0;
-  border-radius: var(--radius-pill);
-  background: rgb(60 60 67 / 40%);
 }
 
 /* Заголовок есть только у окон выбора (отправка теста) */

@@ -49,7 +49,6 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Настройки теста">
-        <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__header">
           <h2 className="sheet__heading">Настройки теста</h2>
           {test && <p className="sent-sheet__subtitle">{test.title}</p>}

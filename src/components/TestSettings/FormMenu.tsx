@@ -24,7 +24,6 @@ function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormS
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__header">
           <h2 className="sheet__heading">{title}</h2>
         </div>

@@ -28,7 +28,6 @@ export function ActionSheet({ onPick, onClose, actions }: ActionSheetProps) {
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
-        <div className="sheet__grab" aria-hidden="true" />
         <div className="sheet__body">
           <ul className="test-actions test-actions--cards">
             {options.map(({ id, title, Icon }) => (
