@@ -114,7 +114,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
         <>
           <PhotoField value={shownPhoto} name={name} seed={chatId} onChange={setPhoto} say={say} />
           <Field label={channel ? 'Название канала' : 'Название группы'} value={name} onChange={setName} max={NAME_MAX} />
-          <Field label="Описание" value={about} onChange={setAbout} max={ABOUT_MAX} multiline placeholder="Необязательно" hint={channel ? 'О чём этот канал: увидят все, кто его откроет.' : 'О чём эта группа: увидят все участники.'} />
+          <Field label="Описание" value={about} onChange={setAbout} max={ABOUT_MAX} multiline placeholder="Необязательно" />
         </>
       )}
 

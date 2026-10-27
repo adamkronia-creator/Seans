@@ -1,4 +1,5 @@
-import { useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { createPortal } from 'react-dom';
 import { CATEGORIES } from '../../data/chats';
 import { ME, avatarOf, byName, contactOf, firstNameOf, nameOf, type Contact } from '../../data/contacts';
 import { useAvatarSrc, useProfile } from '../../data/profile';
@@ -10,6 +11,8 @@ import { Avatar } from '../Avatar/Avatar';
 import { IconBackMk } from '../ChatItem/ChatIcons';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { Frame } from '../Frame/Frame';
+import { IconEmoji } from '../icons';
+import { EmojiPanel } from '../MessageInput/EmojiPanel';
 import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import { SearchField } from '../SearchField/SearchField';
 import '../Switch/Switch.css';
@@ -374,20 +377,45 @@ interface FieldProps {
   hint?: ReactNode;
   prefix?: string;
   inputMode?: 'text' | 'url';
+  /** Кнопка эмодзи справа (только в однострочном поле): панель встаёт вместо клавиатуры */
+  emoji?: boolean;
   /** Enter заканчивает ввод (в многострочном поле — перенос) */
   onEnter?: () => void;
 }
 
 /** Поле в карточке: подпись, текст, счётчик оставшихся знаков; под полем строка-подсказка о введённом */
-export function Field({ label, value, onChange, placeholder, max, multiline, autoFocus, status, hint, prefix, inputMode = 'text', onEnter }: FieldProps) {
+export function Field({ label, value, onChange, placeholder, max, multiline, autoFocus, status, hint, prefix, inputMode = 'text', emoji, onEnter }: FieldProps) {
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const host = emojiOpen ? box.current?.closest('.fp') ?? null : null;
+  useEffect(() => {
+    if (!host) return;
+    host.setAttribute('data-emoji', '');
+    return () => host.removeAttribute('data-emoji');
+  }, [host]);
+  /** Эмодзи встаёт в место курсора (или в конец); если не хватает места, не вставляется */
+  const insertEmoji = (e: string) => {
+    const el = inputRef.current;
+    const chars = Array.from(value);
+    const at = el ? Array.from(value.slice(0, el.selectionStart ?? value.length)).length : chars.length;
+    const end = el ? Array.from(value.slice(0, el.selectionEnd ?? value.length)).length : chars.length;
+    const next = [...chars.slice(0, at), e, ...chars.slice(end)];
+    if (max !== undefined && next.length > max) return;
+    onChange(next.join(''));
+    const caret = [...chars.slice(0, at), e].join('').length;
+    window.requestAnimationFrame(() => el?.setSelectionRange(caret, caret));
+  };
   const left = max === undefined ? undefined : max - Array.from(value).length;
   const set = (raw: string) => onChange(max === undefined ? raw : Array.from(raw).slice(0, max).join(''));
   const input = multiline ? (
     <AutoTextarea className="fp__input gu-textarea" value={value} placeholder={placeholder} rows={3} autoFocus={autoFocus} {...plainText} onChange={set} />
   ) : (
     <input
+      ref={inputRef}
       className="fp__input"
       value={value}
+      onFocus={() => setEmojiOpen(false)}
       placeholder={placeholder}
       autoFocus={autoFocus}
       inputMode={inputMode}
@@ -400,7 +428,8 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
     />
   );
   return (
-    <div className="gu-block">
+    <div className="gu-block" ref={box}>
+      {host && createPortal(<div className="fp__emoji-panel"><EmojiPanel onPick={insertEmoji} /></div>, host)}
       <section className="fp__card" aria-label={label}>
         <label className="fp__field">
           <span className="fp__heading">{label}</span>
@@ -411,6 +440,21 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
               <span className="fp__counter" aria-label={`Можно ввести ещё ${left}`}>
                 {left}
               </span>
+            )}
+            {emoji && !multiline && (
+              <button
+                type="button"
+                className="fp__emoji"
+                aria-label="Эмодзи"
+                aria-expanded={emojiOpen}
+                onPointerDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setEmojiOpen((v) => !v);
+                  if (!emojiOpen) inputRef.current?.blur();
+                }}
+              >
+                <IconEmoji />
+              </button>
             )}
           </span>
         </label>
