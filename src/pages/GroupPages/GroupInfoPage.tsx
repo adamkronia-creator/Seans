@@ -207,11 +207,11 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
           )}
           {!seeMembers && me && <p className="gu-hint gu-hint--alone">В канале {info.members.length} {countWord(info.kind, info.members.length)}. Список {word}ов видят только администраторы.</p>}
 
-          <ContactTabs author={{ id: chatId, name: info.name, avatar: info.avatar }} root={screen} stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={sharedLinks} onCopy={(text) => tools.copy(text)} whose={channel ? 'канала' : 'группы'} />
+          <ContactTabs author={{ id: chatId, name: info.name, avatar: info.avatar }} root={screen} stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={sharedLinks} onCopy={(text) => tools.copy(text)} whose={channel ? 'канала' : 'общего чата'} />
 
           {me && me.role !== 'owner' && (
             <Card>
-              <Row tone="danger" icon={<IconLeave />} title={channel ? 'Отписаться от канала' : 'Покинуть группу'} onClick={() => setLeaving(true)} />
+              <Row tone="danger" icon={<IconLeave />} title={channel ? 'Отписаться от канала' : 'Покинуть общий чат'} onClick={() => setLeaving(true)} />
             </Card>
           )}
         </div>

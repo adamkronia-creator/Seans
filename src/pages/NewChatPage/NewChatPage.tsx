@@ -254,7 +254,7 @@ function ChannelType() {
         />
       </Card>
       {!draft.isPublic && (
-        <Card heading="Ссылка-приглашение" hint="По этой ссылке можно подписаться на канал. Вы можете сбросить её в любой момент.">
+        <Card heading="Ссылка-приглашение" inset={false}>
           <div className="gu-invite">
             <div className="gu-invite__box">
               <span className="gu-invite__url">{shortUrl(link)}</span>

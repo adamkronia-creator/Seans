@@ -96,7 +96,7 @@ function entriesOf(scope: FolderScope): Entry[] {
     return getChats().filter((chat) => !chat.favorites && !chat.empty).map((chat) => ({
       id: chat.id,
       title: chat.name,
-      note: chat.kind ? (chat.kind === 'group' ? 'Группа' : 'Канал') : chat.category ? ROLES[chat.category] : '',
+      note: chat.kind ? (chat.kind === 'group' ? 'Общий чат' : 'Канал') : chat.category ? ROLES[chat.category] : '',
       visual: <Avatar src={chat.avatar} size={VISUAL} />,
     }));
   }

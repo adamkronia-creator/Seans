@@ -9,12 +9,12 @@ import { RemoveSheet } from '../Profile/ProfileSheets';
 export function LeaveSheet({ group, onConfirm, onClose }: { group: GroupInfo; onConfirm: () => void; onClose: () => void }) {
   const owner = myRole(group) === 'owner';
   const channel = group.kind === 'channel';
-  const title = owner ? (channel ? 'Удалить канал?' : 'Удалить группу?') : channel ? 'Отписаться от канала?' : 'Покинуть группу?';
+  const title = owner ? (channel ? 'Удалить канал?' : 'Удалить общий чат?') : channel ? 'Отписаться от канала?' : 'Покинуть общий чат?';
   const text = owner
-    ? `${channel ? 'Канал' : 'Группа'} «${group.name}» и вся переписка будут удалены у всех. Это нельзя отменить.`
+    ? `${channel ? 'Канал' : 'Общий чат'} «${group.name}» и вся переписка будут удалены у всех. Это нельзя отменить.`
     : group.isPublic
       ? `Вернуться можно будет по адресу @${group.username}.`
-      : 'Это частная группа: вернуться можно будет только по ссылке-приглашению.';
+      : 'Это частный общий чат: вернуться можно будет только по ссылке-приглашению.';
   const confirm = owner ? 'Удалить' : channel ? 'Отписаться' : 'Покинуть';
   return <RemoveSheet title={title} text={text} confirm={confirm} onConfirm={onConfirm} onClose={onClose} />;
 }

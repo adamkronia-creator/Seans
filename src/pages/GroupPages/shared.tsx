@@ -61,7 +61,7 @@ function MemberSheet({ info, id, say, onClose }: { info: GroupInfo; id: string; 
     }
     actions.push({
       key: 'remove',
-      label: channel ? 'Удалить из канала' : 'Удалить из группы',
+      label: channel ? 'Удалить из канала' : 'Удалить из общего чата',
       Icon: IconUserMinus,
       danger: true,
       run: () => {

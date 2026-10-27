@@ -48,13 +48,13 @@ export function GroupLinksPage({ chatId }: { chatId: string }) {
   return (
     <SubPage title="Ссылки-приглашения" subtitle={info.name} onBack={back} toast={toast} swipe={!tools.open && !resetting}>
       {info.isPublic && (
-        <Card heading="Публичный адрес" hint="Адрес не меняется: по нему канал или группу находит поиск.">
+        <Card heading="Публичный адрес" hint="Адрес не меняется: по нему канал или общий чат находит поиск.">
           <Row icon={<IconGlobal />} title={`@${info.username}`} note={shortUrl(targetOfPublic(info).url)} end={<IconCopyLine />} onClick={() => tools.copy(targetOfPublic(info).url)} />
           <LinkActions target={targetOfPublic(info)} title={info.name} tools={tools} />
         </Card>
       )}
       {primary && (
-        <Card heading="Основная ссылка" hint={`Любой, у кого есть эта ссылка, сможет ${channel ? 'подписаться на канал' : 'вступить в группу'}. Если сбросить её, прежняя перестанет работать.`}>
+        <Card heading="Основная ссылка" hint={`Любой, у кого есть эта ссылка, сможет ${channel ? 'подписаться на канал' : 'вступить в общий чат'}. Если сбросить её, прежняя перестанет работать.`}>
           <Row icon={<IconLinkRound />} title={shortUrl(targetOfLink(primary).url)} note={linkNote(primary)} onClick={() => tools.copy(targetOfLink(primary).url)} />
           <LinkActions target={targetOfLink(primary)} title={info.name} tools={tools} />
           <Row tone="danger" icon={<IconRestart />} title="Сбросить ссылку" onClick={() => setResetting(true)} />
@@ -76,7 +76,7 @@ export function GroupLinksPage({ chatId }: { chatId: string }) {
       {resetting && (
         <RemoveSheet
           title="Сбросить ссылку?"
-          text={`Прежняя ссылка перестанет работать, а вместо неё появится новая. Те, кто уже ${channel ? 'подписан' : 'в группе'}, останутся.`}
+          text={`Прежняя ссылка перестанет работать, а вместо неё появится новая. Те, кто уже ${channel ? 'подписан' : 'в общем чате'}, останутся.`}
           confirm="Сбросить"
           onClose={() => setResetting(false)}
           onConfirm={() => {

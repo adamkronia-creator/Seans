@@ -257,7 +257,7 @@ test('подписи с числами: склонение и «в сети»', 
   const forms = [[1, 'участник'], [2, 'участника'], [4, 'участника'], [5, 'участников'], [11, 'участников'], [12, 'участников'], [21, 'участник'], [22, 'участника'], [100, 'участников'], [101, 'участник']];
   for (const [n, word] of forms) assert.equal(L.countWord('group', n), word, String(n));
   assert.deepEqual([1, 3, 7, 11].map((n) => L.countWord('channel', n)), ['подписчик', 'подписчика', 'подписчиков', 'подписчиков']);
-  assert.equal(L.kindWord('group'), 'группа');
+  assert.equal(L.kindWord('group'), 'общий чат');
   assert.equal(L.kindWord('channel'), 'канал');
 
   const sup = L.getGroup('supervision');
@@ -300,7 +300,7 @@ test('создание группы: вы владелец, участники �
 
   assert.equal(g.links.length, 1);
   assert.ok(g.links[0].primary && L.isLinkAlive(g.links[0]));
-  assert.deepEqual(texts(g), ['Вы создали группу «Моя группа»']);
+  assert.deepEqual(texts(g), ['Вы создали общий чат «Моя группа»']);
 
   assert.equal(L.getChats().length, before + 1);
   const chat = L.getChat(id);
@@ -308,7 +308,7 @@ test('создание группы: вы владелец, участники �
   assert.equal(chat.name, 'Моя группа');
   assert.equal(chat.avatar, g.avatar);
   const lines = messagesOf(L, id);
-  assert.deepEqual(lines.map((m) => m.text), ['Вы создали группу «Моя группа»', 'Вы добавили участников: Анна Королёва, Игорь Назаров']);
+  assert.deepEqual(lines.map((m) => m.text), ['Вы создали общий чат «Моя группа»', 'Вы добавили участников: Анна Королёва, Игорь Назаров']);
   assert.ok(lines.every((m) => m.service));
   assert.equal(chat.lastMessage, 'Вы добавили участников: Анна Королёва, Игорь Назаров');
 
@@ -352,32 +352,32 @@ test('профиль: название меняет цветные инициа�
   assert.notEqual(g.avatar, first, 'инициалы пересчитаны');
   assert.equal(L.getChat(id).name, 'Вторая школа');
   assert.equal(L.getChat(id).avatar, g.avatar);
-  assert.ok(texts(g).includes('Вы изменили название группы на «Вторая школа»'));
-  assert.ok(messagesOf(L, id).some((m) => m.service && m.text === 'Вы изменили название группы на «Вторая школа»'));
+  assert.ok(texts(g).includes('Вы изменили название общего чата на «Вторая школа»'));
+  assert.ok(messagesOf(L, id).some((m) => m.service && m.text === 'Вы изменили название общего чата на «Вторая школа»'));
 
   L.updateInfo(id, { name: '   ' });
   assert.equal(L.getGroup(id).name, 'Вторая школа', 'пустое название не принимается');
 
   L.updateInfo(id, { description: 'Новое описание' });
   assert.equal(L.getGroup(id).description, 'Новое описание');
-  assert.ok(texts(L.getGroup(id)).includes('Вы изменили описание группы'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы изменили описание общего чата'));
   L.updateInfo(id, { description: '' });
   assert.equal(L.getGroup(id).description, '');
-  assert.ok(texts(L.getGroup(id)).includes('Вы удалили описание группы'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы удалили описание общего чата'));
 
   const photo = 'data:image/jpeg;base64,BBBB';
   L.updateInfo(id, { photo });
   g = L.getGroup(id);
   assert.equal(g.avatar, photo);
   assert.equal(L.getChat(id).avatar, photo);
-  assert.ok(texts(g).includes('Вы обновили фото группы'));
+  assert.ok(texts(g).includes('Вы обновили фото общего чата'));
   L.updateInfo(id, { name: 'Третья школа' });
   assert.equal(L.getGroup(id).avatar, photo, 'своё фото остаётся при смене названия');
   L.updateInfo(id, { photo: null });
   g = L.getGroup(id);
   assert.ok(L.isGenerated(g.avatar), 'без фото снова инициалы');
   assert.equal(L.initialsOf(g.name), 'ТШ');
-  assert.ok(texts(g).includes('Вы удалили фото группы'));
+  assert.ok(texts(g).includes('Вы удалили фото общего чата'));
 
   const same = L.getGroup(id);
   L.updateInfo(id, { name: 'Третья школа', description: '' });
@@ -401,7 +401,7 @@ test('тип: публичным можно сделать только со с�
   let g = L.getGroup(id);
   assert.ok(g.isPublic);
   assert.equal(g.username, 'Free_Group_77');
-  assert.ok(texts(g).includes('Вы сделали группу публичной: @Free_Group_77'));
+  assert.ok(texts(g).includes('Вы сделали общий чат публичным: @Free_Group_77'));
   assert.equal(L.lookupJoin('@free_group_77').status, 'ok', 'регистр адреса не важен');
   const len = g.log.length;
   L.setType(id, true, 'Free_Group_77');
@@ -414,7 +414,7 @@ test('тип: публичным можно сделать только со с�
   assert.equal(g.isPublic, false);
   assert.equal(g.username, '');
   assert.equal(g.joinApproval, false, 'у частной группы заявок нет');
-  assert.ok(texts(g).includes('Вы сделали группу частной'));
+  assert.ok(texts(g).includes('Вы сделали общий чат частным'));
   assert.equal(L.usernameStatus('free_group_77'), 'free', 'адрес освободился');
   assert.equal(L.lookupJoin('@free_group_77').status, 'invalid');
 
@@ -704,7 +704,7 @@ test('вступление по ссылке: счётчик растёт, ис�
   assert.equal(L.joinGroup(primary.code), 'joined', 'по основной ссылке заявок нет');
   assert.equal(L.getGroup('pub-young').links.find((l) => l.primary).joined, 4);
   assert.ok(L.getChat('pub-young'));
-  assert.ok(messagesOf(L, 'pub-young').some((m) => m.service && m.text === 'Вы вступили в группу'));
+  assert.ok(messagesOf(L, 'pub-young').some((m) => m.service && m.text === 'Вы вступили в общий чат'));
   assert.ok(messagesOf(L, 'pub-young').some((m) => m.pinned), 'прежняя переписка и закреп на месте');
 
   const once = L.createLink('pub-cbt', { name: 'один раз', limit: 1, needApproval: false });
@@ -735,8 +735,8 @@ test('вступление по заявке: заявка висит, одоб�
   assert.ok(L.isMember(g));
   assert.equal(mine().length, 0);
   assert.equal(L.getChat('pub-young').unread, 1);
-  assert.ok(messagesOf(L, 'pub-young').some((m) => m.service && m.text === 'Заявка одобрена: вы вступили в группу'));
-  assert.ok(texts(g).includes('Вы вступили в группу'));
+  assert.ok(messagesOf(L, 'pub-young').some((m) => m.service && m.text === 'Заявка одобрена: вы вступили в общий чат'));
+  assert.ok(texts(g).includes('Вы вступили в общий чат'));
   assert.equal(L.lookupJoin('@young_psy').member, true);
 });
 
@@ -776,7 +776,7 @@ test('заявки в вашей группе: принять, отклонит�
   assert.equal(L.getGroup('supervision').members.length, members + 1);
   assert.ok(ids(L.getGroup('supervision')).includes(first.contactId));
   assert.ok(texts(L.getGroup('supervision')).includes('Вы приняли заявку: Павел Зайцев'));
-  assert.ok(messagesOf(L, 'supervision').some((m) => m.service && m.text === 'В группе новый участник: Павел Зайцев'));
+  assert.ok(messagesOf(L, 'supervision').some((m) => m.service && m.text === 'В общем чате новый участник: Павел Зайцев'));
   L.declineRequest('supervision', second.id);
   assert.equal(L.getGroup('supervision').requests.length, 0);
   assert.equal(L.getGroup('supervision').members.length, members + 1);

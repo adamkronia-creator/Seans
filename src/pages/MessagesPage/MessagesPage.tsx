@@ -41,7 +41,7 @@ const ChatList = memo(function ChatList({
   onOpenFound,
 }: {
   chats: Chat[];
-  /** Публичные группы и каналы, в которых вас нет, под строкой поиска: нажатие открывает страницу вступления */
+  /** Публичные общие чаты и каналы, в которых вас нет, под строкой поиска: нажатие открывает страницу вступления */
   found: Chat[];
   onOpenFound: (chat: Chat) => void;
   /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
@@ -139,7 +139,7 @@ const ChatList = memo(function ChatList({
         ))}
         {found.length > 0 && (
           <li className="messages__found" role="presentation">
-            Публичные группы и каналы
+            Публичные общие чаты и каналы
           </li>
         )}
         {found.map((chat) => (

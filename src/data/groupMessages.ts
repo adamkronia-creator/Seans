@@ -9,7 +9,7 @@ export const GROUP_MESSAGES: Record<string, MessageGroup[]> = {
     {
       label: '5 октября, пн',
       messages: [
-        { id: 'sv-s1', from: 'me', service: true, text: 'Вы создали группу «Супервизия КПТ»', time: '10:00' },
+        { id: 'sv-s1', from: 'me', service: true, text: 'Вы создали общий чат «Супервизия КПТ»', time: '10:00' },
         { id: 'sv-s2', from: 'me', service: true, text: 'Вы добавили участников: Богдан Ермолаев, Владислав Семёнов, Анна Королёва, Елена Миронова, Игорь Назаров', time: '10:00' },
         {
           id: 'sv-1',

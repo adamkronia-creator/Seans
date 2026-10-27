@@ -27,7 +27,7 @@ export type AdminRights = Record<RightKey, boolean>;
 /** Права администратора, которые настраиваются в группе и в канале (их набор разный) */
 export const RIGHT_LABELS: Record<GroupKind, Array<{ key: RightKey; label: string }>> = {
   group: [
-    { key: 'changeInfo', label: 'Изменение профиля группы' },
+    { key: 'changeInfo', label: 'Изменение профиля общего чата' },
     { key: 'deleteMessages', label: 'Удаление сообщений' },
     { key: 'banUsers', label: 'Блокировка участников' },
     { key: 'inviteUsers', label: 'Приглашение участников' },
@@ -87,7 +87,7 @@ export const PERMISSION_LABELS: Array<{ key: keyof Permissions; label: string }>
   { key: 'sendMedia', label: 'Отправка фото и файлов' },
   { key: 'addMembers', label: 'Добавление участников' },
   { key: 'pinMessages', label: 'Закрепление сообщений' },
-  { key: 'changeInfo', label: 'Изменение профиля группы' },
+  { key: 'changeInfo', label: 'Изменение профиля общего чата' },
 ];
 
 export const DEFAULT_PERMISSIONS: Permissions = { sendMessages: true, sendMedia: true, addMembers: true, pinMessages: false, changeInfo: false };
@@ -236,7 +236,7 @@ function seeds(): Record<string, GroupInfo> {
       log('bogdan', `${nameOf('bogdan')} закрепил сообщение`, 2 * DAY - 3 * 60 * 60 * 1000),
       log(ME, 'Вы добавили участников: Богдан Ермолаев, Владислав Семёнов, Анна Королёва, Елена Миронова, Игорь Назаров', 2 * DAY - 60 * 60 * 1000),
       log(ME, 'Вы назначили администратором: Богдан Ермолаев', 2 * DAY - 59 * 60 * 1000),
-      log(ME, 'Вы создали группу «Супервизия КПТ»', 2 * DAY),
+      log(ME, 'Вы создали общий чат «Супервизия КПТ»', 2 * DAY),
     ].sort((a, b) => b.at - a.at),
     createdAt: NOW - 2 * DAY,
   };
@@ -426,7 +426,7 @@ export const countText = (g: GroupInfo) => `${g.members.length} ${countWord(g.ki
 export const onlineCount = (g: GroupInfo) => g.members.filter((m) => m.id === ME || contactOf(m.id)?.online).length;
 /** Подпись под названием в шапке чата: «6 участников, 3 в сети»; в канале — только число подписчиков */
 export const subtitleOf = (g: GroupInfo) => (g.kind === 'channel' ? countText(g) : `${countText(g)}, ${onlineCount(g)} в сети`);
-export const kindWord = (kind: GroupKind) => (kind === 'group' ? 'группа' : 'канал');
+export const kindWord = (kind: GroupKind) => (kind === 'group' ? 'общий чат' : 'канал');
 
 /** Адрес-приглашение: настоящая ссылка на этот экран приложения */
 export const inviteUrl = (code: string): string => `${window.location.origin}${window.location.pathname}#/join/${code}`;
@@ -511,12 +511,12 @@ export function createGroup(d: GroupDraft): string {
     joinApproval: false,
     links: [{ ...primaryLink(ME, d.inviteCode || undefined), createdAt: now }],
     requests: [],
-    log: [{ id: uid('e'), at: now, actor: ME, text: `Вы создали ${group ? 'группу' : 'канал'} «${name}»` }],
+    log: [{ id: uid('e'), at: now, actor: ME, text: `Вы создали ${group ? 'общий чат' : 'канал'} «${name}»` }],
     createdAt: now,
   };
   store = { ...store, [id]: g };
   addChat({ id, name, avatar: g.avatar, kind: d.kind, lastMessage: '', time: '', unread: 0 });
-  postService(id, `Вы создали ${group ? 'группу' : 'канал'} «${name}»`);
+  postService(id, `Вы создали ${group ? 'общий чат' : 'канал'} «${name}»`);
   if (group && d.members.length) postService(id, `Вы добавили ${d.members.length === 1 ? 'участника' : 'участников'}: ${list(d.members)}`);
   emit();
   return id;
@@ -527,7 +527,7 @@ export function createGroup(d: GroupDraft): string {
 export function updateInfo(chatId: string, patch: { name?: string; description?: string; photo?: string | null }) {
   const g = store[chatId];
   if (!g) return;
-  const word = g.kind === 'group' ? 'группы' : 'канала';
+  const word = g.kind === 'group' ? 'общего чата' : 'канала';
   let next = g;
   const name = patch.name?.trim();
   if (name && name !== g.name) {
@@ -561,9 +561,8 @@ export function setType(chatId: string, isPublic: boolean, username = '') {
     if (isPublic && usernameStatus(name, chatId) !== 'free') return g;
     const same = g.isPublic === isPublic && g.username === (isPublic ? name : '');
     if (same) return g;
-    const what = g.kind === 'group' ? 'группу' : 'канал';
-    // «группу публичной», но «канал публичным»
-    const word = g.kind === 'group' ? (isPublic ? 'публичной' : 'частной') : isPublic ? 'публичным' : 'частным';
+    const what = g.kind === 'group' ? 'общий чат' : 'канал';
+    const word = isPublic ? 'публичным' : 'частным';
     return withLog({ ...g, isPublic, username: isPublic ? name : '', joinApproval: isPublic ? g.joinApproval : false }, isPublic ? `Вы сделали ${what} ${word}: @${name}` : `Вы сделали ${what} ${word}`);
   });
 }
@@ -755,7 +754,7 @@ function enter(g: GroupInfo, text: string, via?: InviteLink) {
         links: x.links.map((l) => (via && l.id === via.id ? { ...l, joined: l.joined + 1 } : l)),
         requests: x.requests.filter((r) => r.contactId !== ME),
       },
-      g.kind === 'group' ? 'Вы вступили в группу' : 'Вы подписались на канал',
+      g.kind === 'group' ? 'Вы вступили в общий чат' : 'Вы подписались на канал',
     ),
   );
   if (!getChat(g.chatId)) {
@@ -777,12 +776,12 @@ export function joinGroup(code: string): 'joined' | 'requested' | 'failed' {
     window.setTimeout(() => {
       const now = store[g.chatId];
       if (!now || !now.requests.some((r) => r.id === request.id)) return;
-      enter(now, g.kind === 'group' ? 'Заявка одобрена: вы вступили в группу' : 'Заявка одобрена: вы подписались на канал', t.link);
+      enter(now, g.kind === 'group' ? 'Заявка одобрена: вы вступили в общий чат' : 'Заявка одобрена: вы подписались на канал', t.link);
       markUnread(g.chatId);
     }, 4200);
     return 'requested';
   }
-  enter(g, g.kind === 'group' ? 'Вы вступили в группу' : 'Вы подписались на канал', t.link);
+  enter(g, g.kind === 'group' ? 'Вы вступили в общий чат' : 'Вы подписались на канал', t.link);
   return 'joined';
 }
 
@@ -799,7 +798,7 @@ export function approveRequest(chatId: string, requestId: string) {
   update(chatId, (x) =>
     withLog({ ...x, requests: x.requests.filter((q) => q.id !== requestId), members: memberOf(x, r.contactId) ? x.members : [...x.members, member(r.contactId)], links: x.links.map((l) => (l.id === r.linkId ? { ...l, joined: l.joined + 1 } : l)) }, text),
   );
-  note(g, `В ${g.kind === 'group' ? 'группе' : 'канале'} новый ${g.kind === 'group' ? 'участник' : 'подписчик'}: ${nameOf(r.contactId)}`);
+  note(g, `В ${g.kind === 'group' ? 'общем чате' : 'канале'} новый ${g.kind === 'group' ? 'участник' : 'подписчик'}: ${nameOf(r.contactId)}`);
 }
 
 export function declineRequest(chatId: string, requestId: string) {
@@ -829,7 +828,7 @@ onChatsRemoved((gone) => {
       const { [c.id]: _removed, ...rest } = store;
       store = rest;
     } else {
-      store = { ...store, [c.id]: withLog({ ...g, members: g.members.filter((m) => m.id !== ME), requests: g.requests.filter((r) => r.contactId !== ME) }, g.kind === 'group' ? 'Вы покинули группу' : 'Вы отписались от канала') };
+      store = { ...store, [c.id]: withLog({ ...g, members: g.members.filter((m) => m.id !== ME), requests: g.requests.filter((r) => r.contactId !== ME) }, g.kind === 'group' ? 'Вы покинули общий чат' : 'Вы отписались от канала') };
     }
   });
   emit();

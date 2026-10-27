@@ -15,7 +15,7 @@ const PROBLEMS: Record<Exclude<JoinStatus, 'ok'>, { title: string; text: string 
   invalid: { title: 'Ссылка недействительна', text: 'Возможно, её отозвали или в адресе опечатка. Попросите администратора прислать новую.' },
   expired: { title: 'Срок ссылки истёк', text: 'По этой ссылке уже нельзя вступить. Попросите администратора прислать новую.' },
   full: { title: 'Лимит вступлений исчерпан', text: 'По этой ссылке уже вступило максимальное число людей. Попросите администратора прислать новую.' },
-  banned: { title: 'Вступить нельзя', text: 'Администратор заблокировал вас в этой группе или канале.' },
+  banned: { title: 'Вступить нельзя', text: 'Администратор заблокировал вас в этом общем чате или канале.' },
 };
 
 export function JoinPage({ code }: { code: string }) {
@@ -66,7 +66,7 @@ export function JoinPage({ code }: { code: string }) {
 
   return (
     <SubPage
-      title={group ? (channel ? 'Канал' : 'Группа') : 'Приглашение'}
+      title={group ? (channel ? 'Канал' : 'Общий чат') : 'Приглашение'}
       subtitle={group?.isPublic ? `@${group.username}` : 'Приглашение'}
       onBack={back}
       toast={toast}

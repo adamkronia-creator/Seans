@@ -119,14 +119,14 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
       {editInfo && (
         <>
           <PhotoField value={shownPhoto} name={name} seed={chatId} onChange={setPhoto} say={say} />
-          <Field label={channel ? 'Название канала' : 'Название группы'} value={name} onChange={setName} max={NAME_MAX} emoji />
+          <Field label={channel ? 'Название канала' : 'Название общего чата'} value={name} onChange={setName} max={NAME_MAX} emoji />
           <Field label="Описание" value={about} onChange={setAbout} max={ABOUT_MAX} multiline placeholder="Необязательно" />
         </>
       )}
 
       {hasSettings && (
         <Card heading="Настройки">
-          {owner && <Row icon={info.isPublic ? <IconGlobal /> : <IconLock />} title={channel ? 'Тип канала' : 'Тип группы'} value={info.isPublic ? 'Публичный' : 'Частный'} chevron onClick={() => open('type')} />}
+          {owner && <Row icon={info.isPublic ? <IconGlobal /> : <IconLock />} title={channel ? 'Тип канала' : 'Формат общего чата'} value={info.isPublic ? 'Публичный' : 'Частный'} chevron onClick={() => open('type')} />}
           {showLinks && <Row icon={<IconLinkRound />} title="Ссылки-приглашения" value={String(alive)} chevron onClick={() => open('links')} />}
           {adminInfo && <Row icon={<IconSmile />} title="Реакции" value={reactionsText} chevron onClick={() => open('reactions')} />}
           {showPerms && <Row icon={<IconKey />} title="Разрешения" value={info.slowMode ? `Пауза ${slowLabel(info.slowMode)}` : undefined} chevron onClick={() => open('perms')} />}
@@ -188,7 +188,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
 
       {owner && (
         <Card>
-          <Row tone="danger" icon={<IconTrashLine />} title={channel ? 'Удалить канал' : 'Удалить группу'} onClick={() => setDeleting(true)} />
+          <Row tone="danger" icon={<IconTrashLine />} title={channel ? 'Удалить канал' : 'Удалить общий чат'} onClick={() => setDeleting(true)} />
         </Card>
       )}
 
@@ -234,19 +234,19 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
 
   return (
     <SubPage
-      title={channel ? 'Настройки канала' : 'Настройки группы'}
+      title={channel ? 'Настройки канала' : 'Настройки общего чата'}
       subtitle="Выбор формата"
       onBack={() => goBack(gPath(chatId, 'edit'))}
       toast={toast}
       swipe={!tools.open && !resetting}
       footer={{ label: 'Сохранить', disabled: !dirty || !valid, onClick: save }}
     >
-      <Card heading={channel ? 'Тип канала' : 'Тип группы'}>
+      <Card heading={channel ? 'Тип канала' : 'Формат общего чата'}>
         <Row
           top
           lead={<RadioDot on={isPublic} />}
-          title={channel ? 'Открытый канал' : 'Открытая группа'}
-          note={channel ? 'Открытый канал можно найти с помощью поиска и подписаться может любой человек' : 'Открытую группу можно найти с помощью поиска и вступить может любой человек'}
+          title={channel ? 'Открытый канал' : 'Открытый общий чат'}
+          note={channel ? 'Открытый канал можно найти с помощью поиска и подписаться может любой человек' : 'Открытый общий чат можно найти с помощью поиска и вступить может любой человек'}
           role="radio"
           checked={isPublic}
           onClick={() => {
@@ -258,8 +258,8 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
         <Row
           top
           lead={<RadioDot on={!isPublic} />}
-          title={channel ? 'Частный канал' : 'Частная группа'}
-          note={channel ? 'Частный канал является закрытым, подписаться можно только с помощью приглашения' : 'Частная группа является закрытой, вступить можно только с помощью приглашения'}
+          title={channel ? 'Частный канал' : 'Частный общий чат'}
+          note={channel ? 'Частный канал является закрытым, подписаться можно только с помощью приглашения' : 'Частный общий чат является закрытым, вступить можно только с помощью приглашения'}
           role="radio"
           checked={!isPublic}
           onClick={() => setPublic(false)}
@@ -268,7 +268,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
       {isPublic ? (
         <>
           <Field
-            label={channel ? 'Адрес канала' : 'Адрес группы'}
+            label={channel ? 'Адрес канала' : 'Адрес общего чата'}
             prefix="@"
             value={username}
             onChange={(v) => setUsername(v.replace(/[\s@]/g, ''))}
@@ -276,7 +276,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
             inputMode="url"
             placeholder="psy_group"
             status={status === 'empty' ? null : { tone: status === 'free' ? 'ok' : 'error', text: USERNAME_TEXT[status] }}
-            hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этому адресу можно найти и открыть ' + (channel ? 'канал.' : 'группу.')}
+            hint={status === 'empty' ? USERNAME_TEXT.empty : 'По этому адресу можно найти и открыть ' + (channel ? 'канал.' : 'общий чат.')}
           />
           {!channel && (
             <Card hint="Новые участники вступают после вашего одобрения: заявки лежат в разделе «Заявки на вступление».">
@@ -286,7 +286,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
         </>
       ) : (
         primary && (
-          <Card heading="Ссылка-приглашение" hint={`По этой ссылке можно ${channel ? 'подписаться на канал' : 'вступить в группу'}. Вы можете сбросить её в любой момент.`}>
+          <Card heading="Ссылка-приглашение" inset={false}>
             <div className="gu-invite">
               <div className="gu-invite__box">
                 <span className="gu-invite__url">{shortUrl(targetOfLink(primary).url)}</span>
@@ -311,7 +311,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
       {resetting && (
         <RemoveSheet
           title="Сбросить ссылку?"
-          text={`Прежняя ссылка перестанет работать, а вместо неё появится новая. Те, кто уже ${channel ? 'подписан' : 'в группе'}, останутся.`}
+          text={`Прежняя ссылка перестанет работать, а вместо неё появится новая. Те, кто уже ${channel ? 'подписан' : 'в общем чате'}, останутся.`}
           confirm="Сбросить"
           onClose={() => setResetting(false)}
           onConfirm={() => {
@@ -337,7 +337,7 @@ export function GroupPermsPage({ chatId }: { chatId: string }) {
   const silenced = info.members.filter((m) => m.silenced);
   return (
     <SubPage title="Разрешения" subtitle="Что можно участникам" onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={!people.active}>
-      <Card heading="Участникам разрешено" hint="Администраторы могут всё, что им разрешено в правах администратора.">
+      <Card heading="Участникам разрешено">
         {PERMISSION_LABELS.map(({ key, label }) => (
           <SwitchRow key={key} title={label} checked={info.permissions[key]} onChange={(v) => setPermissions(chatId, { [key]: v })} />
         ))}
@@ -378,7 +378,7 @@ export function GroupReactionsPage({ chatId }: { chatId: string }) {
     setSetting(chatId, { reactions: REACTION_CHOICES.filter((e) => (e === emoji ? !has : info.reactions.includes(e))) });
   };
   return (
-    <SubPage title="Реакции" subtitle={info.kind === 'channel' ? 'Под постами канала' : 'Под сообщениями группы'} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
+    <SubPage title="Реакции" subtitle={info.kind === 'channel' ? 'Под постами канала' : 'Под сообщениями общего чата'} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
       <Card hint="Реакции можно ставить на сообщения. Участники выбирают только из разрешённых.">
         <SwitchRow icon={<IconSmile />} title="Реакции" checked={on} onChange={(v) => setSetting(chatId, { reactions: v ? [...REACTION_CHOICES] : [] })} />
       </Card>
@@ -423,7 +423,7 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
   return (
     <SubPage title="Заблокированные" subtitle={info.banned.length ? `Заблокировано: ${info.banned.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={who === null}>
       {info.banned.length === 0 ? (
-        <Card hint={`Заблокированные не могут вернуться в ${info.kind === 'channel' ? 'канал' : 'группу'} по ссылке. Заблокировать можно человека из списка ${info.kind === 'channel' ? 'подписчиков' : 'участников'}.`}>
+        <Card hint={`Заблокированные не могут вернуться в ${info.kind === 'channel' ? 'канал' : 'общий чат'} по ссылке. Заблокировать можно человека из списка ${info.kind === 'channel' ? 'подписчиков' : 'участников'}.`}>
           <Empty>Заблокированных нет</Empty>
         </Card>
       ) : (
@@ -471,7 +471,7 @@ export function GroupRequestsPage({ chatId }: { chatId: string }) {
   return (
     <SubPage title="Заявки на вступление" subtitle={info.requests.length ? `Заявок: ${info.requests.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
       {info.requests.length === 0 ? (
-        <Card hint={`Когда в ${channel ? 'канале' : 'группе'} включено вступление по заявкам (у публичного адреса или у ссылки-приглашения), заявки появятся здесь.`}>
+        <Card hint={`Когда в ${channel ? 'канале' : 'общем чате'} включено вступление по заявкам (у публичного адреса или у ссылки-приглашения), заявки появятся здесь.`}>
           <Empty>Заявок нет</Empty>
         </Card>
       ) : (
@@ -526,7 +526,7 @@ export function GroupRequestsPage({ chatId }: { chatId: string }) {
                       aria-label={`Принять: ${nameOf(r.contactId)}`}
                       onClick={() => {
                         approveRequest(chatId, r.id);
-                        say(`${firstNameOf(r.contactId)} ${gendered(r.contactId, 'принят', 'принята')} в ${channel ? 'канал' : 'группу'}`);
+                        say(`${firstNameOf(r.contactId)} ${gendered(r.contactId, 'принят', 'принята')} в ${channel ? 'канал' : 'общий чат'}`);
                       }}
                     >
                       <IconCheckMark />

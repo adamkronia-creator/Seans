@@ -86,7 +86,7 @@ export function useLinkTools(group: GroupInfo | undefined, say: (text: string) =
         <ForwardSheet
           onClose={() => setSharing(null)}
           onSend={(ids) => {
-            const text = `Приглашение в ${channel ? 'канал' : 'группу'} «${group.name}»\n${sharing.url}`;
+            const text = `Приглашение в ${channel ? 'канал' : 'общий чат'} «${group.name}»\n${sharing.url}`;
             ids.forEach((id) => sendMessage(id, text, undefined, { buttons: [{ label: channel ? 'Подписаться' : 'Вступить', href: `/join/${sharing.code}` }] }));
             setSharing(null);
             say(ids.length === 1 ? 'Ссылка отправлена' : `Ссылка отправлена: ${ids.length}`);

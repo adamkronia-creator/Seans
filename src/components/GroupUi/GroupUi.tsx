@@ -89,17 +89,19 @@ interface CardProps {
   /** Пояснение под карточкой */
   hint?: ReactNode;
   label?: string;
+  /** false: содержимое со своей подложкой (ссылка-приглашение) без отступов у краёв и просветов */
+  inset?: boolean;
   children: ReactNode;
 }
 
 /** Блок страницы: стеклянная карточка с заголовком строкой и пояснением под ней. Строки лежат прямо в карточке: между ними просвет 1 px */
-export function Card({ heading, hint, label, children }: CardProps) {
+export function Card({ heading, hint, label, inset = true, children }: CardProps) {
   return (
     <div className="gu-block">
       <section className="fp__card" aria-label={label ?? (typeof heading === 'string' ? heading : undefined)}>
         {heading && <h2 className="fp__heading fp__heading--pad">{heading}</h2>}
         {/* Пункты лежат на одной подложке: линия только под заголовком, между пунктами её нет; у одиночной строки без заголовка обёртка не нужна */}
-        {heading || Children.toArray(children).length > 1 ? <div className="gu-rows gu-rows--inset">{children}</div> : children}
+        {inset && (heading || Children.toArray(children).length > 1) ? <div className="gu-rows gu-rows--inset">{children}</div> : children}
       </section>
       {hint && <p className="gu-hint">{hint}</p>}
     </div>
