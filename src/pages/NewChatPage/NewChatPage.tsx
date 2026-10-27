@@ -145,12 +145,12 @@ function GroupMembers() {
   const n = draft.members.length;
   return (
     <SubPage
-      title="Новая группа"
-      subtitle={n ? `Выбрано: ${n}` : 'Выберите участников'}
+      title="Создание общего чата"
+      subtitle={n ? `Выбрано: ${n}` : 'Приглашение пользователей'}
       onBack={() => goBack('/new')}
-      footer={{ label: 'Далее', disabled: n === 0, onClick: () => navigate('/new/group/info') }}
+      footer={{ label: 'Далее', onClick: () => navigate('/new/group/info') }}
     >
-      <ContactPicker contacts={contacts} chosen={draft.members} onToggle={toggleDraftMember} empty="Отметьте участников в списке ниже" />
+      <ContactPicker contacts={contacts} chosen={draft.members} onToggle={toggleDraftMember} empty="Выберите контакты в списке ниже" />
     </SubPage>
   );
 }
@@ -174,8 +174,8 @@ function Details({ kind }: { kind: GroupKind }) {
   };
   return (
     <SubPage
-      title={group ? 'Новая группа' : 'Новый канал'}
-      subtitle={group ? `${draft.members.length} ${draft.members.length === 1 ? 'участник' : 'участников'}` : 'Название и описание'}
+      title={group ? 'Создание общего чата' : 'Новый канал'}
+      subtitle={group ? (draft.members.length === 0 ? 'Пока только вы' : `Приглашено: ${draft.members.length}`) : 'Название и описание'}
       onBack={() => goBack(group ? '/new/group' : '/new')}
       toast={toast}
       footer={{ label: group ? 'Создать' : 'Далее', disabled: !ready, onClick: next }}
@@ -191,7 +191,7 @@ function Details({ kind }: { kind: GroupKind }) {
         placeholder="Необязательно"
         hint={group ? 'О чём эта группа: увидят все участники.' : 'О чём этот канал: увидят все, кто его откроет.'}
       />
-      {group && (
+      {group && draft.members.length > 0 && (
         <Card heading={`Участники: ${draft.members.length}`}>
           {draft.members.map((id) => (
             <PersonRow key={id} id={id} presence={false} />

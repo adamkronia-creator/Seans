@@ -191,23 +191,16 @@
 
 /* ---------- Выбор людей ---------- */
 
-/* Выбранные — одна строка, прокручивается вбок: высота не меняется, когда выбирают первого и десятого, и список под ней не прыгает */
+/* Выбранные, как в Telegram: пилюли с аватаром впритык слева, без карточки; не помещаются в строку — переносятся ниже */
 .gu-chosen {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  height: calc(var(--size-chip-h) + var(--space-3) * 2);
-  padding: 0 var(--space-4);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.gu-chosen::-webkit-scrollbar {
-  display: none;
 }
 
 .gu-chosen__none {
   margin: 0;
+  padding: 0 var(--space-1);
   color: var(--text-secondary);
   font: var(--type-label);
   font-weight: 400;
@@ -218,19 +211,14 @@
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-2);
-  height: var(--size-chip-h);
-  padding: 0 var(--space-2) 0 var(--space-1);
+  max-width: 100%;
+  height: var(--size-control);
+  padding: 0 var(--space-4) 0 0;
+  overflow: hidden;
   border-radius: var(--radius-pill);
-  background: var(--glass);
+  background: var(--glass-card);
   color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
-.gu-chosen__chip svg {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: var(--space-4);
+  font: var(--type-body);
 }
 
 .gu-chosen__name {
@@ -238,6 +226,30 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Отметка выбора на аватаре: зелёный круг с галочкой справа внизу */
+.gu-pick {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.gu-pick__badge {
+  position: absolute;
+  right: calc(var(--space-1) * -1);
+  bottom: calc(var(--space-1) * -1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 2px solid var(--bg-raised);
+  border-radius: var(--radius-full);
+  background: var(--presence-online);
+  color: #fff; /* grid:ok — белая галочка на зелёном круге */
+  font-size: var(--space-3);
 }
 
 /* Поиск: стеклянное поле, как в шапке «Диалогов» */

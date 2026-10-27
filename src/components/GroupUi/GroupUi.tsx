@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
 import { CATEGORIES } from '../../data/chats';
 import { ME, avatarOf, byName, contactOf, firstNameOf, nameOf, type Contact } from '../../data/contacts';
 import { useAvatarSrc, useProfile } from '../../data/profile';
@@ -242,10 +242,14 @@ export function PersonRow({ id, note, pills, check, end, chevron, onClick, prese
       checked={check}
       ariaLabel={check === undefined ? undefined : name}
       lead={
-        <>
-          {check !== undefined && <CheckMark on={check} />}
-          <PersonAvatar id={id} presence={presence} />
-        </>
+        <span className="gu-pick">
+          <PersonAvatar id={id} presence={presence && !check} />
+          {check && (
+            <span className="gu-pick__badge" aria-hidden="true">
+              <IconCheck />
+            </span>
+          )}
+        </span>
       }
       title={
         <>
@@ -261,22 +265,15 @@ export function PersonRow({ id, note, pills, check, end, chevron, onClick, prese
   );
 }
 
-/** Выбранные люди: чипсы с аватаром и именем в одну строку, нажатие убирает; пока никого нет, строка объясняет, что делать */
+/** Выбранные люди, как в Telegram: чипсы с аватаром и именем переносятся на новые строки, нажатие убирает; пока никого нет, стоит подсказка */
 export function ChosenChips({ ids, onRemove, none = 'Выберите людей из списка ниже' }: { ids: string[]; onRemove: (id: string) => void; none?: string }) {
-  const strip = useRef<HTMLDivElement>(null);
-  // Новый чипс встаёт в конец: строка прокручивается к нему
-  useEffect(() => {
-    const el = strip.current;
-    if (el) el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
-  }, [ids.length]);
   return (
-    <div ref={strip} className="gu-chosen" data-hscroll>
+    <div className="gu-chosen">
       {ids.length === 0 && <p className="gu-chosen__none">{none}</p>}
       {ids.map((id) => (
         <button key={id} type="button" className="gu-chosen__chip" aria-label={`Убрать: ${nameOf(id)}`} onClick={() => onRemove(id)}>
-          <PersonAvatar id={id} size={24} presence={false} />
+          <PersonAvatar id={id} size={40} presence={false} />
           <span className="gu-chosen__name">{firstNameOf(id)}</span>
-          <IconCloseLine />
         </button>
       ))}
     </div>
@@ -352,12 +349,10 @@ export function ContactPicker({ contacts, chosen, onToggle, none = 'Все ва�
   const [query, setQuery] = useState('');
   return (
     <>
+      <ChosenChips ids={chosen} onRemove={onToggle} none={empty} />
       <div className="gu-search">
         <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       </div>
-      <section className="fp__card" aria-label="Выбранные">
-        <ChosenChips ids={chosen} onRemove={onToggle} none={empty} />
-      </section>
       <ContactList contacts={contacts} chosen={chosen} onPick={(c) => onToggle(c.id)} none={none} query={query} />
     </>
   );
