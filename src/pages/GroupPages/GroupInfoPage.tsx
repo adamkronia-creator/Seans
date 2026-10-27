@@ -2,12 +2,15 @@ import { useMemo, useState, type CSSProperties } from 'react';
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellOff, IconBellOn } from '../../components/FolderMenu/FolderIcons';
 import { HeaderButton, Card, PersonRow, Row } from '../../components/GroupUi/GroupUi';
-import { IconCopyLine, IconLeave, IconLinkRound, IconPenNew, IconUserCheck, IconUserPlus } from '../../components/GroupUi/GroupIcons';
+import { IconCopyLine, IconLeave, IconLinkRound, IconPenNew, IconUserCheck } from '../../components/GroupUi/GroupIcons';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, targetOfPublic, useLinkTools } from '../../components/GroupUi/LinkTools';
 import { IconChatBubble } from '../ContactPage/ContactIcons';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
+import { Badge } from '../../components/Badge/Badge';
+import { IconTestChevron } from '../../components/icons';
+import { IconPlusLine } from '../../components/Profile/ProfileIcons';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/contactShared';
 import { useStoryAuthors } from '../../data/stories';
@@ -19,6 +22,7 @@ import { heroAvatar } from '../../utils/initialsAvatar';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../FolderPage/FolderPage.css';
 import '../ContactPage/ContactPage.css';
+import './GroupPages.css';
 import '../ProfilePage/ProfilePage.css';
 import '../../components/TestSettings/TestSettings.css';
 import '../../components/TestSettings/TestSettings.pm.css';
@@ -175,18 +179,31 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
           )}
 
           {seeMembers && (
-            <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Участники'}>
-              <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Участники'}: ${info.members.length}`}</h2>
-              <div className="gu-rows gu-rows--inset">
-                {mayInvite && <Row tone="link" icon={<IconUserPlus />} title={channel ? 'Добавить подписчиков' : 'Добавить участников'} onClick={() => navigate(gPath(chatId, 'add'))} />}
-                {shown.map((m) => (
-                  <PersonRow key={m.id} id={m.id} pills={rolePills(m)} onClick={m.id === me?.id ? undefined : () => people.open(m.id)} />
-                ))}
-                {members.length > shown.length && (
-                  <Row title="Показать всех" value={String(members.length)} chevron onClick={() => navigate(gPath(chatId, 'members'))} />
-                )}
-              </div>
-            </section>
+            <div className="ts-desc-unit">
+              <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Участники'}>
+                <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Участники'}: ${info.members.length}`}</h2>
+                <div className="gu-rows gu-rows--inset">
+                  {mayInvite && (
+                    <button type="button" className="fp__add" onClick={() => navigate(gPath(chatId, 'add'))}>
+                      <span className="fp__add-icon" aria-hidden="true">
+                        <IconPlusLine />
+                      </span>
+                      {channel ? 'Добавить подписчиков' : 'Добавить участников'}
+                    </button>
+                  )}
+                  {shown.map((m) => (
+                    <PersonRow key={m.id} id={m.id} pills={rolePills(m)} onClick={m.id === me?.id ? undefined : () => people.open(m.id)} />
+                  ))}
+                </div>
+              </section>
+              {members.length > shown.length && (
+                <button type="button" className="ts-desc__toggle gu-more" onClick={() => navigate(gPath(chatId, 'members'))}>
+                  Показать всех
+                  <Badge count={members.length} />
+                  <IconTestChevron className="gu-more__chevron" />
+                </button>
+              )}
+            </div>
           )}
           {!seeMembers && me && <p className="gu-hint gu-hint--alone">В канале {info.members.length} {countWord(info.kind, info.members.length)}. Список {word}ов видят только администраторы.</p>}
 

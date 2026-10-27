@@ -1,0 +1,11 @@
+
+/* «Показать всех»: кнопка под панелью, как «Читать далее»; число в кружке и шеврон справа от подписи */
+[data-pm] .gu-more {
+  gap: var(--space-2);
+}
+
+[data-pm] .gu-more__chevron {
+  flex-shrink: 0;
+  color: var(--text-link);
+  font-size: var(--size-icon-sm);
+}

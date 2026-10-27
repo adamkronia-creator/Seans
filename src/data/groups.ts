@@ -432,7 +432,10 @@ export const kindWord = (kind: GroupKind) => (kind === 'group' ? 'группа' 
 export const inviteUrl = (code: string): string => `${window.location.origin}${window.location.pathname}#/join/${code}`;
 export const publicUrl = (username: string): string => inviteUrl(`@${username}`);
 /** Ссылка без https:// для показа */
-export const shortUrl = (url: string): string => url.replace(/^https?:\/\//, '');
+export const shortUrl = (url: string): string => {
+  const path = url.replace(/^https?:\/\/[^/]+\//, '');
+  return path.startsWith('Seans/') ? path : `Seans/${path}`;
+};
 
 /** Участники для списка: владелец, администраторы, затем остальные (в сети выше), внутри — по алфавиту */
 export function sortedMembers(g: GroupInfo): Member[] {
