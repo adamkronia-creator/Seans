@@ -185,14 +185,6 @@
   color: var(--text-secondary);
 }
 
-/* Значок группы или канала перед именем, цветом и размером под текст имени */
-.chat-item__kind {
-  display: flex;
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: var(--size-icon-sm);
-}
-
 /* В группе у превью первым идёт имя автора последнего сообщения: чуть ярче текста */
 .chat-item .chat-item__author {
   color: var(--text-primary);

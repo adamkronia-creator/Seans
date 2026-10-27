@@ -61,7 +61,7 @@ function StartScreen() {
     navigate(kind === 'group' ? '/new/group' : '/new/channel');
   };
   return (
-    <SubPage title="Новый чат" subtitle="Добавить контакт или создать чат" onBack={() => goBack('/')} swipe={!adding} toast={toast}>
+    <SubPage title="Новый чат" subtitle="Добавить или создать" onBack={() => goBack('/')} swipe={!adding} toast={toast}>
       <div className="gu-search">
         <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       </div>
