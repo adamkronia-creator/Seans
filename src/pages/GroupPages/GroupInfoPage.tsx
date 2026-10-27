@@ -182,7 +182,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
                 onKeyDown={(e) => e.key === 'Enter' && navigate(gPath(chatId, 'requests'))}
               >
                 <IconUserCheck className="ts-row__icon" />
-                <span className="ts-row__link">Заявки на вход</span>
+                <span className="ts-row__link">Заявки</span>
                 <Badge count={info.requests.length} />
                 <IconTestChevron className="ts-row__chevron" />
               </li>
@@ -191,15 +191,15 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
 
           {seeMembers && (
             <div className="ts-desc-unit">
-              <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Участники'}>
-                <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Участники'}: ${info.members.length}`}</h2>
+              <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Пользователи'}>
+                <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Пользователи'}: ${info.members.length}`}</h2>
                 <div className="gu-rows gu-rows--inset">
                   {mayInvite && (
                     <button type="button" className="fp__add" onClick={() => navigate(gPath(chatId, 'add'))}>
                       <span className="fp__add-icon" aria-hidden="true">
                         <IconPlusLine />
                       </span>
-                      {channel ? 'Добавить подписчиков' : 'Добавить участников'}
+                      {channel ? 'Добавить подписчиков' : 'Добавить пользователей'}
                     </button>
                   )}
                   {shown.map((m) => (

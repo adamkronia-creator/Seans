@@ -58,7 +58,7 @@ export function GroupMembersPage({ chatId }: { chatId: string }) {
             onKeyDown={(e) => e.key === 'Enter' && navigate(gPath(chatId, 'add'))}
           >
             <IconUserPlus className="ts-row__icon" />
-            <span className="ts-row__link">{channel ? 'Добавить подписчиков' : 'Добавить участников'}</span>
+            <span className="ts-row__link">{channel ? 'Добавить подписчиков' : 'Добавить пользователей'}</span>
             <IconTestChevron className="ts-row__chevron" />
           </li>
         </ul>
@@ -93,7 +93,7 @@ export function GroupAddMembersPage({ chatId }: { chatId: string }) {
   const toggle = (id: string) => setPicked((now) => (now.includes(id) ? now.filter((x) => x !== id) : [...now, id]));
   return (
     <SubPage
-      title={channel ? 'Добавить подписчиков' : 'Добавить участников'}
+      title={channel ? 'Добавить подписчиков' : 'Добавить пользователей'}
       subtitle={picked.length ? `Выбрано: ${picked.length}` : undefined}
       onBack={back}
       footer={{

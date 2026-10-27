@@ -788,7 +788,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                   { key: 'm-search', label: 'Поиск', Icon: IconSearchMenu, run: openSearch },
                   { key: 'm-info', label: kind === 'channel' ? 'О канале' : 'Об общем чате', Icon: IconInfo, run: () => navigate(`/chat/${chatId}/g`) },
                   { key: 'm-mute', label: chat.muted ? 'Включить звук' : 'Отключить звук', Icon: chat.muted ? IconBellLine : IconBellOffLine, run: toggleMute },
-                  ...(canInvite(info) ? [{ key: 'm-add', label: kind === 'channel' ? 'Добавить подписчиков' : 'Добавить участников', Icon: IconUserPlus, run: () => navigate(`/chat/${chatId}/g/add`) }] : []),
+                  ...(canInvite(info) ? [{ key: 'm-add', label: kind === 'channel' ? 'Добавить подписчиков' : 'Добавить пользователей', Icon: IconUserPlus, run: () => navigate(`/chat/${chatId}/g/add`) }] : []),
                   {
                     key: 'm-leave',
                     label: myMember(info)?.role === 'owner' ? (kind === 'channel' ? 'Удалить канал' : 'Удалить общий чат') : kind === 'channel' ? 'Отписаться' : 'Покинуть общий чат',
