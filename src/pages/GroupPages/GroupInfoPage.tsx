@@ -198,7 +198,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
               </section>
               {members.length > shown.length && (
                 <button type="button" className="ts-desc__toggle gu-more" onClick={() => navigate(gPath(chatId, 'members'))}>
-                  Показать всех
+                  Показать полностью
                   <Badge count={members.length} />
                   <IconTestChevron className="gu-more__chevron" />
                 </button>
