@@ -433,7 +433,7 @@ export const inviteUrl = (code: string): string => `${window.location.origin}${w
 export const publicUrl = (username: string): string => inviteUrl(`@${username}`);
 /** Ссылка без https:// для показа */
 export const shortUrl = (url: string): string => {
-  const path = url.replace(/^https?:\/\/[^/]+\//, '');
+  const path = url.replace(/^https?:\/\/[^/]*\/?/, '');
   return path.startsWith('Seans/') ? path : `Seans/${path}`;
 };
 

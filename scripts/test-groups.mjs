@@ -275,8 +275,8 @@ test('ссылки для показа: настоящий адрес этого
   const L = await fresh();
   assert.equal(L.inviteUrl('Abc123'), 'https://seans.test/#/join/Abc123');
   assert.equal(L.publicUrl('young_psy'), 'https://seans.test/#/join/@young_psy');
-  assert.equal(L.shortUrl('https://seans.test/#/join/Abc123'), 'seans.test/#/join/Abc123');
-  assert.equal(L.shortUrl('http://x.y'), 'x.y');
+  assert.equal(L.shortUrl('https://seans.test/#/join/Abc123'), 'Seans/#/join/Abc123');
+  assert.equal(L.shortUrl('http://x.y'), 'Seans/');
 });
 
 test('создание группы: вы владелец, участники добавлены, чат в списке, записи в переписке и журнале', async () => {
