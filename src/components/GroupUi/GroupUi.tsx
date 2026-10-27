@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
+import { Children, useEffect, useRef, useState, type ChangeEvent, type ComponentType, type ReactNode, type SVGProps } from 'react';
 import { LineInput } from '../LineInput/LineInput';
 import { createPortal } from 'react-dom';
 import { CATEGORIES } from '../../data/chats';
@@ -98,7 +98,8 @@ export function Card({ heading, hint, label, children }: CardProps) {
     <div className="gu-block">
       <section className="fp__card" aria-label={label ?? (typeof heading === 'string' ? heading : undefined)}>
         {heading && <h2 className="fp__heading fp__heading--pad">{heading}</h2>}
-        {children}
+        {/* Пункты лежат на одной подложке: линия только под заголовком, между пунктами её нет; у одиночной строки без заголовка обёртка не нужна */}
+        {heading || Children.toArray(children).length > 1 ? <div className="gu-rows gu-rows--inset">{children}</div> : children}
       </section>
       {hint && <p className="gu-hint">{hint}</p>}
     </div>
