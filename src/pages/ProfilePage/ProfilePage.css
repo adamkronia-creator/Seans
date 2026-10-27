@@ -784,3 +784,10 @@
   font: var(--type-body);
   text-align: center;
 }
+
+/* Нижний край обложки с такой же обводкой 4, как у аватара: линии сливаются там, где аватар заходит на обложку */
+[data-pm] .profile__cover {
+  border-bottom: 4px solid var(--glass-card);
+  box-sizing: border-box;
+  background-clip: padding-box;
+}
