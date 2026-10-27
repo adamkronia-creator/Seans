@@ -176,7 +176,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
           <Card heading="Люди">
             <Row icon={<IconShieldUser />} title="Администраторы" value={String(admins)} chevron onClick={() => open('admins')} />
             <Row icon={<IconUsersGroup />} title={channel ? 'Подписчики' : 'Участники'} value={String(info.members.length)} chevron onClick={() => open('members')} />
-            {can(info, 'inviteUsers') && <Row icon={<IconUserCheck />} title="Заявки на вступление" value={info.requests.length ? String(info.requests.length) : undefined} chevron onClick={() => open('requests')} />}
+            {can(info, 'inviteUsers') && <Row icon={<IconUserCheck />} title="Заявки на вход" value={info.requests.length ? String(info.requests.length) : undefined} chevron onClick={() => open('requests')} />}
             {can(info, 'banUsers') && <Row icon={<IconUserBlock />} title="Заблокированные" value={banned ? String(banned) : undefined} chevron onClick={() => open('banned')} />}
           </Card>
 
@@ -456,9 +456,9 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
   );
 }
 
-// ---------------------------------------------------------------- Заявки на вступление
+// ---------------------------------------------------------------- Заявки на вход
 
-/** Заявки на вступление: принять или отклонить каждую, а при нескольких — сразу все */
+/** Заявки на вход: принять или отклонить каждую, а при нескольких — сразу все */
 export function GroupRequestsPage({ chatId }: { chatId: string }) {
   const { info } = useGroupOf(chatId);
   const [toast, say] = useToast();
@@ -469,7 +469,7 @@ export function GroupRequestsPage({ chatId }: { chatId: string }) {
     return `${whenText(r.at)}${via ? `, по ссылке${via.name ? ` «${via.name}»` : ''}` : ''}`;
   };
   return (
-    <SubPage title="Заявки на вступление" subtitle={info.requests.length ? `Заявок: ${info.requests.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
+    <SubPage title="Заявки на вход" subtitle={info.requests.length ? `Заявок: ${info.requests.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
       {info.requests.length === 0 ? (
         <Card hint={`Когда в ${channel ? 'канале' : 'общем чате'} включено вступление по заявкам (у публичного адреса или у ссылки-приглашения), заявки появятся здесь.`}>
           <Empty>Заявок нет</Empty>

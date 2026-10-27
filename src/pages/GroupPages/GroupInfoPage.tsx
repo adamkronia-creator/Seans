@@ -173,9 +173,20 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
           )}
 
           {can(info, 'inviteUsers') && info.requests.length > 0 && (
-            <Card>
-              <Row icon={<IconUserCheck />} title="Заявки на вступление" value={String(info.requests.length)} chevron onClick={() => navigate(gPath(chatId, 'requests'))} />
-            </Card>
+            <ul className="ts-card nc-create">
+              <li
+                className="ts-row ts-row--link"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(gPath(chatId, 'requests'))}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(gPath(chatId, 'requests'))}
+              >
+                <IconUserCheck className="ts-row__icon" />
+                <span className="ts-row__link">Заявки на вход</span>
+                <Badge count={info.requests.length} />
+                <IconTestChevron className="ts-row__chevron" />
+              </li>
+            </ul>
           )}
 
           {seeMembers && (
