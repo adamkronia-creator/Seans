@@ -40,13 +40,13 @@ export function GroupMembersPage({ chatId }: { chatId: string }) {
   const people = useMemberActions(info, say);
   const [query, setQuery] = useState('');
   const back = () => goBack(gPath(chatId));
-  if (!info) return <SubPage title="Участники" onBack={back}>{null}</SubPage>;
+  if (!info) return <SubPage title="Пользователи" onBack={back}>{null}</SubPage>;
   const channel = info.kind === 'channel';
   const list = sortedMembers(info).filter((m) => matches(nameOf(m.id), query) || (m.id === ME && matches('вы', query)));
   return (
-    <SubPage title={channel ? 'Подписчики' : 'Участники'} subtitle={countText(info)} onBack={back} toast={toast} swipe={!people.active}>
+    <SubPage title={channel ? 'Подписчики' : 'Пользователи'} subtitle={countText(info)} onBack={back} toast={toast} swipe={!people.active}>
       <div className="gu-search">
-        <SearchField value={query} onChange={setQuery} placeholder={channel ? 'Поиск подписчиков' : 'Поиск участников'} onClear={() => setQuery('')} />
+        <SearchField value={query} onChange={setQuery} placeholder={channel ? 'Поиск подписчиков' : 'Поиск пользователей'} onClear={() => setQuery('')} />
       </div>
       {canInvite(info) && !query.trim() && (
         <ul className="ts-card nc-create">
@@ -122,15 +122,24 @@ export function GroupAdminsPage({ chatId }: { chatId: string }) {
   const info = useGroup(chatId);
   const back = () => goBack(gPath(chatId, 'edit'));
   if (!info) return <SubPage title="Администраторы" onBack={back}>{null}</SubPage>;
-  const channel = info.kind === 'channel';
   const staff = sortedMembers(info).filter((m) => m.role !== 'member');
   const mayAdd = can(info, 'addAdmins');
   return (
     <SubPage title="Администраторы" subtitle={`Администраторов: ${staff.length}`} onBack={back}>
       {mayAdd && (
-        <Card>
-          <Row tone="link" icon={<IconShieldKey />} title="Добавить администратора" onClick={() => navigate(gPath(chatId, 'admin/new'))} />
-        </Card>
+        <ul className="ts-card nc-create">
+          <li
+            className="ts-row ts-row--link"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(gPath(chatId, 'admin/new'))}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(gPath(chatId, 'admin/new'))}
+          >
+            <IconShieldKey className="ts-row__icon" />
+            <span className="ts-row__link">Добавить администратора</span>
+            <IconTestChevron className="ts-row__chevron" />
+          </li>
+        </ul>
       )}
       <Card>
         {staff.map((m) => (
@@ -144,9 +153,6 @@ export function GroupAdminsPage({ chatId }: { chatId: string }) {
           />
         ))}
       </Card>
-      <Hint>
-        Администраторы помогают вести {channel ? 'канал' : 'общий чат'} в рамках выданных прав. Владельца нельзя убрать, а права других администраторов можно менять.
-      </Hint>
     </SubPage>
   );
 }
@@ -165,7 +171,7 @@ export function GroupAdminPickPage({ chatId }: { chatId: string }) {
       </div>
       {candidates.length === 0 ? (
         <Card>
-          <Empty>{query.trim() ? 'Никого не нашли' : `Сначала добавьте ${info.kind === 'channel' ? 'подписчиков' : 'участников'}`}</Empty>
+          <Empty>{query.trim() ? 'Никого не нашли' : `Сначала добавьте ${info.kind === 'channel' ? 'подписчиков' : 'пользователей'}`}</Empty>
         </Card>
       ) : (
         <Card>
@@ -229,7 +235,7 @@ export function GroupAdminRightsPage({ chatId, memberId }: { chatId: string; mem
       {dismissing && (
         <RemoveSheet
           title="Снять администратора?"
-          text={`${nameOf(memberId)} станет обычным ${channel ? 'подписчиком' : 'участником'} и потеряет права администратора.`}
+          text={`${nameOf(memberId)} станет обычным ${channel ? 'подписчиком' : 'пользователем'} и потеряет права администратора.`}
           confirm="Снять"
           onClose={() => setDismissing(false)}
           onConfirm={() => {

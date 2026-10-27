@@ -29,8 +29,8 @@ export const RIGHT_LABELS: Record<GroupKind, Array<{ key: RightKey; label: strin
   group: [
     { key: 'changeInfo', label: 'Изменение профиля общего чата' },
     { key: 'deleteMessages', label: 'Удаление сообщений' },
-    { key: 'banUsers', label: 'Блокировка участников' },
-    { key: 'inviteUsers', label: 'Приглашение участников' },
+    { key: 'banUsers', label: 'Блокировка пользователей' },
+    { key: 'inviteUsers', label: 'Приглашение пользователей' },
     { key: 'pinMessages', label: 'Закрепление сообщений' },
     { key: 'addAdmins', label: 'Назначение администраторов' },
   ],
@@ -85,7 +85,7 @@ export interface Permissions {
 export const PERMISSION_LABELS: Array<{ key: keyof Permissions; label: string }> = [
   { key: 'sendMessages', label: 'Отправка сообщений' },
   { key: 'sendMedia', label: 'Отправка фото и файлов' },
-  { key: 'addMembers', label: 'Добавление участников' },
+  { key: 'addMembers', label: 'Добавление пользователей' },
   { key: 'pinMessages', label: 'Закрепление сообщений' },
   { key: 'changeInfo', label: 'Изменение профиля общего чата' },
 ];
@@ -234,7 +234,7 @@ function seeds(): Record<string, GroupInfo> {
     ],
     log: [
       log('bogdan', `${nameOf('bogdan')} закрепил сообщение`, 2 * DAY - 3 * 60 * 60 * 1000),
-      log(ME, 'Вы добавили участников: Богдан Ермолаев, Владислав Семёнов, Анна Королёва, Елена Миронова, Игорь Назаров', 2 * DAY - 60 * 60 * 1000),
+      log(ME, 'Вы добавили пользователей: Богдан Ермолаев, Владислав Семёнов, Анна Королёва, Елена Миронова, Игорь Назаров', 2 * DAY - 60 * 60 * 1000),
       log(ME, 'Вы назначили администратором: Богдан Ермолаев', 2 * DAY - 59 * 60 * 1000),
       log(ME, 'Вы создали общий чат «Супервизия КПТ»', 2 * DAY),
     ].sort((a, b) => b.at - a.at),
@@ -418,7 +418,7 @@ export const canDeleteOthers = (g: GroupInfo | undefined): boolean => !g || can(
 // ---------------------------------------------------------------- подписи
 
 const COUNT_WORDS: Record<GroupKind, [string, string, string]> = {
-  group: ['участник', 'участника', 'участников'],
+  group: ['пользователь', 'пользователя', 'пользователей'],
   channel: ['подписчик', 'подписчика', 'подписчиков'],
 };
 export const countWord = (kind: GroupKind, n: number) => plural(n, COUNT_WORDS[kind]);
@@ -517,7 +517,7 @@ export function createGroup(d: GroupDraft): string {
   store = { ...store, [id]: g };
   addChat({ id, name, avatar: g.avatar, kind: d.kind, lastMessage: '', time: '', unread: 0 });
   postService(id, `Вы создали ${group ? 'общий чат' : 'канал'} «${name}»`);
-  if (group && d.members.length) postService(id, `Вы добавили ${d.members.length === 1 ? 'участника' : 'участников'}: ${list(d.members)}`);
+  if (group && d.members.length) postService(id, `Вы добавили ${d.members.length === 1 ? 'пользователя' : 'пользователей'}: ${list(d.members)}`);
   emit();
   return id;
 }
@@ -575,7 +575,7 @@ const settingText = (key: keyof Settings, value: unknown): string => {
     case 'protectContent':
       return value ? 'Вы запретили сохранять и пересылать содержимое' : 'Вы разрешили сохранять и пересылать содержимое';
     case 'historyVisible':
-      return value ? 'Вы открыли историю для новых участников' : 'Вы скрыли историю от новых участников';
+      return value ? 'Вы открыли историю для новых пользователей' : 'Вы скрыли историю от новых пользователей';
     case 'slowMode':
       return value ? `Вы включили медленный режим: ${slowLabel(value as number)}` : 'Вы выключили медленный режим';
     case 'joinApproval':
@@ -598,7 +598,7 @@ export function setSetting(chatId: string, patch: Settings) {
 }
 
 export function setPermissions(chatId: string, patch: Partial<Permissions>) {
-  update(chatId, (g) => withLog({ ...g, permissions: { ...g.permissions, ...patch } }, 'Вы изменили разрешения участников'));
+  update(chatId, (g) => withLog({ ...g, permissions: { ...g.permissions, ...patch } }, 'Вы изменили разрешения пользователей'));
 }
 
 // ---------------------------------------------------------------- участники
@@ -608,7 +608,7 @@ export function addMembers(chatId: string, ids: string[]) {
   if (!g) return;
   const fresh = ids.filter((id) => !memberOf(g, id) && !g.banned.includes(id));
   if (!fresh.length) return;
-  const text = `Вы добавили ${fresh.length === 1 ? (g.kind === 'group' ? 'участника' : 'подписчика') : g.kind === 'group' ? 'участников' : 'подписчиков'}: ${list(fresh)}`;
+  const text = `Вы добавили ${fresh.length === 1 ? (g.kind === 'group' ? 'пользователя' : 'подписчика') : g.kind === 'group' ? 'пользователей' : 'подписчиков'}: ${list(fresh)}`;
   update(chatId, (x) => withLog({ ...x, members: [...x.members, ...fresh.map((id) => member(id))] }, text));
   note(g, text);
 }
@@ -617,7 +617,7 @@ export function addMembers(chatId: string, ids: string[]) {
 export function removeMember(chatId: string, id: string, ban = false) {
   const g = store[chatId];
   if (!g || !memberOf(g, id)) return;
-  const text = `Вы ${ban ? 'заблокировали' : 'удалили'} ${g.kind === 'group' ? 'участника' : 'подписчика'}: ${nameOf(id)}`;
+  const text = `Вы ${ban ? 'заблокировали' : 'удалили'} ${g.kind === 'group' ? 'пользователя' : 'подписчика'}: ${nameOf(id)}`;
   update(chatId, (x) => withLog({ ...x, members: x.members.filter((m) => m.id !== id), banned: ban ? [...x.banned, id] : x.banned }, text));
   note(g, text);
 }
@@ -798,7 +798,7 @@ export function approveRequest(chatId: string, requestId: string) {
   update(chatId, (x) =>
     withLog({ ...x, requests: x.requests.filter((q) => q.id !== requestId), members: memberOf(x, r.contactId) ? x.members : [...x.members, member(r.contactId)], links: x.links.map((l) => (l.id === r.linkId ? { ...l, joined: l.joined + 1 } : l)) }, text),
   );
-  note(g, `В ${g.kind === 'group' ? 'общем чате' : 'канале'} новый ${g.kind === 'group' ? 'участник' : 'подписчик'}: ${nameOf(r.contactId)}`);
+  note(g, `В ${g.kind === 'group' ? 'общем чате' : 'канале'} новый ${g.kind === 'group' ? 'пользователь' : 'подписчик'}: ${nameOf(r.contactId)}`);
 }
 
 export function declineRequest(chatId: string, requestId: string) {

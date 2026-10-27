@@ -62,7 +62,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
   const link = info.isPublic ? targetOfPublic(info) : mayInvite && primary ? targetOfLink(primary) : null;
   const members = sortedMembers(info);
   const shown = members.slice(0, PREVIEW);
-  const word = channel ? 'подписчик' : 'участник';
+  const word = channel ? 'подписчик' : 'пользователь';
 
   const tiles: Array<{ key: string; label: string; icon: JSX.Element; onClick: () => void; pressed?: boolean }> = [
     { key: 'chat', label: channel ? 'Канал' : 'Чат', icon: <IconChatBubble />, onClick: back },

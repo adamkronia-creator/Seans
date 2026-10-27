@@ -21,7 +21,7 @@ export function rolePills(m: Member): ReactNode {
 export function roleName(m: Member, g: GroupInfo): string {
   if (m.role === 'owner') return 'Владелец';
   if (m.role === 'admin') return m.title ? `Администратор, ${m.title}` : 'Администратор';
-  return g.kind === 'group' ? 'Участник' : 'Подписчик';
+  return g.kind === 'group' ? 'Пользователь' : 'Подписчик';
 }
 
 /** Окно действий над человеком в группе: написать, профиль, права, ограничения, удаление и блокировка */

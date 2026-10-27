@@ -209,7 +209,7 @@ function Details({ kind }: { kind: GroupKind }) {
         placeholder="Необязательно"
       />
       {group && draft.members.length > 0 && (
-        <Card heading={`Участники: ${draft.members.length}`}>
+        <Card heading={`Пользователи: ${draft.members.length}`}>
           {draft.members.map((id) => (
             <PersonRow key={id} id={id} presence={false} />
           ))}

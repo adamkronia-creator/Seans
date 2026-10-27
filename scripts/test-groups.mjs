@@ -144,7 +144,7 @@ test('права владельца: можно всё', async () => {
   for (const key of L.RIGHT_KEYS) assert.ok(L.can(g, key), key);
   assert.ok(L.canWrite(g) && L.canSendMedia(g) && L.canInvite(g) && L.canPin(g) && L.canChangeInfo(g) && L.canDeleteOthers(g));
   const anna = g.members.find((m) => m.id === 'anna');
-  assert.ok(L.canManage(g, anna), 'участника можно убрать');
+  assert.ok(L.canManage(g, anna), 'пользователя можно убрать');
   assert.equal(L.canManage(g, g.members.find((m) => m.id === L.ME)), false, 'себя — нельзя');
 });
 
@@ -168,16 +168,16 @@ test('права администратора группы: только отм�
   for (const key of ['addAdmins', 'changeInfo', 'deleteMessages', 'inviteUsers']) assert.equal(L.can(g, key), false, key);
   assert.ok(L.canWrite(g) && L.canSendMedia(g) && L.canPin(g));
   assert.equal(L.canChangeInfo(g), false);
-  assert.equal(L.canInvite(g), false, 'без права приглашать нельзя, даже если это разрешено участникам');
+  assert.equal(L.canInvite(g), false, 'без права приглашать нельзя, даже если это разрешено пользователям');
   assert.equal(L.canDeleteOthers(g), false);
 
   const member = (id) => g.members.find((m) => m.id === id);
-  assert.ok(L.canManage(g, member('anna')), 'участника убрать можно');
+  assert.ok(L.canManage(g, member('anna')), 'пользователя убрать можно');
   assert.equal(L.canManage(g, member('bogdan')), false, 'другого администратора — нет');
   assert.equal(L.canManage(g, member(L.ME)), false, 'себя — нет');
   assert.equal(L.canManage(g, { id: 'vladislav', role: 'owner', joinedAt: '' }), false, 'владельца — нет');
   const noBan = admin({ pinMessages: true });
-  assert.equal(L.canManage(noBan, noBan.members.find((m) => m.id === 'anna')), false, 'без права блокировать участников не убрать');
+  assert.equal(L.canManage(noBan, noBan.members.find((m) => m.id === 'anna')), false, 'без права блокировать пользователей не убрать');
 
   const full = admin({ changeInfo: true, deleteMessages: true, inviteUsers: true });
   assert.ok(L.canChangeInfo(full) && L.canDeleteOthers(full) && L.canInvite(full));
@@ -204,7 +204,7 @@ test('права в канале: писать и закреплять могу�
   assert.ok(L.canWrite(owner) && L.canPin(owner) && L.canInvite(owner) && L.canChangeInfo(owner) && L.canDeleteOthers(owner));
 });
 
-test('права обычного участника группы: общие разрешения и запрет писать', async () => {
+test('права обычного пользователя группы: общие разрешения и запрет писать', async () => {
   const L = await fresh();
   const base = L.getGroup('supervision');
   const member = (perms = {}, patch = {}) => ({ ...asMe(L, base, { role: 'member', rights: undefined, ...patch }), permissions: { ...base.permissions, ...perms } });
@@ -254,18 +254,18 @@ test('адрес @имя: пусто, коротко, длинно, недопу
 
 test('подписи с числами: склонение и «в сети»', async () => {
   const L = await fresh();
-  const forms = [[1, 'участник'], [2, 'участника'], [4, 'участника'], [5, 'участников'], [11, 'участников'], [12, 'участников'], [21, 'участник'], [22, 'участника'], [100, 'участников'], [101, 'участник']];
+  const forms = [[1, 'пользователь'], [2, 'пользователя'], [4, 'пользователя'], [5, 'пользователей'], [11, 'пользователей'], [12, 'пользователей'], [21, 'пользователь'], [22, 'пользователя'], [100, 'пользователей'], [101, 'пользователь']];
   for (const [n, word] of forms) assert.equal(L.countWord('group', n), word, String(n));
   assert.deepEqual([1, 3, 7, 11].map((n) => L.countWord('channel', n)), ['подписчик', 'подписчика', 'подписчиков', 'подписчиков']);
   assert.equal(L.kindWord('group'), 'общий чат');
   assert.equal(L.kindWord('channel'), 'канал');
 
   const sup = L.getGroup('supervision');
-  assert.equal(L.countText(sup), '6 участников');
+  assert.equal(L.countText(sup), '6 пользователей');
   const online = sup.members.filter((m) => m.id === L.ME || L.CONTACTS.find((c) => c.id === m.id)?.online).length;
   assert.ok(online >= 1);
   assert.equal(L.onlineCount(sup), online);
-  assert.equal(L.subtitleOf(sup), `6 участников, ${online} в сети`);
+  assert.equal(L.subtitleOf(sup), `6 пользователей, ${online} в сети`);
   const myths = L.getGroup('psy-myths');
   assert.equal(L.countText(myths), '7 подписчиков');
   assert.equal(L.subtitleOf(myths), '7 подписчиков', 'в канале «в сети» не пишут');
@@ -279,7 +279,7 @@ test('ссылки для показа: настоящий адрес этого
   assert.equal(L.shortUrl('http://x.y'), 'Seans/');
 });
 
-test('создание группы: вы владелец, участники добавлены, чат в списке, записи в переписке и журнале', async () => {
+test('создание группы: вы владелец, пользователи добавлены, чат в списке, записи в переписке и журнале', async () => {
   const L = await fresh();
   const before = L.getChats().length;
   const id = L.createGroup(draft({ name: '  Моя группа  ', description: ' О чём-то ' }));
@@ -308,15 +308,15 @@ test('создание группы: вы владелец, участники �
   assert.equal(chat.name, 'Моя группа');
   assert.equal(chat.avatar, g.avatar);
   const lines = messagesOf(L, id);
-  assert.deepEqual(lines.map((m) => m.text), ['Вы создали общий чат «Моя группа»', 'Вы добавили участников: Анна Королёва, Игорь Назаров']);
+  assert.deepEqual(lines.map((m) => m.text), ['Вы создали общий чат «Моя группа»', 'Вы добавили пользователей: Анна Королёва, Игорь Назаров']);
   assert.ok(lines.every((m) => m.service));
-  assert.equal(chat.lastMessage, 'Вы добавили участников: Анна Королёва, Игорь Назаров');
+  assert.equal(chat.lastMessage, 'Вы добавили пользователей: Анна Королёва, Игорь Назаров');
 
   const one = L.createGroup(draft({ members: ['anna'] }));
-  assert.equal(messagesOf(L, one)[1].text, 'Вы добавили участника: Анна Королёва');
+  assert.equal(messagesOf(L, one)[1].text, 'Вы добавили пользователя: Анна Королёва');
   const alone = L.createGroup(draft({ members: [] }));
   assert.equal(messagesOf(L, alone).length, 1, 'никого не добавили — записи об этом нет');
-  assert.equal(L.countText(L.getGroup(alone)), '1 участник');
+  assert.equal(L.countText(L.getGroup(alone)), '1 пользователь');
 });
 
 test('создание канала: публичный с адресом, своё фото остаётся как есть, подписчики без записи в переписке', async () => {
@@ -443,13 +443,13 @@ test('настройки: каждое изменение пишется в жу
   g = L.getGroup(id);
   assert.deepEqual(g.reactions, []);
   assert.ok(g.signatures && !g.historyVisible);
-  for (const line of ['Вы выключили медленный режим', 'Вы выключили реакции', 'Вы включили подписи авторов', 'Вы скрыли историю от новых участников']) assert.ok(texts(g).includes(line), line);
+  for (const line of ['Вы выключили медленный режим', 'Вы выключили реакции', 'Вы включили подписи авторов', 'Вы скрыли историю от новых пользователей']) assert.ok(texts(g).includes(line), line);
   L.setSetting(id, { reactions: ['👍', '🔥'] });
   assert.ok(texts(L.getGroup(id)).includes('Вы изменили разрешённые реакции: 👍 🔥'));
 
   L.setPermissions(id, { sendMedia: false, pinMessages: true });
   assert.deepEqual(L.getGroup(id).permissions, { sendMessages: true, sendMedia: false, addMembers: true, pinMessages: true, changeInfo: false });
-  assert.ok(texts(L.getGroup(id)).includes('Вы изменили разрешения участников'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы изменили разрешения пользователей'));
 });
 
 test('журнал держит последние 200 записей, новые сверху', async () => {
@@ -462,15 +462,15 @@ test('журнал держит последние 200 записей, новы�
   assert.ok(g.log.every((e, i) => i === 0 || g.log[i - 1].at >= e.at));
 });
 
-test('участники: добавление без повторов, удаление, блокировка и разблокировка', async () => {
+test('пользователи: добавление без повторов, удаление, блокировка и разблокировка', async () => {
   const L = await fresh();
   const id = L.createGroup(draft({ members: ['anna'] }));
   L.addMembers(id, ['anna', 'igor', 'elena']);
   assert.deepEqual(ids(L.getGroup(id)), [L.ME, 'anna', 'igor', 'elena']);
-  assert.ok(texts(L.getGroup(id)).includes('Вы добавили участников: Игорь Назаров, Елена Миронова'));
-  assert.ok(messagesOf(L, id).some((m) => m.service && m.text === 'Вы добавили участников: Игорь Назаров, Елена Миронова'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы добавили пользователей: Игорь Назаров, Елена Миронова'));
+  assert.ok(messagesOf(L, id).some((m) => m.service && m.text === 'Вы добавили пользователей: Игорь Назаров, Елена Миронова'));
   L.addMembers(id, ['olga']);
-  assert.ok(texts(L.getGroup(id)).includes('Вы добавили участника: Ольга Громова'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы добавили пользователя: Ольга Громова'));
   const len = L.getGroup(id).log.length;
   L.addMembers(id, ['anna', 'olga']);
   assert.equal(L.getGroup(id).log.length, len, 'кто уже в группе, повторно не добавляется');
@@ -478,10 +478,10 @@ test('участники: добавление без повторов, удал
   L.removeMember(id, 'igor');
   assert.equal(ids(L.getGroup(id)).includes('igor'), false);
   assert.deepEqual(L.getGroup(id).banned, []);
-  assert.ok(texts(L.getGroup(id)).includes('Вы удалили участника: Игорь Назаров'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы удалили пользователя: Игорь Назаров'));
   L.removeMember(id, 'elena', true);
   assert.deepEqual(L.getGroup(id).banned, ['elena']);
-  assert.ok(texts(L.getGroup(id)).includes('Вы заблокировали участника: Елена Миронова'));
+  assert.ok(texts(L.getGroup(id)).includes('Вы заблокировали пользователя: Елена Миронова'));
 
   L.addMembers(id, ['elena']);
   assert.equal(ids(L.getGroup(id)).includes('elena'), false, 'заблокированного не добавить');
@@ -566,7 +566,7 @@ test('администраторы: назначение с правами и п
   assert.equal(editor.anonymous, undefined, 'анонимность только в группах');
 });
 
-test('список участников: владелец, администраторы, затем остальные — сначала те, кто в сети, по алфавиту', async () => {
+test('список пользователей: владелец, администраторы, затем остальные — сначала те, кто в сети, по алфавиту', async () => {
   const L = await fresh();
   const sorted = L.sortedMembers(L.getGroup('supervision'));
   assert.equal(sorted.length, 6);
@@ -776,7 +776,7 @@ test('заявки в вашей группе: принять, отклонит�
   assert.equal(L.getGroup('supervision').members.length, members + 1);
   assert.ok(ids(L.getGroup('supervision')).includes(first.contactId));
   assert.ok(texts(L.getGroup('supervision')).includes('Вы приняли заявку: Павел Зайцев'));
-  assert.ok(messagesOf(L, 'supervision').some((m) => m.service && m.text === 'В общем чате новый участник: Павел Зайцев'));
+  assert.ok(messagesOf(L, 'supervision').some((m) => m.service && m.text === 'В общем чате новый пользователь: Павел Зайцев'));
   L.declineRequest('supervision', second.id);
   assert.equal(L.getGroup('supervision').requests.length, 0);
   assert.equal(L.getGroup('supervision').members.length, members + 1);
@@ -796,7 +796,7 @@ test('заявки в вашей группе: принять, отклонит�
   assert.equal(none.getGroup('supervision').members.length, 6);
 });
 
-test('выход: владелец удаляет группу у всех, участник уходит и может вернуться', async () => {
+test('выход: владелец удаляет группу у всех, пользователь уходит и может вернуться', async () => {
   const L = await fresh();
   const id = L.createGroup(draft());
   const code = L.getGroup(id).links[0].code;
@@ -895,7 +895,7 @@ test('канал: пост получает просмотры, подпись �
   assert.equal(direct.signature, undefined);
 });
 
-test('группа: участник иногда отвечает; ограниченный и ушедший — нет', async () => {
+test('группа: пользователь иногда отвечает; ограниченный и ушедший — нет', async () => {
   const L = await fresh();
   await withRandom(0.1, async () => {
     const id = L.createGroup(draft({ members: ['anna', 'igor'] }));
@@ -933,7 +933,7 @@ test('группа: участник иногда отвечает; ограни
   });
 });
 
-test('цвета имён авторов: у участников групп все разные', async () => {
+test('цвета имён авторов: у пользователей групп все разные', async () => {
   const L = await fresh();
   for (const chatId of ['supervision', 'pub-young']) {
     const colors = L.getGroup(chatId).members.filter((m) => m.id !== L.ME).map((m) => L.authorColor(m.id));

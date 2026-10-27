@@ -161,7 +161,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
           {owner && !channel && (
             <SwitchRow
               title="Показывать историю"
-              note="Показывать приглашенным прошлые сообщения"
+              note="Показывать приглашенным пользователям прошлые сообщения чата"
               checked={info.historyVisible}
               onChange={(v) => {
                 setSetting(chatId, { historyVisible: v });
@@ -176,7 +176,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
         <>
           <Card heading="Люди">
             <Row icon={<IconShieldUser />} title="Администраторы" value={String(admins)} chevron onClick={() => open('admins')} />
-            <Row icon={<IconUsersGroup />} title={channel ? 'Подписчики' : 'Участники'} value={String(info.members.length)} chevron onClick={() => open('members')} />
+            <Row icon={<IconUsersGroup />} title={channel ? 'Подписчики' : 'Пользователи'} value={String(info.members.length)} chevron onClick={() => open('members')} />
             {can(info, 'inviteUsers') && <Row icon={<IconUserCheck />} title="Заявки" value={info.requests.length ? <Badge count={info.requests.length} /> : undefined} chevron onClick={() => open('requests')} />}
             {can(info, 'banUsers') && <Row icon={<IconUserBlock />} title="Заблокированные" value={banned ? String(banned) : undefined} chevron onClick={() => open('banned')} />}
           </Card>
@@ -337,13 +337,13 @@ export function GroupPermsPage({ chatId }: { chatId: string }) {
   if (!info) return <SubPage title="Разрешения" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
   const silenced = info.members.filter((m) => m.silenced);
   return (
-    <SubPage title="Разрешения" subtitle="Что можно участникам" onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={!people.active}>
-      <Card heading="Участникам разрешено">
+    <SubPage title="Разрешения" subtitle="Что можно пользователям" onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={!people.active}>
+      <Card heading="Пользователям разрешено">
         {PERMISSION_LABELS.map(({ key, label }) => (
           <SwitchRow key={key} title={label} checked={info.permissions[key]} onChange={(v) => setPermissions(chatId, { [key]: v })} />
         ))}
       </Card>
-      <Card heading="Медленный режим" hint="Участники смогут отправлять одно сообщение за выбранное время. Администраторов это не касается.">
+      <Card heading="Медленный режим" hint="Пользователи смогут отправлять одно сообщение за выбранное время. Администраторов это не касается.">
         {SLOW_MODES.map((s) => (
           <Row key={s} title={s === 0 ? 'Выключен' : `Пауза ${slowLabel(s)}`} role="radio" checked={info.slowMode === s} end={<RadioDot on={info.slowMode === s} />} onClick={() => setSetting(chatId, { slowMode: s })} />
         ))}
@@ -380,7 +380,7 @@ export function GroupReactionsPage({ chatId }: { chatId: string }) {
   };
   return (
     <SubPage title="Реакции" subtitle={info.kind === 'channel' ? 'Под постами канала' : 'Под сообщениями общего чата'} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast}>
-      <Card hint="Реакции можно ставить на сообщения. Участники выбирают только из разрешённых.">
+      <Card hint="Реакции можно ставить на сообщения. Пользователи выбирают только из разрешённых.">
         <SwitchRow icon={<IconSmile />} title="Реакции" checked={on} onChange={(v) => setSetting(chatId, { reactions: v ? [...REACTION_CHOICES] : [] })} />
       </Card>
       {on && (
@@ -424,7 +424,7 @@ export function GroupBannedPage({ chatId }: { chatId: string }) {
   return (
     <SubPage title="Заблокированные" subtitle={info.banned.length ? `Заблокировано: ${info.banned.length}` : undefined} onBack={() => goBack(gPath(chatId, 'edit'))} toast={toast} swipe={who === null}>
       {info.banned.length === 0 ? (
-        <Card hint={`Заблокированные не могут вернуться в ${info.kind === 'channel' ? 'канал' : 'общий чат'} по ссылке. Заблокировать можно человека из списка ${info.kind === 'channel' ? 'подписчиков' : 'участников'}.`}>
+        <Card>
           <Empty>Заблокированных нет</Empty>
         </Card>
       ) : (
