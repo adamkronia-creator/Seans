@@ -35,7 +35,7 @@ export function QrCode({ text }: { text: string }) {
   );
 }
 
-function QrSheet({ title, url, onCopy, onClose }: { title: string; url: string; onCopy: () => void; onClose: () => void }) {
+export function QrSheet({ title, url, onCopy, onClose }: { title: string; url: string; onCopy: () => void; onClose: () => void }) {
   return (
     <Frame
       title="QR-код"

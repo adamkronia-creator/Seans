@@ -12,6 +12,8 @@ import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMen
 import { IconGearMk, IconHelpMk } from '../../components/ChatItem/ChatIcons';
 import { IconArchive } from '../../components/FolderMenu/FolderIcons';
 import { IconCopyLine, IconDotsV, IconShare, IconUser } from '../ContactPage/ContactIcons';
+import { QrSheet } from '../../components/GroupUi/LinkTools';
+import { IconQr } from '../../components/GroupUi/GroupIcons';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -20,6 +22,7 @@ import { avatarSrcOf, coverSrcOf, useProfile } from '../../data/profile';
 import { wantEdit } from '../../data/profileIntent';
 import { navigate } from '../../router';
 import { useTabSwipe } from '../../utils/tabNav';
+import '../FolderPage/FolderPage.css';
 import './ProfilePage.css';
 
 /** Сколько видно на панели профиля: фото двумя рядами по три, альбомов один ряд; остальное на экране «Посмотреть» */
@@ -70,6 +73,7 @@ export function ProfilePage() {
   const [pickingBackground, setPickingBackground] = useState(false);
   const [tab, setTab] = useState<PhotoView>('photos');
   const [newAlbum, setNewAlbum] = useState(false);
+  const [qr, setQr] = useState(false);
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
@@ -142,7 +146,15 @@ export function ProfilePage() {
             </button>
             <button
               type="button"
-              className="profile__badge profile__badge--cover profile__menu-btn"
+              className="fp__back profile__qr-btn"
+              aria-label="QR-код профиля"
+              onClick={() => (link() ? setQr(true) : show('Укажите никнейм в профиле'))}
+            >
+              <IconQr />
+            </button>
+            <button
+              type="button"
+              className="fp__back profile__menu-btn"
               aria-label="Настройки профиля"
               aria-haspopup="menu"
               aria-expanded={menu !== null}
@@ -170,6 +182,7 @@ export function ProfilePage() {
             </div>
 
             <h1 className={`profile__name${name.trim() ? '' : ' profile__name--empty'}`}>{name.trim() || 'Ваше имя'}</h1>
+            <p className="profile__status">в сети</p>
 
             <ul className="profile__stats" aria-label="Сводка">
               <li className="profile__stat">
@@ -314,6 +327,7 @@ export function ProfilePage() {
       {toast && <Toast text={toast} />}
       {pickingBackground && <BackgroundSheet onClose={() => setPickingBackground(false)} />}
       {picking && <PhotoPickSheet kind={picking} onClose={() => setPicking(null)} onNote={show} />}
+      {qr && <QrSheet title={name.trim() || 'Профиль'} url={link()} onCopy={copyLink} onClose={() => setQr(false)} />}
       {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Настройки профиля" width={272} onClose={() => setMenu(null)} />}
       {newAlbum && <AlbumNameSheet onClose={() => setNewAlbum(false)} onSaved={(id) => navigate(`/profile/photos/album/${id}`)} />}
       {viewing && <PhotoViewer startId={viewing} onClose={() => setViewing(null)} />}
