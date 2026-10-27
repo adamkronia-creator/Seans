@@ -1,6 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
-import { IconPin } from '../../components/icons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
@@ -22,6 +21,32 @@ import './ProfilePage.css';
 const PHOTOS_SHOWN = 6;
 const ALBUMS_SHOWN = 3;
 
+/** Карточка с основными сведениями: строки как у личной информации, нажатие открывает редактирование */
+function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows: { label: string; value: string }[]; onEdit: () => void }) {
+  return (
+    <section className="profile__card" aria-labelledby={id}>
+      <header className="profile__card-head">
+        <h2 id={id} className="profile__card-title">
+          {title}
+        </h2>
+        <button type="button" className="profile__card-button" aria-label={`Редактировать: ${title.toLowerCase()}`} onClick={onEdit}>
+          <IconPencil />
+        </button>
+      </header>
+      <ul className="profile__fields">
+        {rows.map((row) => (
+          <li key={row.label}>
+            <button type="button" className="profile__field" onClick={onEdit}>
+              <span className="profile__field-label">{row.label}</span>
+              <span className={`profile__field-value${row.value.trim() ? '' : ' profile__field-value--empty'}`}>{row.value.trim() || 'Не заполнено'}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /**
  * Раздел «Профиль» (последняя вкладка нижней панели): обложка, аватар, имя и специализация, сводка, личная информация и фото.
  * Всё, кроме имени, необязательное: поля личной информации человек заводит и убирает сам (экран «Редактирование профиля»).
@@ -41,7 +66,7 @@ export function ProfilePage() {
   // Свайп вправо ведёт в чаты (предыдущий раздел нижней панели)
   useTabSwipe(root, 'right', 'messages');
 
-  const { photos, albums, thumbs, uploading, name, headline, city, fields } = profile;
+  const { photos, albums, thumbs, uploading, name, headline, city, username, phone, birthday, gender, family, fields } = profile;
   const cover = coverSrcOf(profile);
   const clients = chats.filter((chat) => chat.category === 'clients').length;
   const colleagues = chats.filter((chat) => chat.category === 'colleagues').length;
@@ -111,13 +136,6 @@ export function ProfilePage() {
             </div>
 
             <h1 className={`profile__name${name.trim() ? '' : ' profile__name--empty'}`}>{name.trim() || 'Ваше имя'}</h1>
-            {headline.trim() && <p className="profile__headline">{headline.trim()}</p>}
-            {city.trim() && (
-              <p className="profile__city">
-                <IconPin />
-                {city.trim()}
-              </p>
-            )}
 
             <ul className="profile__stats" aria-label="Сводка">
               <li className="profile__stat">
@@ -135,6 +153,28 @@ export function ProfilePage() {
             </ul>
           </div>
         </div>
+
+        <InfoCard
+          id="profile-contacts"
+          title="Контактная информация"
+          rows={[
+            { label: 'Никнейм', value: username },
+            { label: 'Телефон', value: phone },
+          ]}
+          onEdit={() => edit()}
+        />
+        <InfoCard
+          id="profile-general"
+          title="Общая информация"
+          rows={[
+            { label: 'Дата рождения', value: birthday },
+            { label: 'Специализация', value: headline },
+            { label: 'Пол', value: gender },
+            { label: 'Семейное положение', value: family },
+            { label: 'Город', value: city },
+          ]}
+          onEdit={() => edit()}
+        />
 
         <section className="profile__card" aria-labelledby="profile-info">
           <header className="profile__card-head">

@@ -55,6 +55,8 @@ interface Stored {
   phone: string;
   birthday: string;
   family: string;
+  /** Пол: текстом, как человек напишет */
+  gender: string;
   fields: ProfileField[];
   /** Фото по порядку показа: новые первыми */
   photos: ProfilePhoto[];
@@ -87,6 +89,7 @@ const SEED: Stored = {
   phone: '',
   birthday: '',
   family: '',
+  gender: '',
   fields: [
     {
       id: 'about',
@@ -148,6 +151,7 @@ function sanitize(raw: unknown): Stored {
     phone: isText(data.phone) ? data.phone : '',
     birthday: isText(data.birthday) ? data.birthday : '',
     family: isText(data.family) ? data.family : '',
+    gender: isText(data.gender) ? data.gender : '',
     fields,
     photos,
     albums,
@@ -171,9 +175,9 @@ let saveTimer: number | undefined;
 function flush() {
   window.clearTimeout(saveTimer);
   saveTimer = undefined;
-  const { name, headline, city, username, phone, birthday, family, fields, photos, albums, avatarId, coverId } = state;
+  const { name, headline, city, username, phone, birthday, family, gender, fields, photos, albums, avatarId, coverId } = state;
   try {
-    window.localStorage.setItem(KEY, JSON.stringify({ name, headline, city, username, phone, birthday, family, fields, photos, albums, avatarId, coverId } satisfies Stored));
+    window.localStorage.setItem(KEY, JSON.stringify({ name, headline, city, username, phone, birthday, family, gender, fields, photos, albums, avatarId, coverId } satisfies Stored));
   } catch {
     // Нет места или хранилище закрыто: профиль остаётся в памяти до закрытия страницы
   }
@@ -230,7 +234,7 @@ export function coverSrcOf(profile: ProfileState): string | undefined {
 
 // ---------------------------------------------------------------- основное и поля
 
-export function updateBasics(patch: Partial<Pick<Stored, 'name' | 'headline' | 'city' | 'username' | 'phone' | 'birthday' | 'family'>>) {
+export function updateBasics(patch: Partial<Pick<Stored, 'name' | 'headline' | 'city' | 'username' | 'phone' | 'birthday' | 'family' | 'gender'>>) {
   set(patch);
 }
 

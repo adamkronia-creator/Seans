@@ -135,7 +135,7 @@ const titleOf = (field: ProfileField) => field.label.trim() || 'Без назв�
  */
 export function ProfileEditPage() {
   const profile = useProfile();
-  const { fields, name, headline, city, username, phone, birthday, family } = profile;
+  const { fields, name, headline, city, username, phone, birthday, family, gender } = profile;
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
   const [asking, setAsking] = useState<ProfileField | null>(null);
   const [toast, show] = useToast();
@@ -291,6 +291,7 @@ export function ProfileEditPage() {
         <section className="pe__card" aria-label="Общая информация">
           <TextInput icon={FieldIcon.cake} label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
           <TextInput icon={FieldIcon.badge} label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
+          <TextInput icon={FieldIcon.user} label="Пол" value={gender} onChange={(v) => updateBasics({ gender: v })} placeholder="Например, женский" max={30} />
           <TextInput icon={FieldIcon.heart} label="Семейное положение" value={family} onChange={(v) => updateBasics({ family: v })} placeholder="Например, женат" max={60} />
           <TextInput icon={FieldIcon.city} label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />
         </section>

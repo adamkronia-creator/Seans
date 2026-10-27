@@ -562,7 +562,7 @@
 }
 
 /* Как в редактировании: заголовок карточки отделён просветом 1 px, через который виден фон, линий между полями нет */
-[data-pm] .profile__card:has(#profile-info) {
+[data-pm] .profile__card:has(#profile-info, #profile-contacts, #profile-general) {
   display: flex;
   flex-direction: column;
   gap: 1px; /* grid:ok — просвет-разделитель 1 px */
@@ -570,7 +570,7 @@
   background: none;
 }
 
-[data-pm] .profile__card:has(#profile-info) > * {
+[data-pm] .profile__card:has(#profile-info, #profile-contacts, #profile-general) > * {
   background: var(--glass-card);
 }
 
