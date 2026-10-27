@@ -699,4 +699,5 @@
 [data-pm] .gu-rows--split .gu-row__title {
   color: var(--text-primary);
   font: var(--type-body);
+  font-weight: var(--font-weight-medium);
 }

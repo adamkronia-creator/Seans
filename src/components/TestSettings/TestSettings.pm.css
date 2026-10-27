@@ -535,4 +535,5 @@
 [data-pm] ul.ts-card > .ts-row .ts-row__link {
   color: var(--text-primary);
   font: var(--type-body);
+  font-weight: var(--font-weight-medium);
 }
