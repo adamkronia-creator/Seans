@@ -525,3 +525,14 @@
 [data-pm] .blank-card__body:has(> .result-seg) {
   background: var(--glass-card);
 }
+
+/* «Бланк тестирования» и «Пример заключения» — как «Фото профиля» и «Обложка» в редактировании профиля: строка 64, поля 12 / 16, подпись обычным белым текстом */
+[data-pm] ul.ts-card > .ts-row {
+  min-height: var(--row-h-2);
+  padding: var(--field-pad-y) var(--row-pad-x);
+}
+
+[data-pm] ul.ts-card > .ts-row .ts-row__link {
+  color: var(--text-primary);
+  font: var(--type-body);
+}
