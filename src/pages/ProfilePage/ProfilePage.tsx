@@ -166,6 +166,9 @@ export function ProfilePage() {
 
           <div className="profile__head">
             <div className="profile__row">
+              <button type="button" className="profile__side-btn" aria-label={profile.coverId ? 'Изменить обложку' : 'Добавить обложку'} onClick={() => setPicking('cover')}>
+                <IconCamera />
+              </button>
               <div className="profile__avatar">
                 <button
                   type="button"
@@ -179,6 +182,9 @@ export function ProfilePage() {
                   <IconCamera />
                 </button>
               </div>
+              <button type="button" className="profile__side-btn" aria-label="Изменить фон приложения" onClick={() => setPickingBackground(true)}>
+                <IconWallpaper />
+              </button>
             </div>
 
             <h1 className={`profile__name${name.trim() ? '' : ' profile__name--empty'}`}>{name.trim() || 'Ваше имя'}</h1>

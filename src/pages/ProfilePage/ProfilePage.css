@@ -443,9 +443,8 @@
 }
 
 [data-pm] .profile__avatar {
-  border: 4px solid var(--glass-card);
-  background: none;
-  background-clip: padding-box;
+  border: 4px solid var(--glass-solid);
+  background: var(--glass-solid);
 }
 
 [data-pm] .profile__edit {
@@ -779,15 +778,33 @@
 
 /* Статус под именем */
 [data-pm] .profile__status {
-  margin-top: var(--space-1);
+  margin-top: 0;
   color: var(--text-secondary);
   font: var(--type-body);
   text-align: center;
 }
 
-/* Нижний край обложки с такой же обводкой 4, как у аватара: линии сливаются там, где аватар заходит на обложку */
-[data-pm] .profile__cover {
-  border-bottom: 4px solid var(--glass-card);
-  box-sizing: border-box;
-  background-clip: padding-box;
+
+/* По бокам от аватара: обложка слева, фон приложения справа; круги прозрачные, как панели, отступ от аватара 16, от обложки 12 */
+[data-pm] .profile__row {
+  gap: var(--space-4);
+}
+
+[data-pm] .profile__side-btn {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  margin-top: var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-card);
+  color: var(--text-primary);
+  font-size: var(--size-icon-lg);
+}
+
+[data-pm] .profile__side-btn:active {
+  background: var(--glass);
 }
