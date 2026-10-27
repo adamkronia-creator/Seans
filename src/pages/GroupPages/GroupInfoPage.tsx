@@ -1,20 +1,27 @@
-import { useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { IconBackMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellOff, IconBellOn } from '../../components/FolderMenu/FolderIcons';
 import { HeaderButton, Card, PersonRow, Row } from '../../components/GroupUi/GroupUi';
-import { IconCopyLine, IconInfo, IconLeave, IconLinkRound, IconPenNew, IconQr, IconTrashLine, IconUserCheck, IconUserPlus } from '../../components/GroupUi/GroupIcons';
+import { IconCopyLine, IconLeave, IconLinkRound, IconPenNew, IconUserCheck, IconUserPlus } from '../../components/GroupUi/GroupIcons';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, targetOfPublic, useLinkTools } from '../../components/GroupUi/LinkTools';
 import { IconChatBubble } from '../ContactPage/ContactIcons';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
-import { setMutedMany, useChat } from '../../data/chatStore';
+import { FieldIcon } from '../../components/Profile/FieldIcons';
+import { linksIn, SHARED_FILES, SHARED_LINKS, SHARED_MEDIA } from '../../data/contactShared';
+import { useStoryAuthors } from '../../data/stories';
+import { ContactTabs } from '../ContactPage/ContactTabs';
+import { setMutedMany, useChat, useMessages } from '../../data/chatStore';
 import { canChangeInfo, canInvite, can, countWord, leaveGroup, myMember, shortUrl, sortedMembers, subtitleOf, useGroup } from '../../data/groups';
 import { goBack, goBackBy, navigate } from '../../router';
 import { heroAvatar } from '../../utils/initialsAvatar';
 import { useSwipeBack } from '../../utils/swipeBack';
 import '../FolderPage/FolderPage.css';
 import '../ContactPage/ContactPage.css';
+import '../ProfilePage/ProfilePage.css';
+import '../../components/TestSettings/TestSettings.css';
+import '../../components/TestSettings/TestSettings.pm.css';
 import { gPath, rolePills, useMemberActions } from './shared';
 
 /** Сколько участников видно на самой странице; остальных открывает «Показать всех» */
@@ -32,6 +39,10 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
   const tools = useLinkTools(info, say);
   const people = useMemberActions(info, say);
   const [leaving, setLeaving] = useState(false);
+  const [screen, setScreen] = useState<HTMLElement | null>(null);
+  const groups = useMessages(chatId);
+  const stories = useStoryAuthors().find((a) => a.id === chatId)?.stories ?? [];
+  const sharedLinks = useMemo(() => [...linksIn(groups), ...(SHARED_LINKS[chatId] ?? [])], [groups, chatId]);
   const back = () => goBack(`/chat/${chatId}`);
   useSwipeBack('.ct', !leaving && !tools.open && !people.active, back);
   if (!chat || !info) return <section className="fp ct" />;
@@ -71,7 +82,7 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
   };
 
   return (
-    <section className="fp ct gu-info">
+    <section ref={setScreen} className="fp ct gu-info">
       <header className="fp__header ct__bar">
         <button type="button" className="fp__back" aria-label="Назад" onClick={back}>
           <IconBackMk />
@@ -104,53 +115,57 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
             ))}
           </div>
 
-          {(info.description || link) && (
-            <section className="fp__card ct__card" aria-label="О группе">
+          {(link || info.createdAt) && (
+            <section className="fp__card ct__card" aria-label="О канале">
               <ul className="ct__rows">
-                {info.description && (
+                {link && (
                   <li>
-                    <div className="ct__row">
+                    <button type="button" className="ct__row ct__row--tap" onClick={() => tools.copy(link.url)}>
                       <span className="ct__icon" aria-hidden="true">
-                        <IconInfo />
+                        <IconLinkRound />
                       </span>
                       <span className="ct__text">
-                        <span className="ct__label">Описание</span>
-                        <span className="ct__value gu-about">{info.description}</span>
+                        <span className="ct__label">Ссылка-приглашение</span>
+                        <span className="ct__value">{shortUrl(link.url)}</span>
                       </span>
-                    </div>
+                      <span className="ct__row-icon">
+                        <IconCopyLine />
+                      </span>
+                    </button>
                   </li>
                 )}
-                {link && (
-                  <>
-                    <li>
-                      <button type="button" className="ct__row ct__row--tap" onClick={() => tools.copy(link.url)}>
-                        <span className="ct__icon" aria-hidden="true">
-                          <IconLinkRound />
-                        </span>
-                        <span className="ct__text">
-                          <span className="ct__label">{info.isPublic ? 'Публичная ссылка' : 'Ссылка-приглашение'}</span>
-                          <span className="ct__value">{shortUrl(link.url)}</span>
-                        </span>
-                        <span className="ct__row-icon">
-                          <IconCopyLine />
-                        </span>
-                      </button>
-                    </li>
-                    <li>
-                      <button type="button" className="ct__row ct__row--tap" onClick={() => tools.showQr(link.url, info.name)}>
-                        <span className="ct__icon" aria-hidden="true">
-                          <IconQr />
-                        </span>
-                        <span className="ct__text">
-                          <span className="ct__label">QR-код</span>
-                          <span className="ct__value">Показать для сканирования</span>
-                        </span>
-                      </button>
-                    </li>
-                  </>
-                )}
+                <li>
+                  <div className="ct__row">
+                    <span className="ct__icon" aria-hidden="true">
+                      {FieldIcon.cake}
+                    </span>
+                    <span className="ct__text">
+                      <span className="ct__label">Дата создания</span>
+                      <span className="ct__value">{new Date(info.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    </span>
+                  </div>
+                </li>
               </ul>
             </section>
+          )}
+
+          {info.description && (
+            <div className="ts-desc-unit ct__personal">
+              <section className="profile__card" aria-labelledby="group-about">
+                <header className="profile__card-head">
+                  <h2 id="group-about" className="profile__card-title">
+                    Описание
+                  </h2>
+                </header>
+                <ul className="profile__fields">
+                  <li>
+                    <div className="profile__field person__field">
+                      <span className="profile__field-value">{info.description}</span>
+                    </div>
+                  </li>
+                </ul>
+              </section>
+            </div>
           )}
 
           {can(info, 'inviteUsers') && info.requests.length > 0 && (
@@ -160,26 +175,28 @@ export function GroupInfoPage({ chatId }: { chatId: string }) {
           )}
 
           {seeMembers && (
-            <Card heading={`${channel ? 'Подписчики' : 'Участники'}: ${info.members.length}`}>
-              {mayInvite && <Row tone="link" icon={<IconUserPlus />} title={channel ? 'Добавить подписчиков' : 'Добавить участников'} onClick={() => navigate(gPath(chatId, 'add'))} />}
-              {shown.map((m) => (
-                <PersonRow key={m.id} id={m.id} pills={rolePills(m)} onClick={m.id === me?.id ? undefined : () => people.open(m.id)} />
-              ))}
-              {members.length > shown.length && (
-                <Row title="Показать всех" value={String(members.length)} chevron onClick={() => navigate(gPath(chatId, 'members'))} />
-              )}
-            </Card>
+            <section className="fp__card" aria-label={channel ? 'Подписчики' : 'Участники'}>
+              <h2 className="fp__heading fp__heading--pad">{`${channel ? 'Подписчики' : 'Участники'}: ${info.members.length}`}</h2>
+              <div className="gu-rows gu-rows--inset">
+                {mayInvite && <Row tone="link" icon={<IconUserPlus />} title={channel ? 'Добавить подписчиков' : 'Добавить участников'} onClick={() => navigate(gPath(chatId, 'add'))} />}
+                {shown.map((m) => (
+                  <PersonRow key={m.id} id={m.id} pills={rolePills(m)} onClick={m.id === me?.id ? undefined : () => people.open(m.id)} />
+                ))}
+                {members.length > shown.length && (
+                  <Row title="Показать всех" value={String(members.length)} chevron onClick={() => navigate(gPath(chatId, 'members'))} />
+                )}
+              </div>
+            </section>
           )}
           {!seeMembers && me && <p className="gu-hint gu-hint--alone">В канале {info.members.length} {countWord(info.kind, info.members.length)}. Список {word}ов видят только администраторы.</p>}
 
-          <Card>
-            <Row
-              tone="danger"
-              icon={me?.role === 'owner' ? <IconTrashLine /> : <IconLeave />}
-              title={me?.role === 'owner' ? (channel ? 'Удалить канал' : 'Удалить группу') : channel ? 'Отписаться от канала' : 'Покинуть группу'}
-              onClick={() => setLeaving(true)}
-            />
-          </Card>
+          <ContactTabs author={{ id: chatId, name: info.name, avatar: info.avatar }} root={screen} stories={stories} media={SHARED_MEDIA[chatId] ?? []} files={SHARED_FILES[chatId] ?? []} links={sharedLinks} onCopy={(text) => tools.copy(text)} whose={channel ? 'канала' : 'группы'} />
+
+          {me && me.role !== 'owner' && (
+            <Card>
+              <Row tone="danger" icon={<IconLeave />} title={channel ? 'Отписаться от канала' : 'Покинуть группу'} onClick={() => setLeaving(true)} />
+            </Card>
+          )}
         </div>
       </div>
 

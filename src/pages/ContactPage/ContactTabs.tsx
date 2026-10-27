@@ -20,10 +20,12 @@ interface Props {
   files: SharedFile[];
   links: SharedLink[];
   onCopy: (text: string, done: string) => void;
+  /** Чьи истории: «собеседника» или «канала» */
+  whose?: string;
 }
 
 /** Вкладки профиля, как в Telegram: «Истории», «Медиа», «Файлы», «Ссылки». Выбранная вкладка — плашка, которая переезжает к новой */
-export function ContactTabs({ author, root, stories, media, files, links, onCopy }: Props) {
+export function ContactTabs({ author, root, stories, media, files, links, onCopy, whose = 'собеседника' }: Props) {
   const [tab, setTab] = useState<Tab>('Истории');
   const [viewing, setViewing] = useState<{ at: number; x: number; y: number } | null>(null);
   return (
@@ -64,7 +66,7 @@ export function ContactTabs({ author, root, stories, media, files, links, onCopy
               ))}
             </ul>
           ) : (
-            <EmptyState icon={<IconStory />} title="Историй нет" text="Здесь появятся истории собеседника." />
+            <EmptyState icon={<IconStory />} title="Историй нет" text={`Здесь появятся истории ${whose}.`} />
           ))}
 
         {tab === 'Медиа' &&
