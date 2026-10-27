@@ -181,7 +181,7 @@ function Details({ kind }: { kind: GroupKind }) {
       footer={{ label: group ? 'Создать' : 'Далее', disabled: !ready, onClick: next }}
     >
       <PhotoField value={draft.photo} name={draft.name} seed="new" onChange={(photo) => patchDraft({ photo })} say={say} />
-      <Field label={group ? 'Название группы' : 'Название канала'} value={draft.name} onChange={(name) => patchDraft({ name })} max={NAME_MAX} placeholder={group ? 'Например, Супервизия' : 'Например, Психология без мифов'} autoFocus />
+      <Field label={group ? 'Название общего чата' : 'Название канала'} value={draft.name} onChange={(name) => patchDraft({ name })} max={NAME_MAX} placeholder={group ? 'Например, команда имени А.П. Чехова' : 'Например, Психология без мифов'} autoFocus />
       <Field
         label="Описание"
         value={draft.description}
@@ -189,7 +189,7 @@ function Details({ kind }: { kind: GroupKind }) {
         max={ABOUT_MAX}
         multiline
         placeholder="Необязательно"
-        hint={group ? 'О чём эта группа: увидят все участники.' : 'О чём этот канал: увидят все, кто его откроет.'}
+        hint={group ? undefined : 'О чём этот канал: увидят все, кто его откроет.'}
       />
       {group && draft.members.length > 0 && (
         <Card heading={`Участники: ${draft.members.length}`}>
