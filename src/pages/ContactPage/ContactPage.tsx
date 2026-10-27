@@ -34,6 +34,8 @@ import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { ContactTabs } from './ContactTabs';
 import '../FolderPage/FolderPage.css';
 import '../ProfilePage/ProfilePage.css';
+import '../../components/TestSettings/TestSettings.css';
+import '../../components/TestSettings/TestSettings.pm.css';
 import './ContactPage.css';
 
 export type ContactSheet = 'edit' | 'role' | 'gift' | 'report' | 'delete' | 'clear' | 'block';
@@ -220,6 +222,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
           </section>
 
           {personal.length > 0 && (
+            <div className="ts-desc-unit ct__personal">
             <section className="profile__card" aria-labelledby="contact-info">
               <header className="profile__card-head">
                 <h2 id="contact-info" className="profile__card-title">
@@ -236,12 +239,13 @@ export function ContactPage({ chatId }: { chatId: string }) {
                   </li>
                 ))}
               </ul>
-              {personal.length > 1 && (
-                <button type="button" className="profile__add" aria-expanded={readMore} onClick={() => setReadMore(!readMore)}>
-                  {readMore ? 'Свернуть' : 'Читать далее'}
-                </button>
-              )}
             </section>
+            {personal.length > 1 && (
+              <button type="button" className={`ts-desc__toggle${readMore ? ' ts-desc__toggle--open' : ''}`} aria-expanded={readMore} onClick={() => setReadMore(!readMore)}>
+                {readMore ? 'Скрыть' : 'Читать далее'}
+              </button>
+            )}
+            </div>
           )}
 
           {materials && (

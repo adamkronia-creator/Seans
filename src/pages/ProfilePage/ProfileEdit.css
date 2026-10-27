@@ -585,3 +585,9 @@
   background: var(--action-primary);
   color: var(--action-primary-text);
 }
+
+/* Название поля — textarea в одну строку: текст по центру строки высотой 48 */
+.pe__field-label {
+  box-sizing: border-box;
+  padding-block: var(--space-3);
+}

@@ -437,3 +437,10 @@
   background: var(--glass-card);
   box-shadow: none;
 }
+
+/* «Личная информация» контакта: как «Описание теста» — одна рамка вокруг карточки и кнопки «Читать далее» (.ts-desc-unit), поля даёт сама колонка */
+[data-pm] .ct__personal > .profile__card {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
