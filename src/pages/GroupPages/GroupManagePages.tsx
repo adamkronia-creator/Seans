@@ -4,6 +4,8 @@ import {
   IconCheckMark,
   IconCloseLine,
   IconCopyLine,
+  IconDotsV,
+  IconShareLine,
   IconGlobal,
   IconHistory,
   IconKey,
@@ -16,6 +18,7 @@ import {
   IconUserCheck,
   IconUsersGroup,
 } from '../../components/GroupUi/GroupIcons';
+import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, useLinkTools } from '../../components/GroupUi/LinkTools';
 import { useToast } from '../../components/Toast/useToast';
@@ -36,6 +39,8 @@ import {
   isLinkAlive,
   leaveGroup,
   myRole,
+  resetPrimaryLink,
+  shortUrl,
   setPermissions,
   setSetting,
   setType,
@@ -214,6 +219,7 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
   const [isPublic, setPublic] = useState(info?.isPublic ?? false);
   const [username, setUsername] = useState(info?.username ?? '');
   const [approval, setApproval] = useState(info?.joinApproval ?? false);
+  const [resetting, setResetting] = useState(false);
   const tools = useLinkTools(info, say);
   if (!info) return <SubPage title="Тип" onBack={() => goBack(gPath(chatId, 'edit'))}>{null}</SubPage>;
 
@@ -230,16 +236,32 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
 
   return (
     <SubPage
-      title={channel ? 'Тип канала' : 'Тип группы'}
-      subtitle="Как люди смогут вас найти"
+      title={channel ? 'Настройки канала' : 'Настройки группы'}
+      subtitle="Выбор формата"
       onBack={() => goBack(gPath(chatId, 'edit'))}
       toast={toast}
-      swipe={!tools.open}
+      swipe={!tools.open && !resetting}
       footer={{ label: 'Сохранить', disabled: !dirty || !valid, onClick: save }}
     >
-      <Card label="Тип">
-        <Row tall icon={<IconLock />} title="Частный" note="Вступить можно только по ссылке-приглашению" role="radio" checked={!isPublic} end={<RadioDot on={!isPublic} />} onClick={() => setPublic(false)} />
-        <Row tall icon={<IconGlobal />} title="Публичный" note="Находится поиском и открывается по адресу" role="radio" checked={isPublic} end={<RadioDot on={isPublic} />} onClick={() => setPublic(true)} />
+      <Card heading={channel ? 'Тип канала' : 'Тип группы'}>
+        <Row
+          top
+          lead={<RadioDot on={isPublic} />}
+          title={channel ? 'Открытый канал' : 'Открытая группа'}
+          note={channel ? 'Открытый канал можно найти с помощью поиска и подписаться может любой человек' : 'Открытую группу можно найти с помощью поиска и вступить может любой человек'}
+          role="radio"
+          checked={isPublic}
+          onClick={() => setPublic(true)}
+        />
+        <Row
+          top
+          lead={<RadioDot on={!isPublic} />}
+          title={channel ? 'Частный канал' : 'Частная группа'}
+          note={channel ? 'Частный канал является закрытым, подписаться можно только с помощью приглашения' : 'Частная группа является закрытой, вступить можно только с помощью приглашения'}
+          role="radio"
+          checked={!isPublic}
+          onClick={() => setPublic(false)}
+        />
       </Card>
       {isPublic ? (
         <>
@@ -262,10 +284,40 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
         </>
       ) : (
         primary && (
-          <Card hint="Любой, у кого есть эта ссылка, сможет вступить.">
-            <Row icon={<IconLinkRound />} title="Ссылка-приглашение" note={targetOfLink(primary).url.replace(/^https?:\/\//, '')} end={<IconCopyLine />} onClick={() => tools.copy(targetOfLink(primary).url)} />
+          <Card heading="Ссылка-приглашение" hint={`По этой ссылке можно ${channel ? 'подписаться на канал' : 'вступить в группу'}. Вы можете сбросить её в любой момент.`}>
+            <div className="gu-invite">
+              <div className="gu-invite__box">
+                <span className="gu-invite__url">{shortUrl(targetOfLink(primary).url)}</span>
+                <button type="button" className="gu-invite__more" aria-label="Сбросить ссылку" onClick={() => setResetting(true)}>
+                  <IconDotsV />
+                </button>
+              </div>
+              <div className="gu-invite__btns">
+                <button type="button" className="gu-invite__btn" onClick={() => tools.copy(targetOfLink(primary).url)}>
+                  <IconCopyLine />
+                  Скопировать
+                </button>
+                <button type="button" className="gu-invite__btn" onClick={() => tools.share(targetOfLink(primary))}>
+                  <IconShareLine />
+                  Поделиться
+                </button>
+              </div>
+            </div>
           </Card>
         )
+      )}
+      {resetting && (
+        <RemoveSheet
+          title="Сбросить ссылку?"
+          text={`Прежняя ссылка перестанет работать, а вместо неё появится новая. Те, кто уже ${channel ? 'подписан' : 'в группе'}, останутся.`}
+          confirm="Сбросить"
+          onClose={() => setResetting(false)}
+          onConfirm={() => {
+            setResetting(false);
+            resetPrimaryLink(chatId);
+            say('Ссылка сброшена, создана новая');
+          }}
+        />
       )}
       {tools.node}
     </SubPage>
