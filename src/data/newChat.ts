@@ -1,12 +1,12 @@
 import { useSyncExternalStore } from 'react';
-import type { GroupDraft, GroupKind } from './groups';
+import { newCode, type GroupDraft, type GroupKind } from './groups';
 
 /*
  * Черновик новой группы или канала: его заполняют по шагам на экранах /new/… (участники, название и фото, тип и адрес),
  * а создаётся группа на последнем шаге. Черновик живёт, пока мастер открыт; новый мастер начинает с пустого.
  */
 
-const empty = (kind: GroupKind): GroupDraft => ({ kind, name: '', description: '', photo: null, members: [], isPublic: false, username: '' });
+const empty = (kind: GroupKind): GroupDraft => ({ kind, name: '', description: '', photo: null, members: [], isPublic: false, username: '', inviteCode: newCode() });
 
 let draft: GroupDraft = empty('group');
 const listeners = new Set<() => void>();

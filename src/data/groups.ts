@@ -176,7 +176,7 @@ let seq = 0;
 const uid = (prefix: string) => `${prefix}${(++seq).toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
-function newCode(): string {
+export function newCode(): string {
   const bytes = new Uint8Array(12);
   if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(bytes);
   else bytes.forEach((_, i) => (bytes[i] = Math.floor(Math.random() * 256)));
@@ -478,6 +478,8 @@ export interface GroupDraft {
   members: string[];
   isPublic: boolean;
   username: string;
+  /** Код ссылки-приглашения: виден ещё до создания, станет основной ссылкой */
+  inviteCode: string;
 }
 
 const list = (ids: string[]) => ids.map(nameOf).join(', ');
@@ -504,7 +506,7 @@ export function createGroup(d: GroupDraft): string {
     protectContent: false,
     historyVisible: true,
     joinApproval: false,
-    links: [{ ...primaryLink(ME), createdAt: now }],
+    links: [{ ...primaryLink(ME, d.inviteCode || undefined), createdAt: now }],
     requests: [],
     log: [{ id: uid('e'), at: now, actor: ME, text: `Вы создали ${group ? 'группу' : 'канал'} «${name}»` }],
     createdAt: now,

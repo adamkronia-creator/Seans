@@ -1,12 +1,13 @@
 import { useRef, useState } from 'react';
 import { Frame } from '../../components/Frame/Frame';
 import { Card, ContactList, ContactPicker, Field, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
-import { IconQr, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { IconCopyLine, IconDotsV, IconQr, IconShareLine, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useToast } from '../../components/Toast/useToast';
 import { ensureContactChat } from '../../data/chatStore';
 import { addContact, useContacts } from '../../data/contacts';
-import { USERNAME_TEXT, createGroup, usernameStatus, type GroupKind } from '../../data/groups';
+import { USERNAME_TEXT, createGroup, inviteUrl, newCode, shortUrl, usernameStatus, type GroupKind } from '../../data/groups';
+import { copyText } from '../../utils/clipboard';
 import { patchDraft, startDraft, toggleDraftMember, useDraft } from '../../data/newChat';
 import { goBack, navigate, navigateOver } from '../../router';
 
@@ -204,12 +205,20 @@ function Details({ kind }: { kind: GroupKind }) {
 /** Шаг 2 канала: публичный (с адресом) или частный (только по ссылке) */
 function ChannelType() {
   const draft = useDraft();
+  const [toast, say] = useToast();
+  const link = inviteUrl(draft.inviteCode);
+  const copy = () => void copyText(link).then((ok) => say(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
+  const share = () => {
+    if (typeof navigator.share === 'function') navigator.share({ url: link }).catch(() => undefined);
+    else copy();
+  };
   const status = usernameStatus(draft.username);
   const ok = !draft.isPublic || status === 'free';
   return (
-    <SubPage title="Настройки канала" subtitle="Выбор формата" onBack={() => goBack('/new/channel')} footer={{ label: 'Далее', disabled: !ok, onClick: () => navigate('/new/channel/members') }}>
-      <Card label="Тип канала">
+    <SubPage title="Настройки канала" subtitle="Выбор формата" onBack={() => goBack('/new/channel')} toast={toast} footer={{ label: 'Далее', disabled: !ok, onClick: () => navigate('/new/channel/members') }}>
+      <Card heading="Тип канала">
         <Row
+          top
           lead={<RadioDot on={draft.isPublic} />}
           title="Открытый канал"
           note="Открытый канал можно найти с помощью поиска и подписаться может любой человек"
@@ -218,6 +227,7 @@ function ChannelType() {
           onClick={() => patchDraft({ isPublic: true })}
         />
         <Row
+          top
           lead={<RadioDot on={!draft.isPublic} />}
           title="Частный канал"
           note="Частный канал является закрытым, подписаться можно только с помощью приглашения"
@@ -226,6 +236,28 @@ function ChannelType() {
           onClick={() => patchDraft({ isPublic: false })}
         />
       </Card>
+      {!draft.isPublic && (
+        <Card heading="Ссылка-приглашение" hint="По этой ссылке можно подписаться на канал. Вы можете сбросить её в любой момент.">
+          <div className="gu-invite">
+            <div className="gu-invite__box">
+              <span className="gu-invite__url">{shortUrl(link)}</span>
+              <button type="button" className="gu-invite__more" aria-label="Сбросить ссылку" onClick={() => { patchDraft({ inviteCode: newCode() }); say('Ссылка сброшена'); }}>
+                <IconDotsV />
+              </button>
+            </div>
+            <div className="gu-invite__btns">
+              <button type="button" className="gu-invite__btn" onClick={copy}>
+                <IconCopyLine />
+                Скопировать
+              </button>
+              <button type="button" className="gu-invite__btn" onClick={share}>
+                <IconShareLine />
+                Поделиться
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
       {draft.isPublic && (
         <Field
           label="Ссылка на канал"
