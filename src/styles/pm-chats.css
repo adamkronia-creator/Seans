@@ -766,3 +766,11 @@ html:has([data-pm]) body {
   background: linear-gradient(color-mix(in srgb, var(--chip-tint) 26%, transparent), color-mix(in srgb, var(--chip-tint) 26%, transparent)), var(--glass-fill);
   border-color: transparent;
 }
+
+/* Кнопки и поля внутри шапок со стеклянной подложкой («назад», поиск, значки): у шапки уже есть размытие, поэтому она становится «корнем фона»,
+   и собственный backdrop-filter кнопки видит сквозь неё пустоту — кнопка выходила заметно темнее, чем в «Диалогах» (там подложка — отдельный слой).
+   Без своего размытия кнопка просто лежит заливкой на шапке и выглядит так же */
+[data-pm] :is(.fp__header, .pe__header, .events__header, .archive__bar, .test-settings__header) * {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
