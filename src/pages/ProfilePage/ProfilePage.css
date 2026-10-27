@@ -751,3 +751,22 @@
   gap: var(--field-gap);
   min-width: 0;
 }
+
+/* Аватар и имя по центру; меню настроек — круглая кнопка справа вверху обложки (под строкой состояния) */
+[data-pm] .profile__row {
+  justify-content: center;
+}
+
+[data-pm] .profile__name {
+  text-align: center;
+}
+
+.profile__menu-btn {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--space-3));
+  right: var(--space-4);
+  z-index: 2;
+  width: var(--size-touch);
+  height: var(--size-touch);
+  font-size: var(--size-icon);
+}

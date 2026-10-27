@@ -8,6 +8,10 @@ import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { IconAlbum, IconCamera, IconChevronRight, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
+import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
+import { IconGearMk, IconHelpMk } from '../../components/ChatItem/ChatIcons';
+import { IconArchive } from '../../components/FolderMenu/FolderIcons';
+import { IconCopyLine, IconDotsV, IconShare, IconUser } from '../ContactPage/ContactIcons';
 import { Skeleton } from '../../components/Skeleton/Skeleton';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -66,6 +70,7 @@ export function ProfilePage() {
   const [pickingBackground, setPickingBackground] = useState(false);
   const [tab, setTab] = useState<PhotoView>('photos');
   const [newAlbum, setNewAlbum] = useState(false);
+  const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
   const root = useRef<HTMLElement>(null);
@@ -88,6 +93,33 @@ export function ProfilePage() {
     await uploadPhotos(filesOf(event), show);
   };
 
+  const link = () => {
+    const nick = username.replace(/^@/, '').trim();
+    return nick ? `${window.location.origin}${window.location.pathname}#/@${nick}` : '';
+  };
+  const copyLink = () => {
+    const url = link();
+    if (!url) return show('Укажите никнейм в профиле');
+    void navigator.clipboard?.writeText(url).then(() => show('Ссылка скопирована'), () => show('Не удалось скопировать'));
+  };
+  const shareProfile = () => {
+    const url = link();
+    if (!url) return show('Укажите никнейм в профиле');
+    if (navigator.share) void navigator.share({ title: name.trim() || 'Профиль', url }).catch(() => undefined);
+    else copyLink();
+  };
+  const soon = (what: string) => show(`${what}: скоро`);
+  const items: ChipMenuItem[] = [
+    { key: 'p-edit', label: 'Редактировать профиль', Icon: IconUser, run: () => edit() },
+    { key: 'p-cover', label: 'Настройки обложки', Icon: IconImage, run: () => setPicking('cover') },
+    { key: 'p-bg', label: 'Фон приложения', Icon: IconWallpaper, run: () => setPickingBackground(true) },
+    { key: 'p-link', label: 'Ссылка профиля', Icon: IconCopyLine, gap: true, run: copyLink },
+    { key: 'p-share', label: 'Поделиться профилем', Icon: IconShare, run: shareProfile },
+    { key: 'p-archive', label: 'Архив историй', Icon: IconArchive, gap: true, run: () => soon('Архив историй') },
+    { key: 'p-settings', label: 'Настройки', Icon: IconGearMk, gap: true, run: () => soon('Настройки') },
+    { key: 'p-help', label: 'Помощь', Icon: IconHelpMk, run: () => soon('Помощь') },
+  ];
+
   return (
     <section ref={root} className="profile">
       <div className="profile__scroll">
@@ -108,16 +140,16 @@ export function ProfilePage() {
                 </span>
               )}
             </button>
-            <div className="profile__badges">
-              {cover && (
-                <button type="button" className="profile__badge profile__badge--cover" aria-label="Изменить обложку" onClick={() => setPicking('cover')}>
-                  <IconCamera />
-                </button>
-              )}
-              <button type="button" className="profile__badge profile__badge--cover" aria-label="Изменить фон приложения" onClick={() => setPickingBackground(true)}>
-                <IconWallpaper />
-              </button>
-            </div>
+            <button
+              type="button"
+              className="profile__badge profile__badge--cover profile__menu-btn"
+              aria-label="Настройки профиля"
+              aria-haspopup="menu"
+              aria-expanded={menu !== null}
+              onClick={(e) => setMenu({ rect: e.currentTarget.getBoundingClientRect(), opener: e.currentTarget })}
+            >
+              <IconDotsV />
+            </button>
           </div>
 
           <div className="profile__head">
@@ -135,10 +167,6 @@ export function ProfilePage() {
                   <IconCamera />
                 </button>
               </div>
-              <button type="button" className="profile__edit" onClick={() => edit()}>
-                <IconPencil />
-                Редактировать
-              </button>
             </div>
 
             <h1 className={`profile__name${name.trim() ? '' : ' profile__name--empty'}`}>{name.trim() || 'Ваше имя'}</h1>
@@ -286,6 +314,7 @@ export function ProfilePage() {
       {toast && <Toast text={toast} />}
       {pickingBackground && <BackgroundSheet onClose={() => setPickingBackground(false)} />}
       {picking && <PhotoPickSheet kind={picking} onClose={() => setPicking(null)} onNote={show} />}
+      {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Настройки профиля" width={272} onClose={() => setMenu(null)} />}
       {newAlbum && <AlbumNameSheet onClose={() => setNewAlbum(false)} onSaved={(id) => navigate(`/profile/photos/album/${id}`)} />}
       {viewing && <PhotoViewer startId={viewing} onClose={() => setViewing(null)} />}
     </section>
