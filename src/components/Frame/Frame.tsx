@@ -12,7 +12,8 @@ interface FrameProps {
   quietTitle?: boolean;
   /** Заголовок по центру и линия под ним на всю ширину: список режется по ней (окна выбора, отправки) */
   ruled?: boolean;
-  footer: ReactNode;
+  /** Нижние кнопки; окна выбора из сетки обходятся без них */
+  footer?: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }
@@ -39,7 +40,7 @@ export function Frame({ title, subtitle, quietTitle, ruled, footer, onClose, chi
           )}
           {children}
         </div>
-        <div className="sheet__footer">{footer}</div>
+        {footer && <div className="sheet__footer">{footer}</div>}
       </div>
     </SheetOverlay>
   );

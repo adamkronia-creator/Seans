@@ -17,6 +17,7 @@ import './styles/layout.css';
 import { initAppearance } from './utils/appearance';
 import { installHoverTitles } from './utils/hoverTitles';
 import { installInertiaScroll } from './utils/inertiaScroll';
+import { installNoAutofill } from './utils/noAutofill';
 import { installPressEffect } from './utils/pressEffect';
 
 // Поведение как в приложениях на телефоне: нажатие с пружиной и прокрутка колесом с инерцией (полоса прокрутки — системная);
@@ -26,6 +27,7 @@ initAppearance();
 installPressEffect();
 installInertiaScroll();
 installHoverTitles();
+installNoAutofill();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

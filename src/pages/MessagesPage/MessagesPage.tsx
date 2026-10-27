@@ -171,7 +171,8 @@ export function MessagesPage() {
   const chats = useChats();
   const folders = useFolders('chats');
   // Пока чипсы переставляют, страницы пейджера стоят в прежнем порядке (см. useFrozenWhile); чипсы показывают живой порядок
-  const pagerFolders = useFrozenWhile(useFolderEditing('chats'), folders);
+  const folderEditing = useFolderEditing('chats');
+  const pagerFolders = useFrozenWhile(folderEditing, folders);
   const liveOrder = ['all', ...folders.map((f) => f.id)].join('|');
   const folderMenu = useFolderMenu('chats');
   const [toast, say] = useToast();
@@ -350,7 +351,7 @@ export function MessagesPage() {
         }
       />
 
-      {!selecting && !searching && (
+      {!selecting && !searching && !folderEditing && (
         <button type="button" className="messages__fab" aria-label="Новый чат" onClick={() => navigate('/new')}>
           <IconComposeMk />
         </button>

@@ -5,6 +5,7 @@
  * исправление слов и подсказки клавиатуры остаются включёнными.
  */
 export const plainText = {
+  name: 'plain-text',
   autoComplete: 'off',
   'data-form-type': 'other',
   'data-lpignore': 'true',

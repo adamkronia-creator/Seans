@@ -10,11 +10,11 @@ import { Avatar } from '../Avatar/Avatar';
 import { IconBackMk } from '../ChatItem/ChatIcons';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { Frame } from '../Frame/Frame';
-import { IconCheck } from '../Profile/ProfileIcons';
+import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import { SearchField } from '../SearchField/SearchField';
 import '../Switch/Switch.css';
 import { Toast } from '../Toast/Toast';
-import { IconCameraAdd, IconChevron, IconCloseLine } from './GroupIcons';
+import { IconCameraAdd, IconChevron, IconCloseLine, IconGalleryAdd } from './GroupIcons';
 import '../../pages/FolderPage/FolderPage.css';
 import './GroupUi.css';
 
@@ -437,11 +437,15 @@ interface PhotoFieldProps {
 /** Фото группы или канала: круг 96 с камерой; нажатие — выбор снимка (на телефоне можно сразу сфотографировать), у готового фото — окно «заменить или убрать» */
 export function PhotoField({ value, name, seed, onChange, say }: PhotoFieldProps) {
   const input = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
   const [asking, setAsking] = useState(false);
+  const [choosing, setChoosing] = useState(false);
+  const profile = useProfile();
   const pick = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
+    setChoosing(false);
     try {
       onChange(await squareAvatar(file));
     } catch {
@@ -452,7 +456,7 @@ export function PhotoField({ value, name, seed, onChange, say }: PhotoFieldProps
   return (
     <div className="gu-photo">
       <div className="gu-photo__frame">
-        <button type="button" className="gu-photo__button" aria-label={value ? 'Изменить фото' : 'Добавить фото'} onClick={() => (value ? setAsking(true) : input.current?.click())}>
+        <button type="button" className="gu-photo__button" aria-label={value ? 'Изменить фото' : 'Добавить фото'} onClick={() => (value ? setAsking(true) : setChoosing(true))}>
           {preview ? (
             <img className="gu-photo__img" src={preview} alt="" />
           ) : (
@@ -469,12 +473,47 @@ export function PhotoField({ value, name, seed, onChange, say }: PhotoFieldProps
         )}
       </div>
       <input ref={input} type="file" accept="image/*" hidden onChange={pick} />
+      <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={pick} />
+      {choosing && (
+        <Frame title="Выберите фотографию" onClose={() => setChoosing(false)}>
+          <ul className="gu-gallery">
+            <li>
+              <button type="button" className="gu-gallery__tile gu-gallery__tile--camera" aria-label="Сделать снимок" onClick={() => camera.current?.click()}>
+                <IconCamera />
+              </button>
+            </li>
+            <li>
+              <button type="button" className="gu-gallery__tile gu-gallery__tile--files" onClick={() => input.current?.click()}>
+                <IconGalleryAdd />
+                <span>Из файлов</span>
+              </button>
+            </li>
+            {profile.photos.map((photo, i) =>
+              profile.thumbs[photo.id] ? (
+                <li key={photo.id}>
+                  <button
+                    type="button"
+                    className="gu-gallery__tile"
+                    aria-label={`Фото ${i + 1}`}
+                    onClick={() => {
+                      onChange(profile.thumbs[photo.id]);
+                      setChoosing(false);
+                    }}
+                  >
+                    <img src={profile.thumbs[photo.id]} alt="" />
+                  </button>
+                </li>
+              ) : null,
+            )}
+          </ul>
+        </Frame>
+      )}
       {asking && (
         <ActionSheet
           title="Фото"
           onClose={() => setAsking(false)}
           actions={[
-            { key: 'new', label: 'Выбрать другое', Icon: IconCameraAdd, run: () => input.current?.click() },
+            { key: 'new', label: 'Выбрать другое', Icon: IconCameraAdd, run: () => setChoosing(true) },
             { key: 'remove', label: 'Убрать фото', Icon: IconCloseLine, danger: true, run: () => onChange(null) },
           ]}
         />

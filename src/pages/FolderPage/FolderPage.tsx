@@ -52,7 +52,7 @@ const FOLDER_INKS = TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: '
 
 type Swatch = { id: string; label: string; color: string };
 
-/** Панель цвета, как у заметок и сведений: строка с переключателем и сетка из 16 цветов (выключено — цвет не задан) */
+/** Панель цвета, как у заметок и сведений: строка с переключателем и сетка из 16 цветов; сетка раскрыта всегда, выключено — цвет не задан (выбор цвета включает его) */
 function ColorCard({ label, value, palette, onChange }: { label: string; value: string | undefined; palette: Swatch[]; onChange: (color: string | undefined) => void }) {
   const uid = useId();
   const last = useRef(value ?? palette[0].color);
@@ -66,7 +66,7 @@ function ColorCard({ label, value, palette, onChange }: { label: string; value: 
         </span>
         <Switch checked={on} onChange={(next) => onChange(next ? last.current : undefined)} label={label} />
       </div>
-      <Collapse open={on}>
+      <Collapse open>
         <div className="fp-tones" role="radiogroup" aria-labelledby={`${uid}-l`}>
           {palette.map((sw) => (
             <button
