@@ -39,6 +39,7 @@ import {
   isLinkAlive,
   leaveGroup,
   myRole,
+  newCode,
   resetPrimaryLink,
   shortUrl,
   setPermissions,
@@ -118,7 +119,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
       {editInfo && (
         <>
           <PhotoField value={shownPhoto} name={name} seed={chatId} onChange={setPhoto} say={say} />
-          <Field label={channel ? 'Название канала' : 'Название группы'} value={name} onChange={setName} max={NAME_MAX} />
+          <Field label={channel ? 'Название канала' : 'Название группы'} value={name} onChange={setName} max={NAME_MAX} emoji />
           <Field label="Описание" value={about} onChange={setAbout} max={ABOUT_MAX} multiline placeholder="Необязательно" />
         </>
       )}
@@ -251,7 +252,11 @@ export function GroupTypePage({ chatId }: { chatId: string }) {
           note={channel ? 'Открытый канал можно найти с помощью поиска и подписаться может любой человек' : 'Открытую группу можно найти с помощью поиска и вступить может любой человек'}
           role="radio"
           checked={isPublic}
-          onClick={() => setPublic(true)}
+          onClick={() => {
+            setPublic(true);
+            // Пустой адрес держал бы «Сохранить» неактивной: сразу подставляем свободный, его можно поменять
+            if (!username.trim()) setUsername(`${channel ? 'channel' : 'group'}_${newCode().slice(0, 6).toLowerCase().replace(/[^a-z0-9]/g, 'x')}`);
+          }}
         />
         <Row
           top
