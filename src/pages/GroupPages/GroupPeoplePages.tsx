@@ -4,6 +4,9 @@ import { IconLinkRound, IconShieldKey, IconUserCross, IconUserPlus } from '../..
 import { SearchField } from '../../components/SearchField/SearchField';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { useToast } from '../../components/Toast/useToast';
+import { IconTestChevron } from '../../components/icons';
+import '../../components/TestSettings/TestSettings.css';
+import '../../components/TestSettings/TestSettings.pm.css';
 import { CONTACTS, ME, firstNameOf, nameOf } from '../../data/contacts';
 import {
   RIGHT_LABELS,
@@ -46,9 +49,19 @@ export function GroupMembersPage({ chatId }: { chatId: string }) {
         <SearchField value={query} onChange={setQuery} placeholder={channel ? 'Поиск подписчиков' : 'Поиск участников'} onClear={() => setQuery('')} />
       </div>
       {canInvite(info) && !query.trim() && (
-        <Card>
-          <Row tone="link" icon={<IconUserPlus />} title={channel ? 'Добавить подписчиков' : 'Добавить участников'} onClick={() => navigate(gPath(chatId, 'add'))} />
-        </Card>
+        <ul className="ts-card nc-create">
+          <li
+            className="ts-row ts-row--link"
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(gPath(chatId, 'add'))}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(gPath(chatId, 'add'))}
+          >
+            <IconUserPlus className="ts-row__icon" />
+            <span className="ts-row__link">{channel ? 'Добавить подписчиков' : 'Добавить участников'}</span>
+            <IconTestChevron className="ts-row__chevron" />
+          </li>
+        </ul>
       )}
       {list.length === 0 ? (
         <Card>

@@ -485,7 +485,8 @@
 }
 
 /* Реакция со счётчиком (группа и канал): эмодзи и число; ваша — акцентная */
-.bubble__reaction--count {
+/* Селектор с двумя классами: общий padding 4 из ChatPage.css подключается позже и иначе съедал отступ справа от числа */
+.bubble__reaction.bubble__reaction--count {
   padding-right: var(--space-3);
 }
 

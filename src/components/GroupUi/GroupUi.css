@@ -873,3 +873,10 @@
 [data-pm] .gu-row--switch-plain .switch {
   margin-block: -2px; /* grid:ok — переключатель 28 по центру строки названия 24 */
 }
+
+/* «Создать общий чат» / «Создать канал» — строки как «Бланк тестирования»: панель с полями экрана и скруглением */
+[data-pm] ul.ts-card.nc-create {
+  margin-inline: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
