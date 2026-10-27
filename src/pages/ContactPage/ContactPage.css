@@ -444,3 +444,35 @@
   border: 0;
   border-radius: 0;
 }
+
+/* «Истории» и «Медиа», как в Telegram: плитки на всю ширину экрана (поля колонки 16 снимаются), без скруглений, просвет между плитками тонкий */
+[data-pm] .ct__tiles,
+[data-pm] .ct__grid {
+  margin-inline: calc(var(--space-4) * -1);
+  gap: 2px; /* grid:ok — тонкий просвет между плитками */
+  border-radius: 0;
+}
+
+[data-pm] .ct__story {
+  border-radius: 0;
+}
+
+/* Как в Telegram: вкладки — отдельная стеклянная капсула, а содержимое («Истории», «Медиа») идёт под ней на всю ширину экрана без общей рамки */
+[data-pm] .ct__tabs-block {
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+[data-pm] .ct__tabs {
+  padding: var(--card-pad);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-card);
+}
+
+/* Итоги (сеансы, тесты, задания): подложка у самих ячеек, а у карточки её нет — иначе стекло ложится дважды и панель темнее остальных */
+[data-pm] .fp__card.ct__card:not(.fp__delete):has(.ct__stats) {
+  background: none;
+}
