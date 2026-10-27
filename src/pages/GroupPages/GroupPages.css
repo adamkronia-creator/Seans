@@ -10,3 +10,9 @@
   color: var(--text-link);
   font-size: var(--size-icon-sm);
 }
+
+/* Панель участников и кнопка «Показать полностью» — одно целое: скругления внизу панели нет, углы даёт общая рамка */
+[data-pm] .ts-desc-unit:has(.gu-more) > .fp__card {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
