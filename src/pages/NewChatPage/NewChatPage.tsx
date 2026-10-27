@@ -10,7 +10,7 @@ import { patchDraft, startDraft, toggleDraftMember, useDraft } from '../../data/
 import { goBack, navigate, navigateOver } from '../../router';
 
 /*
- * Новый чат (кнопка «+» в «Диалогах»): список контактов с действиями «Новая группа» и «Новый канал». Группа создаётся в три шага
+ * Новый чат (кнопка «+» в «Диалогах»): список контактов с действиями «Создать общий чат» и «Создать канал». Группа создаётся в три шага
  * (участники → название и фото → создана), канал в четыре (название, описание и фото → тип и адрес → подписчики → создан).
  * Адреса экранов: /new, /new/group, /new/group/info, /new/channel, /new/channel/type, /new/channel/members.
  * Когда группа создана, экраны мастера выбрасываются из истории: «назад» из нового чата ведёт в список, а не в мастер.
@@ -63,8 +63,10 @@ function StartScreen() {
       </div>
       {!searching && (
         <Card label="Создать">
-          <Row tone="link" icon={<IconUsersGroup />} title="Новая группа" note="Общий чат для обсуждения" onClick={() => begin('group')} />
-          <Row tone="link" icon={<IconStation />} title="Новый канал" note="Публикации для подписчиков" onClick={() => begin('channel')} />
+          <div className="gu-rows">
+            <Row tone="link" icon={<IconUsersGroup />} title="Создать общий чат" onClick={() => begin('group')} />
+            <Row tone="link" icon={<IconStation />} title="Создать канал" onClick={() => begin('channel')} />
+          </div>
         </Card>
       )}
       <ContactList contacts={CONTACTS} query={query} onPick={(c) => open(c.id)} />

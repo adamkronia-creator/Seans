@@ -266,7 +266,7 @@
 }
 
 .gu-search .search-field:focus-within {
-  box-shadow: inset 0 0 0 2px var(--border-focus);
+  box-shadow: none;
 }
 
 .gu-search .search-field__clear {
@@ -547,4 +547,10 @@
   margin-bottom: var(--space-2);
   color: var(--text-primary);
   font: var(--type-headline);
+}
+
+/* Строки списка лежат на одной подложке без просветов между ними; просвет остаётся только под заголовком карточки */
+.gu-rows {
+  display: flex;
+  flex-direction: column;
 }
