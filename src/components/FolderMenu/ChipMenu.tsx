@@ -46,7 +46,7 @@ export function ChipMenu({ anchor, opener, items, label = 'Меню папки',
    * отпускают после долгого нажатия на чипсе, начался не здесь, поэтому только что открывшееся меню он не закрывает.
    */
   const armed = useRef(false);
-  useExitAnimation(backdrop);
+  useExitAnimation(backdrop, 'parent'); // копия остаётся внутри экрана: в body она теряла оформление data-pm (белая вспышка при закрытии меню)
 
   const column = document.querySelector('.app')?.getBoundingClientRect();
   const left = Math.max((column?.left ?? 0) + EDGE, Math.min(anchor.left, (column?.right ?? window.innerWidth) - width - EDGE));
