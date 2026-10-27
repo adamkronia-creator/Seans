@@ -476,3 +476,10 @@
 [data-pm] .fp__card.ct__card:not(.fp__delete):has(.ct__stats) {
   background: none;
 }
+
+/* Как в Telegram: верхние углы плиток «Историй» и «Медиа» скруглены */
+[data-pm] .ct__tiles,
+[data-pm] .ct__grid {
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}

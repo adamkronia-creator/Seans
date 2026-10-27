@@ -1,0 +1,7 @@
+
+/* «Создать общий чат» / «Создать канал» — строки как «Бланк тестирования»: панель с полями экрана и скруглением */
+[data-pm] ul.ts-card.nc-create {
+  margin-inline: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}

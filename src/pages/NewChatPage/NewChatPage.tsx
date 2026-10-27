@@ -3,6 +3,9 @@ import { LineInput } from '../../components/LineInput/LineInput';
 import { Frame } from '../../components/Frame/Frame';
 import { Card, ContactList, ContactPicker, Field, PersonRow, PhotoField, RadioDot, Row, SubPage } from '../../components/GroupUi/GroupUi';
 import { IconCopyLine, IconDotsV, IconQr, IconShareLine, IconStation, IconUserPlus, IconUsersGroup } from '../../components/GroupUi/GroupIcons';
+import { IconTestChevron } from '../../components/icons';
+import '../../components/TestSettings/TestSettings.css';
+import '../../components/TestSettings/TestSettings.pm.css';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useToast } from '../../components/Toast/useToast';
 import { ensureContactChat } from '../../data/chatStore';
@@ -68,12 +71,25 @@ function StartScreen() {
         <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       </div>
       {!searching && (
-        <Card label="Создать">
-          <div className="gu-rows gu-rows--split gu-rows--inset">
-            <Row tone="link" icon={<IconUsersGroup />} title="Создать общий чат" onClick={() => begin('group')} />
-            <Row tone="link" icon={<IconStation />} title="Создать канал" onClick={() => begin('channel')} />
-          </div>
-        </Card>
+        <ul className="ts-card nc-create">
+          {([
+            ['group', <IconUsersGroup key="g" className="ts-row__icon" />, 'Создать общий чат'],
+            ['channel', <IconStation key="c" className="ts-row__icon" />, 'Создать канал'],
+          ] as const).map(([kind, icon, title]) => (
+            <li
+              key={kind}
+              className="ts-row ts-row--link"
+              role="button"
+              tabIndex={0}
+              onClick={() => begin(kind)}
+              onKeyDown={(e) => e.key === 'Enter' && begin(kind)}
+            >
+              {icon}
+              <span className="ts-row__link">{title}</span>
+              <IconTestChevron className="ts-row__chevron" />
+            </li>
+          ))}
+        </ul>
       )}
       <ContactList contacts={contacts} query={query} onPick={(c) => open(c.id)} />
       <button type="button" className="gu-fab" aria-label="Новый контакт" onClick={() => setAdding(true)}>

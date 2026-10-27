@@ -247,3 +247,9 @@
 [data-pm] .fp__scroll.ph__scroll {
   padding-bottom: calc(var(--size-bar) + var(--space-8));
 }
+
+/* Верхние углы сетки скруглены, как в Telegram */
+[data-pm] .ph__grid {
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
