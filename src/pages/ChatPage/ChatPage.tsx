@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Badge } from '../../components/Badge/Badge';
-import { countIn, useCommentsStore } from '../../data/comments';
+import { channelOf, countIn, useCommentsStore } from '../../data/comments';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
@@ -28,8 +28,8 @@ import IconSelect from '../../assets/icons/solar/checklist-minimalistic.svg?reac
 import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
-import { ME, contactOf, firstNameOf, nameOf } from '../../data/contacts';
-import { can, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
+import { ME, avatarOf, contactOf, firstNameOf, nameOf } from '../../data/contacts';
+import { can, getGroup, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { EMOJI_GROUPS } from '../../data/emojiSet';
@@ -535,6 +535,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   };
   /** Чьё сообщение: «Вы», имя участника группы или собеседника */
   const replyFrom = (m: Message) => (m.from === 'me' ? 'Вы' : kind === 'group' && m.author ? firstNameOf(m.author) : chat.name.split(' ')[0]);
+  /** Фото трёх последних разных комментаторов поста: на кнопке под ним; свои комментарии от имени сообщества — с фото сообщества */
+  const commentFaces = (postId: string) => {
+    const seen: string[] = [];
+    for (const c of [...(commentStore[`${chatId}:${postId}`] ?? [])].reverse()) if (!seen.includes(c.author)) seen.push(c.author);
+    return seen.slice(0, 3).map((a) => (channelOf(a) ? getGroup(channelOf(a)!)?.avatar : avatarOf(a)));
+  };
   const permsFor = (m: Message): MenuPerms => {
     const mine = m.from === 'me';
     // Править можно только свой обычный текст: карточки тестов и заданий, фото, файлы и пересланное остаются как есть
@@ -694,6 +700,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     showAvatar={!sameRun(m, next, kind)}
                     authorTitle={authorTitle(m)}
                     commentCount={kind === 'channel' && info?.comments && !m.service ? countIn(commentStore, chatId, m.id) : undefined}
+                    commentFaces={kind === 'channel' && info?.comments && !m.service ? commentFaces(m.id) : undefined}
                     onOpenComments={() => navigate(`/chat/${chatId}/comments/${m.id}`)}
                     onOpenAuthor={(who) => {
                       const person = contactOf(who);

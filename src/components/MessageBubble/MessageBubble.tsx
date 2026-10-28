@@ -213,6 +213,8 @@ interface MessageBubbleProps {
   onOpenAuthor?: (id: string) => void;
   /** Пост канала с включёнными комментариями (или картинка): под постом кнопка; число — сколько комментариев уже есть */
   commentCount?: number;
+  /** Фото последних комментаторов (до трёх, новые первыми): стоят на кнопке вместо значка */
+  commentFaces?: Array<string | undefined>;
   onOpenComments?: () => void;
   /** Режим выбора сообщений: слева кружок отметки, нажатие отмечает; selected — это сообщение выбрано */
   selecting?: boolean;
@@ -245,6 +247,7 @@ export function MessageBubble({
   authorTitle,
   onOpenAuthor,
   commentCount,
+  commentFaces,
   onOpenComments,
   selecting = false,
   selected = false,
@@ -298,7 +301,15 @@ export function MessageBubble({
         onOpenComments?.();
       }}
     >
-      <IconMessages className="bubble__comments-icon" aria-hidden="true" />
+      {commentFaces?.length ? (
+        <span className="bubble__comments-faces" aria-hidden="true">
+          {commentFaces.map((src, i) => (
+            <Avatar key={i} src={src} size={24} />
+          ))}
+        </span>
+      ) : (
+        <IconMessages className="bubble__comments-icon" aria-hidden="true" />
+      )}
       <span className="bubble__comments-text">{commentCount ? commentsWord(commentCount) : 'Прокомментировать'}</span>
       <IconTestChevron className="bubble__comments-chevron" aria-hidden="true" />
     </button>
