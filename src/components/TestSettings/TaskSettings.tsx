@@ -14,7 +14,7 @@ import { TestHeader } from './TestHeader';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
 import { TaskPass } from './TaskPass';
-import { TaskPreview } from './TaskPreview';
+import { TaskPreviewScreen } from './PreviewScreen';
 import { TaskResult } from './TaskResult';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
@@ -412,7 +412,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
       {sheet === 'preview' && (
         <PreviewSheet title={task.title} onClose={() => setSheet(null)}>
-          {(tabsHost) => <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} tabsHost={tabsHost} />}
+          <TaskPreviewScreen task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
         </PreviewSheet>
       )}
       {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onPass={() => { setSheet(null); openView('pass'); }} onClose={() => setSheet(null)} />}

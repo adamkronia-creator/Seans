@@ -10,22 +10,20 @@ interface FrameProps {
   subtitle?: string;
   /** Нижние кнопки; окна выбора из сетки обходятся без них */
   footer?: ReactNode;
-  /** Вместо заголовка в шапке — пустое место для экрана (этапы предпросмотра): элемент отдаётся сюда */
-  headerSlot?: (el: HTMLDivElement | null) => void;
+  /** Окно без шапки и кнопок: всё место занимает содержимое (предпросмотр — экран телефона), остаётся только крестик */
+  bare?: boolean;
   onClose: () => void;
   children: ReactNode;
 }
 
 /** Каркас нижнего окна: заголовок слева, прокручиваемое содержимое и нижние кнопки; вид — styles/sheet.css */
-export function Frame({ title, subtitle, footer, headerSlot, onClose, children }: FrameProps) {
+export function Frame({ title, subtitle, footer, bare, onClose, children }: FrameProps) {
   useSheet(onClose);
   const body = useRef<HTMLDivElement>(null);
   return (
     <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
-        {headerSlot ? (
-          <div className="sheet__header sheet__header--tabs" ref={headerSlot} />
-        ) : (
+      <div className={`sheet${bare ? ' sheet--screen' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
+        {!bare && (
           <div className="sheet__header">
             <h2 className="sheet__heading">{title}</h2>
             {subtitle && <p className="frame-subtitle">{subtitle}</p>}

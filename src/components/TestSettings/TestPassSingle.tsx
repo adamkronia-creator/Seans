@@ -35,8 +35,8 @@ interface PassQuestionProps {
   onChoose: (answer: number) => void;
   /** Вариант нажат пальцем или мышью: можно открывать следующий вопрос */
   onPick: () => void;
-  /** Открыть окно со всеми вопросами */
-  onOpenAll: () => void;
+  /** Открыть окно со всеми вопросами; без него ссылки нет (предпросмотр) */
+  onOpenAll?: () => void;
 }
 
 /** Экран одного вопроса: заголовок «Вопрос 12 из 90» со ссылкой на все вопросы, ниже сам вопрос с вариантами ответов */
@@ -54,9 +54,11 @@ export function PassQuestion({ data, index, answer, dir, missing, onChoose, onPi
         <h2 className="blank-card__title" aria-live="polite">
           Вопрос {index + 1} из {data.questions.length}
         </h2>
-        <button type="button" className="pass-q__all" onClick={onOpenAll}>
-          Все вопросы
-        </button>
+        {onOpenAll && (
+          <button type="button" className="pass-q__all" onClick={onOpenAll}>
+            Все вопросы
+          </button>
+        )}
       </div>
       <div className={`pass-q__body pass-q__body--${dir}`} key={index}>
         {heading && <p className="blank-heading">{heading}</p>}

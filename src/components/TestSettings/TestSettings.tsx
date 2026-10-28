@@ -22,7 +22,7 @@ import { FormMenu } from './FormMenu';
 import { ResultChoice } from './ResultChoice';
 import type { ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
-import { TestPreview } from './TestPreview';
+import { TestPreviewScreen } from './PreviewScreen';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
@@ -534,7 +534,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
       {sheet === 'preview' && blank && (
         <PreviewSheet title={test.title} onClose={() => setSheet(null)}>
-          {(tabsHost) => <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} tabsHost={tabsHost} />}
+          <TestPreviewScreen test={test} blank={blank} blind={blind} result={result} duration={data.duration} />
         </PreviewSheet>
       )}
       {sheet === 'send' && (
