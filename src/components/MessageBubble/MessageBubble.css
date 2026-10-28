@@ -517,3 +517,52 @@ button.bubble__avatar {
   border-radius: var(--radius-full);
   cursor: pointer;
 }
+
+/* «Прокомментировать» под постом канала: во всю ширину пузыря, сверху прозрачный разделитель; число комментариев заменяет подпись */
+.bubble .bubble__comments {
+  --press-scale: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: calc(100% + var(--space-6));
+  min-height: var(--size-touch);
+  margin: var(--space-1) calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-top: var(--hairline) solid color-mix(in srgb, var(--text-primary) 14%, transparent);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: transparent;
+  color: var(--color-accent);
+  font: var(--type-body);
+  font-weight: 600;
+  white-space: normal;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-release) ease-out;
+}
+
+.bubble--photo .bubble__comments {
+  width: calc(100% + var(--space-2));
+  margin: var(--space-1) calc(var(--space-1) * -1) calc(var(--space-1) * -1);
+}
+
+.bubble .bubble__comments[data-pressed] {
+  background: var(--color-bg-pressed);
+  transition-duration: 0s;
+}
+
+.bubble .bubble__comments-icon {
+  flex-shrink: 0;
+  font-size: var(--size-icon);
+}
+
+.bubble .bubble__comments-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.bubble .bubble__comments-chevron {
+  flex-shrink: 0;
+  font-size: var(--space-4);
+  opacity: 0.6;
+}

@@ -3,6 +3,7 @@ import { TabBar, type TabId } from './components/TabBar/TabBar';
 import { registerTabSwitch } from './utils/tabNav';
 import { ChatPage } from './pages/ChatPage/ChatPage';
 import { ChatResultScreen, ChatSentTestScreen, ChatTaskScreen, ChatTestScreen } from './pages/ChatPage/ChatScreens';
+import { ChatCommentsPage } from './pages/ChatPage/ChatCommentsPage';
 import { ChatTabsPage } from './pages/ChatTabsPage/ChatTabsPage';
 import { ContactPage } from './pages/ContactPage/ContactPage';
 import { EventsPage } from './pages/EventsPage/EventsPage';
@@ -48,7 +49,7 @@ interface Resolved {
  * Адреса чата: /chat/<чат>, /chat/<чат>/tests/<тест> (настройка теста внутри чата), /chat/<чат>/tasks/<задание> (настройка задания)
  * и /chat/<чат>/result/<результат> (результат теста или задания); /chat/<чат>/contact — профиль собеседника; /chat/<чат>/tabs — настройки вкладок чата
  */
-const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result|sent)\/([^/]+)|\/(contact|profile|tabs))?/;
+const CHAT_ROUTE = /^\/chat\/([^/]+)(?:\/(tests|tasks|result|sent|comments)\/([^/]+)|\/(contact|profile|tabs))?/;
 
 /** Мастер нового чата: /new (контакты), /new/group, /new/group/info, /new/channel, /new/channel/type, /new/channel/members */
 const NEW_STEPS: Record<string, NewStep> = {
@@ -78,7 +79,7 @@ function parentOf(path: string): string | null {
   const grp = groupSubOf(path);
   if (grp) return groupParentOf(grp.chatId, grp.sub);
   if (JOIN_ROUTE.test(path)) return '/';
-  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result|sent)\/|contact|profile|tabs)/);
+  const nested = path.match(/^(\/chat\/[^/]+)\/(?:(?:tests|tasks|result|sent|comments)\/|contact|profile|tabs)/);
   // Профиль собеседника лежит над его карточкой, карточка — над чатом
   if (nested) return path.endsWith('/profile') ? `${nested[1]}/contact` : nested[1];
   return path === '/' ? null : '/';
@@ -238,6 +239,17 @@ export default function App() {
             build: () => (
               <main className="app__content">
                 <ContactPage chatId={chatId} />
+              </main>
+            ),
+          };
+        }
+        if (kind === 'comments') {
+          return {
+            key: `chat/${chatId}/comments/${id}`,
+            pm: true,
+            build: () => (
+              <main className="app__content">
+                <ChatCommentsPage chatId={chatId} postId={id} />
               </main>
             ),
           };

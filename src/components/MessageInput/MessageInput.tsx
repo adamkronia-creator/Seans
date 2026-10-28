@@ -26,6 +26,8 @@ interface MessageInputProps {
   noAttach?: boolean;
   /** Писать нельзя: вместо поля стоит эта строка («Отключить звук» у подписчика канала, «Медленный режим: 0:24») */
   bar?: ReactNode;
+  /** Свой элемент в начале капсулы: у комментария — фото, от чьего имени он будет написан */
+  lead?: ReactNode;
 }
 
 /**
@@ -37,7 +39,7 @@ function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTML
   return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar, lead }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const settled = useRef(false);
@@ -214,6 +216,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
       )}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className="composer">
+        {lead}
         {extras && !noAttach && (
           <>
             <input

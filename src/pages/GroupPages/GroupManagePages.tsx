@@ -148,6 +148,17 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
               }}
             />
           )}
+          {channel && adminInfo && (
+            <SwitchRow
+              title="Комментарии"
+              note="Под постами появится кнопка «Прокомментировать»"
+              checked={info.comments}
+              onChange={(v) => {
+                setSetting(chatId, { comments: v });
+                say(v ? 'Комментарии включены' : 'Комментарии выключены');
+              }}
+            />
+          )}
           {owner && (
             <SwitchRow
               title="Защита содержимого"

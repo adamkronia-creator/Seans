@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { countIn, useCommentsStore } from '../../data/comments';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
@@ -307,6 +308,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const groupInfo = useGroup(chatId);
   const info = chat?.kind ? groupInfo : undefined;
   const kind = info?.kind;
+  const commentStore = useCommentsStore();
   const slow = useSlowLeft(chatId);
   const [toast, say] = useToast();
   const tabs = useChatTabs();
@@ -563,6 +565,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     showAuthor={!sameRun(prev, m, kind)}
                     showAvatar={!sameRun(m, next, kind)}
                     authorTitle={authorTitle(m)}
+                    commentCount={kind === 'channel' && info?.comments && !m.service ? countIn(commentStore, chatId, m.id) : undefined}
+                    onOpenComments={() => navigate(`/chat/${chatId}/comments/${m.id}`)}
                     onOpenAuthor={(who) => {
                       const person = contactOf(who);
                       if (!person || who === ME) return;

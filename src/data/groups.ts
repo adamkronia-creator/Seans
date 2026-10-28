@@ -154,6 +154,8 @@ export interface GroupInfo {
   slowMode: number;
   /** Канал: под постами подпись автора */
   signatures: boolean;
+  /** Канал: под постами кнопка «Прокомментировать», комментарии открываются отдельным экраном */
+  comments: boolean;
   /** Какие реакции разрешены; пустой список — реакции выключены */
   reactions: string[];
   /** Запрет пересылки и копирования */
@@ -220,6 +222,7 @@ function seeds(): Record<string, GroupInfo> {
     permissions: { ...DEFAULT_PERMISSIONS },
     slowMode: 0,
     signatures: false,
+    comments: false,
     reactions: [...REACTION_CHOICES],
     protectContent: false,
     historyVisible: true,
@@ -262,6 +265,7 @@ function seeds(): Record<string, GroupInfo> {
     permissions: { ...DEFAULT_PERMISSIONS },
     slowMode: 0,
     signatures: true,
+    comments: true,
     reactions: ['❤️', '👍', '🔥', '👏'],
     protectContent: false,
     historyVisible: true,
@@ -286,6 +290,7 @@ function seeds(): Record<string, GroupInfo> {
     permissions: { ...DEFAULT_PERMISSIONS },
     slowMode: 30,
     signatures: false,
+    comments: false,
     reactions: [...REACTION_CHOICES],
     protectContent: false,
     historyVisible: true,
@@ -308,6 +313,7 @@ function seeds(): Record<string, GroupInfo> {
     permissions: { ...DEFAULT_PERMISSIONS },
     slowMode: 0,
     signatures: false,
+    comments: true,
     reactions: [...REACTION_CHOICES],
     protectContent: true,
     historyVisible: true,
@@ -505,6 +511,7 @@ export function createGroup(d: GroupDraft): string {
     permissions: { ...DEFAULT_PERMISSIONS },
     slowMode: 0,
     signatures: false,
+    comments: d.kind === 'channel',
     reactions: [...REACTION_CHOICES],
     protectContent: false,
     historyVisible: true,
@@ -567,11 +574,13 @@ export function setType(chatId: string, isPublic: boolean, username = '') {
   });
 }
 
-type Settings = Partial<Pick<GroupInfo, 'signatures' | 'protectContent' | 'historyVisible' | 'slowMode' | 'joinApproval' | 'reactions'>>;
+type Settings = Partial<Pick<GroupInfo, 'signatures' | 'comments' | 'protectContent' | 'historyVisible' | 'slowMode' | 'joinApproval' | 'reactions'>>;
 const settingText = (key: keyof Settings, value: unknown): string => {
   switch (key) {
     case 'signatures':
       return value ? 'Вы включили подписи авторов' : 'Вы выключили подписи авторов';
+    case 'comments':
+      return value ? 'Вы включили комментарии' : 'Вы выключили комментарии';
     case 'protectContent':
       return value ? 'Вы запретили сохранять и пересылать содержимое' : 'Вы разрешили сохранять и пересылать содержимое';
     case 'historyVisible':

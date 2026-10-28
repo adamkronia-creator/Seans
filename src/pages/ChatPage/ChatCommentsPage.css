@@ -1,0 +1,32 @@
+/* Экран комментариев: те же шапка, лента и поле, что у чата; здесь только своё — фото «от чьего имени» в поле и ряд комментариев */
+
+/* Фото в начале капсулы: круг 40, нажатие открывает выбор имени */
+.ccm .ccm__as {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-avatar-sm);
+  height: var(--size-avatar-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+}
+
+.ccm .ccm__as .avatar {
+  --avatar-size: var(--size-avatar-sm);
+}
+
+/* Комментарии стоят группой с местом под фото слева, как сообщения общего чата; интервал между ними 4, как между сообщениями серии */
+.ccm .ccm__list {
+  margin-top: var(--space-3);
+}
+
+.ccm .ccm__comment {
+  max-width: calc(100% - var(--size-avatar-sm) - var(--space-2) - var(--space-8));
+}
+
+.ccm .ccm__face .avatar {
+  --avatar-size: var(--size-avatar-sm);
+}

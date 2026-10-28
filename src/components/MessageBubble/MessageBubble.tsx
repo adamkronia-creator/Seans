@@ -10,7 +10,8 @@ import { authorColor } from '../../data/contacts';
 import { Avatar } from '../Avatar/Avatar';
 import { IconEye } from '../GroupUi/GroupIcons';
 import type { LibraryItem } from '../../data/library';
-import { IconReadTicks } from '../icons';
+import { IconMessages, IconReadTicks, IconTestChevron } from '../icons';
+import { commentsWord } from '../../data/comments';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
 import { IconPinned } from '../FolderMenu/FolderIcons';
 import { reducedMotion } from '../../utils/swipe';
@@ -208,6 +209,9 @@ interface MessageBubbleProps {
   authorTitle?: string;
   /** Нажатие на фото автора: профиль человека */
   onOpenAuthor?: (id: string) => void;
+  /** Пост канала с включёнными комментариями (или картинка): под постом кнопка; число — сколько комментариев уже есть */
+  commentCount?: number;
+  onOpenComments?: () => void;
 }
 
 export function MessageBubble({
@@ -233,6 +237,8 @@ export function MessageBubble({
   showAvatar = false,
   authorTitle,
   onOpenAuthor,
+  commentCount,
+  onOpenComments,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
   const [dx, setDx] = useState(0);
@@ -251,6 +257,21 @@ export function MessageBubble({
       <span className="bubble__author-name">{authorName}</span>
       {authorTitle && <span className="bubble__author-title">{authorTitle}</span>}
     </span>
+  );
+  const commentsOn = commentCount !== undefined && Boolean(onOpenComments);
+  const commentsButton = commentsOn && (
+    <button
+      type="button"
+      className="bubble__comments"
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpenComments?.();
+      }}
+    >
+      <IconMessages className="bubble__comments-icon" aria-hidden="true" />
+      <span className="bubble__comments-text">{commentCount ? commentsWord(commentCount) : 'Прокомментировать'}</span>
+      <IconTestChevron className="bubble__comments-chevron" aria-hidden="true" />
+    </button>
   );
   const authorFace = authored && showAvatar && (
     <button
@@ -510,6 +531,7 @@ export function MessageBubble({
             <Meta message={message} post={post} />
           </span>
         </div>
+        {commentsButton}
       </li>
     );
   }
@@ -532,7 +554,7 @@ export function MessageBubble({
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       {message.file && <FileBlock file={message.file} />}
       <Highlighted text={message.text} query={query} active={activeMatch} />
-      {hasReaction && (
+      {(hasReaction || commentsOn) && (
         <div className="bubble__foot bubble__foot--text">
           <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
           <span className="bubble__meta bubble__meta--foot">
@@ -540,7 +562,8 @@ export function MessageBubble({
           </span>
         </div>
       )}
-      {showMeta && !hasReaction && (
+      {commentsButton}
+      {showMeta && !hasReaction && !commentsOn && (
         <>
           {/* Невидимая копия резервирует место под время в конце последней строки */}
           <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">
