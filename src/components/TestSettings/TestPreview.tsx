@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
+import { createPortal } from 'react-dom';
 import type { LibraryTest } from '../../data/library';
 import { blindTitle, type ResultMode } from '../../data/resultMode';
 import type { TestBlankData } from '../../data/testBlank';
@@ -30,6 +31,8 @@ interface TestPreviewProps {
   initialStage?: Stage;
   /** Только экран телефона: без вкладок этапов и кнопок внизу (макеты в подсказках) */
   bare?: boolean;
+  /** Куда класть этапы «Начало / В процессе / Конец»: место в шапке окна (null — ещё не готово). Без значения они стоят над рамкой */
+  tabsHost?: HTMLElement | null;
 }
 
 /**
@@ -38,7 +41,7 @@ interface TestPreviewProps {
  * вопрос с ответами и завершение. Внутри рамки тот же интерфейс, что у клиента и при прохождении самому.
  * Ответы здесь никуда не сохраняются. При слепом тестировании название и значок теста скрыты.
  */
-export function TestPreview({ test, blank, blind, result, duration, initialStage = 'start', bare }: TestPreviewProps) {
+export function TestPreview({ test, blank, blind, result, duration, initialStage = 'start', bare, tabsHost }: TestPreviewProps) {
   // Номер слепого теста в предпросмотре: время открытия настроек; у настоящего теста он ставится при отправке
   const [title] = useState(() => blindTitle());
   const [stage, setStage] = useState<Stage>(initialStage);
@@ -98,16 +101,21 @@ export function TestPreview({ test, blank, blind, result, duration, initialStage
     step(dx < 0 ? 1 : -1);
   };
 
+  const tabs = (
+    <div className="tp__tabs" role="group" aria-label="Этап прохождения">
+      {STAGES.map(({ id, label }) => (
+        <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+  const tabsEl = tabsHost === undefined ? tabs : tabsHost ? createPortal(tabs, tabsHost) : null;
+
   return (
     <>
             <div id={bare ? undefined : 'preview'} className={`tp tp--inline${bare ? ' tp--bare' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        {!bare && <div className="tp__tabs" role="group" aria-label="Этап прохождения">
-          {STAGES.map(({ id, label }) => (
-            <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
-              {label}
-            </button>
-          ))}
-        </div>}
+        {!bare && tabsEl}
 
         <div className="tp__phone" data-hscroll>
           <div className="tp__status" aria-hidden="true">

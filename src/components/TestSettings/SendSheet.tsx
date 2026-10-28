@@ -157,10 +157,12 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onPass,
 }
 
 /** «Предпросмотр»: то, что увидит клиент, с вкладками «Начало / В процессе / Конец» */
-export function PreviewSheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+export function PreviewSheet({ title, onClose, children }: { title: string; onClose: () => void; children: (tabsHost: HTMLElement | null) => ReactNode }) {
+  // Заголовка у окна нет: в шапке рядом с крестиком стоят этапы предпросмотра, которые кладёт сам макет
+  const [host, setHost] = useState<HTMLDivElement | null>(null);
   return (
-    <Frame title="Предпросмотр" subtitle={title} onClose={onClose}>
-      {children}
+    <Frame title={`Предпросмотр: ${title}`} headerSlot={setHost} onClose={onClose}>
+      {children(host)}
     </Frame>
   );
 }

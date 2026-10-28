@@ -513,7 +513,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           </div>
         </section>
 
-        {blank && <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} />}
       </div>
 
       {locked ? (
@@ -535,7 +534,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
       {sheet === 'preview' && blank && (
         <PreviewSheet title={test.title} onClose={() => setSheet(null)}>
-          <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} />
+          {(tabsHost) => <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} tabsHost={tabsHost} />}
         </PreviewSheet>
       )}
       {sheet === 'send' && (

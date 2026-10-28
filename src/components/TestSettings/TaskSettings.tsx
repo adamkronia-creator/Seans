@@ -391,7 +391,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
               </div>
             </section>
 
-            <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
           </div>
 
           {locked ? (
@@ -413,7 +412,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
       {sheet === 'preview' && (
         <PreviewSheet title={task.title} onClose={() => setSheet(null)}>
-          <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
+          {(tabsHost) => <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} tabsHost={tabsHost} />}
         </PreviewSheet>
       )}
       {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onPass={() => { setSheet(null); openView('pass'); }} onClose={() => setSheet(null)} />}

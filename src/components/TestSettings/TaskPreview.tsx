@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
+import { createPortal } from 'react-dom';
 import type { LibraryTask } from '../../data/library';
 import { emptyValues, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
@@ -25,14 +26,16 @@ interface TaskPreviewProps {
   deadline: string;
   /** Правило постоянного задания, если оно включено в «Правилах назначения» */
   permanent?: PermanentRule;
+  /** Куда класть этапы «Начало / В процессе / Конец»: место в шапке окна (null — ещё не готово). Без значения они стоят над рамкой */
+  tabsHost?: HTMLElement | null;
 }
 
 /**
- * Блок «Предпросмотр» внизу настроек задания (как у теста): то, что увидит клиент, в рамке телефона, и меняется вместе с настройками выше.
+ * Окно «Предпросмотр» настроек задания (как у теста): то, что увидит клиент, в рамке телефона, и меняется вместе с настройками выше.
  * Внутри: начало (инструкция и сведения), бланк страницами и завершение; сообщения специалиста в рамке нет.
  * Внутри рамки тот же интерфейс, что у клиента и при прохождении самому. Написанное здесь никуда не сохраняется.
  */
-export function TaskPreview({ task, data, form, options, deadline, permanent }: TaskPreviewProps) {
+export function TaskPreview({ task, data, form, options, deadline, permanent, tabsHost }: TaskPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
@@ -71,15 +74,20 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
     step(dx < 0 ? 1 : -1);
   };
 
+  const tabs = (
+    <div className="tp__tabs" role="group" aria-label="Этап выполнения">
+      {STAGES.map(({ id, label }) => (
+        <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => setStage(id)}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+  const tabsEl = tabsHost === undefined ? tabs : tabsHost ? createPortal(tabs, tabsHost) : null;
+
   return (
         <div id="preview" className="tp tp--inline" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      <div className="tp__tabs" role="group" aria-label="Этап выполнения">
-        {STAGES.map(({ id, label }) => (
-          <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => setStage(id)}>
-            {label}
-          </button>
-        ))}
-      </div>
+      {tabsEl}
 
       <div className="tp__phone" data-hscroll>
         <div className="tp__status" aria-hidden="true">

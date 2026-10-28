@@ -397,7 +397,7 @@
 /* «Назад» при прохождении — стеклянная кнопка с обводкой, как остальные кнопки интерфейса, а не надпись над фоном */
 [data-pm] .test-pass__back {
   height: var(--size-touch);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--sheet-rim);
   background: var(--glass-fill);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
@@ -578,7 +578,7 @@
 }
 
 [data-pm] .test-settings__cta .test-settings__cta-button.test-settings__cta-button--ghost {
-  border-color: var(--glass-border);
+  border-color: var(--sheet-rim);
   background: var(--glass-solid);
   color: var(--text-primary);
 }
@@ -703,4 +703,13 @@
 
 [data-pm] .test-settings__slot:empty {
   display: none;
+}
+
+/* Этапы предпросмотра — в шапке окна, рядом с крестиком: строка 40, как кнопка закрытия; поле справа оставляет заголовок окна */
+[data-pm] .sheet__header--tabs {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet__header--tabs .tp__tabs {
+  height: var(--size-control);
 }
