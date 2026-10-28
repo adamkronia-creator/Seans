@@ -1,4 +1,4 @@
-import { entriesOf, type EntriesField, type TaskSection, type TaskValues } from '../../data/taskValues';
+import { entriesOf, plural, type EntriesField, type TaskSection, type TaskValues } from '../../data/taskValues';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
 import '../EditSheet/EditSheet.css';
@@ -61,6 +61,39 @@ export function FillMeter({ label = 'Заполнено', done, total, onReset }
         <span style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
       </div>
     </>
+  );
+}
+
+/**
+ * Полоса шагов под шапкой задания: «Шаг 2 из 5» и сегменты по числу шагов (пройденные бледнее, текущий яркий).
+ * До начала (`at` 0) вместо номера «Инструкция», а справа число шагов; когда что-то уже написано, справа «Сбросить».
+ */
+export function PassStrip({ at: step, total, onReset }: { at: number; total: number; onReset?: () => void }) {
+  // Шага, которого уже нет (запись убрали), в счётчике не бывает: номер всегда в пределах полосы
+  const at = Math.min(Math.max(step, 0), total);
+  const intro = at === 0;
+  return (
+    <div className="pass-strip">
+      <div className="pass-strip__row">
+        <span className="pass-strip__step">{intro ? 'Инструкция' : `Шаг ${at} из ${total}`}</span>
+        {onReset ? (
+          <button type="button" className="pass-strip__reset" onClick={onReset}>
+            Сбросить
+          </button>
+        ) : (
+          intro && (
+            <span className="pass-strip__count">
+              {total} {plural(total, ['шаг', 'шага', 'шагов'])}
+            </span>
+          )
+        )}
+      </div>
+      <div className="pass-strip__bar" role="progressbar" aria-label="Шаги задания" aria-valuemin={0} aria-valuemax={total} aria-valuenow={at}>
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className={`pass-strip__seg${i + 1 < at ? ' pass-strip__seg--done' : i + 1 === at ? ' pass-strip__seg--now' : ''}`} />
+        ))}
+      </div>
+    </div>
   );
 }
 

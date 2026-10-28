@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import type { LibraryTask } from '../../data/library';
-import { emptyValues, progressOf, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
+import { emptyValues, type PermanentRule, type TaskSettingsData, type TaskValues } from '../../data/taskValues';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
-import { FillMeter, taskSteps } from './PassParts';
+import { PassStrip, taskSteps } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { TestHeader } from './TestHeader';
 import './TestPreview.css';
@@ -41,7 +41,6 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
   const [partId, setPartId] = useState('');
   const part = Math.max(0, parts.indexOf(partId));
   const setPartAt = (n: number) => setPartId(parts[n]);
-  const { done, total } = progressOf(sections, values);
   const screenRef = useRef<HTMLDivElement>(null);
 
   // Новый этап открывается с начала экрана
@@ -87,6 +86,7 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
           <span className="tp__notch" />
         </div>
         <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" />
+        {stage !== 'end' && <PassStrip at={stage === 'start' ? 0 : part + 1} total={parts.length} />}
         <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
           {stage === 'start' && <ClientIntro message="" rules={data.blank.rules(form)} facts={taskFacts(data, deadline, permanent)} />}
           {stage === 'progress' && <TaskForm data={data} form={form} options={options} only={parts[part]} values={values} onChange={setValues} onEntryStep={(sectionId, index) => setPartId(`each:${sectionId}:${index}`)} />}
@@ -95,7 +95,6 @@ export function TaskPreview({ task, data, form, options, deadline, permanent }: 
 
         {stage !== 'end' && (
           <div className="test-settings__cta test-pass__cta tp__footer">
-            <FillMeter done={done} total={total} />
             <div className="test-pass__buttons">
               {stage === 'progress' && (
                 <button type="button" className="test-pass__back" onClick={() => (part > 0 ? setPartAt(part - 1) : setStage('start'))}>

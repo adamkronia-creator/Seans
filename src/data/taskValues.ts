@@ -18,8 +18,8 @@ export type TaskField =
   | { kind: 'scale'; id: string; label: string; hint?: string; low: string; high: string }
   /** Выбор из вариантов: один (список) или несколько (чипсы) */
   | { kind: 'choice'; id: string; label: string; hint?: string; options: string[]; multiple?: boolean }
-  /** Список коротких строк, который клиент пополняет: доказательства «за» и «против». Сначала показано `count` строк, добавить можно до `max` */
-  | { kind: 'list'; id: string; label: string; hint?: string; placeholder: string; addLabel: string; count: number; max: number }
+  /** Список коротких строк, который клиент пополняет: доказательства «за» и «против». Сначала показано `count` строк, добавить можно до `max`; `item` — подпись строки на рамке («Факт» → «Факт 1»), без неё берётся короткое название списка */
+  | { kind: 'list'; id: string; label: string; item?: string; hint?: string; placeholder: string; addLabel: string; count: number; max: number }
   /** Повторяющаяся запись из нескольких полей (запись дневника, дело плана, беспокойство): сначала показано `count` записей, добавить можно до `max` */
   | { kind: 'entries'; id: string; title: string; addLabel: string; count: number; max: number; groups: EntryGroup[] };
 

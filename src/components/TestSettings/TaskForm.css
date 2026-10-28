@@ -1,32 +1,214 @@
-/* Бланк задания: поля ответа, выбор начала фразы, ползунки процентов, «пирог» долей, шкала состояния.
-   Те же стили в бланке задания, примере выполнения, прохождении, предпросмотре и результате */
+/* Бланк задания: поля ответа, выбор начала фразы, ползунки, «пирог» долей, шкала состояния, записи.
+   Те же стили в бланке задания, примере выполнения, прохождении, предпросмотре и результате.
 
-/* Поле ответа: растёт по тексту, как поле сообщения */
-.task-field {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
+   Ритм (всё шаги сетки 4):
+     поле карточки 16 (у карточки с записями 12, как у вложенного блока), между вопросами 24, внутри вопроса 12,
+     вопрос и пояснение под ним через 4, между соседними полями и плитками 8, между списками и кнопкой «Добавить» 12.
+   Подложки: плитка — тот же цвет текста с прозрачностью 6%, поэтому она чуть светлее тёмной карточки и чуть темнее светлой;
+   выбранное — акцентный оттенок 16% с кольцом 2. Рамка только у поля ответа (как в окне «Новый контакт»), у остального её нет. */
+
+/* Тело карточки бланка: на нём лежат поля и плитки. Здесь же краски подложек */
+.tf-body {
+  --tf-line: var(--field-line, color-mix(in srgb, var(--text-secondary) 55%, transparent));
+  --tf-tile: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  --tf-tile-strong: color-mix(in srgb, var(--text-primary) 12%, transparent);
+  --tf-track: color-mix(in srgb, var(--text-primary) 18%, transparent);
+  --tf-on: color-mix(in srgb, var(--action-primary) 16%, transparent);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4);
+}
+
+/* С записями: плитки лежат на карточке с полем 12, а поясняющая строка стоит на общей вертикали с полями других карточек (12 + 4) */
+.tf-body--tiles {
+  gap: var(--space-3);
+  padding: var(--card-pad);
+}
+
+/* Вопрос: вопрос, пояснение и поле через 12 */
+.tf-q {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Поле без вопроса над ним: подпись на рамке занимает 8 над линией, и она заходит в промежуток, чтобы линия стояла в 24 от соседа */
+.tf-q--box {
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.tf-ask {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tf-prompt {
   margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border: 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-read);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-read);
+}
+
+.tf-prompt strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.tf-hint,
+.task-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+/* Пояснение к разделу: стоит над полями; до первого поля 16 (промежуток 24 минус 8) */
+.tf-intro {
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.tf-body--tiles .tf-intro {
+  margin: 0;
+  padding: var(--space-1) var(--space-1) var(--space-2);
+}
+
+/* ——— Поле ответа: рамка, подпись разрывает линию (как «Новый контакт») ——— */
+
+.tf-box {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--tf-line);
   border-radius: var(--radius-md);
+  cursor: text;
+  transition: border-color 0.12s;
+}
+
+/* Пока поле пусто и не в фокусе, подпись внутри вместо подсказки, а здесь она скрыта; потом переезжает на рамку (разрыв в линии даёт legend) */
+.tf-box legend {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  line-height: var(--space-4);
+  white-space: nowrap;
+}
+
+.tf-box--up legend {
+  width: auto;
+  max-width: 100%;
+  padding: 0 var(--space-1);
+}
+
+.tf-box--focus {
+  /* 2 px настоящей рамкой (не тенью), чтобы линия расступалась под подписью; отрицательные отступы оставляют место в колонке прежним */
+  margin: -1px -1px 0; /* grid:ok — компенсирует рамку 2 px */
+  border-width: 2px;
+  border-color: var(--action-primary);
+}
+
+.tf-box--focus legend {
+  color: var(--action-primary);
+}
+
+/* Сам ввод: строка 24, поля 16 сверху и снизу, поэтому пустое поле в одну строку высотой 56 (рамка с подписью занимает 64) */
+.tf-box__input {
+  flex: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  margin: calc(var(--space-2) * -1) 0 -1px; /* grid:ok — вверх на половину подписи, вниз на нижнюю рамку 1 px: поле целиком кратно 4 */
+  padding: var(--space-4) 0;
+  border: 0;
   outline: 0;
-  font-family: inherit;
-  background: var(--color-bg-fill);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  overflow: hidden;
+  background: none;
+  color: var(--text-primary);
+  caret-color: var(--action-primary);
+  font: var(--type-body);
   resize: none;
 }
 
-.task-field::placeholder {
-  color: var(--color-text-placeholder);
+.tf-box__input::placeholder {
+  color: var(--text-secondary);
 }
 
-/* Ответ в просмотре: текст клиента, выделен акцентным цветом; абзацы и переносы строк сохраняются */
+/* С кнопкой «Удалить» справа: поле до кнопки, кнопка 40 стоит на середине первой строки (4 от рамки) */
+.tf-box--end {
+  padding-right: var(--space-1);
+}
+
+.tf-box--end .tf-box__input {
+  margin-right: var(--space-2);
+}
+
+/* ——— Кнопки ——— */
+
+/* Крестик 20 в зоне 40: в рамке поля, заголовке записи и карточки */
+.tf-remove {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+}
+
+.tf-remove svg {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.tf-remove:active {
+  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
+}
+
+/* В заголовке карточки и записи кнопка 40 не делает строку выше: до края строки 8 вычтено, правый край значка на поле 16 */
+.blank-card__head .tf-remove,
+.tf-entry__head .tf-remove {
+  margin: calc(var(--space-2) * -1) calc((var(--space-5) - var(--size-control)) / 2) calc(var(--space-2) * -1) 0;
+}
+
+/* «Добавить …»: плитка акцентного оттенка с цветом ссылки, высота 44 */
+.tf-add {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--size-touch);
+  border-radius: var(--radius-md);
+  background: var(--tf-on);
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+.tf-add svg {
+  width: var(--size-icon);
+  height: var(--size-icon);
+}
+
+.tf-add:active {
+  background: color-mix(in srgb, var(--action-primary) 26%, transparent);
+}
+
+/* ——— Ответ в просмотре ——— */
+
+/* Текст клиента цветом ссылки: на тёмном стекле он светлее, на светлом темнее; абзацы и переносы строк сохраняются */
 .task-answer {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--text-link);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
   overflow-wrap: anywhere;
@@ -36,11 +218,16 @@
 /* Поле, которое клиент оставил пустым: тихая подпись */
 .tf-empty {
   margin: 0;
-  color: var(--color-text-placeholder);
+  color: var(--text-secondary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
 }
 
+.tf-body--tiles > .tf-empty {
+  padding: var(--space-1);
+}
+
+/* Блок с абзацами на карточке: «Что можно отметить» у примера */
 .task-pad {
   display: flex;
   flex-direction: column;
@@ -48,75 +235,87 @@
   padding: var(--space-4);
 }
 
-.task-hint {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
 /* Абзацы внутри блока с полями: промежуток 12 задает сам блок, а не абзац */
 .task-pad .ts-card__paragraph + .ts-card__paragraph {
   margin-top: 0;
 }
 
-/* Пояснение к разделу: стоит над полями и отделено от них линией */
-.tf-section-hint {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-divider);
-}
+/* ——— Предложение: номер и начало фразы в одной строке, под ними поле ——— */
 
-/* Шкала «Как вы себя чувствуете?»: значок слева от подписи */
-.task-state__text {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.task-state__icon {
-  flex-shrink: 0;
-  color: var(--color-text-secondary);
-  font-size: 22px;
-}
-
-/* ——— Предложение: номер и выбор начала фразы в одной строке, под ними поле ——— */
-
-.tf-sentence {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-.tf-sentence__number {
-  flex-shrink: 0;
-  min-width: var(--space-6);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
-}
-
-/* Выбор начала: тот же список, что у «Срока выполнения», но крупнее — в бланке по нему попадают пальцем */
-.tf-starter {
-  height: var(--size-control-sm);
-  min-width: 0;
-}
-
-/* ——— Ползунок процентов ——— */
-
-.tf-percent {
+.tf-sentence__head {
   display: flex;
   gap: var(--space-3);
   align-items: center;
 }
 
-.tf-percent__range {
+.tf-sentence__number {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--space-7);
+  height: var(--space-7);
+  border-radius: var(--radius-full);
+  background: var(--tf-tile-strong);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+/* Выбор начала: плитка со стрелкой, по нажатию открывается список (сам выбор лежит сверху невидимым) */
+.tf-starter {
+  position: relative;
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-width: 0;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-2) 0 var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--tf-tile);
+  color: var(--text-primary);
+}
+
+.tf-starter__value {
+  font: var(--type-label);
+}
+
+.tf-starter__chevron {
+  flex-shrink: 0;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--text-secondary);
+}
+
+.tf-starter__native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ——— Ползунок на плитке: дорожка и число; у шкалы 0–10 под дорожкой подписи краёв ——— */
+
+.tf-slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--tf-tile);
+}
+
+.tf-slider__range {
   --thumb: var(--space-7);
   --track: var(--space-2);
   --pos: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--fill, 0) / 100);
 
-  flex: 1;
   min-width: 0;
-  height: var(--size-touch);
+  height: var(--row-h);
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -124,31 +323,31 @@
   appearance: none;
 }
 
-.tf-percent__range:focus {
+.tf-slider__range:focus {
   outline: 0;
 }
 
-/* Дорожка 8: слева от бегунка акцентная, справа серая */
-.tf-percent__range::-webkit-slider-runnable-track {
+/* Дорожка 8: слева от бегунка цвет оценки (акцентный или цвет доли), справа серая */
+.tf-slider__range::-webkit-slider-runnable-track {
   height: var(--track);
   border-radius: var(--radius-xs);
-  background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
+  background: linear-gradient(to right, var(--tone, var(--action-primary)) var(--pos), var(--tf-track) var(--pos));
 }
 
-.tf-percent__range::-moz-range-track {
+.tf-slider__range::-moz-range-track {
   height: var(--track);
   border-radius: var(--radius-xs);
-  background: linear-gradient(to right, var(--color-accent) var(--pos), var(--color-bg-fill-strong) var(--pos));
+  background: linear-gradient(to right, var(--tone, var(--action-primary)) var(--pos), var(--tf-track) var(--pos));
 }
 
-/* Бегунок 28: достаточно крупный для пальца */
-.tf-percent__range::-webkit-slider-thumb {
+/* Бегунок 28: белый круг с тенью, достаточно крупный для пальца */
+.tf-slider__range::-webkit-slider-thumb {
   width: var(--thumb);
   height: var(--thumb);
   margin-top: calc((var(--track) - var(--thumb)) / 2); /* бегунок по середине дорожки */
   border: 0;
   border-radius: 50%;
-  background: #fff;
+  background: #fff; /* grid:ok — белый бегунок на любом фоне */
   box-shadow:
     0 1px 4px rgb(19 32 58 / 30%),
     0 0 0 1px rgb(19 32 58 / 6%);
@@ -156,52 +355,82 @@
   appearance: none;
 }
 
-.tf-percent__range::-moz-range-thumb {
+.tf-slider__range::-moz-range-thumb {
   box-sizing: border-box;
   width: var(--thumb);
   height: var(--thumb);
   border: 0;
   border-radius: 50%;
-  background: #fff;
+  background: #fff; /* grid:ok — белый бегунок на любом фоне */
   box-shadow:
     0 1px 4px rgb(19 32 58 / 30%),
     0 0 0 1px rgb(19 32 58 / 6%);
 }
 
-.tf-percent__range:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+.tf-slider__range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-primary) 45%, transparent);
 }
 
-.tf-percent__range:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+.tf-slider__range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--action-primary) 45%, transparent);
 }
 
-/* Пока оценку не выбрали: бегунок серый, вместо числа тире */
-.tf-percent--unset .tf-percent__range::-webkit-slider-thumb {
-  background: var(--color-bg-fill);
-  box-shadow: inset 0 0 0 2px var(--color-text-placeholder);
+/* Пока оценку не выбрали: дорожка без заливки, на бегунке акцентное кольцо, вместо числа тире */
+.tf-slider--unset .tf-slider__range::-webkit-slider-runnable-track {
+  background: var(--tf-track);
 }
 
-.tf-percent--unset .tf-percent__range::-moz-range-thumb {
-  background: var(--color-bg-fill);
-  box-shadow: inset 0 0 0 2px var(--color-text-placeholder);
+.tf-slider--unset .tf-slider__range::-moz-range-track {
+  background: var(--tf-track);
 }
 
-.tf-percent__value {
+.tf-slider--unset .tf-slider__range::-webkit-slider-thumb {
+  box-shadow:
+    inset 0 0 0 2px var(--action-primary),
+    0 1px 4px rgb(19 32 58 / 30%);
+}
+
+.tf-slider--unset .tf-slider__range::-moz-range-thumb {
+  box-shadow:
+    inset 0 0 0 2px var(--action-primary),
+    0 1px 4px rgb(19 32 58 / 30%);
+}
+
+.tf-slider__value {
   display: block;
-  flex-shrink: 0;
   min-width: var(--space-12);
-  color: var(--color-accent);
-  font-size: var(--font-size-md);
+  color: var(--text-link);
+  font: var(--type-headline);
   font-variant-numeric: tabular-nums;
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-md);
   text-align: right;
 }
 
-.tf-percent--unset .tf-percent__value {
-  color: var(--color-text-placeholder);
+.tf-slider--unset .tf-slider__value {
+  color: var(--text-secondary);
   font-weight: var(--font-weight-regular);
+}
+
+/* Подписи краёв стоят под дорожкой; справа остаётся место числа (оно в соседней колонке) */
+.tf-slider__ends {
+  display: flex;
+  grid-column: 1;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  margin-top: calc(var(--space-1) * -1);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+/* Подписи концов делят строку пополам и переносятся ровно; правая прижата к краю, под концом дорожки */
+.tf-slider__ends > span {
+  min-width: 0;
+  text-wrap: balance;
+}
+
+.tf-slider__ends > span:last-child {
+  text-align: right;
 }
 
 /* ——— Доли ответственности ——— */
@@ -221,95 +450,34 @@
   list-style: none;
 }
 
+/* Фактор: название на рамке и под ним ползунок цветом его куска, через 8 */
 .tf-factor {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-}
-
-.tf-factor__head {
-  display: flex;
   gap: var(--space-2);
-  align-items: center;
 }
 
 .tf-dot {
   flex-shrink: 0;
-  width: 12px;
-  height: 12px;
+  width: var(--size-dot);
+  height: var(--size-dot);
   border-radius: 50%;
 }
 
 .tf-dot--own {
-  background: var(--color-accent);
-}
-
-.tf-factor__name {
-  flex: 1;
-  box-sizing: border-box;
-  min-width: 0;
-  height: var(--size-control);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-md);
-  outline: 0;
-  font-family: inherit;
-  background: var(--color-bg-fill);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
-}
-
-.tf-factor__name::placeholder {
-  color: var(--color-text-placeholder);
-}
-
-/* Кнопка 40, внутри значок 20; правый край значка выровнен по краю поля */
-.tf-factor__remove {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--size-control);
-  height: var(--size-control);
-  margin-right: calc((var(--space-5) - var(--size-control)) / 2);
-  color: var(--color-text-caption);
-}
-
-.tf-factor__remove svg {
-  width: var(--space-5);
-  height: var(--space-5);
-}
-
-.tf-add {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  justify-content: center;
-  height: var(--size-touch);
-  border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-medium);
-}
-
-.tf-add svg {
-  width: 20px;
-  height: 20px;
+  background: var(--action-primary);
 }
 
 /* Доля самого клиента: остаток до 100, считается сама */
 .tf-own {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   align-items: center;
-  min-height: var(--size-control);
-  padding: 0 var(--space-3);
+  min-height: var(--row-h);
+  padding: 0 var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--color-bg-app);
-  font-size: var(--font-size-md);
-  line-height: var(--line-height-md);
+  background: var(--tf-on);
+  font: var(--type-body);
 }
 
 .tf-own__label {
@@ -319,24 +487,42 @@
 
 .tf-own__value {
   flex-shrink: 0;
-  color: var(--color-accent);
+  color: var(--text-link);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-semibold);
 }
 
-/* Кольцо: 168, в центре доля клиента */
+/* Кольцо на плитке: 168, в центре доля клиента */
 .tf-pie {
-  position: relative;
-  align-self: center;
-  width: 168px;
-  height: 168px;
+  display: flex;
+  justify-content: center;
   margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--tf-tile);
+}
+
+.tf-pie__ring {
+  position: relative;
+  width: 168px; /* grid:ok — кратно 4 */
+  height: 168px;
 }
 
 .tf-pie__svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Общее правило значков ([data-pm] svg circle) делает линию 1,5 и не даёт ей расти вместе с рисунком: у кольца толщина 20 единиц рисунка, концы ровные */
+[data-pm] .tf-pie__svg circle {
+  stroke-width: 20;
+  stroke-linecap: butt;
+  vector-effect: none;
+}
+
+.tf-pie__track {
+  stroke: var(--tf-track);
 }
 
 .tf-pie__center {
@@ -351,7 +537,7 @@
 }
 
 .tf-pie__center strong {
-  color: var(--color-accent);
+  color: var(--text-primary);
   font-size: var(--font-size-2xl);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-semibold);
@@ -359,7 +545,7 @@
 }
 
 .tf-pie__center span {
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
 }
@@ -377,14 +563,10 @@
   display: flex;
   gap: var(--space-3);
   align-items: center;
-  min-height: 40px;
-  padding: var(--space-2) 0;
+  min-height: var(--size-control);
+  padding: var(--space-2) var(--space-1);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
-}
-
-.tf-legend li + li {
-  border-top: 1px solid var(--color-divider);
 }
 
 .tf-legend__name {
@@ -401,30 +583,113 @@
 
 .tf-legend__own .tf-legend__name,
 .tf-legend__own .tf-legend__value {
-  color: var(--color-accent);
+  color: var(--text-link);
   font-weight: var(--font-weight-semibold);
 }
 
-/* ——— Шкала 0–10: ползунок и подписи краёв под ним ——— */
+/* ——— Выбор: плитки с кружком (один) и чипсы (несколько) ——— */
 
-.tf-scale {
+.tf-options {
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* Подписи стоят под дорожкой: справа оставлено место, которое в строке занимает число (48 и промежуток 12) */
-.tf-scale__ends {
+/* Плитка 48: кружок 20, до текста 12; выбранная — акцентный оттенок и кольцо 2 (внутренней тенью: размер не меняется) */
+.tf-option {
+  position: relative;
   display: flex;
   gap: var(--space-3);
-  justify-content: space-between;
-  margin-top: calc(var(--space-1) * -1);
-  padding-right: calc(var(--space-12) + var(--space-3));
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
+  align-items: center;
+  box-sizing: border-box;
+  min-height: var(--row-h);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--tf-tile);
+  box-shadow: inset 0 0 0 2px transparent;
+  color: var(--text-primary);
+  font: var(--type-body);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-/* ——— Выбор из нескольких вариантов: чипсы ——— */
+.tf-option:has(.tf-option__input:checked) {
+  background: var(--tf-on);
+  box-shadow: inset 0 0 0 2px var(--action-primary);
+}
+
+.tf-option:active {
+  background: var(--tf-tile-strong);
+}
+
+.tf-option__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.tf-option__mark {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: border-color 0.15s ease;
+}
+
+.tf-option__mark::after {
+  content: '';
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--action-primary);
+  transform: scale(0);
+  transition: transform 0.15s ease;
+}
+
+.tf-option__input:checked + .tf-option__mark {
+  border-color: var(--action-primary);
+}
+
+.tf-option__input:checked + .tf-option__mark::after {
+  transform: scale(1);
+}
+
+.tf-option__input:focus-visible + .tf-option__mark {
+  outline: 2px solid var(--action-primary);
+  outline-offset: 2px;
+}
+
+.tf-option__icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-lg);
+}
+
+.tf-option__text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Сохранённый бланк: выбранное видно, менять нельзя; остальные тише */
+.tf-option--locked {
+  cursor: default;
+  pointer-events: none;
+}
+
+.tf-option--locked:not(:has(.tf-option__input:checked)) {
+  color: var(--text-secondary);
+}
 
 .tf-chips {
   display: flex;
@@ -435,37 +700,43 @@
   list-style: none;
 }
 
+/* Чипс 40: плитка с текстом; выбранный — сплошной акцентный */
 .tf-chip {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  min-height: var(--size-chip-h);
-  padding: var(--space-1) var(--space-3);
+  min-height: var(--size-control);
+  padding: var(--space-2) var(--space-4);
   border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-fill);
-  color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  background: var(--tf-tile);
+  color: var(--text-primary);
   font-family: inherit;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
   text-align: left;
 }
 
-.tf-chip--on {
-  background: var(--color-accent);
-  color: var(--color-accent-on);
+.tf-chip:active {
+  background: var(--tf-tile-strong);
 }
 
-/* В просмотре выбранное — тихая метка, как «направления» в настройках */
+.tf-chip--on,
+.tf-chip--on:active {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+/* В просмотре выбранное — тихая метка акцентного оттенка */
 .tf-chip--static {
   min-height: 0;
   padding: var(--space-1) var(--space-3);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: var(--tf-on);
+  color: var(--text-link);
 }
 
-/* ——— Список строк (доказательства «за» и «против») ——— */
+/* ——— Список строк (доказательства «за» и «против», эмоции) ——— */
 
 .tf-list {
   display: flex;
@@ -473,6 +744,7 @@
   gap: var(--space-3);
 }
 
+/* Строки-рамки через 8: с подписью на линии между линиями соседей получается 16, как в окне «Новый контакт» */
 .tf-list__rows {
   display: flex;
   flex-direction: column;
@@ -482,19 +754,7 @@
   list-style: none;
 }
 
-.tf-list__row {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-}
-
-.tf-list__row .task-field {
-  flex: 1;
-  width: auto;
-  min-width: 0;
-}
-
-/* В просмотре: строки с точкой, текст клиента акцентным цветом */
+/* В просмотре: строки с точкой, текст клиента цветом ссылки */
 .tf-bullets {
   display: flex;
   flex-direction: column;
@@ -507,7 +767,7 @@
 .tf-bullets li {
   position: relative;
   padding-left: var(--space-5);
-  color: var(--color-accent);
+  color: var(--text-link);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
   overflow-wrap: anywhere;
@@ -522,32 +782,29 @@
   width: var(--space-2);
   height: var(--space-2);
   border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--text-link);
 }
 
 /* ——— Записи: дневник, дела плана, беспокойства ——— */
 
-/* Вопрос с записями без своих полей: отступы у самих записей, между ними линия */
-.blank-question.tf-q--entries {
-  gap: 0;
-  padding: 0;
-}
-
 .tf-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* Запись — плитка: поле 16, скругление карточки минус её поле (20 − 12), поля внутри через 24 */
 .tf-entry {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
+  min-width: 0;
   padding: var(--space-4);
-}
-
-.tf-entry + .tf-entry {
-  border-top: 1px solid var(--color-divider);
+  border-radius: calc(var(--radius-lg) - var(--card-pad));
+  background: var(--tf-tile);
 }
 
 .tf-entry__head {
@@ -555,47 +812,39 @@
   gap: var(--space-2);
   align-items: center;
   justify-content: space-between;
-  min-height: 24px;
+  min-height: var(--space-6);
 }
 
 .tf-entry__title {
   margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-lg);
 }
 
-.tf-entry__group {
+/* Группа полей записи: название — метка слева, до первого поля 16 */
+.tf-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
+  min-width: 0;
 }
 
-/* Название группы («До дела», «После дела»): метка слева, как у направлений в настройках */
-.tf-entry__group-title {
+.tf-group__title {
   align-self: flex-start;
-  margin: 0;
+  margin: 0 0 calc(var(--space-2) * -1);
   padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  border-radius: var(--radius-full);
+  background: var(--tf-on);
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+/* Что клиент написал в записи, над полями последней страницы: цитата */
+.tf-quote {
+  margin: 0;
+  padding-left: var(--space-3);
+  box-shadow: inset 2px 0 0 var(--tf-line); /* grid:ok — линия цитаты 2 px */
+  color: var(--text-secondary);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
-}
-
-.tf-entry__field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.tf-entries__add {
-  display: flex;
-  flex-direction: column;
-  padding: 0 var(--space-4) var(--space-4);
-}
-
-.tf-entries__empty {
-  padding: var(--space-4);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }

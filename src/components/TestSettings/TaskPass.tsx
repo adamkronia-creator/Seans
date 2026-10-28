@@ -3,7 +3,7 @@ import { editTaskRun, finishTaskRun, resetTaskRun, useTaskRun } from '../../data
 import { progressOf, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { Toast } from '../Toast/Toast';
 import { ClientIntro, TaskDone, taskFacts } from './ClientParts';
-import { ConfirmSheet, FillMeter, taskSteps, unfilledText, type TaskStep } from './PassParts';
+import { ConfirmSheet, PassStrip, taskSteps, unfilledText, type TaskStep } from './PassParts';
 import { TaskForm } from './TaskForm';
 import { BlankRules, CollapseCard } from './TestBlank';
 import { usePassSwipe } from './usePassSwipe';
@@ -99,6 +99,7 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
 
   return (
     <>
+      {!finished && <PassStrip at={at} total={steps.length - 1} onReset={started ? () => setSheet('reset') : undefined} />}
       <div
         className={`test-settings__scroll${moved && !finished ? ` pass-step pass-step--${moved}` : ''}`}
         key={finished ? 'thanks' : step}
@@ -122,16 +123,13 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
       </div>
 
       <div className="test-settings__cta test-pass__cta">
-        {finished && client ? (
-          <div className="test-pass__buttons">
+        <div className="test-pass__buttons">
+          {finished && client ? (
             <button type="button" className="test-settings__cta-button" onClick={client.onExit}>
               Завершить
             </button>
-          </div>
-        ) : (
-          <>
-            <FillMeter done={done} total={total} onReset={started ? () => setSheet('reset') : undefined} />
-            <div className="test-pass__buttons">
+          ) : (
+            <>
               {step !== 'rules' && (
                 <button type="button" className="test-pass__back" onClick={() => goTo(steps[at - 1])}>
                   Назад
@@ -150,9 +148,9 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
                   Завершить задание
                 </button>
               )}
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
 
         {toast && <Toast text={toast} className="test-pass__toast" />}
       </div>

@@ -286,6 +286,27 @@
   letter-spacing: 0;
 }
 
+/* Благодарность за задание: по центру свободного места между шапкой и кнопкой, как пустое состояние («Архивы», «Избранное»).
+   Общее правило «.blank-card» выше оставляет просвет 1 и нулевые поля, поэтому ритм задан здесь заново (два класса — раньше по порядку):
+   значок, заголовок и каждое пояснение отдельной строкой через 8 */
+[data-pm] .blank-card.tp__done--center {
+  flex: 1;
+  gap: var(--space-2);
+  justify-content: center;
+  padding: var(--space-10) var(--space-7);
+  overflow: visible;
+}
+
+[data-pm] .tp__done--center .tp__done-title {
+  margin: 0;
+}
+
+[data-pm] .tp__done--center .tp__done-text {
+  max-width: 20em;
+  color: var(--text-secondary);
+  font: var(--type-body);
+}
+
 /* Шапка в рамке телефона лежит на том же фоне, что и сам экран: без стеклянной подложки и своей заливки */
 [data-pm] .tp__phone .test-settings__header {
   padding: var(--space-3) var(--space-4);
@@ -560,4 +581,58 @@
   border-color: var(--glass-border);
   background: var(--glass-solid);
   color: var(--text-primary);
+}
+
+/* ——— Полоса шагов задания: продолжение стеклянной подложки шапки вниз, текст на ней читается на любом фоне-сцене ——— */
+[data-pm] .pass-strip {
+  position: relative;
+  z-index: 2;
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+[data-pm] .pass-strip__step {
+  color: var(--text-primary);
+  font: var(--type-label);
+}
+
+[data-pm] .pass-strip__count {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
+[data-pm] .pass-strip__reset {
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+/* Сегменты: дорожка тем же цветом текста с прозрачностью, пройденные и текущий — цвета действий */
+[data-pm] .pass-strip__seg {
+  background: color-mix(in srgb, var(--text-primary) 22%, transparent);
+}
+
+[data-pm] .pass-strip__seg--done {
+  background: color-mix(in srgb, var(--action-primary) 60%, transparent);
+}
+
+[data-pm] .pass-strip__seg--now {
+  background: var(--action-primary);
+}
+
+/* В рамке телефона (предпросмотр) шапка без стекла, и полоса тоже */
+[data-pm] .tp__phone .pass-strip {
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Кнопки «Назад» и «Далее» стоят в 12 от прокручиваемого: содержимое, ушедшее под край, не упирается в них */
+[data-pm] .test-settings__cta.test-pass__cta {
+  padding-top: var(--space-3);
+}
+
+[data-pm] .tp__phone .test-settings__cta.test-pass__cta {
+  padding-top: var(--space-3);
 }

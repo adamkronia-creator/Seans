@@ -136,9 +136,21 @@ export function ClientIntro({ message, rules, facts, onOpenAll }: { message: str
 }
 
 /** Экран клиента после выполнения: блок с благодарностью; под ним то, что клиент увидит дальше */
-export function ClientDone({ title, handover = true, children }: { title: string; /** Строка «Ответы переданы вашему специалисту» под названием */ handover?: boolean; children?: ReactNode }) {
+export function ClientDone({
+  title,
+  handover = true,
+  centered = false,
+  children,
+}: {
+  title: string;
+  /** Строка «Ответы переданы вашему специалисту» под названием */
+  handover?: boolean;
+  /** По центру свободного места, как пустое состояние («Архивы», «Избранное»); без него блок стоит под шапкой */
+  centered?: boolean;
+  children?: ReactNode;
+}) {
   return (
-    <section className="blank-card tp__done">
+    <section className={`blank-card tp__done${centered ? ' tp__done--center' : ''}`}>
       <span className="tp__done-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12.5l4.5 4.5L19 7.5" />
@@ -155,13 +167,13 @@ export function ClientDone({ title, handover = true, children }: { title: string
 export function TaskDone({ record, limit }: { record?: number; limit?: number }) {
   if (record) {
     return (
-      <ClientDone title="Спасибо, запись добавлена">
+      <ClientDone title="Спасибо, запись добавлена" centered>
         <p className="tp__done-text">{limit && record >= limit ? 'Все записи выполнены' : 'Новую запись можно добавить, когда это понадобится'}</p>
       </ClientDone>
     );
   }
   return (
-    <ClientDone title="Спасибо, задание выполнено">
+    <ClientDone title="Спасибо, задание выполнено" centered>
       <p className="tp__done-text">Вы обсудите их на ближайшей встрече</p>
     </ClientDone>
   );

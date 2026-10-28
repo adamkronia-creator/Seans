@@ -112,9 +112,12 @@ export default function App() {
   // «Назад» браузера возвращает на экран вместе с его разделом: раздел виден по началу адреса (/tests/…, /tasks/…, /profile/…)
   const prefixTab = /^\/(tests|tasks|profile)\//.exec(route)?.[1] as TabId | undefined;
   const known = prefixTab && wasPopped() ? prefixTab : undefined;
-  const tab = known ?? tabState;
+  // Чат открыт из другого раздела («Открыть чат» в окне отправки теста или задания): текущим становится раздел «Сообщения», иначе чат не строится
+  const chatTab: TabId | undefined = route.startsWith('/chat/') && !wasPopped() ? 'messages' : undefined;
+  const tab = known ?? chatTab ?? tabState;
   useLayoutEffect(() => {
-    if (known && known !== tabState) setTab(known);
+    const want = known ?? chatTab;
+    if (want && want !== tabState) setTab(want);
   });
 
   // Открытое в каждом разделе: уходишь в другой раздел и возвращаешься — на том же экране, а не в списке
