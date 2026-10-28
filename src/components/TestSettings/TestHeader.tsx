@@ -20,10 +20,12 @@ interface TestHeaderProps {
    * но без «избранного» — это библиотека специалиста. Слепой тест клиенту не называют: значка нет, название нейтральное.
    */
   client?: { blind?: boolean; /** Название слепого теста («Тест №131020261007») */ title?: string };
+  /** Место под строкой шапки, куда экран кладёт свою полосу (шаги задания): она на той же подложке, что и шапка, одним слоем, как закреплённое сообщение в чате */
+  slotRef?: (el: HTMLDivElement | null) => void;
 }
 
 /** Шапка экранов теста — как шапка открытого чата: назад, аватарка теста, название, раздел и сердечко «в избранное» на месте поиска и настроек */
-export function TestHeader({ test, kind = 'test', status, onBack, client }: TestHeaderProps) {
+export function TestHeader({ test, kind = 'test', status, onBack, client, slotRef }: TestHeaderProps) {
   const testFavorites = useFavorites();
   const taskFavorites = useTaskFavorites();
   const favorite = (kind === 'task' ? taskFavorites : testFavorites).has(test.id);
@@ -62,6 +64,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client }: Test
           {favorite ? <IconHeartRedLg /> : <IconHeartGrayLg />}
         </button>
       )}
+      {slotRef && <div className="test-settings__slot" ref={slotRef} />}
     </header>
   );
 }

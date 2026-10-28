@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { editTaskRun, finishTaskRun, resetTaskRun, useTaskRun } from '../../data/selfTask';
 import { progressOf, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
 import { Toast } from '../Toast/Toast';
@@ -32,6 +33,8 @@ interface TaskPassProps {
   /** Задание выполнено и сохранено: номер результата (у клиента не вызывается: он остаётся на экране «Спасибо») */
   onDone?: (resultId: string) => void;
   client?: TaskClient;
+  /** Куда класть полосу шагов: место в шапке (null — шапка ещё не готова). Без значения полоса стоит под шапкой сама */
+  stripHost?: HTMLElement | null;
 }
 
 /**
@@ -39,7 +42,7 @@ interface TaskPassProps {
  * Внизу счётчик заполненных полей и кнопки; пустые поля можно пропустить, но не все сразу.
  * У клиента тот же экран: на первом шаге добавляются сообщение специалиста и сведения, после завершения — «Спасибо».
  */
-export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPassProps) {
+export function TaskPass({ taskId, data, form, options, onDone, client, stripHost }: TaskPassProps) {
   const run = useTaskRun(taskId);
   const sections = data.blank.sections(form);
   const { done, total } = progressOf(sections, run.values);
@@ -96,10 +99,12 @@ export function TaskPass({ taskId, data, form, options, onDone, client }: TaskPa
   };
 
   const rules = data.blank.rules(form);
+  const stripEl = <PassStrip at={at} total={steps.length - 1} onReset={started ? () => setSheet('reset') : undefined} />;
+  const strip = stripHost === undefined ? stripEl : stripHost ? createPortal(stripEl, stripHost) : null;
 
   return (
     <>
-      {!finished && <PassStrip at={at} total={steps.length - 1} onReset={started ? () => setSheet('reset') : undefined} />}
+      {!finished && strip}
       <div
         className={`test-settings__scroll${moved && !finished ? ` pass-step pass-step--${moved}` : ''}`}
         key={finished ? 'thanks' : step}

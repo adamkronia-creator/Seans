@@ -584,22 +584,9 @@
 }
 
 /* ——— Полоса шагов задания: продолжение стеклянной подложки шапки вниз, текст на ней читается на любом фоне-сцене ——— */
+/* Полоса шагов лежит внутри шапки (место .test-settings__slot) и на её подложке: шапка и полоса — одна панель, как закреплённое сообщение в чате */
 [data-pm] .pass-strip {
   position: relative;
-  z-index: 2;
-  isolation: isolate;
-}
-
-/* Подложка та же, что у шапки (она тоже слой позади содержимого), поэтому шапка и полоса сливаются в одну панель */
-[data-pm] .pass-strip::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--glass-fill-header);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
-  pointer-events: none;
 }
 
 [data-pm] .pass-strip__step {
@@ -632,9 +619,7 @@
 }
 
 /* В рамке телефона (предпросмотр) шапка без стекла, и полоса тоже */
-[data-pm] .tp__phone .pass-strip::before {
-  display: none;
-}
+
 
 /* Кнопки «Назад» и «Далее» стоят в 12 от прокручиваемого: содержимое, ушедшее под край, не упирается в них */
 [data-pm] .test-settings__cta.test-pass__cta {
@@ -702,4 +687,20 @@
   width: var(--size-icon-lg);
   height: var(--size-icon-lg);
   color: var(--text-secondary);
+}
+
+/* Шапка с полосой: две строки, между ними 12; снизу отступ даёт сама полоса */
+[data-pm] .test-settings__header:has(.test-settings__slot:not(:empty)) {
+  flex-wrap: wrap;
+  row-gap: var(--header-bottom);
+  padding-bottom: 0;
+}
+
+[data-pm] .test-settings__slot {
+  flex: 0 0 calc(100% + var(--page-gutter) * 2);
+  margin: 0 calc(var(--page-gutter) * -1);
+}
+
+[data-pm] .test-settings__slot:empty {
+  display: none;
 }

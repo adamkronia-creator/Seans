@@ -234,6 +234,8 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
   // Задание, отправленное себе, открыто как у клиента: тот же интерфейс, только без «избранного» в шапке, с сообщением специалиста и «Спасибо» в конце
   const live = Boolean(passRequest) && view === 'pass';
+  // Полоса шагов лежит внутри шапки: шапка и она — одна стеклянная панель
+  const [stripSlot, setStripSlot] = useState<HTMLDivElement | null>(null);
 
   return (
     <HelpContext.Provider value={{ test: task, task: { data }, blank: null, conclusion: null, form, duration: data.duration }}>
@@ -244,10 +246,12 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
         client={live ? {} : undefined}
         status={live ? 'Задание от вашего специалиста' : locked && view === 'settings' ? 'Отправленное задание' : STATUS[view]}
         onBack={view === 'settings' ? onBack : stepBack}
+        slotRef={view === 'pass' ? setStripSlot : undefined}
       />
 
       {view === 'pass' ? (
         <TaskPass
+          stripHost={stripSlot}
           taskId={task.id}
           data={data}
           form={form}
