@@ -143,6 +143,14 @@
 }
 
 /* Варианты ответов: друг под другом, между ними 8 */
+.blank-answers,
+.blank-scale {
+  /* Те же краски подложек, что у плиток бланка задания: стеклянная плитка без обводки, выбранная — тонкое акцентное кольцо */
+  --tf-tile: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  --tf-tile-strong: color-mix(in srgb, var(--text-primary) 12%, transparent);
+  --tf-on: color-mix(in srgb, var(--action-primary) 16%, transparent);
+}
+
 .blank-answers {
   display: flex;
   flex-direction: column;
@@ -159,8 +167,8 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: calc(var(--space-3) - 1px) var(--space-3); /* grid:ok — поле 12 за вычетом рамки 1 px: высота варианта кратна 4 */
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-fill);
+  border: 1px solid transparent;
+  background: var(--tf-tile);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
@@ -172,12 +180,12 @@
 
 /* Выбранный вариант: акцентная обводка и лёгкая заливка */
 .blank-answer:has(.blank-answer__input:checked) {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  border-color: var(--action-primary);
+  background: var(--tf-on);
 }
 
 .blank-answer:active {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  background: var(--tf-tile-strong);
 }
 
 /* Сохранённый бланк: ответы видны, менять их нельзя */
@@ -257,8 +265,8 @@
   align-items: center;
   gap: var(--space-1);
   padding: calc(var(--space-3) - 1px) 0; /* grid:ok — поле 12 за вычетом рамки 1 px */
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-fill);
+  border: 1px solid transparent;
+  background: var(--tf-tile);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition:
@@ -267,12 +275,12 @@
 }
 
 .blank-scale__item:has(.blank-answer__input:checked) {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  border-color: var(--action-primary);
+  background: var(--tf-on);
 }
 
 .blank-scale__item:active {
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  background: var(--tf-tile-strong);
 }
 
 .blank-scale__value {
