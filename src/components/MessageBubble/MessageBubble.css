@@ -538,7 +538,6 @@ button.bubble__avatar {
   margin: var(--space-2) calc(var(--space-3) * -1) calc(var(--space-2) * -1);
   padding: 0 var(--space-3);
   border: 0;
-  box-shadow: inset 0 var(--hairline) 0 var(--divider, var(--color-divider)); /* тот же разделитель, что в «Общей информации» */
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   background: transparent;
   color: var(--text-link, var(--color-accent));
@@ -587,4 +586,12 @@ button.bubble__avatar {
   flex-shrink: 0;
   font-size: var(--space-4);
   opacity: 0.6;
+}
+
+/* Между постом и кнопкой не линия, а зазор в 1 px, сквозь который виден фон, как между шапкой и строками карточки «Общая информация»:
+   заливка пузыря состоит из двух слоёв (пост и кнопка высотой --size-touch), между ними просвет */
+.bubble.bubble--in:has(> .bubble__comments) {
+  background:
+    linear-gradient(var(--glass-bubble-in), var(--glass-bubble-in)) top / 100% calc(100% - var(--size-touch) - var(--hairline)) no-repeat,
+    linear-gradient(var(--glass-bubble-in), var(--glass-bubble-in)) bottom / 100% var(--size-touch) no-repeat;
 }
