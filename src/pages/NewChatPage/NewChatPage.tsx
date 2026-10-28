@@ -133,14 +133,23 @@ function NewContactSheet({ onClose, onCreate, onQr }: { onClose: () => void; onC
       <div className="nc-fields">
         <fieldset className="nc-field">
           <legend>Имя (обязательно)</legend>
+          <span className="nc-field__label" aria-hidden="true">
+            Имя (обязательно)
+          </span>
           <LineInput aria-label="Имя" placeholder="Имя (обязательно)" value={name} maxLength={64} autoFocus name="nc-x" autoComplete="nope" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setName(e.target.value)} />
         </fieldset>
         <fieldset className="nc-field">
           <legend>Фамилия</legend>
+          <span className="nc-field__label" aria-hidden="true">
+            Фамилия<span className="nc-field__opt"> (необязательно)</span>
+          </span>
           <LineInput aria-label="Фамилия" placeholder="Фамилия (необязательно)" value={surname} maxLength={64} name="nc-x" autoComplete="nope" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setSurname(e.target.value)} />
         </fieldset>
         <fieldset className="nc-field nc-field--always">
           <legend>Номер телефона</legend>
+          <span className="nc-field__label" aria-hidden="true">
+            Номер телефона
+          </span>
           <span className="nc-field__code">+7</span>
           <LineInput aria-label="Номер телефона" type="tel" inputMode="tel" placeholder="000 000 0000" value={shown} name="nc-x" autoComplete="nope" autoCorrect="off" spellCheck={false} data-form-type="other" data-lpignore="true" onChange={(e) => setPhone(e.target.value)} />
         </fieldset>

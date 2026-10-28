@@ -88,25 +88,60 @@
   border: 1px solid var(--tf-line);
   border-radius: var(--radius-md);
   cursor: text;
-  transition: border-color 0.12s;
+  transition: border-color 0.22s ease;
 }
 
-/* Пока поле пусто и не в фокусе, подпись внутри вместо подсказки, а здесь она скрыта; потом переезжает на рамку (разрыв в линии даёт legend) */
+/* Подпись переезжает из поля на рамку. Legend остаётся прозрачным и только раскрывает разрыв в линии (ширина растёт плавно),
+   а видимый текст — .tf-box__label: в пустом поле он стоит на месте подсказки, при вводе всплывает на линию, уменьшаясь и синея в фокусе */
+.tf-box {
+  --tf-move: 0.22s cubic-bezier(0.2, 0, 0, 1);
+
+  position: relative;
+}
+
 .tf-box legend {
-  width: 0;
+  max-width: 0;
   padding: 0;
   overflow: hidden;
-  color: var(--text-secondary);
+  color: transparent;
   font: var(--type-label);
   font-weight: 400;
   line-height: var(--space-4);
   white-space: nowrap;
+  transition:
+    max-width var(--tf-move),
+    padding var(--tf-move);
 }
 
 .tf-box--up legend {
-  width: auto;
   max-width: 100%;
   padding: 0 var(--space-1);
+}
+
+.tf-box__label {
+  position: absolute;
+  top: var(--space-2); /* первая строка поля: от начала области рамки (под подписью) 8 */
+  left: var(--space-4);
+  max-width: calc(100% - var(--space-8));
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-body);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  transition:
+    transform var(--tf-move),
+    color var(--tf-move);
+}
+
+/* Наверху: на линию (центр строки 24 → центр линии), правее на поле legend 4, размер как у подписи на рамке 15 из 16 */
+.tf-box--up .tf-box__label {
+  transform: translate(var(--space-1), calc(var(--space-7) * -1)) scale(0.9375);
+}
+
+.tf-box--focus .tf-box__label {
+  color: var(--action-primary);
 }
 
 .tf-box--focus {
@@ -114,10 +149,6 @@
   margin: -1px -1px 0; /* grid:ok — компенсирует рамку 2 px */
   border-width: 2px;
   border-color: var(--action-primary);
-}
-
-.tf-box--focus legend {
-  color: var(--action-primary);
 }
 
 /* Сам ввод: строка 24, поля 16 сверху и снизу, поэтому пустое поле в одну строку высотой 56 (рамка с подписью занимает 64) */
@@ -139,6 +170,14 @@
 
 .tf-box__input::placeholder {
   color: var(--text-secondary);
+  animation: tf-hint-in 0.2s ease 0.1s both;
+}
+
+/* Пример появляется, когда подпись уже наверху */
+@keyframes tf-hint-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* С кнопкой «Удалить» справа: поле до кнопки, кнопка 40 стоит на середине первой строки (4 от рамки) */
@@ -847,4 +886,16 @@
   line-height: var(--line-height-sm);
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-box,
+  .tf-box legend,
+  .tf-box__label {
+    transition: none;
+  }
+
+  .tf-box__input::placeholder {
+    animation: none;
+  }
 }

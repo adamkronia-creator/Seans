@@ -650,22 +650,74 @@
   transition: border-color 0.12s;
 }
 
+.nc-field {
+  --nc-move: 0.22s cubic-bezier(0.2, 0, 0, 1);
+
+  position: relative;
+}
+
+/* Подпись переезжает из поля на рамку: legend прозрачный и только раскрывает разрыв в линии (ширина растёт плавно),
+   видимый текст — .nc-field__label: пустое поле — на месте подсказки, при вводе всплывает на линию, уменьшаясь и синея в фокусе */
 .nc-field legend {
-  width: 0;
+  max-width: 0;
   padding: 0;
   overflow: hidden;
-  color: var(--text-secondary);
+  color: transparent;
   font: var(--type-label);
   font-weight: 400;
   line-height: var(--space-4);
   white-space: nowrap;
+  transition:
+    max-width var(--nc-move),
+    padding var(--nc-move);
 }
 
 .nc-field:focus-within legend,
 .nc-field:has(input:not(:placeholder-shown)) legend,
 .nc-field--always legend {
-  width: auto;
+  max-width: 100%;
   padding: 0 var(--space-1);
+}
+
+.nc-field__label {
+  position: absolute;
+  top: var(--space-2); /* центр строки ввода: от области рамки под подписью 8 */
+  left: var(--space-4);
+  color: var(--text-secondary);
+  font: var(--type-body);
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  transition:
+    transform var(--nc-move),
+    color var(--nc-move);
+}
+
+.nc-field:focus-within .nc-field__label,
+.nc-field:has(input:not(:placeholder-shown)) .nc-field__label,
+.nc-field--always .nc-field__label {
+  transform: translate(var(--space-1), calc(var(--space-7) * -1)) scale(0.9375);
+}
+
+.nc-field:focus-within .nc-field__label {
+  color: var(--action-primary);
+}
+
+/* Приписка «(необязательно)» сворачивается, когда подпись на рамке: там стоит одно слово */
+.nc-field__opt {
+  display: inline-block;
+  max-width: 12em;
+  overflow: hidden;
+  vertical-align: bottom;
+  transition:
+    max-width var(--nc-move),
+    opacity var(--nc-move);
+}
+
+.nc-field:focus-within .nc-field__opt,
+.nc-field:has(input:not(:placeholder-shown)) .nc-field__opt {
+  max-width: 0;
+  opacity: 0;
 }
 
 .nc-field:focus-within {
@@ -674,10 +726,6 @@
   margin: -1px -1px 0; /* grid:ok — компенсирует рамку 2 px */
   border-width: 2px;
   border-color: var(--action-primary);
-}
-
-.nc-field:focus-within legend {
-  color: var(--action-primary);
 }
 
 .nc-field input,
@@ -697,13 +745,21 @@
 
 .nc-field input::placeholder,
 .nc-field textarea::placeholder {
+  color: transparent;
+}
+
+.nc-field--always input::placeholder,
+.nc-field--always textarea::placeholder {
   color: var(--text-secondary);
 }
 
-/* В фокусе подпись уже стоит на рамке, подсказка внутри не нужна (у телефона она остаётся: это образец номера) */
-.nc-field:not(.nc-field--always) input:focus::placeholder,
-.nc-field:not(.nc-field--always) textarea:focus::placeholder {
-  color: transparent;
+@media (prefers-reduced-motion: reduce) {
+  .nc-field,
+  .nc-field legend,
+  .nc-field__label,
+  .nc-field__opt {
+    transition: none;
+  }
 }
 
 .nc-field__code {

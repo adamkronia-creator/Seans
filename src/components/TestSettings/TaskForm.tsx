@@ -125,13 +125,17 @@ function AnswerField({ value, onChange, label, example, rows = 1, max = MAX_TEXT
       }}
     >
       <legend>{label}</legend>
+      {/* Подпись, которая переезжает: из поля на рамку (legend только раскрывает разрыв в линии, сам он прозрачный) */}
+      <span className="tf-box__label" aria-hidden="true">
+        {label}
+      </span>
       <textarea
         ref={ref}
         className="tf-box__input"
         rows={rows}
         maxLength={max}
         value={value}
-        placeholder={focus ? (example ?? '') : label}
+        placeholder={focus ? (example ?? '') : ''}
         aria-label={aria ?? label}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
