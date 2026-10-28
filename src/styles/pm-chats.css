@@ -354,7 +354,7 @@ html:has([data-pm]) body {
   --glass-shadow-panel: 0 var(--space-2) var(--space-6) rgb(0 0 0 / 0.14);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
   --glass-chip-active: linear-gradient(135deg, rgb(26 132 255 / 0.97), rgb(0 113 238 / 0.97)); /* белая подпись ≥ 4,9:1 */
-  --glass-border-blue: transparent;
+  --glass-border-blue: var(--sheet-rim); /* синие кнопки и чипсы: кромка света, как у верха нижних окон */
   /* Фон по умолчанию — картинка рассвета; своя картинка пользователя — :root[data-bg='custom'] ниже */
   --scene: url('../assets/bg-default.webp') center / cover no-repeat, #1b1d22;
   --glass-fill-header: rgb(255 255 255 / 0.62);
@@ -512,7 +512,7 @@ html:has([data-pm]) body {
   left: auto;
   z-index: auto;
   padding: var(--space-1);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--sheet-rim); /* кромка света, как у верха нижних окон */
   border-radius: var(--radius-full);
   background: var(--glass-fill-panel);
   box-shadow: var(--glass-shadow-panel);
@@ -537,6 +537,7 @@ html:has([data-pm]) body {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
   background: var(--glass-tab);
+  box-shadow: inset 0 0 0 var(--hairline) var(--sheet-rim);
   transform: translateX(calc(var(--tab-index, 0) * 100%));
   transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
   pointer-events: none;
