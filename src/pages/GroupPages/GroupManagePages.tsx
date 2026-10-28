@@ -129,7 +129,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
       {hasSettings && (
         <Card heading="Настройки">
           {owner && <Row icon={info.isPublic ? <IconGlobal /> : <IconLock />} title={channel ? 'Тип канала' : 'Формат общего чата'} value={info.isPublic ? 'Публичный' : 'Частный'} chevron onClick={() => open('type')} />}
-          {showLinks && <Row icon={<IconLinkRound />} title="Ссылки-приглашения" value={String(alive)} chevron onClick={() => open('links')} />}
+          {showLinks && <Row icon={<IconLinkRound />} title="Ссылки-приглашения" value={<Badge count={alive} />} chevron onClick={() => open('links')} />}
           {adminInfo && <Row icon={<IconSmile />} title="Реакции" value={reactionsText} chevron onClick={() => open('reactions')} />}
           {showPerms && <Row icon={<IconKey />} title="Разрешения" value={info.slowMode ? `Пауза ${slowLabel(info.slowMode)}` : undefined} chevron onClick={() => open('perms')} />}
         </Card>
@@ -187,10 +187,10 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
       {staff && (
         <>
           <Card heading="Люди">
-            <Row icon={<IconShieldUser />} title="Администраторы" value={String(admins)} chevron onClick={() => open('admins')} />
-            <Row icon={<IconUsersGroup />} title={channel ? 'Подписчики' : 'Пользователи'} value={String(info.members.length)} chevron onClick={() => open('members')} />
+            <Row icon={<IconShieldUser />} title="Администраторы" value={<Badge count={admins} />} chevron onClick={() => open('admins')} />
+            <Row icon={<IconUsersGroup />} title={channel ? 'Подписчики' : 'Пользователи'} value={<Badge count={info.members.length} />} chevron onClick={() => open('members')} />
             {can(info, 'inviteUsers') && <Row icon={<IconUserCheck />} title="Заявки" value={info.requests.length ? <Badge count={info.requests.length} /> : undefined} chevron onClick={() => open('requests')} />}
-            {can(info, 'banUsers') && <Row icon={<IconUserBlock />} title="Заблокированные" value={banned ? String(banned) : undefined} chevron onClick={() => open('banned')} />}
+            {can(info, 'banUsers') && <Row icon={<IconUserBlock />} title="Заблокированные" value={banned ? <Badge count={banned} /> : undefined} chevron onClick={() => open('banned')} />}
           </Card>
 
           <Card>

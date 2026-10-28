@@ -24,8 +24,8 @@ type Tools = ReturnType<typeof useLinkTools>;
 function LinkActions({ target, title, tools }: { target: LinkTarget; title: string; tools: Tools }) {
   return (
     <>
-      <Row icon={<CopyIcon />} title="Копировать ссылку" onClick={() => tools.copy(target.url)} />
-      <Row icon={<IconShareLine />} title="Отправить ссылку" onClick={() => tools.share(target)} />
+      <Row icon={<CopyIcon />} title="Скопировать" onClick={() => tools.copy(target.url)} />
+      <Row icon={<IconShareLine />} title="Отправить" onClick={() => tools.share(target)} />
       <Row icon={<IconQr />} title="QR-код" onClick={() => tools.showQr(target.url, title)} />
     </>
   );
@@ -55,14 +55,14 @@ export function GroupLinksPage({ chatId }: { chatId: string }) {
         </Card>
       )}
       {primary && (
-        <Card heading="Основная ссылка" hint={`Любой, у кого есть эта ссылка, сможет ${channel ? 'подписаться на канал' : 'вступить в общий чат'}. Если сбросить её, прежняя перестанет работать.`}>
+        <Card heading="Основная ссылка">
           <Row icon={<IconLinkRound />} title={shortUrl(targetOfLink(primary).url)} note={linkNote(primary)} onClick={() => tools.copy(targetOfLink(primary).url)} />
           <LinkActions target={targetOfLink(primary)} title={info.name} tools={tools} />
-          <Row tone="danger" icon={<IconRestart />} title="Сбросить ссылку" onClick={() => setResetting(true)} />
+          <Row tone="danger" icon={<IconRestart />} title="Сбросить" onClick={() => setResetting(true)} />
         </Card>
       )}
-      <Card heading="Дополнительные ссылки" hint="Можно сделать отдельную ссылку со сроком, лимитом вступлений или одобрением заявок: например, для семинара.">
-        <Row tone="link" icon={<IconLinkRound />} title="Создать ссылку" onClick={() => navigate(gPath(chatId, 'link/new'))} />
+      <Card heading="Дополнительные ссылки" hint="Можно делать отдельные ссылки со сроком, лимитом или заявками на вход.">
+        <Row tone="link" icon={<IconLinkRound />} title="Создать" onClick={() => navigate(gPath(chatId, 'link/new'))} />
         {extra.map((l) => (
           <Row key={l.id} tall icon={<IconLinkRound />} title={linkTitle(l)} note={linkNote(l)} chevron onClick={() => open(l)} />
         ))}
@@ -113,7 +113,7 @@ export function GroupLinkPage({ chatId, linkId }: { chatId: string; linkId: stri
       </Card>
       <Card heading="О ссылке">
         <Row title="Создана" value={whenText(link.createdAt)} note={nameOf(link.createdBy)} />
-        <Row title="Вступило" value={String(link.joined)} />
+        <Row title="Приглашено" value={String(link.joined)} />
         <Row title="Срок действия" value={link.expiresAt ? `${dayText(link.expiresAt)}, ${leftText(link.expiresAt)}` : 'Без срока'} />
         <Row title="Лимит вступлений" value={link.limit ? String(link.limit) : 'Без ограничений'} />
         <Row title="Одобрение заявок" value={link.needApproval ? 'Да' : 'Нет'} />

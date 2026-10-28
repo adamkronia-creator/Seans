@@ -30,6 +30,11 @@ export function useSwipeBack(ref: RefObject<HTMLElement>, back: () => void) {
   useSwipeAction(ref, 'right', back, 0);
 }
 
+/** Свайп влево с любого места экрана, кроме полей ввода и блоков с боковой прокруткой (вкладки внутри экрана: «Фото» → «Альбомы») */
+export function useSwipeNext(ref: RefObject<HTMLElement>, next: () => void) {
+  useSwipeAction(ref, 'left', next, 24);
+}
+
 function useSwipeAction(ref: RefObject<HTMLElement>, dir: 'left' | 'right', action: () => void, minX: number, when?: (origin: Element) => boolean) {
   const allow = useRef(when);
   allow.current = when;

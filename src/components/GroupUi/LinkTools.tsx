@@ -44,7 +44,7 @@ export function QrSheet({ title, url, onCopy, onClose }: { title: string; url: s
       footer={
         <>
           <button type="button" className="sheet__button" onClick={onCopy}>
-            Копировать ссылку
+            Скопировать
           </button>
           <button type="button" className="sheet__button" onClick={onClose}>
             Закрыть

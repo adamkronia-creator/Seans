@@ -59,7 +59,7 @@ export const LINK_LIMITS: Array<{ value: number; label: string }> = [
   { value: 100, label: '100 человек' },
 ];
 
-const JOINED: [string, string, string] = ['Вступил', 'Вступили', 'Вступили'];
+const JOINED: [string, string, string] = ['Приглашён', 'Приглашено', 'Приглашено'];
 const PEOPLE: [string, string, string] = ['человек', 'человека', 'человек'];
 
 /** Название ссылки в списке: своё, а без него — «Основная ссылка» или конец кода */
@@ -69,8 +69,8 @@ export function linkTitle(l: InviteLink): string {
 
 /** Что известно о ссылке: сколько вступило, до какого срока, какой лимит, по заявкам ли */
 export function linkNote(l: InviteLink): string {
-  if (l.revoked) return l.joined ? `Отозвана, вступило: ${l.joined}` : 'Отозвана';
-  const parts: string[] = [l.joined ? `${plural(l.joined, JOINED)} ${l.joined} ${plural(l.joined, PEOPLE)}` : 'Пока никто не вступил'];
+  if (l.revoked) return l.joined ? `Отозвана, приглашено: ${l.joined}` : 'Отозвана';
+  const parts: string[] = [l.joined ? `${plural(l.joined, JOINED)} ${l.joined} ${plural(l.joined, PEOPLE)}` : 'Пока никого не пригласили'];
   if (l.expiresAt) parts.push(leftText(l.expiresAt));
   if (l.limit) parts.push(`лимит ${l.limit}`);
   if (l.needApproval) parts.push('по заявкам');

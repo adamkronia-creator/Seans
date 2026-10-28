@@ -21,7 +21,7 @@ import { removeAlbum, removeManyPhotos, setPinned, useProfile } from '../../data
 import { downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { useLongPress } from '../../utils/useLongPress';
 import { goBack, navigate, replace } from '../../router';
-import { openChat, useSwipeBack } from '../../utils/tabNav';
+import { openChat, useSwipeBack, useSwipeNext } from '../../utils/tabNav';
 import '../FolderPage/FolderPage.css';
 import './PhotosPage.css';
 
@@ -96,7 +96,11 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
   const input = useRef<HTMLInputElement>(null);
   const root = useRef<HTMLElement>(null);
   const back = () => (chosen ? leave() : goBack(view === 'album' ? ALBUMS_PATH : '/'));
-  useSwipeBack(root, back);
+  // Вкладки «Фото» и «Альбомы» листаются свайпом: влево к альбомам, вправо обратно к фото (в альбоме и на «Фото» вправо — «назад»)
+  useSwipeBack(root, () => (view === 'albums' && !chosen ? replace(PHOTOS_PATH, 'slide-prev') : back()));
+  useSwipeNext(root, () => {
+    if (view === 'photos' && !chosen) replace(ALBUMS_PATH, 'slide-next');
+  });
 
   const onFiles = async (event: ChangeEvent<HTMLInputElement>) => {
     await uploadPhotos(filesOf(event), show);
@@ -265,7 +269,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
 
       <div className="fp__scroll ph__scroll">
         {view !== 'album' && (
-          <PhotoTabs value={view} onChange={(next) => replace(next === 'albums' ? ALBUMS_PATH : PHOTOS_PATH, 'fade')} photos={photos.length} albums={albums.length} />
+          <PhotoTabs value={view} onChange={(next) => replace(next === 'albums' ? ALBUMS_PATH : PHOTOS_PATH, next === 'albums' ? 'slide-next' : 'slide-prev')} photos={photos.length} albums={albums.length} />
         )}
         {body}
       </div>
