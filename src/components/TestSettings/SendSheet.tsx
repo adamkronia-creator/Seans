@@ -158,7 +158,7 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onPass,
 
 /** «Предпросмотр»: то, что увидит клиент, с вкладками «Начало / В процессе / Конец» */
 export function PreviewSheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  // Само окно — экран телефона клиента: без заголовка, этапов и рамки, его листают
+  // Окно без панели: на затемнении только экран телефона клиента и кнопка «Отмена» (крестик) над ним
   return (
     <Frame title={`Предпросмотр: ${title}`} bare onClose={onClose}>
       {children}

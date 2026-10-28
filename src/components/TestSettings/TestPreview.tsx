@@ -30,6 +30,8 @@ interface TestPreviewProps {
   initialStage?: Stage;
   /** Только экран телефона: без вкладок этапов и кнопок внизу (макеты в подсказках) */
   bare?: boolean;
+  /** Предпросмотр в окне: без вкладок этапов, вопросов не больше первых пяти */
+  screen?: boolean;
 }
 
 /**
@@ -38,7 +40,11 @@ interface TestPreviewProps {
  * вопрос с ответами и завершение. Внутри рамки тот же интерфейс, что у клиента и при прохождении самому.
  * Ответы здесь никуда не сохраняются. При слепом тестировании название и значок теста скрыты.
  */
-export function TestPreview({ test, blank, blind, result, duration, initialStage = 'start', bare }: TestPreviewProps) {
+/** Сколько первых вопросов показывает предпросмотр в окне: остальные устроены так же */
+export const PREVIEW_QUESTIONS = 5;
+
+export function TestPreview({ test, blank: fullBlank, blind, result, duration, initialStage = 'start', bare, screen }: TestPreviewProps) {
+  const blank = screen ? { ...fullBlank, questions: fullBlank.questions.slice(0, PREVIEW_QUESTIONS) } : fullBlank;
   // Номер слепого теста в предпросмотре: время открытия настроек; у настоящего теста он ставится при отправке
   const [title] = useState(() => blindTitle());
   const [stage, setStage] = useState<Stage>(initialStage);
@@ -101,13 +107,15 @@ export function TestPreview({ test, blank, blind, result, duration, initialStage
   return (
     <>
             <div id={bare ? undefined : 'preview'} className={`tp tp--inline${bare ? ' tp--bare' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        {!bare && <div className="tp__tabs" role="group" aria-label="Этап прохождения">
-          {STAGES.map(({ id, label }) => (
-            <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
-              {label}
-            </button>
-          ))}
-        </div>}
+        {!bare && !screen && (
+          <div className="tp__tabs" role="group" aria-label="Этап прохождения">
+            {STAGES.map(({ id, label }) => (
+              <button key={id} type="button" className={`tp__tab${stage === id ? ' tp__tab--on' : ''}`} aria-pressed={stage === id} onClick={() => toStage(id)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="tp__phone" data-hscroll>
           <div className="tp__status" aria-hidden="true">

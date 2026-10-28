@@ -705,15 +705,19 @@
   display: none;
 }
 
-/* Предпросмотр — окно-экран телефона клиента: высота как у самого высокого окна, шапка вверху без своей подложки (стекло у самого окна),
-   под ней лента, которую листают; справа вверху остаётся крестик окна */
-[data-pm] .sheet--screen {
+/* Предпросмотр: на затемнении нет панели, только экран телефона клиента; крестик окна («Отмена») стоит над ним в правом верхнем углу */
+[data-pm] .sheet.sheet--bare {
   display: flex;
   flex-direction: column;
   height: min(var(--sheet-max-h), var(--sheet-max, var(--sheet-max-h)));
+  padding-top: calc(var(--sheet-close) + var(--space-3));
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
-[data-pm] .sheet.sheet--screen > .sheet__body {
+[data-pm] .sheet.sheet--bare > .sheet__body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -722,32 +726,16 @@
   overflow: hidden;
 }
 
-[data-pm] .pv {
-  --safe-top: 0px; /* grid:ok — безопасная зона экрана окну не нужна: оно парит ниже неё */
-  display: flex;
+/* В окне свой рост у рамки не нужен: она занимает всё место под крестиком */
+[data-pm] .sheet--bare .tp {
   flex: 1;
-  flex-direction: column;
   min-height: 0;
 }
 
-[data-pm] .pv .test-settings__header {
-  padding-right: calc(var(--sheet-close) + var(--sheet-gutter)); /* справа крестик окна */
-  background: none;
-}
-
-[data-pm] .pv .test-settings__header::before {
-  display: none;
-}
-
-[data-pm] .pv .pv__scroll {
-  padding-bottom: calc(var(--space-8) + var(--safe-bottom));
-}
-
-/* «Показаны первые 5 вопросов»: тихая подпись между вопросами и экраном завершения */
-[data-pm] .pv__more {
-  margin: 0;
-  padding: 0 var(--space-4);
-  color: var(--text-secondary);
-  font: var(--type-meta);
-  text-align: center;
+/* Экран телефона лежит прямо на затемнении, без панели под собой: ему нужна своя плотная подложка, сквозь неё страница не читается */
+[data-pm] .sheet--bare .tp__phone {
+  flex: 1 1 0;
+  background: var(--sheet-solid);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
 }

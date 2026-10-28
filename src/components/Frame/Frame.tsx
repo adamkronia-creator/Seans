@@ -22,7 +22,7 @@ export function Frame({ title, subtitle, footer, bare, onClose, children }: Fram
   const body = useRef<HTMLDivElement>(null);
   return (
     <SheetOverlay onClose={onClose}>
-      <div className={`sheet${bare ? ' sheet--screen' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
+      <div className={`sheet${bare ? ' sheet--bare' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         {!bare && (
           <div className="sheet__header">
             <h2 className="sheet__heading">{title}</h2>
