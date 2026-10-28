@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Badge } from '../../components/Badge/Badge';
-import { CrossBar, CrossSheet } from '../../components/CrossPost/CrossPost';
+import { CrossBar, CrossMenuRow, CrossSheet } from '../../components/CrossPost/CrossPost';
 import { channelOf, countIn, useCommentsStore } from '../../data/comments';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
@@ -25,7 +25,6 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
-import IconSelect from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
@@ -75,6 +74,10 @@ const REACT_BAR_H = 48;
 const REACT_BAR_W = 328;
 const MENU_W = 196;
 const MENU_ITEM_H = 48;
+/** Меню с состоянием в сетях шире: «Опубликовано в ВКонтакте» должно поместиться. Строка состояния 40, отступ между группами 16 (полоса 8 и по 4 вокруг) */
+const MENU_W_STATUS = 256;
+const MENU_STATUS_H = 40;
+const MENU_GAP_H = 16;
 /** Не ближе к краю ленты, чем поле страницы (--page-gutter), как у меню чипса */
 const MENU_EDGE = 16;
 
@@ -120,7 +123,7 @@ function MessageMenu({
   onDelete,
   onReact,
   onForward,
-  onSelect,
+  onCrossFailed,
   onCopy,
 }: {
   message: Message;
@@ -136,7 +139,8 @@ function MessageMenu({
   onDelete: () => void;
   onReact: (emoji: string) => void;
   onForward: () => void;
-  onSelect: () => void;
+  /** Нажали на неудачу в строке состояния: открыть окно с причиной */
+  onCrossFailed: (network: Network) => void;
   onCopy: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -154,25 +158,35 @@ function MessageMenu({
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
-  const items = [
-    ...(perms.reply ? [{ label: 'Ответить', Icon: IconReply, run: onReply, danger: false }] : []),
-    ...(perms.edit ? [{ label: 'Изменить', Icon: IconPenNew, run: onEdit, danger: false }] : []),
-    ...(perms.pin ? [{ label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin, danger: false }] : []),
-    ...(perms.forward ? [{ label: 'Переслать', Icon: IconForward, run: onForward, danger: false }] : []),
-    ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: onCopy, danger: false }] : []),
-    { label: 'Выбрать', Icon: IconSelect, run: onSelect, danger: false },
-    ...(perms.remove ? [{ label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true }] : []),
-  ];
+  // Группы пунктов, между ними отступ: состояние в сетях | ответить, переслать, копировать | изменить, закрепить | удалить
+  const statuses = message.crossposts ?? [];
+  const groups = [
+    [
+      ...(perms.reply ? [{ label: 'Ответить', Icon: IconReply, run: onReply, danger: false }] : []),
+      ...(perms.forward ? [{ label: 'Переслать', Icon: IconForward, run: onForward, danger: false }] : []),
+      ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: onCopy, danger: false }] : []),
+    ],
+    [
+      ...(perms.edit ? [{ label: 'Изменить', Icon: IconPenNew, run: onEdit, danger: false }] : []),
+      ...(perms.pin ? [{ label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin, danger: false }] : []),
+    ],
+    [...(perms.remove ? [{ label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true }] : [])],
+  ].filter((g) => g.length > 0);
+  const items = groups.flat();
+  // Блоков, между которыми отступ: состояние (если есть) и группы пунктов
+  const blocks = groups.length + (statuses.length ? 1 : 0);
+  const menuW = statuses.length ? MENU_W_STATUS : MENU_W;
   // Панель реакций: в группе и канале только те, что разрешил владелец, и без стрелки «ещё»; если реакции выключены, панели нет
   const quick = perms.reactions ?? QUICK_REACTIONS;
   const reactable = quick.length > 0;
   const expandable = perms.reactions === null;
   const barH = reactable ? REACT_BAR_H + 8 : 0;
-  const h = items.length * MENU_ITEM_H + (items.length ? 8 : 0);
+  const hasList = items.length > 0 || statuses.length > 0;
+  const h = items.length * MENU_ITEM_H + statuses.length * MENU_STATUS_H + Math.max(0, blocks - 1) * MENU_GAP_H + (hasList ? 8 : 0);
   const minLeft = (bounds?.left ?? 0) + MENU_EDGE;
   const right = (bounds?.right ?? window.innerWidth) - MENU_EDGE;
-  const maxLeft = right - MENU_W;
-  const left = Math.max(minLeft, Math.min(mine ? rect.right - MENU_W : rect.left, maxLeft));
+  const maxLeft = right - menuW;
+  const left = Math.max(minLeft, Math.min(mine ? rect.right - menuW : rect.left, maxLeft));
   // 16 — поля плашки, 40 — кнопка реакции, 32 — стрелка «ещё»
   const barW = Math.min(expandable ? REACT_BAR_W : 16 + quick.length * 40, right - minLeft);
   const barLeft = Math.max(minLeft, Math.min(mine ? rect.right - barW : rect.left, right - barW));
@@ -225,23 +239,44 @@ function MessageMenu({
         )}
       </div>
       )}
-      {!more && items.length > 0 && (
-        <ul className="msg-menu" role="menu" style={{ left, top, width: MENU_W, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
-          {items.map(({ label, Icon, run, danger }) => (
-            <li key={label}>
-              <button
-                type="button"
-                role="menuitem"
-                className={`msg-menu__item${danger ? ' msg-menu__item--danger' : ''}`}
-                onClick={() => {
-                  run();
-                  onClose();
-                }}
-              >
-                <Icon />
-                {label}
-              </button>
-            </li>
+      {!more && hasList && (
+        <ul className="msg-menu" role="menu" style={{ left, top, width: menuW, transformOrigin: origin }} onClick={(e) => e.stopPropagation()}>
+          {statuses.length > 0 && (
+            <>
+              {statuses.map((c) => (
+                <li key={c.network}>
+                  <CrossMenuRow
+                    item={c}
+                    onFailed={(network) => {
+                      onCrossFailed(network);
+                      onClose();
+                    }}
+                  />
+                </li>
+              ))}
+              {groups.length > 0 && <li className="msg-menu__gap" role="separator" aria-hidden="true" />}
+            </>
+          )}
+          {groups.map((group, gi) => (
+            <Fragment key={group[0].label}>
+              {gi > 0 && <li className="msg-menu__gap" role="separator" aria-hidden="true" />}
+              {group.map(({ label, Icon, run, danger }) => (
+                <li key={label}>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={`msg-menu__item${danger ? ' msg-menu__item--danger' : ''}`}
+                    onClick={() => {
+                      run();
+                      onClose();
+                    }}
+                  >
+                    <Icon />
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </Fragment>
           ))}
         </ul>
       )}
@@ -1053,7 +1088,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onPin={() => setMessagePinned(chatId, menu.message.id, !menu.message.pinned)}
           onReact={(emoji) => setMessageReaction(chatId, menu.message.id, emoji)}
           onForward={() => setForwarding([menu.message])}
-          onSelect={() => setSelected([menu.message.id])}
+          onCrossFailed={(network) => setCrossOpen({ messageId: menu.message.id, network })}
           onCopy={() => void copyText(menu.message.text).then((ok) => say(ok ? 'Скопировано' : 'Не удалось скопировать'))}
           onDelete={() => setRemoving([menu.message.id])}
         />

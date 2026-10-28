@@ -69,6 +69,28 @@ export function CrossStatus({ items, onFailed }: { items: Crosspost[]; onFailed:
   );
 }
 
+/**
+ * Строка состояния в верху меню поста (как «изменено в 14:39» в Telegram): плашка сети, «Опубликовано в Telegram» и отметка.
+ * Неудачу можно нажать: откроется окно с причиной и «Повторить».
+ */
+export function CrossMenuRow({ item, onFailed }: { item: Crosspost; onFailed: (network: Network) => void }) {
+  const body = (
+    <>
+      <NetworkTile network={item.network} size={20} />
+      <span className="msg-menu__status-text">{crosspostLabel(item)}</span>
+      <Mark state={item.state} />
+    </>
+  );
+  if (item.state === 'failed') {
+    return (
+      <button type="button" role="menuitem" className="msg-menu__status msg-menu__status--bad" onClick={() => onFailed(item.network)}>
+        {body}
+      </button>
+    );
+  }
+  return <div className="msg-menu__status">{body}</div>;
+}
+
 /** 4210 → «4 210»: число знаков в подсказке читается легче */
 const grouped = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
