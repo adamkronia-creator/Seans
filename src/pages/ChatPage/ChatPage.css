@@ -591,8 +591,8 @@
 .bubble__reactions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
-  margin-top: var(--space-1);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 /* Реакция, как в Telegram: белая плашка — эмодзи и фото того, кто его поставил */
@@ -806,8 +806,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.chat__group--selecting > li[data-selecting],
-.chat__group > li[data-menu] {
+.chat__group--selecting > li[data-selecting] {
   isolation: isolate;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -825,27 +824,24 @@
 /* Заливка: фон внутри строки и тень снаружи, обрезанная по высоте. Выступает на 4 над строкой и под ней, то есть на весь зазор между
    строками (4 у серии одного автора, 8 у остальных): соседние выбранные строки сливаются, а на невыбранную заливка не заходит.
    У пузыря есть рамка 1: заливка стоит по её внешнему краю */
-.chat__group--selecting > li[data-selecting]::before,
-.chat__group > li[data-menu]::before {
+.chat__group--selecting > li[data-selecting]::before {
   content: '';
   position: absolute;
   z-index: -1;
   inset: 0;
   background: var(--select-tint);
   box-shadow: 0 0 0 100vmax var(--select-tint);
-  clip-path: inset(calc(var(--space-1) * -1) -100vmax);
+  clip-path: inset(calc(var(--sel-t, 4px) * -1) -100vmax calc(var(--sel-b, 4px) * -1)); /* половина зазора до соседей: считает MessageBubble */
   opacity: 0;
   transition: opacity var(--dur-quick) ease;
   pointer-events: none;
 }
 
-.chat__group--selecting > li.bubble[data-selecting]::before,
-.chat__group > li.bubble[data-menu]::before {
+.chat__group--selecting > li.bubble[data-selecting]::before {
   inset: -1px; /* grid:ok — рамка пузыря 1 */
 }
 
-.chat__group--selecting > li[data-selected]::before,
-.chat__group > li[data-menu]::before {
+.chat__group--selecting > li[data-selected]::before {
   opacity: 1;
 }
 

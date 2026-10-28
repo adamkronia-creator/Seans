@@ -258,6 +258,16 @@ export function MessageBubble({
     if (!selecting || !el) return;
     const shift = el.matches('.bubble--out, .bubble-group--out') ? 0 : SELECT_SHIFT;
     el.style.setProperty('--sel-x', `${-(el.offsetLeft + shift)}px`);
+    // Заливка занимает ровно половину зазора до каждого соседа: без щелей между выбранными строками и без наложения
+    const r = el.getBoundingClientRect();
+    const bw = 0;
+    const half = (sib: Element | null, up: boolean) => {
+      if (!sib?.matches('li[data-mid]')) return 4;
+      const q = sib.getBoundingClientRect();
+      return Math.max(0, (up ? r.top - q.bottom : q.top - r.bottom) / 2);
+    };
+    el.style.setProperty('--sel-t', `${Math.max(0, half(el.previousElementSibling, true) - bw)}px`);
+    el.style.setProperty('--sel-b', `${Math.max(0, half(el.nextElementSibling, false) - bw)}px`);
   });
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);

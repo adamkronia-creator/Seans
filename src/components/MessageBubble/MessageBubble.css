@@ -487,7 +487,16 @@
 /* Реакция со счётчиком (группа и канал): эмодзи и число; ваша — акцентная */
 /* Селектор с двумя классами: общий padding 4 из ChatPage.css подключается позже и иначе съедал отступ справа от числа */
 .bubble__reaction.bubble__reaction--count {
-  padding-right: var(--space-3);
+  gap: var(--space-1);
+  height: 32px; /* grid:ok — высота плашки реакции */
+  padding: 0 var(--space-3);
+}
+
+/* В плашке со счётчиком эмодзи без квадрата-подложки: 22 по высоте, 4 до числа, по бокам 12 — поля равны слева и справа */
+.bubble__reaction--count .bubble__reaction-emoji {
+  width: auto;
+  height: auto;
+  font-size: 22px; /* grid:ok — эмодзи крупнее числа */
 }
 
 .bubble__reaction-count {

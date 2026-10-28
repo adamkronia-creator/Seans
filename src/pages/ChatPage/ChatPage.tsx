@@ -362,13 +362,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   // Что удаляется, ждёт подтверждения в окне: одно сообщение из меню, отмеченные при выборе (null — окна нет)
   const [removing, setRemoving] = useState<string[] | null>(null);
   const allChats = useChats();
-  // Сообщение, для которого открыто меню, подсвечено, как выбранное: видно, к чему относятся пункты (атрибут ставим на строку напрямую)
-  useEffect(() => {
-    if (!menu) return;
-    const row = listRef.current?.querySelector(`[data-mid="${menu.message.id}"]`);
-    row?.setAttribute('data-menu', '');
-    return () => row?.removeAttribute('data-menu');
-  }, [menu]);
   const [searchOpen, setSearchOpen] = useState(false);
   /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
   const pinShown = pins.length > 0 && section === 'messages' && !searchOpen;
