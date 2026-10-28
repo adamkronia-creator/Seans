@@ -670,8 +670,9 @@
 .bubble__foot {
   display: flex;
   align-items: flex-end;
+  flex-wrap: wrap; /* не помещается — время уходит под реакции, а не сжимает плашки в столбик */
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: var(--space-1) var(--space-2);
   margin-top: var(--space-2);
 }
 
@@ -790,48 +791,102 @@
   max-width: 92%;
 }
 
-/* ——— Выбор сообщений: слева кружок отметки, выбранная строка подсвечена на всю ширину ——— */
-.chat__group--selecting {
-  position: relative;
-  padding-left: var(--space-10);
+/* ——— Выбор сообщений ———
+   Ничего не перекладывается: лента не сужается, текст в пузырях стоит на тех же строках, что и до выбора. Кружок отметки у левого
+   края ленты; входящие уезжают вправо на 36 (transform), исходящие остаются на месте. Выбранная строка залита на всю ширину экрана:
+   заливка лежит под содержимым строки, внутри самой строки она стоит фоном, а наружу выходит тенью без размытия, обрезанной по высоте. */
+.chat__group {
+  --select-tint: color-mix(in srgb, var(--color-accent) 24%, transparent);
 }
 
-.chat__group--selecting > li[data-selecting] {
+.chat__group--selecting {
+  --select-shift: calc(var(--space-6) + var(--space-3)); /* кружок 24 и зазор 12: тот же сдвиг считает MessageBubble (SELECT_SHIFT) */
+  position: relative; /* от этого блока MessageBubble считает место кружка (--sel-x) */
+  cursor: pointer; /* нажатие рядом с пузырём и на кружок тоже отмечает строку (ChatPage, pickByRow) */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chat__group--selecting > li[data-selecting],
+.chat__group > li[data-menu] {
   isolation: isolate;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.chat__group--selecting > li[data-selecting]::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: calc(var(--space-1) * -1) 0;
-  box-shadow: 0 0 0 100vmax transparent;
-  clip-path: inset(calc(var(--space-1) * -1) -100vmax);
+.chat__group--selecting > li[data-selecting]:not(.bubble--out):not(.bubble-group--out) {
+  transform: translateX(var(--select-shift));
+}
+
+/* Нажатия внутри строки (кнопки карточки, аватар автора, «Прокомментировать», ссылки) в режиме выбора только отмечают строку */
+.chat__group--selecting > li[data-selecting] :is(button, a, [role='button']) {
   pointer-events: none;
 }
 
-.chat__group--selecting > li[data-selected]::before {
-  box-shadow: 0 0 0 100vmax color-mix(in srgb, var(--color-accent) 14%, transparent);
+/* Заливка: фон внутри строки и тень снаружи, обрезанная по высоте. Выступает на 4 над строкой и под ней, то есть на весь зазор между
+   строками (4 у серии одного автора, 8 у остальных): соседние выбранные строки сливаются, а на невыбранную заливка не заходит.
+   У пузыря есть рамка 1: заливка стоит по её внешнему краю */
+.chat__group--selecting > li[data-selecting]::before,
+.chat__group > li[data-menu]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: var(--select-tint);
+  box-shadow: 0 0 0 100vmax var(--select-tint);
+  clip-path: inset(calc(var(--space-1) * -1) -100vmax);
+  opacity: 0;
+  transition: opacity var(--dur-quick) ease;
+  pointer-events: none;
 }
 
+.chat__group--selecting > li.bubble[data-selecting]::before,
+.chat__group > li.bubble[data-menu]::before {
+  inset: -1px; /* grid:ok — рамка пузыря 1 */
+}
+
+.chat__group--selecting > li[data-selected]::before,
+.chat__group > li[data-menu]::before {
+  opacity: 1;
+}
+
+/* Кружок: на стекле, чтобы не терялся на любом фоне; отмеченный — синий с белой галочкой */
 .chat__group--selecting > li[data-selecting]::after {
   content: '';
   position: absolute;
   top: 50%;
-  left: calc(var(--row-x, 0px) * -1 + var(--space-2));
+  left: var(--sel-x, 0);
   box-sizing: border-box;
   width: var(--space-6);
   height: var(--space-6);
   margin-top: calc(var(--space-3) * -1);
-  border: 2px solid var(--text-secondary);
+  border: 2px solid var(--text-secondary); /* grid:ok — обводка кружка */
   border-radius: var(--radius-full);
+  background: var(--glass-fill);
+  transition:
+    background-color var(--dur-quick) ease,
+    border-color var(--dur-quick) ease;
+  animation: select-pop var(--dur-base) var(--ease-spring) backwards;
   pointer-events: none;
 }
 
 .chat__group--selecting > li[data-selected]::after {
   border-color: var(--color-accent);
   background: var(--color-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 100% no-repeat;
+}
+
+@keyframes select-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat__group--selecting > li[data-selecting]::before,
+  .chat__group--selecting > li[data-selecting]::after {
+    animation: none;
+    transition: none;
+  }
 }
 
 /* Шапка выбора: крестик, «Выбрано N» и три действия */

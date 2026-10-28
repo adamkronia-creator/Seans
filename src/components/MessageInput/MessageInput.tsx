@@ -123,6 +123,12 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
     }
   }, [edit?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Вместо поля побывала строка-подсказка или панель действий: поле создаётся заново пустым, а набранный текст хранится в состоянии — возвращаем его
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!bar && el && text && el.textContent !== text) el.textContent = text;
+  }, [bar]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const setPanel = (open: boolean) => {
     setEmojiOpen(open);
     // Лента подстраивается под новую высоту после перерисовки

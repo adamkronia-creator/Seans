@@ -174,6 +174,8 @@ function Reaction({ message, peerAvatar, onReact, counted }: { message: Message;
   );
 }
 const LONG_PRESS_MS = 450;
+/** На сколько входящие сообщения уезжают вправо, освобождая место кружку отметки (24 + 12; тот же размер в ChatPage.css) */
+const SELECT_SHIFT = 36;
 
 interface MessageBubbleProps {
   message: Message;
@@ -215,6 +217,8 @@ interface MessageBubbleProps {
   /** Режим выбора сообщений: слева кружок отметки, нажатие отмечает; selected — это сообщение выбрано */
   selecting?: boolean;
   selected?: boolean;
+  /** Долгое нажатие: сразу начать выбор с этого сообщения (без него долгое нажатие открывает меню) */
+  onSelect?: (m: Message) => void;
 }
 
 export function MessageBubble({
@@ -244,15 +248,21 @@ export function MessageBubble({
   onOpenComments,
   selecting = false,
   selected = false,
+  onSelect,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
-  // Кружок отметки стоит у левого края списка, а пузырь у исходящих прижат вправо: расстояние до края считаем от места пузыря
+  // Кружок отметки стоит у левого края списка, а пузырь у исходящих прижат вправо: расстояние до края считаем от места пузыря.
+  // Входящие в режиме выбора сдвигаются вправо на SELECT_SHIFT (transform, без перекладки текста), исходящие стоят на месте
   useLayoutEffect(() => {
     const el = ref.current;
-    if (selecting && el) el.style.setProperty('--row-x', `${el.offsetLeft}px`);
+    if (!selecting || !el) return;
+    const shift = el.matches('.bubble--out, .bubble-group--out') ? 0 : SELECT_SHIFT;
+    el.style.setProperty('--sel-x', `${-(el.offsetLeft + shift)}px`);
   });
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);
+  // Чем нажали: мышь (правая кнопка открывает меню) или палец (долгое нажатие уже выбрало сообщение, меню браузера не нужно)
+  const pointerKind = useRef('touch');
   // Пост канала всегда в белом стекле, как у подписчиков: свои публикации выглядят так же, как чужие
   const post = chatKind === 'channel';
   const out = message.from === 'me' && !post;
@@ -306,14 +316,28 @@ export function MessageBubble({
   };
 
   const onPointerDown = (e: PointerEvent) => {
+    pointerKind.current = e.pointerType;
     if ((e.target as HTMLElement).closest('button')) return;
     const g: { x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } = { x: e.clientX, y: e.clientY, mode: 'idle', timer: 0 };
-    g.timer = window.setTimeout(() => {
-      if (gesture.current === g && g.mode === 'idle') {
-        g.mode = 'cancel';
-        if (ref.current) onMenu(message, ref.current.getBoundingClientRect());
-      }
-    }, LONG_PRESS_MS);
+    // Выбор уже идёт: касание только отмечает, долгое нажатие не нужно
+    if (!selecting) {
+      g.timer = window.setTimeout(() => {
+        if (gesture.current === g && g.mode === 'idle') {
+          g.mode = 'cancel';
+          if (onSelect) {
+            // Короткий отклик, как у выбора в других мессенджерах
+            try {
+              navigator.vibrate?.(12);
+            } catch {
+              /* без вибрации */
+            }
+            onSelect(message);
+          } else if (ref.current) {
+            onMenu(message, ref.current.getBoundingClientRect());
+          }
+        }
+      }, LONG_PRESS_MS);
+    }
     gesture.current = g;
   };
 
@@ -326,7 +350,7 @@ export function MessageBubble({
       if (Math.abs(my) > 10) {
         clearTimer();
         g.mode = 'cancel';
-      } else if (mx > 10 && Math.abs(mx) > Math.abs(my)) {
+      } else if (mx > 10 && Math.abs(mx) > Math.abs(my) && !selecting) {
         clearTimer();
         g.mode = 'swipe';
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -374,7 +398,8 @@ export function MessageBubble({
     onPointerCancel: end,
     onContextMenu: (e: React.MouseEvent) => {
       e.preventDefault();
-      if (ref.current) onMenu(message, ref.current.getBoundingClientRect());
+      // Палец: меню браузера приходит следом за долгим нажатием, которое уже выбрало сообщение, — его гасим
+      if (pointerKind.current === 'mouse' && ref.current) onMenu(message, ref.current.getBoundingClientRect());
     },
     style: dx ? { transform: `translateX(${dx}px)` } : undefined,
   };

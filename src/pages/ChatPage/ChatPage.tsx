@@ -27,7 +27,7 @@ import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconT
 import IconSelect from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
-import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useMessages, useTyping } from '../../data/chatStore';
+import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
 import { ME, contactOf, firstNameOf, nameOf } from '../../data/contacts';
 import { can, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { roleOf } from '../../data/roles';
@@ -42,6 +42,7 @@ import { hasTaskSettings } from '../../data/taskValues';
 import { goBack, goBackBy, guardBack, navigate } from '../../router';
 import { IconPinned } from '../../components/FolderMenu/FolderIcons';
 import { useBackHandler } from '../../utils/backHandler';
+import { copyText } from '../../utils/clipboard';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { installBubbleGradient } from '../../utils/bubbleGradient';
 import { useExitAnimation } from '../../utils/exitAnimation';
@@ -85,7 +86,7 @@ function menuBounds(list: HTMLElement | null) {
 /** Текст плашки закреплённого: сообщение одной строкой, у карточки — её вид */
 const pinPreview = (m: Message) => (m.test ? 'Тест' : m.task ? 'Задание' : m.text.replace(/\s*\n\s*/g, ' '));
 
-/** Что в меню сообщения разрешено: в обычном чате всё, в группе и канале — по правам и настройкам */
+/** Что в меню сообщения разрешено: в обычном чате всё (правка — только у своего текста, её определяет permsFor), в группе и канале — по правам и настройкам */
 interface MenuPerms {
   reply: boolean;
   edit: boolean;
@@ -117,6 +118,7 @@ function MessageMenu({
   onReact,
   onForward,
   onSelect,
+  onCopy,
 }: {
   message: Message;
   rect: DOMRect;
@@ -132,6 +134,7 @@ function MessageMenu({
   onReact: (emoji: string) => void;
   onForward: () => void;
   onSelect: () => void;
+  onCopy: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState(false);
@@ -142,12 +145,18 @@ function MessageMenu({
     return () => window.clearTimeout(t);
   }, []);
   useExitAnimation(backdropRef);
+  // Escape закрывает меню (на компьютере)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
   const items = [
     ...(perms.reply ? [{ label: 'Ответить', Icon: IconReply, run: onReply, danger: false }] : []),
     ...(perms.edit ? [{ label: 'Изменить', Icon: IconPenNew, run: onEdit, danger: false }] : []),
     ...(perms.pin ? [{ label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin, danger: false }] : []),
     ...(perms.forward ? [{ label: 'Переслать', Icon: IconForward, run: onForward, danger: false }] : []),
-    ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined), danger: false }] : []),
+    ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: onCopy, danger: false }] : []),
     { label: 'Выбрать', Icon: IconSelect, run: onSelect, danger: false },
     ...(perms.remove ? [{ label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true }] : []),
   ];
@@ -350,7 +359,16 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [forwarding, setForwarding] = useState<Message[] | null>(null);
   // Режим выбора: id отмеченных сообщений (null — обычный режим); с ним копирование, пересылка и удаление сразу нескольких
   const [selected, setSelected] = useState<string[] | null>(null);
-  const [removingMany, setRemovingMany] = useState(false);
+  // Что удаляется, ждёт подтверждения в окне: одно сообщение из меню, отмеченные при выборе (null — окна нет)
+  const [removing, setRemoving] = useState<string[] | null>(null);
+  const allChats = useChats();
+  // Сообщение, для которого открыто меню, подсвечено, как выбранное: видно, к чему относятся пункты (атрибут ставим на строку напрямую)
+  useEffect(() => {
+    if (!menu) return;
+    const row = listRef.current?.querySelector(`[data-mid="${menu.message.id}"]`);
+    row?.setAttribute('data-menu', '');
+    return () => row?.removeAttribute('data-menu');
+  }, [menu]);
   const [searchOpen, setSearchOpen] = useState(false);
   /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
   const pinShown = pins.length > 0 && section === 'messages' && !searchOpen;
@@ -490,6 +508,13 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const selecting = selected !== null;
   useBackHandler(selecting, cancelSelect);
   useEffect(() => (selecting ? guardBack(cancelSelect) : undefined), [selecting, cancelSelect]);
+  // Escape (на компьютере) выходит из выбора, если поверх него не открыто меню, пересылка или подтверждение: те закрывает сам Escape
+  useEffect(() => {
+    if (!selecting || menu || forwarding || removing) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && cancelSelect();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [selecting, menu, forwarding, removing, cancelSelect]);
 
   const index = sections.findIndex((item) => item.id === section);
 
@@ -518,12 +543,14 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   /** Чьё сообщение: «Вы», имя участника группы или собеседника */
   const replyFrom = (m: Message) => (m.from === 'me' ? 'Вы' : kind === 'group' && m.author ? firstNameOf(m.author) : chat.name.split(' ')[0]);
   const permsFor = (m: Message): MenuPerms => {
-    if (!info) return FULL_PERMS;
     const mine = m.from === 'me';
+    // Править можно только свой обычный текст: карточки тестов и заданий, фото, файлы и пересланное остаются как есть
+    const editable = mine && !m.image && !m.file && !m.test && !m.task && !m.forwarded && Boolean(m.text);
+    if (!info) return { ...FULL_PERMS, edit: editable };
     const channel = info.kind === 'channel';
     return {
       reply: writer,
-      edit: mine && !m.image && !m.file && Boolean(m.text) && (channel ? can(info, 'postMessages') : true),
+      edit: editable && (channel ? can(info, 'postMessages') : true),
       pin: canPin(info),
       forward: !info.protectContent,
       copy: !info.protectContent && Boolean(m.text),
@@ -537,6 +564,19 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       const next = now.includes(id) ? now.filter((x) => x !== id) : [...now, id];
       return next.length ? next : null;
     });
+  /** Нажатие рядом с пузырём (на кружок, в пустое место строки) отмечает строку, на уровне которой оно пришлось: строка целиком — одна мишень, как в Telegram */
+  const pickByRow = (e: React.MouseEvent<HTMLUListElement>) => {
+    if (e.target !== e.currentTarget) return;
+    let best: { id: string; gap: number } | null = null;
+    e.currentTarget.querySelectorAll<HTMLElement>(':scope > li[data-selecting]').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      // Строку держат её границы и половина зазора до соседей (4): в зазоре выигрывает ближайшая
+      const gap = Math.abs(e.clientY - (r.top + r.bottom) / 2) - r.height / 2;
+      if (gap <= 4 && (!best || gap < best.gap)) best = { id: el.dataset.mid ?? '', gap };
+    });
+    const hit = best as { id: string } | null;
+    if (hit?.id) toggleSelected(hit.id);
+  };
   /** Отмеченные сообщения в порядке переписки */
   const chosen = selected ? flat.filter((m) => selected.includes(m.id)) : [];
   const canCopyMany = cards || chosen.some((m) => permsFor(m).copy);
@@ -547,29 +587,54 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
     const text = cards
       ? (section === 'notes' ? allNotes.filter((n) => ids.includes(n.id)).map(noteText) : allSections.filter((x) => ids.includes(x.id)).map(sectionText)).join('\n\n')
       : chosen.filter((m) => permsFor(m).copy).map((m) => m.text).join('\n\n');
-    void navigator.clipboard?.writeText(text).catch(() => undefined);
-    say('Скопировано');
+    void copyText(text).then((ok) => say(ok ? 'Скопировано' : 'Не удалось скопировать'));
     setSelected(null);
   };
   const removeTitle = (n: number) =>
     section === 'notes' ? (n > 1 ? 'Удалить заметки?' : 'Удалить заметку?') : section === 'info' ? 'Удалить сведения?' : n > 1 ? 'Удалить сообщения?' : 'Удалить сообщение?';
-  const removeMany = () => {
+  const removeNow = () => {
+    const ids = removing ?? [];
     if (cards) {
-      if (section === 'notes') deleteNotes(selected ?? []);
-      else deleteSections(selected ?? []);
-      setRemovingMany(false);
-      setSelected(null);
-      return;
+      if (section === 'notes') deleteNotes(ids);
+      else deleteSections(ids);
+    } else {
+      ids.forEach((id) => deleteMessage(chatId, id));
+      if (replyTo && ids.includes(replyTo.id)) setReplyTo(null);
+      if (editing && ids.includes(editing.id)) setEditing(null);
     }
-    chosen.forEach((m) => deleteMessage(chatId, m.id));
-    if (replyTo && chosen.some((m) => m.id === replyTo.id)) setReplyTo(null);
-    if (editing && chosen.some((m) => m.id === editing.id)) setEditing(null);
-    setRemovingMany(false);
+    setRemoving(null);
     setSelected(null);
   };
+  /** Названия чатов, куда ушла пересылка: для подтверждения внизу */
+  const forwardedTo = (ids: string[]) =>
+    ids.length === 1 ? `Переслано: ${allChats.find((c) => c.id === ids[0])?.name ?? 'чат'}` : `Переслано: ${ids.length} чатов`;
   const mmss = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
   let composerBar: ReactNode;
-  if (info && !writer) {
+  if (selecting && section === 'messages') {
+    // Пока выбирают сообщения, вместо поля ввода (оно остаётся со своим черновиком) стоят действия: ответить на одно и переслать
+    const replyOne = chosen.length === 1 && permsFor(chosen[0]).reply;
+    composerBar = (
+      <div className="composer__select" role="toolbar" aria-label="Действия с выбранными сообщениями">
+        {replyOne && (
+          <button
+            type="button"
+            className="composer__bar"
+            onClick={() => {
+              setReplyTo(chosen[0]);
+              setSelected(null);
+            }}
+          >
+            <IconReply />
+            Ответить
+          </button>
+        )}
+        <button type="button" className="composer__bar" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
+          <IconForward />
+          Переслать
+        </button>
+      </div>
+    );
+  } else if (info && !writer) {
     composerBar =
       kind === 'channel' ? (
         <button type="button" className="composer__bar" onClick={toggleMute}>
@@ -611,7 +676,11 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             />
           )}
           {groups.map((group) => (
-            <ul className={`chat__group${kind ? ` chat__group--${kind === 'group' ? 'grp' : 'chan'}` : ''}${selecting ? ' chat__group--selecting' : ''}`} key={group.label}>
+            <ul
+              className={`chat__group${kind ? ` chat__group--${kind === 'group' ? 'grp' : 'chan'}` : ''}${selecting ? ' chat__group--selecting' : ''}`}
+              key={group.label}
+              onClick={selecting ? pickByRow : undefined}
+            >
               <li className="chat__day">
                 <span>{group.label}</span>
               </li>
@@ -644,6 +713,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}
                     selecting={selecting}
                     selected={Boolean(selected?.includes(m.id))}
+                    onSelect={(message) => !message.service && setSelected([message.id])}
                     onReply={(message) => writer && !selecting && !message.service && setReplyTo(message)}
                     onMenu={(message, rect) => (selecting ? toggleSelected(message.id) : hasMenu(permsFor(message)) && setMenu({ message, rect }))}
                     onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}
@@ -753,7 +823,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
               <IconCloseMk />
             </button>
             <h1 className="chat__select-title" aria-live="polite">
-              Выбрано <Badge count={selected?.length ?? 0} variant="select" />
+              Выбрано <Badge count={cards ? (selected?.length ?? 0) : chosen.length} variant="select" />
             </h1>
             <div className="chat__select-actions">
               <button type="button" className="chat__action" aria-label="Копировать" disabled={!canCopyMany} onClick={copyMany}>
@@ -764,7 +834,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                   <IconForward />
                 </button>
               )}
-              <button type="button" className="chat__action" aria-label="Удалить" disabled={!canRemoveMany} onClick={() => setRemovingMany(true)}>
+              <button type="button" className="chat__action" aria-label="Удалить" disabled={!canRemoveMany} onClick={() => setRemoving(selected)}>
                 <IconTrash />
               </button>
             </div>
@@ -939,11 +1009,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onReact={(emoji) => setMessageReaction(chatId, menu.message.id, emoji)}
           onForward={() => setForwarding([menu.message])}
           onSelect={() => setSelected([menu.message.id])}
-          onDelete={() => {
-            if (replyTo?.id === menu.message.id) setReplyTo(null);
-            if (editing?.id === menu.message.id) setEditing(null);
-            deleteMessage(chatId, menu.message.id);
-          }}
+          onCopy={() => void copyText(menu.message.text).then((ok) => say(ok ? 'Скопировано' : 'Не удалось скопировать'))}
+          onDelete={() => setRemoving([menu.message.id])}
         />
       )}
 
@@ -957,17 +1024,18 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             });
             setForwarding(null);
             setSelected(null);
+            say(forwardedTo(ids));
           }}
         />
       )}
 
-      {removingMany && selected && (
+      {removing && (
         <RemoveSheet
-          title={removeTitle(selected.length)}
-          text={selected.length > 1 ? `Будет удалено: ${selected.length}. Это нельзя отменить.` : 'Удаление нельзя отменить.'}
+          title={removeTitle(removing.length)}
+          text={removing.length > 1 ? `Будет удалено: ${removing.length}. Это нельзя отменить.` : 'Удаление нельзя отменить.'}
           confirm="Удалить"
-          onClose={() => setRemovingMany(false)}
-          onConfirm={removeMany}
+          onClose={() => setRemoving(null)}
+          onConfirm={removeNow}
         />
       )}
 

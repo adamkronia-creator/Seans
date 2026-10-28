@@ -272,3 +272,23 @@
 .composer__bar:is(button):active {
   background: var(--glass);
 }
+
+/* Панель действий при выборе сообщений вместо поля ввода: «Ответить» (если выбрано одно) и «Переслать» — две половины одной капсулы */
+.composer__select {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.composer__select > .composer__bar + .composer__bar {
+  border-left: var(--hairline) solid var(--divider);
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
+.composer__select > .composer__bar:not(:last-child) {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
+.composer__bar:disabled {
+  opacity: 0.4;
+}
