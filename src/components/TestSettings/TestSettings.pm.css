@@ -705,12 +705,21 @@
   display: none;
 }
 
-/* Предпросмотр: на затемнении нет панели, только экран телефона клиента; крестик окна («Отмена») стоит над ним в правом верхнем углу */
+/* Предпросмотр: на затемнении нет панели, только экран телефона клиента; «Отмена» (крестик) стоит в его шапке напротив «Назад», окно своего крестика не рисует.
+   Страница позади закрыта плотным затемнением с размытием: она не должна читаться вокруг телефона */
+[data-pm] .sheet--bare > .sheet__close {
+  display: none;
+}
+
+.sheet-overlay[data-pm]:has(.sheet--bare) {
+  background-color: color-mix(in srgb, rgb(12 16 30) calc(var(--sheet-dim, 1) * 82%), transparent);
+  -webkit-backdrop-filter: blur(var(--space-4));
+  backdrop-filter: blur(var(--space-4));
+}
 [data-pm] .sheet.sheet--bare {
   display: flex;
   flex-direction: column;
   height: min(var(--sheet-max-h), var(--sheet-max, var(--sheet-max-h)));
-  padding-top: calc(var(--sheet-close) + var(--space-3));
   background: none;
   box-shadow: none;
   -webkit-backdrop-filter: none;

@@ -534,7 +534,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
       {sheet === 'preview' && blank && (
         <PreviewSheet title={test.title} onClose={() => setSheet(null)}>
-          <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} screen />
+          <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} screen onClose={() => setSheet(null)} />
         </PreviewSheet>
       )}
       {sheet === 'send' && (

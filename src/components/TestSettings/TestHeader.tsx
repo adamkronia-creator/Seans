@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
+import { IconClose } from '../ChatParts/ChatIcons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
 import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
 import './TestSettings.css';
@@ -22,10 +23,12 @@ interface TestHeaderProps {
   client?: { blind?: boolean; /** Название слепого теста («Тест №131020261007») */ title?: string };
   /** Место под строкой шапки, куда экран кладёт свою полосу (шаги задания): она на той же подложке, что и шапка, одним слоем, как закреплённое сообщение в чате */
   slotRef?: (el: HTMLDivElement | null) => void;
+  /** Предпросмотр в окне без панели: «Отмена» (крестик) стоит напротив «Назад» */
+  onClose?: () => void;
 }
 
 /** Шапка экранов теста — как шапка открытого чата: назад, аватарка теста, название, раздел и сердечко «в избранное» на месте поиска и настроек */
-export function TestHeader({ test, kind = 'test', status, onBack, client, slotRef }: TestHeaderProps) {
+export function TestHeader({ test, kind = 'test', status, onBack, client, slotRef, onClose }: TestHeaderProps) {
   const testFavorites = useFavorites();
   const taskFavorites = useTaskFavorites();
   const favorite = (kind === 'task' ? taskFavorites : testFavorites).has(test.id);
@@ -49,6 +52,11 @@ export function TestHeader({ test, kind = 'test', status, onBack, client, slotRe
           <p className="test-settings__status">{status}</p>
         </div>
       </div>
+      {onClose && (
+        <button type="button" className="test-settings__button" aria-label="Отмена" onClick={onClose}>
+          <IconClose />
+        </button>
+      )}
       {!client && (
         <button
           type="button"

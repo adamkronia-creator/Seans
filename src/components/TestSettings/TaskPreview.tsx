@@ -27,6 +27,8 @@ interface TaskPreviewProps {
   permanent?: PermanentRule;
   /** Предпросмотр в окне: без вкладок этапов */
   screen?: boolean;
+  /** «Отмена» в шапке экрана (предпросмотр в окне) */
+  onClose?: () => void;
 }
 
 /**
@@ -34,7 +36,7 @@ interface TaskPreviewProps {
  * Внутри: начало (инструкция и сведения), бланк страницами и завершение; сообщения специалиста в рамке нет.
  * Внутри рамки тот же интерфейс, что у клиента и при прохождении самому. Написанное здесь никуда не сохраняется.
  */
-export function TaskPreview({ task, data, form, options, deadline, permanent, screen }: TaskPreviewProps) {
+export function TaskPreview({ task, data, form, options, deadline, permanent, screen, onClose }: TaskPreviewProps) {
   const [stage, setStage] = useState<Stage>('start');
   const [values, setValues] = useState<TaskValues>(emptyValues);
   // В процессе бланк идёт страницами, как при выполнении: поля, комментарий, состояние
@@ -89,7 +91,7 @@ export function TaskPreview({ task, data, form, options, deadline, permanent, sc
         <div className="tp__status" aria-hidden="true">
           <span className="tp__notch" />
         </div>
-        <TestHeader test={task} kind="task" client={{}} status="Задание от вашего специалиста" />
+        <TestHeader test={task} kind="task" client={{}} onClose={onClose} status="Задание от вашего специалиста" />
         {stage !== 'end' && <PassStrip at={stage === 'start' ? 0 : part + 1} total={parts.length} />}
         <div className="test-settings__scroll tp__screen" key={`${stage}${part}`} ref={screenRef}>
           {stage === 'start' && <ClientIntro message="" rules={data.blank.rules(form)} facts={taskFacts(data, deadline, permanent)} />}

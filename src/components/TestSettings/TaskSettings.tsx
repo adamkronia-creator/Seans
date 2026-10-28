@@ -412,7 +412,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
       {sheet === 'preview' && (
         <PreviewSheet title={task.title} onClose={() => setSheet(null)}>
-          <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} screen />
+          <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} screen onClose={() => setSheet(null)} />
         </PreviewSheet>
       )}
       {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onPass={() => { setSheet(null); openView('pass'); }} onClose={() => setSheet(null)} />}
