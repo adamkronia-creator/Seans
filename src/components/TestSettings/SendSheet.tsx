@@ -98,6 +98,7 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose
 
   return (
     <Frame title="Отправить" onClose={onClose}>
+      <div className="sheet__card">
       <ul className="send-list" aria-label={`Кому отправить ${noun}`}>
         {rows.map((r) => {
           const sent = state[r.id] === 'sent';
@@ -113,6 +114,7 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose
           );
         })}
       </ul>
+      </div>
       <div className="send-tools">
         <button type="button" className="send-tools__item" onClick={() => onCopy(url)}>
           <span className="send-tools__disc">
