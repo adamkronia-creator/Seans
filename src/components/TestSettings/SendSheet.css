@@ -1,0 +1,125 @@
+/* «Отправить»: строки как у «Выбранных чатов» (фото 48, имя, роль), справа кнопка; внизу круглые «Скопировать» и «Поделиться через…» */
+.send-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.send-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row-h-2);
+}
+
+.send-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.send-row__name {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.send-row__note {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.send-row__note--sent {
+  color: var(--text-link);
+}
+
+/* Кнопка 32 справа; «Отправить» — светлая плитка, как в списках отправки; обводка при отправке — тонкое кольцо по краю */
+[data-pm] .send-row__button {
+  position: relative;
+  flex-shrink: 0;
+  min-width: 104px;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--text-primary);
+  color: var(--sheet-solid, var(--bg-subtle));
+  font: var(--type-label);
+  white-space: nowrap;
+}
+
+[data-pm] .send-row__button--sending,
+[data-pm] .send-row__button--open {
+  background: var(--sheet-tile-strong);
+  color: var(--text-primary);
+}
+
+.send-row__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.send-row__ring rect {
+  x: 1px;
+  y: 1px;
+  width: calc(100% - 2px); /* grid:ok — рамка 1 внутри кнопки */
+  height: calc(100% - 2px); /* grid:ok — рамка 1 внутри кнопки */
+  rx: var(--radius-md);
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 2px;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: send-ring linear forwards;
+}
+
+@keyframes send-ring {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.send-tools {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+.send-tools__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 104px;
+  color: var(--text-primary);
+  font: var(--type-caption);
+  text-align: center;
+}
+
+.send-tools__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--sheet-tile-strong);
+  color: var(--text-link);
+  font-size: var(--size-icon-lg);
+}

@@ -6,8 +6,9 @@ import {
 import { Switch } from '../Switch/Switch';
 import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { HelpContext } from '../OptionHelp/HelpScenes';
-import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
-import { CHATS } from '../../data/chats';
+import { SELF_ID } from './TestActions';
+import { PreviewSheet, SendSheet } from './SendSheet';
+import { copyText } from '../../utils/clipboard';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTest } from '../../data/library';
@@ -27,7 +28,7 @@ import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { blindTitle } from '../../data/resultMode';
-import { canPassSelf, formHint, takePass } from '../../data/selfTest';
+import { formHint, takePass } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
@@ -178,7 +179,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const [result, setResult] = useState<ResultMode>(sentOptions?.result ?? 'thanks');
   const [shuffle, setShuffle] = useState(sentOptions?.shuffle ?? passRequest?.shuffle ?? false);
   const [saveBlank, setSaveBlank] = useState(sentOptions?.saveBlank ?? passRequest?.saveBlank ?? true);
-  const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
+  const [sheet, setSheet] = useState<'preview' | 'send' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   // Вместо настроек можно открыть бланк, пример заключения или прохождение; шапка та же
   const [view, setView] = useState<View>(passRequest && testBlank(test.id) ? 'pass' : 'settings');
@@ -199,44 +200,21 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   };
 
-  const send = (ids: string[]) => {
-    ids.forEach((id) => {
-      // В чат уходит карточка теста: сообщение клиенту, если оно включено, стоит в ней текстом, а настройки,
-      // с которыми тест ушёл, лежат в ней же (их показывает кнопка «Настройки теста»)
-      sendMessage(id, messageOn ? message : '', undefined, {
-        test: test.id,
-        testKind: 'sent',
-        ...(id === SELF_ID ? { toSelf: true } : {}),
-        testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, shuffle, ...(data.forms ? { form } : {}) },
-      });
-      // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
-      if (id === 'maxim') logStep('test', test.id, 'sent');
+  /** Тест уходит одному получателю, когда у него заполнилась обводка кнопки в окне «Отправить» */
+  const deliver = (id: string) => {
+    // В чат уходит карточка теста: сообщение клиенту, если оно включено, стоит в ней текстом, а настройки,
+    // с которыми тест ушёл, лежат в ней же (их показывает кнопка «Настройки теста»)
+    sendMessage(id, messageOn ? message : '', undefined, {
+      test: test.id,
+      testKind: 'sent',
+      ...(id === SELF_ID ? { toSelf: true } : {}),
+      testOptions: { blind, ...(blind ? { blindTitle: blindTitle() } : {}), result, saveBlank, shuffle, ...(data.forms ? { form } : {}) },
     });
-    setSheet(null);
-    const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
-    notify(
-      ids.length === 1
-        ? ids[0] === SELF_ID
-          ? 'Тест отправлен вам: он в «Избранном»'
-          : `Тест отправлен: ${names[0]}`
-        : `Тест отправлен: ${ids.length} получателям`,
-    );
+    // Журнал действий (история, вкладка «Тесты») пока ведётся только у Максима
+    if (id === 'maxim') logStep('test', test.id, 'sent');
   };
-
-  const pick = (action: TestAction) => {
-    if (action === 'self') {
-      if (blank && canPassSelf(test.id)) {
-        transition(() => {
-          setSheet(null);
-          setView('pass');
-        }, 'forward');
-      } else {
-        setSheet(null);
-        notify('Бланк теста для самостоятельного прохождения пока недоступен');
-      }
-    } else if (action === 'one' && chatId) send([chatId]);
-    else setSheet(action);
-  };
+  const testUrl = `${window.location.href.split('#')[0]}#/tests/${test.id}`;
+  const copyUrl = (url: string) => void copyText(url).then((ok) => notify(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
 
   const chars = message.length;
   // Полная высота описания нужна, чтобы понять, длинное ли оно, и плавно раскрыть до нужной высоты
@@ -542,8 +520,11 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         <div className="ts-watermark" aria-hidden="true" />
       ) : (
         <div className="test-settings__cta">
-          <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
-            Пройти или отправить
+          <button type="button" className="test-settings__cta-button test-settings__cta-button--ghost" onClick={() => setSheet('preview')}>
+            Предпросмотр
+          </button>
+          <button type="button" className="test-settings__cta-button" onClick={() => setSheet('send')}>
+            Использовать
           </button>
         </div>
       )}
@@ -552,9 +533,13 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
       {toast && <Toast text={toast} className={view === 'settings' ? 'test-settings__toast--cta' : undefined} />}
 
-      {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
-      {(sheet === 'one' || sheet === 'many') && (
-        <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />
+      {sheet === 'preview' && blank && (
+        <PreviewSheet title={test.title} onClose={() => setSheet(null)}>
+          <TestPreview test={test} blank={blank} blind={blind} result={result} duration={data.duration} />
+        </PreviewSheet>
+      )}
+      {sheet === 'send' && (
+        <SendSheet noun="тест" title={test.title} url={testUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onClose={() => setSheet(null)} />
       )}
     </section>
     </HelpContext.Provider>

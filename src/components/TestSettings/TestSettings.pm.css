@@ -544,3 +544,20 @@
 [data-pm] .pass-q__body {
   background: var(--glass-card);
 }
+
+/* Две кнопки в ряд: слева «Предпросмотр» (стекло), справа «Использовать» (синее стекло); зазор 12 */
+[data-pm] .test-settings__cta:not(.test-pass__cta) {
+  display: flex;
+  gap: var(--space-3);
+}
+
+[data-pm] .test-settings__cta:not(.test-pass__cta) .test-settings__cta-button {
+  flex: 1;
+  width: auto;
+}
+
+[data-pm] .test-settings__cta .test-settings__cta-button.test-settings__cta-button--ghost {
+  border-color: var(--glass-border);
+  background: var(--glass-solid);
+  color: var(--text-primary);
+}

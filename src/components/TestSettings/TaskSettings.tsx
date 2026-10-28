@@ -3,7 +3,9 @@ import { IconTestChevron, IconTestChevronDown, IconTestMic } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { Toast } from '../Toast/Toast';
-import { ActionSheet, RecipientSheet, SELF_ID, type TestAction } from './TestActions';
+import { SELF_ID } from './TestActions';
+import { PreviewSheet, SendSheet } from './SendSheet';
+import { copyText } from '../../utils/clipboard';
 import { CollapseCard } from './TestBlank';
 import { FormMenu } from './FormMenu';
 import { MessageField, Row } from './TestSettings';
@@ -14,7 +16,6 @@ import { Paragraphs } from './TaskParts';
 import { TaskPass } from './TaskPass';
 import { TaskPreview } from './TaskPreview';
 import { TaskResult } from './TaskResult';
-import { CHATS } from '../../data/chats';
 import { sendMessage } from '../../data/chatStore';
 import { logStep } from '../../data/clientStore';
 import type { LibraryTask } from '../../data/library';
@@ -126,7 +127,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const [limit, setLimit] = useState(so?.permanent?.limit ?? 0);
   const [messageOn, setMessageOn] = useState(so ? so.note !== '' : true);
   const [message, setMessage] = useState(so ? so.note : (data?.message ?? ''));
-  const [sheet, setSheet] = useState<'actions' | 'one' | 'many' | null>(null);
+  const [sheet, setSheet] = useState<'preview' | 'send' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [view, setView] = useState<View>(passRequest && data ? 'pass' : 'settings');
   // Результат только что выполненного задания: открывается вместо настроек, «назад» возвращает к ним
@@ -177,45 +178,27 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const ruleLine = rule ? permanentNote(rule) : deadline !== TASK_DEADLINES[0] ? `Срок выполнения: ${deadline.toLowerCase()}.` : '';
   const outgoing = [note, ruleLine].filter(Boolean).join('\n\n');
 
-  const send = (ids: string[]) => {
-    ids.forEach((id) => {
-      // В чат уходит карточка задания; настройки, с которыми оно ушло, лежат в ней же (их показывает кнопка «Настройки задания»)
-      sendMessage(id, outgoing, undefined, {
-        task: task.id,
-        ...(id === SELF_ID ? { toSelf: true } : {}),
-        taskOptions: {
-          ...(data.forms ? { form, ...(data.formLabel ? { formLabel: data.formLabel } : {}) } : {}),
-          comment,
-          state,
-          deadline: rule ? TASK_DEADLINES[0] : deadline,
-          remind: false,
-          note,
-          ...(rule ? { permanent: rule } : {}),
-        },
-      });
-      // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
-      if (id === 'maxim') logStep('task', task.id, 'sent', rule ? { permanent: rule } : undefined);
+  /** Задание уходит одному получателю, когда у него заполнилась обводка кнопки в окне «Отправить» */
+  const deliver = (id: string) => {
+    // В чат уходит карточка задания; настройки, с которыми оно ушло, лежат в ней же (их показывает кнопка «Настройки задания»)
+    sendMessage(id, outgoing, undefined, {
+      task: task.id,
+      ...(id === SELF_ID ? { toSelf: true } : {}),
+      taskOptions: {
+        ...(data.forms ? { form, ...(data.formLabel ? { formLabel: data.formLabel } : {}) } : {}),
+        comment,
+        state,
+        deadline: rule ? TASK_DEADLINES[0] : deadline,
+        remind: false,
+        note,
+        ...(rule ? { permanent: rule } : {}),
+      },
     });
-    setSheet(null);
-    const names = ids.map((id) => CHATS.find((c) => c.id === id)?.name).filter(Boolean);
-    notify(
-      ids.length === 1
-        ? ids[0] === SELF_ID
-          ? 'Задание отправлено вам: оно в «Избранном»'
-          : `Задание отправлено: ${names[0]}`
-        : `Задание отправлено: ${ids.length} получателям`,
-    );
+    // Журнал действий (история, вкладка «Задания») пока ведется только у Максима
+    if (id === 'maxim') logStep('task', task.id, 'sent', rule ? { permanent: rule } : undefined);
   };
-
-  const pick = (action: TestAction) => {
-    if (action === 'self') {
-      transition(() => {
-        setSheet(null);
-        setView('pass');
-      }, 'forward');
-    } else if (action === 'one' && chatId) send([chatId]);
-    else setSheet(action);
-  };
+  const taskUrl = `${window.location.href.split('#')[0]}#/tasks/${task.id}`;
+  const copyUrl = (url: string) => void copyText(url).then((ok) => notify(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
 
   const link = (label: string, next: View) => {
     const Icon = next === 'blank' ? IconLinkBlank : IconLinkExample;
@@ -411,8 +394,11 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
             <div className="ts-watermark ts-watermark--task" aria-hidden="true" />
           ) : (
             <div className="test-settings__cta">
-              <button type="button" className="test-settings__cta-button" onClick={() => setSheet('actions')}>
-                Пройти или отправить
+              <button type="button" className="test-settings__cta-button test-settings__cta-button--ghost" onClick={() => setSheet('preview')}>
+                Предпросмотр
+              </button>
+              <button type="button" className="test-settings__cta-button" onClick={() => setSheet('send')}>
+                Использовать
               </button>
             </div>
           )}
@@ -421,8 +407,12 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
       {toast && <Toast text={toast} className={view === 'settings' ? 'test-settings__toast--cta' : undefined} />}
 
-      {sheet === 'actions' && <ActionSheet onPick={pick} onClose={() => setSheet(null)} />}
-      {(sheet === 'one' || sheet === 'many') && <RecipientSheet mode={sheet} onSend={send} onClose={() => setSheet(null)} />}
+      {sheet === 'preview' && (
+        <PreviewSheet title={task.title} onClose={() => setSheet(null)}>
+          <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
+        </PreviewSheet>
+      )}
+      {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onClose={() => setSheet(null)} />}
     </section>
     </HelpContext.Provider>
   );
