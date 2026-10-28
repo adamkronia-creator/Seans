@@ -6,10 +6,8 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 
 import { useAvatarSrc } from '../../data/profile';
 import { avatarOf, firstNameOf, nameOf } from '../../data/contacts';
 import type { Message } from '../../data/messages';
-import type { Network } from '../../data/crosspost';
 import { authorColor } from '../../data/contacts';
 import { Avatar } from '../Avatar/Avatar';
-import { CrossStatus } from '../CrossPost/CrossPost';
 import { IconEye } from '../GroupUi/GroupIcons';
 import type { LibraryItem } from '../../data/library';
 import { IconMessages, IconReadTicks, IconTestChevron } from '../icons';
@@ -224,7 +222,6 @@ interface MessageBubbleProps {
   /** Долгое нажатие: сразу начать выбор с этого сообщения (без него долгое нажатие открывает меню) */
   onSelect?: (m: Message) => void;
   /** Нажали на плашку сети, куда пост не ушёл: окно с причиной и «Повторить» */
-  onCrossFailed?: (m: Message, network: Network) => void;
 }
 
 export function MessageBubble({
@@ -256,7 +253,6 @@ export function MessageBubble({
   selecting = false,
   selected = false,
   onSelect,
-  onCrossFailed,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
   // Кружок отметки стоит у левого края списка, а пузырь у исходящих прижат вправо: расстояние до края считаем от места пузыря.
@@ -320,7 +316,6 @@ export function MessageBubble({
     </button>
   );
   // Свой пост канала, который уходит ещё и в Telegram или ВК: состояние по каждой сети стоит в нижней строке поста
-  const syncRow = post && message.from === 'me' && message.crossposts?.length ? <CrossStatus items={message.crossposts} onFailed={(network) => onCrossFailed?.(message, network)} /> : null;
   const authorFace = authored && showAvatar && (
     <button
       type="button"
@@ -591,14 +586,7 @@ export function MessageBubble({
           </p>
         )}
         <div className="bubble__foot">
-          {syncRow ? (
-            <span className="bubble__foot-main">
-              <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
-              {syncRow}
-            </span>
-          ) : (
-            <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
-          )}
+          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
           <span className="bubble__meta bubble__meta--foot">
             <Meta message={message} post={post} />
           </span>
@@ -626,23 +614,16 @@ export function MessageBubble({
       {message.forwarded && <span className="bubble__fwd">Переслано от {message.forwarded}</span>}
       {message.file && <FileBlock file={message.file} />}
       <Highlighted text={message.text} query={query} active={activeMatch} />
-      {(hasReaction || commentsOn || syncRow) && (
+      {(hasReaction || commentsOn) && (
         <div className="bubble__foot bubble__foot--text">
-          {syncRow ? (
-            <span className="bubble__foot-main">
-              <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
-              {syncRow}
-            </span>
-          ) : (
-            <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
-          )}
+          <Reaction message={message} peerAvatar={peerAvatar} onReact={onReact} counted={counted} />
           <span className="bubble__meta bubble__meta--foot">
             <Meta message={message} post={post} />
           </span>
         </div>
       )}
       {commentsButton}
-      {showMeta && !hasReaction && !commentsOn && !syncRow && (
+      {showMeta && !hasReaction && !commentsOn && (
         <>
           {/* Невидимая копия резервирует место под время в конце последней строки */}
           <span className="bubble__meta bubble__meta--ghost" aria-hidden="true">

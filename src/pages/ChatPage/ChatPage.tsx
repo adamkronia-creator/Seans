@@ -772,7 +772,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     selecting={selecting}
                     selected={Boolean(selected?.includes(m.id))}
                     onSelect={(message) => !message.service && setSelected([message.id])}
-                    onCrossFailed={(message, network) => setCrossOpen({ messageId: message.id, network })}
                     onReply={(message) => writer && !selecting && !message.service && setReplyTo(message)}
                     onMenu={(message, rect) => (selecting ? toggleSelected(message.id) : hasMenu(permsFor(message)) && setMenu({ message, rect }))}
                     onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}

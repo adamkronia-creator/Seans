@@ -77,7 +77,7 @@ export function CrossMenuRow({ item, onFailed }: { item: Crosspost; onFailed: (n
   const body = (
     <>
       <NetworkTile network={item.network} size={20} />
-      <span className="msg-menu__status-text">{crosspostLabel(item)}</span>
+      <span className="msg-menu__status-text">{item.state === 'sent' ? `В ${NETWORK_META[item.network].name}` : crosspostLabel(item)}</span>
       <Mark state={item.state} />
     </>
   );
