@@ -302,6 +302,19 @@ export function updateSection(id: string, patch: Partial<Omit<CaseSection, 'id'>
   });
 }
 
+/** Удаляет заметки; запись о них в журнале клиента («История взаимодействия») уходит вместе с ними */
+export function deleteNotes(ids: string[]) {
+  update({
+    notes: data.notes.filter((x) => !ids.includes(x.id)),
+    activity: data.activity.filter((x) => !(x.kind === 'note' && ids.includes(x.ref))),
+  });
+}
+
+/** Удаляет сведения кейса */
+export function deleteSections(ids: string[]) {
+  update({ caseSections: data.caseSections.filter((x) => !ids.includes(x.id)) });
+}
+
 /** Меняет заметку; дата обновления ставится сегодняшняя */
 export function updateNote(id: string, patch: Partial<Omit<CaseNote, 'id' | 'updated'>>) {
   const { date } = nowStamp();

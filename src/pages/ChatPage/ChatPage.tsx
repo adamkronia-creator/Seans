@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
+import { Badge } from '../../components/Badge/Badge';
 import { countIn, useCommentsStore } from '../../data/comments';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
@@ -14,7 +15,7 @@ import { SECTION_GROUP, SECTION_ICON, SECTION_LABEL } from './chatSections';
 import { IconGearMk, IconSearchMk as IconSearchMenu } from '../../components/ChatItem/ChatIcons';
 import { Collapse } from '../../components/Collapse/Collapse';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
-import { ChatInfo, ChatNotes } from '../../components/ChatCase/ChatCase';
+import { ChatInfo, ChatNotes, noteText, sectionText } from '../../components/ChatCase/ChatCase';
 import { ChatTasks, ChatTests, SelfTasks, SelfTests } from '../../components/ChatTests/ChatTests';
 import { TabBar, type TabId } from '../../components/TabBar/TabBar';
 import { MessageBubble } from '../../components/MessageBubble/MessageBubble';
@@ -23,13 +24,16 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
+import IconSelect from '../../assets/icons/solar/checklist-minimalistic.svg?react';
+import IconCloseMk from '../../assets/icons/solar/close.svg?react';
+import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useMessages, useTyping } from '../../data/chatStore';
 import { ME, contactOf, firstNameOf, nameOf } from '../../data/contacts';
 import { can, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { EMOJI_GROUPS } from '../../data/emojiSet';
-import { addNote, addSection } from '../../data/clientStore';
+import { addNote, addSection, deleteNotes, deleteSections, useClientData } from '../../data/clientStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -112,6 +116,7 @@ function MessageMenu({
   onDelete,
   onReact,
   onForward,
+  onSelect,
 }: {
   message: Message;
   rect: DOMRect;
@@ -126,6 +131,7 @@ function MessageMenu({
   onDelete: () => void;
   onReact: (emoji: string) => void;
   onForward: () => void;
+  onSelect: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState(false);
@@ -142,6 +148,7 @@ function MessageMenu({
     ...(perms.pin ? [{ label: message.pinned ? 'Открепить' : 'Закрепить', Icon: IconPinned, run: onPin, danger: false }] : []),
     ...(perms.forward ? [{ label: 'Переслать', Icon: IconForward, run: onForward, danger: false }] : []),
     ...(perms.copy && message.text ? [{ label: 'Копировать', Icon: IconCopy, run: () => void navigator.clipboard?.writeText(message.text).catch(() => undefined), danger: false }] : []),
+    { label: 'Выбрать', Icon: IconSelect, run: onSelect, danger: false },
     ...(perms.remove ? [{ label: 'Удалить', Icon: IconTrash, run: onDelete, danger: true }] : []),
   ];
   // Панель реакций: в группе и канале только те, что разрешил владелец, и без стрелки «ещё»; если реакции выключены, панели нет
@@ -239,13 +246,16 @@ interface SectionPageProps {
   /** Раздел сейчас на экране */
   active: boolean;
   onAppTabChange: (id: TabId) => void;
+  /** Выбранные карточки заметок или сведений (null — выбора нет) и отметка карточки */
+  picked: string[] | null;
+  onPick: (id: string) => void;
 }
 
 /**
  * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
  * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
  */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange }: SectionPageProps) {
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -270,13 +280,13 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
         ))}
       {id === 'notes' && (
         <>
-          <ChatNotes chatId={chatId} />
+          <ChatNotes chatId={chatId} selected={picked} onPick={onPick} />
           <MessageInput placeholder="Напишите заметку" extras={false} active={active} onSend={(text) => void addNote(chatId, text)} />
         </>
       )}
       {id === 'info' && (
         <>
-          <ChatInfo chatId={chatId} />
+          <ChatInfo chatId={chatId} selected={picked} onPick={onPick} />
           <MessageInput placeholder="Добавьте сведения" extras={false} active={active} onSend={(text) => void addSection(chatId, text)} />
         </>
       )}
@@ -337,7 +347,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [menu, setMenu] = useState<{ message: Message; rect: DOMRect } | null>(null);
   // Карточка отправленного теста, чьи настройки показаны в окне
   const [settingsOf, setSettingsOf] = useState<Message | null>(null);
-  const [forwarding, setForwarding] = useState<Message | null>(null);
+  const [forwarding, setForwarding] = useState<Message[] | null>(null);
+  // Режим выбора: id отмеченных сообщений (null — обычный режим); с ним копирование, пересылка и удаление сразу нескольких
+  const [selected, setSelected] = useState<string[] | null>(null);
+  const [removingMany, setRemovingMany] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
   const pinShown = pins.length > 0 && section === 'messages' && !searchOpen;
@@ -460,11 +473,28 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   useEffect(() => (searchOpen && section === 'messages' ? guardBack(() => closeSearchNow.current()) : undefined), [searchOpen, section]);
   // Чат сменился или закрылся: панель не остаётся открытой
   useEffect(() => setMenuOpen(false), [chatId]);
+  useEffect(() => setSelected(null), [chatId, section]);
+  const pickCard = useCallback(
+    (id: string) =>
+      setSelected((now) => {
+        if (!now) return [id];
+        const next = now.includes(id) ? now.filter((x) => x !== id) : [...now, id];
+        return next.length ? next : null;
+      }),
+    [],
+  );
+  const { notes: allNotes, caseSections: allSections } = useClientData();
+  const cards = section === 'notes' || section === 'info';
+  // Жест и системная «назад» при выборе сообщений выходят из выбора, а не из чата
+  const cancelSelect = useCallback(() => setSelected(null), []);
+  const selecting = selected !== null;
+  useBackHandler(selecting, cancelSelect);
+  useEffect(() => (selecting ? guardBack(cancelSelect) : undefined), [selecting, cancelSelect]);
 
   const index = sections.findIndex((item) => item.id === section);
 
   // Свайп вправо в диалоге (первая страница, листать влево нечего) возвращает в список чатов, как стрелка в шапке
-  useSwipeBack('.chat', index === 0 && !menuOpen && !searchOpen, () => goBack());
+  useSwipeBack('.chat', index === 0 && !menuOpen && !searchOpen && !selecting, () => goBack());
 
   if (!chat) {
     return (
@@ -500,6 +530,42 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       remove: mine ? (channel ? can(info, 'postMessages') : true) : canDeleteOthers(info),
       reactions: info.reactions,
     };
+  };
+  const toggleSelected = (id: string) =>
+    setSelected((now) => {
+      if (!now) return now;
+      const next = now.includes(id) ? now.filter((x) => x !== id) : [...now, id];
+      return next.length ? next : null;
+    });
+  /** Отмеченные сообщения в порядке переписки */
+  const chosen = selected ? flat.filter((m) => selected.includes(m.id)) : [];
+  const canCopyMany = cards || chosen.some((m) => permsFor(m).copy);
+  const canForwardMany = chosen.length > 0 && chosen.every((m) => permsFor(m).forward);
+  const canRemoveMany = cards || (chosen.length > 0 && chosen.every((m) => permsFor(m).remove));
+  const copyMany = () => {
+    const ids = selected ?? [];
+    const text = cards
+      ? (section === 'notes' ? allNotes.filter((n) => ids.includes(n.id)).map(noteText) : allSections.filter((x) => ids.includes(x.id)).map(sectionText)).join('\n\n')
+      : chosen.filter((m) => permsFor(m).copy).map((m) => m.text).join('\n\n');
+    void navigator.clipboard?.writeText(text).catch(() => undefined);
+    say('Скопировано');
+    setSelected(null);
+  };
+  const removeTitle = (n: number) =>
+    section === 'notes' ? (n > 1 ? 'Удалить заметки?' : 'Удалить заметку?') : section === 'info' ? 'Удалить сведения?' : n > 1 ? 'Удалить сообщения?' : 'Удалить сообщение?';
+  const removeMany = () => {
+    if (cards) {
+      if (section === 'notes') deleteNotes(selected ?? []);
+      else deleteSections(selected ?? []);
+      setRemovingMany(false);
+      setSelected(null);
+      return;
+    }
+    chosen.forEach((m) => deleteMessage(chatId, m.id));
+    if (replyTo && chosen.some((m) => m.id === replyTo.id)) setReplyTo(null);
+    if (editing && chosen.some((m) => m.id === editing.id)) setEditing(null);
+    setRemovingMany(false);
+    setSelected(null);
   };
   const mmss = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
   let composerBar: ReactNode;
@@ -545,7 +611,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             />
           )}
           {groups.map((group) => (
-            <ul className={`chat__group${kind ? ` chat__group--${kind === 'group' ? 'grp' : 'chan'}` : ''}`} key={group.label}>
+            <ul className={`chat__group${kind ? ` chat__group--${kind === 'group' ? 'grp' : 'chan'}` : ''}${selecting ? ' chat__group--selecting' : ''}`} key={group.label}>
               <li className="chat__day">
                 <span>{group.label}</span>
               </li>
@@ -576,8 +642,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     query={q}
                     activeMatch={m.id === activeId}
                     test={m.test ? LIBRARY.find((t) => t.id === m.test) : m.task ? TASK_LIBRARY.find((t) => t.id === m.task) : undefined}
-                    onReply={(message) => writer && !message.service && setReplyTo(message)}
-                    onMenu={(message, rect) => hasMenu(permsFor(message)) && setMenu({ message, rect })}
+                    selecting={selecting}
+                    selected={Boolean(selected?.includes(m.id))}
+                    onReply={(message) => writer && !selecting && !message.service && setReplyTo(message)}
+                    onMenu={(message, rect) => (selecting ? toggleSelected(message.id) : hasMenu(permsFor(message)) && setMenu({ message, rect }))}
                     onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}
                     onQuoteClick={jumpTo}
                     onOpenTest={(id) => navigate(`/chat/${chatId}/tests/${id}`)}
@@ -655,6 +723,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           hasClientData={hasClientData}
           active={id === section}
           onAppTabChange={onAppTabChange}
+          picked={id === section ? selected : null}
+          onPick={pickCard}
         />
       ),
   }));
@@ -677,7 +747,29 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   return (
     <section className="chat" data-pinned={pinShown ? '' : undefined}>
       <header className="chat__header">
-        {searchOpen && section === 'messages' ? (
+        {selecting ? (
+          <div key="select" className="chat__top chat__select">
+            <button type="button" className="chat__action" aria-label="Отменить выбор" onClick={cancelSelect}>
+              <IconCloseMk />
+            </button>
+            <h1 className="chat__select-title" aria-live="polite">
+              Выбрано <Badge count={selected?.length ?? 0} variant="select" />
+            </h1>
+            <div className="chat__select-actions">
+              <button type="button" className="chat__action" aria-label="Копировать" disabled={!canCopyMany} onClick={copyMany}>
+                <IconCopy />
+              </button>
+              {!cards && (
+                <button type="button" className="chat__action" aria-label="Переслать" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
+                  <IconForward />
+                </button>
+              )}
+              <button type="button" className="chat__action" aria-label="Удалить" disabled={!canRemoveMany} onClick={() => setRemovingMany(true)}>
+                <IconTrash />
+              </button>
+            </div>
+          </div>
+        ) : searchOpen && section === 'messages' ? (
           <div key="search" className="chat__top chat__search">
             <label className="chat__search-field">
               <IconSearchMk />
@@ -845,7 +937,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           }}
           onPin={() => setMessagePinned(chatId, menu.message.id, !menu.message.pinned)}
           onReact={(emoji) => setMessageReaction(chatId, menu.message.id, emoji)}
-          onForward={() => setForwarding(menu.message)}
+          onForward={() => setForwarding([menu.message])}
+          onSelect={() => setSelected([menu.message.id])}
           onDelete={() => {
             if (replyTo?.id === menu.message.id) setReplyTo(null);
             if (editing?.id === menu.message.id) setEditing(null);
@@ -858,10 +951,23 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         <ForwardSheet
           onClose={() => setForwarding(null)}
           onSend={(ids) => {
-            const title = forwarding.test ? LIBRARY.find((t) => t.id === forwarding.test)?.title : forwarding.task ? TASK_LIBRARY.find((t) => t.id === forwarding.task)?.title : undefined;
-            forwardMessage(ids, forwarding, kind === 'channel' ? chat.name : forwarding.from === 'me' ? 'Вы' : kind === 'group' && forwarding.author ? nameOf(forwarding.author) : chat.name.split(' ')[0], title);
+            forwarding.forEach((m) => {
+              const title = m.test ? LIBRARY.find((t) => t.id === m.test)?.title : m.task ? TASK_LIBRARY.find((t) => t.id === m.task)?.title : undefined;
+              forwardMessage(ids, m, kind === 'channel' ? chat.name : m.from === 'me' ? 'Вы' : kind === 'group' && m.author ? nameOf(m.author) : chat.name.split(' ')[0], title);
+            });
             setForwarding(null);
+            setSelected(null);
           }}
+        />
+      )}
+
+      {removingMany && selected && (
+        <RemoveSheet
+          title={removeTitle(selected.length)}
+          text={selected.length > 1 ? `Будет удалено: ${selected.length}. Это нельзя отменить.` : 'Удаление нельзя отменить.'}
+          confirm="Удалить"
+          onClose={() => setRemovingMany(false)}
+          onConfirm={removeMany}
         />
       )}
 

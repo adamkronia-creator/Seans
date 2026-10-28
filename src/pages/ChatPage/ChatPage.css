@@ -789,3 +789,64 @@
 .chat__group--chan > .bubble {
   max-width: 92%;
 }
+
+/* ——— Выбор сообщений: слева кружок отметки, выбранная строка подсвечена на всю ширину ——— */
+.chat__group--selecting {
+  position: relative;
+  padding-left: var(--space-10);
+}
+
+.chat__group--selecting > li[data-selecting] {
+  isolation: isolate;
+  cursor: pointer;
+}
+
+.chat__group--selecting > li[data-selecting]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: calc(var(--space-1) * -1) 0;
+  box-shadow: 0 0 0 100vmax transparent;
+  clip-path: inset(calc(var(--space-1) * -1) -100vmax);
+  pointer-events: none;
+}
+
+.chat__group--selecting > li[data-selected]::before {
+  box-shadow: 0 0 0 100vmax color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+
+.chat__group--selecting > li[data-selecting]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(var(--row-x, 0px) * -1 + var(--space-2));
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  margin-top: calc(var(--space-3) * -1);
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.chat__group--selecting > li[data-selected]::after {
+  border-color: var(--color-accent);
+  background: var(--color-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 100% no-repeat;
+}
+
+/* Шапка выбора: крестик, «Выбрано N» и три действия */
+.chat__select-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  color: var(--text-primary);
+  font: var(--type-headline);
+}
+
+.chat__select-actions {
+  display: flex;
+  gap: var(--space-2);
+}

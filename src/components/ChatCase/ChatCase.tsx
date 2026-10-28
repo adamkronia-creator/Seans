@@ -1,5 +1,5 @@
 import { ScrollHost } from '../ScrollHost/ScrollHost';
-import { useRef, useState, type CSSProperties } from 'react';
+import { useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { EditSheet, type EditValues } from '../EditSheet/EditSheet';
 import { EmptyState } from '../EmptyState/EmptyState';
@@ -20,20 +20,95 @@ import { useListMotion } from '../../utils/listMotion';
 import { HEAD_ICONS } from './caseIcons';
 import './ChatCase.css';
 
+/** Выбор карточек: в режиме выбора они получают отметку, нажатие переключает её, а долгое нажатие выбор начинает */
+export interface PickProps {
+  /** Режим выбора включён */
+  selecting?: boolean;
+  /** Эта карточка отмечена */
+  selected?: boolean;
+  /** Отметить или снять отметку; вне выбора вызов начинает его с этой карточки */
+  onPick?: (id: string) => void;
+}
+
+const HOLD_MS = 450;
+
+/** Долгое нажатие (начать выбор) и короткое касание в режиме выбора (отметить): без сдвига и не по кнопкам внутри */
+function usePick(id: string, { selecting, onPick }: PickProps) {
+  const hold = useRef<{ x: number; y: number; timer: number; fired: boolean } | null>(null);
+  const clear = () => {
+    if (hold.current) window.clearTimeout(hold.current.timer);
+    hold.current = null;
+  };
+  if (!onPick) return {};
+  return {
+    onPointerDown: (e: PointerEvent<HTMLElement>) => {
+      if (e.button !== 0 || (e.target as HTMLElement).closest('button, a, input, textarea, select, [contenteditable=true]')) return;
+      clear();
+      const h = { x: e.clientX, y: e.clientY, fired: false, timer: 0 };
+      if (!selecting) {
+        h.timer = window.setTimeout(() => {
+          h.fired = true;
+          window.getSelection()?.removeAllRanges();
+          onPick(id);
+        }, HOLD_MS);
+      }
+      hold.current = h;
+    },
+    onPointerMove: (e: PointerEvent<HTMLElement>) => {
+      const h = hold.current;
+      if (h && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 10) clear();
+    },
+    onPointerUp: (e: PointerEvent<HTMLElement>) => {
+      const h = hold.current;
+      if (!h) return;
+      const tap = !h.fired && selecting && Math.hypot(e.clientX - h.x, e.clientY - h.y) < 10;
+      clear();
+      if (tap) onPick(id);
+    },
+    onPointerCancel: clear,
+    onContextMenu: (e: React.MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('input, textarea, [contenteditable=true]')) e.preventDefault();
+    },
+  };
+}
+
+/** Кружок отметки на месте карандаша в шапке карточки */
+const PickMark = () => <span className="case-card__pick" aria-hidden="true" />;
+
+/** Текст сведений для копирования: название, затем содержимое */
+export const sectionText = (s: CaseSection) =>
+  [s.title, s.blocks ? blocksToText(s.blocks) : '', ...(s.rows ?? []).map((r) => `${r.label}: ${r.value}`)].filter(Boolean).join('\n');
+
+/** Текст заметки для копирования: название, затем текст */
+export const noteText = (n: CaseNote) => [n.title, paragraphsToText(n.paragraphs)].filter(Boolean).join('\n');
+
 /** Фон шапки и цвет иконки задаются переменными: цвет можно менять в редакторе */
 const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
   const { bg, fg } = toneOf(tone);
   return { '--head-bg': bg, '--head-fg': fg } as CSSProperties;
 };
 
-function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => void }) {
+function CaseCard({ section, onEdit, selecting, selected, onPick }: { section: CaseSection; onEdit: () => void } & PickProps) {
   const head = section.icon ? HEAD_ICONS[section.icon] : null;
   // Двойной клик/касание: быстрая правка текста на месте; полный редактор открывает карандаш
   const [quick, setQuick] = useState(false);
-  const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick);
+  const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick && !selecting);
+  const pick = usePick(section.id, { selecting, onPick });
 
   return (
-    <li id={`case-s-${section.id}`} className="case-card case-card--editable" data-row={section.id} {...doubleTap}>
+    <li
+      id={`case-s-${section.id}`}
+      className="case-card case-card--editable"
+      data-row={section.id}
+      data-selecting={selecting || undefined}
+      data-selected={selected || undefined}
+      {...doubleTap}
+      {...pick}
+      onPointerUp={(e) => {
+        pick.onPointerUp?.(e);
+        if (!selecting) doubleTap.onPointerUp(e);
+      }}
+    >
       <div className="case-card__head" style={toneStyle(section.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -41,14 +116,13 @@ function CaseCard({ section, onEdit }: { section: CaseSection; onEdit: () => voi
           </span>
         )}
         <span className="case-card__title">{section.title}</span>
-        <button
-          type="button"
-          className="case-card__edit"
-          aria-label={`Изменить: ${section.title}`}
-          onClick={onEdit}
-        >
-          <IconCaseEdit />
-        </button>
+        {selecting ? (
+          <PickMark />
+        ) : (
+          <button type="button" className="case-card__edit" aria-label={`Изменить: ${section.title}`} onClick={onEdit}>
+            <IconCaseEdit />
+          </button>
+        )}
       </div>
 
       {section.rows && (
@@ -121,12 +195,25 @@ function CaseRow({
   );
 }
 
-function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
+function NoteCard({ note, onEdit, selecting, selected, onPick }: { note: CaseNote; onEdit: () => void } & PickProps) {
   const head = note.icon ? HEAD_ICONS[note.icon] : null;
   const [quick, setQuick] = useState(false);
-  const doubleTap = useDoubleActivate(() => setQuick(true), !quick);
+  const doubleTap = useDoubleActivate(() => setQuick(true), !quick && !selecting);
+  const pick = usePick(note.id, { selecting, onPick });
   return (
-    <li id={`case-n-${note.id}`} className="case-card case-card--editable" data-row={note.id} {...doubleTap}>
+    <li
+      id={`case-n-${note.id}`}
+      className="case-card case-card--editable"
+      data-row={note.id}
+      data-selecting={selecting || undefined}
+      data-selected={selected || undefined}
+      {...doubleTap}
+      {...pick}
+      onPointerUp={(e) => {
+        pick.onPointerUp?.(e);
+        if (!selecting) doubleTap.onPointerUp(e);
+      }}
+    >
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         {head && (
           <span className="case-card__icon" style={{ fontSize: head.size }}>
@@ -134,9 +221,13 @@ function NoteCard({ note, onEdit }: { note: CaseNote; onEdit: () => void }) {
           </span>
         )}
         <span className="case-card__title">{note.title}</span>
-        <button type="button" className="case-card__edit" aria-label="Изменить заметку" onClick={onEdit}>
-          <IconCaseEdit />
-        </button>
+        {selecting ? (
+          <PickMark />
+        ) : (
+          <button type="button" className="case-card__edit" aria-label="Изменить заметку" onClick={onEdit}>
+            <IconCaseEdit />
+          </button>
+        )}
       </div>
       <div className="case-card__body case-card__body--note">
         <QuickEdit
@@ -170,7 +261,7 @@ const dayKey = (date?: string) => {
 const oldestFirst = <T extends { updated?: string }>(list: T[]) => list.map((x, i) => ({ x, i })).sort((a, b) => dayKey(a.x.updated) - dayKey(b.x.updated) || a.i - b.i).map(({ x }) => x);
 
 /** Вкладка «Заметки» в открытом чате: заметки этого чата, новые добавляются полем внизу (см. CaseComposer) */
-export function ChatNotes({ chatId }: { chatId: string }) {
+export function ChatNotes({ chatId, selected, onPick }: { chatId: string; selected?: string[] | null; onPick?: (id: string) => void }) {
   const { notes } = useClientData();
   // Тестовые заметки Максима не привязаны к чату, остальные — к чату, где их написали
   const mine = oldestFirst(notes.filter((note) => (note.chatId ?? CLIENT_CHAT) === chatId));
@@ -188,7 +279,7 @@ export function ChatNotes({ chatId }: { chatId: string }) {
         )}
         <ul ref={cards} className="case-cards" hidden={mine.length === 0}>
           {mine.map((note) => (
-            <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} />
+            <NoteCard key={note.id} note={note} onEdit={() => setEditingId(note.id)} selecting={Boolean(selected)} selected={Boolean(selected?.includes(note.id))} onPick={onPick} />
           ))}
         </ul>
       </div>
@@ -221,7 +312,7 @@ export function ChatNotes({ chatId }: { chatId: string }) {
 }
 
 /** Вкладка «Сведения» в открытом чате: сведения о клиенте этого чата, новые добавляются полем внизу (см. CaseComposer) */
-export function ChatInfo({ chatId }: { chatId: string }) {
+export function ChatInfo({ chatId, selected, onPick }: { chatId: string; selected?: string[] | null; onPick?: (id: string) => void }) {
   const { caseSections } = useClientData();
   const mine = oldestFirst(caseSections.filter((section) => (section.chatId ?? CLIENT_CHAT) === chatId));
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -237,7 +328,7 @@ export function ChatInfo({ chatId }: { chatId: string }) {
         )}
         <ul ref={cards} className="case-cards" hidden={mine.length === 0}>
           {mine.map((section) => (
-            <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} />
+            <CaseCard key={section.id} section={section} onEdit={() => setEditingId(section.id)} selecting={Boolean(selected)} selected={Boolean(selected?.includes(section.id))} onPick={onPick} />
           ))}
         </ul>
       </div>

@@ -199,3 +199,32 @@
 .chat-case > .case-page:has(> .empty-state) {
   margin-block: auto;
 }
+
+/* ——— Выбор карточек: кружок отметки на месте карандаша, отмеченная карточка в кольце акцента ——— */
+.case-card[data-selecting] {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.case-card[data-selected] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.case-card__pick {
+  /* На месте карандаша 32: круг 24 стоит в его центре */
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+}
+
+.case-card[data-selected] .case-card__pick {
+  border-color: var(--color-accent);
+  background: var(--color-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 100% no-repeat;
+}

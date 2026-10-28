@@ -2,7 +2,7 @@ import { requestPass } from '../../data/selfTest';
 import { requestTaskPass, useAssignmentRecords } from '../../data/selfTask';
 import { recordsText, TASK_DEADLINES } from '../../data/taskValues';
 import { BLIND_FALLBACK_TITLE } from '../../data/resultMode';
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { useAvatarSrc } from '../../data/profile';
 import { avatarOf, firstNameOf, nameOf } from '../../data/contacts';
 import type { Message } from '../../data/messages';
@@ -212,6 +212,9 @@ interface MessageBubbleProps {
   /** Пост канала с включёнными комментариями (или картинка): под постом кнопка; число — сколько комментариев уже есть */
   commentCount?: number;
   onOpenComments?: () => void;
+  /** Режим выбора сообщений: слева кружок отметки, нажатие отмечает; selected — это сообщение выбрано */
+  selecting?: boolean;
+  selected?: boolean;
 }
 
 export function MessageBubble({
@@ -239,8 +242,15 @@ export function MessageBubble({
   onOpenAuthor,
   commentCount,
   onOpenComments,
+  selecting = false,
+  selected = false,
 }: MessageBubbleProps) {
   const ref = useRef<HTMLLIElement>(null);
+  // Кружок отметки стоит у левого края списка, а пузырь у исходящих прижат вправо: расстояние до края считаем от места пузыря
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (selecting && el) el.style.setProperty('--row-x', `${el.offsetLeft}px`);
+  });
   const [dx, setDx] = useState(0);
   const gesture = useRef<{ x: number; y: number; mode: 'idle' | 'swipe' | 'cancel'; timer?: number } | null>(null);
   // Пост канала всегда в белом стекле, как у подписчиков: свои публикации выглядят так же, как чужие
@@ -350,6 +360,8 @@ export function MessageBubble({
     'data-mid': message.id,
     // Вправо жест здесь — ответ на сообщение, поэтому листание разделов его не перехватывает (влево листает)
     'data-swipe-lock': 'right',
+    'data-selecting': selecting || undefined,
+    'data-selected': selected || undefined,
     onPointerDown,
     onPointerMove,
     onPointerUp: (e: PointerEvent) => {
