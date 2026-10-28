@@ -170,14 +170,34 @@
 
 .tf-box__input::placeholder {
   color: var(--text-secondary);
-  animation: tf-hint-in 0.2s ease 0.1s both;
 }
 
-/* Пример появляется, когда подпись уже наверху */
-@keyframes tf-hint-in {
-  from {
-    opacity: 0;
-  }
+/* Пример в пустом поле: стоит на первой строке; скрыт сдвинутым вниз на 4, показывается с задержкой, когда подпись уже наверху */
+.tf-box__example {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-4);
+  left: var(--space-4);
+  color: var(--text-secondary);
+  font: var(--type-body);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(var(--space-1));
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.tf-box__example--show {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.28s ease 0.12s,
+    transform 0.28s cubic-bezier(0.2, 0, 0, 1) 0.12s;
+}
+
+.tf-box--end .tf-box__example {
+  right: calc(var(--size-control) + var(--space-2));
 }
 
 /* С кнопкой «Удалить» справа: поле до кнопки, кнопка 40 стоит на середине первой строки (4 от рамки) */
@@ -895,7 +915,7 @@
     transition: none;
   }
 
-  .tf-box__input::placeholder {
-    animation: none;
+  .tf-box__example {
+    transition: none;
   }
 }

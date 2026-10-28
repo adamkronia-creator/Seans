@@ -129,13 +129,19 @@ function AnswerField({ value, onChange, label, example, rows = 1, max = MAX_TEXT
       <span className="tf-box__label" aria-hidden="true">
         {label}
       </span>
+      {/* Пример: пока в пустом поле пишут, мягко выезжает снизу после того, как подпись поднялась; уходит быстрее */}
+      {example && (
+        <span className={`tf-box__example${focus && value === '' ? ' tf-box__example--show' : ''}`} aria-hidden="true">
+          {example}
+        </span>
+      )}
       <textarea
         ref={ref}
         className="tf-box__input"
         rows={rows}
         maxLength={max}
         value={value}
-        placeholder={focus ? (example ?? '') : ''}
+        placeholder=""
         aria-label={aria ?? label}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
