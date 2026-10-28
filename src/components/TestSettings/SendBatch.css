@@ -59,27 +59,6 @@
   font: var(--type-headline, 600 17px/24px var(--font-family));
 }
 
-/* Ритм окна: название к карточкам 12, карточки между собой 12, материал от материала 16 без линий; от линии под заголовком до первого материала 16 */
-[data-pm] .sheet__body:has(> .sb-item) {
-  gap: var(--space-4);
-  padding-top: var(--space-4);
-  /* Прокручиваемое режется по линии под заголовком, а не тает */
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-/* Заголовок и подпись по центру, под ними линия на всю ширину окна: список уходит под неё */
-[data-pm] .sheet:has(.sb-item) .sheet__header {
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--glass-border);
-  text-align: center;
-}
-
-[data-pm] .sheet:has(.sb-item) .sheet__heading,
-[data-pm] .sheet:has(.sb-item) .frame-subtitle {
-  text-align: center;
-}
-
 [data-pm] .sb-item {
   gap: var(--space-3);
 }

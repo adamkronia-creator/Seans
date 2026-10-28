@@ -332,39 +332,36 @@
 }
 
 /*
- * На системе мессенджера (data-pm): поля 16 с обеих сторон у всего содержимого, без разделителей; расстояния — токены сетки 4.
- * Блоки разделяет --block-gap (16), как карточки на странице; строки 48 (space-12), текст редактора с полями 16.
+ * На системе мессенджера (data-pm): оболочка листа, плитки и кнопки — styles/sheet.css. Здесь только то, что есть у окна правки:
+ * заголовок-карточка с вводом, строки «Иконка» и «Цвет» с сетками, строки «Общей информации», текст с панелью форматирования.
+ * Плитка — 12 внутри со всех сторон (--card-pad), блоки друг от друга 16 (--sheet-gap), рамок и линий нет, кроме разделителя под строкой переключателя.
  */
-[data-pm] .sheet__body {
-  gap: var(--block-gap);
-}
 
-/* В строках «Иконка» и «Цвет» значков нет: подпись и переключатель, поле слева 16 */
+/* В строках «Иконка» и «Цвет» значков нет: подпись и переключатель, слева поле плитки 12 */
 [data-pm] .sheet__toggle-icon {
   display: none;
 }
 
-[data-pm] .sheet__icons,
-[data-pm] .sheet__tones,
-[data-pm] .sheet__footer,
 /* Карточка с текстом скругляет углы сама (overflow: clip не мешает прилипанию панели), панель — прямая полоса: у скруглённой панели
    в нижних углах, пока она прилипла к краю окна, просвечивал бы прокручиваемый текст */
 [data-pm] .sheet .sheet__card:has(.rich-toolbar) {
   overflow: clip;
 }
 
+/* Панель форматирования плотнее плитки: под ней проходит прокручиваемый текст, поэтому заливка сплошная */
 [data-pm] .rich-toolbar {
   padding: var(--space-3);
   border: 0;
-  border-top: 1px solid var(--divider);
+  border-top: var(--hairline) solid var(--sheet-line);
   border-radius: 0;
-  background: var(--glass-plain, #ffffff);
+  background: var(--sheet-solid);
 }
 
 [data-pm] .sheet__preview {
   min-height: calc(var(--space-12) + var(--space-2));
 }
 
+/* Строка переключателя: 32 внутри плитки с полями 12 даёт 56 */
 [data-pm] .sheet__toggle-row {
   height: var(--space-8);
   padding: 0;
@@ -372,16 +369,23 @@
 
 [data-pm] .sheet__icons,
 [data-pm] .sheet__tones {
-  /* Внутри карточки 12 со всех сторон; сетка начинается через 12 под строкой «Иконка»/«Цвет». cqw — ширина содержимого карточки */
-  /* Разделитель 0,5 px под строкой: 12 над ним и 12 под ним */
+  /* Внутри плитки 12 со всех сторон; сетка начинается через 12 под строкой «Иконка»/«Цвет». cqw — ширина содержимого плитки */
+  /* Разделитель под строкой: 12 над ним и 12 под ним */
   margin-top: var(--space-3);
   padding: var(--space-3) 0 0;
-  border-top: 0.5px solid var(--divider);
+  border-top: var(--hairline) solid var(--sheet-line);
   row-gap: calc((100cqw - var(--cols) * var(--size-control-sm)) / (var(--cols) - 1));
 }
 
+/* Строки «название — значение» («Общая информация»): поля по бокам даёт плитка (12, как у «Иконки» и «Цвета»), строка своих не добавляет,
+   поэтому подписи стоят на одной вертикали с ними; сверху и снизу поля плитки нет: текст в строке 48 и так отстоит от края на 12 */
 [data-pm] .sheet__row {
   min-height: var(--row-h);
+  padding: 0;
+}
+
+[data-pm] .sheet .sheet__card.sheet__rows {
+  padding-block: 0;
 }
 
 [data-pm] .sheet__row + .sheet__row {
@@ -401,33 +405,15 @@
   left: var(--space-3);
 }
 
-/* Полосы окна правки — светлое стекло на «зеркале» листа (pm-chats.css), значки и поля в тон */
-
-/*
- * Блоки окна правки (заголовок, иконка, цвет, текст) — белые карточки, как карточки отправленных тестов в чате: --glass-card, рамка 1 px,
- * скругление radius-lg, поля листа 16 по бокам; между ними 16. Панель форматирования — такая же карточка, плотнее: пока она прилипла
- * к низу, под ней проходит текст
- */
-[data-pm] .sheet__body {
-  padding-top: var(--space-4);
-}
-
-/* Все панели одинаковые, как панель заголовка: белая карточка, рамка 1 px, скругление, внутри 12 со всех сторон.
-   Селектор с .sheet: pm-chats.css делает .sheet__card прозрачным, а порядок файлов не гарантирован */
-[data-pm] .sheet .sheet__preview,
-[data-pm] .sheet .sheet__card {
-  margin-inline: 0;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  background: var(--glass-card);
-}
-
+/* Заголовок-карточка: плитка с вводом названия, значок слева без фона */
 [data-pm] .sheet .sheet__preview {
+  margin-inline: 0;
   padding: var(--space-3);
 }
 
-[data-pm] .sheet .sheet__card:not(.sheet__text) {
-  padding: var(--space-3);
+/* Плитка с текстом: поля держит сам редактор */
+[data-pm] .sheet .sheet__card.sheet__text {
+  padding: 0;
 }
 
 /* Фона у значка нет: выбираются только значок и его цвет. Плитка в заголовке без заливки, ячейки сетки без заливки и рамки, выбранная — кольцо */
@@ -444,12 +430,17 @@
   border-color: var(--head-fg, var(--color-accent));
 }
 
-/* Окно правки поднимается до нижнего края шапки чата (под фото собеседника и подписью): верх листа там, где кончается стеклянная подложка шапки */
+/* Окно правки поднимается до нижнего края шапки чата (под фото собеседника и подписью): верх листа там, где кончается стеклянная подложка шапки;
+   снизу лист парит в --sheet-inset от края, и в высоту это вычтено. Внизу прокручиваемого панель форматирования, поэтому затухание только сверху */
 [data-pm] .sheet--edit {
-  height: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3));
+  height: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3) - var(--sheet-inset) - var(--safe-bottom));
   max-height: none;
 }
 
+[data-pm] .sheet.sheet--edit .sheet__body {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
+}
 
 /* «Иконка» и «Цвет»: 16 */
 [data-pm] .sheet__toggle-label {

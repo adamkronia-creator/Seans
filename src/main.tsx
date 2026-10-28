@@ -14,6 +14,7 @@ import './styles/typography.css';
 import './styles/pm-tokens.css';
 import './styles/pm-chats.css';
 import './styles/layout.css';
+import './styles/sheet.css';
 import { initAppearance } from './utils/appearance';
 import { installHoverTitles } from './utils/hoverTitles';
 import { installInertiaScroll } from './utils/inertiaScroll';

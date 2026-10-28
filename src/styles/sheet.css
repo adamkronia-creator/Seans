@@ -1,0 +1,239 @@
+/*
+ * Нижние окна («листы») на системе мессенджера: «парящее стекло».
+ *
+ * Лист не прижат к краям экрана, а парит над ними на --sheet-inset (8), как капсулы нижней панели и поля ввода: углы скруглены со всех сторон
+ * (--sheet-radius 28, как у капсул), по бокам и снизу виден фон. Материал — то же матовое стекло, что у шапки и карточек, только плотнее
+ * (лист закрывает много содержимого): заливка 0,58 и размытие из токена стекла (--glass-filter, 16). Плотность даёт заливка, а не радиус.
+ * (Безголовый Chromium стенда проверки у краёв листа оставляет чёткие обрывки текста страницы под ним, и тем чётче, чем больше радиус, см. README;
+ * при 16 дымка ровнее.)
+ * Верх чуть светлее низа (свет сверху) и по верхнему краю кромка света в 1 физический пиксель — не рамка: рамок у стекла нет,
+ * край задают заливка, размытие и кромка.
+ *
+ * Слои светлеют вверх: лист — смоляное стекло, плитки внутри него (--sheet-tile) — светлее листа, кнопки — те же плитки. Так лист не
+ * «темнеет вглубь» (плитка тёмного стекла на тёмном листе), и контраст держит яркость слоя, а не рамки и линии. Линии тонкие (--sheet-line),
+ * яркого и сплошного белого в листе нет: отключённая кнопка — тихая плитка, «Удалить» — тональная, основная кнопка — единственный
+ * насыщенный элемент.
+ *
+ * Сетка 4 и ритм 16. Сверху вниз: заголовок (16 сверху, строка 24, подпись 16) → 16 → блоки через 16 → 16 → кнопки 44 → 16.
+ * Крестик 40 стоит в 8 от верха и правого края, его центр на одной линии с первой строкой заголовка (8 + 20 = 16 + 12). У листа нет
+ * рамки (она сдвигала всё внутри на 1 px от сетки): ни одна граница блоков не выпадает из шага 4.
+ *
+ * Внутри листа токены стекла переопределены на --sheet-*: всё, что читает --glass-card, --glass-fill, --divider и т. п. (строки, карточки,
+ * поля, чипсы), ложится светлой плиткой на лист без правки отдельных файлов. Размеры — токены --sheet-* в layout.css, цвета — в pm-chats.css.
+ */
+
+/* ——— Затемнение: мягкое, подкрашенное; сквозь него видна страница ———
+   Цвет — токен, а прозрачность — --sheet-dim: свайп вниз (useSheetDrag) убавляет её вместе с отъездом листа */
+.sheet-overlay[data-pm] {
+  box-sizing: border-box;
+  padding: 0 var(--sheet-inset) calc(var(--sheet-inset) + var(--safe-bottom));
+  background-color: color-mix(in srgb, var(--sheet-scrim) calc(var(--sheet-dim, 1) * 100%), transparent);
+}
+
+/* ——— Лист ——— */
+[data-pm] .sheet {
+  /* Содержимое листа читает токены стекла: здесь они светлые плитки на листе, а не тёмное стекло на тёмном */
+  --glass-card: var(--sheet-tile);
+  --glass-fill: var(--sheet-tile);
+  --glass-fill-panel: var(--sheet-tile);
+  --glass-plain: var(--sheet-solid);
+  --glass-icon-disc: var(--sheet-tile-strong);
+  --glass-bubble-in: var(--sheet-tile-strong); /* вложенная плитка (выбор итога): светлее плитки в тёмном режиме, а не темнее */
+  --glass: var(--sheet-tile-press);
+  --bg-subtle: var(--sheet-tile-strong);
+  --bg-field: var(--sheet-tile);
+  --divider: var(--sheet-line);
+  --border-subtle: var(--sheet-line);
+  --color-divider: var(--sheet-line);
+  --color-border: var(--sheet-line);
+  --color-bg-panel: var(--sheet-tile);
+  --field-line: var(--sheet-outline);
+
+  position: relative;
+  box-sizing: border-box;
+  max-height: min(var(--sheet-max-h), var(--sheet-max, var(--sheet-max-h)));
+  padding: 0;
+  border: 0;
+  border-radius: var(--sheet-radius);
+  background: linear-gradient(to bottom, var(--sheet-sheen), transparent calc(var(--space-16) * 2)), var(--sheet-fill);
+  box-shadow:
+    inset 0 var(--hairline) 0 var(--sheet-rim),
+    0 calc(var(--space-1) * -1) var(--space-8) var(--sheet-shadow);
+  color: var(--text-primary);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* ——— Заголовок: слева, как у шапок экранов (headline 17/24, подпись 16); справа место под крестик ——— */
+[data-pm] .sheet .sheet__header {
+  flex-shrink: 0;
+  padding: var(--sheet-gutter) calc(var(--sheet-close) + var(--sheet-gutter)) 0 var(--sheet-gutter);
+  text-align: left;
+}
+
+[data-pm] .sheet .sheet__heading {
+  margin: 0;
+  color: var(--text-primary);
+  font: var(--type-headline);
+  letter-spacing: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+[data-pm] .sheet .frame-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  text-align: left;
+}
+
+/* ——— Крестик: круглая плитка 40 в 8 от верха и правого края; зона нажатия доведена до 44 невидимой рамкой в 2 px (как у кнопок шапок).
+   Размытия у кнопки нет: она внутри стекла листа, и собственное размытие увидело бы только его ——— */
+[data-pm] .sheet .sheet__close {
+  top: var(--sheet-inset);
+  right: var(--sheet-inset);
+  width: var(--sheet-close);
+  height: var(--sheet-close);
+  background: var(--sheet-tile);
+  color: var(--text-secondary);
+  font-size: var(--size-icon-sm);
+}
+
+[data-pm] .sheet .sheet__close[data-pressed] {
+  background: var(--sheet-tile-press);
+}
+
+[data-pm] .sheet .sheet__close::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--sheet-close) - var(--size-touch)) / 2);
+}
+
+/* ——— Содержимое: поля и зазоры 16; прокручиваемое тает под заголовком и над кнопками на 16, а не режется ———
+   Низ листа держит --sheet-inset с безопасной зоной (у оболочки), поэтому внутри нижний отступ тоже 16 */
+[data-pm] .sheet .sheet__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sheet-gap);
+  min-height: 0;
+  padding: var(--sheet-gutter);
+  overflow-y: auto;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4), #000 calc(100% - var(--space-4)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4), #000 calc(100% - var(--space-4)), transparent 100%);
+  scroll-padding: var(--space-4) 0 65px; /* grid:ok — под панелью форматирования 49 + 16: каретка при вводе не уходит под неё */
+}
+
+[data-pm] .sheet .sheet__body:last-child {
+  padding-bottom: var(--sheet-gutter);
+}
+
+/* Блок, который сам стоит у верха (иллюстрация, плитка во всю высоту), затухание не нужно */
+[data-pm] .sheet .sheet__body--bare {
+  padding-top: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* ——— Плитка: светлее листа, без рамки и тени; скругление как у карточек страниц ——— */
+[data-pm] .sheet .sheet__card,
+[data-pm] .sheet .sheet__preview {
+  flex-shrink: 0;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--sheet-tile);
+}
+
+/* Внутри плитки 12 со всех сторон (--card-pad); подсветка нажатой строки не вылезает за скруглённые углы.
+   Плитка из строк на всю ширину (форма бланка, список получателей) обнуляет поля сама: строки держат свои 16 */
+[data-pm] .sheet .sheet__card {
+  padding: var(--card-pad);
+  overflow: clip;
+}
+
+/* Карточки страниц (Card из GroupUi, .fp__card), положенные в лист: тоже без рамки, иначе внутри всё сдвинуто на 1 px от сетки */
+[data-pm] .sheet .fp__card {
+  border: 0;
+  border-radius: var(--radius-lg);
+}
+
+/* Подпись над плиткой и пояснение под ней: 16 по бокам, как у строк; интервал до плитки задаёт зазор блоков */
+[data-pm] .sheet .gu-hint {
+  padding: 0 var(--space-1);
+}
+
+/* ——— Кнопки: 44, внизу листа в один ряд, зазор 12; поля 16 по бокам и снизу, сверху — 16 от последнего блока (нижний отступ содержимого) ——— */
+[data-pm] .sheet .sheet__footer {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-3);
+  padding: 0 var(--sheet-gutter) var(--sheet-gutter);
+  border: 0;
+  background: none;
+}
+
+[data-pm] .sheet .sheet__button {
+  flex: 1;
+  height: var(--size-touch);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--sheet-tile);
+  color: var(--action-secondary-text);
+  font: var(--type-label);
+}
+
+[data-pm] .sheet .sheet__button[data-pressed] {
+  background: var(--sheet-tile-press);
+}
+
+/* Основная — синее стекло, как выбранный чипс: единственный насыщенный элемент листа */
+[data-pm] .sheet .sheet__button--primary {
+  background: var(--glass-chip-active);
+  color: var(--action-primary-text);
+}
+
+[data-pm] .sheet .sheet__button--primary[data-pressed] {
+  background: var(--glass-chip-active);
+  filter: brightness(0.92);
+}
+
+/* Удаление — тональная кнопка цвета ошибки: сплошную терракоту хранит срочная помощь */
+[data-pm] .sheet .sheet__button--danger {
+  background: var(--sheet-danger);
+  color: var(--sheet-danger-text);
+}
+
+[data-pm] .sheet .sheet__button--danger[data-pressed] {
+  background: var(--sheet-danger);
+  filter: brightness(1.15);
+}
+
+/* Недоступная: тихая плитка, не светлая плашка */
+[data-pm] .sheet .sheet__button:disabled {
+  background: var(--sheet-off);
+  color: var(--sheet-off-text);
+  opacity: 1;
+  filter: none;
+}
+
+/* ——— Вопрос перед действием («Отписаться от канала?», «Сбросить ответы?»): текст рядом с заголовком, вторым цветом ——— */
+[data-pm] .sheet .pf-confirm,
+[data-pm] .sheet .test-pass__confirm {
+  margin: 0;
+  padding: 0;
+  color: var(--text-secondary);
+  font: var(--type-body);
+  text-align: left;
+}
+
+[data-pm] .sheet .sheet__body:has(> .pf-confirm, > .test-pass__confirm) {
+  padding-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pm] .sheet .sheet__button--primary[data-pressed],
+  [data-pm] .sheet .sheet__button--danger[data-pressed] {
+    filter: none;
+  }
+}

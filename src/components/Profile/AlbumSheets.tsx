@@ -77,7 +77,6 @@ export function AlbumPhotosSheet({ albumId, onClose }: { albumId: string; onClos
   return (
     <Frame
       title="Фото в альбоме"
-      quietTitle
       onClose={onClose}
       footer={
         <>

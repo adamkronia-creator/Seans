@@ -335,7 +335,7 @@
   white-space: nowrap;
 }
 
-/* От линии до первой группы 16: верхний зазор первой подписи убран */
-[data-pm] .sheet--ruled .filter-group__title:first-child {
+/* От заголовка окна до первой группы 16: верхний зазор первой подписи убран */
+[data-pm] .sheet .filter-group__title:first-child {
   margin-top: 0;
 }

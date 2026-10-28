@@ -31,14 +31,17 @@
 
 /* ---------- Окно с каруселью ---------- */
 
-.option-help-sheet__body {
-  gap: 0;
-  padding-top: 0;
-}
-
-/* Макеты лежат на цветной подложке во всю ширину окна (сверху место под крестик); у окна нет ни ручки, ни заголовка: название — подпись слайда */
+/* У окна нет заголовка: название — подпись слайда. Иллюстрация идёт вплотную к скруглённому верху окна, как у Telegram (крестик лежит на ней),
+   поэтому у содержимого нет ни верхнего поля, ни затухания, ни зазоров: интервалы между иллюстрацией и подписью задают сами блоки */
 [data-pm] .sheet.option-help-sheet {
   overflow: hidden;
+}
+
+[data-pm] .sheet.option-help-sheet .option-help-sheet__body {
+  gap: 0;
+  padding-top: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 [data-pm] .option-help-sheet .oh {
@@ -48,11 +51,6 @@
     radial-gradient(circle at 90% 62%, rgb(255 255 255 / 16%) 0 6%, transparent 7%),
     radial-gradient(circle at 6% 74%, rgb(255 255 255 / 14%) 0 5%, transparent 6%),
     linear-gradient(160deg, #8d7dff 0%, #6f8cff 52%, #5ea2f2 100%);
-}
-
-/* Окно выше и доходит до верха: иллюстрация вплотную к скруглённому краю, как у Telegram */
-[data-pm] .sheet.option-help-sheet {
-  max-height: 88dvh;
 }
 
 /*
@@ -295,20 +293,4 @@
     animation: none;
     opacity: 0;
   }
-}
-
-/* Иллюстрация вплотную к верху окна */
-[data-pm] .sheet.option-help-sheet > .option-help-sheet__body {
-  padding-top: 0;
-}
-
-/* У верхнего края окна подсказки тени нет */
-[data-pm] .sheet.option-help-sheet {
-  box-shadow: none;
-}
-
-/* Затухание у верхнего края прокручиваемой части здесь не нужно: иллюстрация идёт вплотную к верху */
-[data-pm] .sheet.option-help-sheet > .option-help-sheet__body {
-  -webkit-mask-image: none;
-  mask-image: none;
 }

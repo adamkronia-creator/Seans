@@ -2,7 +2,7 @@ import { useEffect, useRef, type RefObject } from 'react';
 import { reducedMotion, runSpring, SWIPE_DOMINANCE, SWIPE_SLOP, swipeCommits, VelocityTracker } from '../../utils/swipe';
 
 /*
- * Нижнее окно закрывается свайпом вниз, как на телефоне: окно идёт за пальцем, затемнение светлеет. Отпустили ниже порога
+ * Нижнее окно закрывается свайпом вниз, как на телефоне: окно идёт за пальцем, затемнение светлеет (--sheet-dim от 1 до 0 в styles/sheet.css). Отпустили ниже порога
  * или взмахнули — окно уезжает и закрывается; иначе пружинит на место. Тянуть можно за любое место окна, но только
  * вниз и только если прокручиваемое внутри уже в самом верху (иначе палец листает его содержимое).
  *
@@ -23,12 +23,11 @@ interface Drag {
   phase: 'armed' | 'drag' | 'ignore';
   target: Element;
   sheet: HTMLElement;
+  /** Путь, после которого окно целиком за краем экрана: от его верха до низа затемнения (окно парит над краем, поэтому это больше его высоты) */
   height: number;
   /** Палец в момент, когда жест взял окно, и сдвиг окна вниз сейчас */
   anchor: number;
   offset: number;
-  /** Непрозрачность затемнения до жеста */
-  dim: number;
   tracker: VelocityTracker;
 }
 
@@ -62,12 +61,12 @@ export function useSheetDrag(overlay: RefObject<HTMLElement>, onClose: () => voi
     const apply = (d: Drag, offset: number) => {
       d.offset = offset;
       d.sheet.style.transform = `translate3d(0, ${offset}px, 0)`;
-      root.style.backgroundColor = `rgb(0 0 0 / ${d.dim * (1 - Math.min(1, offset / d.height))})`;
+      root.style.setProperty('--sheet-dim', String(1 - Math.min(1, offset / d.height)));
     };
 
     const clean = (d: Drag) => {
       d.sheet.style.removeProperty('transform');
-      root.style.removeProperty('background-color');
+      root.style.removeProperty('--sheet-dim');
     };
 
     const finish = (d: Drag, now: number, cancelled: boolean) => {
@@ -106,10 +105,9 @@ export function useSheetDrag(overlay: RefObject<HTMLElement>, onClose: () => voi
         phase: 'armed',
         target,
         sheet,
-        height: sheet.offsetHeight || 1,
+        height: Math.max(1, root.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top),
         anchor: 0,
         offset: 0,
-        dim: 1,
         tracker: new VelocityTracker(),
       };
     };
@@ -141,8 +139,6 @@ export function useSheetDrag(overlay: RefObject<HTMLElement>, onClose: () => voi
         // Окно ещё въезжает или затемнение проявляется: анимация не должна спорить с пальцем
         d.sheet.getAnimations().forEach((animation) => animation.cancel());
         root.getAnimations().forEach((animation) => animation.cancel());
-        const alpha = getComputedStyle(root).backgroundColor.split(',')[3];
-        d.dim = alpha ? parseFloat(alpha) : 1;
         d.tracker.push(e.timeStamp, touch.clientY);
         if (e.cancelable) e.preventDefault();
         apply(d, 0);

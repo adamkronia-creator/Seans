@@ -148,6 +148,11 @@
   text-align: left;
 }
 
+/* Строка «Инструкция» лежит в странице-карточке: в окне это такая же плитка листа, как и сетка под ней */
+[data-pm] .pass-jump-sheet ul.ts-card {
+  background: var(--sheet-tile);
+}
+
 .pass-jump {
   display: flex;
   flex-direction: column;

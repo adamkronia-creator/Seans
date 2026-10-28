@@ -54,7 +54,7 @@ export function SentTaskSheet({ message, task, onClose }: SentTaskSheetProps) {
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Настройки задания">
         <div className="sheet__header">
           <h2 className="sheet__heading">Настройки задания</h2>
-          {task && <p className="sent-sheet__subtitle">{task.title}</p>}
+          {task && <p className="frame-subtitle">{task.title}</p>}
         </div>
         <div className="sheet__body">
           <ul className="sheet__card sent-sheet__rows">

@@ -59,7 +59,7 @@
 }
 
 .pf-note {
-  margin: calc(var(--space-1) * -1) var(--space-1) 0;
+  margin: calc(var(--space-2) * -1) var(--space-1) 0; /* пояснение под плиткой: 8 от неё при зазоре листа 16 */
   color: var(--color-text-caption);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
@@ -107,14 +107,6 @@
 [data-pm] .pf-check {
   background: var(--action-primary);
   color: var(--action-primary-text);
-}
-
-/* Заголовок окна — как подпись группы «Фон приложения»: тот же шрифт, цвет и отступ слева 4 от полей */
-[data-pm] .sheet .sheet__heading.sheet__heading--quiet {
-  margin: 0 0 calc(var(--heading-bottom) * -1);
-  padding: 0 var(--heading-inset);
-  color: var(--text-secondary);
-  font: var(--type-label);
 }
 
 

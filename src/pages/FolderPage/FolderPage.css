@@ -569,38 +569,11 @@
   white-space: nowrap;
 }
 
-/* ---------- Окно «Добавить …»: отступы по сетке 4 ----------
-   Заголовок и подпись слева, на одной линии с полями 16, зазор между ними 4; до карточки 16. Карточка без внутренних полей по бокам
-   (поля 16 держат сами строки: отметка стоит на 16 от края карточки), сверху и снизу 8. Строка 64 = фото 40 + 12 сверху и снизу.
-   От карточки до кнопок 16. */
-[data-pm] .sheet .sheet__header:has(.frame-subtitle) {
-  padding-bottom: 0;
-}
-
-[data-pm] .sheet .frame-subtitle {
-  margin: var(--space-1) 0 0;
-  color: var(--text-secondary);
-  font: var(--type-label);
-  font-weight: 400;
-  text-align: left;
-}
-
+/* ---------- Окно «Добавить …» ----------
+   Заголовок, подпись «Выбрано N из M», карточка и кнопки — общий ритм листа (styles/sheet.css). Карточка без внутренних полей по бокам
+   (поля 16 держат сами строки: отметка стоит на 16 от края карточки), сверху и снизу 8. Строка 64 = фото 40 + 12 сверху и снизу. */
 [data-pm] .sheet .sheet__card:has(.fp-pick) {
   padding: var(--space-2) 0;
-}
-
-[data-pm] .sheet:has(.fp-pick) .sheet__body {
-  padding-bottom: 0;
-}
-
-[data-pm] .sheet:has(.fp-pick) .sheet__footer {
-  padding-top: var(--space-4);
-}
-
-/* Заголовок окна выбора и счётчик «Выбрано N из M» — по центру */
-[data-pm] .sheet:has(.fp-pick) .sheet__heading,
-[data-pm] .sheet:has(.fp-pick) .frame-subtitle {
-  text-align: center;
 }
 
 /* ---------- Эмодзи в названии папки ---------- */

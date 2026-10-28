@@ -127,15 +127,16 @@ html[data-transition='fade']::view-transition-new(app) {
   }
 }
 
+/* Лист парит над краем экрана на --sheet-inset (и безопасную зону), поэтому «за краем» — это его высота плюс этот отступ, иначе внизу остаётся полоска */
 @keyframes sheet-in {
   from {
-    transform: translateY(100%);
+    transform: translateY(calc(100% + var(--sheet-inset, 0px) + var(--safe-bottom, 0px)));
   }
 }
 
 @keyframes sheet-out {
   to {
-    transform: translateY(100%);
+    transform: translateY(calc(100% + var(--sheet-inset, 0px) + var(--safe-bottom, 0px)));
   }
 }
 

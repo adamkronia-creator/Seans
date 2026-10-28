@@ -39,7 +39,8 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
     const fit = () => {
       const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
       el.style.bottom = covered > 80 ? `${covered}px` : '';
-      el.style.setProperty('--sheet-max', covered > 80 ? `${vv.height - 8}px` : '');
+      // Окно парит в --sheet-inset от краёв (сверху тоже): высота видимой части минус отступы сверху и снизу
+      el.style.setProperty('--sheet-max', covered > 80 ? `calc(${vv.height}px - var(--sheet-inset, 4px) * 2 - var(--safe-bottom, 0px))` : '');
       reveal();
     };
     // Клавиатура выезжает не сразу: сначала фокус, потом изменение окна; проверяем и там, и там

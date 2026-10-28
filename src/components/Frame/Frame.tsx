@@ -8,36 +8,24 @@ interface FrameProps {
   title: string;
   /** Пояснение под заголовком: что именно меняем */
   subtitle?: string;
-  /** Заголовок мелкий, как подпись группы (окна выбора фото и фона) */
-  quietTitle?: boolean;
-  /** Заголовок по центру и линия под ним на всю ширину: список режется по ней (окна выбора, отправки) */
-  ruled?: boolean;
   /** Нижние кнопки; окна выбора из сетки обходятся без них */
   footer?: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }
 
-/** Каркас нижнего окна: ручка, заголовок, прокручиваемое содержимое и нижние кнопки */
-export function Frame({ title, subtitle, quietTitle, ruled, footer, onClose, children }: FrameProps) {
+/** Каркас нижнего окна: заголовок слева, прокручиваемое содержимое и нижние кнопки; вид — styles/sheet.css */
+export function Frame({ title, subtitle, footer, onClose, children }: FrameProps) {
   useSheet(onClose);
   const body = useRef<HTMLDivElement>(null);
   return (
     <SheetOverlay onClose={onClose}>
-      <div className={`sheet${ruled ? ' sheet--ruled' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
-        {!quietTitle && (
-          <div className="sheet__header">
-            <h2 className="sheet__heading">{title}</h2>
-            {subtitle && <p className="frame-subtitle">{subtitle}</p>}
-          </div>
-        )}
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="sheet__header">
+          <h2 className="sheet__heading">{title}</h2>
+          {subtitle && <p className="frame-subtitle">{subtitle}</p>}
+        </div>
         <div className="sheet__body" ref={body}>
-          {/* Мелкий заголовок-подпись группы живёт внутри прокручиваемой части и уходит вместе с ней, а не остаётся в затемнении сверху */}
-          {quietTitle && (
-            <h2 className="sheet__heading sheet__heading--quiet">
-              {title}
-            </h2>
-          )}
           {children}
         </div>
         {footer && <div className="sheet__footer">{footer}</div>}

@@ -626,7 +626,8 @@
 .nc-fields {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  /* Подпись на рамке занимает 8 над линией: между линиями соседних полей получается 16 */
+  gap: var(--space-2);
 }
 
 .nc-field {
@@ -635,7 +636,7 @@
   min-width: 0;
   margin: 0;
   padding: 0 var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border: 1px solid var(--field-line, color-mix(in srgb, var(--text-secondary) 55%, transparent));
   border-radius: var(--radius-md);
   transition: border-color 0.12s;
 }
@@ -659,8 +660,9 @@
 }
 
 .nc-field:focus-within {
-  /* 2 px настоящей рамкой (не тенью), чтобы линия расступалась под подписью; отрицательный отступ оставляет размер прежним */
-  margin: -1px; /* grid:ok — компенсирует рамку 2 px, 1 px вне сетки */
+  /* 2 px настоящей рамкой (не тенью), чтобы линия расступалась под подписью; отрицательные отступы оставляют место в колонке прежним:
+     рамка расходится вверх и в стороны, нижний край и высота поля не меняются */
+  margin: -1px -1px 0; /* grid:ok — компенсирует рамку 2 px */
   border-width: 2px;
   border-color: var(--action-primary);
 }
@@ -673,7 +675,7 @@
 .nc-field textarea {
   flex: 1;
   min-width: 0;
-  height: var(--size-bar);
+  height: calc(var(--size-bar) - 1px); /* grid:ok — минус нижняя рамка: поле целиком 64 (8 подписи над линией и 56 с рамкой) */
   margin-top: calc(var(--space-2) * -1);
   padding: 0;
   border: 0;
@@ -699,7 +701,7 @@
   flex-shrink: 0;
   margin-top: calc(var(--space-2) * -1);
   padding-right: var(--space-3);
-  border-right: 1px solid color-mix(in srgb, var(--text-secondary) 55%, transparent);
+  border-right: 1px solid var(--field-line, color-mix(in srgb, var(--text-secondary) 55%, transparent));
   margin-right: var(--space-3);
   color: var(--text-primary);
   font: var(--type-body);

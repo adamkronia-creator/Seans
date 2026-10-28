@@ -51,7 +51,7 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
       <div className="sheet" role="dialog" aria-modal="true" aria-label="Настройки теста">
         <div className="sheet__header">
           <h2 className="sheet__heading">Настройки теста</h2>
-          {test && <p className="sent-sheet__subtitle">{test.title}</p>}
+          {test && <p className="frame-subtitle">{test.title}</p>}
         </div>
         <div className="sheet__body">
           <ul className="sheet__card sent-sheet__rows">

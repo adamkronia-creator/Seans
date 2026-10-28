@@ -1,12 +1,4 @@
 /* Окно «Настройки теста» под карточкой отправленного теста: строки «подпись — значение» в белой карточке */
-.sent-sheet__subtitle {
-  margin: var(--space-1) 0 0;
-  color: var(--color-text-caption);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-  text-align: center;
-}
-
 .sent-sheet__rows {
   margin: 0;
   padding: 0;

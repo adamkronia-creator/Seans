@@ -23,7 +23,7 @@ export interface EditValues {
 }
 
 interface EditSheetProps {
-  /** Название окна для экранных читалок; на экране заголовка нет */
+  /** Заголовок окна: стоит наверху слева, как у остальных нижних окон */
   heading: string;
   /** Что показывать: поле появляется, если для него есть начальное значение */
   initial: EditValues;
@@ -99,7 +99,9 @@ export function EditSheet({
   return (
     <SheetOverlay onClose={onClose}>
       <div className="sheet sheet--edit" role="dialog" aria-modal="true" aria-label={heading}>
-
+        <div className="sheet__header">
+          <h2 className="sheet__heading">{heading}</h2>
+        </div>
         <div className="sheet__body">
           {hasTitle && (
             <div

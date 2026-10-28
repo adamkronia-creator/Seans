@@ -132,12 +132,11 @@
   background: var(--glass-card);
 }
 
-/* Окна выбора («Пройти или отправить», получатели): блок — стеклянная карточка с полями окна, а не полоса во всю ширину */
+/* Окна выбора («Пройти или отправить», получатели): блок — плитка листа, строки внутри до краёв */
 [data-pm] .sheet .test-actions {
   margin: 0;
-  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: var(--glass-card);
+  background: var(--sheet-tile);
   overflow: hidden;
 }
 
@@ -228,9 +227,9 @@
   opacity: 1;
 }
 
-/* «Все вопросы» не доходит до шапки теста: сверху от её нижней границы ещё 16 */
+/* «Все вопросы» не доходит до шапки теста: сверху от её нижней границы ещё 16; снизу лист парит в --sheet-inset от края */
 [data-pm] .pass-jump-sheet {
-  --sheet-max: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3) - var(--space-4));
+  --sheet-max: calc(100dvh - var(--safe-top) - var(--space-4) - var(--size-avatar-sm) - var(--space-3) - var(--space-4) - var(--sheet-inset) - var(--safe-bottom));
 }
 
 /* «Пройти или отправить» парит над капсулой разделов без подложки: страница прокручивается под кнопкой и за ней,

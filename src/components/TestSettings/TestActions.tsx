@@ -25,9 +25,13 @@ export function ActionSheet({ onPick, onClose, actions }: ActionSheetProps) {
     { id: 'one' as const, title: 'Отправить', Icon: IconTestSend },
     { id: 'many' as const, title: 'Отправить нескольким', Icon: IconTestSendMany },
   ].filter((o) => !actions || actions.includes(o.id));
+  const title = options.some((o) => o.id === 'self') ? 'Пройти или отправить' : 'Отправить';
   return (
     <SheetOverlay onClose={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label="Пройти или отправить">
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="sheet__header">
+          <h2 className="sheet__heading">{title}</h2>
+        </div>
         <div className="sheet__body">
           <ul className="test-actions test-actions--cards">
             {options.map(({ id, title, Icon }) => (
