@@ -661,12 +661,13 @@
 }
 
 [data-pm] .test-settings__scroll:has(+ .test-pass__cta) {
-  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 3 + var(--size-touch) + var(--space-4));
+  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 2 + var(--size-touch) + var(--space-4));
 }
 
-/* У теста над кнопками ещё «Отвечено: N из M» и полоса: 8 + 24 + 8 + 4 */
+/* У теста над кнопками ещё таблетка «Отвечено: N из M» с полосой: запас считается от верха таблетки, до неё от текста 16 */
 [data-pm] .test-settings__scroll:has(+ .test-pass__cta .test-pass__meta) {
-  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 3 + var(--size-touch) + var(--space-4) + var(--space-10) + var(--space-2));
+  --pass-meter-h: 42px; /* grid:ok — таблетка «Отвечено» 26, до полосы 4, полоса 4, до кнопки 8 */
+  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 2 + var(--size-touch) + var(--space-4) + var(--pass-meter-h));
 }
 
 /* В рамке телефона (предпросмотр) кнопки стоят в потоке у низа экрана телефона */
