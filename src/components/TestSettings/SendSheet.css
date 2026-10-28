@@ -2,9 +2,17 @@
 .send-list {
   display: flex;
   flex-direction: column;
-  margin: 0;
+  margin: calc(var(--space-1) * -1) 0; /* 12 карточки + 8 строки − 4 = 16: до первого и от последнего фото столько же, сколько между фото */
   padding: 0;
   list-style: none;
+}
+
+.send-empty {
+  margin: 0;
+  padding: var(--space-4) 0;
+  color: var(--text-secondary);
+  font: var(--type-body);
+  text-align: center;
 }
 
 .send-row {
@@ -48,7 +56,7 @@
 [data-pm] .send-row__button {
   position: relative;
   flex-shrink: 0;
-  min-width: 104px;
+  width: 120px; /* одной ширины в трёх состояниях: «Отправить», «Отменить», «Открыть чат» */
   height: var(--size-control-sm);
   padding: 0 var(--space-3);
   border: 0;
@@ -97,7 +105,7 @@
 .send-tools {
   display: flex;
   justify-content: center;
-  gap: var(--space-6);
+  gap: var(--space-3);
   padding-top: var(--space-2);
 }
 
@@ -106,7 +114,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  width: 104px;
+  width: 96px;
   color: var(--text-primary);
   font: var(--type-caption);
   text-align: center;
@@ -122,4 +130,15 @@
   background: var(--sheet-tile-strong);
   color: var(--text-link);
   font-size: var(--size-icon-lg);
+}
+
+.send-tools__disc--accent {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+/* Поиск над списком получателей: плитка, как у списка под ним */
+[data-pm] .sheet .search-field {
+  flex-shrink: 0;
+  background: var(--sheet-tile);
 }

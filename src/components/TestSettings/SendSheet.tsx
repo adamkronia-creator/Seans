@@ -8,8 +8,15 @@ import { navigate } from '../../router';
 import { CopyIcon } from '../CopyIcon/CopyIcon';
 import { IconShareLine } from '../GroupUi/GroupIcons';
 import { Frame } from '../Frame/Frame';
+import { SearchField } from '../SearchField/SearchField';
 import { SELF_ID } from './TestActions';
 import './SendSheet.css';
+
+const IconPass = () => (
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" />
+  </svg>
+);
 
 const CLIENTS = CHATS.filter((c) => c.category === 'clients');
 /** Сколько заполняется обводка кнопки: пока она идёт, отправку можно отменить */
@@ -30,6 +37,8 @@ interface SendSheetProps {
   onDeliver: (chatId: string) => void;
   /** Скопировать ссылку */
   onCopy: (url: string) => void;
+  /** Пройти самому: окно закрывается, открывается прохождение */
+  onPass?: () => void;
   onClose: () => void;
 }
 
@@ -38,13 +47,14 @@ interface SendSheetProps {
  * надпись меняется на «Отменить»; когда обводка заполнилась, отправка идёт, под именем «Отправлено», а кнопка становится «Открыть чат».
  * Закрытое окно отменяет то, что ещё не отправлено. Внизу «Скопировать» (ссылка) и «Поделиться через…».
  */
-export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose }: SendSheetProps) {
+export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onPass, onClose }: SendSheetProps) {
   const myAvatar = useAvatarSrc();
   const rows = [
     { id: SELF_ID, name: 'Себе', note: 'Избранное', avatar: myAvatar },
     ...CLIENTS.map((c) => ({ id: c.id, name: c.name, note: roleOf(c), avatar: c.avatar })),
   ];
   if (chatId) rows.sort((a, b) => Number(b.id === chatId) - Number(a.id === chatId));
+  const [query, setQuery] = useState('');
   const [state, setState] = useState<Record<string, State>>({});
   const timers = useRef<Record<string, number>>({});
   const deliver = useRef(onDeliver);
@@ -96,11 +106,15 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose
     );
   };
 
+  const q = query.trim().toLowerCase();
+  const shown = q ? rows.filter((r) => r.name.toLowerCase().includes(q)) : rows;
+
   return (
     <Frame title="Отправить" onClose={onClose}>
+      <SearchField value={query} onChange={setQuery} placeholder="Поиск контактов" onClear={() => setQuery('')} />
       <div className="sheet__card">
       <ul className="send-list" aria-label={`Кому отправить ${noun}`}>
-        {rows.map((r) => {
+        {shown.map((r) => {
           const sent = state[r.id] === 'sent';
           return (
             <li key={r.id} className="send-row">
@@ -114,6 +128,7 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose
           );
         })}
       </ul>
+      {shown.length === 0 && <p className="send-empty">Никого не нашли</p>}
       </div>
       <div className="send-tools">
         <button type="button" className="send-tools__item" onClick={() => onCopy(url)}>
@@ -122,6 +137,14 @@ export function SendSheet({ noun, url, title, chatId, onDeliver, onCopy, onClose
           </span>
           Скопировать
         </button>
+        {onPass && (
+          <button type="button" className="send-tools__item" onClick={onPass}>
+            <span className="send-tools__disc send-tools__disc--accent">
+              <IconPass />
+            </span>
+            Пройти
+          </button>
+        )}
         <button type="button" className="send-tools__item" onClick={share}>
           <span className="send-tools__disc">
             <IconShareLine />

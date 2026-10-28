@@ -412,7 +412,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
           <TaskPreview task={task} data={data} form={form} options={options} deadline={deadline} permanent={rule} />
         </PreviewSheet>
       )}
-      {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onClose={() => setSheet(null)} />}
+      {sheet === 'send' && <SendSheet noun="задание" title={task.title} url={taskUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onPass={() => { setSheet(null); openView('pass'); }} onClose={() => setSheet(null)} />}
     </section>
     </HelpContext.Provider>
   );

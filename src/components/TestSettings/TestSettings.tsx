@@ -539,7 +539,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         </PreviewSheet>
       )}
       {sheet === 'send' && (
-        <SendSheet noun="тест" title={test.title} url={testUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onClose={() => setSheet(null)} />
+        <SendSheet noun="тест" title={test.title} url={testUrl} chatId={chatId} onDeliver={deliver} onCopy={copyUrl} onPass={() => { setSheet(null); if (testBlank(test.id)) openView('pass'); else notify('Прохождение этого теста пока недоступно'); }} onClose={() => setSheet(null)} />
       )}
     </section>
     </HelpContext.Provider>
