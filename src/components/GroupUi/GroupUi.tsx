@@ -18,7 +18,7 @@ import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import { SearchField } from '../SearchField/SearchField';
 import '../Switch/Switch.css';
 import { Toast } from '../Toast/Toast';
-import { IconCameraAdd, IconChevron, IconCloseLine, IconGalleryAdd } from './GroupIcons';
+import { IconCameraAdd, IconChevron, IconCloseLine, IconEye, IconEyeClosed, IconGalleryAdd } from './GroupIcons';
 import '../../pages/FolderPage/FolderPage.css';
 import './GroupUi.css';
 
@@ -213,7 +213,7 @@ export function RadioDot({ on }: { on: boolean }) {
   return <span className={`gu-radio${on ? ' gu-radio--on' : ''}`} aria-hidden="true" />;
 }
 
-export function Pill({ children, tone = 'quiet' }: { children: ReactNode; tone?: 'quiet' | 'accent' }) {
+export function Pill({ children, tone = 'quiet' }: { children: ReactNode; tone?: 'quiet' | 'accent' | 'ok' | 'warn' }) {
   return <span className={`gu-pill gu-pill--${tone}`}>{children}</span>;
 }
 
@@ -398,11 +398,14 @@ interface FieldProps {
   emoji?: boolean;
   /** Enter заканчивает ввод (в многострочном поле — перенос) */
   onEnter?: () => void;
+  /** Ключ или токен: знаки скрыты точками, справа кнопка «глаз» показывает их; клавиатура без исправлений и подсказок */
+  secret?: boolean;
 }
 
 /** Поле в карточке: подпись, текст, счётчик оставшихся знаков; под полем строка-подсказка о введённом */
-export function Field({ label, value, onChange, placeholder, max, multiline, autoFocus, status, hint, prefix, inputMode = 'text', emoji, onEnter }: FieldProps) {
+export function Field({ label, value, onChange, placeholder, max, multiline, autoFocus, status, hint, prefix, inputMode = 'text', emoji, onEnter, secret }: FieldProps) {
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const host = emojiOpen ? box.current?.closest('.fp') ?? null : null;
@@ -430,14 +433,15 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
   ) : (
     <LineInput
       ref={inputRef}
-      className="fp__input"
+      className={`fp__input${secret && !revealed ? ' gu-secret' : ''}`}
       value={value}
       onFocus={() => setEmojiOpen(false)}
       placeholder={placeholder}
       autoFocus={autoFocus}
       inputMode={inputMode}
-      autoCapitalize={inputMode === 'url' ? 'none' : undefined}
-      spellCheck={inputMode === 'url' ? false : undefined}
+      autoCapitalize={inputMode === 'url' || secret ? 'none' : undefined}
+      autoCorrect={secret ? 'off' : undefined}
+      spellCheck={inputMode === 'url' || secret ? false : undefined}
       {...plainText}
       enterKeyHint={onEnter ? 'done' : undefined}
       onChange={(e) => set(e.target.value)}
@@ -457,6 +461,11 @@ export function Field({ label, value, onChange, placeholder, max, multiline, aut
               <span className="fp__counter" aria-label={`Можно ввести ещё ${left}`}>
                 {left}
               </span>
+            )}
+            {secret && (
+              <button type="button" className="fp__emoji" aria-label={revealed ? 'Скрыть' : 'Показать'} aria-pressed={revealed} onClick={() => setRevealed((v) => !v)}>
+                {revealed ? <IconEyeClosed /> : <IconEye />}
+              </button>
             )}
             {emoji && !multiline && (
               <button

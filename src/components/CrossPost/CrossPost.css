@@ -1,0 +1,203 @@
+/*
+ * Публикация постов канала в Telegram и ВК: цветная плашка сети, полоса «Также в…» над полем ввода, плашки состояния в строке поста.
+ * Размеры — токены сетки 4; значки в плашках 16, плашка поста 24, кнопка выбора сети 32 (с полем полосы — 40, как у плашки ответа).
+ */
+
+/* Цвета состояний: тёмные на светлом стекле, светлые на тёмном (белый текст, data-ink='light') */
+:root {
+  --cross-ok: #1f7a3a;
+  --cross-warn: #a14600;
+  --cross-bad: #c4271b;
+}
+
+:root[data-ink='light'] {
+  --cross-ok: #7fe0a0;
+  --cross-warn: #ffc277;
+  --cross-bad: #ff9b94;
+}
+
+/* Плашка сети: монограмма на цветном квадрате (логотипов сетей в приложении нет). Размер и оттенок — переменными --tile и --hue */
+.net-tile {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--tile);
+  height: var(--tile);
+  border-radius: calc(var(--tile) / 4);
+  background: hsl(var(--hue) 58% 36%);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: calc(var(--tile) * 0.45);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cross-mark {
+  flex: none;
+  font-size: var(--space-4);
+}
+
+.cross-mark--ok {
+  color: var(--cross-ok);
+}
+
+.cross-mark--bad {
+  color: var(--cross-bad);
+}
+
+.cross-mark--warn {
+  color: var(--cross-warn);
+}
+
+/* ——— Состояние поста в сетях (нижняя строка поста) ——— */
+.cross-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.cross-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--space-6);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+  white-space: nowrap;
+}
+
+/* Выход в сеть без текста: плашка и отметка, поля одинаковые со всех сторон */
+.cross-chip:not(:has(.cross-chip__text)) {
+  padding-right: var(--space-1);
+}
+
+button.cross-chip {
+  cursor: pointer;
+}
+
+.cross-chip--failed {
+  background: color-mix(in srgb, var(--cross-bad) 14%, transparent);
+  color: var(--cross-bad);
+}
+
+.cross-chip--sending .cross-mark {
+  color: var(--text-secondary);
+  animation: cross-wait 1.2s ease-in-out infinite;
+}
+
+@keyframes cross-wait {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cross-chip--sending .cross-mark {
+    animation: none;
+  }
+}
+
+/* ——— Полоса «Также в…» над полем ввода ——— */
+.cross-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-fill-panel);
+  box-shadow: var(--glass-shadow-panel);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+}
+
+.cross-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Подпись и две плашки сетей помещаются в одну строку на 360: промежутки по 4, подпись отступает от первой плашки ещё на 4 */
+.cross-bar__label {
+  flex: none;
+  margin-right: var(--space-1);
+  color: var(--text-secondary);
+  font: var(--type-caption);
+}
+
+.cross-pick {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--space-8);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-weight: 600;
+  transition:
+    background-color var(--dur-quick) ease,
+    color var(--dur-quick) ease;
+}
+
+/* Зона нажатия 40 при видимой кнопке 32 */
+.cross-pick::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-1) * -1);
+}
+
+.cross-pick--on {
+  background: color-mix(in srgb, var(--text-link) 16%, transparent);
+  color: var(--text-link);
+}
+
+.cross-pick--on .cross-mark {
+  color: currentcolor;
+}
+
+.cross-pick--broken {
+  color: var(--cross-warn);
+}
+
+.cross-pick--long {
+  background: color-mix(in srgb, var(--cross-bad) 14%, transparent);
+  color: var(--cross-bad);
+}
+
+.cross-pick:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.cross-bar__warn {
+  margin: 0;
+  padding-bottom: var(--space-1);
+  color: var(--cross-bad);
+  font: var(--type-meta);
+}
+
+/* ——— Окно с причиной ——— */
+.cross-sheet__text {
+  margin: 0;
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  text-align: center;
+}
+
+.cross-sheet__note {
+  margin: var(--space-3) 0 0;
+  padding: 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  text-align: center;
+}

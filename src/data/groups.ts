@@ -276,6 +276,39 @@ function seeds(): Record<string, GroupInfo> {
     createdAt: NOW - 30 * DAY,
   };
 
+  // Ваш канал для показа подключений к Telegram и ВКонтакте (data/integrations.ts): вы его владелец
+  const notes: GroupInfo = {
+    chatId: 'psy-notes',
+    kind: 'channel',
+    name: 'Заметки психолога',
+    avatar: initialsAvatar('Заметки психолога', 'psy-notes'),
+    description: 'Короткие заметки о практике: упражнения, мысли после приёма, ответы на вопросы. Без разбора конкретных случаев.',
+    isPublic: true,
+    username: 'psy_zametki',
+    members: [
+      member(ME, 'owner', '12 октября'),
+      member('anna', 'member', '13 октября'),
+      member('igor', 'member', '14 октября'),
+      member('elena', 'member', '15 октября'),
+      member('olga', 'member', '18 октября'),
+      member('pavel', 'member', '20 октября'),
+      member('tatyana', 'member', '22 октября'),
+    ],
+    banned: [],
+    permissions: { ...DEFAULT_PERMISSIONS },
+    slowMode: 0,
+    signatures: false,
+    comments: true,
+    reactions: ['❤️', '👍', '🔥', '👏'],
+    protectContent: false,
+    historyVisible: true,
+    joinApproval: false,
+    links: [primaryLink(ME, 'Rt7HqW4mXv9B', 6)],
+    requests: [],
+    log: [log(ME, 'Вы создали канал «Заметки психолога»', 16 * DAY)],
+    createdAt: NOW - 16 * DAY,
+  };
+
   // Публичные, в которых вас нет: находятся поиском в списке чатов и открываются по адресу /join/@имя
   const young: GroupInfo = {
     chatId: 'pub-young',
@@ -324,7 +357,7 @@ function seeds(): Record<string, GroupInfo> {
     createdAt: NOW - 90 * DAY,
   };
 
-  return { supervision, 'psy-myths': channel, 'pub-young': young, 'pub-cbt': cbt };
+  return { supervision, 'psy-myths': channel, 'psy-notes': notes, 'pub-young': young, 'pub-cbt': cbt };
 }
 
 let store: Record<string, GroupInfo> = seeds();

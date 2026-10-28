@@ -2,6 +2,7 @@
 export { default as IconAddCircle } from '../../assets/icons/solar/add-circle.svg?react';
 export { default as IconCameraAdd } from '../../assets/icons/solar/camera-add.svg?react';
 export { default as IconCloseCircle } from '../../assets/icons/solar/close-circle.svg?react';
+export { default as IconCrosspost } from '../../assets/icons/solar/multiple-forward-right.svg?react';
 export { default as IconCrown } from '../../assets/icons/solar/crown.svg?react';
 export { default as IconWarning } from '../../assets/icons/solar/danger-triangle.svg?react';
 export { default as IconEye } from '../../assets/icons/solar/eye.svg?react';

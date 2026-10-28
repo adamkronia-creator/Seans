@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { Badge } from '../../components/Badge/Badge';
+import { CrossBar, CrossSheet } from '../../components/CrossPost/CrossPost';
 import { channelOf, countIn, useCommentsStore } from '../../data/comments';
 import { IconBackMk, IconBookmarkMk, IconMenuMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { IconBellLine, IconBellOffLine, IconHourglass, IconInfo, IconLeave, IconPenNew, IconUserPlus } from '../../components/GroupUi/GroupIcons';
@@ -29,7 +30,9 @@ import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
 import { ME, avatarOf, contactOf, firstNameOf, nameOf } from '../../data/contacts';
-import { can, getGroup, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
+import { can, getGroup, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, myRole, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
+import { NETWORK_META, planPublish, type Network } from '../../data/crosspost';
+import { editCrossposts, pickedNetworks, publishPost, removeCrossposts, resetPicks, retryCrosspost, syncedNetworks } from '../../data/integrations';
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { EMOJI_GROUPS } from '../../data/emojiSet';
@@ -361,6 +364,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [selected, setSelected] = useState<string[] | null>(null);
   // Что удаляется, ждёт подтверждения в окне: одно сообщение из меню, отмеченные при выборе (null — окна нет)
   const [removing, setRemoving] = useState<string[] | null>(null);
+  // Плашка сети, куда пост не ушёл, открыта окном с причиной
+  const [crossOpen, setCrossOpen] = useState<{ messageId: string; network: Network } | null>(null);
   const allChats = useChats();
   const [searchOpen, setSearchOpen] = useState(false);
   /** Плашка закрепа видна: есть закреплённые, открыты сообщения и поиск по чату закрыт */
@@ -597,6 +602,10 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       if (section === 'notes') deleteNotes(ids);
       else deleteSections(ids);
     } else {
+      // Посты, вышедшие в Telegram и ВК, убираются и там (номера записей лежат в постах, поэтому до удаления из переписки)
+      void removeCrossposts(chatId, ids).then((failed) => {
+        if (failed.length) say(`Не удалось удалить пост в ${failed.map((n) => NETWORK_META[n].chip).join(' и ')}: удалите его там вручную`);
+      });
       ids.forEach((id) => deleteMessage(chatId, id));
       if (replyTo && ids.includes(replyTo.id)) setReplyTo(null);
       if (editing && ids.includes(editing.id)) setEditing(null);
@@ -608,6 +617,20 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const forwardedTo = (ids: string[]) =>
     ids.length === 1 ? `Переслано: ${allChats.find((c) => c.id === ids[0])?.name ?? 'чат'}` : `Переслано: ${ids.length} чатов`;
   const mmss = (n: number) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+  /** Названия сетей через «и»: «Telegram и ВК» */
+  const netNames = (list: Network[]) => list.map((n) => NETWORK_META[n].chip).join(' и ');
+  /** Пояснение в окне удаления: посты, вышедшие в сети, исчезнут и оттуда */
+  const removeText = (ids: string[]) => {
+    const nets = syncedNetworks(chatId, ids);
+    const many = ids.length > 1;
+    const base = many ? `Будет удалено: ${ids.length}. Это нельзя отменить.` : 'Удаление нельзя отменить.';
+    return nets.length ? `${base} ${many ? 'Посты, вышедшие' : 'Пост, вышедший'} в ${netNames(nets)}, ${many ? 'будут удалены' : 'будет удалён'} и там.` : base;
+  };
+  /** Подключение сети не работает: владельца ведёт в «Подключения», остальным объясняет, кто его чинит */
+  const onCrossBroken = (network: Network) => {
+    if (info && myRole(info) === 'owner') navigate(`/chat/${chatId}/g/integrations`);
+    else say(`${NETWORK_META[network].name}: подключение не работает. Его настраивает владелец канала`);
+  };
   let composerBar: ReactNode;
   if (selecting && section === 'messages') {
     // Пока выбирают сообщения, вместо поля ввода (оно остаётся со своим черновиком) стоят действия: ответить на одно и переслать
@@ -714,6 +737,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
                     selecting={selecting}
                     selected={Boolean(selected?.includes(m.id))}
                     onSelect={(message) => !message.service && setSelected([message.id])}
+                    onCrossFailed={(message, network) => setCrossOpen({ messageId: message.id, network })}
                     onReply={(message) => writer && !selecting && !message.service && setReplyTo(message)}
                     onMenu={(message, rect) => (selecting ? toggleSelected(message.id) : hasMenu(permsFor(message)) && setMenu({ message, rect }))}
                     onReact={(m, emoji) => setMessageReaction(chatId, m.id, emoji)}
@@ -749,28 +773,49 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         placeholder={kind === 'channel' ? 'Опубликовать' : 'Сообщение'}
         bar={composerBar}
         noAttach={!canSendMedia(info)}
+        above={kind === 'channel' && writer && !editing ? (draft) => <CrossBar chatId={chatId} text={draft} onBroken={onCrossBroken} /> : undefined}
         onSend={(text) => {
-          // Правка заменяет текст, новое сообщение не появляется; «изм.» только если текст правда изменился
+          // Правка заменяет текст, новое сообщение не появляется; «изм.» только если текст правда изменился. Вышедший в сети пост обновляется и там
           if (editing) {
-            if (text && text !== editing.text) updateMessage(chatId, editing.id, { text, edited: true });
+            if (text && text !== editing.text) {
+              updateMessage(chatId, editing.id, { text, edited: true });
+              void editCrossposts(chatId, editing.id);
+            }
             setEditing(null);
             return;
           }
-          sendMessage(chatId, text, replyTo?.id);
+          // Пост канала уходит ещё и в выбранные сети; не помещается в одну из них — остаётся в поле, как в Telegram
+          const nets = kind === 'channel' ? pickedNetworks(chatId) : [];
+          const over = planPublish({ text }, nets).filter((p) => !p.fits);
+          if (over.length) {
+            say(`${over.map((p) => `${NETWORK_META[p.network].chip} — до ${p.limit.toLocaleString('ru-RU')} знаков`).join(', ')}. Сократите пост или отключите сеть`);
+            return false;
+          }
+          const id = sendMessage(chatId, text, replyTo?.id);
           setReplyTo(null);
+          if (id && nets.length) void publishPost(chatId, id, nets);
+          // Выбор «Также в…» действует на один пост: следующий снова идёт по настройкам подключений
+          if (kind === 'channel') resetPicks(chatId);
         }}
-        onAttach={(files) =>
+        onAttach={(files) => {
+          let crossed = false;
           files.forEach((f) => {
             const url = URL.createObjectURL(f);
-            // Картинка уходит фото, остальное — файлом с названием и размером
-            sendMessage(chatId, '', undefined, f.type.startsWith('image/') ? { image: url } : { file: { name: f.name, size: f.size, url } });
-          })
-        }
+            // Картинка уходит фото, остальное — файлом с названием и размером; фото канала идёт и в выбранные сети, файл — только в приложении
+            const photo = f.type.startsWith('image/');
+            const id = sendMessage(chatId, '', undefined, photo ? { image: url } : { file: { name: f.name, size: f.size, url } });
+            const nets = kind === 'channel' && photo ? pickedNetworks(chatId) : [];
+            if (id && nets.length) void publishPost(chatId, id, nets);
+            if (kind === 'channel' && photo) crossed = true;
+          });
+          // Выбор сетей учтён для всех фото сразу, потом сбрасывается; файлы в сети не уходят и выбор не трогают
+          if (crossed) resetPicks(chatId);
+        }}
         onLayoutChange={() => atBottom.current && scrollToBottom()}
         edit={editing ? { key: editing.id, text: editing.text } : undefined}
         reply={
           editing
-            ? { name: '', text: editing.text.replace(/\s*\n\s*/g, ' '), edit: true }
+            ? { name: syncedNetworks(chatId, [editing.id]).length ? `также в ${netNames(syncedNetworks(chatId, [editing.id]))}` : '', text: editing.text.replace(/\s*\n\s*/g, ' '), edit: true }
             : replyTo
               ? { name: replyFrom(replyTo), text: replyTo.test ? 'Тест' : replyTo.task ? 'Задание' : replyTo.text.replace(/\s*\n\s*/g, ' ') }
               : undefined
@@ -1032,10 +1077,22 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       {removing && (
         <RemoveSheet
           title={removeTitle(removing.length)}
-          text={removing.length > 1 ? `Будет удалено: ${removing.length}. Это нельзя отменить.` : 'Удаление нельзя отменить.'}
+          text={removeText(removing)}
           confirm="Удалить"
           onClose={() => setRemoving(null)}
           onConfirm={removeNow}
+        />
+      )}
+
+      {crossOpen && byId.get(crossOpen.messageId) && (
+        <CrossSheet
+          chatId={chatId}
+          post={byId.get(crossOpen.messageId)!}
+          network={crossOpen.network}
+          owner={Boolean(info && myRole(info) === 'owner')}
+          onRetry={() => void retryCrosspost(chatId, crossOpen.messageId, crossOpen.network)}
+          onSettings={() => navigate(`/chat/${chatId}/g/integrations`)}
+          onClose={() => setCrossOpen(null)}
         />
       )}
 

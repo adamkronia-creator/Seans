@@ -7,6 +7,7 @@ import { GroupInfoPage } from './GroupInfoPage';
 import { GroupAddMembersPage, GroupAdminPickPage, GroupAdminRightsPage, GroupAdminsPage, GroupMembersPage } from './GroupPeoplePages';
 import { GroupBannedPage, GroupLogPage, GroupManagePage, GroupPermsPage, GroupReactionsPage, GroupRequestsPage, GroupTypePage } from './GroupManagePages';
 import { GroupLinkEditPage, GroupLinkPage, GroupLinksPage } from './GroupLinkPages';
+import { GroupConnectPage, GroupIntegrationsPage, networkOf } from './GroupIntegrationPages';
 import { gPath } from './shared';
 
 /*
@@ -14,7 +15,7 @@ import { gPath } from './shared';
  * (владелец, администратор с нужным правом или обычный участник там, где это разрешено); иначе страница объясняет, что доступа нет.
  */
 
-/** Разделы адреса: edit, type, links, link/<id>, link/new, link/<id>/edit, members, add, admins, admin/<id>, admin/new, perms, banned, requests, log, reactions */
+/** Разделы адреса: edit, type, links, link/<id>, link/new, link/<id>/edit, members, add, admins, admin/<id>, admin/new, perms, banned, requests, log, reactions, integrations, integrations/<сеть> */
 export function groupSubOf(path: string): { chatId: string; sub: string } | null {
   const m = path.match(/^\/chat\/([^/]+)\/g(?:\/(.+?))?\/?$/);
   return m ? { chatId: m[1], sub: m[2] ?? '' } : null;
@@ -27,6 +28,7 @@ export function groupParentOf(chatId: string, sub: string): string {
   if (head === 'edit' || head === 'add' || head === 'members') return gPath(chatId);
   if (head === 'link') return third === 'edit' ? gPath(chatId, `link/${second}`) : gPath(chatId, 'links');
   if (head === 'admin') return gPath(chatId, 'admins');
+  if (head === 'integrations') return second ? gPath(chatId, 'integrations') : gPath(chatId, 'edit');
   return gPath(chatId, 'edit');
 }
 
@@ -62,6 +64,8 @@ export function groupAllowed(sub: string, g: GroupInfo): boolean {
       return staff;
     case 'reactions':
       return can(g, 'changeInfo');
+    case 'integrations':
+      return g.kind === 'channel' && role === 'owner';
     default:
       return false;
   }
@@ -107,6 +111,11 @@ export function GroupScreen({ chatId, sub }: { chatId: string; sub: string }) {
       return <GroupAdminsPage chatId={chatId} />;
     case 'admin':
       return second === 'new' ? <GroupAdminPickPage chatId={chatId} /> : second ? <GroupAdminRightsPage chatId={chatId} memberId={second} /> : <GroupAdminsPage chatId={chatId} />;
+    case 'integrations': {
+      if (!second) return <GroupIntegrationsPage chatId={chatId} />;
+      const network = networkOf(second);
+      return network ? <GroupConnectPage chatId={chatId} network={network} /> : <Missing chatId={chatId} sub={sub} text="Такого раздела нет." />;
+    }
     case 'links':
       return <GroupLinksPage chatId={chatId} />;
     case 'link':

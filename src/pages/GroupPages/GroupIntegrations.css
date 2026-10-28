@@ -1,0 +1,36 @@
+/* Подключение сети: три шага. Номер — круг 24 слева, текст рядом (две и три строки ровняются по первой) */
+.gi-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  list-style: none;
+  counter-reset: gi-step;
+}
+
+.gi-steps li {
+  position: relative;
+  min-height: var(--space-6);
+  padding-left: var(--space-8);
+  counter-increment: gi-step;
+  color: var(--text-primary);
+  font: 400 var(--font-size-label) / var(--line-height-label) var(--font-sans);
+  overflow-wrap: anywhere;
+}
+
+.gi-steps li::before {
+  content: counter(gi-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--glass);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}

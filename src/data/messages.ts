@@ -1,3 +1,4 @@
+import type { Crosspost } from './crosspost';
 import type { ResultMode } from './resultMode';
 import { clientResultPath, recordRef } from './resultLinks';
 import type { PermanentRule } from './taskValues';
@@ -52,6 +53,8 @@ export interface Message {
   counts?: Record<string, number>;
   /** Сообщение изменено после отправки */
   edited?: boolean;
+  /** Свой пост канала, который уходит (или ушёл) ещё и в Telegram или ВКонтакте: состояние по каждой сети (data/integrations.ts) */
+  crossposts?: Crosspost[];
 }
 
 /** Настройки, с которыми тест ушёл клиенту (то, что стояло на экране «Настройка теста» в момент отправки) */

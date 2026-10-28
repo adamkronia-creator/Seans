@@ -124,6 +124,15 @@ export const CHATS: Chat[] = [
     unread: 1,
   },
   {
+    id: 'psy-notes',
+    name: 'Заметки психолога',
+    avatar: initialsAvatar('Заметки психолога', 'psy-notes'),
+    kind: 'channel',
+    lastMessage: '',
+    time: '',
+    unread: 0,
+  },
+  {
     id: 'bogdan',
     name: 'Богдан Ермолаев',
     avatar: avatarBogdan,

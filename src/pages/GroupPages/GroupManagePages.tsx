@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import { ActionSheet, Card, CheckMark, Empty, Field, Hint, PersonAvatar, PersonRow, PhotoField, RadioDot, Row, SubPage, SwitchRow } from '../../components/GroupUi/GroupUi';
+import { ActionSheet, Card, CheckMark, Empty, Field, Hint, PersonAvatar, PersonRow, PhotoField, Pill, RadioDot, Row, SubPage, SwitchRow } from '../../components/GroupUi/GroupUi';
 import {
   IconCheckMark,
   IconCloseLine,
+  IconCrosspost,
   IconDotsV,
   IconShareLine,
   IconGlobal,
@@ -22,6 +23,8 @@ import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { LeaveSheet } from '../../components/GroupUi/GroupSheets';
 import { targetOfLink, useLinkTools } from '../../components/GroupUi/LinkTools';
 import { Badge } from '../../components/Badge/Badge';
+import { NETWORK_META } from '../../data/crosspost';
+import { useConnections } from '../../data/integrations';
 import { useToast } from '../../components/Toast/useToast';
 import { useChat } from '../../data/chatStore';
 import { firstNameOf, gendered, nameOf } from '../../data/contacts';
@@ -85,6 +88,7 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
   // undefined — фото не трогали, null — убрали, строка — новое
   const [photo, setPhoto] = useState<string | null | undefined>(undefined);
   const [deleting, setDeleting] = useState(false);
+  const connections = useConnections(chatId);
   if (!info) return <SubPage title="Управление" onBack={() => goBack(gPath(chatId))}>{null}</SubPage>;
 
   const channel = info.kind === 'channel';
@@ -130,6 +134,15 @@ export function GroupManagePage({ chatId }: { chatId: string }) {
         <Card heading="Настройки">
           {owner && <Row icon={info.isPublic ? <IconGlobal /> : <IconLock />} title={channel ? 'Тип канала' : 'Формат общего чата'} value={info.isPublic ? 'Публичный' : 'Частный'} chevron onClick={() => open('type')} />}
           {showLinks && <Row icon={<IconLinkRound />} title="Ссылки-приглашения" value={<Badge count={alive} />} chevron onClick={() => open('links')} />}
+          {channel && owner && (
+            <Row
+              icon={<IconCrosspost />}
+              title="Подключения"
+              value={connections.some((c) => c.status === 'error') ? <Pill tone="warn">Нужно внимание</Pill> : connections.length ? connections.map((c) => NETWORK_META[c.network].chip).join(', ') : undefined}
+              chevron
+              onClick={() => open('integrations')}
+            />
+          )}
           {adminInfo && <Row icon={<IconSmile />} title="Реакции" value={reactionsText} chevron onClick={() => open('reactions')} />}
           {showPerms && <Row icon={<IconKey />} title="Разрешения" value={info.slowMode ? `Пауза ${slowLabel(info.slowMode)}` : undefined} chevron onClick={() => open('perms')} />}
         </Card>

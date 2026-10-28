@@ -6,7 +6,8 @@ import { IconPenNew } from '../GroupUi/GroupIcons';
 import './MessageInput.css';
 
 interface MessageInputProps {
-  onSend: (text: string) => void;
+  /** false — отправка не принята (например, текст не помещается в выбранную сеть): текст остаётся в поле */
+  onSend: (text: string) => boolean | void;
   /** Высота панели поменялась (открылась панель эмодзи): ленту нужно удержать внизу */
   onLayoutChange?: () => void;
   /** Сообщение, на которое пишется ответ; с edit — сообщение, которое правится (плашка «Редактирование») */
@@ -28,6 +29,8 @@ interface MessageInputProps {
   bar?: ReactNode;
   /** Свой элемент в начале капсулы: у комментария — фото, от чьего имени он будет написан */
   lead?: ReactNode;
+  /** Полоса над капсулой (под плашкой ответа), которой нужен набранный текст: в канале — «Также в Telegram, ВК» и предупреждение о длине */
+  above?: (draft: string) => ReactNode;
 }
 
 /**
@@ -39,7 +42,7 @@ function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTML
   return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar, lead }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar, lead, above }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const settled = useRef(false);
@@ -147,7 +150,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
 
   const submit = () => {
     if (!hasText) return;
-    onSend(text.trim());
+    if (onSend(text.trim()) === false) return;
     setText('');
     savedRange.current = null;
     if (inputRef.current) inputRef.current.textContent = '';
@@ -212,7 +215,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
         <div className="reply-bar">
           {reply.edit ? <IconPenNew className="reply-bar__icon" /> : <IconReply className="reply-bar__icon" />}
           <div className="reply-bar__text">
-            <span className="reply-bar__name">{reply.edit ? 'Редактирование' : `Ответ: ${reply.name}`}</span>
+            <span className="reply-bar__name">{reply.edit ? `Редактирование${reply.name ? ` · ${reply.name}` : ''}` : `Ответ: ${reply.name}`}</span>
             <span className="reply-bar__quote">{reply.text}</span>
           </div>
           <button type="button" className="reply-bar__close" aria-label={reply.edit ? 'Отменить правку' : 'Отменить ответ'} onClick={onCancelReply}>
@@ -220,6 +223,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
           </button>
         </div>
       )}
+      {above?.(text)}
       {/* Не <form> и не <input>: иначе телефон предлагает пароли, карты и адреса */}
       <div className="composer">
         {lead}

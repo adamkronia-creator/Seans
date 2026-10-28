@@ -287,11 +287,11 @@ const SIMULATE_TYPING = true;
 
 /**
  * Отправка сообщения: попадает в переписку и в превью чата; статус идёт «отправляется → отправлено → прочитано».
- * С `test` уходит карточка теста: текст в ней необязателен.
+ * С `test` уходит карточка теста: текст в ней необязателен. Возвращает номер нового сообщения (пост канала по нему уходит в другие сети).
  */
-export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded' | 'image' | 'file'>) {
+export function sendMessage(chatId: string, rawText: string, replyTo?: string, test?: Pick<Message, 'test' | 'testKind' | 'testOptions' | 'toSelf' | 'task' | 'taskOptions' | 'buttons' | 'forwarded' | 'image' | 'file'>): string | undefined {
   const text = rawText.trim();
-  if (!text && !test) return;
+  if (!text && !test) return undefined;
 
   const id = String(nextId++);
   appendToday(chatId, { id, from: 'me', text, time: clock(), status: 'sending', ...sendHooks?.decorate(chatId), ...(replyTo ? { replyTo } : {}), ...test });
@@ -324,6 +324,7 @@ export function sendMessage(chatId: string, rawText: string, replyTo?: string, t
       }, 5200);
     }
   }
+  return id;
 }
 
 /** Поставить реакцию на сообщение; та же реакция второй раз снимает её, null — снять */

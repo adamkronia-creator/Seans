@@ -173,6 +173,15 @@
   color: var(--text-link);
 }
 
+/* Состояние подключения: работает (зелёная) и требует внимания (оранжевая) */
+.gu-pill--ok {
+  color: var(--cross-ok, #1f7a3a);
+}
+
+.gu-pill--warn {
+  color: var(--cross-warn, #a14600);
+}
+
 /* Точка выбора одного варианта: кольцо меняет цвет, а точка внутри вырастает с пружинкой (выбор виден по движению, а не только по цвету) */
 .gu-radio {
   position: relative;
@@ -923,4 +932,10 @@
   .gu-status--error {
     animation: none;
   }
+}
+
+/* Ключ или токен: вместо знаков точки (поле — textarea, поэтому тип password не годится; менеджеры паролей его и не должны трогать) */
+.fp .gu-secret {
+  -webkit-text-security: disc;
+  text-security: disc;
 }

@@ -185,7 +185,12 @@ export function navigate(path: string, kind: TransitionKind = 'forward') {
     const drop = guards.length;
     guards.splice(0).forEach((g) => (g.silent = true));
     pending = { silent: true };
-    queued.push(() => navigate(path, kind));
+    // Экран показывается сразу (ниже), а запись для него ложится в историю, когда записи окон уйдут: повторный navigate здесь
+    // увидел бы, что экран уже показан, и записи не добавил — «назад» с нового экрана перескакивала бы через тот, откуда его открыли
+    queued.push(() => {
+      step += 1;
+      window.history.pushState({ i: step, prev }, '', `#${path}`);
+    });
     window.history.go(-drop);
   } else {
     step += 1;

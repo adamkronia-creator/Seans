@@ -689,6 +689,15 @@
   margin-top: 0;
 }
 
+/* Слева в нижней строке поста канала: реакции и плашки сетей (Telegram, ВК) в одном ряду; не помещаются — плашки уходят под реакции */
+.bubble__foot-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-width: 0;
+}
+
 .bubble__meta--foot {
   position: static;
   margin-left: auto;
