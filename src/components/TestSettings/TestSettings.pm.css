@@ -587,9 +587,19 @@
 [data-pm] .pass-strip {
   position: relative;
   z-index: 2;
+  isolation: isolate;
+}
+
+/* Подложка та же, что у шапки (она тоже слой позади содержимого), поэтому шапка и полоса сливаются в одну панель */
+[data-pm] .pass-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
+  pointer-events: none;
 }
 
 [data-pm] .pass-strip__step {
@@ -622,10 +632,8 @@
 }
 
 /* В рамке телефона (предпросмотр) шапка без стекла, и полоса тоже */
-[data-pm] .tp__phone .pass-strip {
-  background: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+[data-pm] .tp__phone .pass-strip::before {
+  display: none;
 }
 
 /* Кнопки «Назад» и «Далее» стоят в 12 от прокручиваемого: содержимое, ушедшее под край, не упирается в них */
@@ -635,4 +643,62 @@
 
 [data-pm] .tp__phone .test-settings__cta.test-pass__cta {
   padding-top: var(--space-3);
+}
+
+/* ——— Кнопки прохождения парят над капсулой разделов, как «Использовать» у настроек: без подложки, страница уходит под них ———
+   Полоса пропускает нажатия мимо кнопок; внизу страницы запас на кнопки, чтобы последнее не пряталось под ними */
+[data-pm] .test-settings__cta.test-pass__cta {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+[data-pm] .test-pass__cta :is(button, .test-pass__meta > *) {
+  pointer-events: auto;
+}
+
+[data-pm] .test-settings__scroll:has(+ .test-pass__cta) {
+  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 3 + var(--size-touch) + var(--space-4));
+}
+
+/* У теста над кнопками ещё «Отвечено: N из M» и полоса: 8 + 24 + 8 + 4 */
+[data-pm] .test-settings__scroll:has(+ .test-pass__cta .test-pass__meta) {
+  padding-bottom: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) * 3 + var(--size-touch) + var(--space-4) + var(--space-10) + var(--space-2));
+}
+
+/* В рамке телефона (предпросмотр) кнопки стоят в потоке у низа экрана телефона */
+[data-pm] .tp__phone .test-settings__cta.test-pass__cta {
+  position: relative;
+}
+
+[data-pm] .tp__phone .test-settings__scroll:has(+ .test-pass__cta),
+[data-pm] .tp__phone .test-settings__scroll:has(+ .test-pass__cta .test-pass__meta) {
+  padding-bottom: var(--space-4);
+}
+
+/* Сведения перед началом — блок как «Контактная информация» профиля: строки на подложке со значком 24, просвет 1 между ними */
+[data-pm] ul.tp__facts {
+  padding: 0;
+}
+
+[data-pm] ul.tp__facts > li {
+  min-height: var(--row-h);
+  padding: var(--field-pad-y) var(--row-pad-x);
+  gap: var(--row-gap);
+  background: var(--glass-card);
+  color: var(--text-primary);
+  font: var(--type-body);
+}
+
+[data-pm] ul.tp__facts > li + li {
+  border-top: 0;
+}
+
+[data-pm] .tp__fact-icon {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+  color: var(--text-secondary);
 }
