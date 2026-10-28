@@ -705,21 +705,17 @@
   display: none;
 }
 
-/* Предпросмотр: на затемнении нет панели, только экран телефона клиента; «Отмена» (крестик) стоит в его шапке напротив «Назад», окно своего крестика не рисует.
-   Страница позади закрыта плотным затемнением с размытием: она не должна читаться вокруг телефона */
+/* Предпросмотр: на обычном затемнении (страница настройки видна позади) нет панели, только экран телефона клиента;
+   «Отмена» (крестик) стоит в его шапке напротив «Назад», окно своего крестика не рисует */
 [data-pm] .sheet--bare > .sheet__close {
   display: none;
 }
 
-.sheet-overlay[data-pm]:has(.sheet--bare) {
-  background-color: color-mix(in srgb, rgb(12 16 30) calc(var(--sheet-dim, 1) * 82%), transparent);
-  -webkit-backdrop-filter: blur(var(--space-4));
-  backdrop-filter: blur(var(--space-4));
-}
 [data-pm] .sheet.sheet--bare {
   display: flex;
   flex-direction: column;
   height: min(var(--sheet-max-h), var(--sheet-max, var(--sheet-max-h)));
+  padding: 0;
   background: none;
   box-shadow: none;
   -webkit-backdrop-filter: none;
@@ -735,16 +731,19 @@
   overflow: hidden;
 }
 
-/* В окне свой рост у рамки не нужен: она занимает всё место под крестиком */
+/* В окне свой рост у рамки не нужен: она занимает всё место */
 [data-pm] .sheet--bare .tp {
   flex: 1;
   min-height: 0;
 }
 
-/* Экран телефона лежит прямо на затемнении, без панели под собой: ему нужна своя плотная подложка, сквозь неё страница не читается */
+/* Телефон целиком плотный: без размытия и прозрачности, чёрная рамка с тонким светлым кантом, чтобы верх и низ читались чётко на затемнении */
 [data-pm] .sheet--bare .tp__phone {
   flex: 1 1 0;
-  background: var(--sheet-solid);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
+  background: var(--color-bg-app);
+  box-shadow:
+    0 0 0 var(--hairline) rgb(255 255 255 / 32%),
+    0 var(--space-1) var(--space-6) rgb(0 0 0 / 40%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
