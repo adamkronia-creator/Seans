@@ -291,15 +291,8 @@
 
 /* Главное действие панели («Переслать»): активная синяя кнопка */
 .composer__bar--primary {
-  height: calc(var(--size-control) - var(--space-2));
-  margin: var(--space-1);
   background: var(--action-primary);
   color: var(--action-primary-text);
-}
-
-.composer__select > .composer__bar.composer__bar--primary {
-  border-left: 0;
-  border-radius: var(--radius-pill); /* перекрывает «половинки капсулы»: синяя кнопка целиком круглая */
 }
 
 .composer__bar--primary:is(button):active {
