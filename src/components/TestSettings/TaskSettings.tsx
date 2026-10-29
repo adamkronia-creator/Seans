@@ -39,6 +39,14 @@ import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
 import './TestSettings.css';
 import './TestSettings.pm.css';
+import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
+import IconRowAge from '../../assets/icons/solar/user.svg?react';
+import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowComment from '../../assets/icons/solar/chat-round.svg?react';
+import IconRowState from '../../assets/icons/solar/smile-circle.svg?react';
+import IconRowPermanent from '../../assets/icons/solar/restart.svg?react';
+import IconRowCount from '../../assets/icons/solar/list-ordered.svg?react';
+import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkExample from '../../assets/icons/solar/notebook.svg?react';
 import './TaskSettings.css';
@@ -306,8 +314,8 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
             <CollapseCard title="Общая информация">
               <ul className="ts-rows">
-                <Row label="Время выполнения" value={data.duration} />
-                <Row label="Возраст" value={data.age} />
+                <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
+                <Row Icon={IconRowAge} label="Возраст" value={data.age} />
               </ul>
             </CollapseCard>
 
@@ -336,29 +344,29 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
               <ul className="ts-rows">
                 {/* Выбор формы бланка (у заданий с записями — «Количество записей») */}
                 {data.formCount && data.forms ? (
-                  <Row label={formLabel} info value={locked ? formText(data, form) : undefined}>
+                  <Row Icon={IconRowForm} label={formLabel} info value={locked ? formText(data, form) : undefined}>
                     {!locked && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />}
                   </Row>
                 ) : (
                   data.forms && (
-                    <Row label={formLabel} info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
+                    <Row Icon={IconRowForm} label={formLabel} info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
                       {!locked && data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
                     </Row>
                   )
                 )}
-                <Row label="Комментарий клиента" help="comment">
+                <Row Icon={IconRowComment} label="Комментарий клиента" help="comment">
                   <Switch checked={comment} onChange={locked ? noop : setComment} label="Комментарий клиента" />
                 </Row>
-                <Row label="Оценить состояние" help="state">
+                <Row Icon={IconRowState} label="Оценить состояние" help="state">
                   <Switch checked={state} onChange={locked ? noop : setState} label="Оценить состояние" />
                 </Row>
-                <Row label="Назначить постоянным">
+                <Row Icon={IconRowPermanent} label="Назначить постоянным">
                   <Switch checked={permanent} onChange={locked ? noop : setPermanent} label="Назначить постоянным" />
                 </Row>
                 <li className={`ts-fold${permanent ? ' ts-fold--open' : ''}`} aria-hidden={!permanent}>
                   <div className="ts-fold__inner">
                     <ul className="ts-rows">
-                      <Row label="Всего записей" info value={locked ? limitText(limit) : undefined}>
+                      <Row Icon={IconRowCount} label="Всего записей" info value={locked ? limitText(limit) : undefined}>
                         {!locked && select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
                       </Row>
                     </ul>
@@ -370,7 +378,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
             <section className="ts-card ts-message-card">
               <ul className="ts-rows">
-                <Row label="Сообщение для клиента">
+                <Row Icon={IconRowMessage} label="Сообщение для клиента">
                   <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
                 </Row>
               </ul>
