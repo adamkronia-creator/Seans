@@ -685,7 +685,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
             Ответить
           </button>
         )}
-        <button type="button" className="composer__bar" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
+        <button type="button" className="composer__bar composer__bar--primary" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
           <IconForward />
           Переслать
         </button>

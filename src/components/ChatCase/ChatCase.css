@@ -207,9 +207,41 @@
   -webkit-user-select: none;
 }
 
-.case-card[data-selected] {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 1px var(--color-accent);
+/* Выбранная карточка залита на всю ширину экрана, как строка сообщений: заливка лежит под содержимым, наружу выходит тенью без размытия,
+   обрезанной по высоте на половину зазора до соседей (8), поэтому соседние выбранные карточки сливаются. Рамки-кольца у карточки нет */
+.chat-case {
+  --select-tint: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  overflow-x: hidden;
+}
+
+.case-card[data-selecting] {
+  position: relative;
+  isolation: isolate;
+  overflow: visible; /* у шапки и текста своей заливки нет: углы карточки держит её собственный фон */
+}
+
+.case-card[data-selecting]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--select-tint);
+  box-shadow: 0 0 0 100vmax var(--select-tint);
+  clip-path: inset(calc(var(--block-gap) / -2) -100vmax);
+  opacity: 0;
+  transition: opacity var(--dur-quick) ease;
+  pointer-events: none;
+}
+
+.case-card[data-selected]::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-card[data-selecting]::before {
+    transition: none;
+  }
 }
 
 .case-card__pick {
