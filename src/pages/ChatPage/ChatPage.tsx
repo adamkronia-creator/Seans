@@ -807,6 +807,8 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
         placeholder={kind === 'channel' ? 'Опубликовать' : 'Сообщение'}
         bar={composerBar}
         noAttach={!canSendMedia(info)}
+        onAttachTest={!kind && !chat?.favorites ? (id) => navigate(`/chat/${chatId}/tests/${id}`) : undefined}
+        onAttachTask={!kind && !chat?.favorites ? (id) => navigate(`/chat/${chatId}/tasks/${id}`) : undefined}
         above={kind === 'channel' && writer && !editing ? (draft) => <CrossBar chatId={chatId} text={draft} onBroken={onCrossBroken} /> : undefined}
         onSend={(text) => {
           // Правка заменяет текст, новое сообщение не появляется; «изм.» только если текст правда изменился. Вышедший в сети пост обновляется и там

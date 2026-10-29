@@ -1,0 +1,104 @@
+/* «Прикрепить»: плитки-круги в ряд, ниже список библиотеки в плитке листа */
+.at-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.at-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 80px; /* grid:ok — ширина плитки под подпись «Задание» */
+  color: var(--text-primary);
+  font: var(--type-caption);
+  text-align: center;
+}
+
+.at-tile__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px; /* grid:ok — диск как у «Скопировать» в окне отправки */
+  height: 56px; /* grid:ok — то же */
+  border-radius: var(--radius-full);
+  background: var(--sheet-tile-strong);
+  color: var(--text-link);
+  font-size: var(--size-icon-lg);
+}
+
+.at-tile:active .at-tile__disc {
+  background: var(--sheet-tile-press);
+}
+
+.at-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.at-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.at-row__icon {
+  flex-shrink: 0;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.at-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.at-row__title {
+  font: var(--type-body);
+  font-weight: var(--font-weight-medium);
+}
+
+.at-row__note {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.at-row__chevron {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--size-icon-sm);
+}
+
+.at-empty {
+  margin: 0;
+  padding: var(--space-4) 0;
+  color: var(--text-secondary);
+  font: var(--type-body);
+  text-align: center;
+}
+
+.at-back {
+  flex-shrink: 0;
+  height: var(--size-touch);
+  border-radius: var(--radius-lg);
+  background: var(--sheet-tile);
+  color: var(--text-primary);
+  font: var(--type-label);
+}

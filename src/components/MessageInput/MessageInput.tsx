@@ -3,6 +3,7 @@ import { EmojiPanel } from './EmojiPanel';
 import { IconClose, IconReply } from '../ChatParts/ChatIcons';
 import { IconAttach, IconEmoji, IconMicrophone, IconSend } from '../icons';
 import { IconPenNew } from '../GroupUi/GroupIcons';
+import { AttachSheet } from '../AttachSheet/AttachSheet';
 import './MessageInput.css';
 
 interface MessageInputProps {
@@ -25,6 +26,9 @@ interface MessageInputProps {
   onAttach?: (files: File[]) => void;
   /** Кнопки «Прикрепить» нет (в группе запрещены фото и файлы); микрофон остаётся */
   noAttach?: boolean;
+  /** Тест или задание выбраны в окне «Прикрепить» (только в переписке с клиентом; без этих полей плиток нет) */
+  onAttachTest?: (id: string) => void;
+  onAttachTask?: (id: string) => void;
   /** Писать нельзя: вместо поля стоит эта строка («Отключить звук» у подписчика канала, «Медленный режим: 0:24») */
   bar?: ReactNode;
   /** Свой элемент в начале капсулы: у комментария — фото, от чьего имени он будет написан */
@@ -42,7 +46,7 @@ function RoundButton({ settled, className, ...props }: ButtonHTMLAttributes<HTML
   return <button type="button" className={`${className}${pop ? ' composer__round--pop' : ''}`} {...props} />;
 }
 
-export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, bar, lead, above }: MessageInputProps) {
+export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edit, placeholder = 'Сообщение', extras = true, active = false, onAttach, noAttach = false, onAttachTest, onAttachTask, bar, lead, above }: MessageInputProps) {
   const [text, setText] = useState('');
   const [emojiOpen, setEmojiOpen] = useState(false);
   const settled = useRef(false);
@@ -50,6 +54,8 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
     settled.current = true;
   }, []);
   const fileRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [attaching, setAttaching] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   // Последняя позиция курсора в поле: нужна, чтобы вставить эмодзи, когда поле не в фокусе
@@ -229,20 +235,33 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
         {lead}
         {extras && !noAttach && (
           <>
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              hidden
-              onChange={(e) => {
-                const files = Array.from(e.target.files ?? []);
-                e.target.value = '';
-                if (files.length) onAttach?.(files);
-              }}
-            />
-            <button type="button" className="composer__round" aria-label="Прикрепить файл" onClick={() => fileRef.current?.click()}>
+            {([[fileRef, undefined], [photoRef, 'image/*']] as const).map(([ref, accept], i) => (
+              <input
+                key={i}
+                ref={ref}
+                type="file"
+                accept={accept}
+                multiple
+                hidden
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  e.target.value = '';
+                  if (files.length) onAttach?.(files);
+                }}
+              />
+            ))}
+            <button type="button" className="composer__round" aria-label="Прикрепить" onClick={() => setAttaching(true)}>
               <IconAttach />
             </button>
+            {attaching && (
+              <AttachSheet
+                onGallery={() => photoRef.current?.click()}
+                onFile={() => fileRef.current?.click()}
+                onTest={onAttachTest}
+                onTask={onAttachTask}
+                onClose={() => setAttaching(false)}
+              />
+            )}
           </>
         )}
 
