@@ -45,11 +45,10 @@
   object-fit: cover;
 }
 
-/* Значки в одну строку: колонки поровну, подписи не переносятся */
+/* Значки в одну строку без подложки: промежутки между ними и до краёв поровну */
 .at-tiles {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  display: flex;
+  justify-content: space-evenly;
   margin: 0;
   padding: var(--space-3) var(--space-2);
   list-style: none;
@@ -61,26 +60,24 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  min-width: 0;
   color: var(--text-primary);
   font: var(--type-caption);
   text-align: center;
+  white-space: nowrap;
 }
 
 .at-tile__disc {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px; /* grid:ok — диск как у «Скопировать» в окне отправки */
-  height: 56px; /* grid:ok — то же */
-  border-radius: var(--radius-full);
-  background: var(--sheet-tile-strong);
+  width: var(--space-12);
+  height: var(--space-12);
   color: var(--text-link);
   font-size: var(--size-icon-lg);
 }
 
 .at-tile:active .at-tile__disc {
-  background: var(--sheet-tile-press);
+  opacity: 0.6;
 }
 
 .at-list {
