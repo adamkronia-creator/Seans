@@ -55,6 +55,7 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
   }, []);
   const fileRef = useRef<HTMLInputElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [attaching, setAttaching] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -235,12 +236,13 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
         {lead}
         {extras && !noAttach && (
           <>
-            {([[fileRef, undefined], [photoRef, 'image/*']] as const).map(([ref, accept], i) => (
+            {([[fileRef, undefined, undefined], [photoRef, 'image/*', undefined], [cameraRef, 'image/*', 'environment']] as const).map(([ref, accept, capture], i) => (
               <input
                 key={i}
                 ref={ref}
                 type="file"
                 accept={accept}
+                capture={capture}
                 multiple
                 hidden
                 onChange={(e) => {
@@ -257,6 +259,13 @@ export function MessageInput({ onSend, onLayoutChange, reply, onCancelReply, edi
               <AttachSheet
                 onGallery={() => photoRef.current?.click()}
                 onFile={() => fileRef.current?.click()}
+                onCamera={() => cameraRef.current?.click()}
+                onPhoto={(url) =>
+                  void fetch(url)
+                    .then((r) => r.blob())
+                    .then((blob) => onAttach?.([new File([blob], 'photo', { type: blob.type || 'image/jpeg' })]))
+                    .catch(() => undefined)
+                }
                 onTest={onAttachTest}
                 onTask={onAttachTask}
                 onClose={() => setAttaching(false)}

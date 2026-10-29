@@ -1,12 +1,59 @@
 /* «Прикрепить»: плитки-круги в ряд, ниже список библиотеки в плитке листа */
-.at-tiles {
+.at-card {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+/* Фото: три в ряд вплотную, камера первая */
+.at-photos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; /* grid:ok — просвет между плитками 1 px */
   margin: 0;
-  padding: var(--space-2) 0;
+  padding: 0;
   list-style: none;
+}
+
+.at-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--sheet-tile);
+  color: var(--text-link);
+  font-size: var(--size-icon-lg);
+}
+
+/* Фото в профиле ещё нет: камера одна, на всю ширину и ниже квадрата */
+.at-photos--empty li {
+  grid-column: 1 / -1;
+}
+
+.at-photos--empty .at-photo {
+  aspect-ratio: auto;
+  height: calc(var(--space-12) * 2);
+}
+
+.at-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Значки в одну строку: колонки поровну, подписи не переносятся */
+.at-tiles {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  margin: 0;
+  padding: var(--space-3) var(--space-2);
+  list-style: none;
+  background: var(--sheet-tile);
 }
 
 .at-tile {
@@ -14,7 +61,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  width: 80px; /* grid:ok — ширина плитки под подпись «Задание» */
+  min-width: 0;
   color: var(--text-primary);
   font: var(--type-caption);
   text-align: center;
