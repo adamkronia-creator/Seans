@@ -711,10 +711,16 @@
   display: none;
 }
 
+/* Телефон растянут на всю высоту: по 16 до верхнего и нижнего краёв экрана (с безопасными зонами) */
+.sheet-overlay[data-pm]:has(.sheet--bare) {
+  padding: calc(var(--space-4) + var(--safe-top)) var(--space-4) calc(var(--space-4) + var(--safe-bottom));
+}
+
 [data-pm] .sheet.sheet--bare {
   display: flex;
   flex-direction: column;
-  height: min(var(--sheet-max-h), var(--sheet-max, var(--sheet-max-h)));
+  height: 100%;
+  max-height: none;
   padding: 0;
   background: none;
   box-shadow: none;
@@ -743,6 +749,8 @@
 /* Телефон целиком плотный: без размытия и прозрачности, чёрная рамка с тонким светлым кантом и без тени: размытая тень делала верх и низ мутными, в отличие от боков */
 [data-pm] .sheet--bare .tp__phone {
   flex: 1 1 0;
+  max-height: none;
+  margin-top: 0;
   background: var(--color-bg-app);
   box-shadow: 0 0 0 var(--hairline) rgb(255 255 255 / 32%);
   -webkit-backdrop-filter: none;
