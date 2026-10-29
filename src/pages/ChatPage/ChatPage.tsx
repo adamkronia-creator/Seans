@@ -669,22 +669,24 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   let composerBar: ReactNode;
   if (selecting && section === 'messages') {
     // Пока выбирают сообщения, вместо поля ввода (оно остаётся со своим черновиком) стоят действия: ответить на одно и переслать
-    const replyOne = chosen.length === 1 && permsFor(chosen[0]).reply;
+    const replyOne = chosen.length === 1 && Boolean(permsFor(chosen[0]).reply);
     composerBar = (
       <div className="composer__select" role="toolbar" aria-label="Действия с выбранными сообщениями">
-        {replyOne && (
-          <button
-            type="button"
-            className="composer__bar"
-            onClick={() => {
-              setReplyTo(chosen[0]);
-              setSelected(null);
-            }}
-          >
-            <IconReply />
-            Ответить
-          </button>
-        )}
+        {/* «Ответить» остаётся в разметке и сворачивается, когда выбрано несколько: «Переслать» плавно занимает его место */}
+        <button
+          type="button"
+          className="composer__bar composer__bar--primary composer__bar--reply"
+          data-hidden={replyOne ? undefined : ''}
+          aria-hidden={replyOne ? undefined : true}
+          tabIndex={replyOne ? undefined : -1}
+          onClick={() => {
+            setReplyTo(chosen[0]);
+            setSelected(null);
+          }}
+        >
+          <IconReply />
+          Ответить
+        </button>
         <button type="button" className="composer__bar composer__bar--primary" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
           <IconForward />
           Переслать

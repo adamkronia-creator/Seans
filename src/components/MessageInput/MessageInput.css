@@ -273,23 +273,65 @@
   background: var(--glass);
 }
 
-/* Панель действий при выборе сообщений вместо поля ввода: «Ответить» (если выбрано одно) и «Переслать» — две половины одной капсулы */
+/* Панель действий при выборе сообщений вместо поля ввода: «Ответить» (если выбрано одно) и «Переслать» — две отдельные круглые синие кнопки, без капсулы-подложки.
+   Кнопки появляются снизу вверх друг за другом; «Ответить» сворачивается, когда выбрано несколько, и «Переслать» плавно растёт на его место */
+.composer--bar:has(> .composer__select) {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 .composer__select {
   display: flex;
   flex: 1;
   min-width: 0;
 }
 
-.composer__select > .composer__bar + .composer__bar {
-  border-left: var(--hairline) solid var(--divider);
-  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+.composer__select > .composer__bar {
+  flex: 1 1 0;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: select-bar-in var(--dur-base) var(--ease-spring) backwards;
+  transition:
+    flex-grow var(--dur-base) var(--ease-spring),
+    margin var(--dur-base) var(--ease-spring),
+    opacity var(--dur-quick) ease,
+    background-color var(--dur-quick) ease;
 }
 
-.composer__select > .composer__bar:not(:last-child) {
-  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+.composer__select > .composer__bar--reply {
+  margin-right: var(--space-2);
 }
 
-/* Главное действие панели («Переслать»): активная синяя кнопка */
+.composer__select > .composer__bar--reply[data-hidden] {
+  flex-grow: 0;
+  margin-right: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer__select > .composer__bar:last-child {
+  animation-delay: 60ms; /* grid:ok — ступенька между кнопками */
+}
+
+@keyframes select-bar-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4)) scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer__select > .composer__bar {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Главные действия панели: активные синие кнопки */
 .composer__bar--primary {
   background: var(--action-primary);
   color: var(--action-primary-text);
