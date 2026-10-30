@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Frame } from '../Frame/Frame';
 import { SearchField } from '../SearchField/SearchField';
-import { IconTestChevron } from '../icons';
 import IconGallery from '../../assets/icons/solar/gallery.svg?react';
 import IconFile from '../../assets/icons/solar/file.svg?react';
 import IconTest from '../../assets/icons/solar/clipboard-list.svg?react';
@@ -101,12 +100,14 @@ export function AttachSheet({ onGallery, onFile, onCamera, onPhoto, onTest, onTa
           {shown.map((item) => (
             <li key={item.id}>
               <button type="button" className="at-row" onClick={() => pick(item.id)}>
-                <img className="at-row__icon" src={item.icon} alt="" style={{ background: item.tint }} />
-                <span className="at-row__text">
-                  <span className="at-row__title">{item.abbr ?? item.title}</span>
-                  <span className="at-row__note">{item.abbr ? item.title : item.description}</span>
+                {/* Значок и подписи как в меню тестов и заданий: полное название и описание */}
+                <span className="at-row__avatar" style={{ '--tint': item.tint } as CSSProperties}>
+                  <img className="at-row__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
                 </span>
-                <IconTestChevron className="at-row__chevron" />
+                <span className="at-row__text">
+                  <span className="at-row__title">{item.title}</span>
+                  <span className="at-row__note">{item.description}</span>
+                </span>
               </button>
             </li>
           ))}

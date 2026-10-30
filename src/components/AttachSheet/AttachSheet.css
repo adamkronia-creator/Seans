@@ -83,8 +83,11 @@
   background: var(--sheet-tile-press);
 }
 
+/* Строки как в окне «Отправить»: те же отступы (значок 48, зазор 12, строка не ниже --row-h-2, до первого и от последнего столько же, сколько между строками), подписи как в меню тестов и заданий */
 .at-list {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  margin: calc(var(--space-1) * -1) 0;
   padding: 0;
   list-style: none;
 }
@@ -94,17 +97,39 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  padding: var(--space-2) 0;
+  min-height: var(--row-h-2);
   color: var(--text-primary);
   text-align: left;
 }
 
-.at-row__icon {
+/* Круглый значок с цветом теста: градиент и светлая рамка, как у строк меню */
+.at-row__avatar {
+  position: relative;
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   width: var(--space-12);
   height: var(--space-12);
+  border: 1px solid var(--glass-border-blue);
   border-radius: var(--radius-full);
-  object-fit: cover;
+  isolation: isolate;
+}
+
+.at-row__avatar::before {
+  content: '';
+  position: absolute;
+  inset: -1px; /* grid:ok — перекрывает рамку 1 px */
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
+  opacity: 0.9;
+}
+
+.at-row__icon {
+  width: 36px; /* grid:ok — картинка значка теста, как в меню */
+  height: 36px; /* grid:ok — то же */
 }
 
 .at-row__text {
@@ -115,22 +140,20 @@
 }
 
 .at-row__title {
-  font: var(--type-body);
-  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  color: var(--text-primary);
+  font: var(--type-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .at-row__note {
   overflow: hidden;
   color: var(--text-secondary);
-  font: var(--type-caption);
+  font: var(--type-label);
+  font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.at-row__chevron {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: var(--size-icon-sm);
 }
 
 .at-empty {
