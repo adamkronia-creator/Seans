@@ -172,3 +172,9 @@
   color: var(--text-primary);
   font: var(--type-label);
 }
+
+/* Поиск над списком: плитка листа и своя высота (в колонке с прокруткой иначе сжимается до полоски), как в окне «Отправить» */
+[data-pm] .sheet .search-field {
+  flex-shrink: 0;
+  background: var(--sheet-tile);
+}
