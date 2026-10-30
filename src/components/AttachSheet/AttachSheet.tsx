@@ -93,7 +93,15 @@ export function AttachSheet({ onGallery, onFile, onCamera, onPhoto, onTest, onTa
   };
 
   return (
-    <Frame title={isTest ? 'Выберите тест' : 'Выберите задание'} onClose={onClose}>
+    <Frame
+      title={isTest ? 'Выберите тест' : 'Выберите задание'}
+      onClose={onClose}
+      footer={
+        <button type="button" className="sheet__button" onClick={() => { setView('menu'); setQuery(''); }}>
+          Назад
+        </button>
+      }
+    >
       <SearchField value={query} onChange={setQuery} placeholder={isTest ? 'Поиск тестов' : 'Поиск заданий'} onClear={() => setQuery('')} />
       <div className="sheet__card">
         <ul className="at-list">
@@ -114,9 +122,6 @@ export function AttachSheet({ onGallery, onFile, onCamera, onPhoto, onTest, onTa
         </ul>
         {shown.length === 0 && <p className="at-empty">Ничего не нашли</p>}
       </div>
-      <button type="button" className="at-back" onClick={() => { setView('menu'); setQuery(''); }}>
-        Назад
-      </button>
     </Frame>
   );
 }

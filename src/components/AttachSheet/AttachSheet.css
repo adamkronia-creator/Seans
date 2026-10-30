@@ -164,15 +164,6 @@
   text-align: center;
 }
 
-.at-back {
-  flex-shrink: 0;
-  height: var(--size-touch);
-  border-radius: var(--radius-lg);
-  background: var(--sheet-tile);
-  color: var(--text-primary);
-  font: var(--type-label);
-}
-
 /* Поиск над списком: плитка листа и своя высота (в колонке с прокруткой иначе сжимается до полоски), как в окне «Отправить» */
 [data-pm] .sheet .search-field {
   flex-shrink: 0;
