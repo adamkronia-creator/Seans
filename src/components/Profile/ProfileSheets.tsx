@@ -1,6 +1,7 @@
 import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { addToNamedAlbum, setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
 import { Frame } from '../Frame/Frame';
+import { CropSheet } from '../CropSheet/CropSheet';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { BackgroundControls } from '../BackgroundControls/BackgroundControls';
 import { IconCamera, IconCheck } from './ProfileIcons';
@@ -23,6 +24,7 @@ interface PickProps {
 export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
   const profile = useProfile();
   const input = useRef<HTMLInputElement>(null);
+  const [cropping, setCropping] = useState<File | null>(null);
   const isAvatar = kind === 'avatar';
   const current = isAvatar ? profile.avatarId : profile.coverId;
   const apply = (id: string | null) => (isAvatar ? setAvatar(id) : setCover(id));
@@ -40,10 +42,8 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
     onClose();
   };
 
-  // Окно закрывается сразу, а снимок дорабатывается и встаёт на место, когда готов
-  const upload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = filesOf(event);
-    if (files.length === 0) return;
+  // Окно закрывается сразу, а снимок дорабатывается и встаёт на место, когда готов; фото профиля сначала кадрируется
+  const save = async (files: File[]) => {
     onClose();
     const { added, ok } = await uploadPhotos(files.slice(0, 1), onNote);
     if (added[0]) {
@@ -53,6 +53,17 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
     }
     if (ok && added[0]) onNote(done);
   };
+
+  const upload = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = filesOf(event);
+    if (files.length === 0) return;
+    if (isAvatar) setCropping(files[0]);
+    else void save(files);
+  };
+
+  if (cropping) {
+    return <CropSheet file={cropping} onCancel={() => setCropping(null)} onError={() => { setCropping(null); onNote('Не удалось открыть файл: выберите фото в формате JPG, PNG или WebP'); }} onDone={(file) => void save([file])} />;
+  }
 
   return (
     <Frame

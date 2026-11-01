@@ -6,6 +6,7 @@ import { ME, avatarOf, byName, contactOf, firstNameOf, nameOf, type Contact } fr
 import { useAvatarSrc, useProfile } from '../../data/profile';
 import { initialsAvatar } from '../../utils/initialsAvatar';
 import { squareAvatar } from '../../utils/imageResize';
+import { CropSheet } from '../CropSheet/CropSheet';
 import { plainText } from '../../utils/plainText';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { Avatar } from '../Avatar/Avatar';
@@ -510,12 +511,17 @@ export function PhotoField({ value, name, seed, onChange, say }: PhotoFieldProps
   const camera = useRef<HTMLInputElement>(null);
   const [asking, setAsking] = useState(false);
   const [choosing, setChoosing] = useState(false);
+  const [cropping, setCropping] = useState<File | null>(null);
   const profile = useProfile();
   const pick = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
     setChoosing(false);
+    setCropping(file);
+  };
+  const cropped = async (file: File) => {
+    setCropping(null);
     try {
       onChange(await squareAvatar(file));
     } catch {
@@ -544,6 +550,7 @@ export function PhotoField({ value, name, seed, onChange, say }: PhotoFieldProps
       </div>
       <input ref={input} type="file" accept="image/*" hidden onChange={pick} />
       <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={pick} />
+      {cropping && <CropSheet file={cropping} onCancel={() => setCropping(null)} onError={() => { setCropping(null); say('Не удалось открыть файл: выберите фото в формате JPG, PNG или WebP'); }} onDone={(file) => void cropped(file)} />}
       {choosing && (
         <Frame title="Выберите фотографию" onClose={() => setChoosing(false)}>
           <ul className="gu-gallery">

@@ -1,0 +1,55 @@
+/* Окно кадрирования: квадрат во всю ширину окна, фото под круглой вырезкой; за кругом фото затемнено */
+.crop {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: #000000;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.crop:active {
+  cursor: grabbing;
+}
+
+.crop__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+
+.crop__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 100vmax rgb(0 0 0 / 55%),
+    inset 0 0 0 2px rgb(255 255 255 / 70%);
+  pointer-events: none;
+}
+
+.crop__zoom {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 0 var(--space-1);
+}
+
+.crop__zoom-label {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+}
+
+.crop__zoom input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--action-primary);
+}
