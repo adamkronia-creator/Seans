@@ -41,11 +41,11 @@ const SCENES = ['blind-off', 'blind-on', 'shuffle', 'blind-chat', 'blank-off', '
 const SHARED = ['task-off'];
 
 test('у каждой подсказки три макета с подписями', () => {
-  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind', 'comment', 'features', 'result', 'state']);
+  assert.deepEqual(Object.keys(OPTION_HELP).sort(), ['blank', 'blind', 'comment', 'features', 'result', 'state', 'taskFeatures']);
   for (const [id, help] of topics) {
     assert.ok(help.title.length > 0, `${id}: нет названия окна`);
     // «Особенности тестирования»: по слайду на каждую из четырёх настроек, остальные подсказки — три макета
-    assert.equal(help.slides.length, id === 'features' ? 4 : 3, `${id}: неверное число слайдов`);
+    assert.equal(help.slides.length, id === 'features' ? 4 : id === 'taskFeatures' ? 2 : 3, `${id}: неверное число слайдов`);
     for (const slide of help.slides) {
       assert.ok(slide.alt.length > 10, `${id}: у слайда нет описания для экранных читалок`);
       assert.ok(slide.title.length > 0 && slide.title.length <= 28, `${id}: заголовок «${slide.title}» пустой или длиннее 28 знаков`);
@@ -60,7 +60,7 @@ test('макеты известны и не повторяются; размер
     // Окно «Особенностей» повторяет макеты других подсказок: слайдов-повторов внутри него самого нет
     const own = new Set();
     for (const slide of help.slides) {
-      if (id === 'features') {
+      if (id === 'features' || id === 'taskFeatures') {
         assert.ok(SCENES.includes(slide.scene), `${id}: неизвестный макет ${slide.scene}`);
         assert.ok(!own.has(slide.scene), `${id}: макет ${slide.scene} повторяется`);
         own.add(slide.scene);

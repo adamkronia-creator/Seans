@@ -10,6 +10,7 @@ import { CollapseCard } from './TestBlank';
 import { FormMenu } from './FormMenu';
 import { MessageField, Row } from './TestSettings';
 import { HelpContext } from '../OptionHelp/HelpScenes';
+import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { TestHeader } from './TestHeader';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
@@ -211,11 +212,13 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const link = (label: string, next: View) => {
     const Icon = next === 'blank' ? IconLinkBlank : IconLinkExample;
     return (
-    <li className="ts-row ts-row--link" role="button" tabIndex={0} onClick={() => openView(next)} onKeyDown={(e) => e.key === 'Enter' && openView(next)}>
-      <Icon className="ts-row__icon" />
-      <span className="ts-row__link">{label}</span>
-      <IconTestChevron className="ts-row__chevron" />
-    </li>
+      <li>
+        <button type="button" className="ts-action" onClick={() => openView(next)}>
+          <Icon className="ts-action__icon" />
+          <span className="ts-action__label">{label}</span>
+          <IconTestChevron className="ts-action__chevron" />
+        </button>
+      </li>
     );
   };
 
@@ -307,7 +310,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
             )}
             </div>
 
-            <ul className="ts-card">
+            <ul className="ts-actions">
               {link('Бланк задания', 'blank')}
               {link('Пример выполнения', 'example')}
             </ul>
@@ -340,7 +343,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
               </ul>
             </CollapseCard>
 
-            <CollapseCard title="Особенности задания">
+            <CollapseCard title="Особенности задания" badge={<OptionHelp id="taskFeatures" corner />}>
               <ul className="ts-rows">
                 {/* Выбор формы бланка (у заданий с записями — «Количество записей») */}
                 {data.formCount && data.forms ? (
@@ -354,10 +357,10 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
                     </Row>
                   )
                 )}
-                <Row Icon={IconRowComment} label="Комментарий клиента" help="comment">
+                <Row Icon={IconRowComment} label="Комментарий клиента">
                   <Switch checked={comment} onChange={locked ? noop : setComment} label="Комментарий клиента" />
                 </Row>
-                <Row Icon={IconRowState} label="Оценить состояние" help="state">
+                <Row Icon={IconRowState} label="Оценить состояние">
                   <Switch checked={state} onChange={locked ? noop : setState} label="Оценить состояние" />
                 </Row>
                 <Row Icon={IconRowPermanent} label="Назначить постоянным">

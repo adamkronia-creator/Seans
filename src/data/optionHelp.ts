@@ -4,7 +4,7 @@
  * Макеты собираются из выбранного теста (components/OptionHelp/HelpScenes.tsx): его название, шкалы и бланк, а не снимки одного теста.
  */
 
-export type OptionHelpId = 'blind' | 'blank' | 'result' | 'comment' | 'state' | 'features';
+export type OptionHelpId = 'blind' | 'blank' | 'result' | 'comment' | 'state' | 'features' | 'taskFeatures';
 
 /** Какой макет показан в слайде */
 export type HelpScene = 'blind-off' | 'blind-on' | 'shuffle' | 'blind-chat' | 'blank-off' | 'blank-on' | 'blank-view' | 'result-thanks' | 'result-score' | 'result-full' | 'task-off' | 'comment-on' | 'comment-result' | 'state-on' | 'state-result';
@@ -125,6 +125,23 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
         alt: 'Экран клиента после теста: баллы по шкалам с уровнями',
         title: 'Завершение',
         text: 'Что видит пользователь после прохождения теста: только благодарность, баллы или заключение? Помогает избежать тревожности.',
+      },
+    ],
+  },
+  taskFeatures: {
+    title: 'Особенности задания',
+    slides: [
+      {
+        scene: 'comment-on',
+        alt: 'Экран клиента: страница «Комментарий» с пустым полем',
+        title: 'Комментарий клиента',
+        text: 'Перед завершением появляется страница, где клиент может своими словами написать, что было трудно, о чём он думал или что хочет обсудить.',
+      },
+      {
+        scene: 'state-on',
+        alt: 'Экран клиента: страница «Как вы себя чувствуете?» со шкалой',
+        title: 'Оценить состояние',
+        text: 'После заполнения бланка клиент отмечает на шкале, как он себя чувствует после задания.',
       },
     ],
   },
