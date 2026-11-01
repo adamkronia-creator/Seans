@@ -127,3 +127,13 @@
 .hs__stage .tp--bare .tp__phone {
   height: 100%;
 }
+
+/* Шапка в макете клиента — как в настоящем прохождении: стеклянная подложка, поля и высота строки, а не плоская шапка рамки телефона */
+[data-pm] .hs__stage .tp--bare .tp__phone .test-settings__header {
+  min-height: 56px; /* grid:ok — строка шапки */
+  padding: var(--space-3) var(--space-4);
+}
+
+[data-pm] .hs__stage .tp--bare .tp__phone .test-settings__header::before {
+  display: block;
+}
