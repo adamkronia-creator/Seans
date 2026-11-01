@@ -122,3 +122,8 @@
 .hs__stage .chat.hs__screen .chat__day {
   position: static;
 }
+
+/* Экран в макете той же высоты, что кадр: полоса со счётчиком и кнопкой стоит у нижнего края, как у клиента */
+.hs__stage .tp--bare .tp__phone {
+  height: 100%;
+}

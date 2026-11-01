@@ -294,3 +294,18 @@
     opacity: 0;
   }
 }
+
+/* «?» в углу шапки карточки: без отступа слева и подъёма по строке */
+.option-help--corner {
+  flex-shrink: 0;
+  width: 24px; /* grid:ok — значок «?» 24 в шапке карточки */
+  height: 24px; /* grid:ok — то же */
+  margin-left: 0;
+  font-size: 24px; /* grid:ok — то же */
+  vertical-align: middle;
+}
+
+/* Два абзаца подписи слайда: между ними просвет */
+.oh__caption .oh__text + .oh__text {
+  margin-top: var(--space-2);
+}

@@ -774,7 +774,7 @@
   width: 100%;
   min-height: var(--space-12); /* 48 по сетке 4 */
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--action-primary);
   color: var(--action-primary-text);
   font: var(--type-label);

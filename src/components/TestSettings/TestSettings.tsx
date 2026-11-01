@@ -19,7 +19,6 @@ import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { FormMenu } from './FormMenu';
-import { FeatureHints } from './FeatureHints';
 import { RESULT_MODES, type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
@@ -460,7 +459,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           </CollapseCard>
         )}
 
-        <CollapseCard title="Особенности тестирования" badge={<FeatureHints onlyIds={conclusion ? undefined : ['blind', 'shuffle', 'blank']} />}>
+        <CollapseCard title="Особенности тестирования" badge={<OptionHelp id="features" corner />}>
           <ul className="ts-rows">
             {/* Строки без описаний, пояснения в подсказке «?» со скриншотами */}
             <Row

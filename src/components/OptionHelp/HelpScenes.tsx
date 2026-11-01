@@ -38,6 +38,9 @@ export function slidesFor(slides: HelpSlide[], ctx: HelpTest): HelpSlide[] {
   return slides.filter((s) => {
     if (s.scene === 'blank-off' || s.scene === 'blank-on') return Boolean(ctx.conclusion);
     if (s.scene === 'blank-view') return Boolean(ctx.blank);
+    // Итог для клиента есть только у тестов с заключением, остальные макеты теста — только с бланком
+    if (s.scene === 'result-full') return Boolean(ctx.blank && ctx.conclusion);
+    if (s.scene === 'blind-on' || s.scene === 'shuffle') return Boolean(ctx.blank);
     return true;
   });
 }
@@ -158,6 +161,16 @@ function Body({ scene, ctx }: { scene: HelpScene; ctx: HelpTest }) {
   if (TASK_SCENES.includes(scene) && ctx.task) return <TaskBody scene={scene} ctx={ctx} />;
   const { blank, conclusion, form, duration } = ctx;
   const test = ctx.test as LibraryTest;
+  if (scene === 'shuffle') {
+    // Вопросы не по порядку: с конца и через один, чтобы на экране был заметно «чужой» вопрос
+    const order = blank ? [...blank.questions.keys()].reverse() : [];
+    const mixed = blank ? { ...blank, questions: order.map((i) => blank.questions[i]) } : null;
+    return mixed ? (
+      <section className="test-settings hs__screen">
+        <TestPreview test={test} blank={mixed} blind={false} result="thanks" duration={duration} initialStage="progress" bare />
+      </section>
+    ) : null;
+  }
   if (scene === 'blind-off' || scene === 'blind-on') {
     return blank ? (
       <section className="test-settings hs__screen">

@@ -28,7 +28,7 @@ interface TestPreviewProps {
   duration?: string;
   /** С какого этапа открыть (в подсказках — нужный экран сразу) */
   initialStage?: Stage;
-  /** Только экран телефона: без вкладок этапов и кнопок внизу (макеты в подсказках) */
+  /** Только экран телефона без вкладок этапов и рамки (макеты в подсказках); кнопки внизу те же, что у клиента */
   bare?: boolean;
   /** Предпросмотр в окне: без вкладок этапов, вопросов не больше первых пяти */
   screen?: boolean;
@@ -144,7 +144,7 @@ export function TestPreview({ test, blank: fullBlank, blind, result, duration, i
             {stage === 'end' && <TestDone testId={test.id} result={result} />}
           </div>
 
-          {stage !== 'end' && !bare && (
+          {stage !== 'end' && (
             <div className="test-settings__cta test-pass__cta tp__footer">
               <FillMeter label="Отвечено" done={answered} total={total} />
               <div className="test-pass__buttons">

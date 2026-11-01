@@ -10,10 +10,12 @@ import './OptionHelp.css';
 
 interface OptionHelpProps {
   id: OptionHelpId;
+  /** «В углу»: значок стоит в шапке карточки без отступа слева, а не после слова */
+  corner?: boolean;
 }
 
 /** Значок «?» справа от названия настройки: по нажатию открывается окно с каруселью скриншотов и пояснениями */
-export function OptionHelp({ id }: OptionHelpProps) {
+export function OptionHelp({ id, corner }: OptionHelpProps) {
   const help = OPTION_HELP[id];
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
@@ -30,7 +32,7 @@ export function OptionHelp({ id }: OptionHelpProps) {
       <button
         ref={button}
         type="button"
-        className="option-help"
+        className={`option-help${corner ? ' option-help--corner' : ''}`}
         aria-haspopup="dialog"
         aria-label={`Что это: ${help.title}`}
         onClick={() => setOpen(true)}
@@ -144,13 +146,17 @@ function HelpSheet({ help, ctx, onClose }: { help: Help; ctx: HelpTest; onClose:
             {slides.map((slide, i) => (
               <div key={slide.scene} className={`oh__caption${i === index ? ' oh__caption--on' : ''}`}>
                 <h3 className="oh__title">{slide.title}</h3>
-                <p className="oh__text">{slide.text}</p>
+                {slide.text.split('\n').map((para) => (
+                  <p key={para} className="oh__text">
+                    {para}
+                  </p>
+                ))}
               </div>
             ))}
           </div>
           {/* Для экранных читалок подпись читается один раз, при смене скриншота */}
           <p className="visually-hidden" aria-live="polite">
-            {current.title}. {current.text}
+            {current.title}. {current.text.replace('\n', ' ')}
           </p>
         </div>
         <div className="sheet__footer">

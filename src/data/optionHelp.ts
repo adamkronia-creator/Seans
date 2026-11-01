@@ -4,10 +4,10 @@
  * Макеты собираются из выбранного теста (components/OptionHelp/HelpScenes.tsx): его название, шкалы и бланк, а не снимки одного теста.
  */
 
-export type OptionHelpId = 'blind' | 'blank' | 'result' | 'comment' | 'state';
+export type OptionHelpId = 'blind' | 'blank' | 'result' | 'comment' | 'state' | 'features';
 
 /** Какой макет показан в слайде */
-export type HelpScene = 'blind-off' | 'blind-on' | 'blind-chat' | 'blank-off' | 'blank-on' | 'blank-view' | 'result-thanks' | 'result-score' | 'result-full' | 'task-off' | 'comment-on' | 'comment-result' | 'state-on' | 'state-result';
+export type HelpScene = 'blind-off' | 'blind-on' | 'shuffle' | 'blind-chat' | 'blank-off' | 'blank-on' | 'blank-view' | 'result-thanks' | 'result-score' | 'result-full' | 'task-off' | 'comment-on' | 'comment-result' | 'state-on' | 'state-result';
 
 export interface HelpSlide {
   scene: HelpScene;
@@ -96,6 +96,35 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
         alt: 'Экран клиента после теста: баллы по шкалам с уровнями',
         title: 'Полное заключение',
         text: 'Помимо шкал и баллов, появляется расшифровка диапазонов баллов с подписями «низкий, нормативный или высокий показатель».',
+      },
+    ],
+  },
+  features: {
+    title: 'Особенности тестирования',
+    slides: [
+      {
+        scene: 'blind-on',
+        alt: 'Экран клиента: в шапке вместо названия «Тест №» с датой и временем отправки',
+        title: 'Слепое тестирование',
+        text: 'Скрывает название и назначение теста для пользователя.\nИногда, когда не знаешь какой тест выполняешь, — ответы честнее.',
+      },
+      {
+        scene: 'shuffle',
+        alt: 'Экран клиента: вопрос теста, взятый не по порядку',
+        title: 'Перемешать вопросы',
+        text: 'Перемешивает тестовые вопросы в произвольном порядке.\nТак тест сложнее распознать, если проходишь его повторно.',
+      },
+      {
+        scene: 'blank-view',
+        alt: 'Бланк тестирования с отмеченными ответами клиента',
+        title: 'Сохранить бланк',
+        text: 'Сохраняет бланк тестирования, заполненный пользователем, в заключении.\nПомогает для наблюдения за критически важными вопросами.',
+      },
+      {
+        scene: 'result-full',
+        alt: 'Экран клиента после теста: баллы по шкалам с уровнями',
+        title: 'Завершение',
+        text: 'При завершении теста показывается благодарность, только баллы или полное заключение.\nПомогает избежать негативной тревожности и ятрогении.',
       },
     ],
   },
