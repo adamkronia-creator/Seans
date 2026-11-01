@@ -468,14 +468,14 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             >
               <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
             </Row>
-            <Row Icon={IconRowShuffle} label="Перемешать вопросы">
-              <Switch checked={shuffle} onChange={locked ? noop : setShuffle} label="Перемешать вопросы" />
-            </Row>
             <Row
               Icon={IconRowBlank}
               label={blankLabel}
             >
               <Switch checked={saveBlank} onChange={locked ? noop : setSaveBlank} label={blankLabel} />
+            </Row>
+            <Row Icon={IconRowShuffle} label="Перемешать вопросы">
+              <Switch checked={shuffle} onChange={locked ? noop : setShuffle} label="Перемешать вопросы" />
             </Row>
             {conclusion && (
               <Row Icon={IconRowResult} label="Завершение" info value={locked ? resultTitle(result) : undefined}>
@@ -484,7 +484,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                     forms={RESULT_MODES.map((m) => m.id)}
                     value={result}
                     title="Завершение"
-                    hint="Что клиент увидит сразу после прохождения теста"
                     format={resultTitle}
                     formatValue={(v) => RESULT_MODES.find((m) => m.id === v)?.short ?? v}
                     onChange={(v) => setResult(v as ResultMode)}
