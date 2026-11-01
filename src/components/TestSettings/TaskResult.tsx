@@ -5,7 +5,6 @@ import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
 import { formText, progressOf, taskSettings } from '../../data/taskSettings';
 import { TaskForm } from './TaskForm';
-import { Paragraphs } from './TaskParts';
 import { CollapseCard } from './TestBlank';
 import { TestHeader } from './TestHeader';
 import './TestSettings.css';
@@ -75,14 +74,6 @@ export function TaskResult({ resultId, onBack }: TaskResultProps) {
           </CollapseCard>
 
           <TaskForm data={data} form={form} options={{ comment: values.comment.trim() !== '', state: values.state !== undefined }} values={values} />
-
-          <CollapseCard title="Анализ материалов">
-            <div className="task-pad">
-              <Paragraphs text={data.analysis} />
-            </div>
-          </CollapseCard>
-
-          <p className="cc-note">Задание помогает понять человека, но не ставит диагноз. Выводы по ответам делайте вместе с клиентом, учитывая его обстоятельства.</p>
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import { useMemo, useState } from 'react';
 import IconDate from '../../assets/icons/solar/calendar.svg?react';
 import IconTime from '../../assets/icons/solar/clock-circle.svg?react';
@@ -438,16 +439,13 @@ export function TestConclusion({ data, form, onOpenBlank, scalesOnly }: TestConc
       )}
 
       {!scalesOnly && onOpenBlank && (
-        <ul className="ts-card">
-          <li
-            className="ts-row ts-row--link"
-            role="button"
-            tabIndex={0}
-            onClick={onOpenBlank}
-            onKeyDown={(e) => e.key === 'Enter' && onOpenBlank()}
-          >
-            <span className="ts-row__link">Посмотреть бланк тестирования</span>
-            <IconTestChevron className="ts-row__chevron" />
+        <ul className="ts-actions">
+          <li>
+            <button type="button" className="ts-action" onClick={onOpenBlank}>
+              <IconLinkBlank className="ts-action__icon" />
+              <span className="ts-action__label">Посмотреть бланк тестирования</span>
+              <IconTestChevron className="ts-action__chevron" />
+            </button>
           </li>
         </ul>
       )}
