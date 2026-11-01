@@ -6,6 +6,7 @@ import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { BackgroundControls } from '../BackgroundControls/BackgroundControls';
 import { IconCamera, IconCheck } from './ProfileIcons';
 import { filesOf, uploadPhotos } from './upload';
+import '../AttachSheet/AttachSheet.css';
 import './ProfileSheets.css';
 
 /*
@@ -75,19 +76,19 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
         </button>
       }
     >
-      <section className="sheet__card">
-        <ul className="pf-grid">
+      {/* Плитка картинок, как в окне «Прикрепить»: камера первая, фото по три в ряд вплотную */}
+      <div className="at-card">
+        <ul className="at-photos">
           <li>
-            <button type="button" className="pf-tile pf-tile--add" onClick={() => input.current?.click()}>
+            <button type="button" className="at-photo at-photo--camera" aria-label="Загрузить фото" onClick={() => input.current?.click()}>
               <IconCamera />
-              <span>Загрузить</span>
             </button>
           </li>
           {profile.photos.map((photo, i) => (
             <li key={photo.id}>
               <button
                 type="button"
-                className={`pf-tile${photo.id === current ? ' pf-tile--on' : ''}`}
+                className={`at-photo${photo.id === current ? ' at-photo--on' : ''}`}
                 aria-label={`Фото ${i + 1}`}
                 aria-pressed={photo.id === current}
                 onClick={() => choose(photo.id)}
@@ -102,7 +103,7 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
             </li>
           ))}
         </ul>
-      </section>
+      </div>
       {profile.photos.length === 0 && <p className="pf-note">Загруженное фото останется и в вашей галерее</p>}
       {current && (
         <button type="button" className="sheet__card pf-remove" onClick={remove}>

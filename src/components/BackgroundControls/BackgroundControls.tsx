@@ -1,5 +1,8 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import './BackgroundControls.css';
+import '../AttachSheet/AttachSheet.css';
+import { addToNamedAlbum } from '../../data/profile';
+import { uploadPhotos } from '../Profile/upload';
 import dawn from '../../assets/bg-default.webp';
 import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import {
@@ -34,18 +37,17 @@ export function BackgroundControls() {
   const selected = currentBackgroundId();
   return (
     <>
-      <section className="sheet__card">
-        <ul className="pf-grid">
+      <div className="at-card">
+        <ul className="at-photos">
           <li>
-            <button type="button" className="pf-tile pf-tile--add" onClick={() => file.current?.click()}>
+            <button type="button" className="at-photo at-photo--camera" aria-label="Загрузить фон" onClick={() => file.current?.click()}>
               <IconCamera />
-              <span>Загрузить</span>
             </button>
           </li>
           <li>
             <button
               type="button"
-              className={`pf-tile${selected === null ? ' pf-tile--on' : ''}`}
+              className={`at-photo${selected === null ? ' at-photo--on' : ''}`}
               aria-label="Фон по умолчанию"
               aria-pressed={selected === null}
               onClick={() => {
@@ -65,7 +67,7 @@ export function BackgroundControls() {
             <li key={bg.id}>
               <button
                 type="button"
-                className={`pf-tile${bg.id === selected ? ' pf-tile--on' : ''}`}
+                className={`at-photo${bg.id === selected ? ' at-photo--on' : ''}`}
                 aria-label={`Мой фон ${i + 1}`}
                 aria-pressed={bg.id === selected}
                 onClick={async () => {
@@ -92,11 +94,19 @@ export function BackgroundControls() {
           onChange={async (e) => {
             const f = e.target.files?.[0];
             e.target.value = '';
-            if (f) setFailed(!(await setBackgroundFromFile(f)));
+            if (f) {
+              const ok = await setBackgroundFromFile(f);
+              setFailed(!ok);
+              // Загруженный фон складывается и в альбом «Фон приложения» в галерее
+              if (ok) {
+                const { added } = await uploadPhotos([f], () => {});
+                if (added.length > 0) addToNamedAlbum('Фон приложения', added);
+              }
+            }
             refresh();
           }}
         />
-      </section>
+      </div>
       {selected && (
         <button
           type="button"

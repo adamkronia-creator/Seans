@@ -10,7 +10,7 @@
 /* Фото: три в ряд вплотную, камера первая */
 .at-photos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px; /* grid:ok — просвет между плитками 1 px */
   margin: 0;
   padding: 0;
@@ -18,6 +18,7 @@
 }
 
 .at-photo {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,3 +170,11 @@
   flex-shrink: 0;
   background: var(--sheet-tile);
 }
+
+/* Выбранная плитка в окнах «Фото профиля», «Обложка» и «Фон приложения»: рамка внутри плитки и галочка в углу */
+.at-photo--on {
+  outline: 2px solid var(--action-primary);
+  outline-offset: -2px; /* grid:ok — рамка внутри плитки */
+}
+
+/* Подпись на плитке «Загрузить» не нужна: камера, как в окне «Прикрепить» */

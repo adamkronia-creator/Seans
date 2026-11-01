@@ -74,3 +74,7 @@
   font: var(--type-caption);
   font-weight: 400;
 }
+
+.at-card .bg-sheet__note {
+  padding: var(--space-3);
+}
