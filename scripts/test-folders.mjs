@@ -46,7 +46,7 @@ const row = (scope) => getFolders(scope).map((f) => f.id);
 
 test('начальные папки собраны из прежних категорий, «Избранное» в них не попадает', () => {
   assert.deepEqual(getFolder('chats', 'clients').ids, CHATS.filter((c) => c.category === 'clients').map((c) => c.id));
-  assert.deepEqual(getFolder('chats', 'colleagues').ids, CHATS.filter((c) => c.category === 'colleagues').map((c) => c.id));
+  assert.deepEqual(getFolder('chats', 'colleagues').ids, CHATS.filter((c) => c.category === 'colleagues' || c.extraCategories?.includes('colleagues')).map((c) => c.id));
   for (const id of ['clients', 'colleagues', 'seminars']) assert.ok(!getFolder('chats', id).ids.includes('favorites'));
   assert.deepEqual(names('chats', ['clients', 'colleagues', 'seminars']), ['Клиенты', 'Коллеги', 'Семинар']);
   assert.deepEqual(names('tests', ['training', 'svo']), ['Тренинг', 'СВО']);

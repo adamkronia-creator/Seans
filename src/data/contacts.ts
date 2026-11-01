@@ -30,6 +30,9 @@ const STATUS: Record<string, string> = {
   vera: 'был(а) 10 минут назад',
   vladislav: 'в сети',
   bogdan: 'был(а) вчера в 19:40',
+  alisa: 'в сети',
+  sofia: 'в сети',
+  egor: 'был(а) вчера',
 };
 
 const fromChats: Contact[] = CHATS.filter((c) => !c.favorites && !c.kind).map((c) => ({
@@ -40,7 +43,7 @@ const fromChats: Contact[] = CHATS.filter((c) => !c.favorites && !c.kind).map((c
   status: STATUS[c.id] ?? 'был(а) недавно',
   online: Boolean(c.online),
   category: c.category,
-  female: c.id === 'vera',
+  female: ['vera', 'alisa', 'elizaveta', 'ulyana', 'sofia'].includes(c.id),
 }));
 
 const invented = (id: string, name: string, username: string, status: string, category: ChatCategory, female = false): Contact => ({

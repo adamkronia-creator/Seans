@@ -2,6 +2,12 @@ import avatarMaxim from '../assets/avatars/maxim.jpg';
 import avatarVera from '../assets/avatars/vera.jpg';
 import avatarVladislav from '../assets/avatars/vladislav.jpg';
 import avatarBogdan from '../assets/avatars/bogdan.jpg';
+import avatarAlisa from '../assets/avatars/alisa.jpg';
+import avatarArseniy from '../assets/avatars/arseniy.jpg';
+import avatarEgor from '../assets/avatars/egor.jpg';
+import avatarElizaveta from '../assets/avatars/elizaveta.jpg';
+import avatarSofia from '../assets/avatars/sofia.jpg';
+import avatarUlyana from '../assets/avatars/ulyana.jpg';
 import userAvatar from '../assets/avatars/user-avatar-200.jpg';
 import { initialsAvatar } from '../utils/initialsAvatar';
 
@@ -14,6 +20,8 @@ export interface Chat {
   /** Закреплённый системный чат «Избранное» */
   favorites?: boolean;
   category?: ChatCategory;
+  /** Папки, в которых чат лежит кроме основной (Софья — коллега и участница семинара) */
+  extraCategories?: ChatCategory[];
   online?: boolean;
   lastMessage: string;
   time: string;
@@ -90,6 +98,88 @@ export const CHATS: Chat[] = [
     lastMessage: 'Заполнила дневник эмоций :)',
     time: '14:32',
     unread: 2, // не прочитано
+  },
+  {
+    id: 'alisa',
+    name: 'Алиса Филатова',
+    avatar: avatarAlisa,
+    category: 'clients',
+    online: true,
+    phone: '+7 (912) 604-33-18',
+    username: '@alisa_filatova',
+    about: 'Работаем с самооценкой, встречи по вторникам',
+    birthday: '11 июня 1994',
+    lastMessage: 'Спасибо, что выслушали. Стало спокойнее.',
+    time: '11:48',
+    unread: 1,
+  },
+  {
+    id: 'arseniy',
+    name: 'Арсений Осипов',
+    avatar: avatarArseniy,
+    category: 'clients',
+    phone: '+7 (922) 548-07-92',
+    username: '@arseniy_osipov',
+    about: 'Учусь справляться с тревогой перед экзаменами',
+    birthday: '3 февраля 2001',
+    lastMessage: 'Пройду тест сегодня вечером.',
+    time: '10:26',
+    unread: 0,
+  },
+  {
+    id: 'elizaveta',
+    name: 'Елизавета Белова',
+    avatar: avatarElizaveta,
+    category: 'clients',
+    phone: '+7 (904) 281-65-40',
+    username: '@liza_belova',
+    about: 'Пришла после переезда, ищу опору',
+    birthday: '19 сентября 1992',
+    lastMessage: 'Хорошо, до встречи в среду.',
+    outgoing: 'read',
+    time: 'Вчера',
+    unread: 0,
+  },
+  {
+    id: 'ulyana',
+    name: 'Ульяна Спиридонова',
+    avatar: avatarUlyana,
+    category: 'clients',
+    phone: '+7 (951) 773-20-85',
+    username: '@ulyana_spiridonova',
+    about: 'Веду записи мыслей, обсуждаем на встречах',
+    birthday: '28 апреля 1997',
+    lastMessage: 'Заполнила дневник, посмотрите, пожалуйста.',
+    time: '09:12',
+    unread: 2,
+  },
+  {
+    id: 'egor',
+    name: 'Егор Афанасьев',
+    avatar: avatarEgor,
+    category: 'colleagues',
+    phone: '+7 (987) 330-14-56',
+    username: '@egor_afanasyev',
+    about: 'Психолог, гештальт-подход. Обмениваемся случаями',
+    birthday: '6 декабря 1990',
+    lastMessage: 'Скинул вам разбор по тревоге, посмотрите.',
+    time: 'Вчера',
+    unread: 0,
+  },
+  {
+    id: 'sofia',
+    name: 'Софья Жукова',
+    avatar: avatarSofia,
+    category: 'colleagues',
+    extraCategories: ['seminars'],
+    online: true,
+    phone: '+7 (965) 119-72-03',
+    username: '@sofia_zhukova',
+    about: 'Психолог и участница семинара по КПТ',
+    birthday: '14 мая 1993',
+    lastMessage: 'Увидимся на четвёртом занятии!',
+    time: '08:40',
+    unread: 0,
   },
   {
     id: 'supervision',

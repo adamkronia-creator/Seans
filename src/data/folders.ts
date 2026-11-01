@@ -34,7 +34,7 @@ const seed = (categories: { id: string; label: string }[], members: (id: string)
 
 let state: Record<FolderScope, Folder[]> = {
   // «Избранное» лежит только в «Все»: это системный чат
-  chats: seed(CATEGORIES, (id) => CHATS.filter((chat) => !chat.favorites && chat.category === id).map((chat) => chat.id)),
+  chats: seed(CATEGORIES, (id) => CHATS.filter((chat) => !chat.favorites && (chat.category === id || (chat.extraCategories as string[] | undefined)?.includes(id))).map((chat) => chat.id)),
   tests: seed(TEST_CATEGORIES, (id) => LIBRARY.filter((item) => (item.categories as string[]).includes(id)).map((item) => item.id)),
   tasks: seed(TASK_CATEGORIES, (id) => TASK_LIBRARY.filter((item) => (item.categories as string[]).includes(id)).map((item) => item.id)),
 };
