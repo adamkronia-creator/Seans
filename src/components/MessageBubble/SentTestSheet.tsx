@@ -40,7 +40,7 @@ export function SentTestSheet({ message, test, onClose }: SentTestSheetProps) {
   const rows: Row[] = [
     ...(forms && form ? [{ label: 'Форма бланка', value: form }] : []),
     { label: 'Слепое тестирование', ...onOff(options.blind) },
-    { label: 'Итог для клиента', value: RESULT_MODES.find((m) => m.id === options.result)?.value ?? '' },
+    { label: 'Завершение', value: RESULT_MODES.find((m) => m.id === options.result)?.value ?? '' },
     { label: 'Перемешать вопросы', ...onOff(Boolean(options.shuffle)) },
     { label: SAVE_BLANK_LABEL, ...onOff(options.saveBlank) },
     { label: 'Сообщение для клиента', ...onOff(message.text.trim() !== '') },

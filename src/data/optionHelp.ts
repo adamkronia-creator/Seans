@@ -77,7 +77,7 @@ export const OPTION_HELP: Record<OptionHelpId, OptionHelp> = {
     ],
   },
   result: {
-    title: 'Итог для клиента',
+    title: 'Завершение',
     slides: [
       {
         scene: 'result-thanks',

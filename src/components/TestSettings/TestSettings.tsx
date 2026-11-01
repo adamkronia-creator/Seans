@@ -487,12 +487,12 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               <Switch checked={saveBlank} onChange={locked ? noop : setSaveBlank} label={blankLabel} />
             </Row>
             {conclusion && (
-              <Row Icon={IconRowResult} label="Итог для клиента" info value={locked ? resultTitle(result) : undefined}>
+              <Row Icon={IconRowResult} label="Завершение" info value={locked ? resultTitle(result) : undefined}>
                 {!locked && (
                   <FormMenu
                     forms={RESULT_MODES.map((m) => m.id)}
                     value={result}
-                    title="Итог для клиента"
+                    title="Завершение"
                     hint="Что клиент увидит сразу после прохождения теста"
                     format={resultTitle}
                     formatValue={(v) => RESULT_MODES.find((m) => m.id === v)?.short ?? v}
