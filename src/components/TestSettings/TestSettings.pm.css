@@ -756,3 +756,42 @@
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* «Бланк тестирования» и «Пример заключения»: активные синие кнопки на всю ширину (значок слева, стрелка справа) */
+[data-pm] .ts-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-pm] .ts-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--size-control);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+  font: var(--type-label);
+  text-align: left;
+}
+
+[data-pm] .ts-action:active {
+  filter: brightness(0.9);
+}
+
+[data-pm] .ts-action__icon,
+[data-pm] .ts-action__chevron {
+  flex-shrink: 0;
+  font-size: var(--size-icon);
+}
+
+[data-pm] .ts-action__label {
+  flex: 1;
+  min-width: 0;
+}

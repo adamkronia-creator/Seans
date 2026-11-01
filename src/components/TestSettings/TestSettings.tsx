@@ -356,29 +356,21 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         </div>
 
         {(data.scales || blank) && (
-          <ul className="ts-card">
-            <li
-              className="ts-row ts-row--link"
-              role="button"
-              tabIndex={0}
-              onClick={openBlank}
-              onKeyDown={(e) => e.key === 'Enter' && openBlank()}
-            >
-              <IconLinkBlank className="ts-row__icon" />
-              <span className="ts-row__link">Бланк тестирования</span>
-              <IconTestChevron className="ts-row__chevron" />
+          <ul className="ts-actions">
+            <li>
+              <button type="button" className="ts-action" onClick={openBlank}>
+                <IconLinkBlank className="ts-action__icon" />
+                <span className="ts-action__label">Бланк тестирования</span>
+                <IconTestChevron className="ts-action__chevron" />
+              </button>
             </li>
             {data.scales && (
-              <li
-                className="ts-row ts-row--link"
-                role="button"
-                tabIndex={0}
-                onClick={openConclusion}
-                onKeyDown={(e) => e.key === 'Enter' && openConclusion()}
-              >
-                <IconLinkConclusion className="ts-row__icon" />
-                <span className="ts-row__link">Пример заключения</span>
-                <IconTestChevron className="ts-row__chevron" />
+              <li>
+                <button type="button" className="ts-action" onClick={openConclusion}>
+                  <IconLinkConclusion className="ts-action__icon" />
+                  <span className="ts-action__label">Пример заключения</span>
+                  <IconTestChevron className="ts-action__chevron" />
+                </button>
               </li>
             )}
           </ul>
