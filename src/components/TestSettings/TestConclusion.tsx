@@ -376,10 +376,12 @@ interface TestConclusionProps {
   form: string;
   /** Есть сохранённый бланк: между общей информацией и шкалами появляется кнопка «Посмотреть бланк тестирования» */
   onOpenBlank?: () => void;
+  /** Только таблица шкал (без общей информации, расшифровок и примечания): «полное заключение» на экране завершения */
+  scalesOnly?: boolean;
 }
 
 /** Заключение: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
-export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps) {
+export function TestConclusion({ data, form, onOpenBlank, scalesOnly }: TestConclusionProps) {
   const { info, scales } = data;
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
@@ -392,6 +394,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
 
   return (
     <>
+      {!scalesOnly && (
       <CollapseCard title="Общая информация" id="cc-info">
         <ul className="cc-info">
           <li>
@@ -425,15 +428,16 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
           )}
         </ul>
       </CollapseCard>
+      )}
 
-      {data.alert && (
+      {!scalesOnly && data.alert && (
         <p className="cc-alert" role="alert">
           <StatusIcon ok={false} />
           <span>{data.alert}</span>
         </p>
       )}
 
-      {onOpenBlank && (
+      {!scalesOnly && onOpenBlank && (
         <ul className="ts-card">
           <li
             className="ts-row ts-row--link"
@@ -490,7 +494,7 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         </>
       )}
 
-      {data.blocks ? (
+      {scalesOnly ? null : data.blocks ? (
         // Карточки идут в порядке блоков: основная шкала блока и её дополнительные
         scales.map((s) => <ScaleCard key={s.code} data={data} scale={s} onChart={s.block ? () => (data.flat ? scrollTo(`cc-bar-${s.code}`, 'center') : scrollTo(`cc-block-${s.block}`)) : undefined} />)
       ) : (
@@ -504,10 +508,12 @@ export function TestConclusion({ data, form, onOpenBlank }: TestConclusionProps)
         </>
       )}
 
+      {!scalesOnly && (
       <p className="cc-note">
         Опросник — это диагностическая методика. Итоговые показатели описывают состояние человека на момент прохождения и не являются медицинским
         диагнозом.
       </p>
+      )}
     </>
   );
 }

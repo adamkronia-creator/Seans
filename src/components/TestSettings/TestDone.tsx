@@ -1,6 +1,7 @@
 import { conclusionFor, levelOf, type ConclusionScale } from '../../data/conclusions';
 import type { ResultMode } from '../../data/resultMode';
 import { ClientDone } from './ClientParts';
+import { TestConclusion } from './TestConclusion';
 
 const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
@@ -31,11 +32,20 @@ function SampleResult({ testId, mode }: { testId: string; mode: Exclude<ResultMo
   );
 }
 
+/** Полное заключение под благодарностью: таблица шкал, как в примере заключения */
+function FullResult({ testId }: { testId: string }) {
+  const data = conclusionFor(testId);
+  return data ? <TestConclusion data={data} form="" scalesOnly /> : null;
+}
+
 /** Окончание теста: благодарность, а при показе результата под ней баллы или заключение */
 export function TestDone({ testId, result }: { testId: string; result: ResultMode }) {
   return (
-    <ClientDone title="Спасибо за прохождение теста!" handover={false}>
-      {result !== 'thanks' && <SampleResult testId={testId} mode={result} />}
-    </ClientDone>
+    <>
+      <ClientDone title="Спасибо за прохождение теста!" handover={false}>
+        {result === 'score' && <SampleResult testId={testId} mode={result} />}
+      </ClientDone>
+      {result === 'full' && <FullResult testId={testId} />}
+    </>
   );
 }
