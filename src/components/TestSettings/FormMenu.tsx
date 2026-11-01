@@ -64,18 +64,20 @@ interface FormMenuProps {
   title?: string;
   /** Как показать вариант: «50» → «50 мин» */
   format?: (v: string) => string;
+  /** Как показать выбранное на кнопке, если короче, чем в окне (по умолчанию как `format`) */
+  formatValue?: (v: string) => string;
   onChange: (form: string) => void;
 }
 
 /** Кнопка с выбранной формой бланка; по нажатию открывается меню с вариантами и пояснением */
 const same = (v: string) => v;
 
-export function FormMenu({ forms, value, hint, title = 'Форма бланка', format = same, onChange }: FormMenuProps) {
+export function FormMenu({ forms, value, hint, title = 'Форма бланка', format = same, formatValue = format, onChange }: FormMenuProps) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" className="ts-select" aria-haspopup="dialog" aria-label={`${title}: ${format(value)}`} onClick={() => setOpen(true)}>
-        <span className="ts-select__value">{format(value)}</span>
+      <button type="button" className="ts-select" aria-haspopup="dialog" aria-label={`${title}: ${formatValue(value)}`} onClick={() => setOpen(true)}>
+        <span className="ts-select__value">{formatValue(value)}</span>
         <IconTestChevronDown className="ts-select__chevron" />
       </button>
       {open && (

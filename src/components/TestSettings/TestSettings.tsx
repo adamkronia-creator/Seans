@@ -19,8 +19,8 @@ import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { FormMenu } from './FormMenu';
-import { ResultChoice } from './ResultChoice';
-import type { ResultMode } from '../../data/resultMode';
+import { FeatureHints } from './FeatureHints';
+import { RESULT_MODES, type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
@@ -44,6 +44,7 @@ import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
 import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
+import IconRowResult from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
@@ -73,6 +74,8 @@ interface TestSettingsProps {
   sent?: Message;
   onBack: () => void;
 }
+
+const resultTitle = (id: string) => RESULT_MODES.find((m) => m.id === id)?.title ?? id;
 
 /** Название строки с «?» в конце: значок прижат к последнему слову, и при переносе они не расходятся по разным строкам */
 function labelWithHelp(label: string, help: OptionHelpId) {
@@ -465,13 +468,12 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           </CollapseCard>
         )}
 
-        <CollapseCard title="Особенности тестирования">
+        <CollapseCard title="Особенности тестирования" badge={<FeatureHints onlyIds={conclusion ? undefined : ['blind', 'shuffle', 'blank']} />}>
           <ul className="ts-rows">
             {/* Строки без описаний, пояснения в подсказке «?» со скриншотами */}
             <Row
               Icon={IconRowBlind}
               label="Слепое тестирование"
-              help="blind"
             >
               <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
             </Row>
@@ -481,14 +483,26 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             <Row
               Icon={IconRowBlank}
               label={blankLabel}
-              help="blank"
             >
               <Switch checked={saveBlank} onChange={locked ? noop : setSaveBlank} label={blankLabel} />
             </Row>
+            {conclusion && (
+              <Row Icon={IconRowResult} label="Итог для клиента" info value={locked ? resultTitle(result) : undefined}>
+                {!locked && (
+                  <FormMenu
+                    forms={RESULT_MODES.map((m) => m.id)}
+                    value={result}
+                    title="Итог для клиента"
+                    hint="Что клиент увидит сразу после прохождения теста"
+                    format={resultTitle}
+                    formatValue={(v) => RESULT_MODES.find((m) => m.id === v)?.short ?? v}
+                    onChange={(v) => setResult(v as ResultMode)}
+                  />
+                )}
+              </Row>
+            )}
           </ul>
         </CollapseCard>
-
-        {conclusion && <ResultChoice value={result} onChange={locked ? noop : setResult} />}
 
         <section className="ts-card ts-message-card">
           <ul className="ts-rows">
