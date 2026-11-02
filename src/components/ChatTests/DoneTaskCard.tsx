@@ -77,7 +77,8 @@ export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
 
   const long = full > CLAMP;
   return (
-    <li className="done-task chat-tests__list">
+    <li className="done-task">
+      <div className="done-task__card chat-tests__list">
       <button type="button" className="test-card" onClick={() => onOpen(item)}>
         <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
           <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
@@ -89,16 +90,15 @@ export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
           <span className="test-card__description">Выполнено {result?.info.date ?? item.date}</span>
         </span>
       </button>
-      <div className="done-task__body">
         {text && (
           <p ref={body} className={`done-task__text${long ? ' done-task__text--fade' : ''}`} style={long ? { maxHeight: CLAMP } : undefined}>
             {text}
           </p>
         )}
-        <button type="button" className="ts-desc__toggle" onClick={() => onOpen(item)}>
-          Посмотреть
-        </button>
       </div>
+      <button type="button" className="ts-desc__toggle" onClick={() => onOpen(item)}>
+        Посмотреть
+      </button>
     </li>
   );
 }

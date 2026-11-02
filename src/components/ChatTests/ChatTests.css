@@ -124,21 +124,26 @@
   list-style: none;
 }
 
+/* Как описание теста: карточка с текстом и под ней плитка «Посмотреть» через просвет 4, вместе в одной рамке */
 .done-task {
-  gap: var(--space-2);
-  padding-bottom: 0;
-}
-
-.done-task__body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: 0;
+  gap: var(--space-1);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
 }
 
-/* Как «Читать далее» в описании теста: плитка во всю ширину карточки, нижние углы обрезает сама карточка */
-.done-task__body .ts-desc__toggle {
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+.done-task__card.chat-tests__list {
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border: 0;
+  border-radius: 0;
+}
+
+.done-task .ts-desc__toggle {
+  border-radius: 0;
+  background: var(--glass-card);
 }
 
 .done-task__text {
