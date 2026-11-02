@@ -42,6 +42,8 @@ function SectionedList({
   empty,
   onOpen,
   resultOf,
+  selected,
+  onPick,
 }: {
   items: PsyTest[];
   sections: SectionConfig[];
@@ -50,7 +52,11 @@ function SectionedList({
   onOpen?: (item: PsyTest) => void;
   /** Номер результата завершённого задания: такие карточки показываются отдельными плитками с началом ответа */
   resultOf?: (item: PsyTest) => string;
+  /** Отмеченные карточки (null — выбора нет) и отметка карточки; долгое нажатие начинает выбор */
+  selected?: string[] | null;
+  onPick?: (id: string) => void;
 }) {
+  const pickProps = (id: string) => ({ selecting: Boolean(selected), selected: Boolean(selected?.includes(id)), onPick });
   if (items.length === 0) {
     return <EmptyState icon={empty.kind === 'test' ? <IconTabTests /> : <IconTabPractices />} title={empty.title} text={empty.text} />;
   }
@@ -72,13 +78,13 @@ function SectionedList({
             {resultOf && (status === 'done' || status === 'permanent') ? (
               <ul className="chat-tests__cards">
                 {list.map((item) => (
-                  <DoneTaskCard key={item.id} item={item} resultId={resultOf(item)} permanent={status === 'permanent'} onOpen={(t) => onOpen?.(t)} />
+                  <DoneTaskCard key={item.id} item={item} resultId={resultOf(item)} permanent={status === 'permanent'} onOpen={(t) => onOpen?.(t)} {...pickProps(item.id)} />
                 ))}
               </ul>
             ) : (
               <ul className="chat-tests__list">
                 {list.map((item) => (
-                  <TestCard key={item.id} test={item} onClick={onOpen} />
+                  <TestCard key={item.id} test={item} onClick={onOpen} {...pickProps(item.id)} />
                 ))}
               </ul>
             )}
@@ -94,10 +100,14 @@ export function ChatTests({
   hasData,
   onOpenTest,
   onOpenResult,
+  selected,
+  onPick,
 }: {
   hasData: boolean;
   onOpenTest?: (id: string) => void;
   onOpenResult?: (id: string) => void;
+  selected?: string[] | null;
+  onPick?: (id: string) => void;
 }) {
   const data = useClientData();
   return (
@@ -106,6 +116,8 @@ export function ChatTests({
       sections={TEST_SECTIONS}
       empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTest?.(t.id))}
+      selected={selected}
+      onPick={onPick}
     />
   );
 }
@@ -137,10 +149,14 @@ export function ChatTasks({
   hasData,
   onOpenTask,
   onOpenResult,
+  selected,
+  onPick,
 }: {
   hasData: boolean;
   onOpenTask?: (id: string) => void;
   onOpenResult?: (id: string) => void;
+  selected?: string[] | null;
+  onPick?: (id: string) => void;
 }) {
   const data = useClientData();
   return (
@@ -150,6 +166,8 @@ export function ChatTasks({
       empty={{ kind: 'task', title: 'Заданий пока нет', text: 'Отправьте задание из раздела «Задания» — оно появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTask?.(t.id))}
       resultOf={(t) => clientResultId(CLIENT_CHAT, t.id)}
+      selected={selected}
+      onPick={onPick}
     />
   );
 }

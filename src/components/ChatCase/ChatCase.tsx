@@ -33,8 +33,19 @@ export interface PickProps {
 const HOLD_MS = 450;
 
 /** Долгое нажатие (начать выбор) и короткое касание в режиме выбора (отметить): без сдвига и не по кнопкам внутри */
-function usePick(id: string, { selecting, onPick }: PickProps) {
+interface PickHandlers {
+  onPointerDown?: (e: PointerEvent<HTMLElement>) => void;
+  onPointerMove?: (e: PointerEvent<HTMLElement>) => void;
+  onPointerUp?: (e: PointerEvent<HTMLElement>) => void;
+  onPointerCancel?: () => void;
+  onClickCapture?: (e: React.MouseEvent) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+}
+
+export function usePick(id: string, { selecting, onPick }: PickProps, allowButtons = false): PickHandlers {
   const hold = useRef<{ x: number; y: number; timer: number; fired: boolean } | null>(null);
+  // Долгое нажатие уже начало выбор: следующий за ним «клик» не должен открывать карточку
+  const swallow = useRef(false);
   const clear = () => {
     if (hold.current) window.clearTimeout(hold.current.timer);
     hold.current = null;
@@ -42,12 +53,14 @@ function usePick(id: string, { selecting, onPick }: PickProps) {
   if (!onPick) return {};
   return {
     onPointerDown: (e: PointerEvent<HTMLElement>) => {
-      if (e.button !== 0 || (e.target as HTMLElement).closest('button, a, input, textarea, select, [contenteditable=true]')) return;
+      if (e.button !== 0 || (e.target as HTMLElement).closest(allowButtons ? 'a, input, textarea, select, [contenteditable=true]' : 'button, a, input, textarea, select, [contenteditable=true]')) return;
       clear();
+      swallow.current = false;
       const h = { x: e.clientX, y: e.clientY, fired: false, timer: 0 };
       if (!selecting) {
         h.timer = window.setTimeout(() => {
           h.fired = true;
+          swallow.current = true;
           window.getSelection()?.removeAllRanges();
           onPick(id);
         }, HOLD_MS);
@@ -66,6 +79,17 @@ function usePick(id: string, { selecting, onPick }: PickProps) {
       if (tap) onPick(id);
     },
     onPointerCancel: clear,
+    ...(allowButtons
+      ? {
+          onClickCapture: (e: React.MouseEvent) => {
+            if (selecting || swallow.current) {
+              e.stopPropagation();
+              e.preventDefault();
+              swallow.current = false;
+            }
+          },
+        }
+      : {}),
     onContextMenu: (e: React.MouseEvent) => {
       if (!(e.target as HTMLElement).closest('input, textarea, [contenteditable=true]')) e.preventDefault();
     },

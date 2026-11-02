@@ -113,3 +113,18 @@ test('история и события: запись называется зап
     ['Добавил запись 1 в задание «Дневник СМЭР»', '/chat/maxim/result/maxim-smer-r1'],
   ]);
 });
+
+test('снять постоянное и удалить: задание уходит в «Отправленные», удаление убирает карточку, у записи — только её', () => {
+  const { cancelPermanent, deleteItems } = lib;
+  assert.ok(tasksBy('permanent').some((t) => t.id === 'smer'));
+  cancelPermanent(['smer', 'evidence']);
+  assert.ok(!tasksBy('permanent').some((t) => t.id === 'smer' || t.id === 'evidence'));
+  assert.ok(tasksBy('sent').some((t) => t.id === 'smer') && tasksBy('sent').some((t) => t.id === 'evidence'));
+  // Записи остаются завершёнными
+  assert.ok(tasksBy('done').some((t) => t.id === 'smer-r1'));
+  deleteItems('task', ['evidence', 'smer-r1']);
+  assert.ok(!tasksBy('sent').some((t) => t.id === 'evidence'));
+  assert.ok(!tasksBy('done').some((t) => t.id === 'smer-r1') && tasksBy('done').some((t) => t.id === 'smer-r2'));
+  deleteItems('test', ['itt']);
+  assert.ok(!itemsWithStatus(readClientData(), 'test').some((t) => t.id === 'itt'));
+});

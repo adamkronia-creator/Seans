@@ -172,3 +172,66 @@
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
 }
+
+/* ——— Выбор тестов и заданий: долгое нажатие начинает, кружок справа показывает отметку, отмеченная карточка подсвечена ——— */
+.chat-tests {
+  --select-tint: color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+
+.chat-tests li {
+  -webkit-touch-callout: none;
+}
+
+.chat-tests li[data-selecting] {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chat-tests li[data-selecting]::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--select-tint);
+  opacity: 0;
+  transition: opacity var(--dur-quick) ease;
+  pointer-events: none;
+}
+
+.chat-tests li[data-selected]::after {
+  opacity: 1;
+}
+
+.chat-tests li[data-selecting] .test-card {
+  position: relative;
+}
+
+.chat-tests li[data-selecting] .test-card__date {
+  visibility: hidden;
+}
+
+.pick-mark {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  box-sizing: border-box;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 2px solid var(--text-secondary);
+  border-radius: var(--radius-full);
+}
+
+.chat-tests li[data-selected] .pick-mark {
+  z-index: 2;
+  border-color: var(--color-accent);
+  background: var(--color-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 100% no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-tests li[data-selecting]::after {
+    transition: none;
+  }
+}

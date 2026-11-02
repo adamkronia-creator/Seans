@@ -340,6 +340,35 @@ export function logStep(kind: 'test' | 'task', ref: string, state: ActivityState
   update({ activity: [...data.activity, { id: nextId(), kind, ref, state, date, time, ...extra }] });
 }
 
+/**
+ * Убирает тесты или задания из вкладки клиента. Номер карточки — id теста или задания; у записи постоянного задания
+ * («smer-r2») — только эта запись, у остального — все действия по нему (отправка, выполнение, назначение).
+ */
+export function deleteItems(kind: 'test' | 'task', ids: string[]) {
+  const record = (id: string) => /^(.+)-r(\d+)$/.exec(id);
+  update({
+    activity: data.activity.filter((a) => {
+      if (a.kind !== kind) return true;
+      return !ids.some((id) => {
+        const r = kind === 'task' ? record(id) : null;
+        return r ? a.ref === r[1] && a.record === Number(r[2]) : a.ref === id && a.record === undefined;
+      });
+    }),
+  });
+}
+
+/** Задание перестаёт быть постоянным: остаётся среди отправленных, новые записи клиент больше не делает */
+export function cancelPermanent(ids: string[]) {
+  update({
+    activity: data.activity.map((a) => {
+      if (a.kind !== 'task' || a.record !== undefined || !ids.includes(a.ref)) return a;
+      if (!a.permanent && a.state !== 'assigned') return a;
+      const { permanent: _p, ...rest } = a;
+      return { ...rest, state: a.state === 'assigned' ? 'sent' : a.state } as Activity;
+    }),
+  });
+}
+
 // ——— Выборки для экранов ———
 
 export type HistoryEvent =

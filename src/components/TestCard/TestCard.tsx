@@ -1,15 +1,17 @@
 import type { CSSProperties } from 'react';
+import { usePick, type PickProps } from '../ChatCase/ChatCase';
 import type { PsyTest } from '../../data/tests';
 import './TestCard.css';
 
-interface TestCardProps {
+interface TestCardProps extends PickProps {
   test: PsyTest;
   onClick?: (test: PsyTest) => void;
 }
 
-export function TestCard({ test, onClick }: TestCardProps) {
+export function TestCard({ test, onClick, selecting, selected, onPick }: TestCardProps) {
+  const pick = usePick(test.id, { selecting, onPick }, true);
   return (
-    <li>
+    <li data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
       <button type="button" className="test-card" onClick={() => onClick?.(test)}>
         <span
           className="test-card__avatar"
@@ -24,6 +26,7 @@ export function TestCard({ test, onClick }: TestCardProps) {
           </span>
           <span className="test-card__description">{test.description}</span>
         </span>
+        {selecting && <span className="pick-mark" aria-hidden="true" />}
       </button>
     </li>
   );

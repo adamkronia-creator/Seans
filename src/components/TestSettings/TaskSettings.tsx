@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { IconTestChevron, IconTestChevronDown, IconTestMic } from '../icons';
+import { IconTestChevron, IconTestMic } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { Toast } from '../Toast/Toast';
@@ -25,8 +25,6 @@ import {
   emptyValues,
   exampleValues,
   formText,
-  limitText,
-  PERMANENT_LIMITS,
   permanentNote,
   TASK_DEADLINES,
   TASK_MESSAGE_LIMIT,
@@ -46,7 +44,6 @@ import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
 import IconRowComment from '../../assets/icons/solar/chat-round.svg?react';
 import IconRowState from '../../assets/icons/solar/smile-circle.svg?react';
 import IconRowPermanent from '../../assets/icons/solar/restart.svg?react';
-import IconRowCount from '../../assets/icons/solar/list-ordered.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkExample from '../../assets/icons/solar/notebook.svg?react';
@@ -133,7 +130,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const deadline = passRequest?.deadline ?? TASK_DEADLINES[0];
   // Правила назначения: постоянное задание и сколько записей всего (0 — без ограничения)
   const [permanent, setPermanent] = useState(Boolean(so?.permanent));
-  const [limit, setLimit] = useState(so?.permanent?.limit ?? 0);
   const [messageOn, setMessageOn] = useState(so ? so.note !== '' : true);
   const [message, setMessage] = useState(so ? so.note : (data?.message ?? ''));
   const [sheet, setSheet] = useState<'preview' | 'send' | null>(null);
@@ -180,7 +176,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const formLabel = data.formLabel ?? 'Форма бланка';
 
   // Постоянное задание: срока и напоминания у него нет, вместо них в сообщении строка про постоянство и число записей
-  const rule: PermanentRule | undefined = permanent ? (limit ? { limit } : {}) : undefined;
+  const rule: PermanentRule | undefined = permanent ? {} : undefined;
 
   // Сообщение клиенту и, если выбран, срок или правило: клиент видит их в карточке задания
   const note = messageOn ? message.trim() : '';
@@ -221,18 +217,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
       </li>
     );
   };
-
-  const select = (label: string, value: string, values: string[], onChange: (v: string) => void) => (
-    <label className="ts-select">
-      <span className="ts-select__value">{value}</span>
-      <IconTestChevronDown className="ts-select__chevron" />
-      <select className="ts-select__native" aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
-        {values.map((v) => (
-          <option key={v}>{v}</option>
-        ))}
-      </select>
-    </label>
-  );
 
   if (resultId) {
     return (
@@ -366,15 +350,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
                 <Row Icon={IconRowPermanent} label="Назначить постоянным">
                   <Switch checked={permanent} onChange={locked ? noop : setPermanent} label="Назначить постоянным" />
                 </Row>
-                <li className={`ts-fold${permanent ? ' ts-fold--open' : ''}`} aria-hidden={!permanent}>
-                  <div className="ts-fold__inner">
-                    <ul className="ts-rows">
-                      <Row Icon={IconRowCount} label="Всего записей" info value={locked ? limitText(limit) : undefined}>
-                        {!locked && select('Всего записей', limitText(limit), PERMANENT_LIMITS.map(limitText), (v) => setLimit(PERMANENT_LIMITS[PERMANENT_LIMITS.map(limitText).indexOf(v)] ?? 0))}
-                      </Row>
-                    </ul>
-                  </div>
-                </li>
               </ul>
             </CollapseCard>
 

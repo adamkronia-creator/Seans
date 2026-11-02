@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import '../TestCard/TestCard.css';
 import '../TestSettings/TestSettings.css';
+import { usePick, type PickProps } from '../ChatCase/ChatCase';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
@@ -40,7 +41,7 @@ function firstText(fields: TaskField[], values: TaskValues): string {
   return text;
 }
 
-interface DoneTaskCardProps {
+interface DoneTaskCardProps extends PickProps {
   /** Карточка завершённого задания из списка вкладки */
   item: PsyTest;
   /** Номер результата, по которому берутся ответы и открывается экран результата */
@@ -54,7 +55,8 @@ interface DoneTaskCardProps {
  * Завершённое задание во вкладке «Задания»: своя плитка с аватаркой, названием и датой выполнения, под ними первые строки того,
  * что человек написал в бланке (обрезаются, как описание задания в настройках), и кнопка «Посмотреть» открывает результат.
  */
-export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCardProps) {
+export function DoneTaskCard({ item, resultId, onOpen, permanent, selecting, selected, onPick }: DoneTaskCardProps) {
+  const pick = usePick(item.id, { selecting, onPick }, true);
   const own = useTaskResult(resultId);
   const result = permanent ? undefined : (own ?? findClientTaskResult(resultId));
   const [text, setText] = useState('');
@@ -80,7 +82,7 @@ export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCard
 
   const long = full > CLAMP;
   return (
-    <li className="done-task">
+    <li className="done-task" data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
       <div className={`done-task__card chat-tests__list${text ? '' : ' done-task__card--bare'}`}>
       <button type="button" className="test-card" onClick={() => onOpen(item)}>
         <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
@@ -93,6 +95,7 @@ export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCard
           </span>
           <span className="test-card__description">{permanent ? (TASK_LIBRARY.find((t) => t.id === item.id)?.description ?? item.description) : `Выполнено ${result?.info.date ?? item.date}`}</span>
         </span>
+        {selecting && <span className="pick-mark" aria-hidden="true" />}
       </button>
         {text && (
           <p ref={body} className={`done-task__text${long ? ' done-task__text--fade' : ''}`} style={long ? { maxHeight: CLAMP } : undefined}>

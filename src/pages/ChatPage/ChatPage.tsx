@@ -25,6 +25,7 @@ import { SentTestSheet } from '../../components/MessageBubble/SentTestSheet';
 import { MessageInput } from '../../components/MessageInput/MessageInput';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
 import { IconChevronDown, IconChevronUp, IconCopy, IconForward, IconReply, IconTrash } from '../../components/ChatParts/ChatIcons';
+import IconUnpermanent from '../../assets/icons/solar/close-circle.svg?react';
 import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
@@ -35,7 +36,7 @@ import { editCrossposts, pickedNetworks, publishPost, removeCrossposts, resetPic
 import { roleOf } from '../../data/roles';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
 import { EMOJI_GROUPS } from '../../data/emojiSet';
-import { addNote, addSection, deleteNotes, deleteSections, useClientData } from '../../data/clientStore';
+import { addNote, addSection, cancelPermanent, deleteItems, deleteNotes, deleteSections, itemsWithStatus, useClientData } from '../../data/clientStore';
 import type { Message } from '../../data/messages';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -310,6 +311,8 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <SelfTests onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
         ) : (
           <ChatTests
+            selected={picked}
+            onPick={onPick}
             hasData={hasClientData}
             onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
             onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
@@ -320,6 +323,8 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <SelfTasks onOpen={(resultId) => navigate(`/chat/${chatId}/result/${resultId}`)} />
         ) : (
           <ChatTasks
+            selected={picked}
+            onPick={onPick}
             hasData={hasClientData}
             onOpenTask={(taskId) => hasTaskSettings(taskId) && navigate(`/chat/${chatId}/tasks/${taskId}`)}
             onOpenResult={(taskId) => findClientTaskResult(clientResultId(chatId, taskId)) && navigate(clientResultPath(chatId, taskId))}
@@ -534,8 +539,12 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       }),
     [],
   );
-  const { notes: allNotes, caseSections: allSections } = useClientData();
-  const cards = section === 'notes' || section === 'info';
+  const clientData = useClientData();
+  const { notes: allNotes, caseSections: allSections } = clientData;
+  // Тесты и задания клиента выбираются так же, как карточки заметок: отмечаются, удаляются, у постоянных заданий есть «Снять»
+  const listing = !chat?.favorites && (section === 'tests' || section === 'tasks');
+  const cards = section === 'notes' || section === 'info' || listing;
+  const pickedPermanent = section === 'tasks' && selected ? itemsWithStatus(clientData, 'task').filter((t) => t.status === 'permanent' && selected.includes(t.id)).map((t) => t.id) : [];
   // Жест и системная «назад» при выборе сообщений выходят из выбора, а не из чата
   const cancelSelect = useCallback(() => setSelected(null), []);
   const selecting = selected !== null;
@@ -623,18 +632,25 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const canRemoveMany = cards || (chosen.length > 0 && chosen.every((m) => permsFor(m).remove));
   const copyMany = () => {
     const ids = selected ?? [];
-    const text = cards
+    const text = listing
+      ? ''
+      : cards
       ? (section === 'notes' ? allNotes.filter((n) => ids.includes(n.id)).map(noteText) : allSections.filter((x) => ids.includes(x.id)).map(sectionText)).join('\n\n')
       : chosen.filter((m) => permsFor(m).copy).map((m) => m.text).join('\n\n');
     void copyText(text).then((ok) => say(ok ? 'Скопировано' : 'Не удалось скопировать'));
     setSelected(null);
   };
   const removeTitle = (n: number) =>
-    section === 'notes' ? (n > 1 ? 'Удалить заметки?' : 'Удалить заметку?') : section === 'info' ? 'Удалить сведения?' : n > 1 ? 'Удалить сообщения?' : 'Удалить сообщение?';
+    section === 'tests'
+      ? n > 1 ? 'Удалить тесты?' : 'Удалить тест?'
+      : section === 'tasks'
+        ? n > 1 ? 'Удалить задания?' : 'Удалить задание?'
+        : section === 'notes' ? (n > 1 ? 'Удалить заметки?' : 'Удалить заметку?') : section === 'info' ? 'Удалить сведения?' : n > 1 ? 'Удалить сообщения?' : 'Удалить сообщение?';
   const removeNow = () => {
     const ids = removing ?? [];
     if (cards) {
-      if (section === 'notes') deleteNotes(ids);
+      if (listing) deleteItems(section === 'tests' ? 'test' : 'task', ids);
+      else if (section === 'notes') deleteNotes(ids);
       else deleteSections(ids);
     } else {
       // Посты, вышедшие в Telegram и ВК, убираются и там (номера записей лежат в постах, поэтому до удаления из переписки)
@@ -909,9 +925,27 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
               Выбрано <Badge count={cards ? (selected?.length ?? 0) : chosen.length} variant="select" />
             </h1>
             <div className="chat__select-actions">
-              <button type="button" className="chat__action" aria-label="Копировать" disabled={!canCopyMany} onClick={copyMany}>
-                <IconCopy />
-              </button>
+              {listing ? (
+                section === 'tasks' && (
+                  <button
+                    type="button"
+                    className="chat__action"
+                    aria-label="Снять постоянное"
+                    disabled={pickedPermanent.length === 0}
+                    onClick={() => {
+                      cancelPermanent(pickedPermanent);
+                      setSelected(null);
+                      say(pickedPermanent.length > 1 ? 'Задания больше не постоянные' : 'Задание больше не постоянное');
+                    }}
+                  >
+                    <IconUnpermanent />
+                  </button>
+                )
+              ) : (
+                <button type="button" className="chat__action" aria-label="Копировать" disabled={!canCopyMany} onClick={copyMany}>
+                  <IconCopy />
+                </button>
+              )}
               {!cards && (
                 <button type="button" className="chat__action" aria-label="Переслать" disabled={!canForwardMany} onClick={() => setForwarding(chosen)}>
                   <IconForward />
