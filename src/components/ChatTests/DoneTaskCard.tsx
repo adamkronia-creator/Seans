@@ -81,7 +81,7 @@ export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCard
   const long = full > CLAMP;
   return (
     <li className="done-task">
-      <div className="done-task__card chat-tests__list">
+      <div className={`done-task__card chat-tests__list${text ? '' : ' done-task__card--bare'}`}>
       <button type="button" className="test-card" onClick={() => onOpen(item)}>
         <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
           <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
@@ -89,6 +89,7 @@ export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCard
         <span className="test-card__body">
           <span className="test-card__top">
             <span className="test-card__title">{item.title}</span>
+            {permanent && <span className="test-card__date">{item.date}</span>}
           </span>
           <span className="test-card__description">{permanent ? (TASK_LIBRARY.find((t) => t.id === item.id)?.description ?? item.description) : `Выполнено ${result?.info.date ?? item.date}`}</span>
         </span>
@@ -99,7 +100,7 @@ export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCard
           </p>
         )}
       </div>
-      <button type="button" className="ts-desc__toggle" onClick={() => onOpen(item)}>
+      <button type="button" className={`ts-desc__toggle${permanent ? ' done-task__go' : ''}`} onClick={() => onOpen(item)}>
         {permanent ? 'Выполнить' : 'Посмотреть'}
       </button>
     </li>

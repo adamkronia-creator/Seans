@@ -141,6 +141,18 @@
   border-radius: 0;
 }
 
+.done-task__card--bare.chat-tests__list {
+  gap: 0;
+  padding-bottom: var(--space-1);
+}
+
+/* «Выполнить»: активная синяя кнопка, как кнопки бланка в настройках */
+[data-pm] .done-task .ts-desc__toggle.done-task__go,
+.done-task .ts-desc__toggle.done-task__go {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
 .done-task .ts-desc__toggle {
   border-radius: 0;
   background: var(--glass-card);
