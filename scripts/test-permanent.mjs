@@ -20,6 +20,9 @@ const built = esbuild.buildSync({
       export * from './src/data/resultLinks';
       export * from './src/data/clientStore';
       export { findClientTaskResult } from './src/data/clientTaskResults';
+      export { findClientResult } from './src/data/clientResults';
+      export * from './src/data/waiting';
+      export * from './src/data/resultGlance';
     `,
     resolveDir: root,
     loader: 'ts',
@@ -112,6 +115,51 @@ test('история и события: запись называется зап
     ['Добавил запись 2 в задание «Дневник СМЭР»', '/chat/maxim/result/maxim-smer-r2'],
     ['Добавил запись 1 в задание «Дневник СМЭР»', '/chat/maxim/result/maxim-smer-r1'],
   ]);
+});
+
+test('сколько ждёт ответа: сегодня, день, дня, дней; будущая и неверная даты — сегодня', () => {
+  const { waitingText } = lib;
+  const at = (m, d) => new Date(2026, m - 1, d, 15, 30);
+  assert.equal(waitingText('09.10.2026', at(10, 9)), 'Сегодня');
+  assert.deepEqual(
+    [[10, 10], [10, 13], [10, 14], [10, 30], [11, 2]].map(([m, d]) => waitingText('09.10.2026', at(m, d))),
+    ['1 день', '4 дня', '5 дней', '21 день', '24 дня'],
+  );
+  assert.equal(waitingText('09.10.2026', at(10, 1)), 'Сегодня');
+  assert.equal(waitingText('не дата', at(10, 20)), 'Сегодня');
+});
+
+test('карточки чата клиента: у отправленного есть дата и время, у постоянного — число записей, последняя и дата назначения', () => {
+  const data = readClientData();
+  const sent = itemsWithStatus(data, 'task').find((t) => t.id === 'pie');
+  assert.equal(sent.fullDate, '09.10.2026');
+  assert.equal(sent.time, '09:40');
+  const smer = tasksBy('permanent').find((t) => t.id === 'smer');
+  assert.deepEqual(smer.records, { count: 2, last: '07.10.2026', since: '05.10.2026' });
+  const record = tasksBy('done').find((t) => t.id === 'smer-r2');
+  assert.equal(record.fullDate, '07.10.2026');
+});
+
+test('итог результата в карточке: у одной шкалы — её балл и уровень, у многих — самые выраженные', () => {
+  const { resultGlance, findClientResult, scoreText } = lib;
+  const glance = (id) => resultGlance(findClientResult(`maxim-${id}`).data);
+  const phq = glance('phq9');
+  assert.ok(phq.single);
+  assert.deepEqual([phq.rows[0].score, phq.rows[0].max, phq.rows[0].tone, phq.rows[0].legend], [8, 27, 'yellow', 'Легкая']);
+  assert.equal(phq.rows[0].chip, 'Легкая депрессия');
+  assert.ok(phq.rows[0].marks.every((m) => m > 0 && m < 1));
+  assert.deepEqual([glance('gad7').rows[0].tone, glance('rses').rows[0].tone], ['orange', 'green']);
+  // SCL-90: сначала красные основные (по доле от максимума), затем красные дополнительные
+  const scl = glance('scl90');
+  assert.ok(!scl.single);
+  assert.deepEqual(scl.rows.map((r) => r.code), ['PST', 'GSI', 'МС']);
+  assert.equal(scl.more, 9);
+  // 5PFQ: в итог идут только шкалы с диапазонами, дополнительные без диапазонов не берутся
+  const pfq = glance('5pfq');
+  assert.deepEqual(pfq.rows.map((r) => r.tone), ['red', 'red', 'red']);
+  assert.equal(pfq.more, 2);
+  assert.equal(scoreText(1.28), '1,28');
+  assert.equal(scoreText(66), '66');
 });
 
 test('снять постоянное и удалить: задание уходит в «Отправленные», удаление убирает карточку, у записи — только её', () => {

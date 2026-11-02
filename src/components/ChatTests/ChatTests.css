@@ -34,6 +34,12 @@
   letter-spacing: 0;
 }
 
+.chat-tests__count {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+}
+
 .chat .chat-tests__remind {
   /* Область нажатия 44 на 8 шире подписи по бокам; видимые отступы прежние */
   margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1) calc(var(--space-3) * -1) auto;
@@ -91,14 +97,12 @@
   height: var(--space-8);
 }
 
-/* Название в одну строку — headline; под ним описание — label обычного начертания; дата — caption */
+/* Название — headline, до двух строк (длинное имя теста не обрезается на полуслове); под ним описание — label обычного начертания; дата — caption */
 .chat .chat-tests__list .test-card__title {
   overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .chat .chat-tests__list .test-card__description {
@@ -114,18 +118,18 @@
   line-height: var(--space-6);
 }
 
-/* Завершённые задания: у каждого своя плитка */
+/* ——— Карточки: у каждого теста и задания своя, между карточками --block-gap ——— */
 .chat-tests__cards {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--block-gap);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Как описание теста: карточка с текстом и под ней плитка «Посмотреть» через просвет 4, вместе в одной рамке */
-.done-task {
+/* Как описание теста в настройках: стеклянная панель и под ней плитка действия через просвет 4, вместе в одной рамке */
+.item-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -134,43 +138,239 @@
   border-radius: var(--radius-lg);
 }
 
-.done-task__card.chat-tests__list {
-  gap: var(--space-2);
-  padding-bottom: var(--space-3);
+.item-card__panel.chat-tests__list {
+  gap: var(--space-1);
+  padding: var(--space-1) 0 var(--card-pad);
   border: 0;
   border-radius: 0;
 }
 
-.done-task__card--bare.chat-tests__list {
-  gap: 0;
+/* Без содержимого под шапкой: нижний отступ тот же, что сверху */
+.item-card__panel--bare.chat-tests__list {
   padding-bottom: var(--space-1);
 }
 
-/* «Выполнить»: активная синяя кнопка, как кнопки бланка в настройках */
-[data-pm] .done-task .ts-desc__toggle.done-task__go,
-.done-task .ts-desc__toggle.done-task__go {
-  background: var(--action-primary);
-  color: var(--action-primary-text);
+/* Содержимое выровнено по аватарке: поля 16, между блоками 12 */
+.item-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--row-pad-x);
 }
 
-.done-task .ts-desc__toggle {
-  border-radius: 0;
-  background: var(--glass-card);
-}
-
-.done-task__text {
+.item-card__text {
   margin: 0;
   overflow: hidden;
-  padding: 0 var(--space-4);
   color: var(--text-primary);
   font: var(--type-body);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.done-task__text--fade {
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+/* Последние строки обрезанного текста уходят в прозрачность, как в описании теста */
+.item-card__text--fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--space-8)), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--space-8)), transparent);
+}
+
+/* Плитка действия: как «Читать далее», во всю ширину рамки; нижние углы скругляет сама рамка */
+.item-card .ts-desc__toggle {
+  border-radius: 0;
+  background: var(--glass-card);
+}
+
+/* Главное действие карточки («Выполнить»): активная синяя кнопка, как кнопки бланка в настройках */
+[data-pm] .item-card .ts-desc__toggle.item-card__action--primary,
+.item-card .ts-desc__toggle.item-card__action--primary {
+  background: var(--action-primary);
+  color: var(--action-primary-text);
+}
+
+/* ——— Показатели: до трёх колонок, значение и под ним подпись ——— */
+.facts {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--divider);
+  list-style: none;
+}
+
+.facts__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.facts__value {
+  color: var(--text-primary);
+  font: var(--type-label);
+}
+
+.facts__label {
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+/* ——— Итог теста: цвет уровня несёт точка и заливка, смысл — слова ——— */
+.glance {
+  --tone: var(--color-accent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.glance__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.glance__score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.glance__num {
+  color: var(--text-primary);
+  font: var(--type-title);
+}
+
+.glance__of {
+  color: var(--text-secondary);
+  font: var(--type-body);
+}
+
+.glance__chip {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--space-6);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--text-primary);
+  font: var(--type-meta);
+}
+
+.glance__dot {
+  flex-shrink: 0;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.glance__meter {
+  position: relative;
+  display: block;
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--divider);
+}
+
+.glance__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radius-full);
+  background: var(--tone);
+}
+
+.glance__mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px; /* grid:ok — линия */
+  background: rgb(255 255 255 / 50%);
+  transform: translateX(-50%);
+}
+
+/* Несколько шкал: у каждой точка уровня слева, название и под ним балл и уровень */
+.glance__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.glance__row {
+  --tone: var(--color-accent);
+  display: grid;
+  grid-template-columns: var(--space-2) minmax(0, 1fr);
+  column-gap: var(--space-3);
+  align-items: baseline;
+}
+
+.glance__row .glance__dot {
+  align-self: start;
+  margin-top: var(--space-2);
+}
+
+.glance__name {
+  overflow: hidden;
+  color: var(--text-primary);
+  font: var(--type-label);
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.glance__detail {
+  grid-column: 2;
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+.glance__more {
+  margin: 0;
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+.glance--green,
+.glance__chip--green,
+.glance__row--green,
+.glance__meter--green {
+  --tone: var(--color-green);
+}
+
+.glance--yellow,
+.glance__chip--yellow,
+.glance__row--yellow,
+.glance__meter--yellow {
+  --tone: var(--color-yellow);
+}
+
+.glance--orange,
+.glance__chip--orange,
+.glance__row--orange,
+.glance__meter--orange {
+  --tone: var(--color-orange);
+}
+
+.glance--red,
+.glance__chip--red,
+.glance__row--red,
+.glance__meter--red {
+  --tone: var(--color-red);
+}
+
+.glance--darkred,
+.glance__chip--darkred,
+.glance__row--darkred,
+.glance__meter--darkred {
+  --tone: var(--color-darkred);
 }
 
 /* ——— Выбор тестов и заданий: долгое нажатие начинает, кружок справа показывает отметку, отмеченная карточка подсвечена ——— */
@@ -210,13 +410,19 @@
 }
 
 .chat-tests li[data-selecting] .test-card__date {
-  visibility: hidden;
+  display: none;
+}
+
+/* Справа остаётся место под кружок отметки: 24 и зазор 12 */
+.chat-tests li[data-selecting] .test-card__body {
+  padding-right: calc(var(--space-6) + var(--space-3));
 }
 
 .pick-mark {
   position: absolute;
-  top: var(--space-4);
+  top: 50%;
   right: var(--space-4);
+  transform: translateY(-50%);
   box-sizing: border-box;
   width: var(--space-6);
   height: var(--space-6);

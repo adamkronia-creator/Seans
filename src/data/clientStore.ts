@@ -498,7 +498,7 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
     });
     records.forEach((i) => {
       const a = d.activity[i] as ItemActivity;
-      items.push({ item: { ...item, id: recordRef(item.id, a.record!), description: `Запись ${a.record}`, status: 'done', date: a.date.slice(0, 5) }, index: i });
+      items.push({ item: { ...item, id: recordRef(item.id, a.record!), description: `Запись ${a.record}`, status: 'done', date: a.date.slice(0, 5), fullDate: a.date, time: a.time }, index: i });
     });
     if (last < 0) return;
     const a = d.activity[last] as ItemActivity;
@@ -509,13 +509,31 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
       if (a.permanent.limit && mine.length >= a.permanent.limit) return;
       const newest = Math.max(last, ...mine);
       items.push({
-        item: { ...item, status: 'permanent', date: d.activity[newest].date.slice(0, 5), description: recordsText(mine.length, a.permanent.limit) },
+        item: {
+          ...item,
+          status: 'permanent',
+          date: d.activity[newest].date.slice(0, 5),
+          description: recordsText(mine.length, a.permanent.limit),
+          fullDate: a.date,
+          time: a.time,
+          records: { count: mine.length, ...(mine.length ? { last: d.activity[Math.max(...mine)].date } : {}), since: a.date },
+        },
         index: newest,
       });
       return;
     }
     // «Назначенное» и «постоянное» задание — одно и то же: оба стоят в разделе «Постоянные»
-    items.push({ item: { ...item, status: a.state === 'assigned' ? 'permanent' : a.state, date: a.date.slice(0, 5) }, index: last });
+    items.push({
+      item: {
+        ...item,
+        status: a.state === 'assigned' ? 'permanent' : a.state,
+        date: a.date.slice(0, 5),
+        fullDate: a.date,
+        time: a.time,
+        ...(a.state === 'assigned' ? { records: { count: 0, since: a.date } } : {}),
+      },
+      index: last,
+    });
   });
   // Свежие действия выше
   return items.sort((x, y) => y.index - x.index).map((x) => x.item);

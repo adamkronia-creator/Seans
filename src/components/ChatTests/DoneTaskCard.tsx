@@ -1,9 +1,7 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import '../TestCard/TestCard.css';
-import '../TestSettings/TestSettings.css';
-import { usePick, type PickProps } from '../ChatCase/ChatCase';
+import { useLayoutEffect, useRef, useState } from 'react';
+import type { PickProps } from '../ChatCase/ChatCase';
+import { Facts, ItemCard, type Fact } from './ItemCard';
 import { findClientTaskResult } from '../../data/clientTaskResults';
-import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
 import { starterOf, type TaskField, type TaskValues } from '../../data/taskValues';
 import type { PsyTest } from '../../data/tests';
@@ -47,65 +45,62 @@ interface DoneTaskCardProps extends PickProps {
   /** Номер результата, по которому берутся ответы и открывается экран результата */
   resultId: string;
   onOpen: (item: PsyTest) => void;
-  /** Постоянное задание: вместо даты выполнения — короткое описание, вместо «Посмотреть» — «Выполнить», текста ответа нет */
-  permanent?: boolean;
 }
 
 /**
- * Завершённое задание во вкладке «Задания»: своя плитка с аватаркой, названием и датой выполнения, под ними первые строки того,
- * что человек написал в бланке (обрезаются, как описание задания в настройках), и кнопка «Посмотреть» открывает результат.
+ * Завершённое задание: в шапке «Выполнено …», под ней первые строки того, что человек написал в бланке (обрезаются, как описание
+ * задания в настройках), ниже показатели (номер записи, итоги бланка, время), а плитка «Посмотреть» открывает результат.
  */
-export function DoneTaskCard({ item, resultId, onOpen, permanent, selecting, selected, onPick }: DoneTaskCardProps) {
-  const pick = usePick(item.id, { selecting, onPick }, true);
-  const own = useTaskResult(resultId);
-  const result = permanent ? undefined : (own ?? findClientTaskResult(resultId));
+export function DoneTaskCard({ item, resultId, onOpen, selecting, selected, onPick }: DoneTaskCardProps) {
+  const result = useTaskResult(resultId) ?? findClientTaskResult(resultId);
   const [text, setText] = useState('');
+  const [facts, setFacts] = useState<Fact[]>([]);
   const [full, setFull] = useState(0);
   const body = useRef<HTMLParagraphElement>(null);
 
-  // Тексты заданий большие и грузятся отдельно: до их загрузки у плитки нет текста
+  // Тексты заданий большие и грузятся отдельно: до их загрузки у карточки нет текста и показателей
   useLayoutEffect(() => {
     if (!result) return;
     let alive = true;
     void import('../../data/taskSettings').then(({ taskSettings }) => {
       const data = taskSettings({ id: result.taskId });
-      if (alive && data) setText(firstText(data.blank.sections(result.form).flatMap((s) => s.fields), result.values));
+      if (!alive || !data) return;
+      setText(firstText(data.blank.sections(result.form).flatMap((s) => s.fields), result.values));
+      // Итоги бланка («Средняя сила эмоции 70%»); в записи постоянного задания «Сделано записей: 1» ничего не добавляет
+      const rows = (data.summary?.(result.values) ?? []).filter((r) => !(result.record && /^Сделано/.test(r.label)));
+      setFacts(
+        [
+          ...(result.record ? [{ value: `№ ${result.record}`, label: 'Запись' }] : []),
+          ...rows.slice(0, result.record ? 1 : 2).map((r) => ({ value: r.value, label: r.label })),
+          { value: result.info.duration, label: 'Время' },
+        ].slice(0, 3),
+      );
     });
     return () => {
       alive = false;
     };
   }, [result]);
 
+  // Высота полного текста: от неё зависит, нужно ли затухание; меняется вместе с шириной экрана
   useLayoutEffect(() => {
-    if (body.current) setFull(body.current.scrollHeight);
+    const el = body.current;
+    if (!el) return;
+    const measure = () => setFull(el.scrollHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [text]);
 
   const long = full > CLAMP;
   return (
-    <li className="done-task" data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
-      <div className={`done-task__card chat-tests__list${text ? '' : ' done-task__card--bare'}`}>
-      <button type="button" className="test-card" onClick={() => onOpen(item)}>
-        <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
-          <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
-        </span>
-        <span className="test-card__body">
-          <span className="test-card__top">
-            <span className="test-card__title">{item.title}</span>
-            {permanent && <span className="test-card__date">{item.date}</span>}
-          </span>
-          <span className="test-card__description">{permanent ? (TASK_LIBRARY.find((t) => t.id === item.id)?.description ?? item.description) : `Выполнено ${result?.info.date ?? item.date}`}</span>
-        </span>
-        {selecting && <span className="pick-mark" aria-hidden="true" />}
-      </button>
-        {text && (
-          <p ref={body} className={`done-task__text${long ? ' done-task__text--fade' : ''}`} style={long ? { maxHeight: CLAMP } : undefined}>
-            {text}
-          </p>
-        )}
-      </div>
-      <button type="button" className={`ts-desc__toggle${permanent ? ' done-task__go' : ''}`} onClick={() => onOpen(item)}>
-        {permanent ? 'Выполнить' : 'Посмотреть'}
-      </button>
-    </li>
+    <ItemCard item={item} caption={`Выполнено ${result?.info.date ?? item.date}`} action={{ label: 'Посмотреть', onClick: () => onOpen(item) }} onOpen={onOpen} selecting={selecting} selected={selected} onPick={onPick}>
+      {text && (
+        <p ref={body} className={`item-card__text${long ? ' item-card__text--fade' : ''}`} style={long ? { maxHeight: CLAMP } : undefined}>
+          {text}
+        </p>
+      )}
+      <Facts items={facts} />
+    </ItemCard>
   );
 }

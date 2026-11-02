@@ -29,6 +29,7 @@ import IconUnpermanent from '../../assets/icons/solar/close-circle.svg?react';
 import IconCloseMk from '../../assets/icons/solar/close.svg?react';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { deleteMessage, ensureContactChat, forwardMessage, markRead, sendMessage, setMessagePinned, setMessageReaction, setMutedMany, setOpenChat, updateMessage, useChat, useChats, useMessages, useTyping } from '../../data/chatStore';
+import type { PsyTest } from '../../data/tests';
 import { ME, avatarOf, contactOf, firstNameOf, nameOf } from '../../data/contacts';
 import { can, getGroup, canDeleteOthers, canInvite, canPin, canWrite, canSendMedia, leaveGroup, memberOf, myMember, myRole, subtitleOf, useGroup, useSlowLeft } from '../../data/groups';
 import { NETWORK_META, planPublish, type Network } from '../../data/crosspost';
@@ -297,13 +298,15 @@ interface SectionPageProps {
   /** Выбранные карточки заметок или сведений (null — выбора нет) и отметка карточки */
   picked: string[] | null;
   onPick: (id: string) => void;
+  /** Напомнить клиенту о тестах или заданиях, которые ждут ответа */
+  onRemind: (kind: 'test' | 'task', items: PsyTest[]) => void;
 }
 
 /**
  * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
  * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
  */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick }: SectionPageProps) {
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick, onRemind }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -313,6 +316,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <ChatTests
             selected={picked}
             onPick={onPick}
+            onRemind={(items) => onRemind('test', items)}
             hasData={hasClientData}
             onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
             onOpenResult={(resultId) => navigate(clientResultPath(chatId, resultId))}
@@ -325,6 +329,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <ChatTasks
             selected={picked}
             onPick={onPick}
+            onRemind={(items) => onRemind('task', items)}
             hasData={hasClientData}
             onOpenTask={(taskId) => hasTaskSettings(taskId) && navigate(`/chat/${chatId}/tasks/${taskId}`)}
             onOpenResult={(taskId) => findClientTaskResult(clientResultId(chatId, taskId)) && navigate(clientResultPath(chatId, taskId))}
@@ -373,6 +378,17 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const commentStore = useCommentsStore();
   const slow = useSlowLeft(chatId);
   const [toast, say] = useToast();
+  /** Напоминание клиенту: обычное сообщение в чат со списком того, что ждёт ответа */
+  const remind = useCallback(
+    (kind: 'test' | 'task', items: PsyTest[]) => {
+      const names = items.map((t) => `«${t.title}»`).join(', ');
+      const many = items.length > 1;
+      const what = kind === 'test' ? (many ? 'опросники' : 'опросник') : many ? 'задания' : 'задание';
+      sendMessage(chatId, `Напоминаю про ${what} ${names}: ${many ? 'они ждут' : kind === 'test' ? 'он ждёт' : 'оно ждёт'} вас в приложении.`);
+      say(many ? 'Напоминания отправлены' : 'Напоминание отправлено');
+    },
+    [chatId, say],
+  );
   const tabs = useChatTabs();
   // Вкладки в порядке пользователя, без скрытых им; в «Избранном» ещё и без истории; в группе и канале вкладок собеседника нет — только переписка
   const sections = useMemo(() => {
@@ -894,6 +910,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onAppTabChange={onAppTabChange}
           picked={id === section ? selected : null}
           onPick={pickCard}
+          onRemind={remind}
         />
       ),
   }));
