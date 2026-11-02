@@ -69,10 +69,10 @@ function SectionedList({
                 </button>
               )}
             </div>
-            {resultOf && status === 'done' ? (
+            {resultOf && (status === 'done' || status === 'permanent') ? (
               <ul className="chat-tests__cards">
                 {list.map((item) => (
-                  <DoneTaskCard key={item.id} item={item} resultId={resultOf(item)} onOpen={(t) => onOpen?.(t)} />
+                  <DoneTaskCard key={item.id} item={item} resultId={resultOf(item)} permanent={status === 'permanent'} onOpen={(t) => onOpen?.(t)} />
                 ))}
               </ul>
             ) : (

@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import '../TestCard/TestCard.css';
 import '../TestSettings/TestSettings.css';
 import { findClientTaskResult } from '../../data/clientTaskResults';
+import { TASK_LIBRARY } from '../../data/library';
 import { useTaskResult } from '../../data/selfTask';
 import { starterOf, type TaskField, type TaskValues } from '../../data/taskValues';
 import type { PsyTest } from '../../data/tests';
@@ -45,15 +46,17 @@ interface DoneTaskCardProps {
   /** Номер результата, по которому берутся ответы и открывается экран результата */
   resultId: string;
   onOpen: (item: PsyTest) => void;
+  /** Постоянное задание: вместо даты выполнения — короткое описание, вместо «Посмотреть» — «Выполнить», текста ответа нет */
+  permanent?: boolean;
 }
 
 /**
  * Завершённое задание во вкладке «Задания»: своя плитка с аватаркой, названием и датой выполнения, под ними первые строки того,
  * что человек написал в бланке (обрезаются, как описание задания в настройках), и кнопка «Посмотреть» открывает результат.
  */
-export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
+export function DoneTaskCard({ item, resultId, onOpen, permanent }: DoneTaskCardProps) {
   const own = useTaskResult(resultId);
-  const result = own ?? findClientTaskResult(resultId);
+  const result = permanent ? undefined : (own ?? findClientTaskResult(resultId));
   const [text, setText] = useState('');
   const [full, setFull] = useState(0);
   const body = useRef<HTMLParagraphElement>(null);
@@ -87,7 +90,7 @@ export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
           <span className="test-card__top">
             <span className="test-card__title">{item.title}</span>
           </span>
-          <span className="test-card__description">Выполнено {result?.info.date ?? item.date}</span>
+          <span className="test-card__description">{permanent ? (TASK_LIBRARY.find((t) => t.id === item.id)?.description ?? item.description) : `Выполнено ${result?.info.date ?? item.date}`}</span>
         </span>
       </button>
         {text && (
@@ -97,7 +100,7 @@ export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
         )}
       </div>
       <button type="button" className="ts-desc__toggle" onClick={() => onOpen(item)}>
-        Посмотреть
+        {permanent ? 'Выполнить' : 'Посмотреть'}
       </button>
     </li>
   );
