@@ -40,11 +40,14 @@ const TASK_SECTIONS: SectionConfig[] = [
   { status: 'done', title: 'Завершённые' },
 ];
 
-/** Отправленное: когда ушло и сколько ждёт ответа */
+/** Отправленное: время справа вверху (сегодня — часы, раньше — дата) и сколько ждёт ответа */
+function sentWhen(item: PsyTest): string {
+  return item.fullDate && waitingText(item.fullDate) === 'Сегодня' ? (item.time ?? item.fullDate) : (item.fullDate ?? item.date);
+}
 function sentFacts(item: PsyTest): string {
-  if (!item.fullDate) return `Отправлено ${item.date}`;
+  if (!item.fullDate) return 'Ждёт ответа';
   const waiting = waitingText(item.fullDate);
-  return waiting === 'Сегодня' ? `Отправлено сегодня, ${item.time ?? item.fullDate}` : `Отправлено ${item.fullDate}, ждёт ${waiting}`;
+  return waiting === 'Сегодня' ? 'Ждёт ответа' : `Ждёт ${waiting}`;
 }
 
 /** Описание задания из библиотеки: в самом элементе у постоянного задания и записи там счётчик («Записей: 2 из 10», «Запись 2») */
@@ -55,7 +58,7 @@ function PermanentRow({ item, onOpen, ...pick }: PickProps & { item: PsyTest; on
   const count = item.records?.count ?? 0;
   const since = item.records?.since ?? item.fullDate;
   const counts = /^Записей/.test(item.description) ? item.description : `${plural(count, ['Запись', 'Записи', 'Записей'])}: ${count}`;
-  return <StatusRow item={item} description={taskDescription(item.id)} facts={`${counts}${since ? `, назначено ${since}` : ''}`} onOpen={onOpen} {...pick} />;
+  return <StatusRow item={item} description={taskDescription(item.id)} facts={counts} time={since} onOpen={onOpen} {...pick} />;
 }
 
 /** Выполненное задание: дата берётся из результата (у записи постоянного задания добавлен её номер) */
@@ -66,7 +69,7 @@ function DoneTaskRow({ item, resultId, onOpen, ...pick }: PickProps & { item: Ps
     <StatusRow
       item={item}
       description={taskDescription(result?.taskId)}
-      facts={`${result?.record ? `Запись № ${result.record}, выполнена` : 'Выполнено'} ${date}`}
+      facts={result?.record ? `Запись № ${result.record}` : 'Выполнено'} time={date}
       onOpen={onOpen}
       {...pick}
     />
@@ -151,9 +154,9 @@ export function ChatTests({
       empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
       renderCard={(item, pick) =>
         item.status === 'done' ? (
-          <StatusRow key={item.id} item={item} facts={`Пройден ${findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date ?? item.fullDate ?? item.date}`} badgeLabel="Пройден" onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
+          <StatusRow key={item.id} item={item} facts="Пройден" time={findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date ?? item.fullDate ?? item.date} badgeLabel="Пройден" onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
         ) : (
-          <StatusRow key={item.id} item={item} facts={sentFacts(item)} onOpen={(t) => onOpenTest?.(t.id)} {...pick} />
+          <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTest?.(t.id)} {...pick} />
         )
       }
       onRemind={onRemind}
@@ -176,7 +179,7 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
       items={items}
       sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
       empty={{ kind: 'test', title: 'Пройденных тестов пока нет', text: 'Тесты, которые вы пройдёте сами, будут храниться здесь.' }}
-      renderCard={(item, pick) => <StatusRow key={item.id} item={item} facts={`Пройден ${results.find((r) => r.id === item.id)?.data?.info.date ?? item.date}`} badgeLabel="Пройден" onOpen={(t) => onOpen(t.id)} {...pick} />}
+      renderCard={(item, pick) => <StatusRow key={item.id} item={item} facts="Пройден" time={results.find((r) => r.id === item.id)?.data?.info.date ?? item.date} badgeLabel="Пройден" onOpen={(t) => onOpen(t.id)} {...pick} />}
     />
   );
 }
@@ -209,7 +212,7 @@ export function ChatTasks({
           return <DoneTaskRow key={item.id} item={item} resultId={clientResultId(CLIENT_CHAT, item.id)} onOpen={(t) => onOpenResult?.(t.id)} {...pick} />;
         }
         if (item.status === 'permanent') return <PermanentRow key={item.id} item={item} onOpen={(t) => onOpenTask?.(t.id)} {...pick} />;
-        return <StatusRow key={item.id} item={item} facts={sentFacts(item)} onOpen={(t) => onOpenTask?.(t.id)} {...pick} />;
+        return <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTask?.(t.id)} {...pick} />;
       }}
       onRemind={onRemind}
       selected={selected}

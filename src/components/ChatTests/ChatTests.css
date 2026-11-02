@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: calc(var(--block-gap) + var(--heading-top));
   min-height: 0;
-  padding: var(--space-3) var(--page-gutter) var(--space-4);
+  padding: var(--space-3) 0 var(--space-4);
   overflow-y: auto;
 }
 
@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--heading-inset);
+  padding: 0 calc(var(--page-gutter) + var(--heading-inset));
 }
 
 .chat .chat-tests__title {
@@ -54,16 +54,12 @@
   border-radius: var(--radius-sm);
 }
 
-/* Строки одной панелью на раздел: белое стекло, рамка 1 px, скругление radius-lg; нажатая строка светлеет */
+/* Строки без подложки, от края до края, как в меню «Опросники» и «Задания» (lib-card): стекло только у нажатой строки */
 .chat-tests__list {
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: var(--space-1) 0;
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  background: var(--glass-card);
+  padding: 0;
   list-style: none;
 }
 
@@ -93,16 +89,19 @@
 }
 
 .chat-tests__list .test-card__icon {
-  width: var(--space-8);
-  height: var(--space-8);
+  width: 32px;
+  height: 32px;
 }
 
-/* Название — headline, до двух строк (длинное имя теста не обрезается на полуслове); под ним описание — label обычного начертания; дата — caption */
+/* Название — как имя чата: headline в одну строку; описание — label обычного начертания */
 .chat .chat-tests__list .test-card__title {
+  display: block;
   overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat .chat-tests__list .test-card__description {
@@ -111,11 +110,25 @@
   font-weight: 400;
 }
 
-.chat .chat-tests__list .test-card__date {
+/* Название и время в одной строке: время справа вверху — meta, как у чата в списке */
+.status-row__top {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.status-row__top .test-card__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat .status-row__time {
+  flex-shrink: 0;
   color: var(--text-secondary);
-  font: var(--type-caption);
+  font: var(--type-meta);
   font-weight: 400;
-  line-height: var(--space-6);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ——— Строки как в меню «Диагностика» и «Задания»: значок-круг со своим градиентом, название, описание, сведения; на углу значка метка состояния ——— */
@@ -215,10 +228,6 @@
 
 .chat-tests li[data-selecting] .test-card {
   position: relative;
-}
-
-.chat-tests li[data-selecting] .test-card__date {
-  display: none;
 }
 
 /* Справа остаётся место под кружок отметки: 24 и зазор 12 */

@@ -36,6 +36,8 @@ interface StatusRowProps extends PickProps {
   item: PsyTest;
   /** Строка сведений под описанием: «Отправлено 09.10.2026, ждёт 24 дня», «Записей: 2, назначено 05.10.2026», «Выполнено 27.09.2026» */
   facts: string;
+  /** Время или дата справа вверху, как время сообщения в списке чатов */
+  time?: string;
   /** Описание под названием, если нужно не то, что в самом элементе (у задания — из библиотеки) */
   description?: string;
   /** Подпись значка, если она точнее общей («Пройден» вместо «Выполнено») */
@@ -48,7 +50,7 @@ interface StatusRowProps extends PickProps {
  * Строка теста или задания во вкладках чата — как в меню «Диагностика» и «Задания»: значок в круге 48, название, описание и сведения.
  * Вместо сердечка «в избранном» на углу значка метка состояния (`BADGE`). Долгое нажатие начинает выбор, как у остальных карточек вкладки.
  */
-export function StatusRow({ item, facts, description, badgeLabel, onOpen, selecting, selected, onPick }: StatusRowProps) {
+export function StatusRow({ item, facts, time, description, badgeLabel, onOpen, selecting, selected, onPick }: StatusRowProps) {
   const pick = usePick(item.id, { selecting, onPick }, true);
   // Назначенное (assigned) — постоянное задание
   const kind = item.status === 'assigned' ? 'permanent' : item.status;
@@ -60,7 +62,10 @@ export function StatusRow({ item, facts, description, badgeLabel, onOpen, select
           <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
         </span>
         <span className="test-card__body">
-          <span className="test-card__title">{item.title}</span>
+          <span className="status-row__top">
+            <span className="test-card__title">{item.title}</span>
+            {time && <span className="status-row__time">{time}</span>}
+          </span>
           <span className="test-card__description">{description ?? item.description}</span>
           <span className="status-row__facts">{facts}</span>
         </span>
