@@ -257,6 +257,92 @@
   margin: 0;
 }
 
+/* Присланное задание как результат поиска Google: источник (аватарка-круг, «Психологические задания», подход), название, краткое описание */
+.bubble--tcard:has(.gcard) {
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.gcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+}
+
+.gcard__source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gcard__avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-7);
+  height: var(--space-7);
+  border-radius: var(--radius-full);
+}
+
+.gcard__avatar img {
+  width: var(--space-5);
+  height: var(--space-5);
+  object-fit: contain;
+}
+
+.gcard__site {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gcard__name {
+  font: var(--type-label);
+}
+
+.gcard__approach {
+  overflow: hidden;
+  font: var(--type-meta);
+  opacity: 0.8;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Название набрано как имена пользователей и цветом ссылки (в своём синем пузыре — белым) */
+.gcard__title {
+  color: var(--action-primary);
+  font: var(--type-headline);
+}
+
+.bubble--out .gcard__title {
+  color: inherit;
+}
+
+.gcard__snippet {
+  color: var(--text-secondary);
+  font: var(--type-label);
+  font-weight: 400;
+  text-wrap: pretty;
+}
+
+.bubble--out .gcard__snippet {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.gcard__note {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+}
+
+.bubble--out .gcard__note {
+  color: inherit;
+  opacity: 0.8;
+}
+
 /* Сообщение с кнопками под пузырём, как у ботов в Telegram: кнопки той же ширины, что пузырь, интервал 4 */
 .bubble-group {
   position: relative;

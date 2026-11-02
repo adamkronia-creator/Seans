@@ -10,6 +10,8 @@ import { authorColor } from '../../data/contacts';
 import { Avatar } from '../Avatar/Avatar';
 import { IconEye } from '../GroupUi/GroupIcons';
 import type { LibraryItem } from '../../data/library';
+import { taskApproachName } from '../../data/libraryMeta';
+import { typo } from '../../utils/typography';
 import { IconMessages, IconReadTicks, IconTestChevron } from '../icons';
 import { commentsWord } from '../../data/comments';
 import { IconClock, IconReply, IconTickSingle } from '../ChatParts/ChatIcons';
@@ -440,45 +442,69 @@ export function MessageBubble({
     const link = passed ? message.buttons?.[0] : undefined;
     // Тест или задание, которое прислали вы, клиенту уже ушло: пройти его тут нечего, кнопка показывает настройки, с какими оно отправлено
     const settings = out && !passed && !message.toSelf;
+    // Присланное задание (не выполненное) оформлено как результат Google
+    const googleCard = Boolean(isTask && !passed && test);
     // Слепой тест, отправленный себе, выглядит так же, как у клиента: без названия и значка методики
     const hiddenTest = Boolean(!isTask && message.toSelf && message.testOptions?.blind);
     return (
       <li {...common} className={`bubble-group bubble-group--card bubble-group--${out ? 'out' : 'in'}`}>
         {swipeHint}
         <div className={`bubble bubble--${out ? 'out' : 'in'} bubble--last bubble--with-buttons bubble--tcard${message.text ? '' : ' bubble--tcard-bare'}${activeMatch ? ' bubble--match' : ''}`}>
-          <div className="tcard">
-            {test && !hiddenTest && (
-              <span className="tcard__icon" style={{ background: test.tint }}>
-                <img src={test.icon} alt="" loading="lazy" decoding="async" />
-              </span>
-            )}
-            <span className="tcard__text">
-              <span className="tcard__label">
-                {isTask
-                  ? passed
-                    ? message.record
-                      ? 'Запись задания'
-                      : 'Выполненное задание'
-                    : permanent
-                      ? 'Постоянное задание'
-                      : settings
-                        ? 'Отправленное задание'
-                        : 'Присланное задание'
-                  : passed
-                    ? 'Пройденный тест'
-                    : settings
-                      ? 'Отправленный тест'
-                      : 'Присланный тест'}
-              </span>
-              <span className="tcard__title">{hiddenTest ? (message.testOptions?.blindTitle ?? BLIND_FALLBACK_TITLE) : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
-              {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
-              {!passed && permanent && (
-                <span className="tcard__note">
+          {googleCard && test ? (
+            // Присланное задание — как результат поиска Google: источник с аватаркой, название и краткое описание
+            <div className="gcard">
+              <div className="gcard__source">
+                <span className="gcard__avatar" style={{ background: test.tint }}>
+                  <img src={test.icon} alt="" loading="lazy" decoding="async" />
+                </span>
+                <span className="gcard__site">
+                  <span className="gcard__name">Психологические задания</span>
+                  <span className="gcard__approach">{taskApproachName(test.id) ?? 'Психологическая практика'}</span>
+                </span>
+              </div>
+              <span className="gcard__title">{test.title}</span>
+              {test.blurb && <span className="gcard__snippet">{typo(test.blurb)}</span>}
+              {permanent && (
+                <span className="gcard__note">
                   {message.toSelf ? recordsText(selfRecords, permanent.limit) : permanent.limit ? `Всего записей: ${permanent.limit}` : 'Записей без ограничения'}
                 </span>
               )}
-            </span>
-          </div>
+            </div>
+          ) : (
+            <div className="tcard">
+              {test && !hiddenTest && (
+                <span className="tcard__icon" style={{ background: test.tint }}>
+                  <img src={test.icon} alt="" loading="lazy" decoding="async" />
+                </span>
+              )}
+              <span className="tcard__text">
+                <span className="tcard__label">
+                  {isTask
+                    ? passed
+                      ? message.record
+                        ? 'Запись задания'
+                        : 'Выполненное задание'
+                      : permanent
+                        ? 'Постоянное задание'
+                        : settings
+                          ? 'Отправленное задание'
+                          : 'Присланное задание'
+                    : passed
+                      ? 'Пройденный тест'
+                      : settings
+                        ? 'Отправленный тест'
+                        : 'Присланный тест'}
+                </span>
+                <span className="tcard__title">{hiddenTest ? (message.testOptions?.blindTitle ?? BLIND_FALLBACK_TITLE) : (test?.title ?? (isTask ? 'Задание' : 'Тест'))}</span>
+                {settings && message.testOptions?.blind && <span className="tcard__note">Слепой тест: клиент не видит название</span>}
+                {!passed && permanent && (
+                  <span className="tcard__note">
+                    {message.toSelf ? recordsText(selfRecords, permanent.limit) : permanent.limit ? `Всего записей: ${permanent.limit}` : 'Записей без ограничения'}
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
           {message.text ? (
             <p className="tcard__body">
               <Highlighted text={message.text} query={query} active={activeMatch} />

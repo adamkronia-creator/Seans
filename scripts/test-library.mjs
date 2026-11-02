@@ -436,3 +436,20 @@ test('неразрывные пробелы: предлоги, частицы, �
   assert.equal(typo(typo('и в парке на скамье')), typo('и в парке на скамье'), 'повторный вызов ничего не меняет');
   assert.equal(show('первая\nвторая строка'), 'первая\nвторая строка', 'перевод строки не склеивается');
 });
+
+test('карточка задания в чате: подход и краткое описание у каждого задания', () => {
+  const { TASK_LIBRARY, TASKS, taskApproachName, typo } = lib;
+  const names = new Set(['Когнитивно-поведенческая терапия', 'Терапия принятия и ответственности', 'Схема-терапия', 'Психодинамический подход']);
+  const labelOf = { 'Когнитивно-поведенческая терапия': 'КПТ', 'Терапия принятия и ответственности': 'ACT', 'Схема-терапия': 'Схема-терапия', 'Психодинамический подход': 'Психодинамический подход' };
+  for (const item of TASK_LIBRARY) {
+    const approach = taskApproachName(item.id);
+    assert.ok(names.has(approach), `${item.id}: подход «${approach}» не из списка`);
+    assert.ok(TASKS[item.id].approaches.includes(labelOf[approach]), `${item.id}: подход карточки не совпадает с подходами в настройках задания`);
+    const blurb = item.blurb;
+    assert.ok(blurb, `${item.id}: нет краткого описания`);
+    assert.ok(blurb.length >= 60 && blurb.length <= 150, `${item.id}: описание ${blurb.length} знаков, ждали 60–150`);
+    assert.ok(/[.!?]$/.test(blurb), `${item.id}: описание должно заканчиваться точкой`);
+    assert.ok(!/пациент|["']|\.\.\.| {2,}| [,.;!?]|(?<![а-яё])(еще|ее)(?![а-яё])/i.test(blurb), `${item.id}: стиль описания: ${blurb}`);
+    assert.equal(typo(typo(blurb)), typo(blurb));
+  }
+});

@@ -218,6 +218,20 @@ export const TASK_META: Record<string, TaskMeta> = {
   },
 };
 
+/** Полные названия подходов для карточки задания в чате (в фильтрах они короче: КПТ, ACT) */
+const APPROACH_NAMES: Record<string, string> = {
+  cbt: 'Когнитивно-поведенческая терапия',
+  act: 'Терапия принятия и ответственности',
+  schema: 'Схема-терапия',
+  psychodynamic: 'Психодинамический подход',
+};
+
+/** Основной подход задания: первый в его сведениях */
+export function taskApproachName(id: string): string | undefined {
+  const first = TASK_META[id]?.approaches[0];
+  return first ? APPROACH_NAMES[first] : undefined;
+}
+
 // ——— Сведения о материале ———
 
 export interface Described {

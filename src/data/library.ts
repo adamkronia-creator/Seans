@@ -37,6 +37,8 @@ export interface LibraryItem<C extends string = string> {
   /** Короткое название теста (СМОЛ, BDI): в карточках его нет, но по нему ищут */
   abbr?: string;
   description: string;
+  /** Краткое описание задания для карточки в чате (две-три строки) */
+  blurb?: string;
   icon: string;
   /** Фон аватарки: цвет палитры get-color.ru/pastel, без прозрачности */
   tint: string;
@@ -107,15 +109,15 @@ export type LibraryTask = LibraryItem<TaskCategory>;
 
 // Библиотека заданий; порядок как в макете, распределение по категориям условное
 export const TASK_LIBRARY: LibraryTask[] = [
-  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', icon: evidenceIcon, tint: '#FFBCAD', categories: ['practice'] },
-  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', icon: pieIcon, tint: '#9FE2BF', categories: ['practice'] },
-  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', icon: smerIcon, tint: '#FFB28B', categories: ['practice', 'hospital'] },
-  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
-  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
-  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
-  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанцирования от мнений', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
-  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желаний', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
+  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', blurb: 'Проверка тревожной мысли: факты за и против, ошибки мышления и новая, более взвешенная мысль. Помогает снизить уверенность в ней.', icon: evidenceIcon, tint: '#FFBCAD', categories: ['practice'] },
+  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', blurb: 'Разбор ситуации, за исход которой вы чувствуете вину: кто и что на него повлиял. Помогает оценить свою долю ответственности реалистичнее.', icon: pieIcon, tint: '#9FE2BF', categories: ['practice'] },
+  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', blurb: 'Записи о ситуации, мысли, эмоции и реакции. Помогают увидеть связь между событиями, мыслями и чувствами.', icon: smerIcon, tint: '#FFB28B', categories: ['practice', 'hospital'] },
+  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', blurb: 'План небольших дел с оценкой удовольствия и важности. Помогает вернуть активность при апатии, депрессии и выгорании.', icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
+  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', blurb: 'Тревожные мысли записываются в течение дня и разбираются в назначенное время. Помогает меньше застревать в беспокойстве.', icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
+  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', blurb: 'Десять предложений о том, что вы считаете себя обязанным делать. Помогает заметить скрытые долженствования и чужие ожидания.', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
+  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанцирования от мнений', blurb: 'Три решения, которые вы хотели бы принять в ближайший месяц. Помогает отделить собственные желания от чужих мнений.', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
+  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', blurb: 'Фраза значимого взрослого из детства и то, что вы чувствуете, вспоминая её. Помогает увидеть, как она влияет на вас сейчас.', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желаний', blurb: 'Что бы вы сделали за неделю, если бы никто не узнал о вашем решении. Помогает выявить настоящие желания.', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);
