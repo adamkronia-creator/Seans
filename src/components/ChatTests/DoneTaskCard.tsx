@@ -1,4 +1,6 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import '../TestCard/TestCard.css';
+import '../TestSettings/TestSettings.css';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { useTaskResult } from '../../data/selfTask';
 import { starterOf, type TaskField, type TaskValues } from '../../data/taskValues';
@@ -8,27 +10,33 @@ import type { PsyTest } from '../../data/tests';
 const LINE = 24;
 const CLAMP = LINE * 3;
 
-/** Первое, что человек написал в бланке: предложение с началом, текст, первая строка списка или первая запись */
-function firstText(fields: TaskField[], values: TaskValues): string {
+/** Всё, что человек написал в бланке, по порядку: предложение с началом, текст, строки списков и записей */
+function writtenBlocks(fields: TaskField[], values: TaskValues, out: string[] = []): string[] {
   for (const field of fields) {
     if (field.kind === 'sentence') {
       const text = values.text[field.id]?.trim();
-      if (text) return `${field.starters[starterOf(field, values)] ?? ''} ${text}`.trim();
+      if (text) out.push(`${field.starters[starterOf(field, values)] ?? ''} ${text}`.trim());
     } else if (field.kind === 'text') {
       const text = values.text[field.id]?.trim();
-      if (text) return text;
+      if (text) out.push(text);
     } else if (field.kind === 'list') {
-      const text = values.list[field.id]?.find((s) => s.trim());
-      if (text) return text.trim();
+      for (const line of values.list[field.id] ?? []) if (line.trim()) out.push(line.trim());
     } else if (field.kind === 'entries') {
-      const first = values.entries[field.id]?.[0];
-      if (first) {
-        const text = firstText(field.groups.flatMap((g) => g.fields), first);
-        if (text) return text;
-      }
+      for (const entry of values.entries[field.id] ?? []) writtenBlocks(field.groups.flatMap((g) => g.fields), entry, out);
     }
   }
-  return '';
+  return out;
+}
+
+/** Начало ответа: первый блок, а если он короткий — следом следующие, пока не наберётся на три строки */
+const ENOUGH = 180;
+function firstText(fields: TaskField[], values: TaskValues): string {
+  let text = '';
+  for (const block of writtenBlocks(fields, values)) {
+    text = text ? `${text} ${block}` : block;
+    if (text.length >= ENOUGH) break;
+  }
+  return text;
 }
 
 interface DoneTaskCardProps {
@@ -69,26 +77,28 @@ export function DoneTaskCard({ item, resultId, onOpen }: DoneTaskCardProps) {
 
   const long = full > CLAMP;
   return (
-    <li className="done-task">
-      <button type="button" className="done-task__main" onClick={() => onOpen(item)}>
-        <span className="done-task__head">
-          <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
-            <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
-          </span>
-          <span className="done-task__titles">
-            <span className="done-task__title">{item.title}</span>
-            <span className="done-task__date">Выполнено {result?.info.date ?? item.date}</span>
-          </span>
+    <li className="done-task chat-tests__list">
+      <button type="button" className="test-card" onClick={() => onOpen(item)}>
+        <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
+          <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
         </span>
+        <span className="test-card__body">
+          <span className="test-card__top">
+            <span className="test-card__title">{item.title}</span>
+          </span>
+          <span className="test-card__description">Выполнено {result?.info.date ?? item.date}</span>
+        </span>
+      </button>
+      <div className="done-task__body">
         {text && (
           <p ref={body} className={`done-task__text${long ? ' done-task__text--fade' : ''}`} style={long ? { maxHeight: CLAMP } : undefined}>
             {text}
           </p>
         )}
-      </button>
-      <button type="button" className="done-task__open" onClick={() => onOpen(item)}>
-        Посмотреть
-      </button>
+        <button type="button" className="ts-desc__toggle" onClick={() => onOpen(item)}>
+          Посмотреть
+        </button>
+      </div>
     </li>
   );
 }
