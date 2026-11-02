@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { IconClose } from '../ChatParts/ChatIcons';
 import { IconPlus, IconTestChevronDown } from '../icons';
 import { IconTaskState } from './TaskIcons';
+import { typo } from '../../utils/typography';
 import { BlankRules, CollapseCard } from './TestBlank';
 import {
   emptyValues,
@@ -49,8 +50,8 @@ function Ask({ label, hint }: { label?: string; hint?: string }) {
   if (!label && !hint) return null;
   return (
     <div className="tf-ask">
-      {label && <p className="tf-prompt">{label}</p>}
-      {hint && <p className="tf-hint">{hint}</p>}
+      {label && <p className="tf-prompt">{typo(label)}</p>}
+      {hint && <p className="tf-hint">{typo(hint)}</p>}
     </div>
   );
 }
@@ -638,7 +639,7 @@ function TaskSectionCard({ section, values, onChange }: { section: TaskSection; 
   return (
     <CollapseCard title={section.title}>
       <div className={`tf-body${tiles ? ' tf-body--tiles' : ''}`}>
-        {section.hint && <p className="tf-hint tf-intro">{section.hint}</p>}
+        {section.hint && <p className="tf-hint tf-intro">{typo(section.hint)}</p>}
         {section.fields.map((field) => (
           <FieldBody key={field.id} field={field} number={field.kind === 'sentence' ? ++sentence : 0} values={values} onChange={onChange} />
         ))}
@@ -686,7 +687,7 @@ function EntryPage({
       }
     >
       <div className="tf-body">
-        {section.hint && <p className="tf-hint tf-intro">{section.hint}</p>}
+        {section.hint && <p className="tf-hint tf-intro">{typo(section.hint)}</p>}
         <EntryGroups field={field} entry={entry} title={title} skip={late} onChange={(next) => set(list.map((e, j) => (j === at ? next : e)))} />
         {list.length < field.max && (
           <AddButton
@@ -758,7 +759,7 @@ export function TaskForm({ data, form, options, values, onChange, rules = false,
   return (
     <>
       {rules && (
-        <CollapseCard title="Правила задания" id="blank-rules">
+        <CollapseCard title="Инструкция" id="blank-rules">
           <BlankRules rules={data.blank.rules(form)} />
         </CollapseCard>
       )}

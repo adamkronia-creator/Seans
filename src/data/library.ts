@@ -113,9 +113,9 @@ export const TASK_LIBRARY: LibraryTask[] = [
   { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
   { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
   { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
-  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанционирования от мнений', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
+  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанцирования от мнений', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
   { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желания', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желаний', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);

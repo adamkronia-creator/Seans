@@ -1,5 +1,6 @@
 import { Fragment, useState, type ReactNode } from 'react';
 import type { TestBlankData } from '../../data/testBlank';
+import { typo } from '../../utils/typography';
 import './TestBlank.css';
 
 /** Карточка бланка, настройки или заключения: заголовок и содержимое; сворачивать её не нужно, всё всегда раскрыто */
@@ -33,7 +34,7 @@ interface BlankFill {
 
 /** Варианты ответов в правилах («Совсем нет») набраны курсивом */
 function ruleText(rule: string) {
-  return rule.split(/(«[^»]*»)/).map((part, i) => (part.startsWith('«') ? <em key={i}>{part}</em> : part));
+  return typo(rule).split(/(«[^»]*»)/).map((part, i) => (part.startsWith('«') ? <em key={i}>{part}</em> : part));
 }
 
 /** Инструкция бланка: обычные абзацы без номеров и лишних отступов */

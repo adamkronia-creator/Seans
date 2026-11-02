@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { typo } from '../../utils/typography';
 
 /** Строка списка: «• текст» (маркер) или «1. текст» (номер) */
 const BULLET = /^•\s+/;
@@ -15,13 +16,13 @@ function blocks(paragraph: string, lead?: string, first = false): ReactNode[] {
     while (i < lines.length && (BULLET.test(lines[i]) ? 'bullet' : NUMBER.test(lines[i]) ? 'number' : 'text') === kind) i++;
     const chunk = lines.slice(start, i);
     if (kind === 'text') {
-      const text = chunk.join('\n');
+      const text = typo(chunk.join('\n'));
       out.push(
         <p key={start}>
-          {first && start === 0 && lead && text.startsWith(lead) ? (
+          {first && start === 0 && lead && text.startsWith(typo(lead)) ? (
             <>
-              <strong>{lead}</strong>
-              {text.slice(lead.length)}
+              <strong>{typo(lead)}</strong>
+              {text.slice(typo(lead).length)}
             </>
           ) : (
             text
@@ -29,7 +30,7 @@ function blocks(paragraph: string, lead?: string, first = false): ReactNode[] {
         </p>,
       );
     } else {
-      const items = chunk.map((line) => line.replace(kind === 'bullet' ? BULLET : NUMBER, ''));
+      const items = chunk.map((line) => typo(line.replace(kind === 'bullet' ? BULLET : NUMBER, '')));
       const List = kind === 'bullet' ? 'ul' : 'ol';
       out.push(
         <List key={start} className={`ts-card__list ts-card__list--hang${kind === 'number' ? ' ts-card__list--num' : ''}`}>

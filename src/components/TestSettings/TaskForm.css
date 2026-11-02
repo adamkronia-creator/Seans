@@ -48,6 +48,7 @@
 
 .tf-prompt {
   margin: 0;
+  text-wrap: pretty;
   color: var(--text-primary);
   font-size: var(--font-size-read);
   font-weight: var(--font-weight-medium);
@@ -61,6 +62,7 @@
 .tf-hint,
 .task-hint {
   margin: 0;
+  text-wrap: pretty;
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);

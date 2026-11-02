@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { TASK_DEADLINES, type PermanentRule, type TaskSettingsData } from '../../data/taskValues';
+import { typo } from '../../utils/typography';
 import { BlankRules, CollapseCard } from './TestBlank';
 import './ClientParts.css';
 
@@ -115,7 +116,7 @@ export function ClientIntro({ message, rules, facts, onOpenAll }: { message: str
         <CollapseCard title="Сообщение специалиста">
           <div className="blank-rules">
             {paragraphs.map((p) => (
-              <p key={p}>{p}</p>
+              <p key={p}>{typo(p)}</p>
             ))}
           </div>
         </CollapseCard>

@@ -85,6 +85,7 @@
 
 .blank-rules p {
   margin: 0;
+  text-wrap: pretty;
 }
 
 .blank-questions {

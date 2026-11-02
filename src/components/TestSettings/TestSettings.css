@@ -141,6 +141,12 @@
 .ts-card__paragraph p {
   margin: 0;
   white-space: pre-line;
+  text-wrap: pretty;
+}
+
+/* Строка списка в тексте задания не заканчивается одним словом, как и абзац */
+.ts-card__paragraph .ts-card__list li {
+  text-wrap: pretty;
 }
 
 /* Список: без отступа слева, точка 6 в начале строки, перенос идёт под точкой */

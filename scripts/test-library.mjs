@@ -16,6 +16,7 @@ const built = esbuild.buildSync({
   stdin: {
     contents: `
       export * from './src/utils/ruText';
+      export * from './src/utils/typography';
       export * from './src/utils/searchIndex';
       export * from './src/data/library';
       export * from './src/data/libraryMeta';
@@ -334,4 +335,104 @@ test('большой каталог: индекс собирается и ище
   console.log(`  3000 документов: индекс ${build.toFixed(0)} мс, запрос ${search.toFixed(1)} мс`);
   assert.ok(build < 3000, `индекс ${build} мс`);
   assert.ok(search < 150, `запрос ${search} мс`);
+});
+
+// ——— Тексты заданий: единый стиль ———
+
+/** Все строки задания, которые видит человек: описание, инструкции по всем формам, бланк, примеры, итоги */
+function taskStrings(id, t) {
+  const out = [];
+  const add = (where, value) => {
+    if (typeof value === 'string' && value !== '') out.push({ where: `${id}: ${where}`, text: value });
+  };
+  const addField = (where, f) => {
+    for (const key of ['label', 'item', 'hint', 'placeholder', 'addLabel', 'namePlaceholder', 'ownLabel', 'low', 'high', 'title']) add(`${where} ${f.id ?? ''}.${key}`, f[key]);
+    for (const key of ['options', 'starters']) (f[key] ?? []).forEach((v, i) => add(`${where} ${f.id}.${key}[${i}]`, v));
+    for (const g of f.groups ?? []) {
+      add(`${where} ${f.id} группа`, g.title);
+      g.fields.forEach((inner) => addField(`${where} ${f.id}`, inner));
+    }
+  };
+  const addValues = (where, v) => {
+    Object.entries(v.text ?? {}).forEach(([k, text]) => add(`${where} text.${k}`, text));
+    Object.entries(v.list ?? {}).forEach(([k, lines]) => lines.forEach((line, i) => add(`${where} list.${k}[${i}]`, line)));
+    Object.entries(v.factors ?? {}).forEach(([k, list]) => list.forEach((f, i) => add(`${where} factors.${k}[${i}]`, f.name)));
+    Object.entries(v.entries ?? {}).forEach(([k, list]) => list.forEach((e, i) => addValues(`${where} entries.${k}[${i}]`, e)));
+    add(`${where} комментарий`, v.comment);
+  };
+  for (const key of ['lead', 'goal', 'formLabel', 'formHint']) add(key, t[key]);
+  t.intro.split('\n').forEach((line, i) => add(`intro[${i}]`, line));
+  t.analysis.split('\n').forEach((line, i) => add(`analysis[${i}]`, line));
+  add('volume', t.volume.label);
+  add('commentHint', t.blank.commentHint);
+  t.blank.state.forEach((v, i) => add(`state[${i}]`, v));
+  t.example.notes.forEach((v, i) => add(`notes[${i}]`, v));
+  for (const form of t.forms ?? ['']) {
+    t.blank.rules(form).forEach((v, i) => add(`rules(${form})[${i}]`, v));
+    for (const s of t.blank.sections(form)) {
+      add(`раздел ${s.id}.title`, s.title);
+      add(`раздел ${s.id}.hint`, s.hint);
+      s.fields.forEach((f) => addField(`раздел ${s.id}`, f));
+    }
+    const example = t.example.values[form] ?? Object.values(t.example.values)[0];
+    addValues(`пример(${form})`, example);
+    // Итоги по ответам: подписи строк
+    for (const row of t.summary?.({ text: {}, starter: {}, percent: {}, factors: {}, scale: {}, choice: {}, list: {}, entries: {}, comment: '', ...example }) ?? []) add(`итог «${row.label}»`, row.label);
+  }
+  return out;
+}
+
+test('тексты заданий: клиент, ёлочки, тире, многоточие, ё, лишние пробелы', () => {
+  let checked = 0;
+  for (const [id, t] of Object.entries(TASKS)) {
+    for (const { where, text } of taskStrings(id, t)) {
+      checked++;
+      assert.ok(!/пациент/i.test(text), `${where}: в интерфейсе «клиент», а не «пациент»: ${text}`);
+      assert.ok(!/["']/.test(text), `${where}: прямые кавычки, нужны «ёлочки»: ${text}`);
+      assert.ok(!/ - | -- /.test(text), `${where}: дефис вместо тире «—»: ${text}`);
+      assert.ok(!/\d-\d/.test(text), `${where}: диапазон через дефис, нужна «–»: ${text}`);
+      assert.ok(!/\.\.\./.test(text), `${where}: три точки вместо «…»: ${text}`);
+      assert.ok(!/ {2,}/.test(text), `${where}: двойной пробел: ${text}`);
+      assert.equal(text, text.trim(), `${where}: пробел в начале или конце`);
+      assert.ok(!/\S—|—\S/.test(text), `${where}: у тире «—» должны быть пробелы: ${text}`);
+      assert.ok(!/«\s|\s»/.test(text), `${where}: пробел внутри «ёлочек»: ${text}`);
+      assert.ok(!/(?<![а-яё])(еще|ее)(?![а-яё])/i.test(text), `${where}: нужна «ё» (ещё, её): ${text}`);
+      // Знак препинания не отрывается пробелом от слова (смайлик в сообщении клиенту не в счёт)
+      assert.ok(!/ [,.;!?]/.test(text), `${where}: пробел перед знаком препинания: ${text}`);
+      // Подсказка под вопросом — как подпись: без точки в конце
+      if (/(\.hint|Hint)$/.test(where)) assert.ok(!text.endsWith('.'), `${where}: подсказка заканчивается точкой: ${text}`);
+    }
+  }
+  console.log(`  проверено строк: ${checked}`);
+  assert.ok(checked > 600, 'строк подозрительно мало: проверка перестала читать тексты');
+});
+
+test('инструкции заданий: абзацы не повторяются, описание начинается с названия, подписи итогов короткие', () => {
+  for (const [id, t] of Object.entries(TASKS)) {
+    assert.ok(t.intro.startsWith(t.lead), `${id}: описание должно начинаться с «${t.lead}», чтобы название набралось жирным`);
+    for (const form of t.forms ?? ['']) {
+      const rules = t.blank.rules(form);
+      assert.equal(new Set(rules).size, rules.length, `${id}(${form}): в инструкции повторяется абзац`);
+      assert.ok(rules.length >= 3 && rules.length <= 8, `${id}(${form}): ${rules.length} абзацев в инструкции, ждали от 3 до 8`);
+      assert.ok(rules.every((r) => r.length <= 420), `${id}(${form}): слишком длинный абзац инструкции`);
+    }
+    for (const { where, text } of taskStrings(id, t).filter((s) => s.where.includes('итог «'))) assert.ok(text.length <= 30, `${where}: подпись итога длиннее 30 знаков`);
+  }
+  // Дневник СМЭР: подпись «Сделано записей» нужна карточке завершённого задания, она убирает её у записи постоянного задания
+  assert.match(TASKS.smer.summary({ text: {}, starter: {}, percent: {}, factors: {}, scale: {}, choice: {}, list: {}, entries: { records: [{ text: { situation: 'Х' }, starter: {}, percent: {}, factors: {}, scale: {}, choice: {}, list: {}, entries: {}, comment: '' }] }, comment: '' })[0].label, /^Сделано/);
+});
+
+test('неразрывные пробелы: предлоги, частицы, числа и тире', () => {
+  const { typo } = lib;
+  const show = (s) => typo(s).replaceAll('\u00A0', '_').replaceAll('\u2060', '^');
+  assert.equal(show('Запишите, что вы сделали в парке и на улице для себя.'), 'Запишите, что вы сделали в_парке и_на_улице для себя.', 'слова из трёх букв и длиннее не прижимаются');
+  assert.equal(show('Оцените от 0 до 10, это задание — для вас.'), 'Оцените от_0_до_10, это задание_— для вас.');
+  assert.equal(show('Я бы сделал это же самое'), 'Я_бы сделал это_же самое');
+  assert.equal(show('Займёт 15 минут'), 'Займёт 15_минут');
+  assert.equal(show('что-то более значимое'), 'что-^то более значимое', 'слово с дефисом не рвётся по дефису');
+  assert.equal(show('Займёт 5–10 минут'), 'Займёт 5–^10_минут', 'диапазон не рвётся после тире');
+  assert.equal(show('1-й шаг и 2018-2019'), '1-й шаг и_2018-2019', 'дефис между цифрами и после цифры не трогаем');
+  assert.equal(show('когнитивно-поведенческая терапия'), 'когнитивно-поведенческая терапия', 'длинное слово с дефисом переносится по дефису');
+  assert.equal(typo(typo('и в парке на скамье')), typo('и в парке на скамье'), 'повторный вызов ничего не меняет');
+  assert.equal(show('первая\nвторая строка'), 'первая\nвторая строка', 'перевод строки не склеивается');
 });
