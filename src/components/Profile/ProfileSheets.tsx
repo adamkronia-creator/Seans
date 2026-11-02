@@ -1,7 +1,8 @@
 import { useId, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
-import { addToNamedAlbum, setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
+import { addToNamedAlbum, ensureFull, getFullSrc, removePhoto, setAvatar, setCaption, setCover, useProfile } from '../../data/profile';
+import { clearAvatarCrop, getAvatarCrop, setAvatarCrop } from '../../data/avatarCrop';
 import { Frame } from '../Frame/Frame';
-import { CropSheet } from '../CropSheet/CropSheet';
+import { CropSheet, type CropView } from '../CropSheet/CropSheet';
 import { AutoTextarea } from '../EditSheet/AutoTextarea';
 import { BackgroundControls } from '../BackgroundControls/BackgroundControls';
 import { IconCamera, IconCheck } from './ProfileIcons';
@@ -25,7 +26,8 @@ interface PickProps {
 export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
   const profile = useProfile();
   const input = useRef<HTMLInputElement>(null);
-  const [cropping, setCropping] = useState<File | null>(null);
+  // Что кадрируем: снимок, его id в галерее (если уже там), прежний кадр
+  const [cropping, setCropping] = useState<{ file: Blob; source?: string; initial?: CropView } | null>(null);
   const isAvatar = kind === 'avatar';
   const current = isAvatar ? profile.avatarId : profile.coverId;
   const apply = (id: string | null) => (isAvatar ? setAvatar(id) : setCover(id));
@@ -43,7 +45,7 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
     onClose();
   };
 
-  // Окно закрывается сразу, а снимок дорабатывается и встаёт на место, когда готов; фото профиля сначала кадрируется
+  // Окно закрывается сразу, а снимок дорабатывается и встаёт на место, когда готов
   const save = async (files: File[]) => {
     onClose();
     const { added, ok } = await uploadPhotos(files.slice(0, 1), onNote);
@@ -55,15 +57,58 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
     if (ok && added[0]) onNote(done);
   };
 
+  // Фото профиля: в галерею идёт и исходный снимок, и вырезанный квадрат; кадр запоминается, чтобы потом его можно было поменять
+  const saveCropped = async (cropped: File, view: CropView, source: { file: Blob; id?: string }) => {
+    onClose();
+    const previous = profile.avatarId;
+    const files = source.id ? [cropped] : [source.file as File, cropped];
+    const { added, ok } = await uploadPhotos(files, onNote);
+    const avatar = added[added.length - 1];
+    if (!avatar || added.length < files.length) return;
+    const origin = source.id ?? added[0];
+    setAvatar(avatar);
+    addToNamedAlbum('Фото профиля', [avatar]);
+    setAvatarCrop(avatar, { source: origin, ...view });
+    // Прежний вырезанный квадрат больше не нужен: его кадр заменён новым
+    if (previous && getAvatarCrop(previous)) {
+      clearAvatarCrop(previous);
+      removePhoto(previous);
+    }
+    if (ok) onNote(done);
+  };
+
   const upload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = filesOf(event);
     if (files.length === 0) return;
-    if (isAvatar) setCropping(files[0]);
+    if (isAvatar) setCropping({ file: files[0] });
     else void save(files);
   };
 
+  // «Изменить кадр»: открывается исходный снимок (если он ещё в галерее) на прежнем кадре
+  const editFrame = async () => {
+    if (!current) return;
+    const saved = getAvatarCrop(current);
+    const id = saved && profile.photos.some((p) => p.id === saved.source) ? saved.source : current;
+    await ensureFull(id);
+    const url = getFullSrc(id);
+    if (!url) return;
+    const blob = await (await fetch(url)).blob();
+    setCropping({ file: blob, source: id, initial: id === saved?.source ? saved : undefined });
+  };
+
   if (cropping) {
-    return <CropSheet file={cropping} onCancel={() => setCropping(null)} onError={() => { setCropping(null); onNote('Не удалось открыть файл: выберите фото в формате JPG, PNG или WebP'); }} onDone={(file) => void save([file])} />;
+    return (
+      <CropSheet
+        file={cropping.file}
+        initial={cropping.initial}
+        onCancel={() => setCropping(null)}
+        onError={() => {
+          setCropping(null);
+          onNote('Не удалось открыть файл: выберите фото в формате JPG, PNG или WebP');
+        }}
+        onDone={(file, view) => void saveCropped(file, view, { file: cropping.file, id: cropping.source })}
+      />
+    );
   }
 
   return (
@@ -105,6 +150,11 @@ export function PhotoPickSheet({ kind, onClose, onNote }: PickProps) {
         </ul>
       </div>
       {profile.photos.length === 0 && <p className="pf-note">Загруженное фото останется и в вашей галерее</p>}
+      {isAvatar && current && (
+        <button type="button" className="sheet__card pf-edit" onClick={() => void editFrame()}>
+          Изменить кадр
+        </button>
+      )}
       {current && (
         <button type="button" className="sheet__card pf-remove" onClick={remove}>
           {isAvatar ? 'Убрать фото профиля' : 'Убрать обложку'}

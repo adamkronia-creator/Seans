@@ -10,17 +10,26 @@ import './CropSheet.css';
 const OUT = 512;
 const MAX_ZOOM = 4;
 
+/** Положение кадра: центр в долях ширины и высоты снимка и масштаб */
+export interface CropView {
+  x: number;
+  y: number;
+  zoom: number;
+}
+
 interface CropSheetProps {
   file: Blob;
   title?: string;
-  onDone: (result: File) => void;
+  /** Прежний кадр: окно открывается на нём, а не на середине снимка */
+  initial?: CropView;
+  onDone: (result: File, view: CropView) => void;
   /** «Отмена»: вернуться к выбору фото */
   onCancel: () => void;
   /** Файл не открылся как картинка */
   onError?: () => void;
 }
 
-export function CropSheet({ file, title = 'Кадрирование', onDone, onCancel, onError }: CropSheetProps) {
+export function CropSheet({ file, title = 'Кадрирование', initial, onDone, onCancel, onError }: CropSheetProps) {
   const url = useMemo(() => URL.createObjectURL(file), [file]);
   useEffect(() => () => URL.revokeObjectURL(url), [url]);
 
@@ -61,6 +70,13 @@ export function CropSheet({ file, title = 'Кадрирование', onDone, on
     setSize({ w, h });
     // Лицо на портрете обычно в верхней трети: высокое фото открывается чуть выше середины
     const half = Math.min(w, h) / 2;
+    if (initial) {
+      const z = Math.min(MAX_ZOOM, Math.max(1, initial.zoom));
+      const h2 = Math.min(w, h) / z / 2;
+      setZoom(z);
+      setCenter({ x: Math.min(w - h2, Math.max(h2, initial.x * w)), y: Math.min(h - h2, Math.max(h2, initial.y * h)) });
+      return;
+    }
     setCenter({ x: w / 2, y: h > w ? half + (h - w) * 0.3 : h / 2 });
   };
 
@@ -108,7 +124,7 @@ export function CropSheet({ file, title = 'Кадрирование', onDone, on
     ctx.drawImage(img, center.x - visible / 2, center.y - visible / 2, visible, visible, 0, 0, OUT, OUT);
     canvas.toBlob(
       (blob) => {
-        if (blob) onDone(new File([blob], 'avatar.jpg', { type: 'image/jpeg' }));
+        if (blob) onDone(new File([blob], 'avatar.jpg', { type: 'image/jpeg' }), { x: center.x / size.w, y: center.y / size.h, zoom });
       },
       'image/jpeg',
       0.9,

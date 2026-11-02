@@ -66,6 +66,7 @@
 }
 
 /* Красная кнопка во всю ширину карточки */
+.pf-edit,
 .pf-remove {
   width: 100%;
   height: 48px;
@@ -182,4 +183,9 @@
   width: var(--size-control-sm);
   height: var(--size-control-sm);
   color: var(--color-text-secondary);
+}
+
+/* «Изменить кадр»: обычная кнопка-плитка со ссылочным цветом, не красная */
+.pf-edit {
+  color: var(--text-link);
 }

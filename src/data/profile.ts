@@ -295,6 +295,9 @@ void (async () => {
   if (state.coverId) inNamedAlbum('Обложки', state.coverId);
 })();
 
+/** Адрес снимка целиком (или его маленькой копии, пока целый не подгружен) без подписки на изменения */
+export const getFullSrc = (id: string): string | undefined => state.fulls[id] ?? state.thumbs[id];
+
 /** Подгрузить снимок целиком (просмотр, обложка); повторные вызовы ничего не делают */
 export async function ensureFull(id: string) {
   if (state.fulls[id] || loadingFull.has(id) || !state.photos.some((p) => p.id === id)) return;
