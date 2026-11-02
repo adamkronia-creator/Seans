@@ -1,7 +1,9 @@
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconTabPractices, IconTabTests } from '../icons';
+import { DoneTaskCard } from './DoneTaskCard';
 import { TestCard } from '../TestCard/TestCard';
-import { itemsWithStatus, useClientData } from '../../data/clientStore';
+import { CLIENT_CHAT, itemsWithStatus, useClientData } from '../../data/clientStore';
+import { clientResultId } from '../../data/resultLinks';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
@@ -39,12 +41,15 @@ function SectionedList({
   sections,
   empty,
   onOpen,
+  resultOf,
 }: {
   items: PsyTest[];
   sections: SectionConfig[];
   empty: EmptyConfig;
   /** Нажатие на карточку */
   onOpen?: (item: PsyTest) => void;
+  /** Номер результата завершённого задания: такие карточки показываются отдельными плитками с началом ответа */
+  resultOf?: (item: PsyTest) => string;
 }) {
   if (items.length === 0) {
     return <EmptyState icon={empty.kind === 'test' ? <IconTabTests /> : <IconTabPractices />} title={empty.title} text={empty.text} />;
@@ -64,11 +69,19 @@ function SectionedList({
                 </button>
               )}
             </div>
-            <ul className="chat-tests__list">
-              {list.map((item) => (
-                <TestCard key={item.id} test={item} onClick={onOpen} />
-              ))}
-            </ul>
+            {resultOf && status === 'done' ? (
+              <ul className="chat-tests__cards">
+                {list.map((item) => (
+                  <DoneTaskCard key={item.id} item={item} resultId={resultOf(item)} onOpen={(t) => onOpen?.(t)} />
+                ))}
+              </ul>
+            ) : (
+              <ul className="chat-tests__list">
+                {list.map((item) => (
+                  <TestCard key={item.id} test={item} onClick={onOpen} />
+                ))}
+              </ul>
+            )}
           </section>
         );
       })}
@@ -136,6 +149,7 @@ export function ChatTasks({
       sections={TASK_SECTIONS}
       empty={{ kind: 'task', title: 'Заданий пока нет', text: 'Отправьте задание из раздела «Задания» — оно появится здесь.' }}
       onOpen={(t) => (t.status === 'done' ? onOpenResult?.(t.id) : onOpenTask?.(t.id))}
+      resultOf={(t) => clientResultId(CLIENT_CHAT, t.id)}
     />
   );
 }
@@ -156,6 +170,7 @@ export function SelfTasks({ onOpen }: { onOpen: (resultId: string) => void }) {
       sections={TASK_SECTIONS.filter((s) => s.status === 'done')}
       empty={{ kind: 'task', title: 'Выполненных заданий пока нет', text: 'Задания, которые вы выполните сами, будут храниться здесь.' }}
       onOpen={(t) => onOpen(t.id)}
+      resultOf={(t) => t.id}
     />
   );
 }
