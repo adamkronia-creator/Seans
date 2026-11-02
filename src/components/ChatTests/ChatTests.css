@@ -54,7 +54,7 @@
   border-radius: var(--radius-sm);
 }
 
-/* Строки одной панелью: белое стекло, рамка 1 px, скругление radius-lg; нажатая строка светлеет */
+/* Строки одной панелью на раздел: белое стекло, рамка 1 px, скругление radius-lg; нажатая строка светлеет */
 .chat-tests__list {
   display: flex;
   flex-direction: column;
@@ -118,259 +118,67 @@
   line-height: var(--space-6);
 }
 
-/* ——— Карточки: у каждого теста и задания своя, между карточками --block-gap ——— */
-.chat-tests__cards {
-  display: flex;
-  flex-direction: column;
-  gap: var(--block-gap);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Как описание теста в настройках: стеклянная панель и под ней плитка действия через просвет 4, вместе в одной рамке */
-.item-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-}
-
-.item-card__panel.chat-tests__list {
-  gap: var(--space-1);
-  padding: var(--space-1) 0 var(--card-pad);
-  border: 0;
-  border-radius: 0;
-}
-
-/* Без содержимого под шапкой: нижний отступ тот же, что сверху */
-.item-card__panel--bare.chat-tests__list {
-  padding-bottom: var(--space-1);
-}
-
-/* Содержимое выровнено по аватарке: поля 16, между блоками 12 */
-.item-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: 0 var(--row-pad-x);
-}
-
-.item-card__text {
-  margin: 0;
-  overflow: hidden;
-  color: var(--text-primary);
-  font: var(--type-body);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-/* Последние строки обрезанного текста уходят в прозрачность, как в описании теста */
-.item-card__text--fade {
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--space-8)), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--space-8)), transparent);
-}
-
-/* Плитка действия: как «Читать далее», во всю ширину рамки; нижние углы скругляет сама рамка */
-.item-card .ts-desc__toggle {
-  border-radius: 0;
-  background: var(--glass-card);
-}
-
-/* Главное действие карточки («Выполнить»): активная синяя кнопка, как кнопки бланка в настройках */
-[data-pm] .item-card .ts-desc__toggle.item-card__action--primary,
-.item-card .ts-desc__toggle.item-card__action--primary {
-  background: var(--action-primary);
-  color: var(--action-primary-text);
-}
-
-/* ——— Показатели: до трёх колонок, значение и под ним подпись ——— */
-.facts {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: var(--space-3);
-  margin: 0;
-  padding: var(--space-3) 0 0;
-  border-top: 1px solid var(--divider);
-  list-style: none;
-}
-
-.facts__item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.facts__value {
-  color: var(--text-primary);
-  font: var(--type-label);
-}
-
-.facts__label {
-  color: var(--text-secondary);
-  font: var(--type-meta);
-}
-
-/* ——— Итог теста: цвет уровня несёт точка и заливка, смысл — слова ——— */
-.glance {
-  --tone: var(--color-accent);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.glance__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.glance__score {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.glance__num {
-  color: var(--text-primary);
-  font: var(--type-title);
-}
-
-.glance__of {
-  color: var(--text-secondary);
-  font: var(--type-body);
-}
-
-.glance__chip {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--space-2);
-  height: var(--space-6);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--tone) 14%, transparent);
-  color: var(--text-primary);
-  font: var(--type-meta);
-}
-
-.glance__dot {
-  flex-shrink: 0;
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--tone);
-}
-
-.glance__meter {
+/* ——— Строки как в меню «Диагностика» и «Задания»: значок-круг со своим градиентом, название, описание, сведения; на углу значка метка состояния ——— */
+.status-row {
   position: relative;
-  display: block;
-  height: var(--space-2);
-  overflow: hidden;
-  border-radius: var(--radius-full);
-  background: var(--divider);
+  /* Метка на углу значка: круг 20, вокруг него в значке прозрачный зазор (как у метки «в сети» и сердечка в меню) */
+  --presence-size: var(--space-5);
+  --presence-inset: 0px;
+  --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
 }
 
-.glance__fill {
+.status-row .test-card__avatar {
+  box-sizing: border-box;
+  border: 1px solid var(--glass-border-blue);
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+}
+
+.status-row .test-card__avatar::before {
+  inset: -1px; /* grid:ok — перекрывает рамку 1 px */
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
+  opacity: 0.9;
+}
+
+.status-row__badge {
   position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: var(--radius-full);
-  background: var(--tone);
-}
-
-.glance__mark {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px; /* grid:ok — линия */
-  background: rgb(255 255 255 / 50%);
-  transform: translateX(-50%);
-}
-
-/* Несколько шкал: у каждой точка уровня слева, название и под ним балл и уровень */
-.glance__rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.glance__row {
-  --tone: var(--color-accent);
+  top: calc(50% - var(--size-avatar) / 2 + var(--presence-inset));
+  left: calc(var(--row-pad-x) + var(--size-avatar) - var(--presence-inset) - var(--presence-size));
   display: grid;
-  grid-template-columns: var(--space-2) minmax(0, 1fr);
-  column-gap: var(--space-3);
-  align-items: baseline;
+  place-items: center;
+  width: var(--presence-size);
+  height: var(--presence-size);
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  pointer-events: none;
 }
 
-.glance__row .glance__dot {
-  align-self: start;
-  margin-top: var(--space-2);
+.status-row--sent .status-row__badge {
+  background: linear-gradient(135deg, #ffb340 0%, #ff9500 100%);
+  box-shadow: 0 1px 3px rgb(255 149 0 / 0.45);
 }
 
-.glance__name {
-  overflow: hidden;
-  color: var(--text-primary);
-  font: var(--type-label);
-  font-weight: 500;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.status-row--permanent .status-row__badge {
+  background: linear-gradient(135deg, #4da3ff 0%, #007aff 100%);
+  box-shadow: 0 1px 3px rgb(0 122 255 / 0.45);
 }
 
-.glance__detail {
-  grid-column: 2;
+.status-row--done .status-row__badge {
+  background: linear-gradient(135deg, #5fd97b 0%, #34c759 100%);
+  box-shadow: 0 1px 3px rgb(52 199 89 / 0.45);
+}
+
+/* Общее правило значков задаёт им тонкий штрих; у меток он плотнее, иначе 12-пиксельный значок не читается */
+[data-pm] .status-row__badge svg :is(path, circle) {
+  stroke-width: 2.4;
+}
+
+/* Сведения под описанием — мелкая строка; на узком экране переносится, а не обрезается (в ней дата и срок) */
+.status-row__facts {
   color: var(--text-secondary);
-  font: var(--type-meta);
-}
-
-.glance__more {
-  margin: 0;
-  color: var(--text-secondary);
-  font: var(--type-meta);
-}
-
-.glance--green,
-.glance__chip--green,
-.glance__row--green,
-.glance__meter--green {
-  --tone: var(--color-green);
-}
-
-.glance--yellow,
-.glance__chip--yellow,
-.glance__row--yellow,
-.glance__meter--yellow {
-  --tone: var(--color-yellow);
-}
-
-.glance--orange,
-.glance__chip--orange,
-.glance__row--orange,
-.glance__meter--orange {
-  --tone: var(--color-orange);
-}
-
-.glance--red,
-.glance__chip--red,
-.glance__row--red,
-.glance__meter--red {
-  --tone: var(--color-red);
-}
-
-.glance--darkred,
-.glance__chip--darkred,
-.glance__row--darkred,
-.glance__meter--darkred {
-  --tone: var(--color-darkred);
+  font: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
 }
 
 /* ——— Выбор тестов и заданий: долгое нажатие начинает, кружок справа показывает отметку, отмеченная карточка подсвечена ——— */
