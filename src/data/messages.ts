@@ -205,6 +205,13 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
       ],
     },
     {
+      label: '14 сентября, пн',
+      messages: [
+        { id: 't-bdi-sent', from: 'me', text: 'Максим, предлагаю пройти шкалу депрессии Бека. В ней 21 группа утверждений, на неё уйдёт 3–5 минут. В каждой группе выберите то, что лучше всего описывает вас за прошедшую неделю.', time: '10:05', test: 'bdi', testKind: 'sent' },
+        { id: 't-bdi-done', from: 'them', text: 'Максим заполнил шкалу депрессии А. Бека «BDI»', time: '19:41', test: 'bdi', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'bdi') }] },
+      ],
+    },
+    {
       label: '15 сентября, вт',
       messages: [
         { id: 'h39', from: 'them', text: 'Мне кажется, я постоянно жду какого-то окончательного подтверждения, что со мной всё в порядке.', time: '13:40' },
@@ -232,6 +239,13 @@ export const MESSAGES: Record<string, MessageGroup[]> = {
         { id: 'h51', from: 'them', text: 'А потом понял, сколько раз слышал её перед контрольными, выступлениями, соревнованиями.', time: '21:48' },
         { id: 'h52', from: 'them', text: 'И сейчас у меня почти то же самое в голове.', time: '21:50' },
         { id: 'h53', from: 'them', text: 'Только мама уже ничего не говорит.', time: '21:51' },
+      ],
+    },
+    {
+      label: '21 сентября, пн',
+      messages: [
+        { id: 't-smol-sent', from: 'me', text: 'Максим, отправляю СМОЛ — сокращённый многофакторный опросник личности. В нём 71 утверждение, на него уйдёт 15–20 минут. Отвечайте «Верно» или «Неверно», не раздумывая долго.', time: '11:20', test: 'smol', testKind: 'sent' },
+        { id: 't-smol-done', from: 'them', text: 'Максим заполнил сокращённый многофакторный опросник личности «СМОЛ»', time: '20:36', test: 'smol', testKind: 'passed', buttons: [{ label: 'Посмотреть', href: clientResultPath('maxim', 'smol') }] },
       ],
     },
     {

@@ -22,6 +22,9 @@ const built = esbuild.buildSync({
       export * from './src/data/libraryMeta';
       export * from './src/data/libraryQuery';
       export { TASKS } from './src/data/taskContent';
+      export { TEST_COVERS } from './src/data/testCovers';
+      export { findClientResult } from './src/data/clientResults';
+      export { readClientData, itemsWithStatus, historyEvents } from './src/data/clientStore';
     `,
     resolveDir: root,
     loader: 'ts',
@@ -30,7 +33,7 @@ const built = esbuild.buildSync({
   write: false,
   format: 'esm',
   platform: 'node',
-  loader: { '.png': 'dataurl', '.webp': 'dataurl', '.jpg': 'dataurl', '.svg': 'dataurl' },
+  loader: { '.png': 'dataurl', '.webp': 'dataurl', '.jpg': 'dataurl', '.svg': 'dataurl', '.css': 'empty' },
   logLevel: 'error',
 });
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'seans-library-'));
@@ -452,4 +455,34 @@ test('карточка задания в чате: подход и кратко�
     assert.ok(!/пациент|["']|\.\.\.| {2,}| [,.;!?]|(?<![а-яё])(еще|ее)(?![а-яё])/i.test(blurb), `${item.id}: стиль описания: ${blurb}`);
     assert.equal(typo(typo(blurb)), typo(blurb));
   }
+});
+
+test('картинки завершённых тестов: у каждой есть тест в библиотеке, яркость и видимая часть', () => {
+  const { TEST_COVERS, LIBRARY } = lib;
+  assert.ok(Object.keys(TEST_COVERS).length >= 2);
+  for (const [id, cover] of Object.entries(TEST_COVERS)) {
+    assert.ok(LIBRARY.some((t) => t.id === id), `${id}: такого теста нет в библиотеке`);
+    assert.ok(cover.tone === 'dark' || cover.tone === 'light', `${id}: яркость «${cover.tone}»`);
+    assert.match(cover.position, /^\d{1,3}% \d{1,3}%$/, `${id}: видимая часть «${cover.position}»`);
+    assert.ok(cover.src, `${id}: нет картинки`);
+  }
+});
+
+test('BDI и СМОЛ у Максима: пройдены, свежие выше, есть результат, картинка и записи в истории', () => {
+  const { TEST_COVERS, findClientResult, readClientData, itemsWithStatus, historyEvents } = lib;
+  const data = readClientData();
+  const done = itemsWithStatus(data, 'test').filter((t) => t.status === 'done');
+  assert.deepEqual(done.slice(0, 2).map((t) => t.id), ['smol', 'bdi'], 'СМОЛ (21.09) выше BDI (14.09), оба выше SCL-90 (11.09)');
+  assert.deepEqual(done.slice(0, 2).map((t) => t.fullDate), ['21.09.2026', '14.09.2026']);
+  for (const id of ['bdi', 'smol']) {
+    const result = findClientResult(`maxim-${id}`);
+    assert.ok(result?.data, `${id}: у результата Максима нет заключения`);
+    assert.ok(TEST_COVERS[id], `${id}: нет картинки`);
+    assert.equal(result.form, 'Мужская');
+  }
+  assert.equal(findClientResult('maxim-bdi').data.info.date, '14.09.2026');
+  assert.equal(findClientResult('maxim-smol').data.info.date, '21.09.2026');
+  const texts = historyEvents(data).map((e) => e.text ?? '');
+  assert.ok(texts.includes('Вы отправили шкалу депрессии А. Бека «BDI»'));
+  assert.ok(texts.includes('Максим заполнил сокращённый многофакторный опросник личности «СМОЛ»'));
 });

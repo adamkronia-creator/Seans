@@ -10,6 +10,7 @@
 
 .chat-item__button,
 .lib-card .test-card,
+.cover-card__body,
 .event-item__inner,
 .hist-card__event--link,
 .blank-card__head,
@@ -36,6 +37,7 @@
     .chat-item__button,
     .lib-card .test-card,
     .chat .chat-tests__list .test-card,
+    .cover-card__body,
     .event-item__inner,
     .blank-card__head,
     .ts-row--link,

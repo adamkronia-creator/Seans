@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconTabPractices, IconTabTests } from '../icons';
 import type { PickProps } from '../ChatCase/ChatCase';
+import { CoverCard } from './CoverCard';
 import { StatusRow } from './StatusRow';
 import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -11,6 +12,7 @@ import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { useTaskResult, useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import { plural } from '../../data/taskValues';
+import { TEST_COVERS } from '../../data/testCovers';
 import type { PsyTest, TestStatus } from '../../data/tests';
 import { waitingText } from '../../data/waiting';
 import './ChatTests.css';
@@ -152,13 +154,17 @@ export function ChatTests({
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
-      renderCard={(item, pick) =>
-        item.status === 'done' ? (
-          <StatusRow key={item.id} item={item} facts="Пройден" time={findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date ?? item.fullDate ?? item.date} badgeLabel="Пройден" onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
+      renderCard={(item, pick) => {
+        if (item.status !== 'done') return <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTest?.(t.id)} {...pick} />;
+        const date = findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date ?? item.fullDate ?? item.date;
+        const cover = TEST_COVERS[item.id];
+        // У теста с картинкой — карточка на стеклянной подложке, у остальных — обычная строка
+        return cover ? (
+          <CoverCard key={item.id} item={item} cover={cover} date={date} onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
         ) : (
-          <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTest?.(t.id)} {...pick} />
-        )
-      }
+          <StatusRow key={item.id} item={item} facts="Пройден" time={date} badgeLabel="Пройден" onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
+        );
+      }}
       onRemind={onRemind}
       selected={selected}
       onPick={onPick}
