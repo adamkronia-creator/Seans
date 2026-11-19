@@ -298,6 +298,7 @@ interface SectionPageProps {
   /** Выбранные карточки заметок или сведений (null — выбора нет) и отметка карточки */
   picked: string[] | null;
   onPick: (id: string) => void;
+  onCardMenu: (id: string, opener: HTMLButtonElement) => void;
   /** Напомнить клиенту о тестах или заданиях, которые ждут ответа */
   onRemind: (kind: 'test' | 'task', items: PsyTest[]) => void;
 }
@@ -306,7 +307,7 @@ interface SectionPageProps {
  * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
  * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
  */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick, onRemind }: SectionPageProps) {
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick, onCardMenu, onRemind }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -316,6 +317,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <ChatTests
             selected={picked}
             onPick={onPick}
+            onCardMenu={onCardMenu}
             onRemind={(items) => onRemind('test', items)}
             hasData={hasClientData}
             onOpenTest={(testId) => navigate(`/chat/${chatId}/tests/${testId}`)}
@@ -329,6 +331,7 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
           <ChatTasks
             selected={picked}
             onPick={onPick}
+            onCardMenu={onCardMenu}
             onRemind={(items) => onRemind('task', items)}
             hasData={hasClientData}
             onOpenTask={(taskId) => hasTaskSettings(taskId) && navigate(`/chat/${chatId}/tasks/${taskId}`)}
@@ -429,6 +432,11 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cardMenu, setCardMenu] = useState<{ id: string; rect: DOMRect; opener: HTMLButtonElement } | null>(null);
+  const openCardMenu = useCallback((id: string, opener: HTMLButtonElement) => {
+    setCardMenu({ id, rect: opener.getBoundingClientRect(), opener });
+  }, []);
+  const closeCardMenu = useCallback(() => setCardMenu(null), []);
   const [menuAnchor, setMenuAnchor] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   // «Поиск по чату» из боковой панели на другой вкладке: сначала едем в диалог, и только потом поиск открывается
   const searchAfterSwitch = useRef(false);
@@ -537,6 +545,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   // Жест «назад» при открытой боковой панели закрывает её
   useBackHandler(menuOpen, closeMenu);
+  const cardMenuOpen = Boolean(cardMenu);
+  useBackHandler(cardMenuOpen, closeCardMenu);
+  useEffect(() => (cardMenuOpen ? guardBack(closeCardMenu) : undefined), [cardMenuOpen, closeCardMenu]);
   // Системная «назад» (кнопка телефона) при открытой панели закрывает её, а не уводит из чата
   useEffect(() => (menuOpen ? guardBack(closeMenu) : undefined), [menuOpen, closeMenu]);
   // Так же с открытым поиском по чату
@@ -910,6 +921,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           onAppTabChange={onAppTabChange}
           picked={id === section ? selected : null}
           onPick={pickCard}
+          onCardMenu={openCardMenu}
           onRemind={remind}
         />
       ),
@@ -1080,6 +1092,16 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       </header>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />
+
+      {cardMenu && (
+        <ChipMenu
+          anchor={cardMenu.rect}
+          opener={cardMenu.opener}
+          label="Действия с карточкой"
+          onClose={closeCardMenu}
+          items={[{ key: 'delete', label: 'Удалить', Icon: IconTrash, danger: true, run: () => setRemoving([cardMenu.id]) }]}
+        />
+      )}
 
       {menuOpen && menuAnchor && (
         <ChipMenu

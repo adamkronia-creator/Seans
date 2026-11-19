@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconTabPractices, IconTabTests } from '../icons';
 import type { PickProps } from '../ChatCase/ChatCase';
+import { ActivityCard } from './ActivityCard';
 import { StatusRow } from './StatusRow';
 import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -10,9 +11,9 @@ import { clientResultId } from '../../data/resultLinks';
 import { LIBRARY, TASK_LIBRARY } from '../../data/library';
 import { useTaskResult, useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
-import { plural } from '../../data/taskValues';
+import { TASKS } from '../../data/taskContent';
+import { testSettings } from '../../data/testSettings';
 import type { PsyTest, TestStatus } from '../../data/tests';
-import { waitingText } from '../../data/waiting';
 import './ChatTests.css';
 
 /** Что показать, когда во вкладке ничего нет: что именно пусто и что делать дальше */
@@ -40,26 +41,9 @@ const TASK_SECTIONS: SectionConfig[] = [
   { status: 'done', title: 'Завершённые' },
 ];
 
-/** Отправленное: время справа вверху (сегодня — часы, раньше — дата) и сколько ждёт ответа */
-function sentWhen(item: PsyTest): string {
-  return item.fullDate && waitingText(item.fullDate) === 'Сегодня' ? (item.time ?? item.fullDate) : (item.fullDate ?? item.date);
-}
-function sentFacts(item: PsyTest): string {
-  if (!item.fullDate) return 'Ждёт ответа';
-  const waiting = waitingText(item.fullDate);
-  return waiting === 'Сегодня' ? 'Ждёт ответа' : `Ждёт ${waiting}`;
-}
+const introParagraph = (intro?: string) => intro?.split('\n\n', 1)[0].trim();
 
-/** Описание задания из библиотеки: в самом элементе у постоянного задания и записи там счётчик («Записей: 2 из 10», «Запись 2») */
 const taskDescription = (taskId: string | undefined) => TASK_LIBRARY.find((t) => t.id === taskId)?.description;
-
-/** Постоянное задание: сколько записей уже сделано и когда назначено */
-function PermanentRow({ item, onOpen, ...pick }: PickProps & { item: PsyTest; onOpen: (item: PsyTest) => void }) {
-  const count = item.records?.count ?? 0;
-  const since = item.records?.since ?? item.fullDate;
-  const counts = /^Записей/.test(item.description) ? item.description : `${plural(count, ['Запись', 'Записи', 'Записей'])}: ${count}`;
-  return <StatusRow item={item} description={taskDescription(item.id)} facts={counts} time={since} onOpen={onOpen} {...pick} />;
-}
 
 /** Выполненное задание: дата берётся из результата (у записи постоянного задания добавлен её номер) */
 function DoneTaskRow({ item, resultId, onOpen, ...pick }: PickProps & { item: PsyTest; resultId: string; onOpen: (item: PsyTest) => void }) {
@@ -126,6 +110,7 @@ function SectionedList({
 }
 
 interface TabProps {
+  onCardMenu: (id: string, opener: HTMLButtonElement) => void;
   /** Отмеченные карточки (null — выбора нет) и отметка карточки */
   selected?: string[] | null;
   onPick?: (id: string) => void;
@@ -136,6 +121,7 @@ interface TabProps {
 /** Вкладка «Опросники» в открытом чате: отправленный тест открывает его настройку, пройденный — результат клиента */
 export function ChatTests({
   hasData,
+  onCardMenu,
   onOpenTest,
   onOpenResult,
   selected,
@@ -152,13 +138,23 @@ export function ChatTests({
       items={hasData ? itemsWithStatus(data, 'test') : []}
       sections={TEST_SECTIONS}
       empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
-      renderCard={(item, pick) =>
-        item.status === 'done' ? (
-          <StatusRow key={item.id} item={item} facts="Пройден" time={findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date ?? item.fullDate ?? item.date} badgeLabel="Пройден" onOpen={(t) => onOpenResult?.(t.id)} {...pick} />
-        ) : (
-          <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTest?.(t.id)} {...pick} />
-        )
-      }
+      renderCard={(item, pick) => {
+        const test = LIBRARY.find((test) => test.id === item.id);
+        const done = item.status === 'done';
+        const resultDate = done ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date : undefined;
+        return (
+          <ActivityCard
+            key={item.id}
+            item={item}
+            status={done ? 'Завершённый опросник' : 'Отправленный опросник'}
+            date={resultDate ?? item.fullDate ?? item.date}
+            description={introParagraph(test && testSettings(test).intro)}
+            onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
+            onMenu={onCardMenu}
+            {...pick}
+          />
+        );
+      }}
       onRemind={onRemind}
       selected={selected}
       onPick={onPick}
@@ -191,6 +187,7 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
  */
 export function ChatTasks({
   hasData,
+  onCardMenu,
   onOpenTask,
   onOpenResult,
   selected,
@@ -208,11 +205,26 @@ export function ChatTasks({
       sections={TASK_SECTIONS}
       empty={{ kind: 'task', title: 'Заданий пока нет', text: 'Отправьте задание из раздела «Задания» — оно появится здесь.' }}
       renderCard={(item, pick) => {
-        if (item.status === 'done') {
-          return <DoneTaskRow key={item.id} item={item} resultId={clientResultId(CLIENT_CHAT, item.id)} onOpen={(t) => onOpenResult?.(t.id)} {...pick} />;
-        }
-        if (item.status === 'permanent') return <PermanentRow key={item.id} item={item} onOpen={(t) => onOpenTask?.(t.id)} {...pick} />;
-        return <StatusRow key={item.id} item={item} facts={sentFacts(item)} time={sentWhen(item)} onOpen={(t) => onOpenTask?.(t.id)} {...pick} />;
+        const done = item.status === 'done';
+        const assigned = item.status === 'permanent';
+        const result = done ? findClientTaskResult(clientResultId(CLIENT_CHAT, item.id)) : undefined;
+        const taskId = result?.taskId ?? item.id;
+        const details = result?.record
+          ? `Запись № ${result.record}`
+          : assigned && /^Записей/.test(item.description) ? item.description : undefined;
+        return (
+          <ActivityCard
+            key={item.id}
+            item={item}
+            status={done ? 'Завершённое задание' : assigned ? 'Назначенное задание' : 'Отправленное задание'}
+            date={result?.info.date ?? item.records?.since ?? item.fullDate ?? item.date}
+            description={introParagraph(TASKS[taskId]?.intro) ?? taskDescription(taskId)}
+            details={details}
+            onOpen={() => done ? onOpenResult?.(item.id) : onOpenTask?.(item.id)}
+            onMenu={onCardMenu}
+            {...pick}
+          />
+        );
       }}
       onRemind={onRemind}
       selected={selected}
