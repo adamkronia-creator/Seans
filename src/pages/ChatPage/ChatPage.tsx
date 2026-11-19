@@ -931,7 +931,7 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
   };
 
   return (
-    <section className="chat" data-work-list={listing ? '' : undefined} data-pinned={pinShown ? '' : undefined}>
+    <section className="chat" data-pinned={pinShown ? '' : undefined}>
       <header className="chat__header">
         {selecting ? (
           <div key="select" className="chat__top chat__select">

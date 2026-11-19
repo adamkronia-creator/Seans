@@ -426,17 +426,6 @@ html:has([data-pm]) body {
   pointer-events: none;
 }
 
-/* Ровная подложка для рабочих списков с белым текстом. */
-:root[data-ink='light'] [data-pm] :is(.messages, .archive, .chat[data-work-list]) {
-  --work-list-background: #24262d;
-  --work-list-meta: #e9eaf0;
-}
-
-:root[data-ink='light'] [data-pm] :is(.messages, .archive, .chat[data-work-list])::before {
-  background: var(--work-list-background);
-  filter: none;
-}
-
 /* Подложка шапки — отдельный слой позади с размытием, а не на самой шапке: предок с backdrop-filter стал бы «корнем фона», и стеклянные
    кнопки и чипсы внутри видели бы сквозь него только саму шапку. Строки списка уходят под шапку размытыми */
 [data-pm] .chats-header {

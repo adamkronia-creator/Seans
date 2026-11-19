@@ -71,7 +71,7 @@
 /* Время — meta (12/16) */
 .chat-item .chat-item__time {
   flex-shrink: 0;
-  color: var(--work-list-meta, var(--text-secondary));
+  color: var(--text-secondary);
   font: var(--type-meta);
   font-weight: 400;
   font-variant-numeric: tabular-nums;
