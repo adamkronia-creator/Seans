@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Badge } from '../Badge/Badge';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconTabPractices, IconTabTests } from '../icons';
 import type { PickProps } from '../ChatCase/ChatCase';
@@ -37,9 +38,20 @@ const TEST_SECTIONS: SectionConfig[] = [
 
 const TASK_SECTIONS: SectionConfig[] = [
   { status: 'sent', title: 'Отправленные', remind: true },
-  { status: 'permanent', title: 'Постоянные' },
+  { status: 'permanent', title: 'Назначенные' },
   { status: 'done', title: 'Завершённые' },
 ];
+
+const TEST_CARD_DESCRIPTIONS: Readonly<Partial<Record<string, string>>> = {
+  itt: 'Методика предназначена для комплексной экспресс-диагностики тревожности',
+  smol: 'Методика предназначена для комплексной оценки особенностей личности, эмоционального состояния и характера адаптации человека',
+  bdi: 'Стандартизированная методика, предназначенная для количественной оценки депрессивной симптоматики',
+  rses: 'Методика предназначена для исследования самооценки человека и принятия себя',
+  scl90: 'Методика предназначена для комплексной оценки выраженности психологической и соматической симптоматики',
+  '5pfq': 'Методика предназначена для комплексной оценки личности на основе пяти диапазонов черт, которые делятся на свойства личности',
+  gad7: 'Методика предназначена для оценки выраженности симптомов и проявлений тревоги',
+  phq9: 'Методика предназначена для оценки выраженности сниженного психоэмоционального состояния и депрессии',
+};
 
 const introParagraph = (intro?: string) => intro?.split('\n\n', 1)[0].trim();
 
@@ -94,7 +106,7 @@ function SectionedList({
           <section key={status} className="chat-tests__section">
             <div className="chat-tests__heading">
               <h2 className="chat-tests__title">{title}</h2>
-              <span className="chat-tests__count">{list.length}</span>
+              <Badge count={list.length} variant="neutral" />
               {remind && (
                 <button type="button" className="chat-tests__remind" onClick={() => onRemind?.(list)}>
                   {list.length > 1 ? 'Напомнить всем' : 'Напомнить'}
@@ -148,7 +160,7 @@ export function ChatTests({
             item={item}
             status={done ? 'Завершённый опросник' : 'Отправленный опросник'}
             date={resultDate ?? item.fullDate ?? item.date}
-            description={introParagraph(test && testSettings(test).intro)}
+            description={TEST_CARD_DESCRIPTIONS[item.id] ?? introParagraph(test && testSettings(test).intro)}
             onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
             onMenu={onCardMenu}
             {...pick}
