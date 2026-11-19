@@ -17,6 +17,7 @@
 .chat-tests__section {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   gap: var(--heading-bottom);
 }
 
