@@ -125,7 +125,7 @@
 
 .chat .status-row__time {
   flex-shrink: 0;
-  color: var(--text-secondary);
+  color: var(--work-list-meta, var(--text-secondary));
   font: var(--type-meta);
   font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -188,7 +188,7 @@
 
 /* Сведения под описанием — мелкая строка; на узком экране переносится, а не обрезается (в ней дата и срок) */
 .status-row__facts {
-  color: var(--text-secondary);
+  color: var(--work-list-meta, var(--text-secondary));
   font: var(--type-caption);
   font-variant-numeric: tabular-nums;
   text-wrap: pretty;
