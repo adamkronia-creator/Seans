@@ -35,9 +35,7 @@ export function ActivityCard({ item, category, date, description, details, resul
         {selecting && <span className="pick-mark" aria-hidden="true" />}
       </button>
       {result && result.scales.length > 0 && (
-        <div className="activity-card__scales">
-          <ScaleList data={result} onOpen={onOpen} grouping={item.id === '5pfq' ? 'factors' : 'main-extra'} />
-        </div>
+        <ScaleList data={result} onOpen={onOpen} grouping={item.id === '5pfq' ? 'factors' : 'main-extra'} />
       )}
       {!selecting && (
         <button

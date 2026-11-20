@@ -162,7 +162,7 @@
 
 .sheet__toggle-icon {
   flex-shrink: 0;
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   font-size: var(--space-6);
 }
 
@@ -343,13 +343,12 @@
   overflow: clip;
 }
 
-/* Панель форматирования плотнее плитки: под ней проходит прокручиваемый текст, поэтому заливка сплошная */
+/* У текста и панели одна заливка, достаточно плотная для прокрутки текста под панелью. */
 [data-pm] .rich-toolbar {
   padding: var(--space-3);
   border: 0;
   border-top: var(--hairline) solid var(--sheet-line);
   border-radius: 0;
-  background: var(--sheet-solid);
 }
 
 [data-pm] .sheet__preview {
@@ -370,9 +369,12 @@
 
 [data-pm] .sheet__appearance .sheet__toggle-row,
 [data-pm] .sheet__icon-picker,
-[data-pm] .sheet__appearance .sheet__tones,
-[data-pm] .sheet__text .rich-editor {
+[data-pm] .sheet__appearance .sheet__tones {
   background: var(--sheet-tile);
+}
+
+[data-pm] .sheet__text :is(.rich-editor, .rich-toolbar) {
+  background: var(--sheet-solid);
 }
 
 [data-pm] .sheet__appearance .sheet__toggle-row {
