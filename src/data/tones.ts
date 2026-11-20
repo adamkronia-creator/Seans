@@ -108,7 +108,7 @@ const savedShades = APPLE_TONES.map(([id, label]) =>
   tone(`shade-${id}`, `${label} · глубокий оттенок`, `color-mix(in srgb, var(--palette-${id}) 74%, var(--palette-black))`),
 );
 
-export const TONES = [
+const editorTones = [
   ...APPLE_TONES.map(([id, label]) => tone(id, label, `var(--palette-${id})`)),
   tone('white', 'Белый', 'var(--palette-white)', 'rgb(0 0 0 / 60%)'),
   tone('black', 'Чёрный', 'var(--palette-black)', 'rgb(255 255 255 / 60%)'),
@@ -117,11 +117,26 @@ export const TONES = [
   ),
 ];
 
+
+// От тёплых цветов к холодным, затем нейтральные.
+const editorOrder: ToneId[] = [
+  'red', 'mix-salmon', 'orange', 'mix-apricot', 'brown', 'mix-gold', 'yellow', 'mix-vanilla',
+  'mix-pistachio', 'green', 'mix-sage', 'mint', 'mix-sea-glass', 'teal', 'mix-lagoon',
+  'cyan', 'mix-ice', 'blue', 'mix-cornflower', 'slate', 'mix-lilac-mist',
+  'mix-orchid', 'magenta', 'pink', 'mix-blossom', 'mix-dusty-rose', 'white', 'black',
+];
+
+const editorToneById = new Map(editorTones.map((entry) => [entry.id, entry]));
+export const TONES = editorOrder.flatMap((id) => {
+  const entry = editorToneById.get(id);
+  return entry ? [entry] : [];
+});
+
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
 const NEUTRAL_TONE = { id: null, iconFilter: undefined, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
 
 // Сохранённые цвета продолжают отображаться на существующих карточках.
-const toneById = new Map([...FOLDER_TONES, ...savedShades, ...TONES].map((entry) => [entry.id, entry]));
+const toneById = new Map([...FOLDER_TONES, ...savedShades, ...editorTones].map((entry) => [entry.id, entry]));
 
 export const toneOf = (id: ToneId | null) =>
-  id === null ? NEUTRAL_TONE : (toneById.get(id) ?? TONES[0]);
+  id === null ? NEUTRAL_TONE : (toneById.get(id) ?? editorTones[0]);

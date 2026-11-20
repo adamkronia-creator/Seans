@@ -163,7 +163,7 @@
 .sheet__toggle-icon {
   flex-shrink: 0;
   color: var(--color-accent);
-  font-size: var(--size-icon);
+  font-size: var(--space-6);
 }
 
 .sheet__toggle-label {
@@ -392,8 +392,13 @@
 .sheet__icon-picker {
   max-height: min(calc(var(--space-12) * 5), 32dvh);
   overflow-y: auto;
+  scrollbar-width: none;
   overscroll-behavior-y: contain;
   padding: var(--card-pad);
+}
+
+.sheet__icon-picker::-webkit-scrollbar {
+  display: none;
 }
 
 .sheet__icon-picker section + section {
@@ -498,8 +503,8 @@
 }
 
 .sheet__icon svg {
-  width: var(--space-5);
-  height: var(--space-5);
+  width: var(--space-6);
+  height: var(--space-6);
 }
 
 .sheet__preview-icon svg,
