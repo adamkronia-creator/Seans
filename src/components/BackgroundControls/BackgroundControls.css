@@ -8,12 +8,18 @@
 
 .bg-sheet__label {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
   color: var(--text-primary);
   font: var(--type-body);
 }
 
+.bg-sheet__palette .sheet__tones {
+  margin-block-start: 1px; /* grid:ok — просвет как в редакторе */
+}
+
 .bg-sheet__value {
+  margin-inline-start: auto;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }

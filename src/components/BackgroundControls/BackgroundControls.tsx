@@ -4,16 +4,22 @@ import '../AttachSheet/AttachSheet.css';
 import { addToNamedAlbum } from '../../data/profile';
 import { uploadPhotos } from '../Profile/upload';
 import dawn from '../../assets/bg-default.webp';
+import { TonePalette } from '../EditSheet/TonePalette';
+import { IconSheetPalette } from '../icons';
+import IconBlur from '../../assets/icons/solar/radial-blur.svg?react';
+import IconText from '../../assets/icons/solar/text-format.svg?react';
 import { IconCamera, IconCheck } from '../Profile/ProfileIcons';
 import {
   currentBackgroundId,
   getBackgrounds,
+  getBackgroundColor,
   getBlur,
   getInkPref,
   removeBackground,
   resetBackground,
   selectBackground,
   setBackgroundFromFile,
+  setBackgroundColor,
   setBlur,
   setInkPref,
   type InkPref,
@@ -25,7 +31,7 @@ const INKS: { id: InkPref; label: string }[] = [
   { id: 'light', label: 'Белый' },
 ];
 
-/** Настройки фона приложения: загрузить картинку, размытие и цвет текста (авто — по яркости фона). Стоят в окне выбора обложки профиля */
+/** Настройки фона приложения: выбрать картинку или цвет, размытие и цвет текста (авто — по яркости фона). Стоят в окне выбора обложки профиля */
 export function BackgroundControls() {
   const file = useRef<HTMLInputElement>(null);
   const [blur, setBlurState] = useState(getBlur);
@@ -35,6 +41,8 @@ export function BackgroundControls() {
   const refresh = () => setTick((n) => n + 1);
   const list = getBackgrounds();
   const selected = currentBackgroundId();
+  const color = getBackgroundColor();
+  const defaultSelected = selected === null && color === null;
   return (
     <>
       <div className="at-card">
@@ -47,16 +55,16 @@ export function BackgroundControls() {
           <li>
             <button
               type="button"
-              className={`at-photo${selected === null ? ' at-photo--on' : ''}`}
+              className={`at-photo${defaultSelected ? ' at-photo--on' : ''}`}
               aria-label="Фон по умолчанию"
-              aria-pressed={selected === null}
+              aria-pressed={defaultSelected}
               onClick={() => {
                 resetBackground();
                 refresh();
               }}
             >
               <img src={dawn} alt="" />
-              {selected === null && (
+              {defaultSelected && (
                 <span className="pf-check">
                   <IconCheck />
                 </span>
@@ -120,54 +128,68 @@ export function BackgroundControls() {
         </button>
       )}
 
-          <section className="sheet__card bg-sheet__card">
-            <label className="bg-sheet__label" htmlFor="bg-blur">
-              <span>Размытие</span>
-              <output className="bg-sheet__value">{blur}</output>
-            </label>
-            <input
-              id="bg-blur"
-              className="bg-sheet__range"
-              type="range"
-              min={0}
-              max={60}
-              step={1}
-              value={blur}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                setBlurState(v);
-                setBlur(v);
-              }}
-            />
-          </section>
+      <section className="sheet__card sheet__appearance bg-sheet__palette">
+        <div className="sheet__toggle-row">
+          <IconSheetPalette className="sheet__toggle-icon" aria-hidden="true" />
+          <span className="sheet__toggle-label" id="bg-color-label">Цвет фона</span>
+        </div>
+        <TonePalette labelledBy="bg-color-label" value={color} onChange={(id) => {
+          setBackgroundColor(id);
+          refresh();
+        }} />
+      </section>
 
-          <section className="sheet__card bg-sheet__card">
-            <div className="bg-sheet__label" id="bg-ink-label">
-              <span>Цвет текста</span>
-            </div>
-            <div
-              className="bg-sheet__seg"
-              role="radiogroup"
-              aria-labelledby="bg-ink-label"
-              style={{ '--seg-i': Math.max(0, INKS.findIndex((x) => x.id === ink)), '--seg-n': INKS.length } as CSSProperties}
+      <section className="sheet__card bg-sheet__card">
+        <label className="bg-sheet__label" htmlFor="bg-blur">
+          <IconBlur className="sheet__toggle-icon" aria-hidden="true" />
+          <span>Размытие</span>
+          <output className="bg-sheet__value">{blur}</output>
+        </label>
+        <input
+          id="bg-blur"
+          className="bg-sheet__range"
+          type="range"
+          min={0}
+          max={60}
+          step={1}
+          value={blur}
+          disabled={color !== null}
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setBlurState(v);
+            setBlur(v);
+          }}
+        />
+      </section>
+
+      <section className="sheet__card bg-sheet__card">
+        <div className="bg-sheet__label" id="bg-ink-label">
+          <IconText className="sheet__toggle-icon" aria-hidden="true" />
+          <span>Цвет текста</span>
+        </div>
+        <div
+          className="bg-sheet__seg"
+          role="radiogroup"
+          aria-labelledby="bg-ink-label"
+          style={{ '--seg-i': Math.max(0, INKS.findIndex((x) => x.id === ink)), '--seg-n': INKS.length } as CSSProperties}
+        >
+          {INKS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={ink === id}
+              className={`bg-sheet__seg-item${ink === id ? ' is-on' : ''}`}
+              onClick={() => {
+                setInk(id);
+                setInkPref(id);
+              }}
             >
-              {INKS.map(({ id, label }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="radio"
-                  aria-checked={ink === id}
-                  className={`bg-sheet__seg-item${ink === id ? ' is-on' : ''}`}
-                  onClick={() => {
-                    setInk(id);
-                    setInkPref(id);
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </section>
+              {label}
+            </button>
+          ))}
+        </div>
+      </section>
     </>
   );
 }

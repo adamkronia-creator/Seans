@@ -1,10 +1,12 @@
 /**
- * Внешний вид фона (временные настройки): своя картинка, размытие и цвет текста.
+ * Внешний вид фона (временные настройки): своя картинка или цвет, размытие и цвет текста.
  * Всё хранится в localStorage и применяется при запуске. Цвет текста «авто» считается по яркости фона: на тёмном фоне текст белый,
  * на светлом тёмный (атрибут data-ink на <html>: dark — тёмный текст, light — белый).
  */
 import dawn from '../assets/bg-default.webp';
+import { TONES, type ToneId } from '../data/tones';
 
+const K_COLOR = 'seans-bg-color';
 const K_IMAGE = 'seans-bg-image';
 const K_BLUR = 'seans-blur';
 const K_INK = 'seans-ink';
@@ -46,6 +48,40 @@ export const getInkPref = (): InkPref => {
   return v === 'dark' || v === 'light' || v === 'auto' ? v : 'light';
 };
 
+export function getBackgroundColor() {
+  const id = get(K_COLOR);
+  return TONES.find((tone) => tone.id === id)?.id ?? null;
+}
+
+function showColor(swatch: string) {
+  root().style.removeProperty('--user-bg');
+  root().style.setProperty('--user-bg-color', swatch);
+  root().dataset.bg = 'solid';
+}
+
+function solidRGB() {
+  const sample = document.createElement('span');
+  sample.style.color = 'var(--user-bg-color)';
+  root().append(sample);
+  const color = getComputedStyle(sample).color;
+  sample.remove();
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 1;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 1, 1);
+  return ctx.getImageData(0, 0, 1, 1).data;
+}
+
+export function setBackgroundColor(id: ToneId) {
+  const tone = TONES.find((entry) => entry.id === id);
+  if (!tone) return;
+  set(K_COLOR, id);
+  set(K_IMAGE, null);
+  showColor(tone.swatch);
+  void applyInk();
+}
+
 /** Яркость картинки: среднее по уменьшенной копии (формула относительной яркости) */
 async function luminanceOf(src: string): Promise<number> {
   const img = new Image();
@@ -64,15 +100,18 @@ async function luminanceOf(src: string): Promise<number> {
   return sum / (d.length / 4);
 }
 
-/** Яркость текущего фона: своя картинка или картинка по умолчанию */
+/** Яркость однотонного фона или картинки */
 async function sceneLuminance(): Promise<number> {
+  if (root().dataset.bg === 'solid') {
+    const [r, g, b] = solidRGB();
+    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  }
   const custom = get(K_IMAGE);
   if (custom) return luminanceOf(custom);
   return luminanceOf(dawn);
 }
 
-/** Цвет верха приложения: полоса фона у верхнего края (среднее), поверх неё стекло шапки. Нужен, чтобы строка браузера слилась с приложением */
-async function topColor(): Promise<string | null> {
+async function imageTopRGB() {
   const img = new Image();
   img.src = get(K_IMAGE) ?? dawn;
   await img.decode();
@@ -82,7 +121,12 @@ async function topColor(): Promise<string | null> {
   const ctx = canvas.getContext('2d')!;
   // Средний цвет верхних 6% картинки: сжатие в один пиксель усредняет
   ctx.drawImage(img, 0, 0, img.naturalWidth, Math.max(1, img.naturalHeight * 0.06), 0, 0, 1, 1);
-  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+  return ctx.getImageData(0, 0, 1, 1).data;
+}
+
+/** Цвет верха приложения: полоса фона у верхнего края (среднее), поверх неё стекло шапки. Нужен, чтобы строка браузера слилась с приложением */
+async function topColor(): Promise<string | null> {
+  const [r, g, b] = root().dataset.bg === 'solid' ? solidRGB() : await imageTopRGB();
   // Стекло шапки (rgb(... / альфа)) ложится поверх фона
   // Слой экрана появляется чуть позже запуска: ждём его (до двух секунд)
   let layer = document.querySelector('[data-pm]');
@@ -101,32 +145,36 @@ async function topColor(): Promise<string | null> {
 
 /** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая.
  * Строка браузера красится под верх приложения (`theme-color`), чтобы между ними не было ступеньки и светлой черты */
-async function syncChrome() {
+async function syncChrome(revision: number) {
   const light = root().dataset.ink === 'light';
   document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', light ? 'dark' : 'only light');
   const meta = document.querySelector('meta[name="theme-color"]');
   meta?.setAttribute('content', light ? '#12141B' : '#FFFFFF');
   try {
     const color = await topColor();
-    if (color && root().dataset.ink === (light ? 'light' : 'dark')) meta?.setAttribute('content', color);
+    if (color && revision === inkRevision) meta?.setAttribute('content', color);
   } catch {
     // Картинку не прочитать: остаётся цвет по умолчанию
   }
 }
 
+let inkRevision = 0;
+
 /** Выставляет data-ink по выбору; в режиме «авто» считает по фону */
 async function applyInk() {
+  const revision = ++inkRevision;
   const pref = getInkPref();
-  if (pref !== 'auto') {
-    root().dataset.ink = pref;
-  } else {
+  let ink = pref === 'auto' ? 'dark' : pref;
+  if (pref === 'auto') {
     try {
-      root().dataset.ink = (await sceneLuminance()) < DARK_BELOW ? 'light' : 'dark';
+      if ((await sceneLuminance()) < DARK_BELOW) ink = 'light';
     } catch {
-      root().dataset.ink = 'dark';
+      // Остаётся тёмный текст.
     }
   }
-  syncChrome();
+  if (revision !== inkRevision) return;
+  root().dataset.ink = ink;
+  void syncChrome(revision);
 }
 
 export function setInkPref(pref: InkPref) {
@@ -141,6 +189,8 @@ export function setBlur(px: number) {
 }
 
 function show(dataUrl: string) {
+  set(K_COLOR, null);
+  root().style.removeProperty('--user-bg-color');
   root().style.setProperty('--user-bg', `url("${dataUrl}")`);
   root().dataset.bg = 'custom';
 }
@@ -224,6 +274,8 @@ export async function setBackgroundFromFile(file: File): Promise<boolean> {
 
 /** Возвращает фон приложения по умолчанию (картинка рассвета); загруженные фоны остаются в списке */
 export function resetBackground() {
+  set(K_COLOR, null);
+  root().style.removeProperty('--user-bg-color');
   set(K_IMAGE, null);
   root().style.removeProperty('--user-bg');
   root().dataset.bg = '1';
@@ -242,6 +294,8 @@ export function initAppearance() {
   root().dataset.bg = '1';
   root().style.setProperty('--bg-blur', `${getBlur()}px`);
   const image = get(K_IMAGE);
-  if (image) show(image);
+  const color = TONES.find((tone) => tone.id === getBackgroundColor());
+  if (color) showColor(color.swatch);
+  else if (image) show(image);
   void applyInk();
 }

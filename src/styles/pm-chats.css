@@ -395,6 +395,16 @@ html:has([data-pm]) body {
   --scene: var(--user-bg) center / cover no-repeat, #dfe6f0;
 }
 
+:root[data-bg='solid'] [data-pm] {
+  --scene: var(--user-bg-color);
+  --veil: none;
+}
+
+:root[data-bg='solid'] [data-pm] :is(.messages, .chat, .profile, .pe, .test-settings, .events, .fp, .archive)::before {
+  inset: 0;
+  filter: none;
+}
+
 /* Фон «Диалогов» и чата — отдельный слой позади содержимого, размытый на --bg-blur: середина экрана
    мягкая, как стекло шапки и панели. Слой чуть больше экрана, чтобы размытый край не светлел; лишнее обрезает overflow: clip */
 :root {

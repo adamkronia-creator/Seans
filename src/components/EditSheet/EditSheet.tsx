@@ -3,9 +3,10 @@ import { LineInput } from '../LineInput/LineInput';
 import { CASE_ICON_GROUPS, caseIcon } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
 import { RichEditor } from '../RichEditor/RichEditor';
+import { TonePalette } from './TonePalette';
 import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
-import { TONES, toneOf, type ToneId } from '../../data/tones';
+import { toneOf, type ToneId } from '../../data/tones';
 import { AutoTextarea } from './AutoTextarea';
 import { SheetOverlay } from './SheetOverlay';
 import './EditSheet.css';
@@ -166,21 +167,7 @@ export function EditSheet({
                   <Switch checked={toneOn} onChange={setToneOn} label="Цвет шапки" />
                 </div>
                 <Collapse open={toneOn}>
-                  <div className="sheet__tones" role="radiogroup" aria-labelledby={`${uid}-tone`}>
-                    {TONES.map(({ id, label, swatch }) => (
-                      <button
-                        key={id}
-                        type="button"
-                        role="radio"
-                        aria-checked={id === tone}
-                        aria-label={label}
-                        className={`sheet__tone${id === tone ? ' sheet__tone--active' : ''}`}
-                        data-monochrome={id === 'white' || id === 'black' || undefined}
-                        style={{ '--head-fg': swatch, '--head-swatch': swatch } as CSSProperties}
-                        onClick={() => setTone(id)}
-                      />
-                    ))}
-                  </div>
+                  <TonePalette labelledBy={`${uid}-tone`} value={tone} onChange={setTone} />
                 </Collapse>
               </section>
             </>

@@ -324,7 +324,8 @@ export function deleteSections(ids: string[]) {
 /** Меняет заметку; дата обновления ставится сегодняшняя */
 export function updateNote(id: string, patch: Partial<Omit<CaseNote, 'id' | 'updated'>>) {
   const { date } = nowStamp();
-  update({ notes: data.notes.map((x) => (x.id === id ? { ...x, ...patch, updated: date } : x)) });
+  const title = patch.title?.replace(/[«»]/g, '').trim();
+  update({ notes: data.notes.map((x) => (x.id === id ? { ...x, ...patch, title: title || x.title, updated: date } : x)) });
 }
 
 /** Текст блока сеанса в истории; пустой массив — блок остаётся только с названием и датой */
