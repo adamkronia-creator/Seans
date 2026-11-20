@@ -17,7 +17,7 @@ import { CLIENT_CHAT, updateNote, updateSection, useClientData } from '../../dat
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
 import { useListMotion } from '../../utils/listMotion';
-import { HEAD_ICONS } from './caseIcons';
+import { caseIcon } from './caseIcons';
 import './ChatCase.css';
 
 /** Выбор карточек: в режиме выбора они получают отметку, нажатие переключает её, а долгое нажатие выбор начинает */
@@ -113,7 +113,7 @@ const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
 };
 
 function CaseCard({ section, onEdit, selecting, selected, onPick }: { section: CaseSection; onEdit: () => void } & PickProps) {
-  const head = section.icon ? HEAD_ICONS[section.icon] : null;
+  const head = caseIcon(section.icon);
   // Двойной клик/касание: быстрая правка текста на месте; полный редактор открывает карандаш
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !!section.blocks && !quick && !selecting);
@@ -135,8 +135,8 @@ function CaseCard({ section, onEdit, selecting, selected, onPick }: { section: C
     >
       <div className="case-card__head" style={toneStyle(section.tone)}>
         {head && (
-          <span className="case-card__icon" style={{ fontSize: head.size }}>
-            <head.Icon />
+          <span className="case-card__icon">
+            <svg aria-hidden="true"><use href={head.href} /></svg>
           </span>
         )}
         <span className="case-card__title">{section.title}</span>
@@ -220,7 +220,7 @@ function CaseRow({
 }
 
 function NoteCard({ note, onEdit, selecting, selected, onPick }: { note: CaseNote; onEdit: () => void } & PickProps) {
-  const head = note.icon ? HEAD_ICONS[note.icon] : null;
+  const head = caseIcon(note.icon);
   const [quick, setQuick] = useState(false);
   const doubleTap = useDoubleActivate(() => setQuick(true), !quick && !selecting);
   const pick = usePick(note.id, { selecting, onPick });
@@ -240,8 +240,8 @@ function NoteCard({ note, onEdit, selecting, selected, onPick }: { note: CaseNot
     >
       <div className="case-card__head case-card__head--note" style={toneStyle(note.tone)}>
         {head && (
-          <span className="case-card__icon" style={{ fontSize: head.size }}>
-            <head.Icon />
+          <span className="case-card__icon">
+            <svg aria-hidden="true"><use href={head.href} /></svg>
           </span>
         )}
         <span className="case-card__title">{note.title}</span>

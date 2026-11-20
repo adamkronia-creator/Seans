@@ -1,4 +1,7 @@
+export type SolarBoldIconId = `solar:${string}/${string}`;
+
 export type CaseIconId =
+  | SolarBoldIconId
   | 'general'
   | 'anamnesis'
   | 'request'
