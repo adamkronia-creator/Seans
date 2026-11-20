@@ -232,6 +232,10 @@ export function taskApproachName(id: string): string | undefined {
   return first ? APPROACH_NAMES[first] : undefined;
 }
 
+export function taskApproachLabel(id: string): string | undefined {
+  return APPROACHES.find((approach) => approach.id === TASK_META[id]?.approaches[0])?.label;
+}
+
 // ——— Сведения о материале ———
 
 export interface Described {

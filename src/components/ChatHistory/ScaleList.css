@@ -138,6 +138,7 @@
 /* Как в профиле: на просветах видна подложка карточки. */
 .hist-scales[data-grouped] {
   --scales-inset: var(--space-3);
+  --scales-surface: transparent;
   padding: 0;
   overflow: hidden;
   background: none;

@@ -1,3 +1,5 @@
+import { TestDescription } from './TestDescription';
+import { testSettings } from '../../data/testSettings';
 import { useState } from 'react';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconBack, IconSearch, IconTabTests } from '../icons';
@@ -10,7 +12,7 @@ import { useBackHandler } from '../../utils/backHandler';
 import { transition } from '../../utils/transition';
 import { TestBlank } from './TestBlank';
 import { TestHeader } from './TestHeader';
-import { TestConclusion } from './TestConclusion';
+import { TestConclusion, TestConclusionActions } from './TestConclusion';
 import './TestSettings.css';
 import './TestSettings.pm.css';
 
@@ -35,9 +37,10 @@ interface ShownResult {
 export function TestResult({ resultId, onBack }: TestResultProps) {
   const own = useSelfResult(resultId);
   const result: ShownResult | undefined = own ?? findClientResult(resultId);
-  const [blankOpen, setBlankOpen] = useState(false);
+  const [detail, setDetail] = useState<'blank' | 'description' | null>(null);
+  const closeDetail = () => transition(() => setDetail(null), 'back');
   // Жест «назад» из бланка ведёт к заключению, как кнопка в шапке
-  useBackHandler(blankOpen, () => transition(() => setBlankOpen(false), 'back'));
+  useBackHandler(Boolean(detail), closeDetail);
   const test = result && LIBRARY.find((t) => t.id === result.testId);
 
   // Результаты живут, пока открыта страница: после перезагрузки по прямой ссылке их уже нет
@@ -58,25 +61,41 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
   const status = own ? 'Результат тестирования' : 'Результат клиента';
   const { data } = result;
 
+  if (detail === 'description') {
+    const description = testSettings(test);
+    return (
+      <section className="test-settings">
+        <TestHeader test={test} status="Описание теста" onBack={closeDetail} />
+        <div className="test-settings__scroll" key="description">
+          <div className="ts-desc">
+            <div className="ts-desc__body"><TestDescription intro={description.intro} lead={description.lead} /></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  const openDescription = () => transition(() => setDetail('description'), 'forward');
+
   // Для некоторых тестов (RSES) в приложении ещё нет шкал и подсчёта: заключение построить не из чего
   if (!data) {
     return (
       <section className="test-settings">
         <TestHeader test={test} status={status} onBack={onBack} />
+        <TestConclusionActions onOpenDescription={openDescription} />
         <EmptyState icon={<IconTabTests />} title="Заключение пока недоступно" text="Для этого теста в приложении ещё нет шкал и подсчёта баллов." />
       </section>
     );
   }
 
   const blank = result.answers ? testBlank(result.testId) : undefined;
-  const showBlank = blankOpen && blank && result.answers;
+  const showBlank = detail === 'blank' && blank && result.answers;
 
   return (
     <section className="test-settings">
       <TestHeader
         test={test}
         status={showBlank ? 'Бланк тестирования' : status}
-        onBack={showBlank ? () => transition(() => setBlankOpen(false), 'back') : onBack}
+        onBack={showBlank ? closeDetail : onBack}
       />
       {showBlank ? (
         <div className="test-settings__scroll" key="blank">
@@ -85,7 +104,7 @@ export function TestResult({ resultId, onBack }: TestResultProps) {
       ) : (
         <div className="cc-wrap" key="result">
           <div className="test-settings__scroll">
-            <TestConclusion data={data} form={result.form} onOpenBlank={blank ? () => transition(() => setBlankOpen(true), 'forward') : undefined} />
+            <TestConclusion data={data} form={result.form} onOpenDescription={openDescription} onOpenBlank={blank ? () => transition(() => setDetail('blank'), 'forward') : undefined} />
           </div>
         </div>
       )}

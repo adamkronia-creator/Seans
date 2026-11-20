@@ -1,3 +1,4 @@
+import { TestDescription } from './TestDescription';
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
   IconTestChevron,
@@ -233,36 +234,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
       window.removeEventListener('resize', measure);
     };
   }, [view, resultId]);
-  const paragraphs = data.intro.split('\n\n');
-  // Строки «● …» — маркированный список, остальные — обычный текст абзаца
-  const renderParagraph = (paragraph: string, i: number) => {
-    const lines = paragraph.split('\n');
-    const items = lines.filter((l) => l.startsWith('●')).map((l) => l.replace(/^●\s*/, ''));
-    const text = lines.filter((l) => !l.startsWith('●')).join('\n');
-    return (
-      <div key={i} className="ts-card__paragraph">
-        {text && (
-          <p>
-            {i === 0 && data.lead && text.startsWith(data.lead) ? (
-              <>
-                <strong>{data.lead}</strong>
-                {text.slice(data.lead.length)}
-              </>
-            ) : (
-              text
-            )}
-          </p>
-        )}
-        {items.length > 0 && (
-          <ul className="ts-card__list">
-            {items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  };
   // Бланк, заключение и прохождение открываются как следующий экран: выезжают справа, «назад» возвращает к настройкам
   const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
   const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
@@ -335,7 +306,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
           <div className="ts-desc">
             <div className="ts-desc__clip">
               <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
-                {paragraphs.map((paragraph, i) => renderParagraph(paragraph, i))}
+                <TestDescription intro={data.intro} lead={data.lead} />
               </div>
               {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
               {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}

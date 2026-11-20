@@ -7,14 +7,15 @@ import { QuickEdit } from '../QuickEdit/QuickEdit';
 import { SwipePager } from '../SwipePager/SwipePager';
 import {
   IconCaseEdit,
-  IconEventInvite,
   IconChevron,
   IconTabLibrary,
-  IconTlClock,
-  IconTlDoc,
-  IconTlFlame,
-  IconTlNote,
 } from '../icons';
+import markerPending from '../../assets/icons/history/pending.svg';
+import markerTest from '../../assets/icons/history/test.svg';
+import markerTask from '../../assets/icons/history/task.svg';
+import markerNote from '../../assets/icons/history/note.svg';
+import markerInvite from '../../assets/icons/history/invite.svg';
+import { avatarOf, ME } from '../../data/contacts';
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
@@ -50,7 +51,7 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
-/** Кто сделал: подпись у даты вместо аватарок под значком */
+/** Подпись автора для даты или аватарки на рейке */
 function authorOf(event: HistoryEvent) {
   const client = maxim.name.split(' ')[0];
   if (event.kind === 'invite') return client;
@@ -59,16 +60,8 @@ function authorOf(event: HistoryEvent) {
   return event.state === 'done' ? client : 'Вы';
 }
 
-/** Значок события на рейке: круг цвета типа (тот же тон, что у чипса раздела) и чернильный знак; номер у сеанса.
-    Ещё не выполненное — бледный круг с кольцом и часами */
+/** Значок события на рейке. У сеанса сохраняется его номер. */
 function Marker({ event }: { event: HistoryEvent }) {
-  if (event.kind === 'invite') {
-    return (
-      <div className="hist-marker hist-marker--invite">
-        <IconEventInvite />
-      </div>
-    );
-  }
   if (event.kind === 'session') {
     return (
       <div className="hist-marker hist-marker--session">
@@ -78,25 +71,18 @@ function Marker({ event }: { event: HistoryEvent }) {
       </div>
     );
   }
-  if (event.kind === 'note') {
-    return (
-      <div className="hist-marker hist-marker--note">
-        <IconTlNote />
-      </div>
-    );
-  }
-  const done = event.state === 'done';
-  const StateIcon = done ? (event.kind === 'test' ? IconTlDoc : IconTlFlame) : IconTlClock;
-  return (
-    <div className={`hist-marker hist-marker--${event.kind}${done ? '' : ' hist-marker--pending'}`}>
-      <StateIcon />
-    </div>
-  );
+  const src = event.kind === 'invite' ? markerInvite
+    : event.kind === 'note' ? markerNote
+      : event.state !== 'done' ? markerPending
+        : event.kind === 'test' ? markerTest : markerTask;
+  return <img className="hist-marker hist-marker--asset" src={src} alt="" />;
 }
 
 function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
-  const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.title;
+  const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.kind === 'note'
+    ? event.title.replace(/^Заметка:\s*/i, '').replace(/^«(.*)»$/, '$1')
+    : event.title;
   // Сеанс без текста: только название и дата
   const bare = 'paragraphs' in event && event.paragraphs.length === 0 && !quick;
   // Тест или задание, которое отправили или назначили вы: клиент его ещё не выполнил, комментировать и открывать нечего
@@ -141,7 +127,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
         {event.date.split(' ').map((part) => (
           <span key={part}>{part}</span>
         ))}
-        <span>{authorOf(event)}</span>
+        {event.kind !== 'test' && event.kind !== 'task' && <span>{authorOf(event)}</span>}
       </p>
       {'text' in event ? (
         <>
@@ -154,7 +140,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
             <p className="hist-card__text">{event.text}</p>
             {editable && <IconChevron className="hist-card__chevron" />}
           </div>
-          {resultPath && scaleData && scaleData.scales.length > 0 && <ScaleList data={scaleData} onOpen={() => navigate(resultPath)} />}
+          {resultPath && scaleData && scaleData.scales.length > 0 && <ScaleList data={scaleData} grouping={resultRef === '5pfq' ? 'factors' : 'main-extra'} onOpen={() => navigate(resultPath)} />}
           {editable && (
             <QuickEdit
               editing={quick}
@@ -213,6 +199,9 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
                 <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
                   <div className="hist-rail">
                     <Marker event={event} />
+                    {(event.kind === 'test' || event.kind === 'task') && (
+                      <img className="hist-rail__avatar" src={avatarOf(event.state === 'done' ? maxim.id : ME)} alt={authorOf(event)} />
+                    )}
                     {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                   </div>
                   <Card event={event} onEdit={() => onEdit(event.id)} />

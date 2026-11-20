@@ -155,35 +155,23 @@
   color: var(--action-primary-text); /* знак на круге белый */
 }
 
-.hist-marker--invite {
-  --marker-bg: var(--tone-chat);
-}
-
 .hist-marker--session {
   --marker-bg: #007aff;
 }
 
-.hist-marker--test {
-  --marker-bg: #ff9f0a;
+.hist-marker--asset {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
 }
 
-.hist-marker--task {
-  --marker-bg: #34c759;
-}
-
-.hist-marker--note {
-  --marker-bg: #af52de;
-}
-
-.hist-marker svg {
-  flex-shrink: 0;
+.hist-rail__avatar {
+  flex: none;
   width: var(--marker-size);
   height: var(--marker-size);
-}
-
-/* Ждёт выполнения (отправленный тест или задание): жёлтый круг, внутри белые часы (на пройденном — знак типа) */
-.hist-marker--pending {
-  --marker-bg: #ffb300; /* отправлено, ждёт выполнения: жёлтый круг и белые часы, как у остальных значков */
+  margin-top: var(--space-1);
+  border-radius: var(--radius-full);
+  object-fit: cover;
 }
 
 .hist-marker__number {

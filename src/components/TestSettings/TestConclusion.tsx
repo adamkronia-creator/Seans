@@ -1,3 +1,4 @@
+import IconLinkDescription from '../../assets/icons/solar/document-text.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import { useMemo, useState } from 'react';
 import IconDate from '../../assets/icons/solar/calendar.svg?react';
@@ -377,12 +378,34 @@ interface TestConclusionProps {
   form: string;
   /** Есть сохранённый бланк: между общей информацией и шкалами появляется кнопка «Посмотреть бланк тестирования» */
   onOpenBlank?: () => void;
+  onOpenDescription?: () => void;
   /** Только таблица шкал (без общей информации, расшифровок и примечания): «полное заключение» на экране завершения */
   scalesOnly?: boolean;
 }
 
+export function TestConclusionActions({ onOpenBlank, onOpenDescription }: Pick<TestConclusionProps, 'onOpenBlank' | 'onOpenDescription'>) {
+  if (!onOpenBlank && !onOpenDescription) return null;
+  const actions = [
+    { label: 'Посмотреть бланк тестирования', Icon: IconLinkBlank, onOpen: onOpenBlank },
+    { label: 'Посмотреть описание теста', Icon: IconLinkDescription, onOpen: onOpenDescription },
+  ];
+  return (
+    <ul className="ts-actions">
+      {actions.map(({ label, Icon, onOpen }) => onOpen && (
+        <li key={label}>
+          <button type="button" className="ts-action" onClick={onOpen}>
+            <Icon className="ts-action__icon" />
+            <span className="ts-action__label">{label}</span>
+            <IconTestChevron className="ts-action__chevron" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Заключение: общая информация, диаграммы шкал и карточка с расшифровкой каждой шкалы */
-export function TestConclusion({ data, form, onOpenBlank, scalesOnly }: TestConclusionProps) {
+export function TestConclusion({ data, form, onOpenBlank, onOpenDescription, scalesOnly }: TestConclusionProps) {
   const { info, scales } = data;
   const main = scales.filter((s) => s.group === 'main');
   const extra = scales.filter((s) => s.group === 'extra');
@@ -438,17 +461,7 @@ export function TestConclusion({ data, form, onOpenBlank, scalesOnly }: TestConc
         </p>
       )}
 
-      {!scalesOnly && onOpenBlank && (
-        <ul className="ts-actions">
-          <li>
-            <button type="button" className="ts-action" onClick={onOpenBlank}>
-              <IconLinkBlank className="ts-action__icon" />
-              <span className="ts-action__label">Посмотреть бланк тестирования</span>
-              <IconTestChevron className="ts-action__chevron" />
-            </button>
-          </li>
-        </ul>
-      )}
+      {!scalesOnly && <TestConclusionActions onOpenBlank={onOpenBlank} onOpenDescription={onOpenDescription} />}
 
       {data.summary &&
         (data.flat ? (
