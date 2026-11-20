@@ -82,8 +82,8 @@ export { default as IconHeartRedLg } from '../../assets/icons/test/heart-red-lg.
 export { default as IconHeartGrayLg } from '../../assets/icons/test/heart-gray-lg.svg?react';
 
 // Окно редактирования: строки «Иконка» и «Цвет»
-export { default as IconSheetIcon } from '../../assets/icons/solar/face-scan-square.svg?react';
-export { default as IconSheetPalette } from '../../assets/icons/solar/palette.svg?react';
+export { default as IconSheetIcon } from '../../assets/icons/solar/object-scan.svg?react';
+export { default as IconSheetPalette } from '../../assets/icons/solar/palette-2.svg?react';
 
 // Инструменты форматирования текста в редакторе
 export { default as IconFmtBold } from '../../assets/icons/solar/text-bold.svg?react';

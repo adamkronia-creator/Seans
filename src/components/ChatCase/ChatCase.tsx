@@ -108,8 +108,8 @@ export const noteText = (n: CaseNote) => [n.title, paragraphsToText(n.paragraphs
 
 /** Фон шапки и цвет иконки задаются переменными: цвет можно менять в редакторе */
 const toneStyle = (tone: CaseSection['tone']): CSSProperties => {
-  const { bg, fg } = toneOf(tone);
-  return { '--head-bg': bg, '--head-fg': fg } as CSSProperties;
+  const { bg, fg, iconFilter } = toneOf(tone);
+  return { '--head-bg': bg, '--head-fg': fg, '--head-icon-filter': iconFilter } as CSSProperties;
 };
 
 function CaseCard({ section, onEdit, selecting, selected, onPick }: { section: CaseSection; onEdit: () => void } & PickProps) {

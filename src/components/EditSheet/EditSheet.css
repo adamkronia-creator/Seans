@@ -337,11 +337,6 @@
  * Плитка — 12 внутри со всех сторон (--card-pad), блоки друг от друга 16 (--sheet-gap), рамок и линий нет, кроме разделителя под строкой переключателя.
  */
 
-/* В строках «Иконка» и «Цвет» значков нет: подпись и переключатель, слева поле плитки 12 */
-[data-pm] .sheet__toggle-icon {
-  display: none;
-}
-
 /* Карточка с текстом скругляет углы сама (overflow: clip не мешает прилипанию панели), панель — прямая полоса: у скруглённой панели
    в нижних углах, пока она прилипла к краю окна, просвечивал бы прокручиваемый текст */
 [data-pm] .sheet .sheet__card:has(.rich-toolbar) {
@@ -505,4 +500,26 @@
 .sheet__icon svg {
   width: var(--space-5);
   height: var(--space-5);
+}
+
+.sheet__preview-icon svg,
+.sheet__icon svg {
+  filter: var(--head-icon-filter, none);
+}
+
+.sheet__tone[data-monochrome] {
+  position: relative;
+}
+
+.sheet__tone[data-monochrome]::after {
+  position: absolute;
+  inset: 2px; /* grid:ok — граница плашки внутри кольца выбора */
+  border: 1px solid var(--divider);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+.sheet__tone--active[data-monochrome] {
+  border-color: var(--border-focus);
 }

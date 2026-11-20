@@ -6,7 +6,7 @@ import '../../components/EditSheet/EditSheet.css';
 import { Badge } from '../../components/Badge/Badge';
 import { inkOn } from '../../components/Chip/Chip';
 import { Switch } from '../../components/Switch/Switch';
-import { TONES } from '../../data/tones';
+import { FOLDER_TONES } from '../../data/tones';
 import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
@@ -50,8 +50,8 @@ const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleague
 const VISUAL = 48;
 
 /** Цвета папки и счётчика — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
-const FOLDER_COLORS = TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
-const FOLDER_INKS = TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: 'Белый', color: '#FFFFFF' } : t.id === 'gray' ? { id: 'black', label: 'Чёрный', color: '#1C1C1E' } : { id: t.id, label: t.label, color: t.swatch }));
+const FOLDER_COLORS = FOLDER_TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
+const FOLDER_INKS = FOLDER_TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: 'Белый', color: '#FFFFFF' } : t.id === 'gray' ? { id: 'black', label: 'Чёрный', color: '#1C1C1E' } : { id: t.id, label: t.label, color: t.swatch }));
 
 type Swatch = { id: string; label: string; color: string };
 

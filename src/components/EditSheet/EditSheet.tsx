@@ -105,7 +105,7 @@ export function EditSheet({
           {hasTitle && (
             <div
               className="sheet__preview"
-              style={{ '--head-bg': current.bg, '--head-fg': current.fg } as CSSProperties}
+              style={{ '--head-bg': current.bg, '--head-fg': current.fg, '--head-icon-filter': current.iconFilter } as CSSProperties}
             >
               {previewIcon && (
                 <span className="sheet__preview-icon">
@@ -126,9 +126,9 @@ export function EditSheet({
 
           {hasLook && (
             <>
-              <section className="sheet__card sheet__appearance" style={{ '--head-fg': current.fg } as CSSProperties}>
+              <section className="sheet__card sheet__appearance" style={{ '--head-fg': current.fg, '--head-icon-filter': current.iconFilter } as CSSProperties}>
                 <div className="sheet__toggle-row">
-                  <IconSheetIcon className="sheet__toggle-icon" />
+                  <IconSheetIcon className="sheet__toggle-icon" aria-hidden="true" />
                   <span className="sheet__toggle-label" id={`${uid}-icon`}>Иконка</span>
                   <Switch checked={iconOn} onChange={setIconOn} label="Иконка" />
                 </div>
@@ -161,13 +161,13 @@ export function EditSheet({
 
               <section className="sheet__card sheet__appearance">
                 <div className="sheet__toggle-row">
-                  <IconSheetPalette className="sheet__toggle-icon" />
+                  <IconSheetPalette className="sheet__toggle-icon" aria-hidden="true" />
                   <span className="sheet__toggle-label" id={`${uid}-tone`}>Цвет</span>
                   <Switch checked={toneOn} onChange={setToneOn} label="Цвет шапки" />
                 </div>
                 <Collapse open={toneOn}>
                   <div className="sheet__tones" role="radiogroup" aria-labelledby={`${uid}-tone`}>
-                    {TONES.map(({ id, label, bg, fg, swatch }) => (
+                    {TONES.map(({ id, label, swatch, iconFilter }) => (
                       <button
                         key={id}
                         type="button"
@@ -175,7 +175,8 @@ export function EditSheet({
                         aria-checked={id === tone}
                         aria-label={label}
                         className={`sheet__tone${id === tone ? ' sheet__tone--active' : ''}`}
-                        style={{ '--head-bg': bg, '--head-fg': fg, '--head-swatch': swatch } as CSSProperties}
+                        data-monochrome={Boolean(iconFilter) || undefined}
+                        style={{ '--head-fg': swatch, '--head-swatch': swatch } as CSSProperties}
                         onClick={() => setTone(id)}
                       />
                     ))}

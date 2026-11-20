@@ -1,3 +1,20 @@
+const APPLE_TONES = [
+  ['blue', 'Синий'],
+  ['cyan', 'Голубой'],
+  ['teal', 'Бирюзовый'],
+  ['mint', 'Мятный'],
+  ['green', 'Зелёный'],
+  ['yellow', 'Жёлтый'],
+  ['orange', 'Оранжевый'],
+  ['red', 'Красный'],
+  ['pink', 'Розовый'],
+  ['magenta', 'Пурпурный'],
+  ['slate', 'Индиго'],
+  ['brown', 'Коричневый'],
+] as const;
+
+type AppleToneId = typeof APPLE_TONES[number][0];
+
 /** Цвета шапок карточек сведений и заметок: фон шапки и цвет иконки */
 export type ToneId =
   | 'blue'
@@ -23,20 +40,22 @@ export type ToneId =
   | 'ochre'
   | 'terracotta'
   | 'olive'
-  | 'jade';
+  | 'jade'
+  | 'white'
+  | 'black'
+  | `shade-${AppleToneId}`;
 
-// Цвета подобраны под синий акцент #007AFF: та же насыщенность, значок и кружок — один цвет (≥ 3:1 на белой карточке);
-// плитка шапки — тот же цвет на 18% на бумаге
-const tone = (id: ToneId, label: string, color: string) => ({
+const tone = (id: ToneId, label: string, color: string, outline?: string) => ({
   id,
   label,
   swatch: color,
   fg: color,
   bg: `color-mix(in srgb, ${color} 18%, var(--color-bg-app))`,
+  iconFilter: outline ? `drop-shadow(0 0 1px ${outline})` : undefined,
 });
 
-// Палитра для шапок заметок и сведений
-export const TONES = [
+// Цвета папок хранятся как HEX, поэтому их прежняя палитра остаётся доступной.
+export const FOLDER_TONES = [
   tone('blue', 'Синий', '#007AFF'),
   tone('cyan', 'Голубой', '#32ADE6'),
   tone('teal', 'Бирюзовый', '#30B0C7'),
@@ -63,8 +82,20 @@ export const TONES = [
   tone('jade', 'Нефритовый', '#178264'),
 ];
 
+const primaryIds = new Set<ToneId>(APPLE_TONES.map(([id]) => id));
+
+export const TONES = [
+  ...APPLE_TONES.map(([id, label]) => tone(id, label, `var(--palette-${id})`)),
+  tone('white', 'Белый', 'var(--palette-white)', 'rgb(0 0 0 / 60%)'),
+  tone('black', 'Чёрный', 'var(--palette-black)', 'rgb(255 255 255 / 60%)'),
+  ...FOLDER_TONES.filter(({ id }) => !primaryIds.has(id)),
+  ...APPLE_TONES.map(([id, label]) =>
+    tone(`shade-${id}`, `${label} · глубокий оттенок`, `color-mix(in srgb, var(--palette-${id}) 74%, var(--palette-black))`),
+  ),
+];
+
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
-const NEUTRAL_TONE = { id: null, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
+const NEUTRAL_TONE = { id: null, iconFilter: undefined, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
 
 export const toneOf = (id: ToneId | null) =>
   id === null ? NEUTRAL_TONE : (TONES.find((t) => t.id === id) ?? TONES[0]);

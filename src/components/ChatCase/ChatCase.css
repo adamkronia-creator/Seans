@@ -84,6 +84,7 @@
 
 .case-card__icon svg {
   flex-shrink: 0;
+  filter: var(--head-icon-filter, none);
   width: var(--space-6);
   height: var(--space-6);
 }
