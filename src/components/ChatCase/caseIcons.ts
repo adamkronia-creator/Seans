@@ -22,6 +22,24 @@ import {
   IconCaseStructure,
   IconCaseTransfer,
 } from '../icons';
+import heartIcon from '../../assets/icons/solar/heart.svg?react';
+import chatIcon from '../../assets/icons/solar/chat-round.svg?react';
+import calendarIcon from '../../assets/icons/solar/calendar.svg?react';
+import clockIcon from '../../assets/icons/solar/clock-circle.svg?react';
+import flagIcon from '../../assets/icons/solar/flag.svg?react';
+import goalIcon from '../../assets/icons/solar/circle-dot-dashed.svg?react';
+import bookIcon from '../../assets/icons/solar/book-bookmark.svg?react';
+import notebookIcon from '../../assets/icons/solar/notebook.svg?react';
+import documentIcon from '../../assets/icons/solar/document-text.svg?react';
+import folderIcon from '../../assets/icons/solar/folder.svg?react';
+import pencilIcon from '../../assets/icons/solar/pen.svg?react';
+import attachmentIcon from '../../assets/icons/solar/paperclip.svg?react';
+import mindfulnessIcon from '../../assets/icons/solar/meditation-round.svg?react';
+import questionIcon from '../../assets/icons/solar/question-circle.svg?react';
+import warningIcon from '../../assets/icons/solar/danger-triangle.svg?react';
+import keyIcon from '../../assets/icons/solar/key-minimalistic.svg?react';
+import lockIcon from '../../assets/icons/solar/lock-keyhole-minimalistic.svg?react';
+import placeIcon from '../../assets/icons/solar/map-point.svg?react';
 import type { CaseIconId } from '../../data/case';
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -49,4 +67,29 @@ export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; la
   flame: { Icon: IconCaseHeadFlame, size: 20, label: 'Пламя' },
   briefcase: { Icon: IconCaseHeadBriefcase, size: 20, label: 'Портфель' },
   bookmark: { Icon: IconCaseHeadBookmark, size: 20, label: 'Закладка' },
+  heart: { Icon: heartIcon, size: 20, label: 'Сердце' },
+  chat: { Icon: chatIcon, size: 20, label: 'Разговор' },
+  calendar: { Icon: calendarIcon, size: 20, label: 'Календарь' },
+  clock: { Icon: clockIcon, size: 20, label: 'Часы' },
+  flag: { Icon: flagIcon, size: 20, label: 'Флаг' },
+  goal: { Icon: goalIcon, size: 20, label: 'Цель' },
+  book: { Icon: bookIcon, size: 20, label: 'Книга' },
+  notebook: { Icon: notebookIcon, size: 20, label: 'Блокнот' },
+  document: { Icon: documentIcon, size: 20, label: 'Документ' },
+  folder: { Icon: folderIcon, size: 20, label: 'Папка' },
+  pencil: { Icon: pencilIcon, size: 20, label: 'Карандаш' },
+  attachment: { Icon: attachmentIcon, size: 20, label: 'Вложение' },
+  mindfulness: { Icon: mindfulnessIcon, size: 20, label: 'Осознанность' },
+  question: { Icon: questionIcon, size: 20, label: 'Вопрос' },
+  warning: { Icon: warningIcon, size: 20, label: 'Внимание' },
+  key: { Icon: keyIcon, size: 20, label: 'Ключ' },
+  lock: { Icon: lockIcon, size: 20, label: 'Замок' },
+  place: { Icon: placeIcon, size: 20, label: 'Место' },
 };
+
+export const CASE_ICON_GROUPS: { title: string; ids: CaseIconId[] }[] = [
+  { title: 'Человек и взаимодействие', ids: ['general', 'anamnesis', 'request', 'transfer', 'heart', 'chat', 'mindfulness', 'hospital'] },
+  { title: 'Наблюдение и анализ', ids: ['hypothesis', 'structure', 'signifiers', 'scenario', 'eye', 'info', 'question', 'warning', 'goal', 'checklist'] },
+  { title: 'Заметки и документы', ids: ['pin', 'bookmark', 'book', 'notebook', 'document', 'folder', 'pencil', 'attachment', 'briefcase'] },
+  { title: 'События и символы', ids: ['calendar', 'clock', 'place', 'flag', 'star', 'crown', 'bolt', 'flame', 'key', 'lock', 'cross', 'dots'] },
+];

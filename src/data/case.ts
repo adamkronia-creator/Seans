@@ -19,7 +19,25 @@ export type CaseIconId =
   | 'checklist'
   | 'flame'
   | 'briefcase'
-  | 'bookmark';
+  | 'bookmark'
+  | 'heart'
+  | 'chat'
+  | 'calendar'
+  | 'clock'
+  | 'flag'
+  | 'goal'
+  | 'book'
+  | 'notebook'
+  | 'document'
+  | 'folder'
+  | 'pencil'
+  | 'attachment'
+  | 'mindfulness'
+  | 'question'
+  | 'warning'
+  | 'key'
+  | 'lock'
+  | 'place';
 
 import type { ToneId } from './tones';
 import { parseBlocks, serializeBlocks, type RichBlock } from '../utils/richText';

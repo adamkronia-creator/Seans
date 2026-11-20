@@ -15,7 +15,15 @@ export type ToneId =
   | 'purple'
   | 'brown'
   | 'gray'
-  | 'slate';
+  | 'slate'
+  | 'navy'
+  | 'lavender'
+  | 'plum'
+  | 'raspberry'
+  | 'ochre'
+  | 'terracotta'
+  | 'olive'
+  | 'jade';
 
 // Цвета подобраны под синий акцент #007AFF: та же насыщенность, значок и кружок — один цвет (≥ 3:1 на белой карточке);
 // плитка шапки — тот же цвет на 18% на бумаге
@@ -27,7 +35,7 @@ const tone = (id: ToneId, label: string, color: string) => ({
   bg: `color-mix(in srgb, ${color} 18%, var(--color-bg-app))`,
 });
 
-// 16 цветов: два ряда по 8 в окне редактирования
+// Палитра для шапок заметок и сведений
 export const TONES = [
   tone('blue', 'Синий', '#007AFF'),
   tone('cyan', 'Голубой', '#32ADE6'),
@@ -45,6 +53,14 @@ export const TONES = [
   tone('brown', 'Коричневый', '#A2845E'),
   tone('gray', 'Серый', '#8E8E93'),
   tone('slate', 'Индиго', '#5856D6'),
+  tone('navy', 'Тёмно-синий', '#3C548D'),
+  tone('lavender', 'Лавандовый', '#846BD1'),
+  tone('plum', 'Сливовый', '#813989'),
+  tone('raspberry', 'Малиновый', '#B82C68'),
+  tone('ochre', 'Охра', '#A96F22'),
+  tone('terracotta', 'Терракотовый', '#B34D37'),
+  tone('olive', 'Оливковый', '#687821'),
+  tone('jade', 'Нефритовый', '#178264'),
 ];
 
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */

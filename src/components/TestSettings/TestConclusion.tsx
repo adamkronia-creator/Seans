@@ -224,8 +224,8 @@ function ScaleCharts({
           ))}
         </ul>
         {!axisEach && <Axis kind="main" ticks={data.ticks} max={data.max} flat />}
-        {legend && <Legend data={data} />}
       </div>
+      {legend && <Legend data={data} />}
       {validity && data.validity && (
         <p className={`cc-validity${data.validity.ok ? '' : ' cc-validity--warn'}`}>
           <StatusIcon ok={data.validity.ok} />
@@ -275,8 +275,8 @@ function ScaleBlock({
             );
           })}
         </ul>
-        {legend && <Legend data={data} />}
       </div>
+      {legend && <Legend data={data} />}
     </CollapseCard>
   );
 }

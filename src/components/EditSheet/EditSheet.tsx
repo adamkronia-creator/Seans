@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, type CSSProperties } from 'react';
 import { LineInput } from '../LineInput/LineInput';
-import { HEAD_ICONS } from '../ChatCase/caseIcons';
+import { CASE_ICON_GROUPS, HEAD_ICONS } from '../ChatCase/caseIcons';
 import { IconSheetIcon, IconSheetPalette } from '../icons';
 import { RichEditor } from '../RichEditor/RichEditor';
 import { Switch } from '../Switch/Switch';
@@ -127,37 +127,43 @@ export function EditSheet({
 
           {hasLook && (
             <>
-              <section className="sheet__card" style={{ '--head-fg': current.fg } as CSSProperties}>
+              <section className="sheet__card sheet__appearance" style={{ '--head-fg': current.fg } as CSSProperties}>
                 <div className="sheet__toggle-row">
                   <IconSheetIcon className="sheet__toggle-icon" />
                   <span className="sheet__toggle-label" id={`${uid}-icon`}>Иконка</span>
                   <Switch checked={iconOn} onChange={setIconOn} label="Иконка" />
                 </div>
                 <Collapse open={iconOn}>
-                  <div className="sheet__icons" role="radiogroup" aria-labelledby={`${uid}-icon`}>
-                    {(Object.keys(HEAD_ICONS) as CaseIconId[]).map((id) => {
-                      const { Icon, label, size } = HEAD_ICONS[id];
-                      const active = id === icon;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          role="radio"
-                          aria-checked={active}
-                          aria-label={label}
-                          className={`sheet__icon${active ? ' sheet__icon--active' : ''}`}
-                          style={{ fontSize: size }}
-                          onClick={() => setIcon(id)}
-                        >
-                          <Icon />
-                        </button>
-                      );
-                    })}
+                  <div className="sheet__icon-picker" role="radiogroup" aria-labelledby={`${uid}-icon`}>
+                    {CASE_ICON_GROUPS.map(({ title, ids }) => (
+                      <section key={title} aria-label={title}>
+                        <h3 className="sheet__icon-heading">{title}</h3>
+                        <div className="sheet__icons">
+                          {ids.map((id) => {
+                            const { Icon, label, size } = HEAD_ICONS[id];
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                role="radio"
+                                aria-checked={id === icon}
+                                aria-label={label}
+                                className={`sheet__icon${id === icon ? ' sheet__icon--active' : ''}`}
+                                style={{ fontSize: size }}
+                                onClick={() => setIcon(id)}
+                              >
+                                <Icon />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    ))}
                   </div>
                 </Collapse>
               </section>
 
-              <section className="sheet__card">
+              <section className="sheet__card sheet__appearance">
                 <div className="sheet__toggle-row">
                   <IconSheetPalette className="sheet__toggle-icon" />
                   <span className="sheet__toggle-label" id={`${uid}-tone`}>Цвет</span>

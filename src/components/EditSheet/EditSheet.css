@@ -367,14 +367,64 @@
   padding: 0;
 }
 
-[data-pm] .sheet__icons,
-[data-pm] .sheet__tones {
-  /* Внутри плитки 12 со всех сторон; сетка начинается через 12 под строкой «Иконка»/«Цвет». cqw — ширина содержимого плитки */
-  /* Разделитель под строкой: 12 над ним и 12 под ним */
+/* Как в профиле: фон плитки прерывается на 1 px между частями. */
+[data-pm] .sheet .sheet__card:is(.sheet__appearance, .sheet__text) {
+  padding: 0;
+  background: none;
+}
+
+[data-pm] .sheet__appearance .sheet__toggle-row,
+[data-pm] .sheet__icon-picker,
+[data-pm] .sheet__appearance .sheet__tones,
+[data-pm] .sheet__text .rich-editor {
+  background: var(--sheet-tile);
+}
+
+[data-pm] .sheet__appearance .sheet__toggle-row {
+  box-sizing: content-box;
+  padding: var(--card-pad);
+}
+
+[data-pm] .sheet__appearance .sheet__collapse--open,
+[data-pm] .sheet__text .rich-toolbar {
+  margin-block-start: 1px; /* grid:ok — просвет как в профиле */
+}
+
+[data-pm] .sheet__text .rich-toolbar {
+  border-top: 0;
+}
+
+.sheet__icon-picker {
+  max-height: min(calc(var(--space-12) * 5), 32dvh);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: var(--card-pad);
+}
+
+.sheet__icon-picker section + section {
   margin-top: var(--space-3);
-  padding: var(--space-3) 0 0;
-  border-top: var(--hairline) solid var(--sheet-line);
-  row-gap: calc((100cqw - var(--cols) * var(--size-control-sm)) / (var(--cols) - 1));
+}
+
+.sheet__icon-heading {
+  margin: 0 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--type-meta);
+}
+
+[data-pm] .sheet__icon-picker .sheet__icons,
+[data-pm] .sheet__appearance .sheet__tones {
+  grid-template-columns: repeat(auto-fill, minmax(var(--size-control-sm), 1fr));
+  gap: var(--space-1);
+  justify-items: center;
+  border: 0;
+}
+
+[data-pm] .sheet__icon-picker .sheet__icons {
+  padding: 0;
+}
+
+[data-pm] .sheet__appearance .sheet__tones {
+  padding: var(--card-pad);
 }
 
 /* Строки «название — значение» («Общая информация»): поля по бокам даёт плитка (12, как у «Иконки» и «Цвета»), строка своих не добавляет,

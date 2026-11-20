@@ -234,9 +234,6 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-2);
-  margin: var(--space-3) var(--space-4) 0;
-  padding: var(--space-3) 0 0;
-  border-top: 1px solid var(--color-divider);
   list-style: none;
 }
 
@@ -247,13 +244,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  height: 24px;
+  min-height: var(--space-6);
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
   color: var(--color-text-primary);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-xs);
+  font: inherit;
 }
 
 .cc-chip__dot {
@@ -489,16 +484,20 @@
   transform: translateX(-100%);
 }
 
-/* Вывод по контрольным шкалам */
+/* Легенда и вывод по контрольным шкалам занимают один и тот же нижний ряд карточки. */
+.cc-legend,
 .cc-validity {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
   margin: 0;
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--color-divider);
   font-size: var(--font-size-md);
   line-height: var(--line-height-md);
+}
+
+.cc-validity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .cc-validity svg {
@@ -611,11 +610,6 @@
   padding: 0;
 }
 
-.cc-chart--flat .cc-legend {
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-divider);
-}
-
 .cc-single--flat {
   display: block;
   margin: var(--space-2) 0 var(--space-3);
@@ -716,4 +710,8 @@
 
 .cc-bar__name--polar > span:last-child {
   text-align: right;
+}
+
+[data-pm] .blank-card :is(.cc-legend, .cc-validity) {
+  font: var(--type-body);
 }

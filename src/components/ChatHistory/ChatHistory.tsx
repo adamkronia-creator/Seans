@@ -82,7 +82,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
   const [quick, setQuick] = useState(false);
   const title = event.kind === 'session' ? `Сеанс №${event.number}` : event.kind === 'note'
     ? event.title.replace(/^Заметка:\s*/i, '').replace(/^«(.*)»$/, '$1')
-    : event.title;
+    : event.kind === 'task' ? event.title.replace(/^«(.*)»$/, '$1') : event.title;
   // Сеанс без текста: только название и дата
   const bare = 'paragraphs' in event && event.paragraphs.length === 0 && !quick;
   // Тест или задание, которое отправили или назначили вы: клиент его ещё не выполнил, комментировать и открывать нечего
