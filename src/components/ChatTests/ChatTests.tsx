@@ -61,14 +61,14 @@ const TEST_CARD_CATEGORIES: Readonly<Partial<Record<string, string>>> = {
 };
 
 const TEST_CARD_DESCRIPTIONS: Readonly<Partial<Record<string, string>>> = {
-  itt: 'Методика предназначена для комплексной экспресс-диагностики тревожности',
-  smol: 'Методика предназначена для комплексной оценки особенностей личности, эмоционального состояния и характера адаптации человека',
-  bdi: 'Стандартизированная методика, предназначенная для количественной оценки депрессивной симптоматики',
-  rses: 'Методика предназначена для исследования самооценки человека и принятия себя',
-  scl90: 'Методика предназначена для комплексной оценки выраженности психологической и соматической симптоматики',
-  '5pfq': 'Методика предназначена для комплексной оценки личности на основе пяти диапазонов черт, которые делятся на свойства личности',
-  gad7: 'Методика предназначена для оценки выраженности симптомов и проявлений тревоги',
-  phq9: 'Методика предназначена для оценки выраженности сниженного психоэмоционального состояния и депрессии',
+  itt: 'Предназначен для комплексной экспресс-диагностики тревожности',
+  smol: 'Предназначен для комплексной диагностики особенностей личности, эмоционального состояния и характера адаптации',
+  bdi: 'Предназначена для экспресс-диагностики депрессивной симптоматики',
+  rses: 'Предназначена для исследования самооценки и степени принятия себя',
+  scl90: 'Предназначен для комплексной диагностики и оценки психологической и соматической симптоматики',
+  '5pfq': 'Предназначен для комплексной диагностики личности на основе пяти диапазонов черт с разными свойствами',
+  gad7: 'Предназначен для экспресс-диагностики тревожной симптоматики',
+  phq9: 'Предназначен для экспресс-диагностики депрессивной симптоматики',
 };
 
 const introParagraph = (intro?: string) => intro?.split('\n\n', 1)[0].trim();
@@ -171,14 +171,15 @@ export function ChatTests({
       renderCard={(item, pick) => {
         const test = LIBRARY.find((test) => test.id === item.id);
         const done = item.status === 'done';
-        const resultDate = done ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data?.info.date : undefined;
+        const result = done ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data : undefined;
         return (
           <ActivityCard
             key={item.id}
             item={item}
             category={TEST_CARD_CATEGORIES[item.id] ?? 'Опросники'}
             abbreviation={test?.abbr}
-            date={resultDate ?? item.fullDate ?? item.date}
+            date={result?.info.date ?? item.fullDate ?? item.date}
+            result={result}
             description={TEST_CARD_DESCRIPTIONS[item.id] ?? introParagraph(test && testSettings(test).intro)}
             onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
             onMenu={onCardMenu}

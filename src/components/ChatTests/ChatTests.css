@@ -344,6 +344,14 @@
   font-weight: 400;
 }
 
+.activity-card__scales {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.activity-card__scales .hist-scales {
+  margin-top: 0;
+}
+
 .activity-card__menu {
   position: absolute;
   inset-block-start: var(--space-2);
