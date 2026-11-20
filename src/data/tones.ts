@@ -15,6 +15,27 @@ const APPLE_TONES = [
 
 type AppleToneId = typeof APPLE_TONES[number][0];
 
+const EXTRA_TONES = [
+  ['ice', 'Ледяной голубой', 'cyan', 'white', 42],
+  ['sea-glass', 'Морское стекло', 'mint', 'white', 52],
+  ['pistachio', 'Фисташковый', 'green', 'yellow', 56],
+  ['vanilla', 'Ванильный', 'yellow', 'white', 48],
+  ['apricot', 'Абрикосовый', 'orange', 'white', 58],
+  ['blossom', 'Лепестковый', 'pink', 'white', 46],
+  ['lilac-mist', 'Сиреневая дымка', 'slate', 'white', 51],
+  ['dusty-rose', 'Пыльная роза', 'pink', 'brown', 44],
+  ['salmon', 'Лососёвый', 'red', 'orange', 55],
+  ['gold', 'Золотистый', 'yellow', 'brown', 63],
+  ['sage', 'Шалфейный', 'mint', 'brown', 56],
+  ['lagoon', 'Лагунный', 'teal', 'blue', 55],
+  ['cornflower', 'Васильковый', 'blue', 'slate', 56],
+  ['orchid', 'Орхидея', 'magenta', 'slate', 61],
+  ['forest', 'Хвойный', 'green', 'black', 52],
+  ['petrol', 'Нефтяной синий', 'teal', 'black', 54],
+  ['midnight', 'Полуночный индиго', 'slate', 'black', 53],
+  ['wine', 'Винный', 'pink', 'black', 56],
+] as const;
+
 /** Цвета шапок карточек сведений и заметок: фон шапки и цвет иконки */
 export type ToneId =
   | 'blue'
@@ -43,7 +64,8 @@ export type ToneId =
   | 'jade'
   | 'white'
   | 'black'
-  | `shade-${AppleToneId}`;
+  | `shade-${AppleToneId}`
+  | `mix-${typeof EXTRA_TONES[number][0]}`;
 
 const tone = (id: ToneId, label: string, color: string, outline?: string) => ({
   id,
@@ -82,20 +104,24 @@ export const FOLDER_TONES = [
   tone('jade', 'Нефритовый', '#178264'),
 ];
 
-const primaryIds = new Set<ToneId>(APPLE_TONES.map(([id]) => id));
+const savedShades = APPLE_TONES.map(([id, label]) =>
+  tone(`shade-${id}`, `${label} · глубокий оттенок`, `color-mix(in srgb, var(--palette-${id}) 74%, var(--palette-black))`),
+);
 
 export const TONES = [
   ...APPLE_TONES.map(([id, label]) => tone(id, label, `var(--palette-${id})`)),
   tone('white', 'Белый', 'var(--palette-white)', 'rgb(0 0 0 / 60%)'),
   tone('black', 'Чёрный', 'var(--palette-black)', 'rgb(255 255 255 / 60%)'),
-  ...FOLDER_TONES.filter(({ id }) => !primaryIds.has(id)),
-  ...APPLE_TONES.map(([id, label]) =>
-    tone(`shade-${id}`, `${label} · глубокий оттенок`, `color-mix(in srgb, var(--palette-${id}) 74%, var(--palette-black))`),
+  ...EXTRA_TONES.map(([id, label, first, second, weight]) =>
+    tone(`mix-${id}`, label, `color-mix(in oklab, var(--palette-${first}) ${weight}%, var(--palette-${second}))`),
   ),
 ];
 
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
 const NEUTRAL_TONE = { id: null, iconFilter: undefined, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
 
+// Сохранённые цвета продолжают отображаться на существующих карточках.
+const toneById = new Map([...FOLDER_TONES, ...savedShades, ...TONES].map((entry) => [entry.id, entry]));
+
 export const toneOf = (id: ToneId | null) =>
-  id === null ? NEUTRAL_TONE : (TONES.find((t) => t.id === id) ?? TONES[0]);
+  id === null ? NEUTRAL_TONE : (toneById.get(id) ?? TONES[0]);
