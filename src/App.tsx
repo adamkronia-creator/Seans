@@ -25,7 +25,7 @@ import { MessagesPage } from './pages/MessagesPage/MessagesPage';
 import { NewChatPage, type NewStep } from './pages/NewChatPage/NewChatPage';
 import { GroupScreen, groupParentOf, groupSubOf } from './pages/GroupPages/GroupRoute';
 import { JoinPage } from './pages/GroupPages/JoinPage';
-import { goBack, keepTabbarOnNextShow, navigate, useRoute, wasPopped } from './router';
+import { goBack, keepTabbarOnNextShow, navigate, rememberRootTab, useRoute } from './router';
 import { useEdgeBack } from './utils/edgeBack';
 import { LayerContext } from './utils/layer';
 import { transition, type TransitionKind } from './utils/transition';
@@ -68,6 +68,12 @@ const JOIN_ROUTE = /^\/join\/([^/]+)\/?$/;
 /** Адрес настроек папки: /folder/<папка>; раздел (чаты, тесты, задания) определяет вкладка, на которой он открыт */
 const FOLDER_ROUTE = /^\/folder\/([^/]+)/;
 
+/** Явные маршруты принадлежат своей вкладке и при прямой ссылке, и в истории браузера. */
+function tabForPath(path: string): TabId | undefined {
+  if (/^\/(chat|events|archive|new|join)(?:\/|$)/.test(path)) return 'messages';
+  return /^\/(tests|tasks|profile)\//.exec(path)?.[1] as TabId | undefined;
+}
+
 /** Куда вёл бы «назад» с этого адреса, если истории нет (открыли по прямой ссылке) */
 function parentOf(path: string): string | null {
   // Мастер нового чата: шаг ведёт на предыдущий, первый — в список
@@ -106,19 +112,14 @@ function Layer({ top, pm, children }: { top: boolean; pm?: boolean; children: Re
 
 export default function App() {
   const [tabState, setTab] = useState<TabId>('messages');
-  const { path: route, prev } = useRoute();
+  const { path: route, prev, rootTab } = useRoute();
   const appRef = useRef<HTMLDivElement>(null);
 
-  // «Назад» браузера возвращает на экран вместе с его разделом: раздел виден по началу адреса (/tests/…, /tasks/…, /profile/…)
-  const prefixTab = /^\/(tests|tasks|profile)\//.exec(route)?.[1] as TabId | undefined;
-  const known = prefixTab && wasPopped() ? prefixTab : undefined;
-  // Чат открыт из другого раздела («Открыть чат» в окне отправки теста или задания): текущим становится раздел «Сообщения», иначе чат не строится
-  const chatTab: TabId | undefined = route.startsWith('/chat/') && !wasPopped() ? 'messages' : undefined;
-  const tab = known ?? chatTab ?? tabState;
+  const routeTab = route === '/' ? rootTab : tabForPath(route);
+  const tab = routeTab ?? tabState;
   useLayoutEffect(() => {
-    const want = known ?? chatTab;
-    if (want && want !== tabState) setTab(want);
-  });
+    if (routeTab && routeTab !== tabState) setTab(routeTab);
+  }, [routeTab, tabState]);
 
   // Открытое в каждом разделе: уходишь в другой раздел и возвращаешься — на том же экране, а не в списке
   const savedRoute = useRef<Partial<Record<TabId, string>>>({});
@@ -140,12 +141,13 @@ export default function App() {
     // Уходя из раздела, запоминаем, что в нём открыто; вернувшись, открываем это же
     if (id !== active) savedRoute.current[active] = deep ? current : undefined;
     const restore = id !== active ? savedRoute.current[id] : undefined;
-    const dest = restore ?? (toRoot || (id !== active && deep) ? '/' : null);
+    const dest = restore ?? (current !== '/' ? '/' : null);
     // Другая вкладка — мягкая смена содержимого; та же вкладка — возврат к её списку: открытый экран уезжает вправо
     if (dest) keepTabbarOnNextShow();
     transition(() => {
       setTab(id);
-      if (dest && dest !== current) navigate(dest, 'none');
+      if (dest && dest !== current) navigate(dest, 'none', dest === '/' ? id : undefined);
+      else if (current === '/') rememberRootTab(id);
     }, id === active ? 'back' : (kind ?? 'fade'));
   }, []);
   useLayoutEffect(() => {
@@ -405,7 +407,7 @@ export default function App() {
   // (чат под результатом, список под чатом) не работает вхолостую при каждой смене адреса
   const built = useRef(new Map<string, ReactNode>());
   const used = new Set<string>();
-  const screenFor = (path: string, at: TabId = tab): Screen => {
+  const screenFor = (path: string, at: TabId = tabForPath(path) ?? tab): Screen => {
     const { key, build, pm } = resolve(path, at);
     const id = `${at}|${key}`;
     used.add(id);

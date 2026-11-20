@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import type { TabId } from './components/TabBar/TabBar';
 import { transition, type TransitionKind } from './utils/transition';
 
 /*
@@ -14,20 +15,23 @@ import { transition, type TransitionKind } from './utils/transition';
 interface Located {
   path: string;
   prev: string | undefined;
+  rootTab?: TabId;
 }
 
 const readPath = () => window.location.hash.replace(/^#/, '') || '/';
-const readState = (): { i: number | undefined; prev: string | undefined } => {
-  const state = window.history.state as { i?: unknown; prev?: unknown } | null;
+const readState = (): { i: number | undefined; prev: string | undefined; rootTab?: TabId } => {
+  const state = window.history.state as { i?: unknown; prev?: unknown; rootTab?: unknown } | null;
   return {
     i: typeof state?.i === 'number' ? state.i : undefined,
     prev: typeof state?.prev === 'string' ? state.prev : undefined,
+    rootTab: state?.rootTab === 'messages' || state?.rootTab === 'tests' || state?.rootTab === 'tasks' || state?.rootTab === 'profile'
+      ? state.rootTab : undefined,
   };
 };
 
 const initial = readState();
 /** Какой экран показан сейчас (объект меняется целиком, поэтому годится как снимок для React) */
-let shown: Located = { path: readPath(), prev: initial.prev };
+let shown: Located = { path: readPath(), prev: initial.prev, rootTab: initial.rootTab };
 /** Куда идём: экран меняется на кадр позже, когда браузер снял прежний, а повторные вызовы должны это видеть сразу */
 let target = shown.path;
 /** Номер текущей записи истории: 0 — та, с которой открыли приложение */
@@ -56,13 +60,13 @@ export function keepTabbarOnNextShow() {
   document.documentElement.toggleAttribute('data-vt-chat', !tabbarStays);
 }
 
-function show(path: string, kind: TransitionKind, prev: string | undefined) {
+function show(path: string, kind: TransitionKind, prev: string | undefined, rootTab?: TabId) {
   const chatFlag = tabbarStays !== undefined ? !tabbarStays : (isChatRoot(target) || isChatRoot(path)) && !sameChat(target, path);
   tabbarStays = undefined;
   document.documentElement.toggleAttribute('data-vt-chat', chatFlag);
   target = path;
   transition(() => {
-    shown = { path, prev };
+    shown = { path, prev, rootTab };
     listeners.forEach((listener) => listener());
   }, kind);
 }
@@ -122,10 +126,6 @@ export function guardBack(onBack: () => void): () => void {
 let pending: { silent: boolean } | undefined;
 const queued: Array<() => void> = [];
 
-/** Последний переход сделал сам браузер (кнопка «назад»), а не приложение: тогда разделом экрана считается тот, где он был открыт */
-let popped = false;
-export const wasPopped = () => popped;
-
 /** Браузер сам перешёл по истории (кнопка «назад»/«вперёд», свайп) или поменяли адрес руками */
 function onHistory(event: Event) {
   if (pending) {
@@ -162,8 +162,7 @@ function onHistory(event: Event) {
   if (forced && forced.until > performance.now()) kind = forced.kind;
   forced = undefined;
   if (path !== target) {
-    popped = true;
-    show(path, kind, prev);
+    show(path, kind, prev, state.rootTab);
   }
 }
 
@@ -174,10 +173,19 @@ export function useRoute(): Located {
   return useSyncExternalStore(subscribe, () => shown);
 }
 
+/** Смена вкладки на общем корневом адресе обновляет запись без нового шага истории. */
+export function rememberRootTab(rootTab: TabId) {
+  if (shown.path !== '/' || target !== '/') return;
+  window.history.replaceState({ ...window.history.state, rootTab }, '');
+  if (shown.rootTab !== rootTab) {
+    shown = { ...shown, rootTab };
+    listeners.forEach((listener) => listener());
+  }
+}
+
 /** Открыть экран по адресу; по умолчанию он выезжает справа, как при переходе вглубь */
-export function navigate(path: string, kind: TransitionKind = 'forward') {
+export function navigate(path: string, kind: TransitionKind = 'forward', rootTab?: TabId) {
   if (target === path) return;
-  popped = false;
   const prev = target;
   if (guards.length) {
     // Окна и режимы ещё держат свои записи истории: сперва они уходят, и только потом новый экран ложится сверху,
@@ -189,14 +197,14 @@ export function navigate(path: string, kind: TransitionKind = 'forward') {
     // увидел бы, что экран уже показан, и записи не добавил — «назад» с нового экрана перескакивала бы через тот, откуда его открыли
     queued.push(() => {
       step += 1;
-      window.history.pushState({ i: step, prev }, '', `#${path}`);
+      window.history.pushState({ i: step, prev, rootTab }, '', `#${path}`);
     });
     window.history.go(-drop);
   } else {
     step += 1;
-    window.history.pushState({ i: step, prev }, '', `#${path}`);
+    window.history.pushState({ i: step, prev, rootTab }, '', `#${path}`);
   }
-  show(path, kind, prev);
+  show(path, kind, prev, rootTab);
 }
 
 /**
@@ -210,7 +218,6 @@ export function navigateOver(path: string, depth: number, kind: TransitionKind =
     return;
   }
   const drop = Math.min(guards.length + depth, step);
-  popped = false;
   if (drop <= 0) {
     // Истории нет (экран открыт по прямой ссылке): запись меняется на месте
     window.history.replaceState({ i: step, prev: start }, '', `#${path}`);
@@ -244,7 +251,6 @@ export function goBackBy(depth: number, fallback = '/') {
   guards.splice(0).forEach((g) => (g.silent = true));
   pending = { silent: true };
   queued.push(() => {
-    popped = true;
     show(readPath(), 'back', readState().prev);
   });
   window.history.go(-drop);
@@ -253,7 +259,6 @@ export function goBackBy(depth: number, fallback = '/') {
 /** Сменить адрес на месте, без новой записи в истории (вкладки внутри экрана: «назад» уходит с экрана, а не по вкладкам) */
 export function replace(path: string, kind: TransitionKind = 'none') {
   if (target === path) return;
-  popped = false;
   const prev = readState().prev;
   window.history.replaceState({ i: step, prev }, '', `#${path}`);
   show(path, kind, prev);
