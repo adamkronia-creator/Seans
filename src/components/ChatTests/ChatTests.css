@@ -292,8 +292,7 @@
   text-align: start;
 }
 
-.activity-card__body:focus-visible,
-.activity-card__menu:focus-visible {
+.activity-card__body:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
@@ -315,8 +314,7 @@
   background: var(--tint);
 }
 
-.activity-card__icon img,
-.activity-card__menu svg {
+.activity-card__icon img {
   width: var(--space-5);
   height: var(--space-5);
 }
@@ -350,18 +348,6 @@
 
 .activity-card__scales .hist-scales {
   margin-top: 0;
-}
-
-.activity-card__menu {
-  position: absolute;
-  inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
-  display: grid;
-  place-items: center;
-  width: calc(var(--space-4) * 3);
-  height: calc(var(--space-4) * 3);
-  border-radius: var(--radius-full);
-  color: var(--text-primary);
 }
 
 .activity-card .pick-mark {

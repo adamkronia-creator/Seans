@@ -85,6 +85,14 @@
   gap: var(--space-1);
 }
 
+.hist-scale[data-separated] {
+  margin-block-start: var(--space-3);
+}
+
+.hist-scale[data-indented] {
+  padding-inline-start: var(--space-3);
+}
+
 .hist-scale__head {
   display: flex;
   gap: var(--space-2);

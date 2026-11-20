@@ -37,13 +37,13 @@ export function ActivityCard({ item, category, abbreviation, date, description, 
       </button>
       {result && result.scales.length > 0 && (
         <div className="activity-card__scales">
-          <ScaleList data={result} onOpen={onOpen} descending />
+          <ScaleList data={result} onOpen={onOpen} grouping={item.id === '5pfq' ? 'factors' : 'main-extra'} />
         </div>
       )}
       {!selecting && (
         <button
           type="button"
-          className="activity-card__menu"
+          className="case-card__edit"
           aria-label={`Действия: ${item.title}`}
           aria-haspopup="menu"
           data-no-swipe
