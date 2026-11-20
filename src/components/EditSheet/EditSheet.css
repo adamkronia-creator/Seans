@@ -235,7 +235,7 @@
 
 /* Выбранная иконка выделяется полупрозрачной подложкой. */
 .sheet__icon--active {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--color-text-primary) 16%, transparent);
 }
 
 /* Цвет: ячейка 36, как у иконки; кружок 28, выбранный обведён кольцом до границ ячейки */
@@ -474,13 +474,8 @@
   background: none;
 }
 
-[data-pm] .sheet__icon {
-  border-color: transparent;
+[data-pm] .sheet__icon:not(.sheet__icon--active) {
   background: none;
-}
-
-[data-pm] .sheet__icon--active {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 /* Окно правки поднимается до нижнего края шапки чата (под фото собеседника и подписью): верх листа там, где кончается стеклянная подложка шапки;
@@ -493,6 +488,15 @@
 [data-pm] .sheet.sheet--edit .sheet__body {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
   mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
+}
+
+/* Зазор над кнопками находится за пределами прокрутки: под прилипшей панелью виден только фон листа. */
+[data-pm] .sheet.sheet--edit .sheet__body:has(> .sheet__text) {
+  padding-bottom: 0;
+}
+
+[data-pm] .sheet.sheet--edit .sheet__body:has(> .sheet__text) + .sheet__footer {
+  padding-top: var(--sheet-gutter);
 }
 
 /* «Иконка» и «Цвет»: 16 */
