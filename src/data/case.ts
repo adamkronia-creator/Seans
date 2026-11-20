@@ -37,7 +37,23 @@ export type CaseIconId =
   | 'warning'
   | 'key'
   | 'lock'
-  | 'place';
+  | 'place'
+  | 'handHeart'
+  | 'group'
+  | 'smile'
+  | 'dialog'
+  | 'target'
+  | 'graph'
+  | 'idea'
+  | 'puzzle'
+  | 'notesBold'
+  | 'clipboardCheck'
+  | 'layers'
+  | 'shield'
+  | 'sun'
+  | 'moon'
+  | 'leaf'
+  | 'compass';
 
 import type { ToneId } from './tones';
 import { parseBlocks, serializeBlocks, type RichBlock } from '../utils/richText';

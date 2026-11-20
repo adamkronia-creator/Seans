@@ -40,6 +40,22 @@ import warningIcon from '../../assets/icons/solar/danger-triangle.svg?react';
 import keyIcon from '../../assets/icons/solar/key-minimalistic.svg?react';
 import lockIcon from '../../assets/icons/solar/lock-keyhole-minimalistic.svg?react';
 import placeIcon from '../../assets/icons/solar/map-point.svg?react';
+import handHeartIcon from '../../assets/icons/solar/hand-heart-bold.svg?react';
+import groupIcon from '../../assets/icons/solar/users-group-rounded-bold.svg?react';
+import smileIcon from '../../assets/icons/solar/smile-circle-bold.svg?react';
+import dialogIcon from '../../assets/icons/solar/dialog-bold.svg?react';
+import targetIcon from '../../assets/icons/solar/target-bold.svg?react';
+import graphIcon from '../../assets/icons/solar/graph-up-bold.svg?react';
+import ideaIcon from '../../assets/icons/solar/lightbulb-bold.svg?react';
+import puzzleIcon from '../../assets/icons/solar/puzzle-bold.svg?react';
+import notesBoldIcon from '../../assets/icons/solar/notes-bold.svg?react';
+import clipboardCheckIcon from '../../assets/icons/solar/clipboard-check-bold.svg?react';
+import layersIcon from '../../assets/icons/solar/layers-bold.svg?react';
+import shieldIcon from '../../assets/icons/solar/shield-check-bold.svg?react';
+import sunIcon from '../../assets/icons/solar/sun-bold.svg?react';
+import moonIcon from '../../assets/icons/solar/moon-bold.svg?react';
+import leafIcon from '../../assets/icons/solar/leaf-bold.svg?react';
+import compassIcon from '../../assets/icons/solar/compass-bold.svg?react';
 import type { CaseIconId } from '../../data/case';
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -85,11 +101,27 @@ export const HEAD_ICONS: Record<CaseIconId, { Icon: Icon; size: 20 | 22 | 24; la
   key: { Icon: keyIcon, size: 20, label: 'Ключ' },
   lock: { Icon: lockIcon, size: 20, label: 'Замок' },
   place: { Icon: placeIcon, size: 20, label: 'Место' },
+  handHeart: { Icon: handHeartIcon, size: 20, label: 'Поддержка' },
+  group: { Icon: groupIcon, size: 20, label: 'Группа' },
+  smile: { Icon: smileIcon, size: 20, label: 'Улыбка' },
+  dialog: { Icon: dialogIcon, size: 20, label: 'Диалог' },
+  target: { Icon: targetIcon, size: 20, label: 'Мишень' },
+  graph: { Icon: graphIcon, size: 20, label: 'Динамика' },
+  idea: { Icon: ideaIcon, size: 20, label: 'Идея' },
+  puzzle: { Icon: puzzleIcon, size: 20, label: 'Пазл' },
+  notesBold: { Icon: notesBoldIcon, size: 20, label: 'Записи' },
+  clipboardCheck: { Icon: clipboardCheckIcon, size: 20, label: 'Выполнено' },
+  layers: { Icon: layersIcon, size: 20, label: 'Слои' },
+  shield: { Icon: shieldIcon, size: 20, label: 'Защита' },
+  sun: { Icon: sunIcon, size: 20, label: 'Солнце' },
+  moon: { Icon: moonIcon, size: 20, label: 'Луна' },
+  leaf: { Icon: leafIcon, size: 20, label: 'Лист' },
+  compass: { Icon: compassIcon, size: 20, label: 'Компас' },
 };
 
 export const CASE_ICON_GROUPS: { title: string; ids: CaseIconId[] }[] = [
-  { title: 'Человек и взаимодействие', ids: ['general', 'anamnesis', 'request', 'transfer', 'heart', 'chat', 'mindfulness', 'hospital'] },
-  { title: 'Наблюдение и анализ', ids: ['hypothesis', 'structure', 'signifiers', 'scenario', 'eye', 'info', 'question', 'warning', 'goal', 'checklist'] },
-  { title: 'Заметки и документы', ids: ['pin', 'bookmark', 'book', 'notebook', 'document', 'folder', 'pencil', 'attachment', 'briefcase'] },
-  { title: 'События и символы', ids: ['calendar', 'clock', 'place', 'flag', 'star', 'crown', 'bolt', 'flame', 'key', 'lock', 'cross', 'dots'] },
+  { title: 'Человек и взаимодействие', ids: ['general', 'anamnesis', 'request', 'transfer', 'heart', 'chat', 'mindfulness', 'hospital', 'handHeart', 'group', 'smile', 'dialog'] },
+  { title: 'Наблюдение и анализ', ids: ['hypothesis', 'structure', 'signifiers', 'scenario', 'eye', 'info', 'question', 'warning', 'goal', 'checklist', 'target', 'graph', 'idea', 'puzzle'] },
+  { title: 'Заметки и документы', ids: ['pin', 'bookmark', 'book', 'notebook', 'document', 'folder', 'pencil', 'attachment', 'briefcase', 'notesBold', 'clipboardCheck', 'layers', 'shield'] },
+  { title: 'События и символы', ids: ['calendar', 'clock', 'place', 'flag', 'star', 'crown', 'bolt', 'flame', 'key', 'lock', 'cross', 'dots', 'sun', 'moon', 'leaf', 'compass'] },
 ];
