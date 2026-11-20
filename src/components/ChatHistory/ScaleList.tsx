@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { levelOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
+import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import '../TestSettings/TestConclusion.css';
 import './ScaleList.css';
 
@@ -9,27 +9,38 @@ const SCALES_SHOWN = 3;
 const fmtScore = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
 /** Одна шкала: название, значение и полоса цвета диапазона; у шкалы с диапазонами под названием подпись диапазона */
-function ScaleRow({ data, scale, separated, indented }: {
+function ScaleRow({ data, scale, separated, indented, polar, showRanges }: {
   data: ConclusionData;
   scale: ConclusionScale;
   separated: boolean;
   indented: boolean;
+  polar: boolean;
+  showRanges: boolean;
 }) {
-  const level = scale.leveled ? levelOf(scale.group === 'extra' && data.extra ? { ...data, ...data.extra } : data, scale.score, scale) : undefined;
+  const rangesData = scale.group === 'extra' && data.extra ? { ...data, ...data.extra } : data;
+  const level = scale.leveled ? levelOf(rangesData, scale.score, scale) : undefined;
+  const [leftPole, rightPole] = polar ? scale.name.split(' — ', 2) : [];
+  const boundaries = showRanges && scale.leveled
+    ? levelsOf(rangesData, scale).filter(({ from }) => from > 0 && from < scale.max)
+    : [];
   const tone = level?.tone ?? 'accent';
   const pct = Math.min(100, Math.max(0, (scale.score / scale.max) * 100));
   return (
     <li className="hist-scale" data-separated={separated || undefined} data-indented={indented || undefined}>
       <span className="hist-scale__head">
         <span className="hist-scale__name">
-          {scale.name}
-          {level && <>: <span className="hist-scale__code">{level.chip.toLowerCase()}</span></>}
+          {leftPole ?? scale.name}
+          {!rightPole && level && <>: <span className="hist-scale__code">{level.chip.toLowerCase()}</span></>}
         </span>
         <span className="hist-scale__value">{fmtScore(scale.score)}</span>
       </span>
       <span className="hist-scale__track" aria-hidden="true">
         <span className={`hist-scale__fill cc-fill--${tone}`} style={{ width: `${pct}%` }} />
+        {boundaries.map(({ key, from }) => (
+          <span key={key} className="hist-scale__boundary" style={{ insetInlineStart: `${(from / scale.max) * 100}%` }} />
+        ))}
       </span>
+      {rightPole && <span className="hist-scale__pole">{rightPole}</span>}
     </li>
   );
 }
@@ -61,7 +72,7 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
       indented: grouping === 'factors' && index > 0 && group[0].group === 'main',
     })),
   );
-  const renderScale = (row: typeof scales[number]) => <ScaleRow key={row.scale.code} data={data} {...row} />;
+  const renderScale = (row: typeof scales[number]) => <ScaleRow key={row.scale.code} data={data} polar={grouping === 'factors'} showRanges={Boolean(grouping)} {...row} />;
   const long = scales.length > SCALES_SHOWN;
   const head = long ? scales.slice(0, SCALES_SHOWN) : scales;
   // Остальные шкалы всегда в разметке, но свёрнуты по высоте: «Читать далее» раскрывает их плавно, а не вставляет рывком

@@ -294,7 +294,6 @@ interface SectionPageProps {
   hasClientData: boolean;
   /** Раздел сейчас на экране */
   active: boolean;
-  onAppTabChange: (id: TabId) => void;
   /** Выбранные карточки заметок или сведений (null — выбора нет) и отметка карточки */
   picked: string[] | null;
   onPick: (id: string) => void;
@@ -307,7 +306,7 @@ interface SectionPageProps {
  * Страница раздела, кроме переписки: содержимое и снизу панель. У «Заметок» и «Сведений» это поле ввода, как в переписке:
  * зашёл во вкладку и сразу пишешь; у остальных — панель приложения. Не перерисовывается, пока не изменились эти поля
  */
-const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, onAppTabChange, picked, onPick, onCardMenu, onRemind }: SectionPageProps) {
+const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClientData, active, picked, onPick, onCardMenu, onRemind }: SectionPageProps) {
   return (
     <>
       {id === 'tests' &&
@@ -351,7 +350,6 @@ const SectionPage = memo(function SectionPage({ id, chatId, favorites, hasClient
         </>
       )}
       {id === 'library' && <ChatHistory hasData={hasClientData} />}
-      {id !== 'notes' && id !== 'info' && <TabBar active="messages" onChange={onAppTabChange} />}
     </>
   );
 });
@@ -918,7 +916,6 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
           favorites={Boolean(chat.favorites)}
           hasClientData={hasClientData}
           active={id === section}
-          onAppTabChange={onAppTabChange}
           picked={id === section ? selected : null}
           onPick={pickCard}
           onCardMenu={openCardMenu}
@@ -1092,6 +1089,9 @@ export function ChatPage({ chatId, onAppTabChange }: ChatPageProps) {
       </header>
 
       <SwipePager index={index} pages={pages} onIndexChange={(i) => setSection(sections[i].id)} />
+      {(section === 'tests' || section === 'tasks' || section === 'library') && (
+        <TabBar active="messages" onChange={onAppTabChange} />
+      )}
 
       {cardMenu && (
         <ChipMenu

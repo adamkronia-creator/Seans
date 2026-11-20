@@ -86,7 +86,24 @@
 }
 
 .hist-scale[data-separated] {
-  margin-block-start: var(--space-3);
+  position: relative;
+}
+
+.hist-scale[data-separated]::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-3) / -2) 0 auto;
+  height: 1px; /* grid:ok — как просвет между карточками */
+  background: var(--divider);
+  pointer-events: none;
+}
+
+.hist-scales__list--rest > .hist-scale[data-separated]:first-child {
+  padding-block-start: var(--space-2);
+}
+
+.hist-scales__list--rest > .hist-scale[data-separated]:first-child::before {
+  inset-block-start: 0;
 }
 
 .hist-scale[data-indented] {
@@ -124,4 +141,19 @@
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: var(--radius-xs);
+}
+
+.hist-scale__boundary {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px; /* grid:ok — отметка границы диапазона */
+  background: rgb(255 255 255 / 85%);
+  box-shadow: 1px 0 rgb(0 0 0 / 25%);
+}
+
+.hist-scale__pole {
+  color: var(--text-primary);
+  font: var(--type-meta);
+  text-align: end;
 }
