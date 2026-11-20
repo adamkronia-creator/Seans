@@ -325,6 +325,7 @@
   display: grid;
   color: var(--text-primary);
   font: var(--type-label);
+  font-weight: 400;
 }
 
 .activity-card__date {
@@ -340,12 +341,13 @@
 .activity-card__description {
   color: var(--text-secondary);
   font: var(--type-label);
+  font-weight: 400;
 }
 
 .activity-card__menu {
   position: absolute;
   inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-4);
+  inset-inline-end: var(--space-2);
   display: grid;
   place-items: center;
   width: calc(var(--space-4) * 3);

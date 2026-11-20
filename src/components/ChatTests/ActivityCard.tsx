@@ -5,7 +5,8 @@ import type { PsyTest } from '../../data/tests';
 
 interface ActivityCardProps extends PickProps {
   item: PsyTest;
-  status: string;
+  category: string;
+  abbreviation?: string;
   date: string;
   description?: string;
   details?: string;
@@ -13,7 +14,7 @@ interface ActivityCardProps extends PickProps {
   onMenu: (id: string, opener: HTMLButtonElement) => void;
 }
 
-export function ActivityCard({ item, status, date, description, details, onOpen, onMenu, selecting, selected, onPick }: ActivityCardProps) {
+export function ActivityCard({ item, category, abbreviation, date, description, details, onOpen, onMenu, selecting, selected, onPick }: ActivityCardProps) {
   const pick = usePick(item.id, { selecting, onPick }, true);
   return (
     <li className="activity-card" data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
@@ -23,11 +24,11 @@ export function ActivityCard({ item, status, date, description, details, onOpen,
             <img src={item.icon} alt="" loading="lazy" decoding="async" />
           </span>
           <span className="activity-card__meta">
-            <span>{status}</span>
+            <span>{category}</span>
             <span className="activity-card__date">{date}{details && ` · ${details}`}</span>
           </span>
         </span>
-        <span className="activity-card__title">{item.title}</span>
+        <span className="activity-card__title">{item.title}{abbreviation && ` «${abbreviation}»`}</span>
         <span className="activity-card__description">{description || item.description}</span>
         {selecting && <span className="pick-mark" aria-hidden="true" />}
       </button>

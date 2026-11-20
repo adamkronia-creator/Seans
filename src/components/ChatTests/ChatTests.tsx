@@ -9,7 +9,7 @@ import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { CLIENT_CHAT, itemsWithStatus, useClientData } from '../../data/clientStore';
 import { clientResultId } from '../../data/resultLinks';
-import { LIBRARY, TASK_LIBRARY } from '../../data/library';
+import { LIBRARY, TASK_CATEGORIES, TASK_LIBRARY } from '../../data/library';
 import { useTaskResult, useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import { TASKS } from '../../data/taskContent';
@@ -41,6 +41,24 @@ const TASK_SECTIONS: SectionConfig[] = [
   { status: 'permanent', title: 'Назначенные' },
   { status: 'done', title: 'Завершённые' },
 ];
+
+const PERSONALITY = 'Личностные опросники';
+const MOOD = 'Настроение и эмоции';
+const SCREENING = 'Скрининговые методики';
+const TEST_CARD_CATEGORIES: Readonly<Partial<Record<string, string>>> = {
+  ito: PERSONALITY,
+  smol: PERSONALITY,
+  '5pfq': PERSONALITY,
+  sq: PERSONALITY,
+  itt: MOOD,
+  bhs: MOOD,
+  bdi: MOOD,
+  phq9: MOOD,
+  gad7: MOOD,
+  scl90: 'Общая диагностика',
+  ocr: SCREENING,
+  rses: SCREENING,
+};
 
 const TEST_CARD_DESCRIPTIONS: Readonly<Partial<Record<string, string>>> = {
   itt: 'Методика предназначена для комплексной экспресс-диагностики тревожности',
@@ -158,7 +176,8 @@ export function ChatTests({
           <ActivityCard
             key={item.id}
             item={item}
-            status={done ? 'Завершённый опросник' : 'Отправленный опросник'}
+            category={TEST_CARD_CATEGORIES[item.id] ?? 'Опросники'}
+            abbreviation={test?.abbr}
             date={resultDate ?? item.fullDate ?? item.date}
             description={TEST_CARD_DESCRIPTIONS[item.id] ?? introParagraph(test && testSettings(test).intro)}
             onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
@@ -221,6 +240,8 @@ export function ChatTasks({
         const assigned = item.status === 'permanent';
         const result = done ? findClientTaskResult(clientResultId(CLIENT_CHAT, item.id)) : undefined;
         const taskId = result?.taskId ?? item.id;
+        const task = TASK_LIBRARY.find((task) => task.id === taskId);
+        const category = TASK_CATEGORIES.filter(({ id }) => task?.categories.includes(id)).map(({ label }) => label).join(' · ');
         const details = result?.record
           ? `Запись № ${result.record}`
           : assigned && /^Записей/.test(item.description) ? item.description : undefined;
@@ -228,9 +249,9 @@ export function ChatTasks({
           <ActivityCard
             key={item.id}
             item={item}
-            status={done ? 'Завершённое задание' : assigned ? 'Назначенное задание' : 'Отправленное задание'}
+            category={category || 'Задания'}
             date={result?.info.date ?? item.records?.since ?? item.fullDate ?? item.date}
-            description={introParagraph(TASKS[taskId]?.intro) ?? taskDescription(taskId)}
+            description={introParagraph(TASKS[taskId]?.intro) ?? task?.description}
             details={details}
             onOpen={() => done ? onOpenResult?.(item.id) : onOpenTask?.(item.id)}
             onMenu={onCardMenu}
