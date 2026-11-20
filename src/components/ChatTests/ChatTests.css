@@ -282,13 +282,13 @@
 
 .activity-card {
   position: relative;
-  padding: var(--space-2) var(--space-4) var(--space-4);
 }
 
 .activity-card__body {
   display: grid;
   gap: var(--space-2);
   width: 100%;
+  padding: var(--space-2) var(--space-4) var(--space-4);
   text-align: start;
 }
 
@@ -342,35 +342,13 @@
   font-weight: 400;
 }
 
-.activity-card > .hist-scales[data-grouped] {
-  margin-block-start: var(--space-4);
-  overflow: visible;
-  border-radius: 0;
+.activity-card__scales {
+  padding: 0 var(--space-4) var(--space-4);
 }
 
-.activity-card > .hist-scales[data-grouped] .hist-scale {
-  margin-block-start: 0;
-  padding: 0;
-}
-
-.activity-card > .hist-scales[data-grouped] .hist-scale + .hist-scale,
-.activity-card > .hist-scales[data-grouped] .hist-scales__rest--open {
-  margin-block-start: var(--space-2);
-}
-
-.activity-card > .hist-scales[data-grouped] .hist-scale + .hist-scale[data-separated] {
-  margin-block-start: var(--space-3);
-}
-
-.activity-card > .hist-scales[data-grouped] .hist-scales__rest--open:has(.hist-scale[data-separated]:first-child) {
-  margin-block-start: var(--space-3);
-}
-
-.activity-card > .hist-scales[data-grouped] .hist-scales__toggle {
-  margin-block-start: var(--space-3);
-  padding-block: var(--space-2);
-  border-radius: var(--radius-md);
-  background: var(--sheet-tile-strong);
+.activity-card__scales .hist-scales {
+  --grouped-scales-fill: color-mix(in srgb, var(--action-primary) 7%, transparent);
+  margin-top: 0;
 }
 
 .activity-card .pick-mark {

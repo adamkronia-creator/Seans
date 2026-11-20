@@ -343,12 +343,13 @@
   overflow: clip;
 }
 
-/* У текста и панели одна заливка, достаточно плотная для прокрутки текста под панелью. */
+/* Размытие сохраняет читаемость иконок, пока под полупрозрачной панелью прокручивается текст. */
 [data-pm] .rich-toolbar {
   padding: var(--space-3);
   border: 0;
   border-top: var(--hairline) solid var(--sheet-line);
   border-radius: 0;
+  backdrop-filter: blur(var(--space-3));
 }
 
 [data-pm] .sheet__preview {
@@ -374,7 +375,7 @@
 }
 
 [data-pm] .sheet__text :is(.rich-editor, .rich-toolbar) {
-  background: var(--sheet-solid);
+  background: var(--sheet-tile);
 }
 
 [data-pm] .sheet__appearance .sheet__toggle-row {
