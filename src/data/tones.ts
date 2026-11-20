@@ -111,7 +111,7 @@ const savedShades = APPLE_TONES.map(([id, label]) =>
 const editorTones = [
   ...APPLE_TONES.map(([id, label]) => tone(id, label, `var(--palette-${id})`)),
   tone('white', 'Белый', 'var(--palette-white)', 'rgb(0 0 0 / 60%)'),
-  tone('black', 'Чёрный', 'var(--palette-black)', 'rgb(255 255 255 / 60%)'),
+  tone('black', 'Чёрный', 'var(--palette-black)'),
   ...EXTRA_TONES.map(([id, label, first, second, weight]) =>
     tone(`mix-${id}`, label, `color-mix(in oklab, var(--palette-${first}) ${weight}%, var(--palette-${second}))`),
   ),

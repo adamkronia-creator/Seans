@@ -233,9 +233,9 @@
   color: var(--head-fg, var(--color-accent));
 }
 
-/* Выбранная иконка: акцентная обводка, фон остаётся белым */
+/* Выбранная иконка выделяется полупрозрачной подложкой. */
 .sheet__icon--active {
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 /* Цвет: ячейка 36, как у иконки; кружок 28, выбранный обведён кольцом до границ ячейки */
@@ -420,7 +420,10 @@
 }
 
 [data-pm] .sheet__icon-picker .sheet__icons {
+  /* Первый SVG выровнен с заголовком категории и значком строки «Иконка». */
+  margin-inline-start: calc((var(--space-6) - var(--size-control-sm)) / 2);
   padding: 0;
+  justify-items: start;
 }
 
 [data-pm] .sheet__appearance .sheet__tones {
@@ -477,7 +480,7 @@
 }
 
 [data-pm] .sheet__icon--active {
-  border-color: var(--head-fg, var(--color-accent));
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 /* Окно правки поднимается до нижнего края шапки чата (под фото собеседника и подписью): верх листа там, где кончается стеклянная подложка шапки;
