@@ -6,7 +6,8 @@
   margin-top: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--action-primary) 7%, transparent);
+  --scales-surface: color-mix(in srgb, var(--action-primary) 7%, transparent);
+  background: var(--scales-surface);
 }
 
 .hist-scales__list {
@@ -85,31 +86,6 @@
   gap: var(--space-1);
 }
 
-.hist-scale[data-separated] {
-  position: relative;
-}
-
-.hist-scale[data-separated]::before {
-  content: '';
-  position: absolute;
-  inset: calc(var(--space-3) / -2) 0 auto;
-  height: 1px; /* grid:ok — как просвет между карточками */
-  background: var(--divider);
-  pointer-events: none;
-}
-
-.hist-scales__list--rest > .hist-scale[data-separated]:first-child {
-  padding-block-start: var(--space-2);
-}
-
-.hist-scales__list--rest > .hist-scale[data-separated]:first-child::before {
-  inset-block-start: 0;
-}
-
-.hist-scale[data-indented] {
-  padding-inline-start: var(--space-3);
-}
-
 .hist-scale__head {
   display: flex;
   gap: var(--space-2);
@@ -148,12 +124,58 @@
   top: 0;
   bottom: 0;
   width: 1px; /* grid:ok — отметка границы диапазона */
-  background: rgb(255 255 255 / 85%);
-  box-shadow: 1px 0 rgb(0 0 0 / 25%);
+  background: rgb(255 255 255 / 48%);
+  box-shadow: 1px 0 rgb(0 0 0 / 14%);
 }
 
 .hist-scale__pole {
   color: var(--text-primary);
-  font: var(--type-meta);
+  font: var(--type-label);
+  font-weight: 400;
   text-align: end;
+}
+
+/* Как в профиле: на просветах видна подложка карточки. */
+.hist-scales[data-grouped] {
+  padding: 0;
+  overflow: hidden;
+  background: none;
+}
+
+.hist-scales[data-grouped] .hist-scales__list {
+  gap: 0;
+}
+
+.hist-scales[data-grouped] .hist-scales__rest {
+  margin-top: 0;
+}
+
+.hist-scales[data-grouped] .hist-scale,
+.hist-scales[data-grouped] .hist-scales__toggle {
+  background: var(--scales-surface);
+}
+
+.hist-scales[data-grouped] .hist-scale {
+  padding: calc(var(--space-3) / 2) var(--space-3);
+}
+
+.hist-scales[data-grouped] > .hist-scales__list > .hist-scale:first-child,
+.hist-scales[data-grouped] .hist-scale:last-child,
+.hist-scales[data-grouped] .hist-scales__list > .hist-scale:has(+ .hist-scales__rest:not(.hist-scales__rest--open)) {
+  padding-block: var(--space-2);
+}
+
+.hist-scales[data-grouped] .hist-scale[data-separated],
+.hist-scales[data-grouped] .hist-scales__toggle {
+  margin-block-start: 1px; /* grid:ok — прозрачный просвет как в профиле */
+}
+
+.hist-scales[data-grouped] .hist-scales__toggle {
+  align-self: stretch;
+  margin-block-end: 0;
+}
+
+.hist-scales[data-grouped] :is(.hist-scales__list, .hist-scales__toggle):focus-visible {
+  outline: var(--hairline) solid var(--border-focus);
+  outline-offset: calc(var(--hairline) * -1);
 }

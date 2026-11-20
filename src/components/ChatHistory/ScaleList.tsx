@@ -9,11 +9,10 @@ const SCALES_SHOWN = 3;
 const fmtScore = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
 /** Одна шкала: название, значение и полоса цвета диапазона; у шкалы с диапазонами под названием подпись диапазона */
-function ScaleRow({ data, scale, separated, indented, polar, showRanges }: {
+function ScaleRow({ data, scale, separated, polar, showRanges }: {
   data: ConclusionData;
   scale: ConclusionScale;
   separated: boolean;
-  indented: boolean;
   polar: boolean;
   showRanges: boolean;
 }) {
@@ -26,7 +25,7 @@ function ScaleRow({ data, scale, separated, indented, polar, showRanges }: {
   const tone = level?.tone ?? 'accent';
   const pct = Math.min(100, Math.max(0, (scale.score / scale.max) * 100));
   return (
-    <li className="hist-scale" data-separated={separated || undefined} data-indented={indented || undefined}>
+    <li className="hist-scale" data-separated={separated || undefined}>
       <span className="hist-scale__head">
         <span className="hist-scale__name">
           {leftPole ?? scale.name}
@@ -69,7 +68,6 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
     group.map((scale, index) => ({
       scale,
       separated: groupIndex > 0 && index === 0,
-      indented: grouping === 'factors' && index > 0 && group[0].group === 'main',
     })),
   );
   const renderScale = (row: typeof scales[number]) => <ScaleRow key={row.scale.code} data={data} polar={grouping === 'factors'} showRanges={Boolean(grouping)} {...row} />;
@@ -78,7 +76,7 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
   // Остальные шкалы всегда в разметке, но свёрнуты по высоте: «Читать далее» раскрывает их плавно, а не вставляет рывком
   const rest = long ? scales.slice(SCALES_SHOWN) : [];
   return (
-    <div className="hist-scales">
+    <div className="hist-scales" data-grouped={grouping ? true : undefined}>
       <ul
         className="hist-scales__list"
         role="link"
@@ -96,7 +94,7 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
           </li>
         )}
       </ul>
-      {long && <hr className="hist-scales__rule" />}
+      {long && !grouping && <hr className="hist-scales__rule" />}
       {long && (
         <button type="button" className="hist-scales__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? 'Скрыть' : `Читать далее (ещё ${scales.length - SCALES_SHOWN})`}
