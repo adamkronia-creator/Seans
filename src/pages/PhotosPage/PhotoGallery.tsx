@@ -11,7 +11,7 @@ export function PhotoGallery() {
   const { path, prev } = useRoute();
   const { photos, albums } = useProfile();
   const stories = useOwnStories();
-  const [header, setHeader] = useState<HTMLDivElement | null>(null);
+  const [chrome, setChrome] = useState<HTMLDivElement | null>(null);
   const view = PHOTO_VIEWS.find((id) => PHOTO_PATHS[id] === path.replace(/\/$/, ''))
     ?? PHOTO_VIEWS.find((id) => PHOTO_PATHS[id] === prev)
     ?? 'photos';
@@ -19,21 +19,24 @@ export function PhotoGallery() {
 
   return (
     <section className="fp ph ph-gallery">
-      <div ref={setHeader} className="ph-gallery__header" />
-      <PhotoTabs value={view} onChange={switchView} photos={photos.length} albums={albums.length} stories={stories.length} />
-      <SwipePager
-        className="ph-gallery__pager"
-        index={PHOTO_VIEWS.indexOf(view)}
-        onIndexChange={(index) => switchView(PHOTO_VIEWS[index])}
-        onEdgeSwipe={(direction) => { if (direction === -1) goBack('/'); }}
-        pages={PHOTO_VIEWS.map((id) => {
-          const gallery = { headerHost: view === id ? header : null };
-          return {
-            key: id,
-            node: id === 'stories' ? <StoryArchive gallery={gallery} /> : <PhotosPage view={id} gallery={gallery} />,
-          };
-        })}
-      />
+      <div ref={setChrome} className="ph-gallery__chrome" />
+      <div className="fp__scroll ph__scroll ph-gallery__scroll">
+        <PhotoTabs value={view} onChange={switchView} photos={photos.length} albums={albums.length} stories={stories.length} />
+        <SwipePager
+          autoHeight
+          className="ph-gallery__pager"
+          index={PHOTO_VIEWS.indexOf(view)}
+          onIndexChange={(index) => switchView(PHOTO_VIEWS[index])}
+          onEdgeSwipe={(direction) => { if (direction === -1) goBack('/'); }}
+          pages={PHOTO_VIEWS.map((id) => {
+            const gallery = { chromeHost: view === id ? chrome : null };
+            return {
+              key: id,
+              node: id === 'stories' ? <StoryArchive gallery={gallery} /> : <PhotosPage view={id} gallery={gallery} />,
+            };
+          })}
+        />
+      </div>
     </section>
   );
 }

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Chip } from '../../components/Chip/Chip';
+import { MediaTabs } from '../../components/Profile/PhotoTabs';
+import { IconImage as PhotoIcon, IconStories } from '../../components/Profile/ProfileIcons';
 import { StoryViewer } from '../../components/Stories/Stories';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { SwipePager } from '../../components/SwipePager/SwipePager';
-import { usePillChips } from '../../utils/usePillChips';
 import { STORY_BACKGROUNDS, type Story, type StoryAuthor } from '../../data/stories';
 import type { SharedFile, SharedLink, SharedMedia } from '../../data/contactShared';
 import { CopyIcon } from '../../components/CopyIcon/CopyIcon';
@@ -27,30 +27,24 @@ interface Props {
   whose?: string;
 }
 
-/** Вкладки профиля, как в Telegram: «Истории», «Медиа», «Файлы», «Ссылки». Выбранная вкладка — плашка, которая переезжает к новой */
+/** Общие материалы собеседника на вкладках в стиле галереи. */
 export function ContactTabs({ author, root, stories, media, files, links, onCopy, whose = 'собеседника' }: Props) {
   const [tab, setTab] = useState<Tab>('Истории');
   const [viewing, setViewing] = useState<{ at: number; x: number; y: number } | null>(null);
-  const { row, onPosition } = usePillChips();
+  const tabs = [
+    { id: 'Истории', label: 'Истории', count: stories.length, Icon: IconStories },
+    { id: 'Медиа', label: 'Медиа', count: media.length, Icon: PhotoIcon },
+    { id: 'Файлы', label: 'Файлы', count: files.length, Icon: IconFile },
+    { id: 'Ссылки', label: 'Ссылки', count: links.length, Icon: IconLink },
+  ] as const;
   return (
     <section className="ct__tabs-block">
-      <div className="ct__tabs">
-        <div ref={row} className="screen-header__chips ct__chips" role="group" aria-label="Материалы" data-hscroll>
-          {TABS.map((name) => (
-            <Chip key={name} follow tone="chat" active={tab === name} onClick={() => setTab(name)}>
-              {name}
-            </Chip>
-          ))}
-          <span className="chips-pill" aria-hidden="true" />
-        </div>
-      </div>
-
+      <MediaTabs value={tab} onChange={setTab} tabs={tabs} label="Материалы" />
       <SwipePager
         autoHeight
         className="ct__pager"
         index={TABS.indexOf(tab)}
         onIndexChange={(index) => setTab(TABS[index])}
-        onPosition={onPosition}
         pages={TABS.map((name) => ({
           key: name,
           node: (

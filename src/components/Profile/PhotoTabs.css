@@ -1,9 +1,12 @@
 /* Вкладки галереи: выбранная в скруглённой стеклянной подложке. */
 .ptabs {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
+  width: 100%;
   min-width: 0;
+  container-type: inline-size;
   padding-block: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
@@ -14,7 +17,7 @@
   flex-shrink: 0;
   align-items: center;
   height: var(--size-control);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
@@ -44,61 +47,39 @@
   outline-offset: calc(var(--hairline) * -1);
 }
 
-@media (max-width: 440px) {
-  .ptabs__tab {
-    font-size: var(--font-size-md);
-    padding-inline: var(--space-2);
-  }
-}
-
-@media (max-width: 380px) {
-  .ptabs__label {
-    padding-inline: var(--space-1);
-  }
-
-  .ptabs__tab > svg {
-    display: none;
-  }
-}
-
 .ptabs--fit {
-  width: 100%;
-  container-type: inline-size;
   justify-content: space-between;
   gap: 0;
 }
 
-.ptabs--fit .ptabs__tab {
-  justify-content: center;
-  padding-inline: clamp(var(--space-1), calc(100cqi / 16 - var(--space-4)), var(--space-4));
-}
-
 @container (max-width: 456px) {
-  .ptabs--fit .ptabs__tab {
+  .ptabs__tab {
     font: var(--type-label);
+    padding-inline: clamp(var(--space-1), calc(100cqi / 16 - var(--space-4)), var(--space-3));
   }
 
-  .ptabs--fit .ptabs__label {
+  .ptabs__label {
     padding-inline: var(--space-1);
-  }
-
-  .ptabs--fit .ptabs__tab > svg {
-    display: block;
-    font-size: var(--size-icon-sm);
   }
 }
 
 @container (max-width: 376px) {
-  .ptabs--fit .ptabs__tab {
-    font-size: var(--font-size-sm);
-  }
-
-  [data-pm] .ptabs--fit .ptabs__tab > .badge {
+  [data-pm] .ptabs__tab > .badge {
     min-width: var(--space-4);
     height: var(--space-4);
     padding-inline: calc(var(--space-1) / 2);
     font: var(--type-meta);
     font-weight: var(--font-weight-semibold);
+  }
+}
+
+@container (max-width: 351px) {
+  .ptabs__tab {
+    font-size: var(--font-size-sm);
+  }
+
+  .ptabs__tab > svg {
+    font-size: var(--size-icon-sm);
   }
 }
 

@@ -22,8 +22,20 @@ interface PhotoTabsProps {
   stories: number;
 }
 
-/** Разделы галереи с количеством фото, альбомов и историй. */
-export function PhotoTabs({ value, onChange, photos, albums, stories, fit = false }: PhotoTabsProps) {
+interface MediaTab<T extends string> {
+  id: T;
+  label: string;
+  count: number;
+  Icon: typeof IconImage;
+}
+
+export function MediaTabs<T extends string>({ value, onChange, tabs, label, fit = false }: {
+  value: T;
+  onChange: (value: T) => void;
+  tabs: readonly MediaTab<T>[];
+  label: string;
+  fit?: boolean;
+}) {
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const list = row.current;
@@ -33,10 +45,10 @@ export function PhotoTabs({ value, onChange, photos, albums, stories, fit = fals
     const button = selected.getBoundingClientRect();
     if (button.left < bounds.left) list.scrollLeft += button.left - bounds.left;
     if (button.right > bounds.right) list.scrollLeft += button.right - bounds.right;
-  }, [value, photos, albums, stories]);
+  }, [value, tabs]);
 
   const moveFocus = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const count = PHOTO_VIEWS.length;
+    const count = tabs.length;
     let next: number;
     switch (event.key) {
       case 'Home': next = 0; break;
@@ -47,16 +59,11 @@ export function PhotoTabs({ value, onChange, photos, albums, stories, fit = fals
     }
     event.preventDefault();
     row.current?.querySelectorAll('button')[next]?.focus({ preventScroll: true });
-    onChange(PHOTO_VIEWS[next]);
+    onChange(tabs[next].id);
   };
 
-  const tabs: { id: PhotoView; label: string; count: number; Icon: typeof IconImage }[] = [
-    { id: 'photos', label: 'Фото', count: photos, Icon: IconImage },
-    { id: 'albums', label: 'Альбомы', count: albums, Icon: IconAlbum },
-    { id: 'stories', label: 'Истории', count: stories, Icon: IconStories },
-  ];
   return (
-    <div ref={row} className={fit ? 'ptabs ptabs--fit' : 'ptabs'} role="tablist" aria-label="Раздел фото" data-hscroll>
+    <div ref={row} className={fit ? 'ptabs ptabs--fit' : 'ptabs'} role="tablist" aria-label={label} data-hscroll>
       {tabs.map(({ id, label, count, Icon }, index) => (
         <button
           key={id}
@@ -68,11 +75,21 @@ export function PhotoTabs({ value, onChange, photos, albums, stories, fit = fals
           onClick={() => onChange(id)}
           onKeyDown={(event) => moveFocus(event, index)}
         >
-          <Icon />
+          <Icon aria-hidden="true" />
           <span className="ptabs__label">{label}</span>
           <Badge count={count} showZero variant={value === id ? 'inverse' : 'neutral'} />
         </button>
       ))}
     </div>
   );
+}
+
+/** Разделы собственной галереи с количеством фото, альбомов и историй. */
+export function PhotoTabs({ value, onChange, photos, albums, stories, fit }: PhotoTabsProps) {
+  const tabs: MediaTab<PhotoView>[] = [
+    { id: 'photos', label: 'Фото', count: photos, Icon: IconImage },
+    { id: 'albums', label: 'Альбомы', count: albums, Icon: IconAlbum },
+    { id: 'stories', label: 'Истории', count: stories, Icon: IconStories },
+  ];
+  return <MediaTabs value={value} onChange={onChange} tabs={tabs} label="Раздел фото" fit={fit} />;
 }

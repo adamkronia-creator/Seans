@@ -424,23 +424,12 @@
   border-radius: 0;
 }
 
-/* Как в Telegram: вкладки — отдельная стеклянная капсула, а содержимое («Истории», «Медиа») идёт под ней на всю ширину экрана без общей рамки */
+/* Вкладки материалов и содержимое располагаются на фоне профиля. */
 [data-pm] .ct__tabs-block {
   gap: var(--space-2);
   padding: 0;
   border: 0;
   background: none;
-}
-
-[data-pm] .ct__tabs {
-  padding-block: var(--space-1);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  background: var(--glass-card);
-}
-
-[data-pm] .screen-header__chips.ct__chips {
-  margin: 0;
 }
 
 /* Итоги (сеансы, тесты, задания): подложка у самих ячеек, а у карточки её нет — иначе стекло ложится дважды и панель темнее остальных */

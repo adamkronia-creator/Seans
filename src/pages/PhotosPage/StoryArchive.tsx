@@ -53,7 +53,7 @@ function StoryFolderContents({ folder, stories, onClose }: { folder: StoryFolder
   );
 }
 
-export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery?: { headerHost: HTMLElement | null } }) {
+export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery?: { chromeHost: HTMLElement | null } }) {
   const stories = useOwnStories().slice().reverse();
   const folders = useStoryFolders();
   const folder = folders.find(({ id }) => id === folderId);
@@ -73,10 +73,21 @@ export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery
     </header>
   );
 
+  const fab = (!folderId || folder) && (
+    <button
+      type="button"
+      className="ph__fab"
+      aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
+      onClick={folder ? () => setSheet('pick') : media.compose}
+    >
+      <IconPlusLine />
+    </button>
+  );
+
   return (
     <section ref={gallery ? undefined : root} className="fp ph">
-      {gallery ? gallery.headerHost && createPortal(header, gallery.headerHost) : header}
-      <div className="fp__scroll ph__scroll">
+      {gallery ? gallery.chromeHost && createPortal(<>{header}{fab}</>, gallery.chromeHost) : header}
+      <div className={gallery ? 'ph-gallery__content' : 'fp__scroll ph__scroll'}>
         {!folderId && (
           <ul className="ph__albums" aria-label="Папки историй">
             <li>
@@ -114,16 +125,7 @@ export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery
           )
         )}
       </div>
-      {(!folderId || folder) && (
-        <button
-          type="button"
-          className="ph__fab"
-          aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
-          onClick={folder ? () => setSheet('pick') : media.compose}
-        >
-          <IconPlusLine />
-        </button>
-      )}
+      {!gallery && fab}
       {(sheet === 'new' || (sheet === 'name' && folder)) && (
         <CollectionNameSheet
           title={folder ? 'Название папки' : 'Новая папка'}

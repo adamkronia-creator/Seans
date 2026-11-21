@@ -31,7 +31,7 @@ interface PhotosPageProps {
   /** Вкладка («Фото» или «Альбомы») или открытый альбом */
   view: Exclude<PhotoView, 'stories'> | 'album';
   albumId?: string;
-  gallery?: { headerHost: HTMLElement | null };
+  gallery?: { chromeHost: HTMLElement | null };
 }
 
 interface TileProps {
@@ -260,20 +260,22 @@ export function PhotosPage({ view, albumId, gallery }: PhotosPageProps) {
     </header>
   );
 
+  const fab = !selecting && (view !== 'album' || album) && (
+    <button
+      type="button"
+      className="ph__fab"
+      aria-label={view === 'photos' ? 'Добавить фото' : view === 'albums' ? 'Новый альбом' : 'Фото в альбоме'}
+      onClick={() => (view === 'photos' ? input.current?.click() : view === 'albums' ? setSheet('new') : setSheet('pick'))}
+    >
+      <IconPlusLine />
+    </button>
+  );
+
   return (
     <section ref={gallery ? undefined : root} className="fp ph" data-no-swipe={selecting || undefined}>
-      {gallery ? gallery.headerHost && createPortal(header, gallery.headerHost) : header}
-      <div className="fp__scroll ph__scroll">{body}</div>
-      {!selecting && (view !== 'album' || album) && (
-        <button
-          type="button"
-          className="ph__fab"
-          aria-label={view === 'photos' ? 'Добавить фото' : view === 'albums' ? 'Новый альбом' : 'Фото в альбоме'}
-          onClick={() => (view === 'photos' ? input.current?.click() : view === 'albums' ? setSheet('new') : setSheet('pick'))}
-        >
-          <IconPlusLine />
-        </button>
-      )}
+      {gallery ? gallery.chromeHost && createPortal(<>{header}{fab}</>, gallery.chromeHost) : header}
+      <div className={gallery ? 'ph-gallery__content' : 'fp__scroll ph__scroll'}>{body}</div>
+      {!gallery && fab}
 
       <input ref={input} type="file" accept="image/*" multiple hidden onChange={onFiles} />
       {toast && <Toast text={toast} />}

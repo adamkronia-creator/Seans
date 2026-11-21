@@ -175,7 +175,9 @@ mask * {
 
 /* Ряды, которые сами прокручиваются вбок, остаются на браузере */
 .screen .screen-header__chips,
-.screen .screen-header__chips * {
+.screen .screen-header__chips *,
+.screen .ptabs,
+.screen .ptabs * {
   touch-action: pan-x pan-y pinch-zoom;
 }
 
