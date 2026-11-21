@@ -11,6 +11,7 @@ import { FilterSheet } from '../../components/LibraryFilters/FilterSheet';
 import { ResultsBar, type FilterToken } from '../../components/LibraryFilters/ResultsBar';
 import { SuggestPanel, type QuickPick } from '../../components/LibraryFilters/SuggestPanel';
 import { LibraryCard } from '../../components/LibraryCard/LibraryCard';
+import { SearchField } from '../../components/SearchField/SearchField';
 import { ScreenHeader } from '../../components/ScreenHeader/ScreenHeader';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -50,6 +51,8 @@ import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 import './LibraryPage.pm.css';
+import { TestCatalogHeader, TestCatalogResults, type CatalogLayout } from './TestCatalog';
+import './TestCatalog.css';
 
 type Noun = [string, string, string];
 
@@ -125,6 +128,7 @@ interface ListProps {
   onOpen: (item: LibraryItem) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
+  catalogView?: { heading: string; layout: CatalogLayout; onLayout: (layout: CatalogLayout) => void };
 }
 
 /** Страница пейджера: выбранные фильтры и пояснения над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
@@ -167,11 +171,14 @@ function LibraryList(p: ListProps) {
   let body;
   if (total > 0) {
     body = (
-      <ul ref={rows} className="library-page__list">
+      <ul ref={rows} className={`library-page__list${p.catalogView?.layout === 'cards' ? ' library-page__list--cards' : ''}`}>
         {listing.ids.slice(0, shown).map((id) => {
           const entry = catalog.byId.get(id);
           if (!entry) return null;
           const hit = search?.hits.get(id);
+          const [min, max] = entry.d.minutes ?? [];
+          const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
+          const facts = p.catalogView ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
           const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
           return (
             <LibraryCard
@@ -179,7 +186,7 @@ function LibraryList(p: ListProps) {
               test={entry.item}
               favorite={ctx.favorites.has(id)}
               onClick={p.onOpen}
-              facts={entry.d.line.join(' · ') || undefined}
+              facts={facts.join(' · ') || undefined}
               why={why}
               marks={search?.words}
               pinned={p.pinned.has(id)}
@@ -227,6 +234,7 @@ function LibraryList(p: ListProps) {
   return (
     <div ref={scroller} className="library-page__page">
       {(ctx.scope.length > 0 || marked) && <ResultsBar tokens={p.tokens} onResetFilters={p.onResetFilters} notes={notes} />}
+      {p.catalogView && <TestCatalogResults {...p.catalogView} count={describe(total)} />}
       {body}
       {shown < total && <div ref={more} className="library-page__more" aria-hidden="true" />}
     </div>
@@ -243,6 +251,9 @@ function LibraryList(p: ListProps) {
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
 export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, pinned, onSetFavorites, onSetPinned, onOpen, labels, chatLike }: LibraryPageProps) {
+  const catalogDesign = kind === 'test' && !!chatLike;
+  const showRecentSection = catalogDesign || !chatLike;
+  const [layout, setLayout] = useState<CatalogLayout>('cards');
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -256,6 +267,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     return guardBack(() => {
       setQuery(kind, '');
       setSearching(false);
+      input.current?.blur();
     });
   }, [searching, kind]);
   const client = useClientData();
@@ -272,8 +284,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
   /** Разделы по порядку чипсов: по ним же идут страницы. Папки — после «Все», «Избранного» и «Недавнего» */
-  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...pagerFolders.map((f) => f.id)], [pagerFolders, chatLike]);
-  const liveOrder = ['all', FAVORITES, ...(chatLike ? [] : [RECENT]), ...folders.map((f) => f.id)].join('|');
+  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(showRecentSection ? [RECENT] : []), ...pagerFolders.map((f) => f.id)], [pagerFolders, showRecentSection]);
+  const liveOrder = ['all', FAVORITES, ...(showRecentSection ? [RECENT] : []), ...folders.map((f) => f.id)].join('|');
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = sections.join('|');
 
@@ -407,10 +419,18 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             onOpen={tap}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
+            catalogView={catalogDesign ? {
+              heading: normalize(query) ? 'Результаты поиска' :
+                id === 'all' ? labels.all :
+                id === FAVORITES ? 'Избранное' :
+                id === RECENT ? 'Недавние тесты' : folders.find((folder) => folder.id === id)?.name ?? labels.all,
+              layout,
+              onLayout: setLayout,
+            } : undefined}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout, folders],
   );
 
   const onDrag = useCallback(
@@ -466,7 +486,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     <>
             <Chip {...chip('all', labels.all)}>Все</Chip>
             <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
-            {!chatLike && <Chip {...chip(RECENT, 'Недавнее')}>Недавнее</Chip>}
+            {showRecentSection && <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>}
             {folders.map(({ id, name, color, ink, badge }) => (
               <Chip key={id} {...chip(id, name)} folder={{ scope, id }} paint={{ color, ink, badge }}>
                 {name}
@@ -477,12 +497,13 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const filterButton = (
     <button
       type="button"
-      className={`${chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
+      className={`${catalogDesign ? 'catalog-shortcut' : chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
       aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
       aria-haspopup="dialog"
       onClick={() => setSheet('filters')}
     >
-      <IconSliders />
+      <IconSliders aria-hidden="true" />
+      {catalogDesign && 'Фильтры'}
       {activeCount > 0 && (
         <span className="library-page__tile-badge">
           <Badge count={activeCount} />
@@ -513,9 +534,53 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     return () => watch.disconnect();
   }, [chatLike, index, order, liveOrder, searching]);
 
+  const suggestions = showSuggest && (
+    <SuggestPanel
+      history={view.history}
+      picks={picks}
+      onHistory={(h) => {
+        setQuery(kind, h);
+        rememberQuery(kind, h);
+        input.current?.blur();
+      }}
+      onForget={(h) => forgetQuery(kind, h)}
+      onClearHistory={() => clearHistory(kind)}
+      onPick={applyPick}
+    />
+  );
+
   return (
-    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
-      {chatLike ? (
+    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
+      {catalogDesign ? (
+        <TestCatalogHeader
+          title={title}
+          catalog={catalog}
+          filters={view.filters}
+          onToggle={(facet, option) => toggleOption(kind, facet, option)}
+          search={
+            <SearchField
+              value={view.query}
+              onChange={(value) => setQuery(kind, value)}
+              placeholder={searchPlaceholder}
+              onClear={() => setQuery(kind, '')}
+              inputRef={input}
+              onFocus={() => {
+                setFocused(true);
+                setSearching(true);
+              }}
+              onBlur={() => {
+                setFocused(false);
+                if (!readLibraryView(kind).query) setSearching(false);
+              }}
+              onKeyDown={onKeyDown}
+            />
+          }
+          suggestions={suggestions}
+          filterButton={filterButton}
+          folders={chipNodes}
+          selection={sel.header()}
+        />
+      ) : chatLike ? (
         <ChatsHeader
           searching={searching}
           onSearching={setSearching}
@@ -554,20 +619,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
 
       <div className="library-page__body">
         <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => (d > 0 ? switchTab(nextTab, 'slide-next') : prevTab && switchTab(prevTab, 'slide-prev')) : undefined} />
-        {showSuggest && (
-          <SuggestPanel
-            history={view.history}
-            picks={picks}
-            onHistory={(h) => {
-              setQuery(kind, h);
-              rememberQuery(kind, h);
-              input.current?.blur();
-            }}
-            onForget={(h) => forgetQuery(kind, h)}
-            onClearHistory={() => clearHistory(kind)}
-            onPick={applyPick}
-          />
-        )}
+        {!catalogDesign && suggestions}
       </div>
 
       {sheet === 'filters' && (
