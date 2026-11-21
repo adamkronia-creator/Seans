@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 import { Badge } from '../Badge/Badge';
 import { IconAlbum, IconImage, IconStories } from './ProfileIcons';
 import './PhotoTabs.css';
@@ -34,6 +34,21 @@ export function PhotoTabs({ value, onChange, photos, albums, stories }: PhotoTab
     if (button.right > bounds.right) list.scrollLeft += button.right - bounds.right;
   }, [value, photos, albums, stories]);
 
+  const moveFocus = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const count = PHOTO_VIEWS.length;
+    let next: number;
+    switch (event.key) {
+      case 'Home': next = 0; break;
+      case 'End': next = count - 1; break;
+      case 'ArrowLeft': next = (index + count - 1) % count; break;
+      case 'ArrowRight': next = (index + 1) % count; break;
+      default: return;
+    }
+    event.preventDefault();
+    row.current?.querySelectorAll('button')[next]?.focus({ preventScroll: true });
+    onChange(PHOTO_VIEWS[next]);
+  };
+
   const tabs: { id: PhotoView; label: string; count: number; Icon: typeof IconImage }[] = [
     { id: 'photos', label: 'Фото', count: photos, Icon: IconImage },
     { id: 'albums', label: 'Альбомы', count: albums, Icon: IconAlbum },
@@ -41,8 +56,17 @@ export function PhotoTabs({ value, onChange, photos, albums, stories }: PhotoTab
   ];
   return (
     <div ref={row} className="ptabs" role="tablist" aria-label="Раздел фото" data-hscroll>
-      {tabs.map(({ id, label, count, Icon }) => (
-        <button key={id} type="button" role="tab" className="ptabs__tab" aria-selected={value === id} onClick={() => onChange(id)}>
+      {tabs.map(({ id, label, count, Icon }, index) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          className="ptabs__tab"
+          aria-selected={value === id}
+          tabIndex={value === id ? 0 : -1}
+          onClick={() => onChange(id)}
+          onKeyDown={(event) => moveFocus(event, index)}
+        >
           <Icon />
           <span className="ptabs__label">{label}</span>
           <Badge count={count} showZero variant={value === id ? 'inverse' : 'neutral'} />

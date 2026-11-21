@@ -1,4 +1,4 @@
-import { LIBRARY, setFavorites, setPinned, toggleFavorite, useFavorites, usePinned } from '../../data/library';
+import { LIBRARY, setFavorites, setPinned, useFavorites, usePinned } from '../../data/library';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
 
@@ -12,7 +12,6 @@ export function TestsPage() {
       searchPlaceholder="Поиск по тестам"
       items={LIBRARY}
       favorites={useFavorites()}
-      onToggleFavorite={toggleFavorite}
       pinned={usePinned()}
       onSetFavorites={setFavorites}
       onSetPinned={setPinned}

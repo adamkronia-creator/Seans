@@ -15,6 +15,17 @@ export function colorPixels(color: string, scope: Element = document.documentEle
   return ctx.getImageData(0, 0, 1, 1).data;
 }
 
+/** Относительная яркость sRGB для сравнения контраста текста. */
+export function relativeLuminance(r: number, g: number, b: number): number {
+  const linear = (channel: number) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+}
+
+export const prefersDarkInk = (luminance: number): boolean => luminance >= Math.sqrt(0.05 * 1.05) - 0.05;
+
 const contrastInk = new Map<string, string>();
 
 /** Выбирает белый или чёрный по максимальному контрасту с заливкой палитры. */
@@ -22,12 +33,7 @@ export function inkOn(color: string): string {
   const cached = contrastInk.get(color);
   if (cached) return cached;
   const [r, g, b] = colorPixels(color);
-  const linear = (channel: number) => {
-    const value = channel / 255;
-    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  };
-  const luminance = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
-  const ink = luminance > Math.sqrt(0.05 * 1.05) - 0.05 ? 'var(--palette-black)' : 'var(--palette-white)';
+  const ink = prefersDarkInk(relativeLuminance(r, g, b)) ? 'var(--palette-black)' : 'var(--palette-white)';
   contrastInk.set(color, ink);
   return ink;
 }

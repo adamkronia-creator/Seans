@@ -39,7 +39,7 @@
   /* Область нажатия 44 на 8 шире подписи по бокам; видимые отступы прежние */
   margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1) calc(var(--space-3) * -1) auto;
   padding: var(--space-3) var(--space-2);
-  color: var(--action-primary);
+  color: var(--text-link);
   font: var(--type-label);
 }
 

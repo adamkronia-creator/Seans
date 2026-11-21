@@ -3,7 +3,7 @@
  * Всё хранится в localStorage и применяется при запуске. Цвет текста «авто» считается по яркости фона: на тёмном фоне текст белый,
  * на светлом тёмный (атрибут data-ink на <html>: dark — тёмный текст, light — белый).
  */
-import { colorPixels } from './color';
+import { colorPixels, prefersDarkInk, relativeLuminance } from './color';
 import dawn from '../assets/bg-default.webp';
 import { TONES, type ToneId } from '../data/tones';
 
@@ -17,8 +17,6 @@ const K_RESET = 'seans-bg-default-2';
 const K_LIST = 'seans-bg-list';
 const MAX_SAVED = 8;
 const MAX_SIDE = 1600;
-/** Средняя яркость фона (0…1) ниже этого порога — текст белый */
-const DARK_BELOW = 0.5;
 
 export type InkPref = 'auto' | 'dark' | 'light';
 const DEFAULT_BLUR = 60;
@@ -46,7 +44,8 @@ export const getBlur = () => {
 };
 export const getInkPref = (): InkPref => {
   const v = get(K_INK);
-  return v === 'dark' || v === 'light' || v === 'auto' ? v : 'light';
+  if (v === 'dark' || v === 'light' || v === 'auto') return v;
+  return get(K_IMAGE) || getBackgroundColor() ? 'auto' : 'light';
 };
 
 export function getBackgroundColor() {
@@ -83,7 +82,7 @@ async function luminanceOf(src: string): Promise<number> {
   ctx.drawImage(img, 0, 0, w, h);
   const d = ctx.getImageData(0, 0, w, h).data;
   let sum = 0;
-  for (let i = 0; i < d.length; i += 4) sum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+  for (let i = 0; i < d.length; i += 4) sum += relativeLuminance(d[i], d[i + 1], d[i + 2]);
   return sum / (d.length / 4);
 }
 
@@ -91,7 +90,7 @@ async function luminanceOf(src: string): Promise<number> {
 async function sceneLuminance(): Promise<number> {
   if (root().dataset.bg === 'solid') {
     const [r, g, b] = colorPixels('var(--user-bg-color)');
-    return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return relativeLuminance(r, g, b);
   }
   const custom = get(K_IMAGE);
   if (custom) return luminanceOf(custom);
@@ -152,7 +151,7 @@ async function applyInk() {
   let ink = pref === 'auto' ? 'dark' : pref;
   if (pref === 'auto') {
     try {
-      if ((await sceneLuminance()) < DARK_BELOW) ink = 'light';
+      ink = prefersDarkInk(await sceneLuminance()) ? 'dark' : 'light';
     } catch {
       // Остаётся тёмный текст.
     }

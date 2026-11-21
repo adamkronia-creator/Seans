@@ -11,6 +11,10 @@
   color: inherit;
 }
 
+[data-pm] .lib-mark {
+  color: var(--palette-blue-pressed);
+}
+
 /* ——— Над списком: выбранные фильтры и пояснения ——— */
 
 .results-bar {

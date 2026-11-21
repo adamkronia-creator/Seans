@@ -60,7 +60,6 @@ interface LibraryPageProps {
   searchPlaceholder: string;
   items: LibraryItem[];
   favorites: ReadonlySet<string>;
-  onToggleFavorite: (id: string) => void;
   /** Закреплённые: идут в списке первыми */
   pinned: ReadonlySet<string>;
   /** Добавить в избранное или убрать сразу несколько (выбор в списке) */
@@ -123,7 +122,6 @@ interface ListProps {
   pinned: ReadonlySet<string>;
   selected: readonly string[];
   onHold: (item: LibraryItem) => void;
-  onToggleFavorite: (id: string) => void;
   onOpen: (item: LibraryItem) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
@@ -180,7 +178,6 @@ function LibraryList(p: ListProps) {
               key={id}
               test={entry.item}
               favorite={ctx.favorites.has(id)}
-              onToggleFavorite={p.onToggleFavorite}
               onClick={p.onOpen}
               facts={entry.d.line.join(' · ') || undefined}
               why={why}
@@ -245,7 +242,7 @@ function LibraryList(p: ListProps) {
  * Поверх любого раздела работают поиск по словам и фильтры (лист «Фильтры»); выбранные фильтры и пояснения к выдаче стоят над списком.
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
-export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, onToggleFavorite, pinned, onSetFavorites, onSetPinned, onOpen, labels, chatLike }: LibraryPageProps) {
+export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, pinned, onSetFavorites, onSetPinned, onOpen, labels, chatLike }: LibraryPageProps) {
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -407,14 +404,13 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             pinned={pinned}
             selected={sel.ids}
             onHold={sel.hold}
-            onToggleFavorite={onToggleFavorite}
             onOpen={tap}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, onToggleFavorite, tap, relax, kind, pinned, sel.ids, sel.hold],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold],
   );
 
   const onDrag = useCallback(
@@ -518,7 +514,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   }, [chatLike, index, order, liveOrder, searching]);
 
   return (
-    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined}>
+    <section ref={root} className={chatLike ? `library-page messages${recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={searching}

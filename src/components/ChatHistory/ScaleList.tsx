@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import '../TestSettings/TestConclusion.css';
 import './ScaleList.css';
@@ -64,6 +64,7 @@ function groupScales(scales: ConclusionScale[], grouping?: ScaleGrouping): Concl
 
 export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; onOpen: () => void; grouping?: ScaleGrouping }) {
   const [open, setOpen] = useState(false);
+  const restId = useId();
   const scales = groupScales(data.scales, grouping).filter((group) => group.length > 0).flatMap((group, groupIndex) =>
     group.map((scale, index) => ({
       scale,
@@ -87,7 +88,7 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
       >
         {head.map(renderScale)}
         {rest.length > 0 && (
-          <li className={`hist-scales__rest${open ? ' hist-scales__rest--open' : ''}`}>
+          <li id={restId} aria-hidden={!open} className={`hist-scales__rest${open ? ' hist-scales__rest--open' : ''}`}>
             <ul className="hist-scales__list hist-scales__list--rest">
               {rest.map(renderScale)}
             </ul>
@@ -96,7 +97,7 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
       </ul>
       {long && !grouping && <hr className="hist-scales__rule" />}
       {long && (
-        <button type="button" className="hist-scales__toggle" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <button type="button" className="hist-scales__toggle" aria-expanded={open} aria-controls={restId} onClick={() => setOpen(!open)}>
           {open ? 'Скрыть' : `Читать далее (ещё ${scales.length - SCALES_SHOWN})`}
         </button>
       )}

@@ -70,7 +70,8 @@
   padding: var(--space-2) var(--space-6);
   border: 0;
   background: none;
-  color: var(--action-primary);
+  min-height: var(--size-touch);
+  color: var(--text-link, var(--action-primary));
   font: var(--type-label);
 }
 

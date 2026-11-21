@@ -35,7 +35,7 @@ const INKS: { id: InkPref; label: string }[] = [
 export function BackgroundControls() {
   const file = useRef<HTMLInputElement>(null);
   const [blur, setBlurState] = useState(getBlur);
-  const [ink, setInk] = useState<InkPref>(getInkPref);
+  const ink = getInkPref();
   const [failed, setFailed] = useState(false);
   const [, setTick] = useState(0);
   const refresh = () => setTick((n) => n + 1);
@@ -181,8 +181,8 @@ export function BackgroundControls() {
               aria-checked={ink === id}
               className={`bg-sheet__seg-item${ink === id ? ' is-on' : ''}`}
               onClick={() => {
-                setInk(id);
                 setInkPref(id);
+                refresh();
               }}
             >
               {label}

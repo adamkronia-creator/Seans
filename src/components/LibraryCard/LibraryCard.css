@@ -32,12 +32,9 @@
   height: 32px;
 }
 
-/* Название как имя чата: 16, насыщенное, в одну строку; длинное обрезается многоточием в конце */
 .lib-card .test-card__title {
   display: block;
-  font-size: var(--font-size-lg);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 /* Сердечко «в избранное» сидит на краю значка в круге на месте метки «в сети» (размер и положение — токены --presence-*, см. LibraryPage.pm.css):
@@ -54,20 +51,9 @@
   line-height: 0;
 }
 
-.lib-card__heart::after {
-  content: '';
-  position: absolute;
-  inset: calc(var(--space-2) * -1);
-}
-
 .lib-card__heart svg {
   width: var(--space-3);
   height: var(--space-3);
-}
-
-/* Не в избранном: сердечко бледнее, чтобы красные выделялись, а список не пестрел серыми */
-.lib-card__heart[aria-pressed='false'] svg {
-  opacity: 0.45;
 }
 
 /* Сведения и пояснение: мелкие строки под описанием */

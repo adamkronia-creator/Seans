@@ -26,11 +26,6 @@
   height: var(--space-10);
 }
 
-/* Без недавних тестов ряда нет, и шапка ниже на его высоту */
-.messages.library-page--bare {
-  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
-}
-
 /* Страница списка прокручивается под шапкой и над панелью, как список чатов */
 .library-page.messages .library-page__page {
   gap: 0;
@@ -77,12 +72,9 @@
 }
 
 [data-pm] .lib-card .test-card__title {
-  overflow: hidden;
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 [data-pm] .lib-card .test-card__description,
@@ -96,12 +88,6 @@
 [data-pm] .lib-card .lib-card__facts,
 [data-pm] .lib-card .lib-card__why {
   font: var(--type-caption);
-}
-
-/* Сердечко на значке: стеклянный кружок вместо белого */
-[data-pm] .lib-card__heart {
-  border: 1px solid var(--glass-border);
-  background: var(--glass-solid);
 }
 
 /* Фильтры в шапке: выбранные — синее стекло, с числом выбранного */
@@ -155,19 +141,9 @@
   stroke: none;
 }
 
-/* Сердечко в списке — только метка «в избранном»: избранное переключается в шапке настройки теста. У теста не в избранном кнопки нет вовсе:
-   невидимая, она с областью нажатия шире кружка на 8 (::after) ловила тап по углу значка и молча добавляла тест в избранное вместо открытия.
-   У отмеченного метка нажатий не принимает, тап по значку открывает тест, как по остальной строке */
-[data-pm] .lib-card__heart[aria-pressed='false'] {
-  display: none;
-}
-
+/* Тап по значку открывает сам материал. */
 [data-pm] .lib-card__heart {
   pointer-events: none;
-}
-
-[data-pm] .lib-card__heart::after {
-  display: none;
 }
 
 [data-pm] .lib-card--fav .test-card__avatar {
@@ -309,11 +285,6 @@
 /* Пока выбирают, под кнопкой «Отправить» остаётся место: последние строки не прячутся под ней */
 .library-page[data-selecting] .library-page__page {
   padding-bottom: calc(var(--pm-bottom) + var(--size-touch) + var(--space-4));
-}
-
-/* История сворачивается: шапка ниже на высоту ряда недавних */
-.messages.library-page[data-selecting] {
-  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
 }
 
 /* Сердечко в шапке выбора — то же, что в карточке теста (серое / красное), крупнее под кнопку 40 */

@@ -12,6 +12,7 @@
 }
 
 .search-field__icon {
+  display: flex;
   flex-shrink: 0;
   font-size: var(--size-icon-sm);
 }

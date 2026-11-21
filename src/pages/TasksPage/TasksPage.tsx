@@ -1,4 +1,4 @@
-import { setTaskFavorites, setTaskPinned, TASK_LIBRARY, toggleTaskFavorite, useTaskFavorites, useTaskPinned } from '../../data/library';
+import { setTaskFavorites, setTaskPinned, TASK_LIBRARY, useTaskFavorites, useTaskPinned } from '../../data/library';
 import { hasTaskSettings } from '../../data/taskValues';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
@@ -13,7 +13,6 @@ export function TasksPage() {
       searchPlaceholder="Поиск по заданиям"
       items={TASK_LIBRARY}
       favorites={useTaskFavorites()}
-      onToggleFavorite={toggleTaskFavorite}
       pinned={useTaskPinned()}
       onSetFavorites={setTaskFavorites}
       onSetPinned={setTaskPinned}

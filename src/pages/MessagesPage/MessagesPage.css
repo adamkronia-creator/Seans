@@ -138,7 +138,7 @@
   height: var(--size-control);
   /* Справа поля нет: текст «Отмена» стоит в 16 от края экрана, как все значки шапки */
   padding: 0 0 0 var(--space-2);
-  color: var(--action-primary);
+  color: var(--text-link);
   font: var(--type-body);
 }
 
@@ -213,9 +213,24 @@
   flex: 1;
   flex-direction: column;
   padding: var(--pm-top) 0 var(--pm-bottom);
+  overflow-y: auto;
 }
 
-/* Истории сворачиваются, когда идёт выбор чатов: высота плавно уходит в ноль вместе с зазором под ними, список поднимается следом */
+.messages__empty-action {
+  min-height: var(--size-touch);
+  margin-block-start: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--glass-card);
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+.messages__empty-action[data-pressed] {
+  background: var(--glass-strong);
+}
+
+/* Истории сворачиваются при поиске и выборе чатов: высота плавно уходит в ноль вместе с зазором под ними, список поднимается следом */
 .chats-header__belt {
   display: grid;
   grid-template-rows: 1fr;
@@ -233,17 +248,18 @@
   opacity: 0;
 }
 
-.messages[data-selecting] {
+.messages:is([data-selecting], [data-searching], .library-page--bare) {
   --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
 }
 
-.messages__list {
+:is(.messages__list, .messages__empty) {
   transition: padding-top var(--collapse-time) var(--collapse-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .chats-header__belt,
-  .messages__list {
+  .messages__list,
+  .messages__empty {
     transition: none;
   }
 }

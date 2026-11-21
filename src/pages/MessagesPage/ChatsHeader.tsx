@@ -56,11 +56,19 @@ export function ChatsHeader({
 }: ChatsHeaderProps) {
   const avatar = useAvatarSrc();
   const own = useRef<HTMLInputElement>(null);
+  const searchButton = useRef<HTMLButtonElement>(null);
+  const restoreSearchFocus = useRef(false);
+  const collapseBelt = searching || Boolean(selection) || belt === null;
   const input = inputRef ?? own;
   useEffect(() => {
     if (searching) (input as { current: HTMLInputElement | null }).current?.focus({ preventScroll: true });
+    else if (restoreSearchFocus.current) {
+      restoreSearchFocus.current = false;
+      searchButton.current?.focus({ preventScroll: true });
+    }
   }, [searching]);
   const close = () => {
+    restoreSearchFocus.current = true;
     onQuery('');
     onSearching(false);
   };
@@ -103,7 +111,7 @@ export function ChatsHeader({
             <span className="chats-header__name">{title}</span>
             <span className="chats-header__status">{status}</span>
           </span>
-          <button type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
+          <button ref={searchButton} type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
             <IconSearchMk />
           </button>
           {aside ?? (
@@ -113,7 +121,7 @@ export function ChatsHeader({
           )}
         </div>
       )}
-      <div className="chats-header__belt" data-collapsed={selection ? '' : undefined} aria-hidden={selection ? true : undefined} {...({ inert: selection ? '' : undefined } as object)}>
+      <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={collapseBelt || undefined} {...({ inert: collapseBelt ? '' : undefined } as object)}>
         <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
       </div>
       <div className="screen-header__chips" role="group" aria-label={chipsLabel}>

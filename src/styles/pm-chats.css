@@ -646,6 +646,7 @@ html:has([data-pm]) body {
   --icon-action: var(--palette-white);
   --text-link: color-mix(in srgb, var(--palette-blue) 45%, var(--palette-white));
   --action-secondary-text: var(--text-link);
+  --error-text: color-mix(in srgb, var(--palette-red) 42%, var(--palette-white));
   --border-subtle: color-mix(in srgb, var(--palette-white) 16%, transparent);
   --divider: color-mix(in srgb, var(--palette-white) 40%, transparent);
   --bg-canvas: color-mix(in srgb, var(--palette-black) 87%, var(--palette-white));

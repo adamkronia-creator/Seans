@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useLongPress } from '../../utils/useLongPress';
 import { useJustOn } from '../../utils/useJustOn';
-import { IconHeartGray, IconHeartRed } from '../icons';
+import { IconHeartRed } from '../icons';
 import { Highlight } from '../LibraryFilters/Highlight';
 import type { LibraryItem } from '../../data/library';
 import '../TestCard/TestCard.css';
@@ -10,7 +10,6 @@ import './LibraryCard.css';
 interface LibraryCardProps {
   test: LibraryItem;
   favorite: boolean;
-  onToggleFavorite: (id: string) => void;
   onClick?: (test: LibraryItem) => void;
   /** Строка сведений под описанием (у задания: «Дневник · КПТ · 5–7 мин на запись») — по ней материалы различают, не открывая */
   facts?: string;
@@ -26,15 +25,15 @@ interface LibraryCardProps {
   onLongPress?: (test: LibraryItem) => void;
 }
 
-/** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», справа сердечко «в избранное» (см. LibraryCard.css) */
-export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
+/** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
+export function LibraryCard({ test, favorite, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
   const newPin = useJustOn(pinned);
   return (
     <li className={`lib-card${favorite ? ' lib-card--fav' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
-      <button type="button" className="test-card" onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
+      <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />
         </span>
@@ -55,21 +54,14 @@ export function LibraryCard({ test, favorite, onToggleFavorite, onClick, facts, 
             )}
           </span>
           <span className="test-card__description">
+            {test.abbr && <><Highlight text={test.abbr} words={marks} /> · </>}
             <Highlight text={test.description} words={marks} />
           </span>
           {facts && <span className="lib-card__facts">{facts}</span>}
           {why && <span className="lib-card__why">{why}</span>}
         </span>
       </button>
-      <button
-        type="button"
-        className="lib-card__heart"
-        aria-label={favorite ? 'Убрать из избранного' : 'Добавить в избранное'}
-        aria-pressed={favorite}
-        onClick={() => onToggleFavorite(test.id)}
-      >
-        {favorite ? <IconHeartRed /> : <IconHeartGray />}
-      </button>
+      {favorite && <span className="lib-card__heart" aria-hidden="true"><IconHeartRed /></span>}
     </li>
   );
 }

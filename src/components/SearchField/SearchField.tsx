@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactNode, Ref } from 'react';
+import { useId, type KeyboardEvent, type ReactNode, type Ref } from 'react';
 import { IconClose } from '../ChatParts/ChatIcons';
 import { IconSearch } from '../icons';
 import './SearchField.css';
@@ -18,12 +18,17 @@ interface SearchFieldProps {
 }
 
 export function SearchField({ value, onChange, placeholder, trailing, onClear, inputRef, onFocus, onBlur, onKeyDown }: SearchFieldProps) {
+  const id = useId();
   const clearable = !!onClear && value !== '';
   return (
-    <label className={`search-field${trailing || clearable ? ' search-field--trailing' : ''}`}>
-      <IconSearch className="search-field__icon" />
+    <div className={`search-field${trailing || clearable ? ' search-field--trailing' : ''}`}>
+      <label htmlFor={id} className="search-field__icon">
+        <IconSearch aria-hidden="true" />
+        <span className="visually-hidden">{placeholder ?? 'Поиск'}</span>
+      </label>
       <input
         ref={inputRef}
+        id={id}
         className="search-field__input"
         type="search"
         value={value}
@@ -41,11 +46,20 @@ export function SearchField({ value, onChange, placeholder, trailing, onClear, i
       />
       {clearable && (
         // mousedown не отдаёт фокус кнопке: после очистки можно сразу печатать
-        <button type="button" className="search-field__clear" aria-label="Очистить запрос" onMouseDown={(e) => e.preventDefault()} onClick={onClear}>
+        <button
+          type="button"
+          className="search-field__clear"
+          aria-label="Очистить запрос"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            onClear();
+            document.getElementById(id)?.focus({ preventScroll: true });
+          }}
+        >
           <IconClose />
         </button>
       )}
       {trailing}
-    </label>
+    </div>
   );
 }

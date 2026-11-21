@@ -7,7 +7,7 @@ import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
-import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
+import { folderPath, useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { IconSearch } from '../../components/icons';
 import { IconComposeMk } from '../../components/ChatItem/ChatIcons';
 import { ChatsHeader } from './ChatsHeader';
@@ -39,6 +39,9 @@ const ChatList = memo(function ChatList({
   view,
   found,
   onOpenFound,
+  folderId,
+  onSearchEverywhere,
+  onClearQuery,
 }: {
   chats: Chat[];
   /** Публичные общие чаты и каналы, в которых вас нет, под строкой поиска: нажатие открывает страницу вступления */
@@ -52,6 +55,9 @@ const ChatList = memo(function ChatList({
   selected: readonly string[];
   /** Что показано сейчас (поисковый запрос): пока он тот же, перестановка строк — движение, а не замена списка */
   view: string;
+  folderId?: string;
+  onSearchEverywhere: () => void;
+  onClearQuery: () => void;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
@@ -128,6 +134,10 @@ const ChatList = memo(function ChatList({
   // Смена поиска заменяет набор строк целиком, поэтому двигать ничего не нужно
   useListMotion(rows, { attr: 'data-chat', view, leave: true });
 
+  useLayoutEffect(() => {
+    if (view && scroller.current) scroller.current.scrollTop = 0;
+  }, [view]);
+
   return chats.length > 0 || hasArchive || found.length > 0 ? (
     <div ref={scroller} className="messages__list">
       <ul ref={rows} className="messages__rows">
@@ -149,7 +159,21 @@ const ChatList = memo(function ChatList({
     </div>
   ) : (
     <div className="messages__empty">
-      <EmptyState icon={<IconSearch />} title="Ничего не найдено" text="В этом разделе нет подходящих чатов." />
+      <EmptyState
+        icon={<IconSearch />}
+        title={view ? 'Ничего не найдено' : folderId ? 'В папке пока нет чатов' : 'Пока нет чатов'}
+        text={view ? (folderId ? 'В этой папке нет подходящих чатов.' : 'Попробуйте поискать по имени или по тексту последнего сообщения.') : undefined}
+      >
+        {view ? (
+          <button type="button" className="messages__empty-action" onClick={folderId ? onSearchEverywhere : onClearQuery}>
+            {folderId ? 'Искать во всех чатах' : 'Очистить запрос'}
+          </button>
+        ) : folderId && (
+          <button type="button" className="messages__empty-action" onClick={() => navigate(folderPath(folderId))}>
+            Настроить папку
+          </button>
+        )}
+      </EmptyState>
     </div>
   );
 });
@@ -157,6 +181,7 @@ const ChatList = memo(function ChatList({
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const searchInput = useRef<HTMLInputElement>(null);
   // Системная «назад» закрывает поиск, а не уводит с вкладки
   useEffect(() => {
     if (!searching) return;
@@ -263,9 +288,35 @@ export function MessagesPage() {
     [toggle],
   );
 
+  const searchEverywhere = useCallback(() => {
+    setFilter('all');
+    root.current?.querySelector<HTMLButtonElement>('.screen-header__chips .chip')?.focus({ preventScroll: true });
+  }, []);
+  const clearQuery = useCallback(() => {
+    setQuery('');
+    searchInput.current?.focus({ preventScroll: true });
+  }, []);
+
   const pages = useMemo(
-    () => filters.map((id, i) => ({ key: id, node: <ChatList chats={lists[i]} archived={id === 'all' ? archived : []} onOpen={tapChat} onMenu={holdChat} selected={sel.ids} view={query.trim()} found={id === 'all' ? found : []} onOpenFound={openFound} /> })),
-    [filters, lists, archived, tapChat, holdChat, sel.ids, query, found, openFound],
+    () => filters.map((id, i) => ({
+      key: id,
+      node: (
+        <ChatList
+          chats={lists[i]}
+          archived={id === 'all' ? archived : []}
+          found={id === 'all' ? found : []}
+          folderId={id === 'all' ? undefined : id}
+          onOpen={tapChat}
+          onMenu={holdChat}
+          onOpenFound={openFound}
+          onSearchEverywhere={searchEverywhere}
+          onClearQuery={clearQuery}
+          selected={sel.ids}
+          view={query.trim()}
+        />
+      ),
+    })),
+    [filters, lists, archived, tapChat, holdChat, sel.ids, query, found, openFound, searchEverywhere, clearQuery],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -318,13 +369,14 @@ export function MessagesPage() {
   }, [index, order, liveOrder, countsKey, searching]);
 
   return (
-    <section ref={setRoot} className="messages" data-selecting={selecting ? '' : undefined}>
+    <section ref={setRoot} className="messages" data-selecting={selecting ? '' : undefined} data-searching={searching ? '' : undefined}>
       <ChatsHeader
         searching={searching}
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
         storiesRoot={screen}
+        inputRef={searchInput}
         selection={sel.header(chats)}
         chips={
           <>
