@@ -1,8 +1,16 @@
-/* Шапка и список каталога идут в потоке, а оформление берут у «Диалогов». */
+/* Поиск, недавние тесты и подборки стоят над выдачей на общем фоне приложения. */
 .catalog-library .chats-header {
   position: relative;
   flex: none;
   gap: var(--space-3);
+}
+
+[data-pm] .catalog-library .chats-header::before {
+  content: none;
+}
+
+.catalog-library .chats-header__belt[data-collapsed] {
+  margin-bottom: calc(var(--space-3) * -1);
 }
 
 .catalog-search {
@@ -23,70 +31,53 @@
   box-shadow: var(--glass-shadow-panel);
 }
 
-.catalog-controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.catalog-topics,
-.catalog-shortcuts {
-  display: flex;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--page-gutter);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.screen .catalog-library :is(.catalog-topics, .catalog-shortcuts),
-.screen .catalog-library :is(.catalog-topics, .catalog-shortcuts) * {
-  touch-action: pan-x pan-y pinch-zoom;
-}
-
-.catalog-topics {
+.catalog-library .recent-row {
   gap: var(--space-1);
+  height: calc(var(--space-12) + var(--space-4) + var(--space-2));
 }
 
-.catalog-topic {
-  display: flex;
-  flex: 1 0 var(--space-12);
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-2xs);
-  line-height: var(--space-4);
-  text-align: center;
+.catalog-library .recent-row .stories__cell {
+  flex: 0 0 max(var(--space-12), calc((100% - var(--space-1) * 5) / 6));
+  min-width: 0;
 }
 
-.catalog-topic .recent-row__avatar {
+.catalog-library .recent-row .stories__item {
+  width: 100%;
+}
+
+.catalog-library .recent-row :is(.stories__ring, .recent-row__avatar) {
   width: var(--space-12);
   height: var(--space-12);
 }
 
-.catalog-topic .recent-row__icon {
+.catalog-library .recent-row__icon {
   width: var(--space-8);
   height: var(--space-8);
-  object-fit: contain;
 }
 
-.catalog-library .catalog-topic[aria-pressed='true'] {
-  outline: none;
-  color: var(--text-primary);
-  font-weight: var(--font-weight-semibold);
+.catalog-library .recent-row .stories__label {
+  font-size: var(--font-size-2xs);
 }
 
-.catalog-topic[aria-pressed='true'] .recent-row__avatar {
-  outline: var(--active-ring-width) solid var(--text-link);
+.screen .catalog-library .recent-row,
+.screen .catalog-library .recent-row * {
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
-.catalog-library .catalog-topic:focus-visible {
-  border-radius: var(--radius-md);
-  box-shadow: var(--focus-ring);
+.catalog-library .chats-header__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline-start: var(--page-gutter);
 }
 
-.catalog-shortcut {
+[data-pm] .catalog-library .chats-header__filters .screen-header__chips {
+  flex: 1;
+  min-width: 0;
+  padding-inline-start: var(--space-1);
+}
+
+.catalog-filter-button {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -101,19 +92,18 @@
   white-space: nowrap;
 }
 
-.catalog-shortcut svg {
+.catalog-filter-button svg {
   flex: none;
   font-size: var(--size-icon-sm);
 }
 
-.catalog-shortcut[aria-pressed='true'],
-.catalog-shortcut.library-page__tile--on {
+.catalog-filter-button.library-page__tile--on {
   border-color: var(--glass-border-blue);
   background: var(--glass-chip-active);
   color: var(--action-primary-text);
 }
 
-.catalog-shortcut .library-page__tile-badge {
+.catalog-filter-button .library-page__tile-badge {
   position: static;
 }
 
@@ -195,61 +185,62 @@
   margin: 0;
 }
 
-/* Карточка повторяет порядок сведений из раздела «Опросники» в чате. */
 [data-pm] .catalog-library .library-page__list--cards .lib-card {
-  --size-avatar: var(--size-control);
   overflow: clip;
-  border: var(--hairline) solid var(--glass-border);
   border-radius: var(--radius-lg);
-  background: var(--glass-card);
-  contain-intrinsic-size: auto 112px;
+  contain-intrinsic-size: auto 224px;
 }
 
 [data-pm] .catalog-library .library-page__list--cards .test-card {
-  display: grid;
-  grid-template-columns: var(--size-avatar) minmax(0, 1fr);
-  gap: var(--space-2);
-  padding: var(--card-pad) var(--row-pad-x) var(--space-4);
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   border-radius: inherit;
 }
 
 [data-pm] .catalog-library .library-page__list--cards .test-card__avatar {
-  grid-area: 1 / 1;
-  width: var(--size-avatar);
-  height: var(--size-avatar);
+  width: 100%;
+  height: calc(var(--space-16) * 2);
+  border: 0;
+  border-radius: var(--radius-lg);
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+[data-pm] .catalog-library .library-page__list--cards .test-card__avatar::before {
+  inset: 0;
+  background: radial-gradient(ellipse at center, var(--tint), transparent 78%), color-mix(in oklab, var(--tint) 50%, var(--palette-white));
+  opacity: 1;
 }
 
 [data-pm] .catalog-library .library-page__list--cards .test-card__icon {
-  width: var(--space-6);
-  height: var(--space-6);
+  width: calc(var(--space-16) + var(--space-8));
+  height: calc(var(--space-16) + var(--space-8));
+  object-fit: contain;
 }
 
 [data-pm] .catalog-library .library-page__list--cards .test-card__body {
-  display: contents;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4) var(--space-4);
 }
 
-[data-pm] .catalog-library .library-page__list--cards .lib-card__facts {
-  grid-area: 1 / 2;
+[data-pm] .catalog-library .library-page__list--cards :is(.lib-card__check, .lib-card__heart) {
+  top: var(--space-3);
+  right: var(--space-3);
+  left: auto;
 }
 
-[data-pm] .catalog-library .library-page__list--cards :is(.lib-card__top, .test-card__description, .lib-card__why) {
-  grid-column: 1 / -1;
-}
-
-[data-pm] .catalog-library .library-page__list--cards .lib-card__heart {
-  top: var(--card-pad);
-}
-
-[data-pm] .catalog-library .library-page__list--cards .lib-card__check {
-  top: calc(var(--card-pad) + var(--size-avatar) - var(--space-5));
-}
-
-[data-pm] .catalog-library .library-page__list--cards .lib-card--selected {
-  border-color: var(--text-link);
+[data-pm] .catalog-library .library-page__list--cards .lib-card--selected .lib-card__heart {
+  right: var(--space-10);
 }
 
 @media (max-height: 484px) {
-  .catalog-topics {
+  .catalog-library .recent-row {
     display: none;
+  }
+
+  .catalog-library .chats-header__belt {
+    margin-bottom: calc(var(--space-3) * -1);
   }
 }

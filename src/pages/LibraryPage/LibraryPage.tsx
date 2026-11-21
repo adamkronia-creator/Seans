@@ -51,7 +51,7 @@ import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 import './LibraryPage.pm.css';
-import { TestCatalogControls, TestCatalogResults, type CatalogLayout } from './TestCatalog';
+import { TestCatalogResults, type CatalogLayout } from './TestCatalog';
 import './TestCatalog.css';
 
 type Noun = [string, string, string];
@@ -497,7 +497,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const filterButton = (
     <button
       type="button"
-      className={`${catalogDesign ? 'catalog-shortcut' : chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
+      className={`${catalogDesign ? 'catalog-filter-button' : chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
       aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
       aria-haspopup="dialog"
       onClick={() => setSheet('filters')}
@@ -557,7 +557,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           onSearching={setSearching}
           query={view.query}
           onQuery={(value) => setQuery(kind, value)}
-          title={kind === 'task' ? 'Задания' : 'Тесты'}
+          title={title}
           status={kind === 'task' ? 'Ваши практики' : 'Ваши опросники'}
           heading={title}
           placeholder={searchPlaceholder}
@@ -585,9 +585,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
               {suggestions}
             </div>
           ) : undefined}
-          belt={catalogDesign ? (
-            <TestCatalogControls catalog={catalog} filters={view.filters} onToggle={(facet, option) => toggleOption(kind, facet, option)} filterButton={filterButton} />
-          ) : recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
+          belt={recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
+          beforeChips={catalogDesign ? filterButton : undefined}
           inputRef={input}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

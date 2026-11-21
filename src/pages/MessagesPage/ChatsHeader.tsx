@@ -19,6 +19,8 @@ interface ChatsHeaderProps {
   heading?: string;
   placeholder?: string;
   chipsLabel?: string;
+  /** Кнопка слева от прокручиваемого ряда подборок. */
+  beforeChips?: ReactNode;
   aside?: ReactNode;
   /** Постоянное поле поиска под верхней строкой, например в каталоге тестов. */
   inlineSearch?: ReactNode;
@@ -49,6 +51,7 @@ export function ChatsHeader({
   heading = 'Диалоги',
   placeholder = 'Поиск по чатам',
   chipsLabel = 'Фильтр диалогов',
+  beforeChips,
   aside,
   inlineSearch,
   onAvatarClick,
@@ -86,6 +89,13 @@ export function ChatsHeader({
   const picture = avatar
     ? <img className="chats-header__avatar" src={avatar} alt="" />
     : <span className="chats-header__avatar" />;
+
+  const chipsRow = (
+    <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
+      <span className="chips-pill" aria-hidden="true" />
+      {chips}
+    </div>
+  );
 
   return (
     <header className="chats-header">
@@ -142,10 +152,7 @@ export function ChatsHeader({
       <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={collapseBelt || undefined} {...({ inert: collapseBelt ? '' : undefined } as object)}>
         <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
       </div>
-      <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
-        <span className="chips-pill" aria-hidden="true" />
-        {chips}
-      </div>
+      {beforeChips ? <div className="chats-header__filters">{beforeChips}{chipsRow}</div> : chipsRow}
     </header>
   );
 }
