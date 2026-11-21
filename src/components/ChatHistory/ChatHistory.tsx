@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type UIEvent } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { EditSheet } from '../EditSheet/EditSheet';
@@ -26,7 +26,8 @@ import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { ScaleList } from './ScaleList';
 import { navigate } from '../../router';
-import { usePillChips } from '../../utils/usePillChips';
+import { centerChips } from '../../utils/centerChips';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
@@ -49,6 +50,9 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'task', label: 'Задания' },
   { id: 'note', label: 'Заметки' },
 ];
+
+/** Одиночные субпиксельные колебания при прокрутке не меняют направление. */
+const FILTER_SCROLL_DELTA = 8;
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
@@ -224,7 +228,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
 
 /**
  * Вкладка «История взаимодействия» в открытом чате: лента событий (свежие внизу), под ней чипсы-фильтры, в самом низу учёт.
- * Чипсы и учёт закреплены внизу, как поле ввода в переписке; лента над ними прокручивается.
+ * При движении к старым событиям ряд уходит вниз, а при движении к новым возвращается.
  * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
  * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
  */
@@ -234,6 +238,9 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
+  const row = useRef<HTMLDivElement>(null);
+  const scrollPositions = useRef(new WeakMap<HTMLElement, number>());
+  const [filtersHidden, setFiltersHidden] = useState(false);
   const data = useClientData();
   const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
@@ -275,35 +282,57 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     setDragIndex(position === null ? null : Math.round(Math.min(FILTERS.length - 1, Math.max(0, position))));
   }, []);
 
-  const { row, onPosition } = usePillChips(events.length > 0);
+  const onPosition = useCallback((position: number, via?: PositionVia) => {
+    const list = row.current;
+    if (!list) return;
+    followChips(list.querySelectorAll<HTMLElement>(':scope > .chip'), position, via);
+    centerChips(list, position, '.chip', via);
+  }, []);
 
-  // Чипсы и под ними учёт стоят под лентами, как поле ввода под перепиской: не прокручиваются вместе с лентой
+  const selectFilter = (id: HistoryFilter) => {
+    setFiltersHidden(false);
+    setFilter(id);
+  };
+
+  const onHistoryScroll = (event: UIEvent<HTMLDivElement>) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement) || !target.matches('.chat-history:not([inert] *)')) return;
+    const end = Math.max(0, target.scrollHeight - target.clientHeight);
+    const top = Math.min(end, Math.max(0, target.scrollTop));
+    const previous = scrollPositions.current.get(target) ?? end;
+    if (end - top <= FILTER_SCROLL_DELTA) {
+      scrollPositions.current.set(target, top);
+      if (filtersHidden) setFiltersHidden(false);
+    } else if (Math.abs(top - previous) >= FILTER_SCROLL_DELTA) {
+      scrollPositions.current.set(target, top);
+      const hide = top < previous;
+      if (hide !== filtersHidden) setFiltersHidden(hide);
+    }
+  };
+
   const foot = (
-    <>
-      <div ref={row} className="screen-header__chips hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
-        {FILTERS.map(({ id, label }, i) => {
-          const c = counts[id];
-          return (
-            <Chip
-              key={id}
-              follow
-              tone="chat"
-              active={shown === i}
-              count={c ? (c.total ?? c.value) : undefined}
-              onClick={() => setFilter(id)}
-              ariaLabel={c && c.total !== undefined ? `${label}: выполнено ${c.value} из ${c.total}` : c ? `${label}: ${c.value}` : label}
-            >
-              {label}
-            </Chip>
-          );
-        })}
-        <span className="chips-pill" aria-hidden="true" />
-      </div>
-    </>
+    <div ref={row} className="screen-header__chips hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
+      {FILTERS.map(({ id, label }, i) => {
+        const c = counts[id];
+        return (
+          <Chip
+            key={id}
+            follow
+            tone="chat"
+            active={shown === i}
+            count={c ? (c.total ?? c.value) : undefined}
+            onClick={() => selectFilter(id)}
+            ariaLabel={c && c.total !== undefined ? `${label}: выполнено ${c.value} из ${c.total}` : c ? `${label}: ${c.value}` : label}
+          >
+            {label}
+          </Chip>
+        );
+      })}
+    </div>
   );
 
   return (
-    <div ref={root} className="hist-host">
+    <div ref={root} className="hist-host" onScrollCapture={onHistoryScroll}>
       {events.length === 0 ? (
         // Событий нет совсем: подсказка вместо пустых лент и чипсов с нулями
         <EmptyState icon={<IconTabLibrary />} title="История пока пуста" text="Здесь появятся сеансы, тесты, задания и заметки по этому клиенту." />
@@ -314,12 +343,19 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             nested
             index={index}
             pages={pages}
-            onIndexChange={(i) => setFilter(FILTERS[i].id)}
+            onIndexChange={(i) => selectFilter(FILTERS[i].id)}
             onPosition={onPosition}
             onDrag={onDrag}
           />
 
-          <div className="hist-foot">{foot}</div>
+          <div
+            className="hist-foot"
+            data-hidden={filtersHidden || undefined}
+            aria-hidden={filtersHidden || undefined}
+            {...({ inert: filtersHidden ? '' : undefined } as object)}
+          >
+            {foot}
+          </div>
         </>
       )}
 

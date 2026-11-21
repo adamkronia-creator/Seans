@@ -35,7 +35,7 @@
   align-items: flex-end;
   gap: var(--space-1);
   padding: var(--space-2);
-  border: 1px solid var(--glass-border);
+  border: var(--active-ring-width) solid var(--active-ring-color);
   border-radius: var(--space-7);
   background: var(--glass-fill-panel);
   box-shadow: var(--glass-shadow-panel);
