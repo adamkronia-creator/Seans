@@ -656,21 +656,6 @@
   object-fit: cover;
 }
 
-.profile__album-name {
-  overflow: hidden;
-  color: var(--text-primary);
-  font: var(--type-label);
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile__album-count {
-  color: var(--text-secondary);
-  font: var(--type-meta);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Нижний ряд панели: две стеклянные кнопки рядом, как кнопки под сообщениями с тестами (высота 40, акцентная подпись, углы 4) */
 .profile__photos {
   display: flex;

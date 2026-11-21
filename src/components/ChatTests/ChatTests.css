@@ -356,7 +356,6 @@
 }
 
 .activity-card__scales .hist-scales {
-  --grouped-scales-fill: var(--sheet-tile);
   margin-top: 0;
 }
 

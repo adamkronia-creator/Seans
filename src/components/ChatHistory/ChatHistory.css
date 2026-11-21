@@ -171,12 +171,12 @@
   display: flex;
   flex: none;
   flex-direction: column;
+  gap: var(--space-1);
   margin-block-start: var(--space-2);
 }
 
-.hist-rail__avatars .avatar + .avatar {
-  margin-block-start: calc(var(--space-2) * -1);
-  box-shadow: 0 0 0 var(--hairline) var(--glass-solid);
+.hist-item--session {
+  min-height: calc(var(--marker-size) + var(--hist-avatar-size) * 2 + var(--space-8));
 }
 
 .hist-marker__number {

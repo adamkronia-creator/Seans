@@ -4,6 +4,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Frame } from '../../components/Frame/Frame';
 import { IconBack } from '../../components/icons';
 import { CollectionNameSheet } from '../../components/Profile/AlbumSheets';
+import { CollectionCaption } from '../../components/Profile/CollectionCaption';
 import { PHOTO_PATHS } from '../../components/Profile/PhotoTabs';
 import { IconAlbum, IconPencil, IconPlusLine, IconStories } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
@@ -79,9 +80,9 @@ export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery
         {!folderId && (
           <ul className="ph__albums" aria-label="Папки историй">
             <li>
-              <button type="button" className="ph__album ph__album--new" onClick={() => setSheet('new')}>
-                <span className="ph__album-cover"><IconPlusLine /></span>
-                <span className="ph__album-name">Новая папка</span>
+              <button type="button" className="ph__tile ph__tile--add ph__collection-add" onClick={() => setSheet('new')}>
+                <IconPlusLine />
+                <span>Новая папка</span>
               </button>
             </li>
             {folders.map((item) => {
@@ -92,8 +93,7 @@ export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery
                     <span className="ph__album-cover" style={cover ? { background: STORY_BACKGROUNDS[cover.bg], color: 'var(--palette-white)' } : undefined}>
                       <IconAlbum />
                     </span>
-                    <span className="ph__album-name">{item.name}</span>
-                    <span className="ph__album-count">{item.storyIds.length}</span>
+                    <CollectionCaption name={item.name} count={item.storyIds.length} />
                   </button>
                 </li>
               );

@@ -15,6 +15,7 @@ export const PHOTO_VIEWS: readonly PhotoView[] = ['photos', 'albums', 'stories']
 
 interface PhotoTabsProps {
   value: PhotoView;
+  fit?: boolean;
   onChange: (view: PhotoView) => void;
   photos: number;
   albums: number;
@@ -22,7 +23,7 @@ interface PhotoTabsProps {
 }
 
 /** Разделы галереи с количеством фото, альбомов и историй. */
-export function PhotoTabs({ value, onChange, photos, albums, stories }: PhotoTabsProps) {
+export function PhotoTabs({ value, onChange, photos, albums, stories, fit = false }: PhotoTabsProps) {
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const list = row.current;
@@ -55,7 +56,7 @@ export function PhotoTabs({ value, onChange, photos, albums, stories }: PhotoTab
     { id: 'stories', label: 'Истории', count: stories, Icon: IconStories },
   ];
   return (
-    <div ref={row} className="ptabs" role="tablist" aria-label="Раздел фото" data-hscroll>
+    <div ref={row} className={fit ? 'ptabs ptabs--fit' : 'ptabs'} role="tablist" aria-label="Раздел фото" data-hscroll>
       {tabs.map(({ id, label, count, Icon }, index) => (
         <button
           key={id}

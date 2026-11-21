@@ -5,6 +5,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { IconBack } from '../../components/icons';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumMoveSheet, AlbumNameSheet, AlbumPhotosSheet } from '../../components/Profile/AlbumSheets';
+import { CollectionCaption } from '../../components/Profile/CollectionCaption';
 import { PHOTO_PATHS, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { IconAlbum, IconCamera, IconCheck, IconDots, IconDownload, IconFolderMove, IconForward, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
@@ -194,11 +195,9 @@ export function PhotosPage({ view, albumId, gallery }: PhotosPageProps) {
     body = (
       <ul className="ph__albums">
         <li>
-          <button type="button" className="ph__album ph__album--new" onClick={() => setSheet('new')}>
-            <span className="ph__album-cover">
-              <IconPlusLine />
-            </span>
-            <span className="ph__album-name">Новый альбом</span>
+          <button type="button" className="ph__tile ph__tile--add ph__collection-add" onClick={() => setSheet('new')}>
+            <IconPlusLine />
+            <span>Новый альбом</span>
           </button>
         </li>
         {albums.map((a) => (
@@ -207,8 +206,7 @@ export function PhotosPage({ view, albumId, gallery }: PhotosPageProps) {
               <span className="ph__album-cover">
                 <AlbumCover album={a} />
               </span>
-              <span className="ph__album-name">{a.name}</span>
-              <span className="ph__album-count">{a.photoIds.length}</span>
+              <CollectionCaption name={a.name} count={a.photoIds.length} />
             </button>
           </li>
         ))}

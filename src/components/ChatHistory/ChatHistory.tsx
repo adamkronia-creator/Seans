@@ -53,15 +53,6 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
-/** Подпись автора для даты или аватарки на рейке */
-function authorOf(event: HistoryEvent) {
-  const client = maxim.name.split(' ')[0];
-  if (event.kind === 'invite') return client;
-  if (event.kind === 'session') return `Вы и ${client}`;
-  if (event.kind === 'note') return 'Вы';
-  return event.state === 'done' ? client : 'Вы';
-}
-
 /** Значок события на рейке. У сеанса сохраняется его номер. */
 function Marker({ event }: { event: HistoryEvent }) {
   if (event.kind === 'session') {
@@ -129,7 +120,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
         {event.date.split(' ').map((part) => (
           <span key={part}>{part}</span>
         ))}
-        {event.kind !== 'test' && event.kind !== 'task' && <span>{authorOf(event)}</span>}
+        {event.kind === 'invite' && <span>{maxim.name.split(' ')[0]}</span>}
       </p>
       {'text' in event ? (
         <>
@@ -140,7 +131,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
               : {})}
           >
             <p className="hist-card__text">{event.text}</p>
-            {editable && <IconChevron className="hist-card__chevron" />}
+            {editable && event.kind === 'task' && <IconChevron className="hist-card__chevron" />}
           </div>
           {resultPath && scaleData && scaleData.scales.length > 0 && <ScaleList data={scaleData} grouping={resultRef === '5pfq' ? 'factors' : 'main-extra'} onOpen={() => navigate(resultPath)} />}
           {editable && (
@@ -199,6 +190,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
           <ol className="hist-timeline">
             {events.map((event, i) => {
               const hasNext = i < events.length - 1;
+              const byClient = event.kind === 'invite' || ('state' in event && event.state === 'done');
               return (
                 <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
                   <div className="hist-rail">
@@ -211,8 +203,8 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
                         </>
                       ) : (
                         <Avatar
-                          src={event.kind === 'invite' || (event.kind !== 'note' && event.state === 'done') ? clientAvatar : ownAvatar}
-                          alt={authorOf(event)}
+                          src={byClient ? clientAvatar : ownAvatar}
+                          alt={byClient ? maxim.name : 'Вы'}
                         />
                       )}
                     </div>

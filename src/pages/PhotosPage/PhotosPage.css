@@ -112,29 +112,8 @@
   object-fit: cover;
 }
 
-.ph__album--new .ph__album-cover {
-  border: 1.5px solid transparent;
-  background: color-mix(in srgb, var(--palette-black) 34%, transparent);
-  color: var(--text-link);
-}
-
-.ph__album-name {
-  overflow: hidden;
-  color: var(--text-primary);
-  font: var(--type-label);
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ph__album--new .ph__album-name {
-  color: var(--text-link);
-}
-
-.ph__album-count {
-  color: var(--text-secondary);
-  font: var(--type-meta);
-  font-variant-numeric: tabular-nums;
+.ph__collection-add {
+  border-radius: var(--radius-lg);
 }
 
 /* Пустой раздел: большая кнопка добавления */
@@ -247,7 +226,7 @@
 .ph__fab {
   position: absolute;
   right: var(--space-4);
-  bottom: var(--space-4);
+  bottom: calc(var(--space-3) + var(--safe-bottom));
   z-index: 4;
   display: flex;
   align-items: center;
@@ -266,7 +245,7 @@
   transform: scale(0.94);
 }
 
-/* Низ списка не прячется под кнопкой */
+/* У кнопки нет рамки капсулы. Учитываем её толщину, чтобы просвет совпадал с каталогом. */
 [data-pm] .fp__scroll.ph__scroll {
-  padding-bottom: calc(var(--size-bar) + var(--scroll-bottom));
+  padding-bottom: calc(var(--scroll-bottom-tabbar) - 2 * var(--active-ring-width));
 }

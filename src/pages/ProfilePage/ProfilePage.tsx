@@ -4,9 +4,11 @@ import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
+import { SwipePager } from '../../components/SwipePager/SwipePager';
+import { CollectionCaption } from '../../components/Profile/CollectionCaption';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
-import { PhotoTabs, PHOTO_PATHS, type PhotoView } from '../../components/Profile/PhotoTabs';
+import { PhotoTabs, PHOTO_PATHS, PHOTO_VIEWS, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { IconAlbum, IconCamera, IconImage, IconPencil, IconStories, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
@@ -267,73 +269,74 @@ export function ProfilePage() {
         <div className="profile__photos">
         <section className="profile__card profile__card--joined" aria-label="Фото и альбомы">
           <header className="profile__card-head profile__card-head--tabs">
-            <PhotoTabs value={tab} onChange={setTab} photos={photos.length} albums={albums.length} stories={stories.length} />
+            <PhotoTabs fit value={tab} onChange={setTab} photos={photos.length} albums={albums.length} stories={stories.length} />
           </header>
 
-          {tab === 'photos' &&
-            (photos.length + uploading > 0 ? (
-              <ul className="profile__grid">
-                {Array.from({ length: Math.min(uploading, PHOTOS_SHOWN) }, (_, i) => (
-                  <li key={`wait-${i}`}>
-                    <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
-                  </li>
-                ))}
-                {shown.slice(0, Math.max(0, PHOTOS_SHOWN - uploading)).map((photo, i) => (
-                  <li key={photo.id}>
-                    {thumbs[photo.id] ? (
-                      <button type="button" className="profile__tile" aria-label={`Фото ${i + 1} из ${photos.length}`} onClick={() => setViewing(photo.id)}>
-                        <img src={thumbs[photo.id]} alt="" loading="lazy" decoding="async" />
-                      </button>
-                    ) : (
-                      <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <button type="button" className="profile__drop" onClick={() => input.current?.click()}>
-                <IconImage />
-                <span>Добавьте первое фото</span>
-              </button>
-            ))}
-
-          {tab === 'albums' &&
-            (albums.length > 0 ? (
-              <ul className="profile__albums">
-                {albums.slice(0, ALBUMS_SHOWN).map((album) => (
-                  <li key={album.id}>
-                    <button type="button" className="profile__album" onClick={() => navigate(`/profile/photos/album/${album.id}`)}>
-                      <span className="profile__album-cover">
-                        <AlbumCover album={album} />
-                      </span>
-                      <span className="profile__album-name">{album.name}</span>
-                      <span className="profile__album-count">{album.photoIds.length}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <button type="button" className="profile__drop" onClick={() => setNewAlbum(true)}>
-                <IconAlbum />
-                <span>Создайте первый альбом</span>
-              </button>
-            ))}
-
-          {tab === 'stories' &&
-            (recentStories.length > 0 ? (
-              <ul className="profile__grid">
-                {recentStories.map((story) => (
-                  <li key={story.id}>
-                    <StoryTile story={story} onClick={(event) => storyMedia.open(story.id, event)} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <button type="button" className="profile__drop" onClick={storyMedia.compose}>
-                <IconStories />
-                <span>Добавьте первую историю</span>
-              </button>
-            ))}
+          <SwipePager
+            autoHeight
+            index={PHOTO_VIEWS.indexOf(tab)}
+            onIndexChange={(index) => setTab(PHOTO_VIEWS[index])}
+            pages={[
+              { key: 'photos', node: photos.length + uploading > 0 ? (
+                  <ul className="profile__grid">
+                    {Array.from({ length: Math.min(uploading, PHOTOS_SHOWN) }, (_, i) => (
+                      <li key={`wait-${i}`}>
+                        <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
+                      </li>
+                    ))}
+                    {shown.slice(0, Math.max(0, PHOTOS_SHOWN - uploading)).map((photo, i) => (
+                      <li key={photo.id}>
+                        {thumbs[photo.id] ? (
+                          <button type="button" className="profile__tile" aria-label={`Фото ${i + 1} из ${photos.length}`} onClick={() => setViewing(photo.id)}>
+                            <img src={thumbs[photo.id]} alt="" loading="lazy" decoding="async" />
+                          </button>
+                        ) : (
+                          <Skeleton className="profile__wait" width="100%" height="auto" radius="0" />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <button type="button" className="profile__drop" onClick={() => input.current?.click()}>
+                    <IconImage />
+                    <span>Добавьте первое фото</span>
+                  </button>
+              ) },
+              { key: 'albums', node: albums.length > 0 ? (
+                  <ul className="profile__albums">
+                    {albums.slice(0, ALBUMS_SHOWN).map((album) => (
+                      <li key={album.id}>
+                        <button type="button" className="profile__album" onClick={() => navigate(`/profile/photos/album/${album.id}`)}>
+                          <span className="profile__album-cover">
+                            <AlbumCover album={album} />
+                          </span>
+                          <CollectionCaption name={album.name} count={album.photoIds.length} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <button type="button" className="profile__drop" onClick={() => setNewAlbum(true)}>
+                    <IconAlbum />
+                    <span>Создайте первый альбом</span>
+                  </button>
+              ) },
+              { key: 'stories', node: recentStories.length > 0 ? (
+                  <ul className="profile__grid">
+                    {recentStories.map((story) => (
+                      <li key={story.id}>
+                        <StoryTile story={story} onClick={(event) => storyMedia.open(story.id, event)} />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <button type="button" className="profile__drop" onClick={storyMedia.compose}>
+                    <IconStories />
+                    <span>Добавьте первую историю</span>
+                  </button>
+              ) },
+            ]}
+          />
         </section>
           <div className="profile__foot">
             <button
