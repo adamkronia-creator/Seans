@@ -1,12 +1,49 @@
+[data-pm] .catalog-library {
+  --catalog-surface: var(--glass-plain);
+  --catalog-line: color-mix(in srgb, var(--text-primary) 12%, transparent);
+}
+
+:root[data-ink='light'] [data-pm] .catalog-library {
+  --catalog-surface: color-mix(in srgb, var(--palette-white) 8%, var(--glass-plain));
+}
+
 /* Поиск, недавние тесты и подборки стоят над выдачей на общем фоне приложения. */
 .catalog-library .chats-header {
   position: relative;
   flex: none;
   gap: var(--space-3);
+  padding-block-start: calc(var(--safe-top) + var(--space-2));
 }
 
 [data-pm] .catalog-library .chats-header::before {
   content: none;
+}
+
+.catalog-library .chats-header__top {
+  height: var(--size-touch);
+  padding-inline: var(--page-gutter);
+}
+
+.catalog-library .chats-header__name,
+.catalog-results h2 {
+  font: var(--type-title);
+  letter-spacing: var(--letter-spacing-title);
+}
+
+.catalog-library .chats-header__status {
+  display: none;
+}
+
+.catalog-library .chats-header__avatar-button {
+  order: 1;
+  place-items: center;
+  width: var(--size-touch);
+  height: var(--size-touch);
+}
+
+.catalog-library .chats-header__avatar {
+  width: var(--space-8);
+  height: var(--space-8);
 }
 
 .catalog-library .chats-header__belt[data-collapsed] {
@@ -18,8 +55,16 @@
   margin-inline: var(--page-gutter);
 }
 
-.catalog-library .catalog-search .search-field {
+[data-pm] .catalog-library .catalog-search .search-field {
+  height: var(--size-touch);
+  border: var(--hairline) solid var(--catalog-line);
+  background: var(--catalog-surface);
+  backdrop-filter: none;
   animation: none;
+}
+
+.catalog-library .catalog-search .search-field__icon {
+  color: var(--text-secondary);
 }
 
 .catalog-library.messages .catalog-search .suggest {
@@ -48,6 +93,12 @@
 .catalog-library .recent-row :is(.stories__ring, .recent-row__avatar) {
   width: var(--space-12);
   height: var(--space-12);
+  border-radius: var(--radius-md);
+}
+
+.catalog-library .recent-row__avatar::before {
+  background: color-mix(in oklab, var(--tint) 92%, var(--palette-white));
+  opacity: 1;
 }
 
 .catalog-library .recent-row__icon {
@@ -139,7 +190,6 @@
 .catalog-results h2 {
   margin: 0;
   color: var(--text-primary);
-  font: var(--type-headline);
 }
 
 .catalog-results__title span {
@@ -151,10 +201,10 @@
 .catalog-layout {
   display: flex;
   flex: none;
+  gap: var(--space-1);
   padding: var(--space-1);
-  border: var(--active-ring-width) solid var(--glass-border);
-  border-radius: var(--radius-full);
-  background: var(--glass-fill-panel);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
 }
 
 .catalog-layout button {
@@ -162,14 +212,14 @@
   place-items: center;
   width: var(--size-control-sm);
   height: var(--space-8);
-  border-radius: var(--radius-full);
-  color: var(--text-icon);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   font-size: var(--size-icon);
 }
 
 .catalog-layout button[aria-pressed='true'] {
-  background: var(--glass-tab);
-  color: var(--text-link);
+  background: var(--catalog-surface);
+  color: var(--text-primary);
 }
 
 [data-pm] .catalog-library.messages .library-page__list {
@@ -187,8 +237,14 @@
 
 [data-pm] .catalog-library .library-page__list--cards .lib-card {
   overflow: clip;
+  border: var(--hairline) solid var(--catalog-line);
   border-radius: var(--radius-lg);
+  background: var(--catalog-surface);
   contain-intrinsic-size: auto 224px;
+}
+
+[data-pm] .catalog-library .library-page__list--cards .lib-card--selected {
+  border-color: var(--text-link);
 }
 
 [data-pm] .catalog-library .library-page__list--cards .test-card {
@@ -199,11 +255,16 @@
   border-radius: inherit;
 }
 
+[data-pm] .catalog-library .library-page__list--cards .test-card:focus-visible {
+  outline: var(--hairline) solid var(--text-link);
+  outline-offset: calc(var(--hairline) * -1);
+}
+
 [data-pm] .catalog-library .library-page__list--cards .test-card__avatar {
   width: 100%;
   height: calc(var(--space-16) * 2);
   border: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   mask-image: none;
   -webkit-mask-image: none;
 }
