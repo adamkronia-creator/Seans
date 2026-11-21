@@ -4,7 +4,7 @@
   width: 100%;
   aspect-ratio: 393 / 480;
   overflow: hidden;
-  background: #1b1d22;
+  background: color-mix(in srgb, var(--palette-black) 88%, var(--palette-white));
 }
 
 .hs__stage {

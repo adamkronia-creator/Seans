@@ -3,6 +3,7 @@
  * Всё хранится в localStorage и применяется при запуске. Цвет текста «авто» считается по яркости фона: на тёмном фоне текст белый,
  * на светлом тёмный (атрибут data-ink на <html>: dark — тёмный текст, light — белый).
  */
+import { colorPixels } from './color';
 import dawn from '../assets/bg-default.webp';
 import { TONES, type ToneId } from '../data/tones';
 
@@ -59,20 +60,6 @@ function showColor(swatch: string) {
   root().dataset.bg = 'solid';
 }
 
-function solidRGB() {
-  const sample = document.createElement('span');
-  sample.style.color = 'var(--user-bg-color)';
-  root().append(sample);
-  const color = getComputedStyle(sample).color;
-  sample.remove();
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 1;
-  const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 1, 1);
-  return ctx.getImageData(0, 0, 1, 1).data;
-}
-
 export function setBackgroundColor(id: ToneId) {
   const tone = TONES.find((entry) => entry.id === id);
   if (!tone) return;
@@ -103,7 +90,7 @@ async function luminanceOf(src: string): Promise<number> {
 /** Яркость однотонного фона или картинки */
 async function sceneLuminance(): Promise<number> {
   if (root().dataset.bg === 'solid') {
-    const [r, g, b] = solidRGB();
+    const [r, g, b] = colorPixels('var(--user-bg-color)');
     return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   }
   const custom = get(K_IMAGE);
@@ -126,7 +113,7 @@ async function imageTopRGB() {
 
 /** Цвет верха приложения: полоса фона у верхнего края (среднее), поверх неё стекло шапки. Нужен, чтобы строка браузера слилась с приложением */
 async function topColor(): Promise<string | null> {
-  const [r, g, b] = root().dataset.bg === 'solid' ? solidRGB() : await imageTopRGB();
+  const [r, g, b] = root().dataset.bg === 'solid' ? colorPixels('var(--user-bg-color)') : await imageTopRGB();
   // Стекло шапки (rgb(... / альфа)) ложится поверх фона
   // Слой экрана появляется чуть позже запуска: ждём его (до двух секунд)
   let layer = document.querySelector('[data-pm]');
@@ -135,12 +122,10 @@ async function topColor(): Promise<string | null> {
     layer = document.querySelector('[data-pm]');
   }
   if (!layer) return null;
-  const fill = getComputedStyle(layer).getPropertyValue('--glass-fill-header');
-  const n = fill.match(/[\d.]+/g)?.map(Number);
-  if (!n || n.length < 3) return null;
-  const alpha = n.length > 3 ? n[3] : 1;
+  const [red, green, blue, opacity] = colorPixels('var(--glass-fill-header)', layer);
+  const alpha = opacity / 255;
   const mix = (back: number, front: number) => Math.round(back * (1 - alpha) + front * alpha);
-  return '#' + [mix(r, n[0]), mix(g, n[1]), mix(b, n[2])].map((v) => v.toString(16).padStart(2, '0')).join('');
+  return '#' + [mix(r, red), mix(g, green), mix(b, blue)].map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
 /** Белый текст — тёмная тема системных панелей (строка состояния браузера, полосы прокрутки, поля), тёмный — светлая.
@@ -149,7 +134,7 @@ async function syncChrome(revision: number) {
   const light = root().dataset.ink === 'light';
   document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', light ? 'dark' : 'only light');
   const meta = document.querySelector('meta[name="theme-color"]');
-  meta?.setAttribute('content', light ? '#12141B' : '#FFFFFF');
+  meta?.setAttribute('content', light ? '#000000' : '#FFFFFF');
   try {
     const color = await topColor();
     if (color && revision === inkRevision) meta?.setAttribute('content', color);

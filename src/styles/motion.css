@@ -39,14 +39,14 @@ html[data-transition='forward']::view-transition-old(app) {
 
 html[data-transition='forward']::view-transition-new(app) {
   animation: vt-push-in var(--vt-duration) var(--ease-ios) both;
-  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+  box-shadow: -10px 0 30px color-mix(in srgb, var(--palette-black) 14%, transparent);
 }
 
 /* Назад: текущий экран уезжает вправо поверх, под ним возвращается предыдущий */
 html[data-transition='back']::view-transition-old(app) {
   z-index: 1;
   animation: vt-pop-out var(--vt-duration) var(--ease-ios) both;
-  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+  box-shadow: -10px 0 30px color-mix(in srgb, var(--palette-black) 14%, transparent);
 }
 
 html[data-transition='back']::view-transition-new(app) {
@@ -117,13 +117,13 @@ html[data-transition='fade']::view-transition-new(app) {
 
 @keyframes overlay-in {
   from {
-    background-color: rgb(0 0 0 / 0%);
+    background-color: transparent;
   }
 }
 
 @keyframes overlay-out {
   to {
-    background-color: rgb(0 0 0 / 0%);
+    background-color: transparent;
   }
 }
 

@@ -141,7 +141,7 @@ mask * {
   position: absolute;
   inset: 0;
   display: none;
-  background: rgb(0 0 0 / 10%);
+  background: color-mix(in srgb, var(--palette-black) 10%, transparent);
   pointer-events: none;
 }
 
@@ -154,7 +154,7 @@ mask * {
 }
 
 .app.is-edge-dragging > .screen[data-layer='top'] {
-  box-shadow: -10px 0 30px rgb(0 0 0 / 14%);
+  box-shadow: -10px 0 30px color-mix(in srgb, var(--palette-black) 14%, transparent);
 }
 
 .app.is-edge-dragging > .screen[data-layer='under'] {

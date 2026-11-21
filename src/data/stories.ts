@@ -20,12 +20,15 @@ export interface StoryAuthor {
 
 /** Фоны историй: мягкие градиенты в тон приложению */
 export const STORY_BACKGROUNDS = [
-  'linear-gradient(160deg, #3f9bf1 0%, #7b6cf0 100%)',
-  'linear-gradient(160deg, #f6a469 0%, #e8647c 100%)',
-  'linear-gradient(160deg, #4bb34b 0%, #007AFF 100%)',
-  'linear-gradient(160deg, #8e7cf0 0%, #d46cc0 100%)',
-  'linear-gradient(160deg, #2c3a4d 0%, #4a6a8f 100%)',
-];
+  ['blue', 'slate'],
+  ['orange', 'pink'],
+  ['green', 'blue'],
+  ['slate', 'magenta'],
+  ['slate', 'blue'],
+].map(([start, end], index) => {
+  const weight = index === 4 ? 36 : 68;
+  return `linear-gradient(160deg, color-mix(in srgb, var(--palette-${start}) ${weight}%, var(--palette-black)), color-mix(in srgb, var(--palette-${end}) ${weight}%, var(--palette-black)))`;
+});
 
 const SEEN_KEY = 'seans.stories.seen';
 const OWN_KEY = 'seans.stories.own';

@@ -13,14 +13,14 @@
 [data-pm] .ct .ct__scroll {
   /* Высота шапки (--header-h из layout.css): от неё липнут вкладки */
   --bar: var(--header-h);
-  --ct-haze: rgb(255 255 255 / 0.92);
+  --ct-haze: color-mix(in srgb, var(--palette-white) 92%, transparent);
   gap: 0;
   padding: 0 0 var(--scroll-bottom);
   overflow-anchor: none;
 }
 
 :root[data-ink='light'] [data-pm] .ct .ct__scroll {
-  --ct-haze: rgb(8 10 16 / 0.92);
+  --ct-haze: color-mix(in srgb, var(--palette-black) 92%, transparent);
 }
 
 .ct__hero,
@@ -41,8 +41,8 @@
   aspect-ratio: 1 / 1.08;
   overflow: hidden;
   background: var(--glass-fill);
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, var(--palette-black) 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, var(--palette-black) 62%, transparent 100%);
 }
 
 .ct__photo::after {
@@ -300,7 +300,7 @@
   padding: var(--space-2);
   overflow: hidden;
   border-radius: var(--radius-md);
-  color: #fff;
+  color: var(--palette-white);
 }
 
 .ct__story-text {

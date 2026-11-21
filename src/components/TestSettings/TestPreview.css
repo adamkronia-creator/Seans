@@ -41,7 +41,7 @@
 .tp__tab--on {
   background: var(--color-bg-panel);
   color: var(--color-text-primary);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--palette-black) 12%, transparent);
 }
 
 /* Корпус телефона: темная рамка; высота — всё свободное место экрана (не ниже 480), экран внутри прокручивается, кнопки внизу всегда на виду */
@@ -58,10 +58,10 @@
   max-height: 720px;
   margin: var(--space-1) auto 0;
   overflow: hidden;
-  border: 8px solid #000000;
+  border: 8px solid var(--palette-black);
   border-radius: 40px;
   background: var(--color-bg-panel);
-  box-shadow: 0 4px 20px rgb(19 32 58 / 16%);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--palette-black) 16%, transparent);
 }
 
 /* Неподвижная шторка с «островком»: шапка и карточки при прокрутке уходят под нее, а не под чёлку */
@@ -78,7 +78,7 @@
   width: 72px;
   height: 20px;
   border-radius: var(--radius-pill);
-  background: #000000;
+  background: var(--palette-black);
   transform: translateX(-50%);
 }
 

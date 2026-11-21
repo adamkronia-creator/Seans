@@ -1,5 +1,5 @@
 /*
- * Цветовая система мессенджера «Сеанс» — токены из справочника claude/messenger-color-system.md (источник истины; HEX как в нём).
+ * Цветовые роли мессенджера «Сеанс» используют общую палитру из tokens.css.
  * Цвета, размеры, скругления, размытие и тени названы так же, как в справочнике. Отступы сетки 4 — в tokens.css (--space-1 … --space-16).
  * Гарнитура — Inter (справочник даёт Manrope, но разрешает замену: цветовые токены от неё не зависят).
  *
@@ -9,35 +9,35 @@
  */
 
 :root {
-  --bg-canvas: #F2F2F7;
-  --bg-bar: #F2F2F7e0;
-  --bg-field: #E9E9EB;
-  --bg-raised: #FFFFFF;
-  --bg-subtle: #E9E9EB;
-  --bg-inverse: #000000;
-  --bg-scrim: #00000066;
-  --text-primary: #000000;
-  --icon-action: #000000; /* значки кнопок шапок (поиск, назад, меню): чёрные, не --text-primary */
-  --text-secondary: #4A4A4F;
-  --text-disabled: #8E8E93;
-  --text-link: #007AFF;
-  --text-inverse: #F2F2F7;
-  --border-subtle: #E5E5EA;
+  --bg-canvas: color-mix(in srgb, var(--palette-black) 5%, var(--palette-white));
+  --bg-bar: color-mix(in srgb, color-mix(in srgb, var(--palette-black) 5%, var(--palette-white)) 88%, transparent);
+  --bg-field: color-mix(in srgb, var(--palette-black) 8%, var(--palette-white));
+  --bg-raised: var(--palette-white);
+  --bg-subtle: color-mix(in srgb, var(--palette-black) 8%, var(--palette-white));
+  --bg-inverse: var(--palette-black);
+  --bg-scrim: color-mix(in srgb, var(--palette-black) 40%, transparent);
+  --text-primary: var(--palette-black);
+  --icon-action: var(--palette-black); /* значки кнопок шапок (поиск, назад, меню): чёрные, не --text-primary */
+  --text-secondary: color-mix(in srgb, var(--palette-black) 71%, var(--palette-white));
+  --text-disabled: color-mix(in srgb, var(--palette-black) 44%, var(--palette-white));
+  --text-link: var(--palette-blue);
+  --text-inverse: color-mix(in srgb, var(--palette-black) 5%, var(--palette-white));
+  --border-subtle: color-mix(in srgb, var(--palette-black) 10%, var(--palette-white));
   --border-focus: var(--palette-blue);
   --action-primary: var(--palette-action-blue);
-  --action-primary-text: #FFFFFF;
-  --action-secondary: #E5F1FF;
-  --action-secondary-text: #0062CC;
-  --action-disabled: #E9E9EB;
-  --error-bg: #FFE5E3;
-  --error-text: #C4271B;
+  --action-primary-text: var(--palette-white);
+  --action-secondary: color-mix(in srgb, var(--palette-blue) 10%, var(--palette-white));
+  --action-secondary-text: var(--palette-blue-pressed);
+  --action-disabled: color-mix(in srgb, var(--palette-black) 8%, var(--palette-white));
+  --error-bg: color-mix(in srgb, var(--palette-red) 14%, var(--palette-white));
+  --error-text: color-mix(in srgb, var(--palette-red) 75%, var(--palette-black));
   --chat-unread-bg: var(--palette-action-blue);
-  --chat-unread-text: #FFFFFF;
+  --chat-unread-text: var(--palette-white);
   --presence-online: var(--palette-green);
-  --presence-session: #B25000;
-  --presence-offline: #4A4A4F;
-  --shadow-lg: 0 2px 6px #00000014, 0 12px 32px -4px #00000029;
-  --focus-ring: 0 0 0 2px #F2F2F7, 0 0 0 4px #0A6FE8;
+  --presence-session: color-mix(in srgb, var(--palette-orange) 61%, var(--palette-black));
+  --presence-offline: color-mix(in srgb, var(--palette-black) 71%, var(--palette-white));
+  --shadow-lg: 0 2px 6px color-mix(in srgb, var(--palette-black) 8%, transparent), 0 12px 32px -4px color-mix(in srgb, var(--palette-black) 16%, transparent);
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--palette-black) 5%, var(--palette-white)), 0 0 0 4px var(--palette-action-blue);
 
   /* Размеры и скругления, размытие */
   --radius-xs: 4px;

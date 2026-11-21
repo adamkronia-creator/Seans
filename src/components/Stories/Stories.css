@@ -136,7 +136,7 @@
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: rgb(0 0 0 / var(--stage-a, 1));
+  background: color-mix(in srgb, var(--palette-black) 100%, transparent));
   animation: story-stage-in 0.2s ease-out backwards;
 }
 
@@ -237,7 +237,7 @@
   flex-direction: column;
   gap: var(--space-3);
   padding: calc(var(--safe-top) + var(--space-3)) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
-  color: #ffffff;
+  color: var(--palette-white);
 }
 
 .story-view__bars {
@@ -250,14 +250,14 @@
   height: 2px; /* grid:ok — толщина полоски */
   overflow: hidden;
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.35);
+  background: color-mix(in srgb, var(--palette-white) 35%, transparent);
 }
 
 .story-view__fill {
   display: block;
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: var(--palette-white);
   transform: scaleX(var(--p, 0));
   transform-origin: left;
 }
@@ -291,8 +291,8 @@
   width: var(--size-control);
   height: var(--size-control);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.2);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--palette-white) 20%, transparent);
+  color: var(--palette-white);
   font-size: var(--size-icon-lg);
 }
 
@@ -335,8 +335,8 @@
 .story-view__reply {
   height: var(--size-control);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 0.22);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--palette-white) 22%, transparent);
+  color: var(--palette-white);
   font: var(--type-body);
   font-weight: 600;
   -webkit-backdrop-filter: blur(var(--space-4));
@@ -349,7 +349,7 @@
 
 .story-view button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #ffffff;
+  box-shadow: 0 0 0 2px var(--palette-white);
 }
 
 /* ——— Новая история ——— */
@@ -359,7 +359,7 @@
   padding: var(--space-6);
   border: 0;
   background: none;
-  color: #ffffff;
+  color: var(--palette-white);
   font: var(--type-display);
   font-weight: 600;
   text-align: center;
@@ -368,7 +368,7 @@
 }
 
 .story-compose__field::placeholder {
-  color: rgb(255 255 255 / 0.7);
+  color: color-mix(in srgb, var(--palette-white) 70%, transparent);
 }
 
 .story-compose__bottom {
@@ -386,12 +386,12 @@
 .story-compose__swatch {
   width: var(--space-8);
   height: var(--space-8);
-  border: 2px solid rgb(255 255 255 / 0.5);
+  border: 2px solid color-mix(in srgb, var(--palette-white) 50%, transparent);
   border-radius: var(--radius-full);
 }
 
 .story-compose__swatch[data-on] {
-  border-color: #ffffff;
+  border-color: var(--palette-white);
 }
 
 /* Пока открыт просмотр, нижняя панель разделов не нужна */

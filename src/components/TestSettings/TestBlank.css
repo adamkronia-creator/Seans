@@ -319,15 +319,15 @@
 }
 
 .wave-scale__zone--green {
-  --wave: var(--color-green, #34c759);
+  --wave: var(--color-green, var(--palette-green));
 }
 
 .wave-scale__zone--blue {
-  --wave: var(--color-accent, #0a84ff);
+  --wave: var(--color-accent, var(--palette-blue));
 }
 
 .wave-scale__zone--gray {
-  --wave: #8e8e93;
+  --wave: color-mix(in srgb, var(--palette-black) 44%, var(--palette-white));
 }
 
 /* Ряд — прозрачная кнопка: дуга на всю ширину, таблетка по центру */
@@ -373,7 +373,7 @@
   min-width: 64px;
   height: 32px;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--wave) 30%, white);
+  background: color-mix(in srgb, var(--wave) 30%, var(--palette-white));
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
@@ -389,7 +389,7 @@
 /* Выбранный ряд: таблетка заливается цветом, дуга становится плотной */
 .wave-scale__zone--on .wave-scale__label {
   background: var(--wave);
-  color: #fff;
+  color: var(--palette-white);
 }
 
 .wave-scale__zone--on .wave-scale__arc path {

@@ -16,24 +16,20 @@ const APPLE_TONES = [
 type AppleToneId = typeof APPLE_TONES[number][0];
 
 const EXTRA_TONES = [
-  ['ice', 'Ледяной голубой', 'cyan', 'white', 42],
-  ['sea-glass', 'Морское стекло', 'mint', 'white', 52],
-  ['pistachio', 'Фисташковый', 'green', 'yellow', 56],
-  ['vanilla', 'Ванильный', 'yellow', 'white', 48],
-  ['apricot', 'Абрикосовый', 'orange', 'white', 58],
-  ['blossom', 'Лепестковый', 'pink', 'white', 46],
-  ['lilac-mist', 'Сиреневая дымка', 'slate', 'white', 51],
-  ['dusty-rose', 'Пыльная роза', 'pink', 'brown', 44],
-  ['salmon', 'Лососёвый', 'red', 'orange', 55],
-  ['gold', 'Золотистый', 'yellow', 'brown', 63],
-  ['sage', 'Шалфейный', 'mint', 'brown', 56],
-  ['lagoon', 'Лагунный', 'teal', 'blue', 55],
-  ['cornflower', 'Васильковый', 'blue', 'slate', 56],
-  ['orchid', 'Орхидея', 'magenta', 'slate', 61],
-  ['forest', 'Хвойный', 'green', 'black', 52],
-  ['petrol', 'Нефтяной синий', 'teal', 'black', 54],
-  ['midnight', 'Полуночный индиго', 'slate', 'black', 53],
-  ['wine', 'Винный', 'pink', 'black', 56],
+  ['ice', 'Ледяной голубой'],
+  ['sea-glass', 'Морское стекло'],
+  ['pistachio', 'Фисташковый'],
+  ['vanilla', 'Ванильный'],
+  ['apricot', 'Абрикосовый'],
+  ['blossom', 'Лепестковый'],
+  ['lilac-mist', 'Сиреневая дымка'],
+  ['dusty-rose', 'Пыльная роза'],
+  ['salmon', 'Лососёвый'],
+  ['gold', 'Золотистый'],
+  ['sage', 'Шалфейный'],
+  ['lagoon', 'Лагунный'],
+  ['cornflower', 'Васильковый'],
+  ['orchid', 'Орхидея'],
 ] as const;
 
 /** Цвета шапок карточек сведений и заметок: фон шапки и цвет иконки */
@@ -65,7 +61,7 @@ export type ToneId =
   | 'white'
   | 'black'
   | `shade-${AppleToneId}`
-  | `mix-${typeof EXTRA_TONES[number][0]}`;
+  | `mix-${typeof EXTRA_TONES[number][0] | 'forest' | 'petrol' | 'midnight' | 'wine'}`;
 
 const tone = (id: ToneId, label: string, color: string, outline?: string) => ({
   id,
@@ -76,47 +72,12 @@ const tone = (id: ToneId, label: string, color: string, outline?: string) => ({
   iconFilter: outline ? `drop-shadow(0 0 1px ${outline})` : undefined,
 });
 
-// Цвета папок хранятся как HEX, поэтому их прежняя палитра остаётся доступной.
-export const FOLDER_TONES = [
-  tone('blue', 'Синий', '#007AFF'),
-  tone('cyan', 'Голубой', '#32ADE6'),
-  tone('teal', 'Бирюзовый', '#30B0C7'),
-  tone('mint', 'Мятный', '#00A89F'),
-  tone('green', 'Зелёный', '#28A745'),
-  tone('lime', 'Салатовый', '#7FB000'),
-  tone('yellow', 'Жёлтый', '#C98A00'),
-  tone('orange', 'Оранжевый', '#FF9500'),
-  tone('coral', 'Коралловый', '#FF6B5B'),
-  tone('red', 'Красный', '#FF3B30'),
-  tone('pink', 'Розовый', '#FF2D55'),
-  tone('magenta', 'Пурпурный', '#C644C9'),
-  tone('purple', 'Фиолетовый', '#AF52DE'),
-  tone('brown', 'Коричневый', '#A2845E'),
-  tone('gray', 'Серый', '#8E8E93'),
-  tone('slate', 'Индиго', '#5856D6'),
-  tone('navy', 'Тёмно-синий', '#3C548D'),
-  tone('lavender', 'Лавандовый', '#846BD1'),
-  tone('plum', 'Сливовый', '#813989'),
-  tone('raspberry', 'Малиновый', '#B82C68'),
-  tone('ochre', 'Охра', '#A96F22'),
-  tone('terracotta', 'Терракотовый', '#B34D37'),
-  tone('olive', 'Оливковый', '#687821'),
-  tone('jade', 'Нефритовый', '#178264'),
-];
-
-const savedShades = APPLE_TONES.map(([id, label]) =>
-  tone(`shade-${id}`, `${label} · глубокий оттенок`, `color-mix(in srgb, var(--palette-${id}) 74%, var(--palette-black))`),
-);
-
 const editorTones = [
   ...APPLE_TONES.map(([id, label]) => tone(id, label, `var(--palette-${id})`)),
-  tone('white', 'Белый', 'var(--palette-white)', 'rgb(0 0 0 / 60%)'),
+  tone('white', 'Белый', 'var(--palette-white)', 'color-mix(in srgb, var(--palette-black) 60%, transparent)'),
   tone('black', 'Чёрный', 'var(--palette-black)'),
-  ...EXTRA_TONES.map(([id, label, first, second, weight]) =>
-    tone(`mix-${id}`, label, `color-mix(in oklab, var(--palette-${first}) ${weight}%, var(--palette-${second}))`),
-  ),
+  ...EXTRA_TONES.map(([id, label]) => tone(`mix-${id}`, label, `var(--palette-mix-${id})`)),
 ];
-
 
 // От тёплых цветов к холодным, затем нейтральные.
 const editorOrder: ToneId[] = [
@@ -135,8 +96,30 @@ export const TONES = editorOrder.flatMap((id) => {
 /** Без цвета: белая шапка, текст стандартного цвета, иконка акцентная */
 const NEUTRAL_TONE = { id: null, iconFilter: undefined, label: 'Без цвета', swatch: 'var(--color-accent)', fg: 'var(--color-accent)', bg: 'var(--color-bg-panel)' };
 
-// Сохранённые цвета продолжают отображаться на существующих карточках.
-const toneById = new Map([...FOLDER_TONES, ...savedShades, ...editorTones].map((entry) => [entry.id, entry]));
+// Старые идентификаторы отображаются ближайшим цветом из действующей палитры.
+const legacyTones: Partial<Record<ToneId, ToneId>> = {
+  lime: 'mix-pistachio',
+  coral: 'mix-salmon',
+  purple: 'mix-orchid',
+  gray: 'black',
+  navy: 'slate',
+  lavender: 'mix-lilac-mist',
+  plum: 'magenta',
+  raspberry: 'pink',
+  ochre: 'mix-gold',
+  terracotta: 'brown',
+  olive: 'mix-sage',
+  jade: 'mint',
+  'mix-forest': 'green',
+  'mix-petrol': 'mix-lagoon',
+  'mix-midnight': 'slate',
+  'mix-wine': 'mix-dusty-rose',
+};
+
+export function editorToneId(id: ToneId): ToneId {
+  if (id.startsWith('shade-')) return id.slice(6) as AppleToneId;
+  return legacyTones[id] ?? id;
+}
 
 export const toneOf = (id: ToneId | null) =>
-  id === null ? NEUTRAL_TONE : (toneById.get(id) ?? editorTones[0]);
+  id === null ? NEUTRAL_TONE : (editorToneById.get(editorToneId(id)) ?? editorTones[0]);

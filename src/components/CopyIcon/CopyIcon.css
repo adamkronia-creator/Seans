@@ -1,6 +1,6 @@
 /* Галочка вместо «копировать»: выскакивает с пружинкой и зелёная; прежний значок потом возвращается мягким проявлением */
 .copy-icon--done {
-  color: var(--presence-online, #248a3d); /* grid:ok — цвет, не размер */
+  color: var(--presence-online, color-mix(in srgb, var(--palette-green) 63%, var(--palette-black))); /* grid:ok — цвет, не размер */
   animation: pop-in 0.3s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) backwards;
 }
 

@@ -36,7 +36,10 @@ import './TaskForm.css';
 const MAX_TEXT = 3000;
 const MAX_FACTORS = 8;
 /** Цвета долей «пирога»: спокойные, но различимые и на светлом, и на тёмном стекле; доля самого клиента — акцентным цветом */
-const PIE_COLORS = ['#E6A04C', '#9B8AD0', '#4FB59A', '#D9798B', '#C9B458', '#7F9BB5', '#B58A6E', '#9AA3AE'];
+const PIE_COLORS = [
+  'var(--palette-orange)', 'var(--palette-slate)', 'var(--palette-mint)', 'var(--palette-pink)',
+  'var(--palette-yellow)', 'var(--palette-cyan)', 'var(--palette-brown)', 'var(--palette-magenta)',
+];
 const colorOf = (i: number) => PIE_COLORS[i % PIE_COLORS.length];
 
 /** Подпись умещается на рамке поля, если она короткая: тогда вопроса над полем нет, он сам стоит на рамке. Длинный вопрос остаётся текстом над полем */

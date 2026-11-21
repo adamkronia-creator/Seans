@@ -3,15 +3,15 @@
  * везде, где нужен src картинки (аватар в списке, шапке, строке участника). Цвет берётся из названия: одно имя — один цвет.
  */
 
-/** Пары цветов градиента сверху вниз: те же семь оттенков, что у аватарок в Telegram */
+/** Базовые цвета --palette-* в HEX для SVG, который загружается отдельно от CSS. */
 const GRADIENTS: Array<[string, string]> = [
-  ['#FF885E', '#FF516A'],
-  ['#FFCD6A', '#FFA85C'],
-  ['#82B1FF', '#665FFF'],
-  ['#A0DE7E', '#54CB68'],
-  ['#53EDD6', '#28C9B7'],
-  ['#72D5FD', '#2A9EF1'],
-  ['#E0A2F3', '#D669ED'],
+  ['#FF8D28', '#FF383C'],
+  ['#FFCC00', '#FF8D28'],
+  ['#0088FF', '#6155F5'],
+  ['#34C759', '#00C8B3'],
+  ['#00C8B3', '#00C3D0'],
+  ['#00C0E8', '#0088FF'],
+  ['#CB30E0', '#FF2D55'],
 ];
 
 /** Число 0…6 из строки: устойчиво, без зависимости от порядка создания */
@@ -46,7 +46,7 @@ function draw({ from, to, text, size }: Parts, height: number, y: number): strin
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 ${height}">` +
     `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs>` +
     `<rect width="128" height="${height}" fill="url(#g)"/>` +
-    `<text x="64" y="${y}" dy=".35em" text-anchor="middle" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="${size}" font-weight="600" fill="#fff">${text}</text>` +
+    `<text x="64" y="${y}" dy=".35em" text-anchor="middle" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="${size}" font-weight="600" fill="#000000">${text}</text>` +
     '</svg>';
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }

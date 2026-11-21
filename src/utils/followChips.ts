@@ -43,7 +43,7 @@ export function followChips(chips: Iterable<HTMLElement>, position: number, via?
  * от чипса к чипсу, а не перетекает цветом: положение и ширина — взвешенная сумма положений и ширин чипсов (веса те же, что у --w).
  */
 /** Обычная заливка выбранного чипса одним цветом (середина градиента --glass-chip-active), чтобы смешивать её с цветом папки */
-const DEFAULT_PILL = '#0D7CF2';
+const DEFAULT_PILL = 'var(--palette-action-blue)';
 
 export function placePill(chips: HTMLElement[], weights: number[]) {
   const pill = chips[0]?.parentElement?.querySelector<HTMLElement>(':scope > .chips-pill');
@@ -74,7 +74,7 @@ export function placePill(chips: HTMLElement[], weights: number[]) {
       sum += wt;
     });
     pill.style.setProperty('--pill-fill', mix);
-    pill.style.setProperty('--pill-border', `color-mix(in srgb, ${mix} 60%, white)`);
+    pill.style.setProperty('--pill-border', `color-mix(in srgb, ${mix} 60%, var(--palette-white))`);
   } else {
     pill.style.removeProperty('--pill-fill');
     pill.style.removeProperty('--pill-border');

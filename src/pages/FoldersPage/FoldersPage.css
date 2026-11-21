@@ -43,7 +43,7 @@
 .fs-row--dragging {
   z-index: 2;
   background: var(--glass-solid, var(--color-bg-panel));
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.2);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--palette-black) 20%, transparent);
 }
 
 .fs-row__grip {

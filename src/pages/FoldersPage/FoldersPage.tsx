@@ -122,10 +122,10 @@ export function FoldersPage({ scope }: { scope: FolderScope }) {
       <div className="fp__scroll">
         <div className="fs__lead">
           <svg className="fs__art" viewBox="0 0 96 80" aria-hidden="true">
-            <rect x="16" y="14" width="64" height="12" rx="4" fill="#E08A3C" />
-            <rect x="26" y="8" width="18" height="10" rx="3" fill="#3B5BDB" />
-            <rect x="52" y="8" width="18" height="10" rx="3" fill="#E03131" />
-            <path d="M10 28a4 4 0 0 1 4-4h22l6 6h40a4 4 0 0 1 4 4v38a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="#F0C48F" stroke="#C99A5E" strokeWidth="2" />
+            <rect x="16" y="14" width="64" height="12" rx="4" fill="var(--palette-orange)" />
+            <rect x="26" y="8" width="18" height="10" rx="3" fill="var(--palette-slate)" />
+            <rect x="52" y="8" width="18" height="10" rx="3" fill="var(--palette-red)" />
+            <path d="M10 28a4 4 0 0 1 4-4h22l6 6h40a4 4 0 0 1 4 4v38a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4z" fill="var(--palette-mix-apricot)" stroke="var(--palette-brown)" strokeWidth="2" />
           </svg>
           <p>{text.lead}</p>
         </div>

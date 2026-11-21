@@ -633,8 +633,8 @@
   gap: var(--space-1);
   padding: var(--space-1);
   border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 94%);
-  color: #1c1c1e;
+  background: color-mix(in srgb, var(--palette-white) 94%, transparent);
+  color: color-mix(in srgb, var(--palette-black) 89%, var(--palette-white));
   animation: pop-in 0.3s var(--ease-spring) backwards;
 }
 
@@ -659,7 +659,7 @@
   height: 28px; /* grid:ok */
   border-radius: 50%;
   object-fit: cover;
-  background: rgb(120 120 128 / 30%);
+  background: color-mix(in srgb, color-mix(in srgb, var(--palette-black) 52%, var(--palette-white)) 30%, transparent);
 }
 
 .bubble__reaction-faces > * + * {
@@ -742,14 +742,14 @@
   width: var(--size-touch);
   height: var(--size-touch);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 22%);
+  background: color-mix(in srgb, var(--palette-white) 22%, transparent);
   color: inherit;
   font-size: var(--size-icon);
 }
 
 .bubble--in .bubble__file-icon {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--palette-white);
 }
 
 .bubble__file-text {
@@ -780,7 +780,7 @@
 }
 
 .bubble--out .bubble__fwd {
-  color: rgb(255 255 255 / 85%);
+  color: color-mix(in srgb, var(--palette-white) 85%, transparent);
 }
 
 .bubble--tcard-bare:has(.bubble__foot) {
@@ -791,23 +791,23 @@
 
 /* Цвета имён авторов: семь оттенков, как в Telegram; на светлом стекле темнее, на тёмном (белый текст приложения) светлее */
 [data-pm] {
-  --author-0: #c42b3a;
-  --author-1: #b35900;
-  --author-2: #6d4bd8;
-  --author-3: #1e8a3c;
-  --author-4: #00857f;
-  --author-5: #1a6fd1;
-  --author-6: #b8368f;
+  --author-0: color-mix(in srgb, var(--palette-red) 75%, var(--palette-black));
+  --author-1: color-mix(in srgb, var(--palette-orange) 61%, var(--palette-black));
+  --author-2: color-mix(in srgb, var(--palette-slate) 82%, var(--palette-black));
+  --author-3: color-mix(in srgb, var(--palette-green) 63%, var(--palette-black));
+  --author-4: color-mix(in srgb, var(--palette-teal) 66%, var(--palette-black));
+  --author-5: color-mix(in srgb, var(--palette-blue) 75%, var(--palette-black));
+  --author-6: color-mix(in srgb, var(--palette-magenta) 71%, var(--palette-black));
 }
 
 :root[data-ink='light'] [data-pm] {
-  --author-0: #ff8f8a;
-  --author-1: #ffb46b;
-  --author-2: #b4a0ff;
-  --author-3: #7edb8b;
-  --author-4: #5adbd0;
-  --author-5: #7dbbff;
-  --author-6: #f29ad8;
+  --author-0: var(--palette-mix-salmon);
+  --author-1: var(--palette-mix-apricot);
+  --author-2: var(--palette-mix-lilac-mist);
+  --author-3: var(--palette-mix-pistachio);
+  --author-4: var(--palette-mix-sea-glass);
+  --author-5: var(--palette-mix-ice);
+  --author-6: var(--palette-mix-blossom);
 }
 
 /* В группе у входящих слева место под фото автора; пузырь немного уже, чтобы справа оставался воздух */

@@ -264,7 +264,7 @@
 .chip--editing.chip--dragging {
   z-index: 2;
   animation: none;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.22);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--palette-black) 22%, transparent);
   scale: 1.06;
   touch-action: none;
 }
@@ -277,7 +277,7 @@
   height: 20px;
   margin-right: calc(var(--space-1) * -1);
   border-radius: var(--radius-full);
-  background: rgb(0 0 0 / 0.14);
+  background: color-mix(in srgb, var(--palette-black) 14%, transparent);
   color: inherit;
 }
 

@@ -22,22 +22,37 @@
   --palette-brown: #AC7F5E;
   --palette-white: #FFFFFF;
   --palette-black: #000000;
+  --palette-mix-ice: color-mix(in oklab, var(--palette-cyan) 42%, var(--palette-white));
+  --palette-mix-sea-glass: color-mix(in oklab, var(--palette-mint) 52%, var(--palette-white));
+  --palette-mix-pistachio: color-mix(in oklab, var(--palette-green) 56%, var(--palette-yellow));
+  --palette-mix-vanilla: color-mix(in oklab, var(--palette-yellow) 48%, var(--palette-white));
+  --palette-mix-apricot: color-mix(in oklab, var(--palette-orange) 58%, var(--palette-white));
+  --palette-mix-blossom: color-mix(in oklab, var(--palette-pink) 46%, var(--palette-white));
+  --palette-mix-lilac-mist: color-mix(in oklab, var(--palette-slate) 51%, var(--palette-white));
+  --palette-mix-dusty-rose: color-mix(in oklab, var(--palette-pink) 44%, var(--palette-brown));
+  --palette-mix-salmon: color-mix(in oklab, var(--palette-red) 55%, var(--palette-orange));
+  --palette-mix-gold: color-mix(in oklab, var(--palette-yellow) 63%, var(--palette-brown));
+  --palette-mix-sage: color-mix(in oklab, var(--palette-mint) 56%, var(--palette-brown));
+  --palette-mix-lagoon: color-mix(in oklab, var(--palette-teal) 55%, var(--palette-blue));
+  --palette-mix-cornflower: color-mix(in oklab, var(--palette-blue) 56%, var(--palette-slate));
+  --palette-mix-orchid: color-mix(in oklab, var(--palette-magenta) 61%, var(--palette-slate));
+  --palette-blue-pressed: color-mix(in srgb, var(--palette-blue) 75%, var(--palette-black));
   --palette-action-blue: color-mix(in srgb, var(--palette-blue) 83%, var(--palette-black));
 
   /* Поверхности */
-  --color-bg-app: #F2F2F7;       /* основа: приложение, шапки, списки, нижние панели, листы */
-  --color-bg-desk: #E5E5EA;      /* за краями приложения на широком окне */
+  --color-bg-app: color-mix(in srgb, var(--palette-black) 5%, var(--palette-white));       /* основа: приложение, шапки, списки, нижние панели, листы */
+  --color-bg-desk: color-mix(in srgb, var(--palette-black) 10%, var(--palette-white));      /* за краями приложения на широком окне */
   --color-bg-panel: var(--color-bg-app);   /* шапки, нижние панели, листы, полосы: та же основа, от соседей их отделяет линейка */
-  --color-bg-fill: #EEEEF0;      /* поля ввода и неактивные чипсы — заливка без рамки */
-  --color-bg-fill-strong: #D1D1D6; /* дорожка переключателя: заливка выше сливалась бы с основой */
+  --color-bg-fill: color-mix(in srgb, var(--palette-black) 7%, var(--palette-white));      /* поля ввода и неактивные чипсы — заливка без рамки */
+  --color-bg-fill-strong: color-mix(in srgb, var(--palette-black) 18%, var(--palette-white)); /* дорожка переключателя: заливка выше сливалась бы с основой */
   --color-bg-row: var(--color-bg-panel);   /* строки списков (чаты, события) */
-  --color-bg-row-pressed: #E5E5EA;         /* та же строка под пальцем */      /* лента сообщений — своя «комната», чуть насыщеннее основы шапки; белые и голубые пузыри на ней читаются как формы */      /* плашки поверх ленты (день), непрозрачные: под ними проезжают пузыри */
+  --color-bg-row-pressed: color-mix(in srgb, var(--palette-black) 10%, var(--palette-white));         /* та же строка под пальцем */      /* лента сообщений — своя «комната», чуть насыщеннее основы шапки; белые и голубые пузыри на ней читаются как формы */      /* плашки поверх ленты (день), непрозрачные: под ними проезжают пузыри */
 
   /* Текст: чернила тёмно-синие, четыре ступени, все читаются на основе */
-  --color-text-primary: #000000;   /* основной (15:1) */
-  --color-text-secondary: #3C3C43; /* вторичный: описания, превью (9:1) */
-  --color-text-caption: #4A4A4F;   /* подписи: время, даты, подсказки (6,2:1 на основе, 5,6:1 на заливке полей) */
-  --color-text-placeholder: #6C6C70; /* подсказка в пустом поле, неактивные значки (4,8:1) */
+  --color-text-primary: var(--palette-black);   /* основной (15:1) */
+  --color-text-secondary: color-mix(in srgb, var(--palette-black) 76%, var(--palette-white)); /* вторичный: описания, превью (9:1) */
+  --color-text-caption: color-mix(in srgb, var(--palette-black) 71%, var(--palette-white));   /* подписи: время, даты, подсказки (6,2:1 на основе, 5,6:1 на заливке полей) */
+  --color-text-placeholder: color-mix(in srgb, var(--palette-black) 58%, var(--palette-white)); /* подсказка в пустом поле, неактивные значки (4,8:1) */
 
   /* Акцент: systemBlue */
   --color-accent: var(--palette-action-blue);
@@ -47,34 +62,34 @@
   --color-yellow: var(--palette-yellow);
   --color-orange: var(--palette-orange);
   --color-red: var(--palette-red);
-  --color-darkred: #A3201A;     /* пятый уровень шкал: тяжёлая степень (тёмный производный от красного) */       /* Кофе с молоком */
+  --color-darkred: color-mix(in srgb, var(--palette-red) 61%, var(--palette-black));     /* пятый уровень шкал: тяжёлая степень (тёмный производный от красного) */       /* Кофе с молоком */
 
   /* Те же цвета для текста на бумаге (≥ 5:1): пастель годится для заливок и точек, но не для букв */
-  --color-green-text: #248A3D;
-  --color-yellow-text: #946200;
-  --color-orange-text: #C93400;
-  --color-red-text: #D70015;
+  --color-green-text: color-mix(in srgb, var(--palette-green) 63%, var(--palette-black));
+  --color-yellow-text: color-mix(in srgb, var(--palette-orange) 55%, var(--palette-black));
+  --color-orange-text: color-mix(in srgb, var(--palette-red) 73%, var(--palette-black));
+  --color-red-text: color-mix(in srgb, var(--palette-red) 75%, var(--palette-black));
 
   /* Семантика */
   --color-success: var(--color-green);
 
   /* Производные цвета */
-  --color-border: #D1D1D6;                              /* границы полей и карточек: заливка полей на ступень темнее */
-  --color-divider: #E5E5EA;                             /* линейки между строками списков и под шапками */
-  --color-stroke: #D1D1D6;                              /* тонкие обводки и кольца */
+  --color-border: color-mix(in srgb, var(--palette-black) 18%, var(--palette-white));                              /* границы полей и карточек: заливка полей на ступень темнее */
+  --color-divider: color-mix(in srgb, var(--palette-black) 10%, var(--palette-white));                             /* линейки между строками списков и под шапками */
+  --color-stroke: color-mix(in srgb, var(--palette-black) 18%, var(--palette-white));                              /* тонкие обводки и кольца */
   --color-accent-soft: color-mix(in srgb, var(--palette-blue) 14%, transparent);           /* акцент 14%: подложки акцентных значков и выбранных строк */
-  --color-accent-on: #FFFFFF;                           /* текст на акцентном фоне */
+  --color-accent-on: var(--palette-white);                           /* текст на акцентном фоне */
   --color-ink-on-pastel: var(--color-text-primary);     /* текст на любой пастельной заливке: чернила (≥ 4,3:1 на всех 76 цветах палитры) */                     /* Синий-синий иней: исходящие пузыри, чернила на нём 10:1 */                           /* входящие: белый лист */
   --color-green-soft: color-mix(in srgb, var(--palette-green) 20%, transparent);           /* подложки меток: подтверждено, состоялось */           /* ждём ответа */             /* отказ, отмена */
 
   /* Вид содержимого: каждому свой цвет, везде один и тот же (выбранный чипс раздела, линия времени, значки в списках, плашки записей).
      Заливка — пастель, текст по ней — чернила. soft — та же пастель, разведённая бумагой, для больших полотен */
-  --tone-chat: #CCE4FF;          /* Диалог */
-  --tone-session: #99CBFF;       /* Сеансы: синий */
-  --tone-test: #FFE066;          /* Тесты (методики): жёлтый */
-  --tone-task: #A6E8B7;          /* Задания: зелёный */
-  --tone-info: #FFC2CF;          /* Сведения: розовый */
-  --tone-note: #E5CCF5;          /* Заметки: фиолетовый */
+  --tone-chat: color-mix(in srgb, var(--palette-blue) 22%, var(--palette-white));          /* Диалог */
+  --tone-session: var(--palette-mix-ice);       /* Сеансы: синий */
+  --tone-test: var(--palette-mix-vanilla);          /* Тесты (методики): жёлтый */
+  --tone-task: var(--palette-mix-pistachio);          /* Задания: зелёный */
+  --tone-info: var(--palette-mix-blossom);          /* Сведения: розовый */
+  --tone-note: var(--palette-mix-lilac-mist);          /* Заметки: фиолетовый */
 
   /* Шрифт: Inter с оптическими размерами (мелкий кегль рисуется шире и разборчивее, крупный плотнее) */
   --font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -133,7 +148,7 @@
   --radius-full: 50%;
 
   /* Тени: только у того, что парит над страницей */
-  --shadow-float: 0 4px 16px rgb(23 46 47 / 14%), 0 1px 3px rgb(23 46 47 / 8%);
+  --shadow-float: 0 4px 16px color-mix(in srgb, var(--palette-black) 14%, transparent), 0 1px 3px color-mix(in srgb, var(--palette-black) 8%, transparent);
 
   /* Безопасные зоны: строка состояния, вырез камеры, индикатор «домой». Приложение рисуется до краёв экрана (viewport-fit=cover),
      шапки и нижние панели тянутся под системные области, а их содержимое отступает на эту величину. Без вырезов (браузер, рабочий стол) везде 0 */

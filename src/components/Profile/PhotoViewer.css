@@ -109,7 +109,7 @@
   height: var(--size-control);
   margin-top: calc(var(--size-control) / -2);
   border-radius: var(--radius-full);
-  background: rgb(255 255 255 / 14%);
+  background: color-mix(in srgb, var(--palette-white) 14%, transparent);
   color: var(--color-accent-on);
   font-size: var(--size-icon);
 }
@@ -152,7 +152,7 @@
 .viewer__tags li {
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 16%);
+  background: color-mix(in srgb, var(--palette-white) 16%, transparent);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-sm);
 }
@@ -181,7 +181,7 @@
   gap: var(--space-1);
   min-width: var(--size-touch);
   min-height: var(--size-touch);
-  color: rgb(255 255 255 / 88%);
+  color: color-mix(in srgb, var(--palette-white) 88%, transparent);
   font-size: var(--size-icon-lg);
 }
 
@@ -193,7 +193,7 @@
 
 /* Сердечко отмечено */
 .viewer__action--like {
-  color: #ff4d5e;
+  color: var(--palette-red);
 }
 
 /* Подсказка на тёмном фоне: светлая плашка, у верхнего края, чтобы не закрывать подпись и действия.
@@ -203,7 +203,7 @@
   bottom: auto;
   max-width: 448px;
   margin-inline: auto;
-  background: rgb(255 255 255 / 94%);
+  background: color-mix(in srgb, var(--palette-white) 94%, transparent);
   color: var(--color-text-primary);
 }
 
@@ -220,21 +220,21 @@
 
 /* data-pm нужен меню и окнам внутри просмотра; фон просмотра остаётся тёмным */
 .viewer[data-pm] {
-  background: #05070c;
-  color: #fff;
+  background: color-mix(in srgb, var(--palette-black) 97%, var(--palette-white));
+  color: var(--palette-white);
 }
 
 .viewer[data-pm] .viewer__button,
 .viewer[data-pm] .viewer__nav {
-  color: #fff;
+  color: var(--palette-white);
 }
 
 .viewer[data-pm] .viewer__action--like,
 .viewer[data-pm] .viewer__action--like span {
-  color: #ff4d5e;
+  color: var(--palette-red);
 }
 
 .viewer[data-pm] .viewer__action--like svg {
-  color: #ff4d5e;
+  color: var(--palette-red);
   opacity: 1;
 }

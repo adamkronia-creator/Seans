@@ -22,8 +22,8 @@
   /* Как круги «Архивы» и «Избранное»: синий градиент и белый значок */
   box-sizing: border-box;
   border: 1px solid var(--glass-border-blue, transparent);
-  background: var(--grad-circle, linear-gradient(135deg, rgb(51 149 255 / 0.96), rgb(0 122 255 / 0.92)));
-  color: #ffffff;
+  background: var(--grad-circle, linear-gradient(135deg, color-mix(in srgb, var(--palette-blue) 96%, transparent), color-mix(in srgb, var(--palette-blue) 92%, transparent)));
+  color: var(--palette-white);
   font-size: 32px;
 }
 

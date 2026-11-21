@@ -87,7 +87,7 @@
 .profile__badge--cover {
   width: 32px;
   height: 32px;
-  background: rgb(19 32 58 / 52%);
+  background: color-mix(in srgb, var(--palette-black) 52%, transparent);
   font-size: 18px;
 }
 

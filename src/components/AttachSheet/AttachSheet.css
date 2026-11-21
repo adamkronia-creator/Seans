@@ -125,7 +125,7 @@
   inset: -1px; /* grid:ok — перекрывает рамку 1 px */
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, var(--palette-white)), var(--tint));
   opacity: 0.9;
 }
 

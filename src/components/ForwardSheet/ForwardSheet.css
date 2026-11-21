@@ -57,6 +57,6 @@
   height: var(--size-control);
   border-radius: var(--radius-pill);
   background: var(--glass-chip-active, var(--color-accent));
-  color: #fff;
+  color: var(--palette-white);
   font-weight: var(--font-weight-medium);
 }

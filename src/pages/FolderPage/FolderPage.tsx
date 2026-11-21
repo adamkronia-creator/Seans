@@ -4,9 +4,9 @@ import { Avatar } from '../../components/Avatar/Avatar';
 import { Collapse } from '../../components/EditSheet/EditSheet';
 import '../../components/EditSheet/EditSheet.css';
 import { Badge } from '../../components/Badge/Badge';
-import { inkOn } from '../../components/Chip/Chip';
+import { inkOn } from '../../utils/color';
 import { Switch } from '../../components/Switch/Switch';
-import { FOLDER_TONES } from '../../data/tones';
+import { TONES } from '../../data/tones';
 import { Frame } from '../../components/Frame/Frame';
 import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { removeFolderText } from '../../components/FolderMenu/folderTexts';
@@ -49,16 +49,10 @@ const ROLES: Record<ChatCategory, string> = { clients: 'Клиент', colleague
 
 const VISUAL = 48;
 
-/** Цвета папки и счётчика — те же 16, что у шапок заметок и сведений; для текста вместо коричневого и серого белый и чёрный */
-const FOLDER_COLORS = FOLDER_TONES.map((t) => ({ id: t.id, label: t.label, color: t.swatch }));
-const FOLDER_INKS = FOLDER_TONES.map((t) => (t.id === 'brown' ? { id: 'white', label: 'Белый', color: '#FFFFFF' } : t.id === 'gray' ? { id: 'black', label: 'Чёрный', color: '#1C1C1E' } : { id: t.id, label: t.label, color: t.swatch }));
-
-type Swatch = { id: string; label: string; color: string };
-
-/** Панель цвета, как у заметок и сведений: строка с переключателем и сетка из 16 цветов; сетка раскрыта всегда, выключено — цвет не задан (выбор цвета включает его) */
-function ColorCard({ label, value, palette, onChange }: { label: string; value: string | undefined; palette: Swatch[]; onChange: (color: string | undefined) => void }) {
+/** Папка, текст и счётчик используют ту же палитру, что заметки и сведения. */
+function ColorCard({ label, value, onChange }: { label: string; value: string | undefined; onChange: (color: string | undefined) => void }) {
   const uid = useId();
-  const last = useRef(value ?? palette[0].color);
+  const last = useRef(value ?? TONES[0].swatch);
   if (value) last.current = value;
   const on = value !== undefined;
   return (
@@ -71,17 +65,17 @@ function ColorCard({ label, value, palette, onChange }: { label: string; value: 
       </div>
       <Collapse open>
         <div className="fp-tones" role="radiogroup" aria-labelledby={`${uid}-l`}>
-          {palette.map((sw) => (
+          {TONES.map((sw) => (
             <button
               key={sw.id}
               type="button"
               role="radio"
-              aria-checked={sw.color === value}
+              aria-checked={sw.swatch === value}
               aria-label={sw.label}
-              className={`fp-tone${sw.color === value ? ' fp-tone--active' : ''}`}
-              data-light={sw.color === '#FFFFFF' || undefined}
-              style={{ '--swatch': sw.color } as CSSProperties}
-              onClick={() => onChange(sw.color)}
+              className={`fp-tone${sw.swatch === value ? ' fp-tone--active' : ''}`}
+              data-monochrome={sw.id === 'white' || sw.id === 'black' || undefined}
+              style={{ '--swatch': sw.swatch } as CSSProperties}
+              onClick={() => onChange(sw.swatch)}
             />
           ))}
         </div>
@@ -285,7 +279,7 @@ export function FolderPage({ scope, id }: FolderPageProps) {
         {/* Как шапка открытого чата: «назад», затем чипс таким, каким он будет в ряду (цвета видно сразу), правее название и подпись */}
         <span
           className="fp__preview"
-          style={{ ...(folder.color && { '--preview-bg': folder.color }), ...(folder.ink && { '--preview-ink': folder.ink }), ...(folder.badge && { '--badge-bg': folder.badge, '--badge-on': inkOn(folder.badge) }) } as CSSProperties}
+          style={{ ...(folder.color && { '--preview-bg': folder.color }), '--preview-ink': folder.ink ?? (folder.color ? inkOn(folder.color) : undefined), ...(folder.badge && { '--badge-bg': folder.badge, '--badge-on': inkOn(folder.badge) }) } as CSSProperties}
           data-paint-badge={folder.badge}
           aria-hidden="true"
         >
@@ -338,9 +332,9 @@ export function FolderPage({ scope, id }: FolderPageProps) {
           </label>
         </section>
 
-        <ColorCard label="Цвет папки" value={folder.color} palette={FOLDER_COLORS} onChange={(color) => setFolderPaint(scope, id, { color })} />
-        <ColorCard label="Цвет текста" value={folder.ink} palette={FOLDER_INKS} onChange={(ink) => setFolderPaint(scope, id, { ink })} />
-        <ColorCard label="Цвет счётчика" value={folder.badge} palette={FOLDER_COLORS} onChange={(badge) => setFolderPaint(scope, id, { badge })} />
+        <ColorCard label="Цвет папки" value={folder.color} onChange={(color) => setFolderPaint(scope, id, { color })} />
+        <ColorCard label="Цвет текста" value={folder.ink} onChange={(ink) => setFolderPaint(scope, id, { ink })} />
+        <ColorCard label="Цвет счётчика" value={folder.badge} onChange={(badge) => setFolderPaint(scope, id, { badge })} />
 
         <section className="fp__card" aria-labelledby="fp-selected">
           <h2 id="fp-selected" className="fp__heading fp__heading--pad">

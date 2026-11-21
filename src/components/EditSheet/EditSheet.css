@@ -6,7 +6,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgb(19 32 58 / 40%);
+  background: color-mix(in srgb, var(--palette-black) 40%, transparent);
 }
 
 /* Панель на фоне приложения, карточки внутри белые; верхние углы 24 */
@@ -39,13 +39,13 @@
   width: var(--size-control-sm);
   height: var(--size-control-sm);
   border-radius: var(--radius-full);
-  background: var(--glass-fill, rgb(120 120 128 / 16%));
+  background: var(--glass-fill, color-mix(in srgb, color-mix(in srgb, var(--palette-black) 52%, var(--palette-white)) 16%, transparent));
   color: var(--text-secondary, var(--color-text-secondary));
   font-size: var(--size-icon-sm);
 }
 
 .sheet__close[data-pressed] {
-  background: var(--glass, rgb(120 120 128 / 28%));
+  background: var(--glass, color-mix(in srgb, color-mix(in srgb, var(--palette-black) 52%, var(--palette-white)) 28%, transparent));
 }
 
 .sheet > .sheet__header {
@@ -78,7 +78,7 @@
   padding: var(--space-3) var(--space-4) var(--space-4);
   overflow-y: auto;
   /* Прокручиваемое плавно уходит под верхний край панели, а не обрезается резко */
-  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
+  mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4));
   scroll-padding-top: var(--space-4);
   /* Под текстом панель форматирования 49: каретка при вводе не уходит под нее */
   scroll-padding-bottom: 65px;
@@ -489,8 +489,8 @@
 }
 
 [data-pm] .sheet.sheet--edit .sheet__body {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
-  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4));
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4));
+  mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4));
 }
 
 /* Зазор над кнопками находится за пределами прокрутки: под прилипшей панелью виден только фон листа. */

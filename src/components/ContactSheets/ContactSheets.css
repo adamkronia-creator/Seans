@@ -21,7 +21,7 @@
 .ct-chip[aria-pressed='true'] {
   border-color: transparent;
   background: var(--action-primary, var(--color-accent));
-  color: var(--color-accent-on, #fff);
+  color: var(--color-accent-on, var(--palette-white));
 }
 
 .ct-hint {

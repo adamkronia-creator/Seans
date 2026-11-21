@@ -29,8 +29,8 @@ export function QrCode({ text }: { text: string }) {
   }, [text]);
   return (
     <svg className="gu-qr__code" viewBox={`0 0 ${size} ${size}`} role="img" aria-label="QR-код ссылки" shapeRendering="crispEdges">
-      <rect width={size} height={size} fill="#fff" />
-      <path d={path} fill="#000" />
+      <rect width={size} height={size} fill="var(--palette-white)" />
+      <path d={path} fill="var(--palette-black)" />
     </svg>
   );
 }

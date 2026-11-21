@@ -136,7 +136,7 @@
   width: 1px;
   min-height: 0;
   margin: var(--space-1) 0;
-  background: var(--glass-thread, rgb(255 255 255 / 60%)); /* полупрозрачная белая: на цветном фоне сцены даёт спокойную светлую нить */
+  background: var(--glass-thread, color-mix(in srgb, var(--palette-white) 60%, transparent)); /* полупрозрачная белая: на цветном фоне сцены даёт спокойную светлую нить */
 }
 
 /* Круг 20 цвета типа события: те же тона, что у чипсов разделов (сеанс — бирюзовый, тест — розовый, задание — зелёный,
@@ -156,7 +156,7 @@
 }
 
 .hist-marker--session {
-  --marker-bg: #007aff;
+  --marker-bg: var(--palette-blue);
 }
 
 .hist-marker--asset {

@@ -47,10 +47,10 @@
 [data-pm] .option-help-sheet .oh {
   padding: 0 0 var(--space-2);
   background:
-    radial-gradient(circle at 12% 18%, rgb(255 255 255 / 22%) 0 8%, transparent 9%),
-    radial-gradient(circle at 90% 62%, rgb(255 255 255 / 16%) 0 6%, transparent 7%),
-    radial-gradient(circle at 6% 74%, rgb(255 255 255 / 14%) 0 5%, transparent 6%),
-    linear-gradient(160deg, #8d7dff 0%, #6f8cff 52%, #5ea2f2 100%);
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--palette-white) 22%, transparent) 0 8%, transparent 9%),
+    radial-gradient(circle at 90% 62%, color-mix(in srgb, var(--palette-white) 16%, transparent) 0 6%, transparent 7%),
+    radial-gradient(circle at 6% 74%, color-mix(in srgb, var(--palette-white) 14%, transparent) 0 5%, transparent 6%),
+    linear-gradient(160deg, var(--palette-mix-lilac-mist) 0%, var(--palette-mix-cornflower) 52%, var(--palette-mix-ice) 100%);
 }
 
 /*
@@ -102,11 +102,11 @@
   margin: 0;
   overflow: hidden;
   /* Телефон обрезан сверху (экран продолжается за край окна), внизу виден корпус */
-  border: 6px solid #14141b; /* grid:ok — корпус телефона */
+  border: 6px solid color-mix(in srgb, var(--palette-black) 92%, var(--palette-white)); /* grid:ok — корпус телефона */
   border-top: 0;
   border-bottom-width: 16px; /* grid:ok — нижняя рамка корпуса */
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  background: #14141b;
+  background: color-mix(in srgb, var(--palette-black) 92%, var(--palette-white));
   opacity: 0.55;
   transform: scale(0.95);
   transition:
@@ -132,8 +132,8 @@
   height: 56px; /* grid:ok */
   margin: -28px 0 0 -28px; /* grid:ok */
   border-radius: 50%;
-  background: rgb(255 255 255 / 55%);
-  box-shadow: 0 0 0 2px rgb(120 120 140 / 35%);
+  background: color-mix(in srgb, var(--palette-white) 55%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, color-mix(in srgb, var(--palette-black) 50%, var(--palette-white)) 35%, transparent);
   opacity: 0;
   pointer-events: none;
 }
@@ -178,7 +178,7 @@
   position: absolute;
   border: 2px solid var(--color-orange);
   border-radius: var(--radius-md);
-  box-shadow: 0 0 0 3px rgb(255 117 20 / 22%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--palette-orange) 22%, transparent);
   opacity: 0;
   pointer-events: none;
 }

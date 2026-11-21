@@ -119,7 +119,7 @@
 .result-seg__input:checked + .result-seg__face {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: #fff;
+  color: var(--palette-white);
 }
 
 .result-seg__input:focus-visible + .result-seg__face {

@@ -110,7 +110,7 @@
   height: var(--space-2);
   overflow: hidden;
   border-radius: var(--radius-xs);
-  background: rgb(60 60 67 / 18%);
+  background: color-mix(in srgb, color-mix(in srgb, var(--palette-black) 76%, var(--palette-white)) 18%, transparent);
 }
 
 .hist-scale__fill {
@@ -124,8 +124,8 @@
   top: 0;
   bottom: 0;
   width: 1px; /* grid:ok — отметка границы диапазона */
-  background: rgb(255 255 255 / 48%);
-  box-shadow: 1px 0 rgb(0 0 0 / 14%);
+  background: color-mix(in srgb, var(--palette-white) 48%, transparent);
+  box-shadow: 1px 0 color-mix(in srgb, var(--palette-black) 14%, transparent);
 }
 
 .hist-scale__pole {

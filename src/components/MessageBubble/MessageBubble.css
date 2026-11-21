@@ -78,7 +78,7 @@
 }
 
 .bubble--out .bubble__meta {
-  color: rgb(255 255 255 / 0.92);
+  color: color-mix(in srgb, var(--palette-white) 92%, transparent);
 }
 
 /* Галочки доставки на синем — белые */
@@ -103,12 +103,12 @@
 /* Подсветка в поиске по чату */
 .bubble__mark {
   border-radius: var(--radius-xs);
-  background: rgb(255 207 72 / 55%);
+  background: color-mix(in srgb, var(--palette-yellow) 55%, transparent);
   color: inherit;
 }
 
 .bubble__mark--active {
-  background: #FFCC00; /* Восход солнца */
+  background: var(--palette-yellow); /* Восход солнца */
   color: var(--text-primary);
 }
 
@@ -141,7 +141,7 @@
 }
 
 .bubble--out .bubble__quote {
-  border-left-color: rgb(255 255 255 / 0.7);
+  border-left-color: color-mix(in srgb, var(--palette-white) 70%, transparent);
 }
 
 .bubble__quote-name {
@@ -164,7 +164,7 @@
 }
 
 .bubble--out .bubble__quote-text {
-  color: rgb(255 255 255 / 0.85);
+  color: color-mix(in srgb, var(--palette-white) 85%, transparent);
 }
 
 /* Подсказка свайпа: значок «ответить» появляется слева */

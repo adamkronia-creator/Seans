@@ -6,7 +6,7 @@
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: #000000;
+  background: var(--palette-black);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -30,8 +30,8 @@
   inset: 0;
   border-radius: 50%;
   box-shadow:
-    0 0 0 100vmax rgb(0 0 0 / 55%),
-    inset 0 0 0 2px rgb(255 255 255 / 70%);
+    0 0 0 100vmax color-mix(in srgb, var(--palette-black) 55%, transparent),
+    inset 0 0 0 2px color-mix(in srgb, var(--palette-white) 70%, transparent);
   pointer-events: none;
 }
 

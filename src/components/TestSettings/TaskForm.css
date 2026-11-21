@@ -408,10 +408,10 @@
   margin-top: calc((var(--track) - var(--thumb)) / 2); /* бегунок по середине дорожки */
   border: 0;
   border-radius: 50%;
-  background: #fff; /* grid:ok — белый бегунок на любом фоне */
+  background: var(--palette-white); /* grid:ok — белый бегунок на любом фоне */
   box-shadow:
-    0 1px 4px rgb(19 32 58 / 30%),
-    0 0 0 1px rgb(19 32 58 / 6%);
+    0 1px 4px color-mix(in srgb, var(--palette-black) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--palette-black) 6%, transparent);
   -webkit-appearance: none;
   appearance: none;
 }
@@ -422,10 +422,10 @@
   height: var(--thumb);
   border: 0;
   border-radius: 50%;
-  background: #fff; /* grid:ok — белый бегунок на любом фоне */
+  background: var(--palette-white); /* grid:ok — белый бегунок на любом фоне */
   box-shadow:
-    0 1px 4px rgb(19 32 58 / 30%),
-    0 0 0 1px rgb(19 32 58 / 6%);
+    0 1px 4px color-mix(in srgb, var(--palette-black) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--palette-black) 6%, transparent);
 }
 
 .tf-slider__range:focus-visible::-webkit-slider-thumb {
@@ -448,13 +448,13 @@
 .tf-slider--unset .tf-slider__range::-webkit-slider-thumb {
   box-shadow:
     inset 0 0 0 2px var(--action-primary),
-    0 1px 4px rgb(19 32 58 / 30%);
+    0 1px 4px color-mix(in srgb, var(--palette-black) 30%, transparent);
 }
 
 .tf-slider--unset .tf-slider__range::-moz-range-thumb {
   box-shadow:
     inset 0 0 0 2px var(--action-primary),
-    0 1px 4px rgb(19 32 58 / 30%);
+    0 1px 4px color-mix(in srgb, var(--palette-black) 30%, transparent);
 }
 
 .tf-slider__value {

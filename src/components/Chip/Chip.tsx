@@ -3,6 +3,7 @@ import { Badge } from '../Badge/Badge';
 import type { Tone } from '../../utils/tone';
 import { askRemoveFolder, useFolderEditing } from '../../data/folderEdit';
 import type { FolderScope } from '../../data/folders';
+import { inkOn } from '../../utils/color';
 import './Chip.css';
 
 /** Сколько держать палец, чтобы это было долгое нажатие: как у сообщений в чате */
@@ -48,13 +49,6 @@ interface ChipProps {
   folder?: { scope: FolderScope; id: string };
   /** Свой цвет заливки выбранного чипса и подписи на ней (настройки папки) */
   paint?: { color?: string; ink?: string; badge?: string };
-}
-
-/** Цвет цифры на кружке выбранного цвета: тёмный на светлом, белый на тёмном */
-export function inkOn(hex: string): string {
-  const n = parseInt(hex.slice(1), 16);
-  const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
-  return lum > 0.6 ? '#1C1C1E' : '#FFFFFF';
 }
 
 export function Chip({ children, count, muted = false, active = false, onClick, onLongPress, ariaLabel, className, follow = false, icon, split = false, tone, disabled = false, folder, paint }: ChipProps) {
@@ -141,7 +135,7 @@ export function Chip({ children, count, muted = false, active = false, onClick, 
       aria-pressed={active}
       aria-label={ariaLabel}
       data-tone={tone}
-      style={paint?.color || paint?.ink || paint?.badge ? ({ ...(paint.badge && { '--badge-bg': paint.badge, '--badge-on': inkOn(paint.badge) }), ...(paint.color && { '--chip-bg': paint.color, '--chip-tint': paint.color }), ...(paint.ink && { '--chip-on': paint.ink, '--text-chip': paint.ink }) } as CSSProperties) : undefined}
+      style={paint?.color || paint?.ink || paint?.badge ? ({ ...(paint.badge && { '--badge-bg': paint.badge, '--badge-on': inkOn(paint.badge) }), ...(paint.color && { '--chip-bg': paint.color, '--chip-tint': paint.color, '--chip-on': inkOn(paint.color) }), ...(paint.ink && { '--chip-on': paint.ink, '--text-chip': paint.ink }) } as CSSProperties) : undefined}
       data-paint-color={paint?.color}
       data-paint-badge={paint?.badge}
       data-folder-id={editing ? folder?.id : undefined}

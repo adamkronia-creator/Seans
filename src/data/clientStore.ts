@@ -268,7 +268,7 @@ export function addNote(chatId: string, text: string): string | null {
     title,
     paragraphs,
     icon: 'pin',
-    tone: 'purple',
+    tone: 'mix-orchid',
     updated: date,
     ...(chatId === CLIENT_CHAT ? {} : { chatId }),
   };

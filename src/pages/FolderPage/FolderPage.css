@@ -468,14 +468,25 @@
   background-clip: content-box;
 }
 
-/* Контур у белого круга убран: кольцо только у выбранного цвета */
-.fp-tone[data-light] {
-  border-color: transparent;
+.fp-tone[data-monochrome] {
+  position: relative;
 }
 
-.fp-tone--active,
-.fp-tone--active[data-light] {
+.fp-tone[data-monochrome]::after {
+  position: absolute;
+  inset: 2px; /* grid:ok — граница кружка внутри кольца */
+  border: var(--hairline) solid var(--divider);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+.fp-tone--active {
   border-color: var(--swatch);
+}
+
+.fp-tone--active[data-monochrome] {
+  border-color: var(--border-focus);
 }
 
 /* ——— Шапка в манере открытого чата и «Готово» внизу ——— */

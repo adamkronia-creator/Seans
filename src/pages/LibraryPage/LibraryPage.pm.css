@@ -138,8 +138,8 @@
   height: var(--presence-size);
   border: 0;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #ff6b8a 0%, #ff2d55 100%);
-  box-shadow: 0 1px 3px rgb(255 45 85 / 0.45);
+  background: linear-gradient(135deg, var(--palette-mix-blossom) 0%, var(--palette-pink) 100%);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--palette-pink) 45%, transparent);
 }
 
 /* Красный круг 20 с белым сердечком 12 по середине */
@@ -151,7 +151,7 @@
 
 /* Сердечко белое на красном градиентном круге (цвет «Избранного» из системы iOS); вырез в аватаре отделяет круг от значка */
 [data-pm] .lib-card__heart svg path {
-  fill: #fff;
+  fill: var(--palette-white);
   stroke: none;
 }
 
@@ -171,8 +171,8 @@
 }
 
 [data-pm] .lib-card--fav .test-card__avatar {
-  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
-  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
 }
 
 /* Круглые значки тестов и заданий — как «Избранное» и «Архивы»: светлая рамка 1 px и градиент 135° от осветлённого цвета значка к самому цвету */
@@ -183,7 +183,7 @@
 
 [data-pm] .lib-card .test-card__avatar::before {
   inset: -1px; /* grid:ok — перекрывает рамку 1 px */
-  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, #ffffff), var(--tint));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, var(--palette-white)), var(--tint));
   opacity: 0.9;
 }
 
@@ -220,8 +220,8 @@
   width: var(--space-5);
   height: var(--space-5);
   border-radius: var(--radius-full);
-  background: #34c759;
-  color: #ffffff;
+  background: var(--palette-green);
+  color: var(--palette-white);
   opacity: 0;
   transform: scale(0.4);
   transition: opacity var(--dur-quick), transform 0.3s var(--ease-spring);
@@ -234,20 +234,20 @@
 }
 
 [data-pm] .lib-card--selected .test-card {
-  background: color-mix(in srgb, var(--action-primary, #0a84ff) 14%, transparent);
+  background: color-mix(in srgb, var(--action-primary, var(--palette-blue)) 14%, transparent);
 }
 
 [data-pm] .lib-card--selected .test-card__avatar {
-  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
-  mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), var(--palette-black) calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), var(--palette-black) calc(var(--space-5) / 2 + 2.5px));
 }
 
 /* В избранном и выбран: вырезы под сердечко и под галочку вместе */
 [data-pm] .lib-card--fav.lib-card--selected .test-card__avatar {
-  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
-    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
-  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), #000 calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
-    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), #000 calc(var(--space-5) / 2 + 2.5px));
+  -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), var(--palette-black) calc(var(--space-5) / 2 + 2.5px));
+  mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
+    radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), var(--palette-black) calc(var(--space-5) / 2 + 2.5px));
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }

@@ -119,8 +119,8 @@
   min-height: 0;
   padding: var(--sheet-gutter);
   overflow-y: auto;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4), #000 calc(100% - var(--space-4)), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-4), #000 calc(100% - var(--space-4)), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4), var(--palette-black) calc(100% - var(--space-4)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4), var(--palette-black) calc(100% - var(--space-4)), transparent 100%);
   scroll-padding: var(--space-4) 0 65px; /* grid:ok — под панелью форматирования 49 + 16: каретка при вводе не уходит под неё */
 }
 

@@ -5,15 +5,15 @@
 
 /* Цвета состояний: тёмные на светлом стекле, светлые на тёмном (белый текст, data-ink='light') */
 :root {
-  --cross-ok: #1f7a3a;
-  --cross-warn: #a14600;
-  --cross-bad: #c4271b;
+  --cross-ok: color-mix(in srgb, var(--palette-green) 57%, var(--palette-black));
+  --cross-warn: color-mix(in srgb, var(--palette-orange) 55%, var(--palette-black));
+  --cross-bad: color-mix(in srgb, var(--palette-red) 75%, var(--palette-black));
 }
 
 :root[data-ink='light'] {
-  --cross-ok: #7fe0a0;
-  --cross-warn: #ffc277;
-  --cross-bad: #ff9b94;
+  --cross-ok: var(--palette-mix-pistachio);
+  --cross-warn: var(--palette-mix-apricot);
+  --cross-bad: var(--palette-mix-salmon);
 }
 
 /* Плашка сети: монограмма на цветном квадрате (логотипов сетей в приложении нет). Размер и оттенок — переменными --tile и --hue */
@@ -26,7 +26,7 @@
   height: var(--tile);
   border-radius: calc(var(--tile) / 4);
   background: hsl(var(--hue) 58% 36%);
-  color: #fff;
+  color: var(--palette-white);
   font-family: var(--font-sans);
   font-size: calc(var(--tile) * 0.45);
   font-weight: 600;

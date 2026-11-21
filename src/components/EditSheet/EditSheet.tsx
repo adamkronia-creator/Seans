@@ -6,7 +6,7 @@ import { RichEditor } from '../RichEditor/RichEditor';
 import { TonePalette } from './TonePalette';
 import { Switch } from '../Switch/Switch';
 import type { CaseIconId } from '../../data/case';
-import { toneOf, type ToneId } from '../../data/tones';
+import { editorToneId, toneOf, type ToneId } from '../../data/tones';
 import { AutoTextarea } from './AutoTextarea';
 import { SheetOverlay } from './SheetOverlay';
 import './EditSheet.css';
@@ -61,7 +61,7 @@ export function EditSheet({
   const [text, setText] = useState(initial.text ?? '');
   // Выбор иконки и цвета помнится, пока переключатель выключен: включил снова — всё на месте
   const [icon, setIcon] = useState<CaseIconId>(initial.icon ?? 'pin');
-  const [tone, setTone] = useState<ToneId>(initial.tone ?? 'blue');
+  const [tone, setTone] = useState<ToneId>(() => editorToneId(initial.tone ?? 'blue'));
   const [iconOn, setIconOn] = useState(initial.icon !== null);
   const [toneOn, setToneOn] = useState(initial.tone !== null);
   const [rows, setRows] = useState(initial.rows ?? []);
