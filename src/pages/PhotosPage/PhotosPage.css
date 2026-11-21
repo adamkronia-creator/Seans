@@ -13,7 +13,6 @@
   z-index: 1;
   flex-shrink: 0;
   padding-inline: var(--page-gutter);
-  background: var(--glass-card);
 }
 
 /* Галерея задаёт рамки своих плиток отдельно. */
