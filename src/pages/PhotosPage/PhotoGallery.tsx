@@ -24,6 +24,7 @@ export function PhotoGallery() {
         <PhotoTabs value={view} onChange={switchView} photos={photos.length} albums={albums.length} stories={stories.length} />
         <SwipePager
           autoHeight
+          animateHeight
           className="ph-gallery__pager"
           index={PHOTO_VIEWS.indexOf(view)}
           onIndexChange={(index) => switchView(PHOTO_VIEWS[index])}

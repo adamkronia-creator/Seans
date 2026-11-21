@@ -39,8 +39,10 @@ interface SwipePagerProps {
   nested?: boolean;
   /** Страницу потянули за край и отпустили: 1 — за последнюю, -1 — за первую (экран может перейти к соседнему разделу) */
   onEdgeSwipe?: (dir: 1 | -1) => void;
-  /** Высота по странице, а не по окну (пейджер внутри прокручиваемого блока); пока страницы идут, по самой высокой из видимых */
+  /** Высота по содержимому, а не по окну (пейджер внутри прокручиваемого блока). */
   autoHeight?: boolean;
+  /** Подстраивать высоту одновременно с листанием, вместо запаса до конца перехода. */
+  animateHeight?: boolean;
   /** Над страницами, но в окне жеста: за пальцем не едет (только с autoHeight) */
   header?: ReactNode;
   className?: string;
@@ -79,14 +81,23 @@ interface Gesture {
 }
 
 /**
- * Высота окна: у страницы на месте — её собственная, а пока страницы идут, самой высокой из них. Плавно её не меняем:
- * на каждом кадре это заставляло бы браузер заново раскладывать и рисовать прокручиваемый блок (на слабом телефоне кадры рвались),
- * а увидеть можно было бы разве что размах прокрутки, потому что страницы прижаты кверху и под короткой пусто.
- * Страницы, которые ещё не нарисованы (высота 0), не считаются: для страницы на месте берётся ближайшая известная.
+ * При включённой анимации высота меняется вместе с содержимым. В остальных случаях запас
+ * сохраняется до завершения перехода. Ещё не загруженная страница (высота 0) не уменьшает окно.
  */
-function heightAt(heights: number[], position: number): number {
+function heightAt(heights: number[], position: number, animate: boolean, jump: { a: number; b: number } | null): number {
   const last = heights.length - 1;
   if (last < 0) return 0;
+  if (animate) {
+    const at = Math.max(0, Math.min(last, position));
+    const from = jump?.a ?? Math.floor(at);
+    const to = jump?.b ?? Math.ceil(at);
+    const start = heights[from];
+    const end = heights[to];
+    if (start > 0 && end > 0) {
+      const progress = from === to ? 0 : Math.max(0, Math.min(1, (at - from) / (to - from)));
+      return Math.round(start + (end - start) * progress);
+    }
+  }
   const nearest = Math.max(0, Math.min(last, Math.round(position)));
   if (Math.abs(position - nearest) > 0.001) {
     let tallest = 0;
@@ -137,7 +148,7 @@ interface ScrollMetrics {
  *    куда листать, а на его краю тот же жест листает внешний.
  * Мышью тоже можно тянуть (там, где не выделяется текст), а двухпальцевый жест по тачпаду листает страницы шагами.
  */
-export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, nested = false, onEdgeSwipe, autoHeight = false, header, className }: SwipePagerProps) {
+export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, nested = false, onEdgeSwipe, autoHeight = false, animateHeight = false, header, className }: SwipePagerProps) {
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   /** Обрезка по высоте страницы (только autoHeight): меняется её высота, а ряд страниц остаётся своего размера */
@@ -153,7 +164,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
    * a и b — настоящие номера страниц, dir — в какую сторону едем; position при этом идёт от a к b
    */
   const jump = useRef<{ a: number; b: number; dir: 1 | -1 } | null>(null);
-  const live = useRef({ index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight, onEdgeSwipe });
+  const live = useRef({ index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight, animateHeight, onEdgeSwipe });
   /** Собственная метка пейджера: по ней знаем, что его страницы между местами (setPaging) */
   const self = useRef({}).current;
   /** Высоты страниц по номерам (для autoHeight); у ненарисованной 0 */
@@ -171,7 +182,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
   const loadedNow = useRef(loaded);
 
   useLayoutEffect(() => {
-    live.current = { index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight, onEdgeSwipe };
+    live.current = { index, count: pages.length, onIndexChange, onPosition, onDrag, nested, autoHeight, animateHeight, onEdgeSwipe };
     loadedNow.current = loaded;
   });
 
@@ -286,7 +297,7 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
 
   const applyHeight = useCallback((value: number) => {
     if (!live.current.autoHeight || !body.current) return;
-    const height = heightAt(heights.current, value);
+    const height = heightAt(heights.current, value, live.current.animateHeight, jump.current);
     if (height > 0 && height !== appliedHeight.current) {
       appliedHeight.current = height;
       body.current.style.height = `${height}px`;
@@ -307,7 +318,8 @@ export function SwipePager({ index, pages, onIndexChange, onPosition, onDrag, ne
         if (live.current.autoHeight) {
           if (!between) land(arrived ? j.b : j.a);
           else if (!rest.current.moving) shiftPages();
-          applyHeight(between ? j.a + j.dir * 0.5 : arrived ? j.b : j.a);
+          const reservedPosition = between ? j.a + j.dir * 0.5 : arrived ? j.b : j.a;
+          applyHeight(live.current.animateHeight ? value : reservedPosition);
         }
         setPaging(self, between);
         live.current.onPosition?.(value, { from: j.a, to: j.b, t: progress });

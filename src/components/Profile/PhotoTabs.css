@@ -42,3 +42,10 @@
 .ptabs__tab:focus-visible {
   outline-offset: calc(var(--hairline) * -1);
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ptabs__tab,
+  .ptabs__tab > .badge {
+    transition: background-color var(--dur-base) ease-out, color var(--dur-base) ease-out;
+  }
+}

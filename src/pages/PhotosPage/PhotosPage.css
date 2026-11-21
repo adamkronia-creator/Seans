@@ -39,7 +39,6 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   list-style: none;
 }
@@ -99,7 +98,6 @@
   place-items: center;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--glass-card);
   color: var(--text-secondary);
@@ -112,8 +110,15 @@
   object-fit: cover;
 }
 
-.ph__collection-add {
-  border-radius: var(--radius-lg);
+.ph__collection-add .ph__album-cover {
+  background: color-mix(in srgb, var(--palette-black) 34%, transparent);
+  color: var(--text-link);
+}
+
+.ph__collection-caption {
+  color: var(--text-link);
+  font: var(--type-label);
+  text-align: center;
 }
 
 /* Пустой раздел: большая кнопка добавления */
@@ -218,10 +223,6 @@
   vertical-align: middle;
 }
 
-/* Сетка в полях галереи с четырьмя скруглёнными углами. */
-[data-pm] .ph__grid {
-  border: 0;
-}
 /* Кнопка добавления — круглая, справа внизу, как «Новый чат» в чатах (.messages__fab) */
 .ph__fab {
   position: absolute;

@@ -91,9 +91,9 @@ export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery
         {!folderId && (
           <ul className="ph__albums" aria-label="Папки историй">
             <li>
-              <button type="button" className="ph__tile ph__tile--add ph__collection-add" onClick={() => setSheet('new')}>
-                <IconPlusLine />
-                <span>Новая папка</span>
+              <button type="button" className="ph__album ph__collection-add" onClick={() => setSheet('new')}>
+                <span className="ph__album-cover"><IconPlusLine /></span>
+                <span className="ph__collection-caption">Новая папка</span>
               </button>
             </li>
             {folders.map((item) => {

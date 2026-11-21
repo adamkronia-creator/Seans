@@ -195,9 +195,9 @@ export function PhotosPage({ view, albumId, gallery }: PhotosPageProps) {
     body = (
       <ul className="ph__albums">
         <li>
-          <button type="button" className="ph__tile ph__tile--add ph__collection-add" onClick={() => setSheet('new')}>
-            <IconPlusLine />
-            <span>Новый альбом</span>
+          <button type="button" className="ph__album ph__collection-add" onClick={() => setSheet('new')}>
+            <span className="ph__album-cover"><IconPlusLine /></span>
+            <span className="ph__collection-caption">Новый альбом</span>
           </button>
         </li>
         {albums.map((a) => (

@@ -274,6 +274,7 @@ export function ProfilePage() {
 
           <SwipePager
             autoHeight
+            animateHeight
             index={PHOTO_VIEWS.indexOf(tab)}
             onIndexChange={(index) => setTab(PHOTO_VIEWS[index])}
             pages={[

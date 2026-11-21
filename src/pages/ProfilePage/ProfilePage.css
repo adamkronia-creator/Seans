@@ -643,7 +643,6 @@
   place-items: center;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   background: var(--bg-subtle);
   color: var(--text-secondary);
