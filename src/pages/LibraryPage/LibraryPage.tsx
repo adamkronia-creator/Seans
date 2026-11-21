@@ -51,7 +51,7 @@ import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 import './LibraryPage.pm.css';
-import { TestCatalogResults, type CatalogLayout } from './TestCatalog';
+import { TestCatalogLayout, type CatalogLayout } from './TestCatalog';
 import './TestCatalog.css';
 
 type Noun = [string, string, string];
@@ -130,7 +130,7 @@ interface ListProps {
   onOpen: (item: LibraryItem) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
-  catalogView?: { heading: string; layout: CatalogLayout; onLayout: (layout: CatalogLayout) => void };
+  catalogLayout?: CatalogLayout;
 }
 
 /** Страница пейджера: выбранные фильтры и пояснения над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
@@ -173,14 +173,14 @@ function LibraryList(p: ListProps) {
   let body;
   if (total > 0) {
     body = (
-      <ul ref={rows} className={`library-page__list${p.catalogView?.layout === 'cards' ? ' library-page__list--cards' : ''}`}>
+      <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards' : ''}`}>
         {listing.ids.slice(0, shown).map((id) => {
           const entry = catalog.byId.get(id);
           if (!entry) return null;
           const hit = search?.hits.get(id);
           const [min, max] = entry.d.minutes ?? [];
           const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
-          const facts = p.catalogView ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
+          const facts = p.catalogLayout ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
           const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
           return (
             <LibraryCard
@@ -236,7 +236,6 @@ function LibraryList(p: ListProps) {
   return (
     <div ref={scroller} className="library-page__page">
       {(ctx.scope.length > 0 || marked) && <ResultsBar tokens={p.tokens} onResetFilters={p.onResetFilters} notes={notes} />}
-      {p.catalogView && <TestCatalogResults {...p.catalogView} count={describe(total)} />}
       {body}
       {shown < total && <div ref={more} className="library-page__more" aria-hidden="true" />}
     </div>
@@ -421,18 +420,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             onOpen={tap}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
-            catalogView={catalogDesign ? {
-              heading: normalize(query) ? 'Результаты поиска' :
-                id === 'all' ? labels.all :
-                id === FAVORITES ? 'Избранное' :
-                id === RECENT ? 'Недавние тесты' : folders.find((folder) => folder.id === id)?.name ?? labels.all,
-              layout,
-              onLayout: setLayout,
-            } : undefined}
+            catalogLayout={catalogDesign ? layout : undefined}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout, folders],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout],
   );
 
   const onDrag = useCallback(
@@ -568,7 +560,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           heading={title}
           placeholder={searchPlaceholder}
           chipsLabel={catalogDesign ? 'Подборки тестов' : labels.filters}
-          aside={catalogDesign ? undefined : filterButton}
+          aside={catalogDesign ? <TestCatalogLayout layout={layout} onLayout={setLayout} /> : filterButton}
           onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
           inlineSearch={catalogDesign ? (
             <div className="catalog-search">

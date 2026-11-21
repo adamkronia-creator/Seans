@@ -1,10 +1,5 @@
 [data-pm] .catalog-library {
-  --catalog-layout-selected: var(--glass-plain);
   --catalog-line: color-mix(in srgb, var(--text-primary) 12%, transparent);
-}
-
-:root[data-ink='light'] [data-pm] .catalog-library {
-  --catalog-layout-selected: color-mix(in srgb, var(--palette-white) 8%, var(--glass-plain));
 }
 
 /* Стеклянная шапка остаётся над прокручиваемой выдачей. */
@@ -18,17 +13,9 @@
   margin-inline: var(--page-gutter);
 }
 
-[data-pm] .catalog-library .catalog-search .search-field {
+.catalog-library .catalog-search .search-field {
   height: var(--size-touch);
-  border: var(--hairline) solid var(--catalog-line);
-  background: var(--glass-card);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
   animation: none;
-}
-
-.catalog-library .catalog-search .search-field__icon {
-  color: var(--text-secondary);
 }
 
 .catalog-library.messages .catalog-search .suggest {
@@ -65,59 +52,19 @@
   padding-bottom: calc(var(--pm-bottom) + var(--size-touch) + var(--space-4));
 }
 
-.catalog-results,
-.catalog-results__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.catalog-results {
-  flex: none;
-  justify-content: space-between;
-}
-
-.catalog-results__title {
-  flex-wrap: wrap;
-  row-gap: 0;
-  min-width: 0;
-}
-
-.catalog-results h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font: var(--type-title);
-  letter-spacing: var(--letter-spacing-title);
-}
-
-.catalog-results__title span {
-  color: var(--text-secondary);
-  font: var(--type-caption);
-  white-space: nowrap;
-}
-
 .catalog-layout {
   display: flex;
   flex: none;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  gap: inherit;
 }
 
-.catalog-layout button {
-  display: grid;
-  place-items: center;
-  width: var(--size-control-sm);
-  height: var(--space-8);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: var(--size-icon);
+.catalog-layout svg {
+  width: 1em;
+  height: 1em;
 }
 
-.catalog-layout button[aria-pressed='true'] {
-  background: var(--catalog-layout-selected);
-  color: var(--text-primary);
+[data-pm] .catalog-layout .chats-header__action[aria-pressed='true'] {
+  background: var(--glass-tab);
 }
 
 [data-pm] .catalog-library.messages .library-page__list {

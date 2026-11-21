@@ -132,17 +132,15 @@ export function ChatsHeader({
             <span className="chats-header__status">{status}</span>
           </span>
           {!inlineSearch && (
-            <>
-              <button ref={searchButton} type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
-                <IconSearchMk />
-              </button>
-              {aside ?? (
-                <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
-                  <IconBellMk />
-                </button>
-              )}
-            </>
+            <button ref={searchButton} type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
+              <IconSearchMk />
+            </button>
           )}
+          {aside ?? (!inlineSearch && (
+            <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
+              <IconBellMk />
+            </button>
+          ))}
         </div>
       )}
       {!selection && inlineSearch}
