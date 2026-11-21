@@ -6,7 +6,7 @@ import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumMoveSheet, AlbumNameSheet, AlbumPhotosSheet } from '../../components/Profile/AlbumSheets';
 import { PhotoTabs, PHOTO_PATHS, switchPhotoView, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
-import { IconAlbum, IconCheck, IconDots, IconDownload, IconFolderMove, IconForward, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
+import { IconAlbum, IconCamera, IconCheck, IconDots, IconDownload, IconFolderMove, IconForward, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconTrash } from '../../components/ChatParts/ChatIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
@@ -145,6 +145,14 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
   const title = view === 'album' ? (album?.name ?? 'Альбом') : 'Фото и альбомы';
   const grid = (
     <ul className="ph__grid">
+      {view === 'photos' && !selecting && (
+        <li>
+          <button type="button" className="ph__tile ph__tile--add" onClick={() => input.current?.click()}>
+            <IconCamera />
+            <span>Загрузить</span>
+          </button>
+        </li>
+      )}
       {view !== 'album' &&
         Array.from({ length: uploading }, (_, i) => (
           <li key={`wait-${i}`}>
@@ -210,15 +218,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
       </ul>
     );
   } else {
-    body =
-      photos.length + uploading > 0 ? (
-        grid
-      ) : (
-        <button type="button" className="ph__empty" onClick={() => input.current?.click()}>
-          <IconImage />
-          <span>Добавьте первое фото</span>
-        </button>
-      );
+    body = grid;
   }
 
   return (
@@ -261,6 +261,16 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
                 <IconPencil />
               </button>
             )}
+            {(view !== 'album' || album) && (
+              <button
+                type="button"
+                className="fp__back"
+                aria-label={view === 'photos' ? 'Добавить фото' : view === 'albums' ? 'Новый альбом' : 'Фото в альбоме'}
+                onClick={() => (view === 'photos' ? input.current?.click() : view === 'albums' ? setSheet('new') : setSheet('pick'))}
+              >
+                <IconPlusLine />
+              </button>
+            )}
           </>
         )}
       </header>
@@ -269,18 +279,6 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
         <PhotoTabs value={view} onChange={(next) => switchPhotoView(view, next)} photos={photos.length} albums={albums.length} stories={stories.length} />
       )}
       <div className="fp__scroll ph__scroll">{body}</div>
-
-      {/* Кнопка добавления, как «Новый чат» в чатах: круглая, справа внизу (фото, новый альбом или фото в альбом) */}
-      {!selecting && (view !== 'album' || album) && (
-        <button
-          type="button"
-          className="ph__fab"
-          aria-label={view === 'photos' ? 'Добавить фото' : view === 'albums' ? 'Новый альбом' : 'Фото в альбоме'}
-          onClick={() => (view === 'photos' ? input.current?.click() : view === 'albums' ? setSheet('new') : setSheet('pick'))}
-        >
-          <IconPlusLine />
-        </button>
-      )}
 
       <input ref={input} type="file" accept="image/*" multiple hidden onChange={onFiles} />
       {toast && <Toast text={toast} />}

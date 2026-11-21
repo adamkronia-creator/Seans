@@ -71,6 +71,16 @@ export function StoryArchive({ folderId }: { folderId?: string }) {
         <button type="button" className="fp__back" aria-label="Назад" onClick={back}><IconBack /></button>
         <h1 className="fp__title">{folder?.name ?? (folderId ? 'Папка историй' : 'Фото и альбомы')}</h1>
         {folder && <button type="button" className="fp__back" aria-label="Настроить папку историй" onClick={() => setSheet('name')}><IconPencil /></button>}
+        {(!folderId || folder) && (
+          <button
+            type="button"
+            className="fp__back"
+            aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
+            onClick={folder ? () => setSheet('pick') : media.compose}
+          >
+            <IconPlusLine />
+          </button>
+        )}
       </header>
       {!folderId && (
         <PhotoTabs value="stories" onChange={(next) => switchPhotoView('stories', next)} photos={photos.length} albums={albums.length} stories={stories.length} />
@@ -114,16 +124,6 @@ export function StoryArchive({ folderId }: { folderId?: string }) {
           )
         )}
       </div>
-      {(!folderId || folder) && (
-        <button
-          type="button"
-          className="ph__fab"
-          aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
-          onClick={folder ? () => setSheet('pick') : media.compose}
-        >
-          <IconPlusLine />
-        </button>
-      )}
       {(sheet === 'new' || (sheet === 'name' && folder)) && (
         <CollectionNameSheet
           title={folder ? 'Название папки' : 'Новая папка'}
