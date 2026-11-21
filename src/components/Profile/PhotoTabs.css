@@ -27,7 +27,7 @@
 }
 
 .ptabs__tab[aria-selected='true'] {
-  border-color: var(--glass-border);
+  border-color: var(--active-ring-color);
   background: var(--glass-fill);
   color: var(--text-primary);
 }

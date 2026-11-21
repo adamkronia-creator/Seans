@@ -89,10 +89,11 @@
   background: var(--glass-chip-active);
 }
 
-/* Лента: значки слева (x 16), линия по центру значков, карточки событий от x 52 (значок 20 и по 16 с каждой стороны) */
+/* Лента: значки слева (x 16), линия по центру значков, карточки событий начинаются после рейки с аватарками */
 .hist-timeline {
   --marker-size: var(--space-5);
-  --hist-indent: calc(var(--space-4) * 2 + var(--marker-size));
+  --hist-avatar-size: var(--space-6);
+  --hist-indent: calc(var(--space-4) * 2 + var(--hist-avatar-size));
   display: flex;
   margin: 0;
   padding: 0;
@@ -124,7 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: var(--marker-size);
+  width: var(--hist-avatar-size);
 }
 
 .hist-item:last-child .hist-rail {
@@ -165,13 +166,17 @@
   box-shadow: none;
 }
 
-.hist-rail__avatar {
+.hist-rail__avatars {
+  --avatar-size: var(--hist-avatar-size);
+  display: flex;
   flex: none;
-  width: var(--marker-size);
-  height: var(--marker-size);
-  margin-top: var(--space-1);
-  border-radius: var(--radius-full);
-  object-fit: cover;
+  flex-direction: column;
+  margin-block-start: var(--space-2);
+}
+
+.hist-rail__avatars .avatar + .avatar {
+  margin-block-start: calc(var(--space-2) * -1);
+  box-shadow: 0 0 0 var(--hairline) var(--glass-solid);
 }
 
 .hist-marker__number {

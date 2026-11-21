@@ -27,6 +27,8 @@
 }
 
 .tabbar__item--active {
+  border-radius: var(--radius-full);
+  box-shadow: var(--active-ring);
   color: var(--color-accent);
 }
 

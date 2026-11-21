@@ -354,7 +354,7 @@ html:has([data-pm]) body {
   --glass-shadow-panel: 0 var(--space-2) var(--space-6) color-mix(in srgb, var(--palette-black) 14%, transparent);
   /* синее стекло: выбранный чипс и круги «Избранное» и «Архивы» */
   --glass-chip-active: linear-gradient(135deg, color-mix(in srgb, var(--palette-action-blue) 97%, transparent), color-mix(in srgb, var(--palette-blue-pressed) 97%, transparent)); /* белая подпись ≥ 4,9:1 */
-  --glass-border-blue: var(--sheet-rim); /* синие кнопки и чипсы: кромка света, как у верха нижних окон */
+  --glass-border-blue: var(--active-ring-color);
   /* Фон по умолчанию — картинка рассвета; своя картинка пользователя — :root[data-bg='custom'] ниже */
   --scene: url('../assets/bg-default.webp') center / cover no-repeat, color-mix(in srgb, var(--palette-black) 88%, var(--palette-white));
   --glass-fill-header: color-mix(in srgb, var(--palette-white) 62%, transparent);
@@ -486,7 +486,7 @@ html:has([data-pm]) body {
 /* Синее стекло: выбранный чипс (с рамкой) и круги «Избранное» и «Архивы» (без рамки; заливка круга — градиент акцента на 50%) */
 [data-pm] .chips-pill {
   box-sizing: border-box;
-  border: 1px solid var(--glass-border-blue);
+  border: var(--active-ring-width) solid var(--active-ring-color);
   background: var(--glass-chip-active);
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
@@ -522,7 +522,7 @@ html:has([data-pm]) body {
   left: auto;
   z-index: auto;
   padding: var(--space-1);
-  border: 1px solid var(--sheet-rim); /* кромка света, как у верха нижних окон */
+  border: var(--active-ring-width) solid var(--active-ring-color);
   border-radius: var(--radius-full);
   background: var(--glass-fill-panel);
   box-shadow: var(--glass-shadow-panel);
@@ -535,6 +535,7 @@ html:has([data-pm]) body {
 
 [data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item--active {
   background: none;
+  box-shadow: none;
 }
 
 /* Плашка выбранного раздела одна на всю панель и скользит к новому разделу: ширина — четверть внутренней ширины, сдвиг — на номер раздела */
@@ -547,7 +548,7 @@ html:has([data-pm]) body {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
   background: var(--glass-tab);
-  box-shadow: inset 0 0 0 var(--hairline) var(--sheet-rim);
+  box-shadow: var(--active-ring);
   transform: translateX(calc(var(--tab-index, 0) * 100%));
   transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
   pointer-events: none;
@@ -726,7 +727,6 @@ html:has([data-pm]) body {
 
 /* Свой цвет папки: плашка выбранного и невыбранный чипс (оттенок цвета на стекле) */
 [data-pm] .chips-pill {
-  border-color: transparent;
   background: var(--pill-fill, var(--glass-chip-active));
   transition: opacity 0.16s;
 }

@@ -49,6 +49,7 @@
   width: calc((100% - var(--space-1) * (var(--seg-n, 3) + 1)) / var(--seg-n, 3));
   border-radius: calc(var(--radius-md) - var(--space-1));
   background: var(--action-primary);
+  box-shadow: var(--active-ring);
   transform: translateX(calc(var(--seg-i, 0) * (100% + var(--space-1))));
   transition: transform 0.28s var(--ease-ios);
 }

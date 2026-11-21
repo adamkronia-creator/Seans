@@ -15,7 +15,9 @@ import markerTest from '../../assets/icons/history/test.svg';
 import markerTask from '../../assets/icons/history/task.svg';
 import markerNote from '../../assets/icons/history/note.svg';
 import markerInvite from '../../assets/icons/history/invite.svg';
-import { avatarOf, ME } from '../../data/contacts';
+import { Avatar } from '../Avatar/Avatar';
+import { useChat } from '../../data/chatStore';
+import { useAvatarSrc } from '../../data/profile';
 import { CHATS } from '../../data/chats';
 import { parseBlocks, RichBlocks } from '../../utils/richText';
 import { useDoubleActivate } from '../../utils/useDoubleActivate';
@@ -188,6 +190,8 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
  * ничего не сдвигается по вертикали: страницы только скользят вбок.
  */
 const HistoryList = memo(function HistoryList({ events, onEdit }: { events: HistoryEvent[]; onEdit: (id: string) => void }) {
+  const ownAvatar = useAvatarSrc();
+  const clientAvatar = useChat(maxim.id)?.avatar ?? maxim.avatar;
   return (
     <ScrollHost className="chat-history" anchorEnd>
       <div className="hist-page">
@@ -199,9 +203,19 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
                 <li key={event.id} className={`hist-item hist-item--${event.kind}`}>
                   <div className="hist-rail">
                     <Marker event={event} />
-                    {(event.kind === 'test' || event.kind === 'task') && (
-                      <img className="hist-rail__avatar" src={avatarOf(event.state === 'done' ? maxim.id : ME)} alt={authorOf(event)} />
-                    )}
+                    <div className="hist-rail__avatars">
+                      {event.kind === 'session' ? (
+                        <>
+                          <Avatar src={ownAvatar} alt="Вы" />
+                          <Avatar src={clientAvatar} alt={maxim.name} />
+                        </>
+                      ) : (
+                        <Avatar
+                          src={event.kind === 'invite' || (event.kind !== 'note' && event.state === 'done') ? clientAvatar : ownAvatar}
+                          alt={authorOf(event)}
+                        />
+                      )}
+                    </div>
                     {hasNext && <span className="hist-item__line" aria-hidden="true" />}
                   </div>
                   <Card event={event} onEdit={() => onEdit(event.id)} />

@@ -70,3 +70,26 @@ summary {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* Общая обводка выбранных кнопок. У подвижных плашек она рисуется на самой плашке. */
+:root {
+  --active-ring-width: var(--hairline);
+  --active-ring-color: color-mix(in srgb, var(--palette-black) 32%, transparent);
+  --active-ring: inset 0 0 0 var(--active-ring-width) var(--active-ring-color);
+}
+
+:root[data-ink='light'] {
+  --active-ring-color: color-mix(in srgb, var(--palette-white) 42%, transparent);
+}
+
+:is(
+  button[aria-pressed='true'],
+  button[role='tab'][aria-selected='true'],
+  button[aria-current='page'],
+  button.sheet__button--primary:enabled,
+  button.messages__fab:enabled,
+  button.ph__fab:enabled
+):not(:focus-visible, .rich-toolbar__button, .ptabs__tab, .tabbar__item, .hist-chips .chip, .screen-header__chips:has(.chips-pill) .chip) {
+  outline: var(--active-ring-width) solid var(--active-ring-color);
+  outline-offset: calc(var(--active-ring-width) * -1);
+}
