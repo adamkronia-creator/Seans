@@ -239,7 +239,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const row = useRef<HTMLDivElement>(null);
-  const scrollPositions = useRef(new WeakMap<HTMLElement, number>());
+  const scrollPositions = useRef(new WeakMap<HTMLElement, { top: number; end: number }>());
   const [filtersHidden, setFiltersHidden] = useState(false);
   const data = useClientData();
   const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
@@ -275,6 +275,20 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     [events],
   );
 
+  useEffect(() => {
+    const scroller = root.current?.querySelector<HTMLElement>('.chat-history__pager > .swipe-pager__track > .swipe-pager__page:not([inert]) .chat-history');
+    if (!scroller) return;
+    const remember = () => {
+      const end = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+      scrollPositions.current.set(scroller, { top: Math.min(end, Math.max(0, scroller.scrollTop)), end });
+    };
+    remember();
+    const observer = new ResizeObserver(remember);
+    observer.observe(scroller);
+    if (scroller.firstElementChild) observer.observe(scroller.firstElementChild);
+    return () => observer.disconnect();
+  }, [filter, events.length === 0]);
+
   const index = FILTERS.findIndex((item) => item.id === filter);
   const shown = dragIndex ?? index;
 
@@ -299,15 +313,18 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     if (!(target instanceof HTMLElement) || !target.matches('.chat-history:not([inert] *)')) return;
     const end = Math.max(0, target.scrollHeight - target.clientHeight);
     const top = Math.min(end, Math.max(0, target.scrollTop));
-    const previous = scrollPositions.current.get(target) ?? end;
-    if (end - top <= FILTER_SCROLL_DELTA) {
-      scrollPositions.current.set(target, top);
-      if (filtersHidden) setFiltersHidden(false);
-    } else if (Math.abs(top - previous) >= FILTER_SCROLL_DELTA) {
-      scrollPositions.current.set(target, top);
-      const hide = top < previous;
-      if (hide !== filtersHidden) setFiltersHidden(hide);
+    const previous = scrollPositions.current.get(target);
+    const nearEnd = end - top <= FILTER_SCROLL_DELTA;
+    // При открытии вкладки и изменении высоты ленты событие прокрутки приходит и без жеста.
+    if (!previous || previous.end !== end || nearEnd) {
+      scrollPositions.current.set(target, { top, end });
+      if (nearEnd && filtersHidden) setFiltersHidden(false);
+      return;
     }
+    if (Math.abs(top - previous.top) < FILTER_SCROLL_DELTA) return;
+    scrollPositions.current.set(target, { top, end });
+    const hide = top < previous.top;
+    if (hide !== filtersHidden) setFiltersHidden(hide);
   };
 
   const foot = (
