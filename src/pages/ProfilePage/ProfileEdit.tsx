@@ -140,7 +140,7 @@ export function ProfileEditPage() {
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
   const [asking, setAsking] = useState<ProfileField | null>(null);
   const [toast, show] = useToast();
-  // К чему перейти при открытии: к полю, которое нажали на странице профиля, или к «Добавить поле»
+  // К чему перейти при открытии: к полю, которое нажали на странице профиля, или к «Добавить информацию»
   const [target] = useState(wantedEdit);
   const scroller = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLElement>(null);
@@ -198,7 +198,7 @@ export function ProfileEditPage() {
     if (before) flip(Array.from(box.querySelectorAll<HTMLElement>('.pe__fields > li[data-field]')), before, 'y');
   }, [order]);
 
-  // Брошенные «Добавить поле» без названия и текста при выходе убираются
+  // Брошенные «Добавить информацию» без названия и текста при выходе убираются
   useEffect(
     () => () => {
       clearWantedEdit();
@@ -355,7 +355,7 @@ export function ProfileEditPage() {
         <section ref={addCard} className="pe__card pe__field pe__add" aria-labelledby="pe-add">
           <div className="pe__field-head">
             <h2 id="pe-add" className="pe__add-title">
-              Добавить поле
+              Добавить информацию
             </h2>
           </div>
           <div className="pe__chips">

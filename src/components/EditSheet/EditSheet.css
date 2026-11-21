@@ -80,8 +80,7 @@
   /* Прокручиваемое плавно уходит под верхний край панели, а не обрезается резко */
   mask-image: linear-gradient(to bottom, transparent 0, var(--palette-black) var(--space-4));
   scroll-padding-top: var(--space-4);
-  /* Под текстом панель форматирования 49: каретка при вводе не уходит под нее */
-  scroll-padding-bottom: 65px;
+  scroll-padding-bottom: var(--space-4);
   scrollbar-width: none; /* полоса прокрутки не сдвигает края: слева и справа ровно 16 */
 }
 
@@ -337,19 +336,23 @@
  * Плитка — 12 внутри со всех сторон (--card-pad), блоки друг от друга 16 (--sheet-gap), рамок и линий нет, кроме разделителя под строкой переключателя.
  */
 
-/* Карточка с текстом скругляет углы сама (overflow: clip не мешает прилипанию панели), панель — прямая полоса: у скруглённой панели
-   в нижних углах, пока она прилипла к краю окна, просвечивал бы прокручиваемый текст */
-[data-pm] .sheet .sheet__card:has(.rich-toolbar) {
+/* Панель форматирования занимает собственную строку и не перекрывает прокручиваемый текст. */
+.sheet__format {
+  flex-shrink: 0;
+  margin: 0 var(--space-4);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   overflow: clip;
 }
 
-/* Размытие сохраняет читаемость иконок, пока под полупрозрачной панелью прокручивается текст. */
-[data-pm] .rich-toolbar {
+[data-pm] .sheet__format {
+  margin-inline: var(--sheet-gutter);
+  margin-block-start: 1px; /* grid:ok — просвет как в профиле */
+}
+
+[data-pm] .sheet__format .rich-toolbar {
   padding: var(--space-3);
   border: 0;
-  border-top: var(--hairline) solid var(--sheet-line);
-  border-radius: 0;
-  backdrop-filter: blur(var(--space-3));
+  background: var(--sheet-tile);
 }
 
 [data-pm] .sheet__preview {
@@ -374,7 +377,7 @@
   background: var(--sheet-tile);
 }
 
-[data-pm] .sheet__text :is(.rich-editor, .rich-toolbar) {
+[data-pm] .sheet__text .rich-editor {
   background: var(--sheet-tile);
 }
 
@@ -383,13 +386,8 @@
   padding: var(--card-pad);
 }
 
-[data-pm] .sheet__appearance .sheet__collapse--open,
-[data-pm] .sheet__text .rich-toolbar {
+[data-pm] .sheet__appearance .sheet__collapse--open {
   margin-block-start: 1px; /* grid:ok — просвет как в профиле */
-}
-
-[data-pm] .sheet__text .rich-toolbar {
-  border-top: 0;
 }
 
 .sheet__icon-picker {
@@ -496,9 +494,10 @@
 /* Зазор над кнопками находится за пределами прокрутки: под прилипшей панелью виден только фон листа. */
 [data-pm] .sheet.sheet--edit .sheet__body:has(> .sheet__text) {
   padding-bottom: 0;
+  scroll-padding-bottom: var(--space-2);
 }
 
-[data-pm] .sheet.sheet--edit .sheet__body:has(> .sheet__text) + .sheet__footer {
+[data-pm] .sheet.sheet--edit .sheet__format + .sheet__footer {
   padding-top: var(--sheet-gutter);
 }
 

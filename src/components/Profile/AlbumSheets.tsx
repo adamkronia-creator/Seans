@@ -17,27 +17,48 @@ interface NameProps {
 /** Название альбома: новый или переименование. Без названия сохранить нельзя */
 export function AlbumNameSheet({ albumId, onClose, onSaved, onDelete }: NameProps) {
   const { albums } = useProfile();
-  const [name, setName] = useState(() => albums.find((a) => a.id === albumId)?.name ?? '');
+  const name = albums.find((a) => a.id === albumId)?.name;
+  return (
+    <CollectionNameSheet
+      title={albumId ? 'Название альбома' : 'Новый альбом'}
+      initial={name}
+      editing={Boolean(albumId)}
+      onClose={onClose}
+      onSave={(next) => {
+        const id = albumId ?? addAlbum(next);
+        if (albumId) renameAlbum(albumId, next);
+        onClose();
+        onSaved?.(id);
+      }}
+      onDelete={onDelete}
+      deleteLabel="Удалить альбом"
+    />
+  );
+}
+
+export function CollectionNameSheet({ title, initial = '', editing, onClose, onSave, onDelete, deleteLabel }: {
+  title: string;
+  initial?: string;
+  editing: boolean;
+  onClose: () => void;
+  onSave: (name: string) => void;
+  onDelete?: () => void;
+  deleteLabel?: string;
+}) {
+  const [name, setName] = useState(initial);
   const uid = useId();
   const ready = name.trim().length > 0;
-  const save = () => {
-    if (!ready) return;
-    const id = albumId ?? addAlbum(name);
-    if (albumId) renameAlbum(albumId, name);
-    onClose();
-    onSaved?.(id);
-  };
   return (
     <Frame
-      title={albumId ? 'Название альбома' : 'Новый альбом'}
+      title={title}
       onClose={onClose}
       footer={
         <>
           <button type="button" className="sheet__button" onClick={onClose}>
             Отмена
           </button>
-          <button type="button" className="sheet__button sheet__button--primary" disabled={!ready} onClick={save}>
-            {albumId ? 'Сохранить' : 'Создать'}
+          <button type="button" className="sheet__button sheet__button--primary" disabled={!ready} onClick={() => onSave(name.trim())}>
+            {editing ? 'Сохранить' : 'Создать'}
           </button>
         </>
       }
@@ -58,7 +79,7 @@ export function AlbumNameSheet({ albumId, onClose, onSaved, onDelete }: NameProp
       </section>
       {onDelete && (
         <button type="button" className="sheet__card pf-remove" onClick={onDelete}>
-          Удалить альбом
+          {deleteLabel}
         </button>
       )}
     </Frame>

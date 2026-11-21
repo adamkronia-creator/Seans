@@ -61,6 +61,7 @@ export function EditSheet({
   const [text, setText] = useState(initial.text ?? '');
   // Выбор иконки и цвета помнится, пока переключатель выключен: включил снова — всё на месте
   const [icon, setIcon] = useState<CaseIconId>(initial.icon ?? 'pin');
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
   const [tone, setTone] = useState<ToneId>(() => editorToneId(initial.tone ?? 'blue'));
   const [iconOn, setIconOn] = useState(initial.icon !== null);
   const [toneOn, setToneOn] = useState(initial.tone !== null);
@@ -199,11 +200,13 @@ export function EditSheet({
                 onChange={setText}
                 placeholder={textPlaceholder}
                 ariaLabel={heading}
+                toolbarHost={toolbarHost}
               />
             </section>
           )}
         </div>
 
+        {hasText && <div className="sheet__format" ref={setToolbarHost} />}
         <div className="sheet__footer">
           <button type="button" className="sheet__button" onClick={onClose}>
             Отмена

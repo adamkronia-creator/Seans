@@ -613,7 +613,7 @@
   font-size: var(--size-icon);
 }
 
-/* Вкладки «Фото» и «Альбомы» вместо заголовка карточки */
+/* Вкладки галереи вместо заголовка карточки */
 [data-pm] .profile__card-head--tabs {
   min-height: 0;
   padding: var(--card-pad) var(--card-pad) 0;
@@ -706,10 +706,6 @@
   font: var(--type-label);
   text-align: center;
   transition: filter 0.15s ease;
-}
-
-.profile__foot-button svg {
-  font-size: var(--size-icon);
 }
 
 .profile__foot-button:first-child {

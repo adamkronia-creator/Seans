@@ -1,11 +1,13 @@
+import { useOwnStories } from '../../data/stories';
+import { StoryTile, useOwnStoryMedia } from '../../components/Profile/StoryMedia';
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumNameSheet } from '../../components/Profile/AlbumSheets';
-import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
-import { IconAlbum, IconCamera, IconChevronRight, IconImage, IconPencil, IconPlusLine, IconWallpaper } from '../../components/Profile/ProfileIcons';
+import { PhotoTabs, PHOTO_PATHS, type PhotoView } from '../../components/Profile/PhotoTabs';
+import { IconAlbum, IconCamera, IconImage, IconPencil, IconStories, IconWallpaper } from '../../components/Profile/ProfileIcons';
 import { BackgroundSheet, PhotoPickSheet } from '../../components/Profile/ProfileSheets';
 import { filesOf, uploadPhotos } from '../../components/Profile/upload';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
@@ -71,6 +73,9 @@ export function ProfilePage() {
   const [viewing, setViewing] = useState<string | null>(null);
   const [picking, setPicking] = useState<'avatar' | 'cover' | null>(null);
   const [pickingBackground, setPickingBackground] = useState(false);
+  const stories = useOwnStories();
+  const recentStories = stories.slice(-PHOTOS_SHOWN).reverse();
+  const storyMedia = useOwnStoryMedia(recentStories);
   const [tab, setTab] = useState<PhotoView>('photos');
   const [newAlbum, setNewAlbum] = useState(false);
   const [qr, setQr] = useState(false);
@@ -255,15 +260,14 @@ export function ProfilePage() {
             <p className="profile__empty">Здесь может быть всё, что вы хотите о себе рассказать: образование, подход, опыт, личный анализ.</p>
           )}
           <button type="button" className="profile__add" onClick={() => edit('add')}>
-            <IconPlusLine />
-            Добавить поле
+            Добавить информацию
           </button>
         </section>
 
         <div className="profile__photos">
         <section className="profile__card profile__card--joined" aria-label="Фото и альбомы">
           <header className="profile__card-head profile__card-head--tabs">
-            <PhotoTabs value={tab} onChange={setTab} photos={photos.length} albums={albums.length} />
+            <PhotoTabs value={tab} onChange={setTab} photos={photos.length} albums={albums.length} stories={stories.length} />
           </header>
 
           {tab === 'photos' &&
@@ -315,15 +319,32 @@ export function ProfilePage() {
               </button>
             ))}
 
+          {tab === 'stories' &&
+            (recentStories.length > 0 ? (
+              <ul className="profile__grid">
+                {recentStories.map((story) => (
+                  <li key={story.id}>
+                    <StoryTile story={story} onClick={(event) => storyMedia.open(story.id, event)} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <button type="button" className="profile__drop" onClick={storyMedia.compose}>
+                <IconStories />
+                <span>Добавьте первую историю</span>
+              </button>
+            ))}
         </section>
           <div className="profile__foot">
-            <button type="button" className="profile__foot-button" onClick={() => (tab === 'photos' ? input.current?.click() : setNewAlbum(true))}>
-              <IconPlusLine />
-              {tab === 'photos' ? 'Добавить' : 'Новый альбом'}
+            <button
+              type="button"
+              className="profile__foot-button"
+              onClick={() => tab === 'photos' ? input.current?.click() : tab === 'albums' ? setNewAlbum(true) : storyMedia.compose()}
+            >
+              {tab === 'albums' ? 'Новый альбом' : 'Добавить'}
             </button>
-            <button type="button" className="profile__foot-button" onClick={() => navigate(tab === 'photos' ? '/profile/photos' : '/profile/photos/albums')}>
+            <button type="button" className="profile__foot-button" onClick={() => navigate(PHOTO_PATHS[tab])}>
               Посмотреть
-              <IconChevronRight />
             </button>
           </div>
         </div>
@@ -336,6 +357,7 @@ export function ProfilePage() {
       {qr && <QrSheet title={name.trim() || 'Профиль'} url={link()} onCopy={copyLink} onClose={() => setQr(false)} />}
       {menu && <ChipMenu anchor={menu.rect} opener={menu.opener} items={items} label="Настройки профиля" width={272} onClose={() => setMenu(null)} />}
       {newAlbum && <AlbumNameSheet onClose={() => setNewAlbum(false)} onSaved={(id) => navigate(`/profile/photos/album/${id}`)} />}
+      {storyMedia.overlay}
       {viewing && <PhotoViewer startId={viewing} onClose={() => setViewing(null)} />}
     </section>
   );

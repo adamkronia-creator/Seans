@@ -1,20 +1,23 @@
-/* Вкладки «Фото» и «Альбомы»: выбранная в скруглённой стеклянной рамке, остальные просто подписью */
+/* Вкладки галереи: выбранная в скруглённой стеклянной рамке. */
 .ptabs {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .ptabs__tab {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   height: var(--size-control);
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-2);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font: var(--type-headline);
+  font: var(--type-label);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -27,4 +30,16 @@
   border-color: var(--glass-border);
   background: var(--glass-fill);
   color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+  .ptabs__tab > svg {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .ptabs__tab {
+    padding-inline: var(--space-1);
+  }
 }

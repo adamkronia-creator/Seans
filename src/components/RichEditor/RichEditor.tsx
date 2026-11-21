@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type ComponentType, type SVGProps } from 'react';
 import {
   IconFmtBold,
@@ -71,12 +72,13 @@ interface Props {
   onChange: (text: string) => void;
   placeholder?: string;
   ariaLabel: string;
+  toolbarHost: HTMLElement | null;
 }
 
 type ToolState = Partial<Record<Tool, boolean>>;
 
-/** Редактор текста с панелью форматирования: строка иконок сверху и поле ввода под ней */
-export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props) {
+/** Редактор текста с панелью форматирования: панель вынесена из прокручиваемой области */
+export function RichEditor({ initial, onChange, placeholder, ariaLabel, toolbarHost }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [empty, setEmpty] = useState(initial.trim() === '');
   const [state, setState] = useState<ToolState>({});
@@ -212,7 +214,7 @@ export function RichEditor({ initial, onChange, placeholder, ariaLabel }: Props)
         onKeyUp={readState}
         onMouseUp={readState}
       />
-      {toolbar}
+      {toolbarHost && createPortal(toolbar, toolbarHost)}
     </>
   );
 }

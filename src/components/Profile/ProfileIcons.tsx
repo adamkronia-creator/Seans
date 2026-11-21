@@ -21,3 +21,4 @@ export { default as IconFolderMove } from '../../assets/icons/solar/folder-move.
 export { default as IconSelect } from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 export { default as IconUser } from '../../assets/icons/solar/user-rounded.svg?react';
 export { default as IconForward } from '../../assets/icons/solar/forward.svg?react';
+export { default as IconStories } from '../../assets/icons/solar/play-circle.svg?react';

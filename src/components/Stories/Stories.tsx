@@ -239,7 +239,7 @@ export function StoryViewer({ queue, startId, startStory, origin, onClose }: { q
 }
 
 /** Новая история: текст и фон из пяти градиентов */
-function StoryComposer({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
+export function StoryComposer({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
   const [text, setText] = useState('');
   const [bg, setBg] = useState(0);
   const field = useRef<HTMLTextAreaElement>(null);

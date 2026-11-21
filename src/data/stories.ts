@@ -18,6 +18,12 @@ export interface StoryAuthor {
   stories: Story[];
 }
 
+export interface StoryFolder {
+  id: string;
+  name: string;
+  storyIds: string[];
+}
+
 /** Фоны историй: мягкие градиенты в тон приложению */
 export const STORY_BACKGROUNDS = [
   ['blue', 'slate'],
@@ -32,6 +38,7 @@ export const STORY_BACKGROUNDS = [
 
 const SEEN_KEY = 'seans.stories.seen';
 const OWN_KEY = 'seans.stories.own';
+const FOLDERS_KEY = 'seans.stories.folders';
 
 // Тестовые истории собеседников (придуманы); свои хранятся в браузере
 const SEED: Record<string, Story[]> = {
@@ -64,6 +71,11 @@ const write = (key: string, value: unknown) => {
 
 let seen = new Set<string>(Array.isArray(read(SEEN_KEY)) ? (read(SEEN_KEY) as string[]) : []);
 let own: Story[] = Array.isArray(read(OWN_KEY)) ? (read(OWN_KEY) as Story[]) : [];
+const storedFolders = read(FOLDERS_KEY);
+let folders: StoryFolder[] = Array.isArray(storedFolders) ? storedFolders.filter((folder) =>
+  typeof folder?.id === 'string' && typeof folder.name === 'string'
+    && Array.isArray(folder.storyIds) && folder.storyIds.every((id: unknown) => typeof id === 'string'),
+) : [];
 let version = 0;
 const listeners = new Set<() => void>();
 const emit = () => {
@@ -82,12 +94,47 @@ export const markSeen = (id: string) => {
   emit();
 };
 
+const newId = () => crypto.randomUUID?.() ?? `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+
 /** Опубликовать свою историю */
 export const addStory = (text: string, bg: number) => {
-  own = [...own, { id: `me-${Date.now()}`, text, bg, ago: 'только что' }];
+  own = [...own, { id: `me-${newId()}`, text, bg, ago: 'только что' }];
   write(OWN_KEY, own);
   emit();
 };
+
+function saveStoryFolders(next: StoryFolder[]) {
+  folders = next;
+  write(FOLDERS_KEY, folders);
+  emit();
+}
+
+export function saveStoryFolder(name: string, id?: string): string {
+  const clean = name.trim();
+  if (id) {
+    if (clean && folders.some((folder) => folder.id === id)) {
+      saveStoryFolders(folders.map((folder) => folder.id === id ? { ...folder, name: clean } : folder));
+    }
+    return id;
+  }
+  if (!clean) return '';
+  const folder = { id: newId(), name: clean, storyIds: [] };
+  saveStoryFolders([...folders, folder]);
+  return folder.id;
+}
+
+export function setFolderStories(id: string, storyIds: string[]) {
+  const valid = new Set(own.map((story) => story.id));
+  const ids = [...new Set(storyIds)].filter((storyId) => valid.has(storyId));
+  saveStoryFolders(folders.map((folder) => folder.id === id ? { ...folder, storyIds: ids } : folder));
+}
+
+export function removeStoryFolder(id: string) {
+  saveStoryFolders(folders.filter((folder) => folder.id !== id));
+}
+
+export const useOwnStories = () => useSyncExternalStore(subscribe, () => own);
+export const useStoryFolders = () => useSyncExternalStore(subscribe, () => folders);
 
 export const isSeen = (id: string) => seen.has(id);
 

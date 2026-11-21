@@ -136,7 +136,7 @@
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: color-mix(in srgb, var(--palette-black) 100%, transparent));
+  background: var(--palette-black);
   animation: story-stage-in 0.2s ease-out backwards;
 }
 

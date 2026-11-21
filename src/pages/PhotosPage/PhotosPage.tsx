@@ -4,7 +4,7 @@ import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { IconBack } from '../../components/icons';
 import { AlbumCover } from '../../components/Profile/AlbumCover';
 import { AlbumMoveSheet, AlbumNameSheet, AlbumPhotosSheet } from '../../components/Profile/AlbumSheets';
-import { PhotoTabs, type PhotoView } from '../../components/Profile/PhotoTabs';
+import { PhotoTabs, PHOTO_PATHS, switchPhotoView, type PhotoView } from '../../components/Profile/PhotoTabs';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
 import { IconAlbum, IconCheck, IconDots, IconDownload, IconFolderMove, IconForward, IconImage, IconPencil, IconPin, IconPlusLine, IconSelect, IconShare } from '../../components/Profile/ProfileIcons';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
@@ -17,20 +17,18 @@ import { useToast } from '../../components/Toast/useToast';
 import { sendMessage } from '../../data/chatStore';
 import { Badge } from '../../components/Badge/Badge';
 import { ForwardSheet } from '../../components/ForwardSheet/ForwardSheet';
+import { useOwnStories } from '../../data/stories';
 import { removeAlbum, removeManyPhotos, setPinned, useProfile } from '../../data/profile';
 import { downloadPhotos, messageImage, sharePhotos } from '../../utils/photoActions';
 import { useLongPress } from '../../utils/useLongPress';
-import { goBack, navigate, replace } from '../../router';
+import { goBack, navigate } from '../../router';
 import { openChat, useSwipeBack, useSwipeNext } from '../../utils/tabNav';
 import '../FolderPage/FolderPage.css';
 import './PhotosPage.css';
 
-const PHOTOS_PATH = '/profile/photos';
-const ALBUMS_PATH = '/profile/photos/albums';
-
 interface PhotosPageProps {
   /** Вкладка («Фото» или «Альбомы») или открытый альбом */
-  view: PhotoView | 'album';
+  view: Exclude<PhotoView, 'stories'> | 'album';
   albumId?: string;
 }
 
@@ -83,6 +81,7 @@ function PhotoTile({ src, label, selecting, selected, onOpen, onToggle, onMenu, 
  */
 export function PhotosPage({ view, albumId }: PhotosPageProps) {
   const profile = useProfile();
+  const stories = useOwnStories();
   const { photos, albums, thumbs, uploading } = profile;
   const album = view === 'album' ? albums.find((a) => a.id === albumId) : undefined;
   const [viewing, setViewing] = useState<string | null>(null);
@@ -95,11 +94,10 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
   const [toast, show] = useToast();
   const input = useRef<HTMLInputElement>(null);
   const root = useRef<HTMLElement>(null);
-  const back = () => (chosen ? leave() : goBack(view === 'album' ? ALBUMS_PATH : '/'));
-  // Вкладки «Фото» и «Альбомы» листаются свайпом: влево к альбомам, вправо обратно к фото (в альбоме и на «Фото» вправо — «назад»)
-  useSwipeBack(root, () => (view === 'albums' && !chosen ? replace(PHOTOS_PATH, 'slide-prev') : back()));
+  const back = () => (chosen ? leave() : goBack(view === 'album' ? PHOTO_PATHS.albums : '/'));
+  useSwipeBack(root, () => (view === 'albums' && !chosen ? switchPhotoView('albums', 'photos') : back()));
   useSwipeNext(root, () => {
-    if (view === 'photos' && !chosen) replace(ALBUMS_PATH, 'slide-next');
+    if (view !== 'album' && !chosen) switchPhotoView(view, view === 'photos' ? 'albums' : 'stories');
   });
 
   const onFiles = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -269,7 +267,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
 
       <div className="fp__scroll ph__scroll">
         {view !== 'album' && (
-          <PhotoTabs value={view} onChange={(next) => replace(next === 'albums' ? ALBUMS_PATH : PHOTOS_PATH, next === 'albums' ? 'slide-next' : 'slide-prev')} photos={photos.length} albums={albums.length} />
+          <PhotoTabs value={view} onChange={(next) => switchPhotoView(view, next)} photos={photos.length} albums={albums.length} stories={stories.length} />
         )}
         {body}
       </div>
@@ -300,7 +298,7 @@ export function PhotosPage({ view, albumId }: PhotosPageProps) {
           onConfirm={() => {
             setSheet(null);
             removeAlbum(album.id);
-            goBack(ALBUMS_PATH);
+            goBack(PHOTO_PATHS.albums);
           }}
         />
       )}

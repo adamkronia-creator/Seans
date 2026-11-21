@@ -31,8 +31,15 @@ export function SheetOverlay({ onClose, children }: { onClose: () => void; child
       const box = field.closest<HTMLElement>('.sheet__preview') ?? field;
       const margin = 16;
       const scroller = body.getBoundingClientRect();
-      const rect = box.getBoundingClientRect();
-      const bottomLimit = scroller.bottom - (field.matches('textarea, [contenteditable]') ? 65 : margin);
+      const selection = window.getSelection();
+      const range = field.isContentEditable && selection?.rangeCount && field.contains(selection.focusNode)
+        ? selection.getRangeAt(0).cloneRange()
+        : null;
+      range?.collapse(selection?.focusNode === range.startContainer && selection.focusOffset === range.startOffset);
+      const caret = range?.getBoundingClientRect();
+      const rect = caret?.height ? caret : box.getBoundingClientRect();
+      const bottomMargin = field.isContentEditable ? 0 : field.matches('textarea') ? 65 : margin;
+      const bottomLimit = scroller.bottom - bottomMargin;
       if (rect.top < scroller.top + margin) body.scrollTop += rect.top - scroller.top - margin;
       else if (rect.bottom > bottomLimit) body.scrollTop += rect.bottom - bottomLimit;
     };

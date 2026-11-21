@@ -12,6 +12,7 @@ import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
 import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
 import { PhotosPage } from './pages/PhotosPage/PhotosPage';
+import { StoryArchive } from './pages/PhotosPage/StoryArchive';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
@@ -372,6 +373,19 @@ export default function App() {
       const taskId = path.match(/^\/tasks\/([^/]+)/)?.[1];
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at, true) : page('tasks', <TasksPage />, at, true);
+    }
+    const storyRoute = path.match(/^\/profile\/photos\/stories(?:\/folder\/([^/]+))?\/?$/);
+    if (storyRoute) {
+      const folderId = storyRoute[1];
+      return {
+        key: folderId ? `profile/photos/stories/folder/${folderId}` : 'profile/photos/stories',
+        pm: true,
+        build: () => (
+          <main className="app__content">
+            <StoryArchive folderId={folderId} />
+          </main>
+        ),
+      };
     }
     // /profile/photos, /profile/photos/albums и /profile/photos/album/<альбом>: фото и альбомы на весь экран; у каждой вкладки свой ключ (экран строится заново)
     const photosRoute = path.match(/^\/profile\/photos(?:\/(albums)|\/album\/([^/]+))?\/?$/);

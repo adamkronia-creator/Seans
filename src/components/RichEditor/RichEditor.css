@@ -1,10 +1,4 @@
-/* Панель форматирования под текстом внутри карточки. Пока низ карточки за краем видимой области, панель держится у нижнего края
-   (над клавиатурой); когда низ карточки на виду, она встаёт на свое место. Так же держатся даты в ленте чата */
 .rich-toolbar {
-  position: sticky;
-  /* Панель держится у края прокручиваемой области. */
-  bottom: 0;
-  z-index: 1;
   display: flex;
   justify-content: space-between;
   padding: var(--space-2) var(--space-4);
@@ -24,10 +18,9 @@
   font-size: var(--size-icon);
 }
 
-/* Активное форматирование — подложка и обводка в цвет текста. */
+/* Активное форматирование отмечено такой же подложкой, как выбранная иконка. */
 .rich-toolbar__button--active {
-  background: color-mix(in srgb, currentColor 14%, transparent);
-  box-shadow: inset 0 0 0 var(--hairline) currentColor;
+  background: color-mix(in srgb, currentColor 16%, transparent);
 }
 
 .rich-toolbar__button:disabled {
