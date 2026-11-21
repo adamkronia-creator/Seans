@@ -72,33 +72,33 @@ export function StoryArchive({ folderId }: { folderId?: string }) {
         <h1 className="fp__title">{folder?.name ?? (folderId ? 'Папка историй' : 'Фото и альбомы')}</h1>
         {folder && <button type="button" className="fp__back" aria-label="Настроить папку историй" onClick={() => setSheet('name')}><IconPencil /></button>}
       </header>
+      {!folderId && (
+        <PhotoTabs value="stories" onChange={(next) => switchPhotoView('stories', next)} photos={photos.length} albums={albums.length} stories={stories.length} />
+      )}
       <div className="fp__scroll ph__scroll">
         {!folderId && (
-          <>
-            <PhotoTabs value="stories" onChange={(next) => switchPhotoView('stories', next)} photos={photos.length} albums={albums.length} stories={stories.length} />
-            <ul className="ph__albums" aria-label="Папки историй">
-              <li>
-                <button type="button" className="ph__album ph__album--new" onClick={() => setSheet('new')}>
-                  <span className="ph__album-cover"><IconPlusLine /></span>
-                  <span className="ph__album-name">Новая папка</span>
-                </button>
-              </li>
-              {folders.map((item) => {
-                const cover = stories.find(({ id }) => item.storyIds.includes(id));
-                return (
-                  <li key={item.id}>
-                    <button type="button" className="ph__album" onClick={() => navigate(folderPath(item.id))}>
-                      <span className="ph__album-cover" style={cover ? { background: STORY_BACKGROUNDS[cover.bg], color: 'var(--palette-white)' } : undefined}>
-                        <IconAlbum />
-                      </span>
-                      <span className="ph__album-name">{item.name}</span>
-                      <span className="ph__album-count">{item.storyIds.length}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
+          <ul className="ph__albums" aria-label="Папки историй">
+            <li>
+              <button type="button" className="ph__album ph__album--new" onClick={() => setSheet('new')}>
+                <span className="ph__album-cover"><IconPlusLine /></span>
+                <span className="ph__album-name">Новая папка</span>
+              </button>
+            </li>
+            {folders.map((item) => {
+              const cover = stories.find(({ id }) => item.storyIds.includes(id));
+              return (
+                <li key={item.id}>
+                  <button type="button" className="ph__album" onClick={() => navigate(folderPath(item.id))}>
+                    <span className="ph__album-cover" style={cover ? { background: STORY_BACKGROUNDS[cover.bg], color: 'var(--palette-white)' } : undefined}>
+                      <IconAlbum />
+                    </span>
+                    <span className="ph__album-name">{item.name}</span>
+                    <span className="ph__album-count">{item.storyIds.length}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         )}
         {folderId && !folder ? <EmptyState icon={<IconAlbum />} title="Папка не найдена" /> : (
           shown.length > 0 ? (

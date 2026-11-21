@@ -1,6 +1,20 @@
 /* «Фото и альбомы»: каркас .fp (шапка со стеклянными кнопками, фон-сцена), поля 16 */
 
-/* Общее правило .fp__scroll > :first-child рисует рамку вокруг первого блока; у вкладок рамки нет */
+/* Шапка и вкладки занимают отдельные строки над прокручиваемой галереей. */
+[data-pm] .ph:has(> .ptabs) > .fp__header {
+  position: relative;
+}
+
+[data-pm] .ph > .ptabs + .ph__scroll {
+  padding-top: var(--block-gap);
+}
+
+.ph > .ptabs {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+/* Галерея задаёт рамки своих плиток отдельно. */
 [data-pm] .fp__scroll.ph__scroll > :first-child {
   border: 0;
 }
@@ -53,7 +67,8 @@
 /* Альбомы: две карточки в ряд, обложка квадратом */
 .ph__albums {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  flex-shrink: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--block-gap) var(--space-3);
   margin: 0;
   padding: 0;

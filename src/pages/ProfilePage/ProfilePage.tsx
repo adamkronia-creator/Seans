@@ -306,8 +306,10 @@ export function ProfilePage() {
                       <span className="profile__album-cover">
                         <AlbumCover album={album} />
                       </span>
-                      <span className="profile__album-name">{album.name}</span>
-                      <span className="profile__album-count">{album.photoIds.length}</span>
+                      <span className="profile__album-caption">
+                        <span className="profile__album-name">{album.name}</span>
+                        <span className="profile__album-count" aria-label={`Фото: ${album.photoIds.length}`}>{album.photoIds.length}</span>
+                      </span>
                     </button>
                   </li>
                 ))}
