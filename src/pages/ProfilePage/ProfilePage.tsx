@@ -345,7 +345,7 @@ export function ProfilePage() {
             >
               {tab === 'albums' ? 'Новый альбом' : 'Добавить'}
             </button>
-            <button type="button" className="profile__foot-button" onClick={() => navigate(PHOTO_PATHS[tab])}>
+            <button type="button" className="profile__foot-button" onClick={() => navigate(PHOTO_PATHS.photos)}>
               Посмотреть
             </button>
           </div>

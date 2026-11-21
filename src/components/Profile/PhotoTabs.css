@@ -4,12 +4,14 @@
   align-items: center;
   gap: var(--space-1);
   min-width: 0;
+  padding-block: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
 }
 
 .ptabs__tab {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
   height: var(--size-control);
@@ -30,6 +32,14 @@
   border-color: var(--active-ring-color);
   background: var(--glass-fill);
   color: var(--text-primary);
+}
+
+.ptabs__tab[data-pressed] {
+  background: var(--glass);
+}
+
+.ptabs__tab:focus-visible {
+  outline-offset: calc(var(--hairline) * -1);
 }
 
 @media (max-width: 480px) {

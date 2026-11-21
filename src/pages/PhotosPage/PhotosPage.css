@@ -9,9 +9,11 @@
   padding-top: var(--block-gap);
 }
 
-.ph > .ptabs {
+[data-pm] .ph > .ptabs {
+  z-index: 1;
   flex-shrink: 0;
-  padding: var(--space-2) var(--space-4) 0;
+  padding-inline: var(--page-gutter);
+  background: var(--glass-card);
 }
 
 /* Галерея задаёт рамки своих плиток отдельно. */
