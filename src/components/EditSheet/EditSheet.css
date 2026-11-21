@@ -177,14 +177,14 @@
   grid-template-rows: 0fr;
   visibility: hidden;
   transition:
-    grid-template-rows 0.25s ease,
-    visibility 0s linear 0.25s;
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    visibility 0s linear var(--collapse-time);
 }
 
 .sheet__collapse--open {
   grid-template-rows: 1fr;
   visibility: visible;
-  transition: grid-template-rows 0.25s ease;
+  transition: grid-template-rows var(--collapse-time) var(--collapse-ease);
 }
 
 .sheet__collapse-inner {

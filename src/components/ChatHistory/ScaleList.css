@@ -30,7 +30,7 @@
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
     margin-top var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out,
+    opacity var(--collapse-fade-time) ease-out,
     visibility 0s linear var(--collapse-time);
 }
 
@@ -42,7 +42,7 @@
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
     margin-top var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out;
+    opacity var(--collapse-fade-time) ease-out;
 }
 
 .hist-scales__list--rest {

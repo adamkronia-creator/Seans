@@ -667,14 +667,14 @@
   grid-template-rows: 0fr;
   visibility: hidden;
   transition:
-    grid-template-rows 0.25s ease,
-    visibility 0s linear 0.25s;
+    grid-template-rows var(--collapse-time) var(--collapse-ease),
+    visibility 0s linear var(--collapse-time);
 }
 
 .cc-rest--open {
   grid-template-rows: 1fr;
   visibility: visible;
-  transition: grid-template-rows 0.25s ease;
+  transition: grid-template-rows var(--collapse-time) var(--collapse-ease);
 }
 
 .cc-rest__inner {
@@ -714,4 +714,11 @@
 
 [data-pm] .blank-card :is(.cc-legend, .cc-validity) {
   font: var(--type-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-rest,
+  .cc-rest--open {
+    transition: none;
+  }
 }

@@ -26,8 +26,7 @@ import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
 import { ScaleList } from './ScaleList';
 import { navigate } from '../../router';
-import { followChips, type PositionVia } from '../../utils/followChips';
-import { centerChips } from '../../utils/centerChips';
+import { usePillChips } from '../../utils/usePillChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
 import {
@@ -276,19 +275,12 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     setDragIndex(position === null ? null : Math.round(Math.min(FILTERS.length - 1, Math.max(0, position))));
   }, []);
 
-  // Цвет чипсов идёт за положением страниц, а не прыгает на середине
-  const onPosition = useCallback((position: number, via?: PositionVia) => {
-    const chips = root.current?.querySelectorAll<HTMLElement>('.hist-chips .chip');
-    if (chips) followChips(chips, position, via);
-    // Ряд чипсов едет за страницами: активный остаётся посередине
-    const row = root.current?.querySelector<HTMLElement>('.hist-chips');
-    if (row) centerChips(row, position, '.chip', via);
-  }, []);
+  const { row, onPosition } = usePillChips(events.length > 0);
 
   // Чипсы и под ними учёт стоят под лентами, как поле ввода под перепиской: не прокручиваются вместе с лентой
   const foot = (
     <>
-      <div className="hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
+      <div ref={row} className="screen-header__chips hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
         {FILTERS.map(({ id, label }, i) => {
           const c = counts[id];
           return (
@@ -305,6 +297,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             </Chip>
           );
         })}
+        <span className="chips-pill" aria-hidden="true" />
       </div>
     </>
   );

@@ -234,7 +234,7 @@
 .chats-header__belt {
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows var(--collapse-time) var(--collapse-ease), margin-bottom var(--collapse-time) var(--collapse-ease), opacity calc(var(--collapse-time) * 0.6) ease-out;
+  transition: grid-template-rows var(--collapse-time) var(--collapse-ease), margin-bottom var(--collapse-time) var(--collapse-ease), opacity var(--collapse-fade-time) ease-out;
 }
 
 .chats-header__belt-inner {

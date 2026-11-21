@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Collapse } from '../../components/Collapse/Collapse';
 import { ContactSheetsHost } from './ContactSheetsHost';
 import { ChipMenu, type ChipMenuItem } from '../../components/FolderMenu/ChipMenu';
 import { IconArchive, IconBellOff, IconBellOn, IconPinned, IconUnarchive } from '../../components/FolderMenu/FolderIcons';
@@ -54,6 +55,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   const [menu, setMenu] = useState<{ rect: DOMRect; opener: HTMLElement } | null>(null);
   const [sheet, setSheet] = useState<ContactSheet | null>(null);
   const [readMore, setReadMore] = useState(false);
+  const moreInfoId = useId();
   // Экран профиля: на нём лежит просмотр историй
   const [screen, setScreen] = useState<HTMLElement | null>(null);
   const groups = useMessages(chatId);
@@ -228,28 +230,46 @@ export function ContactPage({ chatId }: { chatId: string }) {
 
           {personal.length > 0 && (
             <div className="ts-desc-unit ct__personal">
-            <section className="profile__card" aria-labelledby="contact-info">
-              <header className="profile__card-head">
-                <h2 id="contact-info" className="profile__card-title">
-                  Личная информация
-                </h2>
-              </header>
-              <ul className="profile__fields">
-                {(readMore ? personal : personal.slice(0, 1)).map((field) => (
-                  <li key={field.label}>
+              <section className="profile__card" aria-labelledby="contact-info">
+                <header className="profile__card-head">
+                  <h2 id="contact-info" className="profile__card-title">Личная информация</h2>
+                </header>
+                <ul className="profile__fields">
+                  <li>
                     <div className="profile__field person__field">
-                      <span className="profile__field-label">{field.label}</span>
-                      <span className="profile__field-value">{field.value}</span>
+                      <span className="profile__field-label">{personal[0].label}</span>
+                      <span className="profile__field-value">{personal[0].value}</span>
                     </div>
                   </li>
-                ))}
-              </ul>
-            </section>
-            {personal.length > 1 && (
-              <button type="button" className={`ts-desc__toggle${readMore ? ' ts-desc__toggle--open' : ''}`} aria-expanded={readMore} onClick={() => setReadMore(!readMore)}>
-                {readMore ? 'Скрыть' : 'Читать далее'}
-              </button>
-            )}
+                  {personal.length > 1 && (
+                    <li aria-hidden={!readMore}>
+                      <Collapse open={readMore}>
+                        <ul id={moreInfoId} className="profile__fields">
+                          {personal.slice(1).map((field) => (
+                            <li key={field.label}>
+                              <div className="profile__field person__field">
+                                <span className="profile__field-label">{field.label}</span>
+                                <span className="profile__field-value">{field.value}</span>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </Collapse>
+                    </li>
+                  )}
+                </ul>
+              </section>
+              {personal.length > 1 && (
+                <button
+                  type="button"
+                  className={`ts-desc__toggle${readMore ? ' ts-desc__toggle--open' : ''}`}
+                  aria-controls={moreInfoId}
+                  aria-expanded={readMore}
+                  onClick={() => setReadMore(!readMore)}
+                >
+                  {readMore ? 'Скрыть' : 'Читать далее'}
+                </button>
+              )}
             </div>
           )}
 

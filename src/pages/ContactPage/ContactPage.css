@@ -235,45 +235,12 @@
   background: var(--glass-card);
 }
 
-/* Чипсы на всю ширину контейнера: четыре делят её поровну (своя капсула им больше не нужна: фон даёт контейнер) */
-.ct__tabs {
-  position: relative;
-}
-
-.ct__chips {
-  display: flex;
-  gap: var(--space-2);
-}
-
-/* Четыре чипса делят ширину поровну */
-.ct__chips .chip {
-  flex: 1 1 0;
-  justify-content: center;
-  min-width: 0;
-  margin-right: 0;
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-md);
-}
-
-/* Невыбранные без своего стекла (фон даёт капсула), выбранный — синее стекло с рамкой */
-.ct__chips .chip--follow::before,
-.ct__chips .chip--follow::after {
-  border-radius: var(--radius-md);
-}
-
-.ct__chips .chip--follow::before {
-  border: 1px solid transparent;
-  background: none;
-}
-
-.ct__chips .chip--follow::after {
-  box-sizing: border-box;
-  border: 1px solid var(--glass-border-blue);
-  background: var(--glass-chip-active);
+.ct__pager {
+  margin-inline: calc(var(--page-gutter) * -1);
 }
 
 .ct__panel {
-  animation: fade-in var(--dur-base, 0.24s) ease-out backwards;
+  padding-inline: var(--page-gutter);
 }
 
 .ct__tiles,
@@ -466,10 +433,14 @@
 }
 
 [data-pm] .ct__tabs {
-  padding: var(--card-pad);
+  padding-block: var(--space-1);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   background: var(--glass-card);
+}
+
+[data-pm] .screen-header__chips.ct__chips {
+  margin: 0;
 }
 
 /* Итоги (сеансы, тесты, задания): подложка у самих ячеек, а у карточки её нет — иначе стекло ложится дважды и панель темнее остальных */

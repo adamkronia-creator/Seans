@@ -9,7 +9,7 @@
   visibility: hidden;
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out,
+    opacity var(--collapse-fade-time) ease-out,
     visibility 0s linear var(--collapse-time);
 }
 
@@ -24,7 +24,7 @@
   visibility: visible;
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out;
+    opacity var(--collapse-fade-time) ease-out;
 }
 
 /* Блок в колонке с промежутками: свёрнутый, он «съедает» свой промежуток отрицательным отступом, раскрываясь — возвращает */
@@ -32,7 +32,7 @@
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
     margin-bottom var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out,
+    opacity var(--collapse-fade-time) ease-out,
     visibility 0s linear var(--collapse-time);
 }
 
@@ -44,7 +44,7 @@
   transition:
     grid-template-rows var(--collapse-time) var(--collapse-ease),
     margin-bottom var(--collapse-time) var(--collapse-ease),
-    opacity calc(var(--collapse-time) * 0.6) ease-out;
+    opacity var(--collapse-fade-time) ease-out;
 }
 
 .collapse__inner {

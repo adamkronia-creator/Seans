@@ -217,7 +217,7 @@
 
 .ts-desc__body {
   overflow: hidden;
-  transition: max-height 0.25s ease;
+  transition: max-height var(--collapse-time) var(--collapse-ease);
 }
 
 /* Текст → 12 → разделитель по ширине текста → 12 → кнопка → 12 до конца блока */
@@ -246,7 +246,7 @@
   );
   opacity: 1;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--collapse-fade-time) ease-out;
 }
 
 .ts-desc__fade--hidden {
@@ -687,4 +687,11 @@
 .test-settings--sent > :not(.ts-watermark) {
   position: relative;
   z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-desc__body,
+  .ts-desc__fade {
+    transition: none;
+  }
 }

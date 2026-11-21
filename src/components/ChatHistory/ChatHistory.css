@@ -59,34 +59,14 @@
   backdrop-filter: var(--glass-filter-panel);
 }
 
-/* Чипсы фильтров — как в «Диалогах»: отдельные пилюли высотой 32 с зазором space-2, невыбранные — белое стекло, выбранный залит
-   СВОИМ цветом (пастель вида, у «Все» — синее стекло) и подпись на нём тёмная/белая. Цвет идёт за листанием лент (followChips).
-   Ряд уходит вбок за край панели; двигает его скрипт (data-hscroll, SwipePager). Сверху и снизу space-1 оставлены кольцу фокуса:
-   ряд обрезает всё, что выходит за него по вертикали */
-.hist-chips {
-  display: flex;
-  gap: var(--space-2);
+[data-pm] .screen-header__chips.hist-chips {
+  margin: 0;
   padding: var(--space-1);
-  overflow-x: hidden;
-  scrollbar-width: none;
 }
 
-.chat .hist-chips .chip {
-  margin-right: 0;
-  border-radius: var(--radius-full);
-}
-
-/* Невыбранный: слой стекла (гаснет по мере выбора), выбранный: слой цвета вида с рамкой 1 px */
-/* Невыбранные чипсы без своего стекла: фон им даёт капсула */
-.hist-chips .chip--follow::before {
-  border: 1px solid transparent;
-  background: none;
-}
-
-.hist-chips .chip--follow::after {
-  box-sizing: border-box;
-  border: 1px solid var(--glass-border-blue);
-  background: var(--glass-chip-active);
+/* На узких экранах чипсы можно прокрутить внутри панели. */
+.hist-foot {
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* Лента: значки слева (x 16), линия по центру значков, карточки событий начинаются после рейки с аватарками */

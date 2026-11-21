@@ -60,7 +60,7 @@ const docOf = ({ item, d }: Entry): IndexDoc => ({
     topic: d.topics,
     scale: d.scales,
     approach: d.approaches,
-    description: [item.description],
+    description: [item.catalogDescription ?? item.description],
     format: d.format ? [d.format] : [],
   },
   exact: [item.abbr, item.title, ...d.aliases].filter((s): s is string => !!s),

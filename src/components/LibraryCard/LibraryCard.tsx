@@ -54,8 +54,7 @@ export function LibraryCard({ test, favorite, onClick, facts, why, marks, pinned
             )}
           </span>
           <span className="test-card__description">
-            {test.abbr && <><Highlight text={test.abbr} words={marks} /> · </>}
-            <Highlight text={test.description} words={marks} />
+            <Highlight text={test.catalogDescription ?? test.description} words={marks} />
           </span>
           {facts && <span className="lib-card__facts">{facts}</span>}
           {why && <span className="lib-card__why">{why}</span>}
