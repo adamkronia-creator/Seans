@@ -1,4 +1,4 @@
-/* Вкладки галереи: выбранная в скруглённой стеклянной рамке. */
+/* Вкладки галереи: выбранная в скруглённой стеклянной подложке. */
 .ptabs {
   display: flex;
   align-items: center;
@@ -16,7 +16,7 @@
   gap: var(--space-1);
   height: var(--size-control);
   padding: 0 var(--space-2);
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font: var(--type-label);
@@ -29,7 +29,6 @@
 }
 
 .ptabs__tab[aria-selected='true'] {
-  border-color: var(--active-ring-color);
   background: var(--glass-fill);
   color: var(--text-primary);
 }
