@@ -20,6 +20,9 @@ interface ChatsHeaderProps {
   placeholder?: string;
   chipsLabel?: string;
   aside?: ReactNode;
+  /** Постоянное поле поиска под верхней строкой, например в каталоге тестов. */
+  inlineSearch?: ReactNode;
+  onAvatarClick?: () => void;
   /** Кнопка «+» справа от уведомлений: новый чат, группа или канал */
   belt?: ReactNode;
   inputRef?: Ref<HTMLInputElement>;
@@ -47,6 +50,8 @@ export function ChatsHeader({
   placeholder = 'Поиск по чатам',
   chipsLabel = 'Фильтр диалогов',
   aside,
+  inlineSearch,
+  onAvatarClick,
   belt,
   inputRef,
   onFocus,
@@ -78,6 +83,10 @@ export function ChatsHeader({
   useEffect(() => {
     wasSelecting.current = Boolean(selection);
   });
+  const picture = avatar
+    ? <img className="chats-header__avatar" src={avatar} alt="" />
+    : <span className="chats-header__avatar" />;
+
   return (
     <header className="chats-header">
       <h1 className="visually-hidden">{heading}</h1>
@@ -106,21 +115,30 @@ export function ChatsHeader({
         </div>
       ) : (
         <div key="main" className={`chats-header__top${back ? ' chats-header__top--back' : ''}`}>
-          {avatar ? <img className="chats-header__avatar" src={avatar} alt="" /> : <span className="chats-header__avatar" />}
+          {onAvatarClick ? (
+            <button type="button" className="chats-header__avatar-button" aria-label="Открыть профиль" onClick={onAvatarClick}>
+              {picture}
+            </button>
+          ) : picture}
           <span className="chats-header__who">
             <span className="chats-header__name">{title}</span>
             <span className="chats-header__status">{status}</span>
           </span>
-          <button ref={searchButton} type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
-            <IconSearchMk />
-          </button>
-          {aside ?? (
-            <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
-              <IconBellMk />
-            </button>
+          {!inlineSearch && (
+            <>
+              <button ref={searchButton} type="button" className="chats-header__action" aria-label="Поиск" onClick={() => onSearching(true)}>
+                <IconSearchMk />
+              </button>
+              {aside ?? (
+                <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
+                  <IconBellMk />
+                </button>
+              )}
+            </>
           )}
         </div>
       )}
+      {!selection && inlineSearch}
       <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={collapseBelt || undefined} {...({ inert: collapseBelt ? '' : undefined } as object)}>
         <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
       </div>

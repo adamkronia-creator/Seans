@@ -51,7 +51,7 @@ import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 import './LibraryPage.pm.css';
-import { TestCatalogHeader, TestCatalogResults, type CatalogLayout } from './TestCatalog';
+import { TestCatalogControls, TestCatalogResults, type CatalogLayout } from './TestCatalog';
 import './TestCatalog.css';
 
 type Noun = [string, string, string];
@@ -551,38 +551,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
 
   return (
     <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
-      {catalogDesign ? (
-        <TestCatalogHeader
-          title={title}
-          catalog={catalog}
-          filters={view.filters}
-          onToggle={(facet, option) => toggleOption(kind, facet, option)}
-          search={
-            <SearchField
-              value={view.query}
-              onChange={(value) => setQuery(kind, value)}
-              placeholder={searchPlaceholder}
-              onClear={() => setQuery(kind, '')}
-              inputRef={input}
-              onFocus={() => {
-                setFocused(true);
-                setSearching(true);
-              }}
-              onBlur={() => {
-                setFocused(false);
-                if (!readLibraryView(kind).query) setSearching(false);
-              }}
-              onKeyDown={onKeyDown}
-            />
-          }
-          suggestions={suggestions}
-          filterButton={filterButton}
-          folders={chipNodes}
-          selection={sel.header()}
-        />
-      ) : chatLike ? (
+      {chatLike ? (
         <ChatsHeader
-          searching={searching}
+          searching={!catalogDesign && searching}
           onSearching={setSearching}
           query={view.query}
           onQuery={(value) => setQuery(kind, value)}
@@ -590,9 +561,33 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           status={kind === 'task' ? 'Ваши практики' : 'Ваши опросники'}
           heading={title}
           placeholder={searchPlaceholder}
-          chipsLabel={labels.filters}
-          aside={filterButton}
-          belt={recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
+          chipsLabel={catalogDesign ? 'Подборки тестов' : labels.filters}
+          aside={catalogDesign ? undefined : filterButton}
+          onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
+          inlineSearch={catalogDesign ? (
+            <div className="catalog-search">
+              <SearchField
+                value={view.query}
+                onChange={(value) => setQuery(kind, value)}
+                placeholder={searchPlaceholder}
+                onClear={() => setQuery(kind, '')}
+                inputRef={input}
+                onFocus={() => {
+                  setFocused(true);
+                  setSearching(true);
+                }}
+                onBlur={() => {
+                  setFocused(false);
+                  if (!readLibraryView(kind).query) setSearching(false);
+                }}
+                onKeyDown={onKeyDown}
+              />
+              {suggestions}
+            </div>
+          ) : undefined}
+          belt={catalogDesign ? (
+            <TestCatalogControls catalog={catalog} filters={view.filters} onToggle={(facet, option) => toggleOption(kind, facet, option)} filterButton={filterButton} />
+          ) : recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
           inputRef={input}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

@@ -47,6 +47,12 @@
   object-fit: cover;
 }
 
+.chats-header__avatar-button {
+  display: grid;
+  flex: none;
+  border-radius: var(--radius-full);
+}
+
 .chats-header__who {
   display: flex;
   flex: 1;
