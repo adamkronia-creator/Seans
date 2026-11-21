@@ -1,13 +1,13 @@
+import { createPortal } from 'react-dom';
 import { useRef, useState } from 'react';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
 import { Frame } from '../../components/Frame/Frame';
 import { IconBack } from '../../components/icons';
 import { CollectionNameSheet } from '../../components/Profile/AlbumSheets';
-import { PhotoTabs, PHOTO_PATHS, switchPhotoView } from '../../components/Profile/PhotoTabs';
+import { PHOTO_PATHS } from '../../components/Profile/PhotoTabs';
 import { IconAlbum, IconPencil, IconPlusLine, IconStories } from '../../components/Profile/ProfileIcons';
 import { RemoveSheet } from '../../components/Profile/ProfileSheets';
 import { StoryTile, useOwnStoryMedia } from '../../components/Profile/StoryMedia';
-import { useProfile } from '../../data/profile';
 import { removeStoryFolder, saveStoryFolder, setFolderStories, STORY_BACKGROUNDS, useOwnStories, useStoryFolders, type Story, type StoryFolder } from '../../data/stories';
 import { goBack, navigate } from '../../router';
 import { useSwipeBack } from '../../utils/tabNav';
@@ -52,8 +52,7 @@ function StoryFolderContents({ folder, stories, onClose }: { folder: StoryFolder
   );
 }
 
-export function StoryArchive({ folderId }: { folderId?: string }) {
-  const { photos, albums } = useProfile();
+export function StoryArchive({ folderId, gallery }: { folderId?: string; gallery?: { headerHost: HTMLElement | null } }) {
   const stories = useOwnStories().slice().reverse();
   const folders = useStoryFolders();
   const folder = folders.find(({ id }) => id === folderId);
@@ -62,29 +61,30 @@ export function StoryArchive({ folderId }: { folderId?: string }) {
   const [sheet, setSheet] = useState<'new' | 'name' | 'pick' | 'delete' | null>(null);
   const root = useRef<HTMLElement>(null);
   const back = () => goBack(folderId ? PHOTO_PATHS.stories : '/');
-  useSwipeBack(root, () => folderId ? back() : switchPhotoView('stories', 'albums'));
+  useSwipeBack(root, back);
   const close = () => setSheet(null);
 
-  return (
-    <section ref={root} className="fp ph">
-      <header className="fp__header">
-        <button type="button" className="fp__back" aria-label="Назад" onClick={back}><IconBack /></button>
-        <h1 className="fp__title">{folder?.name ?? (folderId ? 'Папка историй' : 'Фото и альбомы')}</h1>
-        {folder && <button type="button" className="fp__back" aria-label="Настроить папку историй" onClick={() => setSheet('name')}><IconPencil /></button>}
-        {(!folderId || folder) && (
-          <button
-            type="button"
-            className="fp__back"
-            aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
-            onClick={folder ? () => setSheet('pick') : media.compose}
-          >
-            <IconPlusLine />
-          </button>
-        )}
-      </header>
-      {!folderId && (
-        <PhotoTabs value="stories" onChange={(next) => switchPhotoView('stories', next)} photos={photos.length} albums={albums.length} stories={stories.length} />
+  const header = (
+    <header className="fp__header">
+      <button type="button" className="fp__back" aria-label="Назад" onClick={back}><IconBack /></button>
+      <h1 className="fp__title">{folder?.name ?? (folderId ? 'Папка историй' : 'Фото и альбомы')}</h1>
+      {folder && <button type="button" className="fp__back" aria-label="Настроить папку историй" onClick={() => setSheet('name')}><IconPencil /></button>}
+      {(!folderId || folder) && (
+        <button
+          type="button"
+          className="fp__back"
+          aria-label={folder ? 'Истории в папке' : 'Добавить историю'}
+          onClick={folder ? () => setSheet('pick') : media.compose}
+        >
+          <IconPlusLine />
+        </button>
       )}
+    </header>
+  );
+
+  return (
+    <section ref={gallery ? undefined : root} className="fp ph">
+      {gallery ? gallery.headerHost && createPortal(header, gallery.headerHost) : header}
       <div className="fp__scroll ph__scroll">
         {!folderId && (
           <ul className="ph__albums" aria-label="Папки историй">

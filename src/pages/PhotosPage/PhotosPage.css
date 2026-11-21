@@ -1,11 +1,15 @@
 /* «Фото и альбомы»: каркас .fp (шапка со стеклянными кнопками, фон-сцена), поля 16 */
 
 /* Шапка и вкладки занимают отдельные строки над прокручиваемой галереей. */
-[data-pm] .ph:has(> .ptabs) > .fp__header {
+.ph-gallery__header {
+  flex-shrink: 0;
+}
+
+[data-pm] .ph-gallery__header > .fp__header {
   position: relative;
 }
 
-[data-pm] .ph > .ptabs + .ph__scroll {
+[data-pm] .ph-gallery__pager .ph__scroll {
   padding-top: calc(var(--block-gap) - var(--space-1));
 }
 
@@ -14,6 +18,11 @@
   flex-shrink: 0;
   margin-block-start: calc(var(--block-gap) - var(--space-1));
   padding-inline: var(--page-gutter);
+}
+
+/* Фон остаётся у общего экрана, прокручиваются и перелистываются только его страницы. */
+[data-pm] .ph-gallery__pager .ph::before {
+  content: none;
 }
 
 /* Галерея задаёт рамки своих плиток отдельно. */

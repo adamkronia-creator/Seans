@@ -11,6 +11,7 @@ import { FolderPage } from './pages/FolderPage/FolderPage';
 import { FoldersPage, foldersPath } from './pages/FoldersPage/FoldersPage';
 import { PersonProfilePage } from './pages/PersonProfilePage/PersonProfilePage';
 import { ProfileEditPage } from './pages/ProfilePage/ProfileEdit';
+import { PhotoGallery } from './pages/PhotosPage/PhotoGallery';
 import { PhotosPage } from './pages/PhotosPage/PhotosPage';
 import { StoryArchive } from './pages/PhotosPage/StoryArchive';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
@@ -374,11 +375,18 @@ export default function App() {
       const task = taskId ? TASK_LIBRARY.find((t) => t.id === taskId) : undefined;
       return task ? page(`tasks/${task.id}`, <TaskSettings task={task} onBack={() => goBack('/')} />, at, true) : page('tasks', <TasksPage />, at, true);
     }
-    const storyRoute = path.match(/^\/profile\/photos\/stories(?:\/folder\/([^/]+))?\/?$/);
+    if (/^\/profile\/photos(?:\/(?:albums|stories))?\/?$/.test(path)) {
+      return {
+        key: 'profile/photos',
+        pm: true,
+        build: () => <main className="app__content"><PhotoGallery /></main>,
+      };
+    }
+    const storyRoute = path.match(/^\/profile\/photos\/stories\/folder\/([^/]+)\/?$/);
     if (storyRoute) {
       const folderId = storyRoute[1];
       return {
-        key: folderId ? `profile/photos/stories/folder/${folderId}` : 'profile/photos/stories',
+        key: `profile/photos/stories/folder/${folderId}`,
         pm: true,
         build: () => (
           <main className="app__content">
@@ -387,17 +395,16 @@ export default function App() {
         ),
       };
     }
-    // /profile/photos, /profile/photos/albums и /profile/photos/album/<альбом>: фото и альбомы на весь экран; у каждой вкладки свой ключ (экран строится заново)
-    const photosRoute = path.match(/^\/profile\/photos(?:\/(albums)|\/album\/([^/]+))?\/?$/);
+    // Открытый альбом лежит отдельным экраном поверх галереи.
+    const photosRoute = path.match(/^\/profile\/photos\/album\/([^/]+)\/?$/);
     if (photosRoute) {
-      const albumId = photosRoute[2];
-      const view = albumId ? 'album' : photosRoute[1] ? 'albums' : 'photos';
+      const albumId = photosRoute[1];
       return {
-        key: albumId ? `profile/photos/album/${albumId}` : `profile/photos/${view}`,
+        key: `profile/photos/album/${albumId}`,
         pm: true,
         build: () => (
           <main className="app__content">
-            <PhotosPage view={view} albumId={albumId} />
+            <PhotosPage view="album" albumId={albumId} />
           </main>
         ),
       };
