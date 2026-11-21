@@ -269,7 +269,7 @@ export function ProfilePage() {
         <div className="profile__photos">
         <section className="profile__card profile__card--joined" aria-label="Фото и альбомы">
           <header className="profile__card-head profile__card-head--tabs">
-            <PhotoTabs fit value={tab} onChange={setTab} photos={photos.length} albums={albums.length} stories={stories.length} />
+            <PhotoTabs value={tab} onChange={setTab} photos={photos.length} albums={albums.length} stories={stories.length} />
           </header>
 
           <SwipePager

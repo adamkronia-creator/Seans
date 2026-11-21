@@ -426,7 +426,7 @@
 
 /* Вкладки материалов и содержимое располагаются на фоне профиля. */
 [data-pm] .ct__tabs-block {
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding: 0;
   border: 0;
   background: none;

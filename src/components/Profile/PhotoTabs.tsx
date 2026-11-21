@@ -15,7 +15,6 @@ export const PHOTO_VIEWS: readonly PhotoView[] = ['photos', 'albums', 'stories']
 
 interface PhotoTabsProps {
   value: PhotoView;
-  fit?: boolean;
   onChange: (view: PhotoView) => void;
   photos: number;
   albums: number;
@@ -29,12 +28,11 @@ interface MediaTab<T extends string> {
   Icon: typeof IconImage;
 }
 
-export function MediaTabs<T extends string>({ value, onChange, tabs, label, fit = false }: {
+export function MediaTabs<T extends string>({ value, onChange, tabs, label }: {
   value: T;
   onChange: (value: T) => void;
   tabs: readonly MediaTab<T>[];
   label: string;
-  fit?: boolean;
 }) {
   const row = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -63,7 +61,7 @@ export function MediaTabs<T extends string>({ value, onChange, tabs, label, fit 
   };
 
   return (
-    <div ref={row} className={fit ? 'ptabs ptabs--fit' : 'ptabs'} role="tablist" aria-label={label} data-hscroll>
+    <div ref={row} className="ptabs" role="tablist" aria-label={label} data-hscroll>
       {tabs.map(({ id, label, count, Icon }, index) => (
         <button
           key={id}
@@ -85,11 +83,11 @@ export function MediaTabs<T extends string>({ value, onChange, tabs, label, fit 
 }
 
 /** Разделы собственной галереи с количеством фото, альбомов и историй. */
-export function PhotoTabs({ value, onChange, photos, albums, stories, fit }: PhotoTabsProps) {
+export function PhotoTabs({ value, onChange, photos, albums, stories }: PhotoTabsProps) {
   const tabs: MediaTab<PhotoView>[] = [
     { id: 'photos', label: 'Фото', count: photos, Icon: IconImage },
     { id: 'albums', label: 'Альбомы', count: albums, Icon: IconAlbum },
     { id: 'stories', label: 'Истории', count: stories, Icon: IconStories },
   ];
-  return <MediaTabs value={value} onChange={onChange} tabs={tabs} label="Раздел фото" fit={fit} />;
+  return <MediaTabs value={value} onChange={onChange} tabs={tabs} label="Раздел фото" />;
 }
