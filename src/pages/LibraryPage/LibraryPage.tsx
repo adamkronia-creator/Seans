@@ -72,7 +72,7 @@ interface LibraryPageProps {
   /** Нажатие на карточку (открыть настройку) */
   onOpen?: (item: LibraryItem) => void;
   /** Подписи для экранных читалок и пустых состояний; noun — «тест», «теста», «тестов» */
-  /** Шапка и чипсы как в «Диалогах», над чипсами недавние тесты (раздел «Диагностика») */
+  /** Шапка и чипсы как в «Диалогах» */
   chatLike?: boolean;
   labels: { all: string; filters: string; emptyRecent: string; noun: Noun; everywhere: string };
 }
@@ -82,6 +82,8 @@ type Section = string;
 
 const FAVORITES = 'favorites';
 const RECENT = 'recent';
+// У кнопки «Фильтры» нет своей страницы, хотя она находится в том же ряду.
+const SECTION_CHIP = ':scope > .chip[aria-pressed]';
 
 /** Порядок выдачи один: по порядку раздела, а при поиске по совпадению (переключателя порядка в интерфейсе нет) */
 const SORT: ViewQuery['sort'] = 'auto';
@@ -442,11 +444,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
 
   // Цвет чипсов идёт за положением страниц
   const onPosition = useCallback((position: number, via?: PositionVia) => {
-    const chips = root.current?.querySelectorAll<HTMLElement>('.screen-header__chips .chip');
-    if (chips) followChips(chips, position, via);
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
-    if (row) centerChips(row, position, '.chip', via);
-  }, []);
+    if (!row) return;
+    followChips(row.querySelectorAll<HTMLElement>(SECTION_CHIP), position, via);
+    centerChips(row, position, SECTION_CHIP, via, catalogDesign);
+  }, [catalogDesign]);
 
   // Чипс раздела: пока что-то ищут, пустые разделы бледнеют, а число находок слышно в подписи.
   // Долгое нажатие открывает меню папки (у «Избранного» и «Недавнего» меню нет); у «Все» на экране одно слово, а читалке нужно знать, чего «все»: «Все тесты»
@@ -482,34 +484,38 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     input.current?.blur();
   };
 
-  const chipNodes = (
-    <>
-            <Chip {...chip('all', labels.all)}>Все</Chip>
-            <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
-            {showRecentSection && <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>}
-            {folders.map(({ id, name, color, ink, badge }) => (
-              <Chip key={id} {...chip(id, name)} folder={{ scope, id }} paint={{ color, ink, badge }}>
-                {name}
-              </Chip>
-            ))}
-    </>
-  );
   const filterButton = (
     <button
       type="button"
-      className={`${catalogDesign ? 'catalog-filter-button' : chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
+      className={catalogDesign
+        ? `chip chip--follow catalog-filter-chip${activeCount ? ' chip--counted' : ''}`
+        : `${chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
+      data-filtered={catalogDesign && activeCount > 0 ? '' : undefined}
       aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
       aria-haspopup="dialog"
       onClick={() => setSheet('filters')}
     >
       <IconSliders aria-hidden="true" />
       {catalogDesign && 'Фильтры'}
-      {activeCount > 0 && (
+      {activeCount > 0 && (catalogDesign ? <Badge count={activeCount} /> : (
         <span className="library-page__tile-badge">
           <Badge count={activeCount} />
         </span>
-      )}
+      ))}
     </button>
+  );
+  const chipNodes = (
+    <>
+      {catalogDesign && filterButton}
+      <Chip {...chip('all', labels.all)}>Все</Chip>
+      <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
+      {showRecentSection && <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>}
+      {folders.map(({ id, name, color, ink, badge }) => (
+        <Chip key={id} {...chip(id, name)} folder={{ scope, id }} paint={{ color, ink, badge }}>
+          {name}
+        </Chip>
+      ))}
+    </>
   );
   const recentItems = useMemo(() => recent.map((id) => catalog.byId.get(id)?.item).filter((x): x is LibraryItem => Boolean(x)), [recent, catalog]);
 
@@ -520,7 +526,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     const row = root.current?.querySelector<HTMLElement>('.screen-header__chips');
     if (!row) return;
     const place = () => {
-      const chips = Array.from(row.querySelectorAll<HTMLElement>(':scope > .chip'));
+      const chips = Array.from(row.querySelectorAll<HTMLElement>(SECTION_CHIP));
       const kept = row.querySelector<HTMLElement>(':scope > .chips-pill')?.dataset.weights?.split(',').map(Number);
       const at = liveOrder.split('|').indexOf(sections[index]);
       placePill(chips, kept && kept.length === chips.length && liveOrder === keptOrder.current ? kept : chips.map((_, i) => (i === at ? 1 : 0)));
@@ -585,8 +591,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
               {suggestions}
             </div>
           ) : undefined}
-          belt={recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
-          beforeChips={catalogDesign ? filterButton : undefined}
+          belt={!catalogDesign && recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
           inputRef={input}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

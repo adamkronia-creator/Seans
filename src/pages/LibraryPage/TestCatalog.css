@@ -1,53 +1,16 @@
 [data-pm] .catalog-library {
-  --catalog-surface: var(--glass-plain);
+  --catalog-layout-selected: var(--glass-plain);
   --catalog-line: color-mix(in srgb, var(--text-primary) 12%, transparent);
 }
 
 :root[data-ink='light'] [data-pm] .catalog-library {
-  --catalog-surface: color-mix(in srgb, var(--palette-white) 8%, var(--glass-plain));
+  --catalog-layout-selected: color-mix(in srgb, var(--palette-white) 8%, var(--glass-plain));
 }
 
-/* Поиск, недавние тесты и подборки стоят над выдачей на общем фоне приложения. */
+/* Стеклянная шапка остаётся над прокручиваемой выдачей. */
 .catalog-library .chats-header {
   position: relative;
   flex: none;
-  gap: var(--space-3);
-  padding-block-start: calc(var(--safe-top) + var(--space-2));
-}
-
-[data-pm] .catalog-library .chats-header::before {
-  content: none;
-}
-
-.catalog-library .chats-header__top {
-  height: var(--size-touch);
-  padding-inline: var(--page-gutter);
-}
-
-.catalog-library .chats-header__name,
-.catalog-results h2 {
-  font: var(--type-title);
-  letter-spacing: var(--letter-spacing-title);
-}
-
-.catalog-library .chats-header__status {
-  display: none;
-}
-
-.catalog-library .chats-header__avatar-button {
-  order: 1;
-  place-items: center;
-  width: var(--size-touch);
-  height: var(--size-touch);
-}
-
-.catalog-library .chats-header__avatar {
-  width: var(--space-8);
-  height: var(--space-8);
-}
-
-.catalog-library .chats-header__belt[data-collapsed] {
-  margin-bottom: calc(var(--space-3) * -1);
 }
 
 .catalog-search {
@@ -58,7 +21,8 @@
 [data-pm] .catalog-library .catalog-search .search-field {
   height: var(--size-touch);
   border: var(--hairline) solid var(--catalog-line);
-  background: var(--catalog-surface);
+  background: var(--glass-card);
+  -webkit-backdrop-filter: none;
   backdrop-filter: none;
   animation: none;
 }
@@ -76,92 +40,24 @@
   box-shadow: var(--glass-shadow-panel);
 }
 
-.catalog-library .recent-row {
-  gap: var(--space-1);
-  height: calc(var(--space-12) + var(--space-4) + var(--space-2));
-}
-
-.catalog-library .recent-row .stories__cell {
-  flex: 0 0 max(var(--space-12), calc((100% - var(--space-1) * 5) / 6));
-  min-width: 0;
-}
-
-.catalog-library .recent-row .stories__item {
-  width: 100%;
-}
-
-.catalog-library .recent-row :is(.stories__ring, .recent-row__avatar) {
-  width: var(--space-12);
-  height: var(--space-12);
-  border-radius: var(--radius-md);
-}
-
-.catalog-library .recent-row__avatar::before {
-  background: color-mix(in oklab, var(--tint) 92%, var(--palette-white));
-  opacity: 1;
-}
-
-.catalog-library .recent-row__icon {
-  width: var(--space-8);
-  height: var(--space-8);
-}
-
-.catalog-library .recent-row .stories__label {
-  font-size: var(--font-size-2xs);
-}
-
-.screen .catalog-library .recent-row,
-.screen .catalog-library .recent-row * {
-  touch-action: pan-x pan-y pinch-zoom;
-}
-
-.catalog-library .chats-header__filters {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding-inline-start: var(--page-gutter);
-}
-
-[data-pm] .catalog-library .chats-header__filters .screen-header__chips {
-  flex: 1;
-  min-width: 0;
-  padding-inline-start: var(--space-1);
-}
-
-.catalog-filter-button {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: var(--space-8);
-  padding: 0 var(--space-2);
-  border: var(--active-ring-width) solid var(--glass-border);
-  border-radius: var(--radius-full);
-  background: var(--glass-fill);
-  color: var(--text-chip);
-  font: var(--type-caption);
-  white-space: nowrap;
-}
-
-.catalog-filter-button svg {
+.catalog-filter-chip > svg {
   flex: none;
   font-size: var(--size-icon-sm);
 }
 
-.catalog-filter-button.library-page__tile--on {
-  border-color: var(--glass-border-blue);
-  background: var(--glass-chip-active);
+[data-pm] .screen-header__chips .catalog-filter-chip[data-filtered] {
   color: var(--action-primary-text);
 }
 
-.catalog-filter-button .library-page__tile-badge {
-  position: static;
+[data-pm] .screen-header__chips .catalog-filter-chip[data-filtered]::before {
+  border-color: var(--glass-border-blue);
+  background: var(--glass-chip-active);
 }
 
 [data-pm] .catalog-library.messages .library-page__page {
   --pm-top: 0px;
   gap: var(--space-3);
-  padding: 0 var(--page-gutter) var(--pm-bottom);
+  padding: var(--space-3) var(--page-gutter) var(--pm-bottom);
   scroll-padding-top: var(--space-3);
 }
 
@@ -190,6 +86,8 @@
 .catalog-results h2 {
   margin: 0;
   color: var(--text-primary);
+  font: var(--type-title);
+  letter-spacing: var(--letter-spacing-title);
 }
 
 .catalog-results__title span {
@@ -218,7 +116,7 @@
 }
 
 .catalog-layout button[aria-pressed='true'] {
-  background: var(--catalog-surface);
+  background: var(--catalog-layout-selected);
   color: var(--text-primary);
 }
 
@@ -239,7 +137,7 @@
   overflow: clip;
   border: var(--hairline) solid var(--catalog-line);
   border-radius: var(--radius-lg);
-  background: var(--catalog-surface);
+  background: var(--glass-card);
   contain-intrinsic-size: auto 224px;
 }
 
@@ -294,14 +192,4 @@
 
 [data-pm] .catalog-library .library-page__list--cards .lib-card--selected .lib-card__heart {
   right: var(--space-10);
-}
-
-@media (max-height: 484px) {
-  .catalog-library .recent-row {
-    display: none;
-  }
-
-  .catalog-library .chats-header__belt {
-    margin-bottom: calc(var(--space-3) * -1);
-  }
 }
