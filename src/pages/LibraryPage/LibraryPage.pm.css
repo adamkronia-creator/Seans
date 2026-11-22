@@ -110,8 +110,8 @@
 }
 
 /* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: круг 20 в углу значка, вокруг него в значке
-   вырезан прозрачный зазор 2. Серого сердечка нет: избранное меняется в шапке настроек теста */
-[data-pm] .lib-card--fav {
+   вырезан прозрачный зазор 2. В списке «Диагностики» на том же месте находится кнопка избранного. */
+[data-pm] :is(.lib-card--fav, .lib-card--favorite-on-avatar) {
   --presence-size: var(--space-5);
   --presence-inset: 0px;
   --presence-center: calc(var(--presence-inset) + var(--presence-size) / 2);
@@ -146,7 +146,7 @@
   pointer-events: none;
 }
 
-[data-pm] .lib-card--fav .test-card__avatar {
+[data-pm] :is(.lib-card--fav, .lib-card--favorite-on-avatar) .test-card__avatar {
   -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
   mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
 }
@@ -219,7 +219,7 @@
 }
 
 /* В избранном и выбран: вырезы под сердечко и под галочку вместе */
-[data-pm] .lib-card--fav.lib-card--selected .test-card__avatar {
+[data-pm] :is(.lib-card--fav, .lib-card--favorite-on-avatar).lib-card--selected .test-card__avatar {
   -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
     radial-gradient(circle at calc(100% - var(--space-5) / 2) calc(100% - var(--space-5) / 2), transparent calc(var(--space-5) / 2 + 2px), var(--palette-black) calc(var(--space-5) / 2 + 2.5px));
   mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px)),
