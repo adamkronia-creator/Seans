@@ -11,6 +11,8 @@ export { default as IconTestsBold } from '../../assets/icons/solar/clipboard-lis
 export { default as IconTasksBold } from '../../assets/icons/solar/meditation-round-bold.svg?react';
 export { default as IconProfileBold } from '../../assets/icons/solar/user-rounded-bold.svg?react';
 export { default as IconSearch } from '../../assets/icons/solar/magnifier.svg?react';
+export { default as IconScaleProfile } from '../../assets/icons/solar/chart-square.svg?react';
+export { default as IconTotalScore } from '../../assets/icons/solar/calculator.svg?react';
 export { default as IconFavorites } from '../../assets/icons/solar/bookmark.svg?react';
 export { default as IconBack } from '../../assets/icons/solar/alt-arrow-left.svg?react';
 // Значок приглашения (лента истории)

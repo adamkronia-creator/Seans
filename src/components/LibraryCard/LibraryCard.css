@@ -77,6 +77,25 @@
   white-space: nowrap;
 }
 
+.lib-card__fact-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+.lib-card__fact-list > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.lib-card__fact-list svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
 /* Почему найдено — до двух строк: на узком экране «Также называется: Скрининг тревоги» не должно обрываться на полуслове */
 .lib-card__why {
   display: -webkit-box;

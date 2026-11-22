@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useLongPress } from '../../utils/useLongPress';
 import { useJustOn } from '../../utils/useJustOn';
 import { IconHeartRed } from '../icons';
@@ -19,7 +19,7 @@ interface LibraryCardProps {
   selecting?: boolean;
   onClick?: (test: LibraryItem) => void;
   /** Строка сведений под описанием (у задания: «Дневник · КПТ · 5–7 мин на запись») — по ней материалы различают, не открывая */
-  facts?: string;
+  facts?: ReactNode;
   /** Почему найдено, если в названии и описании этого нет: «Шкала: Ипохондрия (Hs)» */
   why?: string;
   /** Слова, по которым нашлось: подсвечиваются в названии и описании */

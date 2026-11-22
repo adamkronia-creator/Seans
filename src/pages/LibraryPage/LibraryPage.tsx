@@ -1,10 +1,10 @@
 import { guardBack } from '../../router';
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type UIEvent } from 'react';
-import { IconClose } from '../../components/ChatParts/ChatIcons';
+import { IconClock, IconClose } from '../../components/ChatParts/ChatIcons';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
-import { IconFavorites, IconTabLibrary, IconTabTests } from '../../components/icons';
+import { IconFavorites, IconScaleProfile, IconTabLibrary, IconTabTests, IconTotalScore } from '../../components/icons';
 import { useFolderMenu } from '../../components/FolderMenu/useFolderMenu';
 import { EmptyResults, type EmptyAction } from '../../components/LibraryFilters/EmptyResults';
 import { IconSliders } from '../../components/LibraryFilters/FilterIcons';
@@ -191,19 +191,27 @@ function LibraryList(p: ListProps) {
           : min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
         const facts = p.catalogLayout === 'cards' ? [duration, entry.d.format].filter(Boolean)
           : p.catalogLayout === 'list' ? [] : entry.d.line;
+        const illustratedTest = catalog.kind === 'test' && p.catalogLayout === 'cards';
+        const ResultIcon = entry.d.facets.result?.includes('profile') ? IconScaleProfile : IconTotalScore;
         const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
         return (
           <LibraryCard
             key={id}
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
-            description={catalog.kind === 'test' && p.catalogLayout === 'cards' ? testCardDescription(id) : undefined}
+            description={illustratedTest ? testCardDescription(id) : undefined}
             favorite={ctx.favorites.has(id)}
             favoriteOnAvatar={p.catalogLayout === 'list'}
             onFavoriteChange={setFavorites && ((on) => setFavorites([id], on))}
             selecting={p.selecting}
             onClick={p.onOpen}
-            facts={facts.join(' · ') || undefined}
+            facts={illustratedTest && facts.length > 0 ? (
+              <span className="lib-card__fact-list">
+                {duration && <span><IconClock aria-hidden="true" />{duration}</span>}
+                {duration && entry.d.format && ' '}
+                {entry.d.format && <span><ResultIcon aria-hidden="true" />{entry.d.format}</span>}
+              </span>
+            ) : facts.join(' · ') || undefined}
             why={why}
             marks={search?.words}
             pinned={p.pinned.has(id)}
