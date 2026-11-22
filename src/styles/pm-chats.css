@@ -458,6 +458,7 @@ html:has([data-pm]) body {
 /* Белое стекло: кнопки «поиск» и «оповещения», невыбранные чипсы (слой под подписью гаснет там, где её накрывает синяя плашка),
    плитка «добавить историю», поле поиска */
 [data-pm] .chats-header__action,
+[data-pm] .catalog-layout::before,
 [data-pm] .badge--select,
 [data-pm] .stories__add,
 [data-pm] .chats-header .search-field,

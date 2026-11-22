@@ -190,11 +190,26 @@
   flex: none;
 }
 
+.catalog-layout,
+.catalog-layout::before,
+.catalog-layout .segmented-control__item {
+  border-radius: var(--radius-pill);
+}
+
+.catalog-layout::before {
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
 .catalog-layout .segmented-control__item {
   display: grid;
   place-items: center;
   width: var(--size-touch);
   height: calc(var(--size-touch) - 2 * var(--space-1));
+}
+
+.catalog-layout .segmented-control__item[aria-pressed='true'] {
+  color: var(--text-primary);
 }
 
 .catalog-layout svg {
