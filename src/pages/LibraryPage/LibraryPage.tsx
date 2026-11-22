@@ -131,6 +131,8 @@ interface ListProps {
   onOpen: (item: LibraryItem) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
+  onSetFavorites?: LibraryPageProps['onSetFavorites'];
+  selecting: boolean;
   catalogLayout?: CatalogLayout;
   animateFilterRemoval: boolean;
 }
@@ -175,6 +177,7 @@ function LibraryList(p: ListProps) {
 
   const describe = (n: number) => `${n} ${plural(n, p.noun)}`;
   const marked = hasMarks(ctx.marks);
+  const setFavorites = p.onSetFavorites;
 
   const cards = (
     <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards' : ''}`}>
@@ -193,6 +196,8 @@ function LibraryList(p: ListProps) {
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
             favorite={ctx.favorites.has(id)}
+            onFavoriteChange={setFavorites && ((on) => setFavorites([id], on))}
+            selecting={p.selecting}
             onClick={p.onOpen}
             facts={facts.join(' · ') || undefined}
             why={why}
@@ -458,12 +463,14 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             onOpen={tap}
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
+            onSetFavorites={catalogDesign ? onSetFavorites : undefined}
+            selecting={sel.selecting}
             catalogLayout={catalogDesign ? layout : undefined}
             animateFilterRemoval={animateFilterRemoval}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout, animateFilterRemoval],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, sel.selecting, catalogDesign, layout, animateFilterRemoval, onSetFavorites],
   );
 
   const onDrag = useCallback(
