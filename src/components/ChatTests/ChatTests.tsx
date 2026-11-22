@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
+import { SwipePager } from '../SwipePager/SwipePager';
 import { IconTabPractices, IconTabTests } from '../icons';
 import type { PickProps } from '../ChatCase/ChatCase';
 import { ActivityCard } from './ActivityCard';
@@ -137,70 +138,79 @@ export function ChatTests({
   onOpenResult?: (id: string) => void;
 }) {
   const data = useClientData();
-  const scroller = useRef<HTMLDivElement>(null);
   const statuses = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<'sent' | 'done' | null>(null);
   const items = hasData ? itemsWithStatus(data, 'test') : [];
   const sent = items.filter((item) => item.status === 'sent');
   const done = items.filter((item) => item.status === 'done');
   const active = filter ?? (sent.length > 0 ? 'sent' : 'done');
-  const shown = active === 'sent' ? sent : done;
+  const index = active === 'sent' ? 0 : 1;
   const hasItems = items.length > 0;
+  const chipPosition = useRef(index);
+  const moveStatusPill = useCallback((position: number) => {
+    chipPosition.current = position;
+    const chips = statuses.current?.querySelectorAll<HTMLButtonElement>('.chip');
+    if (chips) followChips(chips, position);
+  }, []);
 
   useLayoutEffect(() => {
     const row = statuses.current;
     if (!row) return;
     const chips = row.querySelectorAll<HTMLButtonElement>('.chip');
-    const place = () => followChips(chips, active === 'sent' ? 0 : 1);
+    const place = () => moveStatusPill(chipPosition.current);
     place();
     const resize = new ResizeObserver(place);
     chips.forEach((chip) => resize.observe(chip));
     return () => resize.disconnect();
-  }, [active, hasItems]);
-
-  const selectStatus = (next: 'sent' | 'done') => {
-    if (next === active) return;
-    setFilter(next);
-    if (scroller.current) scroller.current.scrollTop = 0;
-  };
+  }, [hasItems, moveStatusPill]);
 
   if (!hasItems) {
     return <EmptyState icon={<IconTabTests />} title="Тесты ещё не отправлялись" text="Отправьте тест из раздела «Диагностика» — он появится здесь." />;
   }
 
+  const pages = [
+    { key: 'sent', tests: sent, empty: 'Нет тестов, ожидающих ответа' },
+    { key: 'done', tests: done, empty: 'Нет завершённых тестов' },
+  ].map(({ key, tests, empty }) => ({
+    key,
+    node: (
+      <div className="chat-tests__status-page">
+        {tests.length === 0 ? <EmptyState icon={<IconTabTests />} title={empty} /> : (
+          <ul className="chat-tests__catalog catalog-cards">
+            {tests.map((item) => {
+              const test = LIBRARY.find((entry) => entry.id === item.id);
+              const completed = item.status === 'done';
+              const result = completed ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data : undefined;
+              return (
+                <ChatTestCard
+                  key={item.id}
+                  item={item}
+                  test={test}
+                  result={result}
+                  description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
+                  onOpen={() => completed ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
+                  onMenu={onCardMenu}
+                  onRemind={!completed && onRemind ? () => onRemind([item]) : undefined}
+                  selecting={Boolean(selected)}
+                  selected={selected?.includes(item.id)}
+                  onPick={onPick}
+                />
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    ),
+  }));
+
   return (
-    <div ref={scroller} className="chat-tests chat-tests--catalog">
+    <div className="chat-tests chat-tests--catalog">
       <div ref={statuses} className="screen-header__chips chat-tests__filters" role="group" aria-label="Статусы опросников" data-hscroll>
         <span className="chips-pill" aria-hidden="true" />
-        <Chip follow active={active === 'sent'} count={sent.length} onClick={() => selectStatus('sent')}>Отправленные</Chip>
-        <Chip follow active={active === 'done'} count={done.length} onClick={() => selectStatus('done')}>Завершённые</Chip>
+        <Chip follow active={active === 'sent'} count={sent.length} onClick={() => setFilter('sent')}>Отправленные</Chip>
+        <Chip follow active={active === 'done'} count={done.length} onClick={() => setFilter('done')}>Завершённые</Chip>
       </div>
-      {shown.length === 0 ? (
-        <EmptyState icon={<IconTabTests />} title={active === 'sent' ? 'Нет тестов, ожидающих ответа' : 'Нет завершённых тестов'} />
-      ) : (
-        <ul key={active} className="chat-tests__catalog catalog-cards" data-status-changed={filter !== null || undefined}>
-          {shown.map((item) => {
-            const test = LIBRARY.find((entry) => entry.id === item.id);
-            const completed = item.status === 'done';
-            const result = completed ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data : undefined;
-            return (
-              <ChatTestCard
-                key={item.id}
-                item={item}
-                test={test}
-                result={result}
-                description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
-                onOpen={() => completed ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
-                onMenu={onCardMenu}
-                onRemind={!completed && onRemind ? () => onRemind([item]) : undefined}
-                selecting={Boolean(selected)}
-                selected={selected?.includes(item.id)}
-                onPick={onPick}
-              />
-            );
-          })}
-        </ul>
-      )}
+      <SwipePager nested index={index} pages={pages} onIndexChange={(next) => setFilter(next === 0 ? 'sent' : 'done')} onPosition={moveStatusPill} />
     </div>
   );
 }

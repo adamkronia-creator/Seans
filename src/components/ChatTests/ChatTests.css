@@ -359,19 +359,19 @@
   translate: 0 1px;
 }
 
-.chat-tests--catalog {
+[data-pm] .chat .chat-tests--catalog {
   gap: var(--space-3);
-  padding-inline: var(--page-gutter);
+  padding-bottom: 0;
+  overflow: clip;
 }
 
 [data-pm] .screen-header__chips.chat-tests__filters {
   --glass-fill: var(--glass-fill-header);
   display: flex;
   flex: none;
-  gap: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
-  margin: 0;
+  margin: 0 var(--page-gutter);
   padding: 0;
   border: var(--space-1) solid transparent;
   border-radius: var(--radius-full);
@@ -395,18 +395,14 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-pm] .chat-tests__filters .chips-pill {
-    transition: transform var(--dur-base) var(--ease-ios), width var(--dur-base) var(--ease-ios);
-  }
-
-  [data-pm] .chat-tests__filters .chip {
-    transition: color var(--dur-base) var(--ease-ios);
-  }
-
-  .chat-tests__catalog[data-status-changed] {
-    animation: fade-in var(--dur-base) var(--ease-ios);
-  }
+.chat-tests__status-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--page-gutter) var(--page-bottom, var(--space-4));
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .chat-tests__catalog {
@@ -485,7 +481,7 @@
 }
 
 .chat-test-card__remind {
-  inset-inline-start: var(--cover-action-inset);
+  inset-inline-start: calc(var(--cover-action-inset) + (var(--size-touch) - var(--space-8)) / 2);
   padding-inline: var(--space-3);
   font: var(--type-caption);
 }
