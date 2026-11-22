@@ -37,6 +37,7 @@ export function ChatTestCard({ item, test, description, result, onOpen, onMenu, 
             loading="lazy"
             decoding="async"
           />
+          {done && test?.catalogCover && test.abbr && <span className="lib-card__abbr">{test.abbr}</span>}
         </span>
         <span className="test-card__body">
           <span className="test-card__title">{item.title}</span>

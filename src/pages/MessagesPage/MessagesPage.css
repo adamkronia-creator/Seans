@@ -183,6 +183,7 @@
   --stories-row-height: calc(var(--space-16) + var(--space-1) * 2 + var(--space-4));
   --floating-row: calc(var(--stories-row-height) + var(--floating-gap));
   --floating-shift: var(--stories-offset, 0px);
+  --floating-chips-offset: 0px;
   --pm-top: var(--floating-controls-space);
 }
 
@@ -198,7 +199,7 @@
 
 .messages--dialogs .chats-header__belt {
   position: absolute;
-  inset-block-start: 100%;
+  inset-block-start: calc(100% + var(--floating-gap) + var(--floating-chips-height));
   inset-inline: 0;
   display: block;
   height: var(--floating-row);
@@ -222,6 +223,13 @@
 
 .messages--dialogs .chats-header__belt:not([inert]) .stories {
   pointer-events: auto;
+}
+
+@media (max-width: 360px) {
+  .messages--dialogs .chats-header__top:has(.chats-header__archive) {
+    --size-control: var(--size-control-sm);
+    gap: var(--space-2);
+  }
 }
 
 /* ——— Список: лежит на фоне экрана, сверху поле на высоту шапки, снизу — на нижнюю панель ——— */

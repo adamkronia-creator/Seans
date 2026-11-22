@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type UIEvent } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { countText, isMember, useAllGroups } from '../../data/groups';
-import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
+import { ChatItem } from '../../components/ChatItem/ChatItem';
 import { useListMotion } from '../../utils/listMotion';
 import { Toast } from '../../components/Toast/Toast';
 import { useToast } from '../../components/Toast/useToast';
@@ -26,21 +26,9 @@ import './MessagesPage.css';
 /** 'all' или номер папки */
 type Filter = string;
 
-/** Скрытая строка архива не считается прокруткой от начала видимого списка. */
-function hiddenArchiveHeight(scroller: HTMLElement | null) {
-  const archive = scroller?.querySelector<HTMLElement>('.chat-item--archive');
-  const next = archive?.nextElementSibling;
-  return archive && next instanceof HTMLElement ? next.offsetTop - archive.offsetTop : 0;
-}
-
-/**
- * Чаты одного фильтра: страница пейджера со своей прокруткой. На странице «Все» над «Избранным» стоит строка «Архивы», но при открытии
- * список сдвинут на её высоту, и строка спрятана под шапкой; протяжка вниз выдвигает её, а недотянутую или недоведённую до конца
- * прокрутку список сам доводит до ближайшего края.
- */
+/** Чаты одного фильтра: страница пейджера со своей прокруткой. */
 const ChatList = memo(function ChatList({
   chats,
-  archived,
   onOpen,
   onMenu,
   selected,
@@ -55,8 +43,6 @@ const ChatList = memo(function ChatList({
   /** Публичные общие чаты и каналы, в которых вас нет, под строкой поиска: нажатие открывает страницу вступления */
   found: Chat[];
   onOpenFound: (chat: Chat) => void;
-  /** Чаты в архиве: если они есть, на странице «Все» без поиска стоит строка «Архивы» */
-  archived: Chat[];
   onOpen: (chat: Chat) => void;
   onMenu: (chat: Chat, row: HTMLElement) => void;
   /** Выбранные чаты (режим выбора) */
@@ -69,71 +55,8 @@ const ChatList = memo(function ChatList({
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const rows = useRef<HTMLUListElement>(null);
-  const hasArchive = archived.length > 0;
   const favorites = chats.find((c) => c.favorites);
   const others = chats.filter((c) => !c.favorites);
-
-  // Высота спрятанной части: строка «Архивы» вместе с промежутком до следующей
-  const hiddenHeight = () => hiddenArchiveHeight(scroller.current);
-
-  // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать. Пока человек список не трогал,
-  // строка остаётся спрятанной при любом пересчёте размеров (шрифты, адресная строка, поворот): иначе она бы выглядывала по умолчанию
-  useLayoutEffect(() => {
-    const box = scroller.current;
-    const list = rows.current;
-    if (!box || !list || !hasArchive) return;
-    let touched = false;
-    const fit = () => {
-      if (box.clientHeight === 0) return; // страница ещё не показана
-      // Процент от внутренней высоты окна списка (без отступов): когда отступ сверху меняется (выбор чатов), прокрутка не теряется
-      list.style.minHeight = `calc(100% + ${hiddenHeight()}px)`;
-      if (!touched) box.scrollTop = hiddenHeight();
-    };
-    const touch = () => {
-      touched = true;
-    };
-    fit();
-    const watch = new ResizeObserver(fit);
-    watch.observe(box);
-    for (const type of ['pointerdown', 'wheel', 'keydown'] as const) box.addEventListener(type, touch, { passive: true });
-    return () => {
-      watch.disconnect();
-      for (const type of ['pointerdown', 'wheel', 'keydown'] as const) box.removeEventListener(type, touch);
-      // Строки «Архивы» больше нет (начали искать): список снова начинается с первой строки, а не со сдвига под шапку
-      list.style.minHeight = '';
-      box.scrollTop = 0;
-    };
-  }, [hasArchive]);
-
-  // Доводка: отпустили на полпути — строка либо выезжает целиком, либо уходит обратно
-  useEffect(() => {
-    const box = scroller.current;
-    if (!box || !hasArchive) return;
-    let timer = 0;
-    const settle = () => {
-      const h = hiddenHeight();
-      if (box.scrollTop > 0 && box.scrollTop < h) box.scrollTo({ top: box.scrollTop < h / 2 ? 0 : h, behavior: 'smooth' });
-    };
-    // Шапка — стекло, и спрятанная выше строка «Архивы» просвечивала бы сквозь неё: прозрачность строки идёт за тем, сколько её ниже шапки
-    const archive = rows.current?.querySelector<HTMLElement>('.chat-item--archive');
-    const fade = () => {
-      if (archive) archive.style.opacity = String(Math.max(0, Math.min(1, (hiddenHeight() - box.scrollTop) / 24)));
-    };
-    fade();
-    const onScroll = () => {
-      fade();
-      window.clearTimeout(timer);
-      timer = window.setTimeout(settle, 140);
-    };
-    box.addEventListener('scroll', onScroll, { passive: true });
-    const watch = new ResizeObserver(fade);
-    watch.observe(box);
-    return () => {
-      watch.disconnect();
-      box.removeEventListener('scroll', onScroll);
-      window.clearTimeout(timer);
-    };
-  }, [hasArchive]);
 
   // Чат закрепили, вернули, убрали в архив или в другую папку: строки переезжают на новые места, ушедшая схлопывается на своём (utils/listMotion.ts).
   // Смена поиска заменяет набор строк целиком, поэтому двигать ничего не нужно
@@ -143,10 +66,9 @@ const ChatList = memo(function ChatList({
     if (view && scroller.current) scroller.current.scrollTop = 0;
   }, [view]);
 
-  return chats.length > 0 || hasArchive || found.length > 0 ? (
+  return chats.length > 0 || found.length > 0 ? (
     <div ref={scroller} className="messages__list">
       <ul ref={rows} className="messages__rows">
-        {hasArchive && <ArchiveRow chats={archived} onClick={() => navigate('/archive')} />}
         {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
         {others.map((chat) => (
@@ -250,8 +172,6 @@ export function MessagesPage() {
     });
   }, [chats, folders, filters, query]);
 
-  const archived = useMemo(() => (query.trim() ? [] : chats.filter((c) => c.archived)), [chats, query]);
-
   // Поиск находит и публичные группы и каналы, в которых вас нет: по названию или адресу @имя
   const publicGroups = useAllGroups();
   const found = useMemo<Chat[]>(() => {
@@ -309,7 +229,6 @@ export function MessagesPage() {
       node: (
         <ChatList
           chats={lists[i]}
-          archived={id === 'all' ? archived : []}
           found={id === 'all' ? found : []}
           folderId={id === 'all' ? undefined : id}
           onOpen={tapChat}
@@ -322,7 +241,7 @@ export function MessagesPage() {
         />
       ),
     })),
-    [filters, lists, archived, tapChat, holdChat, sel.ids, query, found, openFound, searchEverywhere, clearQuery],
+    [filters, lists, tapChat, holdChat, sel.ids, query, found, openFound, searchEverywhere, clearQuery],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
@@ -331,7 +250,7 @@ export function MessagesPage() {
     const belt = screen?.querySelector<HTMLElement>('.chats-header__belt');
     if (!screen || !belt) return;
     const height = belt.offsetHeight;
-    const { offset, opacity } = floatingRowProgress(height, (scroller?.scrollTop ?? 0) - hiddenArchiveHeight(scroller));
+    const { offset, opacity } = floatingRowProgress(height, scroller?.scrollTop ?? 0);
     screen.style.setProperty('--stories-offset', `${offset}px`);
     screen.style.setProperty('--stories-opacity', String(opacity));
     setStoriesScrolledAway(height > 0 && offset >= height);
@@ -400,6 +319,7 @@ export function MessagesPage() {
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
+        showArchive
         storiesRoot={screen}
         storiesScrolledAway={storiesScrolledAway}
         inputRef={searchInput}

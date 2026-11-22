@@ -45,7 +45,7 @@
 [data-pm] :is(.catalog-library, .messages--dialogs) .screen-header__chips {
   --glass-fill: var(--glass-fill-header);
   position: absolute;
-  inset-block-start: calc(100% + var(--floating-row) + var(--floating-gap) - var(--floating-shift));
+  inset-block-start: calc(100% + var(--floating-gap) + var(--floating-chips-offset, var(--floating-row) - var(--floating-shift)));
   inset-inline: var(--floating-inset);
   height: var(--floating-chips-height);
   margin: 0;

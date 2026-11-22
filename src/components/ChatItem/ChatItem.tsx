@@ -2,7 +2,7 @@ import type { Chat } from '../../data/chats';
 import { useLongPress } from '../../utils/useLongPress';
 import { Avatar } from '../Avatar/Avatar';
 import { Badge } from '../Badge/Badge';
-import { IconArchiveMk, IconBookmarkMk, IconTicksMk } from './ChatIcons';
+import { IconBookmarkMk, IconTicksMk } from './ChatIcons';
 import './ChatItem.css';
 
 interface ChatItemProps {
@@ -92,37 +92,6 @@ export function ChatItem({ chat, onClick, onLongPress, selected = false }: ChatI
               </span>
             </span>
             <Badge count={chat.unread} ariaLabel={`Непрочитанных: ${chat.unread}`} />
-          </span>
-        </span>
-      </button>
-    </li>
-  );
-}
-
-interface ArchiveRowProps {
-  /** Чаты в архиве: из них строится превью и число непрочитанных */
-  chats: Chat[];
-  onClick: () => void;
-}
-
-/**
- * Строка «Архивы» в начале списка, как в макете: круг с градиентом и коробкой, в превью имена чатов из архива, справа время
- * последнего и число непрочитанных сообщений. Список при открытии сдвинут так, что строки не видно: она выезжает при протяжке вниз.
- */
-export function ArchiveRow({ chats, onClick }: ArchiveRowProps) {
-  const unread = chats.reduce((sum, c) => sum + c.unread, 0);
-  return (
-    <li className="chat-item chat-item--compact chat-item--archive">
-      <button type="button" className="chat-item__button" onClick={onClick}>
-        <Avatar icon={<IconArchiveMk />} />
-        <span className="chat-item__body">
-          <span className="chat-item__row chat-item__row--top">
-            <span className="chat-item__name">Архивы</span>
-            <span className="chat-item__time">{chats[0]?.time}</span>
-          </span>
-          <span className="chat-item__row chat-item__row--bottom">
-            <span className="chat-item__preview">{chats.map((c) => c.name.split(' ')[0]).join(', ')}</span>
-            <Badge count={unread} ariaLabel={`Непрочитанных в архиве: ${unread}`} />
           </span>
         </span>
       </button>

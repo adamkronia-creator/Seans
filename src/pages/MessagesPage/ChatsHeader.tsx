@@ -1,5 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent, type ReactNode, type Ref } from 'react';
-import { IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
+import { IconArchiveMk, IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
 import { StoriesRow } from '../../components/Stories/Stories';
@@ -16,6 +16,7 @@ interface ChatsHeaderProps {
   /** Экран, поверх которого открываются истории */
   storiesRoot?: HTMLElement | null;
   storiesScrolledAway?: boolean;
+  showArchive?: boolean;
   /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений и ряд вместо историй */
   title?: string;
   status?: string;
@@ -49,6 +50,7 @@ export function ChatsHeader({
   chipsRef,
   storiesRoot = null,
   storiesScrolledAway = false,
+  showArchive = false,
   title = 'Чаты',
   status = 'Ваши диалоги',
   heading = 'Диалоги',
@@ -142,6 +144,11 @@ export function ChatsHeader({
               <IconSearchMk />
             </button>
           )}
+          {showArchive && (
+            <button type="button" className="chats-header__action chats-header__archive" aria-label="Архивы" onClick={() => navigate('/archive')}>
+              <IconArchiveMk />
+            </button>
+          )}
           {aside ?? (!inlineSearch && (
             <button type="button" className="chats-header__action" aria-label="События" onClick={() => navigate('/events')}>
               <IconBellMk />
@@ -150,10 +157,10 @@ export function ChatsHeader({
         </div>
       )}
       {!selection && inlineSearch}
+      {chipsRow}
       <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={hideBelt || undefined} {...({ inert: hideBelt ? '' : undefined } as object)}>
         <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
       </div>
-      {chipsRow}
     </header>
   );
 }
