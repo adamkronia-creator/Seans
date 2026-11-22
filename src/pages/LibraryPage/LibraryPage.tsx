@@ -132,6 +132,7 @@ interface ListProps {
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
   catalogLayout?: CatalogLayout;
+  animateFilterRemoval: boolean;
 }
 
 /** Страница пейджера: выбранные фильтры и пояснения над карточками, карточки или пустая выдача; у каждой страницы своя прокрутка */
@@ -144,11 +145,15 @@ function LibraryList(p: ListProps) {
   const total = listing.ids.length;
   const shown = Math.min(limit, total);
 
-  // Запрос, фильтры, отметки или порядок изменились: список снова с начала
+  // При снятии фильтра сохраняем позицию и уже показанные карточки для перехода.
+  const lastReset = useRef(p.resetKey);
   useEffect(() => {
+    if (lastReset.current === p.resetKey) return;
+    lastReset.current = p.resetKey;
+    if (p.animateFilterRemoval) return;
     setLimit(STEP);
     if (scroller.current) scroller.current.scrollTop = 0;
-  }, [p.resetKey]);
+  }, [p.resetKey, p.animateFilterRemoval]);
 
   // Дошли до конца показанного — добавляем ещё порцию
   useEffect(() => {
@@ -159,9 +164,9 @@ function LibraryList(p: ListProps) {
     return () => io.disconnect();
   }, [shown, total]);
 
-  // Закрепили или убрали из выборки (избранное): карточки переезжают и схлопываются на месте, а не прыгают. Новый запрос, фильтр или порядок
-  // заменяют список целиком (resetKey), долистывание добавляет карточки снизу: там ничего двигать не нужно
-  useListMotion(rows, { attr: 'data-item', view: p.resetKey, enter: false, leave: true });
+  useListMotion(rows, {
+    attr: 'data-item', view: p.resetKey, enter: p.animateFilterRemoval, leave: true, animateViewChange: p.animateFilterRemoval,
+  });
 
   const search = listing.search;
   const notes: string[] = [];
@@ -171,39 +176,39 @@ function LibraryList(p: ListProps) {
   const describe = (n: number) => `${n} ${plural(n, p.noun)}`;
   const marked = hasMarks(ctx.marks);
 
-  let body;
-  if (total > 0) {
-    body = (
-      <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards' : ''}`}>
-        {listing.ids.slice(0, shown).map((id) => {
-          const entry = catalog.byId.get(id);
-          if (!entry) return null;
-          const hit = search?.hits.get(id);
-          const [min, max] = entry.d.minutes ?? [];
-          const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
-          const facts = p.catalogLayout ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
-          const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
-          return (
-            <LibraryCard
-              key={id}
-              test={entry.item}
-              cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
-              favorite={ctx.favorites.has(id)}
-              onClick={p.onOpen}
-              facts={facts.join(' · ') || undefined}
-              why={why}
-              marks={search?.words}
-              pinned={p.pinned.has(id)}
-              selected={p.selected.includes(id)}
-              onLongPress={p.onHold}
-            />
-          );
-        })}
-      </ul>
-    );
-  } else if (ctx.scope.length === 0 && !marked) {
-    body = <EmptyState icon={ctx.marks.favorites ? <IconFavorites /> : ctx.marks.recent ? <IconTabLibrary /> : <IconTabTests />} title={p.empty.title} text={p.empty.text} />;
-  } else {
+  const cards = (
+    <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards' : ''}`}>
+      {listing.ids.slice(0, shown).map((id) => {
+        const entry = catalog.byId.get(id);
+        if (!entry) return null;
+        const hit = search?.hits.get(id);
+        const [min, max] = entry.d.minutes ?? [];
+        const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
+        const facts = p.catalogLayout ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
+        const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
+        return (
+          <LibraryCard
+            key={id}
+            test={entry.item}
+            cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
+            favorite={ctx.favorites.has(id)}
+            onClick={p.onOpen}
+            facts={facts.join(' · ') || undefined}
+            why={why}
+            marks={search?.words}
+            pinned={p.pinned.has(id)}
+            selected={p.selected.includes(id)}
+            onLongPress={p.onHold}
+          />
+        );
+      })}
+    </ul>
+  );
+
+  let empty;
+  if (total === 0 && ctx.scope.length === 0 && !marked) {
+    empty = <EmptyState icon={ctx.marks.favorites ? <IconFavorites /> : ctx.marks.recent ? <IconTabLibrary /> : <IconTabTests />} title={p.empty.title} text={p.empty.text} />;
+  } else if (total === 0) {
     const label = (r: Relaxation) =>
       r.type === 'option'
         ? `Без фильтра «${r.label}»`
@@ -232,13 +237,14 @@ function LibraryList(p: ListProps) {
           : filtered
             ? `${where ? `${where} нет` : 'Нет'} материалов, которые подходят под все выбранные фильтры.`
             : p.empty.text;
-    body = <EmptyResults title={words || filtered ? 'Ничего не нашлось' : 'Здесь пусто'} text={text} actions={actions} describe={describe} />;
+    empty = <EmptyResults title={words || filtered ? 'Ничего не нашлось' : 'Здесь пусто'} text={text} actions={actions} describe={describe} />;
   }
 
   return (
-    <div ref={scroller} className="library-page__page">
+    <div ref={scroller} className="library-page__page" data-filter-removal={p.animateFilterRemoval ? '' : undefined}>
       {(ctx.scope.length > 0 || marked) && <ResultsBar tokens={p.tokens} onResetFilters={p.onResetFilters} notes={notes} />}
-      {body}
+      {(total > 0 || p.catalogLayout) && cards}
+      {empty}
       {shown < total && <div ref={more} className="library-page__more" aria-hidden="true" />}
     </div>
   );
@@ -284,6 +290,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const folderMenu = useFolderMenu(scope);
   const root = useRef<HTMLElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const catalogChips = useRef<HTMLDivElement>(null);
+  useListMotion(catalogChips, { attr: 'data-filter-key', axis: 'x', enter: false, leave: true });
 
   const catalog = useMemo(() => catalogOf(kind, items), [kind, items]);
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
@@ -375,6 +383,12 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       ),
     [catalog, view.filters, kind],
   );
+  const previousFilters = useRef({ query, tokens });
+  const animateFilterRemoval = catalogDesign && previousFilters.current.query === query &&
+    previousFilters.current.tokens.some((old) => !tokens.some((token) => token.key === old.key));
+  useLayoutEffect(() => {
+    previousFilters.current = { query, tokens };
+  }, [query, tokens]);
 
   const open = useCallback(
     (item: LibraryItem) => {
@@ -444,10 +458,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             onRelax={relax}
             onResetFilters={() => clearFilters(kind)}
             catalogLayout={catalogDesign ? layout : undefined}
+            animateFilterRemoval={animateFilterRemoval}
           />
         ),
       })),
-    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout],
+    [sections, catalog, bases, everything, listings, q, query, labels, favorites, recent, tokens, resetKey, tap, relax, kind, pinned, sel.ids, sel.hold, catalogDesign, layout, animateFilterRemoval],
   );
 
   const onDrag = useCallback(
@@ -503,7 +518,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     <button
       type="button"
       className={catalogDesign
-        ? `chip chip--follow catalog-filter-chip${activeCount ? ' chip--counted' : ''}`
+        ? 'chip chip--follow catalog-filter-chip catalog-filter-toggle'
         : `${chatLike ? 'chats-header__action' : 'screen-header__action'} library-page__tile${activeCount ? ' library-page__tile--on' : ''}`}
       data-filtered={catalogDesign && activeCount > 0 ? '' : undefined}
       aria-label={activeCount ? `Фильтры: выбрано ${activeCount}` : 'Фильтры'}
@@ -512,11 +527,15 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     >
       <IconSliders aria-hidden="true" />
       {catalogDesign && 'Фильтры'}
-      {activeCount > 0 && (catalogDesign ? <Badge count={activeCount} /> : (
+      {catalogDesign ? (
+        <span className="catalog-filter-count" aria-hidden="true">
+          <span><Badge count={activeCount} showZero /></span>
+        </span>
+      ) : activeCount > 0 && (
         <span className="library-page__tile-badge">
           <Badge count={activeCount} />
         </span>
-      ))}
+      )}
     </button>
   );
   const chipNodes = (
@@ -524,7 +543,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       {catalogDesign && filterButton}
       {catalogDesign && tokens.map((token) => (
         <button key={token.key} type="button" className="chip chip--follow catalog-filter-chip"
-          data-filtered="" aria-label={`Убрать фильтр: ${token.group} — ${token.label}`} onClick={token.onRemove}>
+          data-filtered="" data-filter-key={token.key} aria-label={`Убрать фильтр: ${token.group} — ${token.label}`} onClick={token.onRemove}>
           {token.label}
           <IconClose />
         </button>
@@ -590,6 +609,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           heading={title}
           placeholder={searchPlaceholder}
           chipsLabel={catalogDesign ? 'Подборки тестов' : labels.filters}
+          chipsRef={catalogDesign ? catalogChips : undefined}
           aside={catalogDesign ? <TestCatalogLayout layout={layout} onLayout={setLayout} /> : filterButton}
           onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
           inlineSearch={catalogDesign ? (

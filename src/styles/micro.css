@@ -95,6 +95,22 @@
   }
 }
 
+.row-ghost--horizontal {
+  width: var(--ghost-w);
+  min-width: 0;
+  animation-name: row-ghost-out-horizontal;
+}
+
+@keyframes row-ghost-out-horizontal {
+  45% { opacity: 0; }
+  to {
+    width: 0;
+    margin-inline-end: calc(var(--ghost-gap) * -1);
+    padding-inline: 0;
+    opacity: 0;
+  }
+}
+
 /* ---------- Смена состояния ---------- */
 
 /* Выбранный, включённый и нажатый вид переключается короткой сменой цвета, а не вспышкой (фильтры, вкладки, плитки, значки выбора, сегменты).

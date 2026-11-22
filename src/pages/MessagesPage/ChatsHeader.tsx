@@ -11,6 +11,7 @@ interface ChatsHeaderProps {
   query: string;
   onQuery: (q: string) => void;
   chips: ReactNode;
+  chipsRef?: Ref<HTMLDivElement>;
   /** Экран, поверх которого открываются истории */
   storiesRoot?: HTMLElement | null;
   /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений и ряд вместо историй */
@@ -43,6 +44,7 @@ export function ChatsHeader({
   query,
   onQuery,
   chips,
+  chipsRef,
   storiesRoot = null,
   title = 'Чаты',
   status = 'Ваши диалоги',
@@ -88,7 +90,7 @@ export function ChatsHeader({
     : <span className="chats-header__avatar" />;
 
   const chipsRow = (
-    <div className="screen-header__chips" role="group" aria-label={chipsLabel}>
+    <div ref={chipsRef} className="screen-header__chips" role="group" aria-label={chipsLabel}>
       <span className="chips-pill" aria-hidden="true" />
       {chips}
     </div>
