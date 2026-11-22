@@ -11,6 +11,9 @@ import gad7Icon from '../assets/tests/gad7.webp';
 import rsesIcon from '../assets/tests/rses.webp';
 import pfqIcon from '../assets/tests/5pfq.webp';
 import scl90Icon from '../assets/tests/scl90.webp';
+import smolCover from '../assets/tests/covers/smol.webp';
+import bdiCover from '../assets/tests/covers/bdi.webp';
+import ittCover from '../assets/tests/covers/itt.webp';
 import evidenceIcon from '../assets/tasks/evidence.webp';
 import pieIcon from '../assets/tasks/pie.webp';
 import smerIcon from '../assets/tasks/smer.webp';
@@ -39,6 +42,8 @@ export interface LibraryItem<C extends string = string> {
   description: string;
   /** Короткое описание в «Диагностике» или «Заданиях». */
   catalogDescription?: string;
+  /** Иллюстрация для крупной карточки в библиотеке. */
+  catalogCover?: string;
   /** Краткое описание задания для карточки в чате (две-три строки) */
   blurb?: string;
   icon: string;
@@ -52,11 +57,11 @@ export type LibraryTest = LibraryItem<TestCategory>;
 
 // Библиотека всех тестов приложения; порядок как в макете
 export const LIBRARY: LibraryTest[] = [
-  { id: 'smol', title: 'Сокращённый многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', catalogDescription: 'Комплексная диагностика личности', icon: smolIcon, tint: '#A8E4A0', categories: ['training', 'svo'] },
+  { id: 'smol', title: 'Сокращённый многофакторный опросник личности', abbr: 'СМОЛ', description: 'Для комплексной оценки личности', catalogDescription: 'Комплексная диагностика личности', catalogCover: smolCover, icon: smolIcon, tint: '#A8E4A0', categories: ['training', 'svo'] },
   { id: 'bhs', title: 'Шкала безнадежности А. Бека', abbr: 'BHS', description: 'Для оценки ожиданий', catalogDescription: 'Оценка характера ожиданий', icon: bhsIcon, tint: '#FFDB8B', categories: ['svo'] },
   { id: 'sq', title: 'Опросник Леонгарда-Шмишека', abbr: 'SQ', description: 'Для выявления особенностей личности', catalogDescription: 'Диагностика характера личности', icon: sqIcon, tint: '#FAD6A5', categories: ['training'] },
-  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', catalogDescription: 'Диагностика тревожности', icon: ittIcon, tint: '#FCDD76', categories: ['training', 'svo'] },
-  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', catalogDescription: 'Диагностика депрессии', icon: bdiIcon, tint: '#FFBCAD', categories: ['svo'] },
+  { id: 'itt', title: 'Интегративный тест тревожности', abbr: 'ИТТ', description: 'Для оценки тревожности', catalogDescription: 'Диагностика тревожности', catalogCover: ittCover, icon: ittIcon, tint: '#FCDD76', categories: ['training', 'svo'] },
+  { id: 'bdi', title: 'Шкала депрессии А. Бека', abbr: 'BDI', description: 'Для оценки депрессии', catalogDescription: 'Диагностика депрессии', catalogCover: bdiCover, icon: bdiIcon, tint: '#FFBCAD', categories: ['svo'] },
   { id: 'ito', title: 'Индивидуально-типологический опросник Л.Н. Собчик', abbr: 'ИТО', description: 'Для типологической оценки личности', catalogDescription: 'Типологическая диагностика личности', icon: itoIcon, tint: '#EDD19C', categories: ['training'] },
   { id: 'ocr', title: 'Опросник суицидального риска', abbr: 'ОСР', description: 'Для выявления суицидального риска', catalogDescription: 'Выявление суицидального риска', icon: ocrIcon, tint: '#E6E6FA', categories: ['svo'] },
   { id: 'phq9', title: 'Опросник депрессивного состояния', abbr: 'PHQ-9', description: 'Для оценки депрессии', catalogDescription: 'Диагностика депрессии', icon: phq9Icon, tint: '#FFBCAD', categories: ['svo'] },

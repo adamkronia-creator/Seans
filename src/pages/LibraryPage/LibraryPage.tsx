@@ -186,6 +186,7 @@ function LibraryList(p: ListProps) {
             <LibraryCard
               key={id}
               test={entry.item}
+              cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
               favorite={ctx.favorites.has(id)}
               onClick={p.onOpen}
               facts={facts.join(' · ') || undefined}

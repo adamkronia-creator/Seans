@@ -9,6 +9,7 @@ import './LibraryCard.css';
 
 interface LibraryCardProps {
   test: LibraryItem;
+  cover?: string;
   favorite: boolean;
   onClick?: (test: LibraryItem) => void;
   /** Строка сведений под описанием (у задания: «Дневник · КПТ · 5–7 мин на запись») — по ней материалы различают, не открывая */
@@ -26,7 +27,7 @@ interface LibraryCardProps {
 }
 
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
-export function LibraryCard({ test, favorite, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
+export function LibraryCard({ test, cover, favorite, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
@@ -35,7 +36,7 @@ export function LibraryCard({ test, favorite, onClick, facts, why, marks, pinned
     <li className={`lib-card${favorite ? ' lib-card--fav' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
       <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
-          <img className="test-card__icon" src={test.icon} alt="" loading="lazy" decoding="async" />
+          <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />
         </span>
         <span className="lib-card__check" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
