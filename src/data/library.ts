@@ -32,6 +32,15 @@ import shouldIcon from '../assets/tasks/should.webp';
 import choiceIcon from '../assets/tasks/choice.webp';
 import phraseIcon from '../assets/tasks/phrase.webp';
 import secretIcon from '../assets/tasks/secret.webp';
+import evidenceCover from '../assets/tasks/covers/evidence.webp';
+import pieCover from '../assets/tasks/covers/pie.webp';
+import smerCover from '../assets/tasks/covers/smer.webp';
+import activationCover from '../assets/tasks/covers/activation.webp';
+import worryCover from '../assets/tasks/covers/worry.webp';
+import shouldCover from '../assets/tasks/covers/should.webp';
+import choiceCover from '../assets/tasks/covers/choice.webp';
+import phraseCover from '../assets/tasks/covers/phrase.webp';
+import secretCover from '../assets/tasks/covers/secret.webp';
 
 export type TestCategory = 'training' | 'svo';
 export type TaskCategory = 'practice' | 'hospital';
@@ -125,15 +134,15 @@ export type LibraryTask = LibraryItem<TaskCategory>;
 
 // Библиотека заданий; порядок как в макете, распределение по категориям условное
 export const TASK_LIBRARY: LibraryTask[] = [
-  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', catalogDescription: 'Коррекция реакций и мыслей', blurb: 'Проверка тревожной мысли: факты за и против, ошибки мышления и новая, более взвешенная мысль. Помогает снизить уверенность в ней.', icon: evidenceIcon, tint: '#FFBCAD', categories: ['practice'] },
-  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', catalogDescription: 'Снижение вины и ответственности', blurb: 'Разбор ситуации, за исход которой вы чувствуете вину: кто и что на него повлиял. Помогает оценить свою долю ответственности реалистичнее.', icon: pieIcon, tint: '#9FE2BF', categories: ['practice'] },
-  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', catalogDescription: 'Анализ событий, мыслей и эмоций', blurb: 'Записи о ситуации, мысли, эмоции и реакции. Помогают увидеть связь между событиями, мыслями и чувствами.', icon: smerIcon, tint: '#FFB28B', categories: ['practice', 'hospital'] },
-  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', catalogDescription: 'Коррекция апатии при депрессии и выгорании', blurb: 'План небольших дел с оценкой удовольствия и важности. Помогает вернуть активность при апатии, депрессии и выгорании.', icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
-  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', catalogDescription: 'Снижение тревожности', blurb: 'Тревожные мысли записываются в течение дня и разбираются в назначенное время. Помогает меньше застревать в беспокойстве.', icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
-  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', catalogDescription: 'Исследование долженствований', blurb: 'Десять предложений о том, что вы считаете себя обязанным делать. Помогает заметить скрытые долженствования и чужие ожидания.', icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
-  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанцирования от мнений', catalogDescription: 'Прояснение желаний и мотивации', blurb: 'Три решения, которые вы хотели бы принять в ближайший месяц. Помогает отделить собственные желания от чужих мнений.', icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
-  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', catalogDescription: 'Анализ материалов из детства', blurb: 'Фраза значимого взрослого из детства и то, что вы чувствуете, вспоминая её. Помогает увидеть, как она влияет на вас сейчас.', icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
-  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желаний', catalogDescription: 'Выявление желаний и мотивации', blurb: 'Что бы вы сделали за неделю, если бы никто не узнал о вашем решении. Помогает выявить настоящие желания.', icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
+  { id: 'evidence', title: 'Поиск доказательств', description: 'Для мыслей автоматического характера', catalogDescription: 'Коррекция реакций и мыслей', blurb: 'Проверка тревожной мысли: факты за и против, ошибки мышления и новая, более взвешенная мысль. Помогает снизить уверенность в ней.', catalogCover: evidenceCover, icon: evidenceIcon, tint: '#FFBCAD', categories: ['practice'] },
+  { id: 'pie', title: 'Пирог ответственности', description: 'Для снижения вины и ответственности', catalogDescription: 'Снижение вины и ответственности', blurb: 'Разбор ситуации, за исход которой вы чувствуете вину: кто и что на него повлиял. Помогает оценить свою долю ответственности реалистичнее.', catalogCover: pieCover, icon: pieIcon, tint: '#9FE2BF', categories: ['practice'] },
+  { id: 'smer', title: 'Дневник СМЭР', description: 'Для анализа событий, мыслей, эмоций', catalogDescription: 'Анализ событий, мыслей и эмоций', blurb: 'Записи о ситуации, мысли, эмоции и реакции. Помогают увидеть связь между событиями, мыслями и чувствами.', catalogCover: smerCover, icon: smerIcon, tint: '#FFB28B', categories: ['practice', 'hospital'] },
+  { id: 'activation', title: 'Поведенческая активация', description: 'Для апатии при депрессии и выгорании', catalogDescription: 'Коррекция апатии при депрессии и выгорании', blurb: 'План небольших дел с оценкой удовольствия и важности. Помогает вернуть активность при апатии, депрессии и выгорании.', catalogCover: activationCover, icon: activationIcon, tint: '#FFBCAD', categories: ['hospital'] },
+  { id: 'worry', title: 'Отложенное беспокойство', description: 'Для снижения тревожности', catalogDescription: 'Снижение тревожности', blurb: 'Тревожные мысли записываются в течение дня и разбираются в назначенное время. Помогает меньше застревать в беспокойстве.', catalogCover: worryCover, icon: worryIcon, tint: '#C6DF90', categories: ['hospital'] },
+  { id: 'should', title: 'Что я должен?', description: 'Для исследования долженствований', catalogDescription: 'Исследование долженствований', blurb: 'Десять предложений о том, что вы считаете себя обязанным делать. Помогает заметить скрытые долженствования и чужие ожидания.', catalogCover: shouldCover, icon: shouldIcon, tint: '#FCE883', categories: ['practice'] },
+  { id: 'choice', title: 'Выбор без правильного ответа', description: 'Для дистанцирования от мнений', catalogDescription: 'Прояснение желаний и мотивации', blurb: 'Три решения, которые вы хотели бы принять в ближайший месяц. Помогает отделить собственные желания от чужих мнений.', catalogCover: choiceCover, icon: choiceIcon, tint: '#E6E6FA', categories: ['practice'] },
+  { id: 'phrase', title: 'Фраза, которую я запомнил', description: 'Для анализа материалов из детства', catalogDescription: 'Анализ материалов из детства', blurb: 'Фраза значимого взрослого из детства и то, что вы чувствуете, вспоминая её. Помогает увидеть, как она влияет на вас сейчас.', catalogCover: phraseCover, icon: phraseIcon, tint: '#FFE4C4', categories: ['practice'] },
+  { id: 'secret', title: 'Если никто не узнает', description: 'Для выявления желаний', catalogDescription: 'Выявление желаний и мотивации', blurb: 'Что бы вы сделали за неделю, если бы никто не узнал о вашем решении. Помогает выявить настоящие желания.', catalogCover: secretCover, icon: secretIcon, tint: '#E6EDF8', categories: ['practice'] },
 ];
 
 const taskFavorites = createFavorites(['pie', 'activation', 'worry', 'should', 'secret']);
