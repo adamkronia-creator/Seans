@@ -244,6 +244,12 @@
   border-color: var(--text-link);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  [data-pm] .catalog-library .library-page__list--cards .lib-card:not(.lib-card--selected) {
+    border: 0;
+  }
+}
+
 [data-pm] .catalog-library .library-page__list--cards .test-card {
   align-items: stretch;
   flex-direction: column;

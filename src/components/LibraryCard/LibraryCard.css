@@ -82,6 +82,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-3);
+  padding-block-start: var(--space-1);
 }
 
 .lib-card__fact-list > span {
