@@ -337,6 +337,7 @@
 .lib-card__favorite svg {
   width: var(--favorite-icon-size);
   height: var(--favorite-icon-size);
+  translate: 0 2px; /* grid:ok — оптическое выравнивание */
 }
 
 [data-pm] .catalog-library .lib-card--favorite-on-avatar .lib-card__favorite {
