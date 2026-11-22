@@ -514,7 +514,20 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
     });
     records.forEach((i) => {
       const a = d.activity[i] as ItemActivity;
-      items.push({ item: { ...item, id: recordRef(item.id, a.record!), description: `Запись ${a.record}`, status: 'done', date: a.date.slice(0, 5), fullDate: a.date, time: a.time }, index: i });
+      const number = a.record!;
+      items.push({
+        item: {
+          ...item,
+          id: recordRef(item.id, number),
+          description: `Запись ${number}`,
+          status: 'done',
+          date: a.date.slice(0, 5),
+          fullDate: a.date,
+          time: a.time,
+          record: { taskId: item.id, number },
+        },
+        index: i,
+      });
     });
     if (last < 0) return;
     const a = d.activity[last] as ItemActivity;

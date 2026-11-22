@@ -20,6 +20,8 @@ export interface PsyTest {
   /** Дата отправки той попытки, которая завершилась результатом */
   sentDate?: string;
   time?: string;
+  /** Завершённая запись постоянного задания с собственным результатом */
+  record?: { taskId: string; number: number };
   /** Постоянное задание: сколько записей сделано, когда последняя и когда задание назначено (даты «дд.мм.гггг») */
   records?: { count: number; last?: string; since: string };
 }

@@ -1,7 +1,6 @@
 /*
- * Вкладки «Тесты» и «Задания» в чате на системе мессенджера: заголовок раздела и под ним одна стеклянная панель со строками
- * (значок в круге 48, название, описание, дата). Панели лежат на градиентном фоне и проезжают под шапкой и нижней капсулой.
- * Верхний и нижний отступы страницы задаёт ChatPage.css (под шапку и под капсулу). Размеры — токены сетки 4.
+ * Вкладки «Опросники» и «Задания» в чате клиента используют карточки библиотеки и чипсы статусов.
+ * В чате «Избранное» собственные результаты показаны списком.
  */
 .chat-tests {
   display: flex;
@@ -21,7 +20,7 @@
   gap: var(--heading-bottom);
 }
 
-/* Заголовок раздела: название и число рядом; «Напомнить» прижато вправо */
+/* Заголовок раздела: название и число рядом */
 .chat-tests__heading {
   display: flex;
   align-items: center;
@@ -33,20 +32,6 @@
   color: var(--text-primary);
   font: var(--type-headline);
   letter-spacing: 0;
-}
-
-.chat .chat-tests__remind {
-  /* Область нажатия 44 на 8 шире подписи по бокам; видимые отступы прежние */
-  margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1) calc(var(--space-3) * -1) auto;
-  padding: var(--space-3) var(--space-2);
-  color: var(--text-link);
-  font: var(--type-label);
-}
-
-.chat-tests__remind:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
 }
 
 /* Строки без подложки, от края до края, как в меню «Опросники» и «Задания» (lib-card): стекло только у нажатой строки */
@@ -222,7 +207,7 @@
 }
 
 /* Справа остаётся место под кружок отметки: 24 и зазор 12 */
-.chat-tests li[data-selecting]:not(.chat-test-card) .test-card__body {
+.chat-tests li[data-selecting]:not(.chat-activity-card) .test-card__body {
   padding-right: calc(var(--space-6) + var(--space-3));
 }
 
@@ -248,115 +233,6 @@
   .chat-tests li[data-selecting]::after {
     transition: none;
   }
-}
-
-/* Как в профиле: скруглённая группа, внутри — просветы между участками стекла. */
-.chat-tests:has(.activity-card) {
-  gap: var(--space-4);
-}
-
-.chat-tests__section:has(.activity-card) {
-  gap: 1px; /* grid:ok — просвет-разделитель, как в профиле */
-  margin-inline: var(--page-gutter);
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-}
-
-.chat-tests__section:has(.activity-card) .chat-tests__heading {
-  padding: var(--space-3) var(--space-4);
-}
-
-.chat-tests__list:has(.activity-card) {
-  gap: 1px; /* grid:ok — просвет-разделитель, как в профиле */
-}
-
-.chat-tests__section:has(.activity-card) .chat-tests__heading,
-.activity-card {
-  background: var(--glass-card);
-}
-
-.activity-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: var(--space-2);
-  padding-block-start: var(--space-2);
-}
-
-.activity-card__body {
-  grid-area: 1 / 1 / span 3;
-  display: grid;
-  grid-template-rows: subgrid;
-  width: 100%;
-  padding: 0 var(--space-4) var(--space-4);
-  text-align: start;
-}
-
-.activity-card__body:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.activity-card__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: calc(var(--space-4) * 3);
-  padding-inline-end: calc(var(--space-4) * 3);
-}
-
-.activity-card__icon {
-  flex: 0 0 var(--space-8);
-  width: var(--space-8);
-  height: var(--space-8);
-  border-radius: var(--radius-full);
-}
-
-.activity-card__meta {
-  display: grid;
-  color: var(--text-primary);
-  font: var(--type-label);
-  font-weight: 400;
-}
-
-.activity-card__date {
-  color: var(--text-secondary);
-  font: var(--type-meta);
-}
-
-.activity-card__title {
-  color: var(--text-link);
-  font: var(--type-title);
-}
-
-.activity-card__description {
-  color: var(--text-secondary);
-  font: var(--type-label);
-  font-weight: 400;
-}
-
-.activity-card .pick-mark {
-  top: var(--space-8);
-  right: calc(var(--space-4) + var(--space-3));
-}
-
-.activity-card > .case-card__edit {
-  grid-area: 1 / 1;
-  position: relative;
-  inset: auto;
-  align-self: center;
-  justify-self: end;
-  margin-inline-end: var(--space-2);
-}
-
-/* Сохраняем размер и центр иконки, разводим крайние точки на один пиксель. */
-.activity-card > .case-card__edit circle:first-child {
-  translate: 0 -1px;
-}
-
-.activity-card > .case-card__edit circle:last-child {
-  translate: 0 1px;
 }
 
 [data-pm] .chat .chat-tests--catalog {
@@ -415,40 +291,44 @@
   list-style: none;
 }
 
-.chat-test-card {
+.chat-activity-card {
   position: relative;
   --cover-action-inset: var(--space-1);
 }
 
-.chat-test-card .test-card__title {
+.chat-activity-card .test-card__title {
   display: block;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.chat-test-card .test-card__description {
+.chat-activity-card .test-card__description {
   white-space: normal;
 }
 
-.chat-test-card__dates {
+.chat-activity-card .lib-card__abbr[data-below-reminder] {
+  inset-block: auto var(--abbr-inset);
+}
+
+.chat-activity-card__facts {
   color: var(--text-secondary);
   font: var(--type-caption);
   font-variant-numeric: tabular-nums;
 }
 
-.chat-test-card__dates > span {
+.chat-activity-card__facts > span {
   white-space: nowrap;
 }
 
-.chat-test-card__scales {
+.chat-activity-card__scales {
   padding: 0 var(--space-4) var(--space-4);
 }
 
-.chat-test-card__scales .hist-scales {
+.chat-activity-card__scales .hist-scales {
   margin-block-start: 0;
 }
 
-:is(.chat-test-card__menu, .chat-test-card__remind) {
+:is(.chat-activity-card__menu, .chat-activity-card__remind) {
   position: absolute;
   inset-block-start: var(--cover-action-inset);
   z-index: 1;
@@ -460,7 +340,7 @@
   color: var(--palette-white);
 }
 
-:is(.chat-test-card__menu, .chat-test-card__remind)::before {
+:is(.chat-activity-card__menu, .chat-activity-card__remind)::before {
   position: absolute;
   z-index: -1;
   inset: 0;
@@ -471,27 +351,27 @@
   content: '';
 }
 
-.chat-test-card__menu {
+.chat-activity-card__menu {
   inset-inline-end: var(--cover-action-inset);
   width: var(--size-touch);
 }
 
-.chat-test-card__menu::before {
+.chat-activity-card__menu::before {
   width: var(--space-8);
 }
 
-.chat-test-card__remind {
+.chat-activity-card__remind {
   inset-inline-start: calc(var(--cover-action-inset) + (var(--size-touch) - var(--space-8)) / 2);
   padding-inline: var(--space-3);
   font: var(--type-caption);
 }
 
-.chat-test-card__menu svg {
+.chat-activity-card__menu svg {
   width: var(--space-5);
   height: var(--space-5);
 }
 
-.chat-test-card .pick-mark {
+.chat-activity-card .pick-mark {
   --pick-inset: calc(var(--cover-action-inset) + (var(--size-touch) - var(--space-6)) / 2);
   inset-block-start: var(--pick-inset);
   inset-inline-end: var(--pick-inset);

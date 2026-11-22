@@ -19,14 +19,6 @@ textarea,
 }
 
 
-/* ——— Типографика: гротеск ———
-   Размеры имён, заголовков и записей — styles/typography.css. Здесь остаются подписи, действия, время и числа в таблицах. */
-.chat-tests__remind {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-label);
-}
-
 /* Время, даты, счётчики и числа в таблицах: цифры одной ширины, колонки не «дышат» */
 .chat-item__time,
 .event-item__date,
