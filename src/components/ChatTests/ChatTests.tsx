@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
 import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
@@ -18,6 +18,7 @@ import { useSelfResults } from '../../data/selfTest';
 import { TASKS } from '../../data/taskContent';
 import { testCardDescription, testSettings } from '../../data/testSettings';
 import type { PsyTest, TestStatus } from '../../data/tests';
+import { followChips } from '../../utils/followChips';
 import './ChatTests.css';
 
 /** Что показать, когда во вкладке ничего нет: что именно пусто и что делать дальше */
@@ -137,36 +138,47 @@ export function ChatTests({
 }) {
   const data = useClientData();
   const scroller = useRef<HTMLDivElement>(null);
+  const statuses = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<'sent' | 'done' | null>(null);
   const items = hasData ? itemsWithStatus(data, 'test') : [];
   const sent = items.filter((item) => item.status === 'sent');
   const done = items.filter((item) => item.status === 'done');
   const active = filter ?? (sent.length > 0 ? 'sent' : 'done');
   const shown = active === 'sent' ? sent : done;
+  const hasItems = items.length > 0;
+
+  useLayoutEffect(() => {
+    const row = statuses.current;
+    if (!row) return;
+    const chips = row.querySelectorAll<HTMLButtonElement>('.chip');
+    const place = () => followChips(chips, active === 'sent' ? 0 : 1);
+    place();
+    const resize = new ResizeObserver(place);
+    chips.forEach((chip) => resize.observe(chip));
+    return () => resize.disconnect();
+  }, [active, hasItems]);
+
   const selectStatus = (next: 'sent' | 'done') => {
+    if (next === active) return;
     setFilter(next);
     if (scroller.current) scroller.current.scrollTop = 0;
   };
 
-  if (items.length === 0) {
+  if (!hasItems) {
     return <EmptyState icon={<IconTabTests />} title="Тесты ещё не отправлялись" text="Отправьте тест из раздела «Диагностика» — он появится здесь." />;
   }
 
   return (
     <div ref={scroller} className="chat-tests chat-tests--catalog">
-      <div className="chat-tests__filters" role="group" aria-label="Статусы опросников" data-hscroll>
-        <Chip active={active === 'sent'} count={sent.length} onClick={() => selectStatus('sent')}>Отправленные</Chip>
-        <Chip active={active === 'done'} count={done.length} onClick={() => selectStatus('done')}>Завершённые</Chip>
+      <div ref={statuses} className="screen-header__chips chat-tests__filters" role="group" aria-label="Статусы опросников" data-hscroll>
+        <span className="chips-pill" aria-hidden="true" />
+        <Chip follow active={active === 'sent'} count={sent.length} onClick={() => selectStatus('sent')}>Отправленные</Chip>
+        <Chip follow active={active === 'done'} count={done.length} onClick={() => selectStatus('done')}>Завершённые</Chip>
       </div>
-      {active === 'sent' && sent.length > 0 && onRemind && !selected && (
-        <button type="button" className="chat-tests__catalog-remind" onClick={() => onRemind(sent)}>
-          {sent.length > 1 ? 'Напомнить всем' : 'Напомнить'}
-        </button>
-      )}
       {shown.length === 0 ? (
         <EmptyState icon={<IconTabTests />} title={active === 'sent' ? 'Нет тестов, ожидающих ответа' : 'Нет завершённых тестов'} />
       ) : (
-        <ul className="chat-tests__catalog catalog-cards">
+        <ul key={active} className="chat-tests__catalog catalog-cards" data-status-changed={filter !== null || undefined}>
           {shown.map((item) => {
             const test = LIBRARY.find((entry) => entry.id === item.id);
             const completed = item.status === 'done';
@@ -180,6 +192,7 @@ export function ChatTests({
                 description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
                 onOpen={() => completed ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
                 onMenu={onCardMenu}
+                onRemind={!completed && onRemind ? () => onRemind([item]) : undefined}
                 selecting={Boolean(selected)}
                 selected={selected?.includes(item.id)}
                 onPick={onPick}

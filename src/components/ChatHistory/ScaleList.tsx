@@ -62,12 +62,7 @@ function groupScales(scales: ConclusionScale[], grouping?: ScaleGrouping): Concl
   ];
 }
 
-export function ScaleList({ data, onOpen, grouping, showReadMore = false }: {
-  data: ConclusionData;
-  onOpen: () => void;
-  grouping?: ScaleGrouping;
-  showReadMore?: boolean;
-}) {
+export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; onOpen: () => void; grouping?: ScaleGrouping }) {
   const [open, setOpen] = useState(false);
   const restId = useId();
   const scales = groupScales(data.scales, grouping).filter((group) => group.length > 0).flatMap((group, groupIndex) =>
@@ -106,7 +101,6 @@ export function ScaleList({ data, onOpen, grouping, showReadMore = false }: {
           {open ? 'Скрыть' : `Читать далее (ещё ${scales.length - SCALES_SHOWN})`}
         </button>
       )}
-      {!long && showReadMore && <button type="button" className="hist-scales__toggle" onClick={onOpen}>Читать далее</button>}
     </div>
   );
 }

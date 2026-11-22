@@ -364,12 +364,15 @@
   padding-inline: var(--page-gutter);
 }
 
-.chat-tests__filters {
+[data-pm] .screen-header__chips.chat-tests__filters {
+  --glass-fill: var(--glass-fill-header);
   display: flex;
   flex: none;
   gap: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
+  margin: 0;
+  padding: 0;
   border: var(--space-1) solid transparent;
   border-radius: var(--radius-full);
   background: var(--bg-field);
@@ -392,19 +395,18 @@
   }
 }
 
-.chat-tests__filters .chip:not(.chip--active) {
-  background: var(--glass-fill-header);
-  color: var(--text-primary);
-}
+@media (prefers-reduced-motion: no-preference) {
+  [data-pm] .chat-tests__filters .chips-pill {
+    transition: transform var(--dur-base) var(--ease-ios), width var(--dur-base) var(--ease-ios);
+  }
 
-.chat-tests__catalog-remind {
-  align-self: flex-end;
-  min-height: var(--size-touch);
-  padding-inline: var(--space-4);
-  border-radius: var(--radius-full);
-  background: var(--glass-card);
-  color: var(--text-link);
-  font: var(--type-label);
+  [data-pm] .chat-tests__filters .chip {
+    transition: color var(--dur-base) var(--ease-ios);
+  }
+
+  .chat-tests__catalog[data-status-changed] {
+    animation: fade-in var(--dur-base) var(--ease-ios);
+  }
 }
 
 .chat-tests__catalog {
@@ -450,30 +452,42 @@
   margin-block-start: 0;
 }
 
-.chat-test-card__menu {
+:is(.chat-test-card__menu, .chat-test-card__remind) {
   position: absolute;
   inset-block-start: var(--cover-action-inset);
-  inset-inline-end: var(--cover-action-inset);
   z-index: 1;
   display: grid;
   place-items: center;
   isolation: isolate;
-  width: var(--size-touch);
   height: var(--size-touch);
   border-radius: var(--radius-full);
   color: var(--palette-white);
 }
 
-.chat-test-card__menu::before {
+:is(.chat-test-card__menu, .chat-test-card__remind)::before {
   position: absolute;
   z-index: -1;
   inset: 0;
-  width: var(--space-8);
   height: var(--space-8);
   margin: auto;
   border-radius: inherit;
   background: color-mix(in srgb, var(--palette-black) 62%, transparent);
   content: '';
+}
+
+.chat-test-card__menu {
+  inset-inline-end: var(--cover-action-inset);
+  width: var(--size-touch);
+}
+
+.chat-test-card__menu::before {
+  width: var(--space-8);
+}
+
+.chat-test-card__remind {
+  inset-inline-start: var(--cover-action-inset);
+  padding-inline: var(--space-3);
+  font: var(--type-caption);
 }
 
 .chat-test-card__menu svg {

@@ -17,9 +17,10 @@ interface ChatTestCardProps extends PickProps {
   result?: ConclusionData;
   onOpen: () => void;
   onMenu: (id: string, opener: HTMLButtonElement) => void;
+  onRemind?: () => void;
 }
 
-export function ChatTestCard({ item, test, description, result, onOpen, onMenu, selecting, selected, onPick }: ChatTestCardProps) {
+export function ChatTestCard({ item, test, description, result, onOpen, onMenu, onRemind, selecting, selected, onPick }: ChatTestCardProps) {
   const pick = usePick(item.id, { selecting, onPick }, true);
   const done = item.status === 'done';
   const date = item.fullDate || result?.info.date || item.date;
@@ -50,8 +51,20 @@ export function ChatTestCard({ item, test, description, result, onOpen, onMenu, 
       </button>
       {result && result.scales.length > 0 && (
         <div className="chat-test-card__scales" {...({ inert: selecting ? '' : undefined } as object)}>
-          <ScaleList data={result} onOpen={onOpen} grouping={test?.id === '5pfq' ? 'factors' : 'main-extra'} showReadMore />
+          <ScaleList data={result} onOpen={onOpen} grouping={test?.id === '5pfq' ? 'factors' : 'main-extra'} />
         </div>
+      )}
+      {!selecting && onRemind && (
+        <button
+          type="button"
+          className="chat-test-card__remind"
+          aria-label={`Напомнить: ${item.title}`}
+          data-no-swipe
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={onRemind}
+        >
+          Напомнить
+        </button>
       )}
       {!selecting && (
         <button
