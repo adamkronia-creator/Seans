@@ -332,6 +332,14 @@
   height: 100%;
 }
 
+[data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__avatar {
+  border: 0;
+}
+
+[data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__avatar::before {
+  content: none;
+}
+
 [data-pm] .catalog-library .library-page__list--cards .lib-card__favorite {
   inset-block-start: var(--space-1);
   inset-inline-end: var(--space-1);
