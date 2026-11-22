@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
 import { IconBack, IconHeartGrayLg, IconHeartRedLg } from '../icons';
 import { IconClose } from '../ChatParts/ChatIcons';
 import { toggleFavorite, toggleTaskFavorite, useFavorites, useTaskFavorites, type LibraryItem } from '../../data/library';
@@ -43,7 +43,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client, slotRe
       </button>
       <div className="test-settings__peer">
         {!hidden && (
-          <span className="test-settings__avatar" data-test-art={kind === 'test' ? '' : undefined} style={{ '--tint': test.tint } as CSSProperties}>
+          <span className="test-settings__avatar">
             <img className="test-settings__icon" src={test.icon} alt="" />
           </span>
         )}

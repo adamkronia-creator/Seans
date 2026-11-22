@@ -40,41 +40,17 @@
   min-width: 0;
 }
 
-/* Круг цвета теста (75%), как аватар в списке; значок внутри 24 */
+/* Круглая иллюстрация теста или задания, как в каталоге */
 .test-settings__avatar {
-  position: relative;
-  display: flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-full);
-  isolation: isolate;
-}
-
-.test-settings__avatar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--tint);
-  opacity: 0.75;
 }
 
 .test-settings__icon {
-  width: 24px;
-  height: 24px;
-}
-
-.test-settings__avatar[data-test-art] .test-settings__icon {
+  display: block;
   width: 100%;
   height: 100%;
-}
-
-.test-settings__avatar[data-test-art]::before {
-  content: none;
 }
 
 .test-settings__who {

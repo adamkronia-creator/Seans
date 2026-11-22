@@ -186,11 +186,6 @@
   height: var(--size-avatar-sm);
 }
 
-[data-pm] .test-settings__icon {
-  width: var(--space-7, 28px);
-  height: var(--space-7, 28px);
-}
-
 [data-pm] .test-settings__name,
 [data-pm] .test-settings__status {
   line-height: var(--space-5);

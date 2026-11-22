@@ -100,10 +100,10 @@
   transition: inset-block-start var(--catalog-search-motion);
 }
 
-/* Боковые поля капсулы лежат за пределами области прокрутки. */
+/* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
 [data-pm] .catalog-library[data-catalog-kind='test'] .screen-header__chips {
-  padding-inline: 0;
-  border-inline: var(--space-1) solid transparent;
+  padding: 0;
+  border: var(--space-1) solid transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -366,7 +366,7 @@
   box-shadow: 0 1px 3px color-mix(in srgb, var(--palette-pink) 45%, transparent);
 }
 
-[data-pm] .catalog-library[data-catalog-kind='test'] .library-page__list:not(.library-page__list--cards) .test-card__icon {
+[data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__icon {
   width: 100%;
   height: 100%;
 }
@@ -376,10 +376,6 @@
 }
 
 [data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__avatar::before {
-  inset: 0;
-}
-
-[data-pm] .catalog-library[data-catalog-kind='test'] .library-page__list:not(.library-page__list--cards) .test-card__avatar::before {
   content: none;
 }
 
