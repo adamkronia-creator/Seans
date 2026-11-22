@@ -13,6 +13,7 @@ interface LibraryCardProps {
   test: LibraryItem;
   cover?: string;
   favorite: boolean;
+  favoriteOnAvatar?: boolean;
   onFavoriteChange?: (on: boolean) => void;
   selecting?: boolean;
   onClick?: (test: LibraryItem) => void;
@@ -31,13 +32,13 @@ interface LibraryCardProps {
 }
 
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
-export function LibraryCard({ test, cover, favorite, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
+export function LibraryCard({ test, cover, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
   const newPin = useJustOn(pinned);
   return (
-    <li className={`lib-card${favorite && !onFavoriteChange ? ' lib-card--fav' : ''}${onFavoriteChange && !cover ? ' lib-card--favorite-on-avatar' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
+    <li className={`lib-card${favorite && !onFavoriteChange ? ' lib-card--fav' : ''}${favoriteOnAvatar ? ' lib-card--favorite-on-avatar' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
       <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />

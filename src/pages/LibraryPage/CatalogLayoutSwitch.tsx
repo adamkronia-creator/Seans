@@ -4,7 +4,7 @@ import IconList from '../../assets/icons/solar/list.svg?react';
 
 export type CatalogLayout = 'cards' | 'list';
 
-export function TestCatalogLayout({ layout, onLayout }: {
+export function CatalogLayoutSwitch({ layout, onLayout }: {
   layout: CatalogLayout;
   onLayout: (layout: CatalogLayout) => void;
 }) {

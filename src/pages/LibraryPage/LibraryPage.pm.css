@@ -1,31 +1,3 @@
-/* ——— Раздел тестов в стиле «Диалогов» (data-pm): шапка и чипсы общие с чатами (messages.css, pm-chats.css), здесь ряд недавних, список и строки ——— */
-
-/* Недавние тесты: круг 64 с цветом теста (75%), значок внутри 40 */
-.recent-row__avatar {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--space-16);
-  height: var(--space-16);
-  border-radius: var(--radius-full);
-  isolation: isolate;
-}
-
-.recent-row__avatar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--tint);
-  opacity: 0.75;
-}
-
-.recent-row__icon {
-  width: var(--space-10);
-  height: var(--space-10);
-}
-
 /* Страница списка прокручивается под шапкой и над панелью, как список чатов */
 .library-page.messages .library-page__page {
   gap: 0;
@@ -109,8 +81,8 @@
   backdrop-filter: var(--glass-filter-panel);
 }
 
-/* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: круг 20 в углу значка, вокруг него в значке
-   вырезан прозрачный зазор 2. В списке «Диагностики» на том же месте находится кнопка избранного. */
+/* «В избранном» — сердечко на окружности значка на месте метки «в сети» у аватара чата: круг 20 и прозрачный зазор 2.
+   В списках «Диагностики» и «Практики» на том же месте находится кнопка избранного. */
 [data-pm] :is(.lib-card--fav, .lib-card--favorite-on-avatar) {
   --presence-size: var(--space-5);
   --presence-inset: 0px;

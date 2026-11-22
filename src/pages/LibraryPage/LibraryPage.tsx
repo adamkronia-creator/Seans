@@ -21,7 +21,7 @@ import { recentIds, useClientData } from '../../data/clientStore';
 import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
 import { useFolders } from '../../data/folders';
 import type { LibraryItem } from '../../data/library';
-import type { Kind } from '../../data/libraryMeta';
+import { TASK_META, type Kind } from '../../data/libraryMeta';
 import {
   catalogOf,
   countFilters,
@@ -48,12 +48,11 @@ import { taskSettings } from '../../data/taskSettings';
 import { ChatsHeader } from '../MessagesPage/ChatsHeader';
 import { useLibrarySelection } from './LibrarySelection';
 import '../MessagesPage/MessagesPage.css';
-import { RecentRow } from './RecentRow';
 import { normalize } from '../../utils/ruText';
 import './LibraryPage.css';
 import './LibraryPage.pm.css';
-import { TestCatalogLayout, type CatalogLayout } from './TestCatalog';
-import './TestCatalog.css';
+import { CatalogLayoutSwitch, type CatalogLayout } from './CatalogLayoutSwitch';
+import './Catalog.css';
 
 type Noun = [string, string, string];
 
@@ -186,7 +185,9 @@ function LibraryList(p: ListProps) {
         if (!entry) return null;
         const hit = search?.hits.get(id);
         const [min, max] = entry.d.minutes ?? [];
-        const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
+        const duration = catalog.kind === 'task'
+          ? TASK_META[id]?.duration
+          : min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
         const facts = p.catalogLayout === 'cards' ? [duration, entry.d.format].filter(Boolean)
           : p.catalogLayout === 'list' ? [] : entry.d.line;
         const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
@@ -196,6 +197,7 @@ function LibraryList(p: ListProps) {
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
             favorite={ctx.favorites.has(id)}
+            favoriteOnAvatar={p.catalogLayout === 'list'}
             onFavoriteChange={setFavorites && ((on) => setFavorites([id], on))}
             selecting={p.selecting}
             onClick={p.onOpen}
@@ -266,8 +268,7 @@ function LibraryList(p: ListProps) {
  * Состояние лежит в libraryView.ts, поэтому после открытия теста запрос и фильтры на месте.
  */
 export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, pinned, onSetFavorites, onSetPinned, onOpen, labels, chatLike }: LibraryPageProps) {
-  const catalogDesign = kind === 'test' && !!chatLike;
-  const showRecentSection = catalogDesign || !chatLike;
+  const catalogDesign = Boolean(chatLike);
   const [layout, setLayout] = useState<CatalogLayout>('cards');
   const [section, setSection] = useState<Section>('all');
   // Пока страницы ведёт палец, чипс подсвечивает ту, что ближе к положению; отпустили — выбранный раздел
@@ -303,8 +304,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const picks = useMemo<QuickPick[]>(() => quickPicks(catalog), [catalog]);
 
   /** Разделы по порядку чипсов: по ним же идут страницы. Папки — после «Все», «Избранного» и «Недавнего» */
-  const sections = useMemo<Section[]>(() => ['all', FAVORITES, ...(showRecentSection ? [RECENT] : []), ...pagerFolders.map((f) => f.id)], [pagerFolders, showRecentSection]);
-  const liveOrder = ['all', FAVORITES, ...(showRecentSection ? [RECENT] : []), ...folders.map((f) => f.id)].join('|');
+  const sections = useMemo<Section[]>(() => ['all', FAVORITES, RECENT, ...pagerFolders.map((f) => f.id)], [pagerFolders]);
+  const liveOrder = ['all', FAVORITES, RECENT, ...folders.map((f) => f.id)].join('|');
   /** Страницы пейджера привязаны к номерам, поэтому когда папки добавили, убрали или переставили, пейджер строится заново */
   const order = sections.join('|');
 
@@ -558,7 +559,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       ))}
       <Chip {...chip('all', labels.all)}>Все</Chip>
       <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
-      {showRecentSection && <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>}
+      <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>
       {folders.map(({ id, name, color, ink, badge }) => (
         <Chip key={id} {...chip(id, name)} folder={{ scope, id }} paint={{ color, ink, badge }}>
           {name}
@@ -566,7 +567,6 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       ))}
     </>
   );
-  const recentItems = useMemo(() => recent.map((id) => catalog.byId.get(id)?.item).filter((x): x is LibraryItem => Boolean(x)), [recent, catalog]);
 
   // В покое подвижная заливка стоит под выбранным чипсом (как в «Диалогах»)
   const keptOrder = useRef('');
@@ -605,10 +605,10 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   return (
-    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
+    <section ref={root} className={chatLike ? 'library-page messages catalog-library' : 'library-page'} data-catalog-kind={catalogDesign ? kind : undefined} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
-          searching={!catalogDesign && searching}
+          searching={false}
           onSearching={setSearching}
           query={view.query}
           onQuery={(value) => setQuery(kind, value)}
@@ -616,11 +616,11 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           status={kind === 'task' ? 'Ваши практики' : 'Ваши опросники'}
           heading={title}
           placeholder={searchPlaceholder}
-          chipsLabel={catalogDesign ? 'Подборки тестов' : labels.filters}
-          chipsRef={catalogDesign ? catalogChips : undefined}
-          aside={catalogDesign ? <TestCatalogLayout layout={layout} onLayout={setLayout} /> : filterButton}
-          onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
-          inlineSearch={catalogDesign ? (
+          chipsLabel={kind === 'task' ? 'Подборки заданий' : 'Подборки тестов'}
+          chipsRef={catalogChips}
+          aside={<CatalogLayoutSwitch layout={layout} onLayout={setLayout} />}
+          onAvatarClick={() => switchTab('profile')}
+          inlineSearch={
             <div ref={catalogSearch} className="catalog-search" {...({ inert: searchCollapsed && !focused ? '' : undefined } as object)}>
               <SearchField
                 value={view.query}
@@ -640,12 +640,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
               />
               {suggestions}
             </div>
-          ) : undefined}
-          belt={!catalogDesign && recentItems.length > 0 ? <RecentRow items={recentItems} onOpen={open} /> : null}
-          inputRef={input}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onKeyDown={onKeyDown}
+          }
+          belt={null}
           chips={chipNodes}
           selection={sel.header()}
         />

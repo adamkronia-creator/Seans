@@ -360,7 +360,7 @@
   box-shadow: 0 1px 3px color-mix(in srgb, var(--palette-pink) 45%, transparent);
 }
 
-[data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__icon {
+[data-pm] .catalog-library[data-catalog-kind='test'] .library-page__list:not(.library-page__list--cards) .test-card__icon {
   width: 100%;
   height: 100%;
 }
@@ -370,6 +370,10 @@
 }
 
 [data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__avatar::before {
+  inset: 0;
+}
+
+[data-pm] .catalog-library[data-catalog-kind='test'] .library-page__list:not(.library-page__list--cards) .test-card__avatar::before {
   content: none;
 }
 
