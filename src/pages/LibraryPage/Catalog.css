@@ -100,6 +100,12 @@
   transition: inset-block-start var(--catalog-search-motion);
 }
 
+/* Боковые поля капсулы лежат за пределами области прокрутки. */
+[data-pm] .catalog-library[data-catalog-kind='test'] .screen-header__chips {
+  padding-inline: 0;
+  border-inline: var(--space-1) solid transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-pm] .catalog-library {
     --catalog-search-motion: 0s linear;

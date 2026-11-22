@@ -10,7 +10,7 @@ export function centerChips(row: HTMLElement, position: number, selector = '.chi
   const chips = Array.from(row.querySelectorAll<HTMLElement>(selector));
   const room = row.scrollWidth - row.clientWidth;
   if (chips.length === 0 || room <= 1) return;
-  const rowLeft = row.getBoundingClientRect().left;
+  const rowLeft = row.getBoundingClientRect().left + row.clientLeft;
   // Середина чипса в самом ряду (с учётом прокрутки), а не на экране
   const middle = (index: number) => {
     if (startAtEdge && index === 0) return row.clientWidth / 2;
