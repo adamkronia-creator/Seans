@@ -68,6 +68,11 @@
   height: 24px;
 }
 
+.test-settings__avatar[data-test-art] .test-settings__icon {
+  width: 100%;
+  height: 100%;
+}
+
 .test-settings__who {
   display: flex;
   flex: 1;

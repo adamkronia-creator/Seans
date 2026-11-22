@@ -43,7 +43,7 @@ export function TestHeader({ test, kind = 'test', status, onBack, client, slotRe
       </button>
       <div className="test-settings__peer">
         {!hidden && (
-          <span className="test-settings__avatar" style={{ '--tint': test.tint } as CSSProperties}>
+          <span className="test-settings__avatar" data-test-art={kind === 'test' ? '' : undefined} style={{ '--tint': test.tint } as CSSProperties}>
             <img className="test-settings__icon" src={test.icon} alt="" />
           </span>
         )}

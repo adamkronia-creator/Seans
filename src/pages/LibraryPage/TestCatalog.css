@@ -327,6 +327,11 @@
   padding-inline-end: calc(var(--size-touch) + var(--space-3) + var(--space-1));
 }
 
+[data-pm] .catalog-library .library-page__list:not(.library-page__list--cards) .test-card__icon {
+  width: 100%;
+  height: 100%;
+}
+
 [data-pm] .catalog-library .library-page__list--cards .lib-card__favorite {
   inset-block-start: var(--space-1);
   inset-inline-end: var(--space-1);
