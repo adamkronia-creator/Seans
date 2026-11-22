@@ -338,7 +338,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     if (!search) return;
     const height = search.offsetHeight;
     const offset = Math.min(height, Math.max(0, page?.scrollTop ?? 0));
+    const visible = 1 - offset / Math.max(1, height);
     root.current?.style.setProperty('--catalog-search-offset', `${offset}px`);
+    root.current?.style.setProperty('--catalog-search-opacity', String(visible * visible * (3 - 2 * visible)));
     setSearchCollapsed(offset >= height);
   }, []);
 
