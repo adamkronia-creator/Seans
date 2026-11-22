@@ -90,6 +90,7 @@
 }
 
 [data-pm] .catalog-library .screen-header__chips {
+  --glass-fill: var(--glass-fill-header);
   position: absolute;
   inset-block-start: calc(100% + var(--catalog-search-row) + var(--catalog-control-gap) - var(--catalog-search-shift));
   inset-inline: var(--catalog-control-inset);
@@ -97,10 +98,6 @@
   margin: 0;
   padding: var(--space-1);
   transition: inset-block-start var(--catalog-search-motion);
-}
-
-:root[data-ink='light'] [data-pm] .catalog-library .screen-header__chips {
-  --glass-fill: color-mix(in srgb, var(--glass) 60%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
