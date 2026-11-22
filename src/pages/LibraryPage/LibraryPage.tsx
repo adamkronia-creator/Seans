@@ -45,6 +45,7 @@ import { useListMotion } from '../../utils/listMotion';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
 import { taskSettings } from '../../data/taskSettings';
+import { testCardDescription } from '../../data/testSettings';
 import { ChatsHeader } from '../MessagesPage/ChatsHeader';
 import { useLibrarySelection } from './LibrarySelection';
 import '../MessagesPage/MessagesPage.css';
@@ -196,6 +197,7 @@ function LibraryList(p: ListProps) {
             key={id}
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
+            description={catalog.kind === 'test' && p.catalogLayout === 'cards' ? testCardDescription(id) : undefined}
             favorite={ctx.favorites.has(id)}
             favoriteOnAvatar={p.catalogLayout === 'list'}
             onFavoriteChange={setFavorites && ((on) => setFavorites([id], on))}

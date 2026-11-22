@@ -12,6 +12,7 @@ import './LibraryCard.css';
 interface LibraryCardProps {
   test: LibraryItem;
   cover?: string;
+  description?: string;
   favorite: boolean;
   favoriteOnAvatar?: boolean;
   onFavoriteChange?: (on: boolean) => void;
@@ -32,7 +33,7 @@ interface LibraryCardProps {
 }
 
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
-export function LibraryCard({ test, cover, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
+export function LibraryCard({ test, cover, description, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
@@ -59,8 +60,8 @@ export function LibraryCard({ test, cover, favorite, favoriteOnAvatar, onFavorit
               </svg>
             )}
           </span>
-          <span className="test-card__description">
-            <Highlight text={test.catalogDescription ?? test.description} words={marks} />
+          <span className={description ? 'test-card__description lib-card__description--full' : 'test-card__description'}>
+            <Highlight text={description ?? test.catalogDescription ?? test.description} words={marks} />
           </span>
           {facts && <span className="lib-card__facts">{facts}</span>}
           {why && <span className="lib-card__why">{why}</span>}

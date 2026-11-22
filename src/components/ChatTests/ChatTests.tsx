@@ -14,7 +14,7 @@ import { taskApproachLabel } from '../../data/libraryMeta';
 import { useTaskResult, useTaskResults } from '../../data/selfTask';
 import { useSelfResults } from '../../data/selfTest';
 import { TASKS } from '../../data/taskContent';
-import { testSettings } from '../../data/testSettings';
+import { testCardDescription, testSettings } from '../../data/testSettings';
 import type { PsyTest, TestStatus } from '../../data/tests';
 import './ChatTests.css';
 
@@ -42,17 +42,6 @@ const TASK_SECTIONS: SectionConfig[] = [
   { status: 'permanent', title: 'Назначенные' },
   { status: 'done', title: 'Завершённые' },
 ];
-
-const TEST_CARD_DESCRIPTIONS: Readonly<Partial<Record<string, string>>> = {
-  itt: 'Предназначен для комплексной экспресс-диагностики тревожности',
-  smol: 'Предназначен для комплексной диагностики личности, эмоционального состояния и характера адаптации',
-  bdi: 'Предназначена для экспресс-диагностики депрессивной симптоматики',
-  rses: 'Предназначена для исследования самооценки и степени принятия себя',
-  scl90: 'Предназначен для комплексной диагностики и оценки психологической и соматической симптоматики',
-  '5pfq': 'Предназначен для комплексной диагностики личности на основе пяти диапазонов черт с разными свойствами',
-  gad7: 'Предназначен для экспресс-диагностики тревожной симптоматики',
-  phq9: 'Предназначен для экспресс-диагностики депрессивной симптоматики',
-};
 
 const introParagraph = (intro?: string) => intro?.split('\n\n', 1)[0].trim();
 
@@ -162,7 +151,7 @@ export function ChatTests({
             category={test?.abbr ?? 'Опросник'}
             date={result?.info.date ?? item.fullDate ?? item.date}
             result={result}
-            description={TEST_CARD_DESCRIPTIONS[item.id] ?? introParagraph(test && testSettings(test).intro)}
+            description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
             onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
             onMenu={onCardMenu}
             {...pick}
