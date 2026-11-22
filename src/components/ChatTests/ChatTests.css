@@ -84,8 +84,8 @@
 }
 
 .chat-tests__list .test-card__icon {
-  width: 32px;
-  height: 32px;
+  width: 100%;
+  height: 100%;
 }
 
 /* Название — как имя чата: headline в одну строку; описание — label обычного начертания */
@@ -126,7 +126,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ——— Строки как в меню «Диагностика» и «Задания»: значок-круг со своим градиентом, название, описание, сведения; на углу значка метка состояния ——— */
+/* ——— Строки как в библиотеке: круглая иллюстрация с меткой состояния, название, описание и сведения ——— */
 .status-row {
   position: relative;
   /* Метка на углу значка: круг 20, вокруг него в значке прозрачный зазор (как у метки «в сети» и сердечка в меню) */
@@ -136,16 +136,12 @@
 }
 
 .status-row .test-card__avatar {
-  box-sizing: border-box;
-  border: 1px solid var(--glass-border-blue);
   -webkit-mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
   mask-image: radial-gradient(circle at calc(100% - var(--presence-center)) var(--presence-center), transparent calc(var(--presence-size) / 2 + var(--presence-gap)), var(--palette-black) calc(var(--presence-size) / 2 + var(--presence-gap) + 0.5px));
 }
 
 .status-row .test-card__avatar::before {
-  inset: -1px; /* grid:ok — перекрывает рамку 1 px */
-  background: linear-gradient(135deg, color-mix(in srgb, var(--tint) 65%, var(--palette-white)), var(--tint));
-  opacity: 0.9;
+  content: none;
 }
 
 .status-row__badge {
@@ -315,17 +311,10 @@
 }
 
 .activity-card__icon {
-  display: grid;
   flex: 0 0 var(--space-8);
-  place-items: center;
+  width: var(--space-8);
   height: var(--space-8);
   border-radius: var(--radius-full);
-  background: var(--tint);
-}
-
-.activity-card__icon img {
-  width: var(--space-5);
-  height: var(--space-5);
 }
 
 .activity-card__meta {

@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { usePick, type PickProps } from '../ChatCase/ChatCase';
 import { ScaleList } from '../ChatHistory/ScaleList';
 import type { ConclusionData } from '../../data/conclusions';
@@ -22,9 +21,7 @@ export function ActivityCard({ item, category, date, description, details, resul
     <li className="activity-card" data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
       <button type="button" className="activity-card__body" onClick={onOpen}>
         <span className="activity-card__header">
-          <span className="activity-card__icon" style={{ '--tint': item.tint } as CSSProperties}>
-            <img src={item.icon} alt="" loading="lazy" decoding="async" />
-          </span>
+          <img className="activity-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
           <span className="activity-card__meta">
             <span>{category}</span>
             <span className="activity-card__date">{date}{details && ` · ${details}`}</span>

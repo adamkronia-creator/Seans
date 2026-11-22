@@ -89,6 +89,7 @@
   transition: translate var(--catalog-search-motion), opacity var(--catalog-search-motion), box-shadow var(--catalog-search-motion);
 }
 
+/* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
 [data-pm] .catalog-library .screen-header__chips {
   --glass-fill: var(--glass-fill-header);
   position: absolute;
@@ -96,14 +97,9 @@
   inset-inline: var(--catalog-control-inset);
   height: var(--catalog-chip-row);
   margin: 0;
-  padding: var(--space-1);
-  transition: inset-block-start var(--catalog-search-motion);
-}
-
-/* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
-[data-pm] .catalog-library[data-catalog-kind='test'] .screen-header__chips {
   padding: 0;
   border: var(--space-1) solid transparent;
+  transition: inset-block-start var(--catalog-search-motion);
 }
 
 @media (prefers-reduced-motion: reduce) {

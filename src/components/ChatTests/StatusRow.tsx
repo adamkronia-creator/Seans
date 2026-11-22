@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { usePick, type PickProps } from '../ChatCase/ChatCase';
 import type { PsyTest } from '../../data/tests';
 import '../TestCard/TestCard.css';
@@ -58,7 +57,7 @@ export function StatusRow({ item, facts, time, description, badgeLabel, onOpen, 
   return (
     <li className={`status-row status-row--${kind}`} data-selecting={selecting || undefined} data-selected={selected || undefined} {...pick}>
       <button type="button" className="test-card" onClick={() => onOpen(item)}>
-        <span className="test-card__avatar" style={{ '--tint': item.tint } as CSSProperties}>
+        <span className="test-card__avatar">
           <img className="test-card__icon" src={item.icon} alt="" loading="lazy" decoding="async" />
         </span>
         <span className="test-card__body">

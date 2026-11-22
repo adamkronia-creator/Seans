@@ -605,7 +605,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   return (
-    <section ref={root} className={chatLike ? 'library-page messages catalog-library' : 'library-page'} data-catalog-kind={catalogDesign ? kind : undefined} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
+    <section ref={root} className={chatLike ? 'library-page messages catalog-library' : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={false}
@@ -613,7 +613,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           query={view.query}
           onQuery={(value) => setQuery(kind, value)}
           title={title}
-          status={kind === 'task' ? 'Ваши практики' : 'Ваши опросники'}
+          status={kind === 'task' ? 'Ваши задания' : 'Ваши опросники'}
           heading={title}
           placeholder={searchPlaceholder}
           chipsLabel={kind === 'task' ? 'Подборки заданий' : 'Подборки тестов'}
