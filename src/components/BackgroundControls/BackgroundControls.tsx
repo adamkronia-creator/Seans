@@ -1,5 +1,6 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import './BackgroundControls.css';
+import '../../styles/segmented-control.css';
 import '../AttachSheet/AttachSheet.css';
 import { addToNamedAlbum } from '../../data/profile';
 import { uploadPhotos } from '../Profile/upload';
@@ -168,7 +169,7 @@ export function BackgroundControls() {
           <span>Цвет текста</span>
         </div>
         <div
-          className="bg-sheet__seg"
+          className="segmented-control"
           role="radiogroup"
           aria-labelledby="bg-ink-label"
           style={{ '--seg-i': Math.max(0, INKS.findIndex((x) => x.id === ink)), '--seg-n': INKS.length } as CSSProperties}
@@ -179,7 +180,7 @@ export function BackgroundControls() {
               type="button"
               role="radio"
               aria-checked={ink === id}
-              className={`bg-sheet__seg-item${ink === id ? ' is-on' : ''}`}
+              className="segmented-control__item"
               onClick={() => {
                 setInkPref(id);
                 refresh();

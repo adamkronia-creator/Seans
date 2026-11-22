@@ -187,18 +187,19 @@
 }
 
 .catalog-layout {
-  display: flex;
   flex: none;
-  gap: inherit;
+}
+
+.catalog-layout .segmented-control__item {
+  display: grid;
+  place-items: center;
+  width: var(--size-touch);
+  height: calc(var(--size-touch) - 2 * var(--space-1));
 }
 
 .catalog-layout svg {
-  width: 1em;
-  height: 1em;
-}
-
-[data-pm] .catalog-layout .chats-header__action[aria-pressed='true'] {
-  background: var(--glass-tab);
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
 }
 
 [data-pm] .catalog-library.messages .library-page__list {

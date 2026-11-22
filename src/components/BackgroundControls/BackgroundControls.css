@@ -29,52 +29,6 @@
   accent-color: var(--action-primary);
 }
 
-.bg-sheet__seg {
-  position: relative;
-  display: flex;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  /* Не капсула, а скруглённый прямоугольник; ползунок внутри скруглён на ширину рамки меньше */
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
-}
-
-/* Ползунок один и переезжает под выбранный вариант (разметка отдаёт номер --seg-i и число вариантов --seg-n), а не загорается на новом месте */
-.bg-sheet__seg::before {
-  content: '';
-  position: absolute;
-  top: var(--space-1);
-  bottom: var(--space-1);
-  left: var(--space-1);
-  width: calc((100% - var(--space-1) * (var(--seg-n, 3) + 1)) / var(--seg-n, 3));
-  border-radius: calc(var(--radius-md) - var(--space-1));
-  background: var(--action-primary);
-  box-shadow: var(--active-ring);
-  transform: translateX(calc(var(--seg-i, 0) * (100% + var(--space-1))));
-  transition: transform 0.28s var(--ease-ios);
-}
-
-.bg-sheet__seg-item {
-  position: relative;
-  flex: 1;
-  height: var(--space-8);
-  border-radius: calc(var(--radius-md) - var(--space-1));
-  color: var(--text-primary);
-  font: var(--type-label);
-  transition: color var(--dur-base) ease;
-}
-
-.bg-sheet__seg-item.is-on {
-  color: var(--action-primary-text);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bg-sheet__seg::before,
-  .bg-sheet__seg-item {
-    transition: none;
-  }
-}
-
 .bg-sheet__note {
   margin: 0;
   color: var(--text-secondary);
