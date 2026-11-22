@@ -222,7 +222,7 @@
 }
 
 /* Справа остаётся место под кружок отметки: 24 и зазор 12 */
-.chat-tests li[data-selecting] .test-card__body {
+.chat-tests li[data-selecting]:not(.chat-test-card) .test-card__body {
   padding-right: calc(var(--space-6) + var(--space-3));
 }
 
@@ -293,10 +293,6 @@
   text-align: start;
 }
 
-.activity-card__body:has(+ .activity-card__scales) {
-  padding-block-end: var(--space-2);
-}
-
 .activity-card__body:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
@@ -340,14 +336,6 @@
   font-weight: 400;
 }
 
-.activity-card__scales {
-  padding: 0 var(--space-4) var(--space-4);
-}
-
-.activity-card__scales .hist-scales {
-  margin-top: 0;
-}
-
 .activity-card .pick-mark {
   top: var(--space-8);
   right: calc(var(--space-4) + var(--space-3));
@@ -369,4 +357,134 @@
 
 .activity-card > .case-card__edit circle:last-child {
   translate: 0 1px;
+}
+
+.chat-tests--catalog {
+  gap: var(--space-3);
+  padding-inline: var(--page-gutter);
+}
+
+.chat-tests__filters {
+  display: flex;
+  flex: none;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  border: var(--space-1) solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--bg-field);
+  -webkit-backdrop-filter: blur(var(--space-2));
+  backdrop-filter: blur(var(--space-2));
+}
+
+[data-pm] .chat-tests__filters .chip {
+  flex-grow: 1;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  font: var(--type-label);
+  font-weight: 500;
+}
+
+@media (max-width: 360px) {
+  [data-pm] .chat-tests__filters .chip {
+    font: var(--type-caption);
+  }
+}
+
+.chat-tests__filters .chip:not(.chip--active) {
+  background: var(--glass-fill-header);
+  color: var(--text-primary);
+}
+
+.chat-tests__catalog-remind {
+  align-self: flex-end;
+  min-height: var(--size-touch);
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--glass-card);
+  color: var(--text-link);
+  font: var(--type-label);
+}
+
+.chat-tests__catalog {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-test-card {
+  position: relative;
+  --cover-action-inset: var(--space-1);
+}
+
+.chat-test-card .test-card__title {
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-test-card .test-card__description {
+  white-space: normal;
+}
+
+.chat-test-card__dates {
+  color: var(--text-secondary);
+  font: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-test-card__dates > span {
+  white-space: nowrap;
+}
+
+.chat-test-card__scales {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.chat-test-card__scales .hist-scales {
+  margin-block-start: 0;
+}
+
+.chat-test-card__menu {
+  position: absolute;
+  inset-block-start: var(--cover-action-inset);
+  inset-inline-end: var(--cover-action-inset);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  width: var(--size-touch);
+  height: var(--size-touch);
+  border-radius: var(--radius-full);
+  color: var(--palette-white);
+}
+
+.chat-test-card__menu::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: var(--space-8);
+  height: var(--space-8);
+  margin: auto;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--palette-black) 62%, transparent);
+  content: '';
+}
+
+.chat-test-card__menu svg {
+  width: var(--space-5);
+  height: var(--space-5);
+}
+
+.chat-test-card .pick-mark {
+  --pick-inset: calc(var(--cover-action-inset) + (var(--size-touch) - var(--space-6)) / 2);
+  inset-block-start: var(--pick-inset);
+  inset-inline-end: var(--pick-inset);
+  transform: none;
+  border-color: var(--palette-white);
 }

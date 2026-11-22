@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Badge } from '../Badge/Badge';
+import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { IconTabPractices, IconTabTests } from '../icons';
 import type { PickProps } from '../ChatCase/ChatCase';
 import { ActivityCard } from './ActivityCard';
+import { ChatTestCard } from './ChatTestCard';
 import { StatusRow } from './StatusRow';
 import { findClientResult } from '../../data/clientResults';
 import { findClientTaskResult } from '../../data/clientTaskResults';
@@ -32,8 +34,7 @@ interface SectionConfig {
   remind?: boolean;
 }
 
-const TEST_SECTIONS: SectionConfig[] = [
-  { status: 'sent', title: 'Отправленные', remind: true },
+const COMPLETED_TEST_SECTIONS: SectionConfig[] = [
   { status: 'done', title: 'Завершённые' },
 ];
 
@@ -135,33 +136,59 @@ export function ChatTests({
   onOpenResult?: (id: string) => void;
 }) {
   const data = useClientData();
+  const scroller = useRef<HTMLDivElement>(null);
+  const [filter, setFilter] = useState<'sent' | 'done' | null>(null);
+  const items = hasData ? itemsWithStatus(data, 'test') : [];
+  const sent = items.filter((item) => item.status === 'sent');
+  const done = items.filter((item) => item.status === 'done');
+  const active = filter ?? (sent.length > 0 ? 'sent' : 'done');
+  const shown = active === 'sent' ? sent : done;
+  const selectStatus = (next: 'sent' | 'done') => {
+    setFilter(next);
+    if (scroller.current) scroller.current.scrollTop = 0;
+  };
+
+  if (items.length === 0) {
+    return <EmptyState icon={<IconTabTests />} title="Тесты ещё не отправлялись" text="Отправьте тест из раздела «Диагностика» — он появится здесь." />;
+  }
+
   return (
-    <SectionedList
-      items={hasData ? itemsWithStatus(data, 'test') : []}
-      sections={TEST_SECTIONS}
-      empty={{ kind: 'test', title: 'Тесты ещё не отправлялись', text: 'Отправьте тест из раздела «Диагностика» — он появится здесь.' }}
-      renderCard={(item, pick) => {
-        const test = LIBRARY.find((test) => test.id === item.id);
-        const done = item.status === 'done';
-        const result = done ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data : undefined;
-        return (
-          <ActivityCard
-            key={item.id}
-            item={item}
-            category={test?.abbr ?? 'Опросник'}
-            date={result?.info.date ?? item.fullDate ?? item.date}
-            result={result}
-            description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
-            onOpen={() => done ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
-            onMenu={onCardMenu}
-            {...pick}
-          />
-        );
-      }}
-      onRemind={onRemind}
-      selected={selected}
-      onPick={onPick}
-    />
+    <div ref={scroller} className="chat-tests chat-tests--catalog">
+      <div className="chat-tests__filters" role="group" aria-label="Статусы опросников" data-hscroll>
+        <Chip active={active === 'sent'} count={sent.length} onClick={() => selectStatus('sent')}>Отправленные</Chip>
+        <Chip active={active === 'done'} count={done.length} onClick={() => selectStatus('done')}>Завершённые</Chip>
+      </div>
+      {active === 'sent' && sent.length > 0 && onRemind && !selected && (
+        <button type="button" className="chat-tests__catalog-remind" onClick={() => onRemind(sent)}>
+          {sent.length > 1 ? 'Напомнить всем' : 'Напомнить'}
+        </button>
+      )}
+      {shown.length === 0 ? (
+        <EmptyState icon={<IconTabTests />} title={active === 'sent' ? 'Нет тестов, ожидающих ответа' : 'Нет завершённых тестов'} />
+      ) : (
+        <ul className="chat-tests__catalog catalog-cards">
+          {shown.map((item) => {
+            const test = LIBRARY.find((entry) => entry.id === item.id);
+            const completed = item.status === 'done';
+            const result = completed ? findClientResult(clientResultId(CLIENT_CHAT, item.id))?.data : undefined;
+            return (
+              <ChatTestCard
+                key={item.id}
+                item={item}
+                test={test}
+                result={result}
+                description={testCardDescription(item.id) ?? introParagraph(test && testSettings(test).intro)}
+                onOpen={() => completed ? onOpenResult?.(item.id) : onOpenTest?.(item.id)}
+                onMenu={onCardMenu}
+                selecting={Boolean(selected)}
+                selected={selected?.includes(item.id)}
+                onPick={onPick}
+              />
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -176,7 +203,7 @@ export function SelfTests({ onOpen }: { onOpen: (resultId: string) => void }) {
   return (
     <SectionedList
       items={items}
-      sections={TEST_SECTIONS.filter((s) => s.status === 'done')}
+      sections={COMPLETED_TEST_SECTIONS}
       empty={{ kind: 'test', title: 'Пройденных тестов пока нет', text: 'Тесты, которые вы пройдёте сами, будут храниться здесь.' }}
       renderCard={(item, pick) => <StatusRow key={item.id} item={item} facts="Пройден" time={results.find((r) => r.id === item.id)?.data?.info.date ?? item.date} badgeLabel="Пройден" onOpen={(t) => onOpen(t.id)} {...pick} />}
     />

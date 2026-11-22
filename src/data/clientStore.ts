@@ -497,11 +497,20 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
   catalog(kind).forEach(({ categories: _c, ...base }) => {
     const item = { ...base, status: 'sent' as const, date: '' };
     let last = -1;
+    let pendingTestSentDate: string | undefined;
+    let completedTestSentDate: string | undefined;
     const records: number[] = [];
     d.activity.forEach((a, i) => {
       if (a.kind !== kind || a.ref !== item.id) return;
       if (a.record !== undefined) records.push(i);
-      else last = i;
+      else {
+        last = i;
+        if (kind === 'test' && a.state === 'sent') pendingTestSentDate = a.date;
+        if (kind === 'test' && a.state === 'done') {
+          completedTestSentDate = pendingTestSentDate;
+          pendingTestSentDate = undefined;
+        }
+      }
     });
     records.forEach((i) => {
       const a = d.activity[i] as ItemActivity;
@@ -537,6 +546,7 @@ export function itemsWithStatus(d: ClientData, kind: 'test' | 'task'): PsyTest[]
         date: a.date.slice(0, 5),
         fullDate: a.date,
         time: a.time,
+        ...(a.state === 'done' && completedTestSentDate ? { sentDate: completedTestSentDate } : {}),
         ...(a.state === 'assigned' ? { records: { count: 0, since: a.date } } : {}),
       },
       index: last,

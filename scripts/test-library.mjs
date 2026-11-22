@@ -462,6 +462,7 @@ test('BDI и СМОЛ у Максима: пройдены, свежие выше
   const done = itemsWithStatus(data, 'test').filter((t) => t.status === 'done');
   assert.deepEqual(done.slice(0, 2).map((t) => t.id), ['smol', 'bdi'], 'СМОЛ (21.09) выше BDI (14.09), оба выше SCL-90 (11.09)');
   assert.deepEqual(done.slice(0, 2).map((t) => t.fullDate), ['21.09.2026', '14.09.2026']);
+  assert.deepEqual(done.slice(0, 2).map((t) => t.sentDate), ['21.09.2026', '14.09.2026']);
   for (const id of ['bdi', 'smol']) {
     const result = findClientResult(`maxim-${id}`);
     assert.ok(result?.data, `${id}: у результата Максима нет заключения`);
@@ -472,4 +473,17 @@ test('BDI и СМОЛ у Максима: пройдены, свежие выше
   const texts = historyEvents(data).map((e) => e.text ?? '');
   assert.ok(texts.includes('Вы отправили шкалу депрессии А. Бека «BDI»'));
   assert.ok(texts.includes('Максим заполнил сокращённый многофакторный опросник личности «СМОЛ»'));
+});
+
+test('Дата отправки завершённого теста относится к его последней попытке', () => {
+  const { itemsWithStatus, readClientData } = lib;
+  const data = readClientData();
+  const activity = ['sent', 'done', 'sent', 'done', 'done'].map((state, index) => ({
+    id: String(index), kind: 'test', ref: 'smol', state, date: `0${index + 1}.10.2026`,
+  }));
+  const [second] = itemsWithStatus({ ...data, activity: activity.slice(0, 4) }, 'test');
+  assert.equal(second.sentDate, '03.10.2026');
+  assert.equal(second.fullDate, '04.10.2026');
+  const [withoutSend] = itemsWithStatus({ ...data, activity }, 'test');
+  assert.equal(withoutSend.sentDate, undefined);
 });

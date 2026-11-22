@@ -180,7 +180,7 @@ function LibraryList(p: ListProps) {
   const setFavorites = p.onSetFavorites;
 
   const cards = (
-    <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards' : ''}`}>
+    <ul ref={rows} className={`library-page__list${p.catalogLayout === 'cards' ? ' library-page__list--cards catalog-cards' : ''}`}>
       {listing.ids.slice(0, shown).map((id) => {
         const entry = catalog.byId.get(id);
         if (!entry) return null;

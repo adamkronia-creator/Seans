@@ -8,6 +8,7 @@ import { Highlight } from '../LibraryFilters/Highlight';
 import type { LibraryItem } from '../../data/library';
 import '../TestCard/TestCard.css';
 import './LibraryCard.css';
+import './CatalogCard.css';
 
 interface LibraryCardProps {
   test: LibraryItem;
