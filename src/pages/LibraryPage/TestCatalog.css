@@ -3,6 +3,18 @@
   --catalog-control-inset: var(--space-3);
   --catalog-control-gap: var(--space-2);
   --catalog-chip-row: calc(var(--space-8) + var(--space-1) * 2);
+  --catalog-search-row: calc(var(--size-touch) + var(--catalog-control-gap));
+  --catalog-search-shift: var(--catalog-search-offset, 0px);
+  --catalog-controls-space: calc(var(--catalog-search-row) + var(--catalog-control-gap) + var(--catalog-chip-row));
+}
+
+[data-pm] .catalog-library:has(.catalog-search:focus-within),
+[data-pm] .catalog-library[data-selecting] {
+  --catalog-search-shift: 0px;
+}
+
+[data-pm] .catalog-library[data-selecting] {
+  --catalog-search-row: 0px;
 }
 
 /* Стеклянная шапка остаётся над прокручиваемой выдачей. */
@@ -14,7 +26,8 @@
   pointer-events: none;
 }
 
-.catalog-library .chats-header > :is(.chats-header__top, .catalog-search, .screen-header__chips) {
+.catalog-library .chats-header > :is(.chats-header__top, .screen-header__chips),
+.catalog-search :is(.search-field, .suggest) {
   pointer-events: auto;
 }
 
@@ -42,14 +55,13 @@
 }
 
 .catalog-search {
-  position: relative;
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: var(--catalog-control-inset);
   z-index: 2;
-  height: var(--size-touch);
-  margin-block-start: var(--catalog-control-gap);
-  margin-inline: var(--catalog-control-inset);
+  height: var(--catalog-search-row);
+  padding-block-start: var(--catalog-control-gap);
   overflow: clip;
-  transition: height var(--collapse-time) var(--collapse-ease),
-    margin-block-start var(--collapse-time) var(--collapse-ease), opacity var(--collapse-time) ease-out;
 }
 
 .catalog-search:has(.suggest) {
@@ -66,37 +78,20 @@
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   animation: none;
-}
-
-.catalog-library[data-search-collapsed] .catalog-search {
-  height: 0;
-  margin-block-start: 0;
-  overflow: clip;
-  opacity: 0;
+  translate: 0 calc(-1 * var(--catalog-search-shift));
 }
 
 [data-pm] .catalog-library .screen-header__chips {
-  flex: none;
+  position: absolute;
+  inset-block-start: calc(100% + var(--catalog-search-row) + var(--catalog-control-gap) - var(--catalog-search-shift));
+  inset-inline: var(--catalog-control-inset);
   height: var(--catalog-chip-row);
-  margin: var(--catalog-control-gap) var(--catalog-control-inset) 0;
+  margin: 0;
   padding: var(--space-1);
   border-radius: var(--radius-full);
-  transition: margin-bottom var(--collapse-time) var(--collapse-ease), background-color var(--collapse-time) ease-out;
-}
-
-[data-pm] .catalog-library[data-search-collapsed]:not([data-selecting]) .screen-header__chips {
-  /* Капсула поверх списка: её высота больше не занимает место в шапке. */
-  margin-block-end: calc(-1 * (var(--catalog-chip-row) + var(--catalog-control-gap)));
   background-color: var(--glass-card);
   -webkit-backdrop-filter: blur(var(--space-2));
   backdrop-filter: blur(var(--space-2));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .catalog-library .catalog-search,
-  [data-pm] .catalog-library .screen-header__chips {
-    transition: none;
-  }
 }
 
 .catalog-library.messages .catalog-search .suggest {
@@ -120,12 +115,8 @@
 [data-pm] .catalog-library.messages .library-page__page {
   --pm-top: 0px;
   gap: var(--space-3);
-  padding: var(--space-3) var(--page-gutter) var(--pm-bottom);
-  scroll-padding-top: var(--space-3);
-}
-
-[data-pm] .catalog-library.messages[data-search-collapsed]:not([data-selecting]) .library-page__page {
-  scroll-padding-top: calc(var(--catalog-chip-row) + var(--catalog-control-gap) + var(--space-3));
+  padding: calc(var(--catalog-controls-space) + var(--space-3)) var(--page-gutter) var(--pm-bottom);
+  scroll-padding-top: calc(var(--catalog-controls-space) + var(--space-3) - var(--catalog-search-shift));
 }
 
 [data-pm] .catalog-library.messages[data-selecting] .library-page__page {

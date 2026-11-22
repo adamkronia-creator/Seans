@@ -263,7 +263,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const [sheet, setSheet] = useState<null | 'filters'>(null);
   const [focused, setFocused] = useState(false);
   const [searchCollapsed, setSearchCollapsed] = useState(false);
-  const scrollSample = useRef<{ top: number; max: number } | null>(null);
+  const catalogSearch = useRef<HTMLDivElement>(null);
   const [toast, say] = useToast();
   const [searching, setSearching] = useState(() => readLibraryView(kind).query !== '');
   // Системная «назад» закрывает поиск, а не уводит с вкладки
@@ -333,31 +333,19 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const resetKey = `${query}|${JSON.stringify(view.filters)}`;
 
   const index = Math.max(0, sections.indexOf(section));
-  useLayoutEffect(() => {
-    scrollSample.current = null;
-    setSearchCollapsed(false);
-  }, [index, resetKey, layout]);
+  const syncCatalogScroll = useCallback((page: HTMLElement | null) => {
+    const search = catalogSearch.current;
+    if (!search) return;
+    const height = search.offsetHeight;
+    const offset = Math.min(height, Math.max(0, page?.scrollTop ?? 0));
+    root.current?.style.setProperty('--catalog-search-offset', `${offset}px`);
+    setSearchCollapsed(offset >= height);
+  }, []);
 
   const onCatalogScroll = (event: UIEvent<HTMLDivElement>) => {
     const page = event.target;
     if (!(page instanceof HTMLElement) || !page.matches('.library-page__page:not([inert] *)')) return;
-    const max = page.scrollHeight - page.clientHeight;
-    const top = Math.min(max, Math.max(0, page.scrollTop));
-    const previous = scrollSample.current;
-    if (top === 0 || focused) {
-      scrollSample.current = { top, max };
-      setSearchCollapsed(false);
-      return;
-    }
-    // Высота области меняется во время анимации. Не считаем коррекцию прокрутки сменой направления.
-    if (previous && max < previous.max && top === max && previous.top > max) {
-      scrollSample.current = { top, max };
-      return;
-    }
-    const delta = top - (previous?.top ?? 0);
-    if (Math.abs(delta) < 12) return;
-    scrollSample.current = { top, max };
-    setSearchCollapsed(delta > 0);
+    syncCatalogScroll(page);
   };
   const shown = dragIndex ?? index;
   // Соседние разделы нижней панели («Задания», «Диагностика», «Диалоги»): с последнего чипса влево — в следующий, с первого вправо — в
@@ -407,6 +395,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     say,
     canSend: (item) => kind === 'test' || Boolean(taskSettings(item)),
   });
+  useLayoutEffect(() => {
+    if (catalogDesign) syncCatalogScroll(root.current?.querySelector<HTMLElement>('.swipe-pager__page:not([inert]) > .library-page__page') ?? null);
+  }, [catalogDesign, index, order, resetKey, layout, sel.selecting, syncCatalogScroll]);
   // Пока идёт выбор, нажатие на строку выделяет её, а не открывает
   const tap = useCallback(
     (item: LibraryItem) => {
@@ -585,7 +576,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   return (
-    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined} data-search-collapsed={catalogDesign && searchCollapsed && !focused ? '' : undefined}>
+    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={!catalogDesign && searching}
@@ -600,7 +591,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           aside={catalogDesign ? <TestCatalogLayout layout={layout} onLayout={setLayout} /> : filterButton}
           onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
           inlineSearch={catalogDesign ? (
-            <div className="catalog-search" {...({ inert: searchCollapsed && !focused ? '' : undefined } as object)}>
+            <div ref={catalogSearch} className="catalog-search" {...({ inert: searchCollapsed && !focused ? '' : undefined } as object)}>
               <SearchField
                 value={view.query}
                 onChange={(value) => setQuery(kind, value)}
