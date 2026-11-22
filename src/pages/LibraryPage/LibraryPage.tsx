@@ -184,7 +184,8 @@ function LibraryList(p: ListProps) {
         const hit = search?.hits.get(id);
         const [min, max] = entry.d.minutes ?? [];
         const duration = min === undefined ? undefined : `${min === max ? min : `${min}–${max}`} мин`;
-        const facts = p.catalogLayout ? [duration, entry.d.format].filter(Boolean) : entry.d.line;
+        const facts = p.catalogLayout === 'cards' ? [duration, entry.d.format].filter(Boolean)
+          : p.catalogLayout === 'list' ? [] : entry.d.line;
         const why = hit ? (hit.via ? `Близко по смыслу: ${hit.via}` : hit.visible ? undefined : `${hit.fieldLabel}: ${hit.text}`) : undefined;
         return (
           <LibraryCard
