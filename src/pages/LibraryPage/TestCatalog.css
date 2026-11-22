@@ -3,17 +3,12 @@
   --catalog-control-inset: var(--space-3);
   --catalog-control-gap: var(--space-2);
   --catalog-chip-row: calc(var(--space-8) + var(--space-1) * 2);
-  --catalog-title-row: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
-  --catalog-search-space: var(--size-touch);
-  --catalog-controls-space: calc(var(--catalog-search-space) + var(--catalog-control-gap) + var(--catalog-chip-row));
-}
-
-[data-pm] .catalog-library[data-selecting] {
-  --catalog-search-space: 0px;
 }
 
 /* Стеклянная шапка остаётся над прокручиваемой выдачей. */
 .catalog-library .chats-header {
+  position: relative;
+  flex: none;
   gap: 0;
   padding-block: 0;
   pointer-events: none;
@@ -31,7 +26,7 @@
 .catalog-library .chats-header__top {
   position: relative;
   isolation: isolate;
-  height: var(--catalog-title-row);
+  height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
   padding-block: calc(var(--space-4) + var(--safe-top)) var(--space-4);
 }
 
@@ -39,28 +34,22 @@
   position: absolute;
   inset: 0;
   z-index: -1;
+  background: var(--glass-fill-header);
   -webkit-backdrop-filter: var(--glass-filter-panel);
   backdrop-filter: var(--glass-filter-panel);
   pointer-events: none;
   content: '';
 }
 
-[data-pm] .catalog-library .chats-header__who {
-  text-shadow: 0 1px var(--space-1) var(--palette-white);
-}
-
-:root[data-ink='light'] [data-pm] .catalog-library .chats-header__who {
-  text-shadow: 0 1px var(--space-1) var(--palette-black);
-}
-
 .catalog-search {
-  position: absolute;
-  inset-block-start: 100%;
-  inset-inline: var(--catalog-control-inset);
+  position: relative;
   z-index: 2;
   height: var(--size-touch);
+  margin-block-start: var(--catalog-control-gap);
+  margin-inline: var(--catalog-control-inset);
   overflow: clip;
-  transition: height var(--collapse-time) var(--collapse-ease), opacity var(--collapse-time) ease-out;
+  transition: height var(--collapse-time) var(--collapse-ease),
+    margin-block-start var(--collapse-time) var(--collapse-ease), opacity var(--collapse-time) ease-out;
 }
 
 .catalog-search:has(.suggest) {
@@ -79,29 +68,25 @@
   animation: none;
 }
 
-:root[data-ink='light'] [data-pm] .catalog-library .catalog-search .search-field {
-  background: var(--glass-solid);
-}
-
 .catalog-library[data-search-collapsed] .catalog-search {
   height: 0;
+  margin-block-start: 0;
   overflow: clip;
   opacity: 0;
 }
 
 [data-pm] .catalog-library .screen-header__chips {
-  position: absolute;
-  inset-block-start: calc(100% + var(--catalog-search-space) + var(--catalog-control-gap));
-  inset-inline: var(--catalog-control-inset);
+  flex: none;
   height: var(--catalog-chip-row);
-  margin: 0;
+  margin: var(--catalog-control-gap) var(--catalog-control-inset) 0;
   padding: var(--space-1);
   border-radius: var(--radius-full);
-  transition: inset-block-start var(--collapse-time) var(--collapse-ease), background-color var(--collapse-time) ease-out;
+  transition: margin-bottom var(--collapse-time) var(--collapse-ease), background-color var(--collapse-time) ease-out;
 }
 
 [data-pm] .catalog-library[data-search-collapsed]:not([data-selecting]) .screen-header__chips {
-  inset-block-start: calc(100% + var(--catalog-control-gap));
+  /* Капсула поверх списка: её высота больше не занимает место в шапке. */
+  margin-block-end: calc(-1 * (var(--catalog-chip-row) + var(--catalog-control-gap)));
   background-color: var(--glass-card);
   -webkit-backdrop-filter: blur(var(--space-2));
   backdrop-filter: blur(var(--space-2));
@@ -135,13 +120,12 @@
 [data-pm] .catalog-library.messages .library-page__page {
   --pm-top: 0px;
   gap: var(--space-3);
-  /* Отступ перед первой карточкой прокручивается с выдачей под поиском и чипсами. */
-  padding: calc(var(--catalog-title-row) + var(--catalog-controls-space) + var(--space-3)) var(--page-gutter) var(--pm-bottom);
-  scroll-padding-top: calc(var(--catalog-title-row) + var(--catalog-controls-space) + var(--space-3));
+  padding: var(--space-3) var(--page-gutter) var(--pm-bottom);
+  scroll-padding-top: var(--space-3);
 }
 
 [data-pm] .catalog-library.messages[data-search-collapsed]:not([data-selecting]) .library-page__page {
-  scroll-padding-top: calc(var(--catalog-title-row) + var(--catalog-chip-row) + var(--catalog-control-gap) + var(--space-3));
+  scroll-padding-top: calc(var(--catalog-chip-row) + var(--catalog-control-gap) + var(--space-3));
 }
 
 [data-pm] .catalog-library.messages[data-selecting] .library-page__page {
