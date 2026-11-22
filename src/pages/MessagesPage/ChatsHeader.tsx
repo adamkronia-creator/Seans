@@ -4,6 +4,7 @@ import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
 import { StoriesRow } from '../../components/Stories/Stories';
 import { navigate } from '../../router';
+import './FloatingHeader.css';
 
 interface ChatsHeaderProps {
   searching: boolean;
@@ -14,6 +15,7 @@ interface ChatsHeaderProps {
   chipsRef?: Ref<HTMLDivElement>;
   /** Экран, поверх которого открываются истории */
   storiesRoot?: HTMLElement | null;
+  storiesScrolledAway?: boolean;
   /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений и ряд вместо историй */
   title?: string;
   status?: string;
@@ -46,6 +48,7 @@ export function ChatsHeader({
   chips,
   chipsRef,
   storiesRoot = null,
+  storiesScrolledAway = false,
   title = 'Чаты',
   status = 'Ваши диалоги',
   heading = 'Диалоги',
@@ -66,6 +69,7 @@ export function ChatsHeader({
   const searchButton = useRef<HTMLButtonElement>(null);
   const restoreSearchFocus = useRef(false);
   const collapseBelt = searching || Boolean(selection) || belt === null;
+  const hideBelt = collapseBelt || storiesScrolledAway;
   const input = inputRef ?? own;
   useEffect(() => {
     if (searching) (input as { current: HTMLInputElement | null }).current?.focus({ preventScroll: true });
@@ -146,7 +150,7 @@ export function ChatsHeader({
         </div>
       )}
       {!selection && inlineSearch}
-      <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={collapseBelt || undefined} {...({ inert: collapseBelt ? '' : undefined } as object)}>
+      <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={hideBelt || undefined} {...({ inert: hideBelt ? '' : undefined } as object)}>
         <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
       </div>
       {chipsRow}

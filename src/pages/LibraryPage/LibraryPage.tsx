@@ -41,6 +41,7 @@ import {
 import { clearFilters, clearHistory, forgetQuery, readLibraryView, rememberQuery, setFilters, setQuery, toggleOption, useLibraryView } from '../../data/libraryView';
 import { plural } from '../../data/taskValues';
 import { centerChips } from '../../utils/centerChips';
+import { floatingRowProgress } from '../../utils/floatingRow';
 import { useListMotion } from '../../utils/listMotion';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { switchTab, useChipsDrag, useTabSwipe } from '../../utils/tabNav';
@@ -362,10 +363,9 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     const search = catalogSearch.current;
     if (!search) return;
     const height = search.offsetHeight;
-    const offset = Math.min(height, Math.max(0, page?.scrollTop ?? 0));
-    const visible = 1 - offset / Math.max(1, height);
+    const { offset, opacity } = floatingRowProgress(height, page?.scrollTop ?? 0);
     root.current?.style.setProperty('--catalog-search-offset', `${offset}px`);
-    root.current?.style.setProperty('--catalog-search-opacity', String(visible * visible * (3 - 2 * visible)));
+    root.current?.style.setProperty('--catalog-search-opacity', String(opacity));
     setSearchCollapsed(offset >= height);
   }, []);
 

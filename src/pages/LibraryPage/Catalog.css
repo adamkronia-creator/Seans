@@ -1,13 +1,10 @@
 [data-pm] .catalog-library {
   --catalog-line: color-mix(in srgb, var(--text-primary) 12%, transparent);
-  --catalog-control-inset: var(--space-3);
-  --catalog-control-gap: var(--space-2);
-  --catalog-chip-row: calc(var(--space-8) + var(--space-1) * 2);
-  --catalog-search-row: calc(var(--size-touch) + var(--catalog-control-gap));
+  --catalog-search-row: calc(var(--size-touch) + var(--floating-gap));
   --catalog-search-shift: var(--catalog-search-offset, 0px);
   --catalog-search-fade: var(--catalog-search-opacity, 1);
-  --catalog-search-motion: 120ms ease-out;
-  --catalog-controls-space: calc(var(--catalog-search-row) + var(--catalog-control-gap) + var(--catalog-chip-row));
+  --floating-row: var(--catalog-search-row);
+  --floating-shift: var(--catalog-search-shift);
 }
 
 [data-pm] .catalog-library:has(.catalog-search:focus-within),
@@ -20,50 +17,21 @@
   --catalog-search-row: 0px;
 }
 
-/* Стеклянная шапка остаётся над прокручиваемой выдачей. */
-.catalog-library .chats-header {
-  position: relative;
-  flex: none;
-  gap: 0;
-  padding-block: 0;
-  pointer-events: none;
-}
-
-.catalog-library .chats-header > :is(.chats-header__top, .screen-header__chips),
 .catalog-search :is(.search-field, .suggest) {
   pointer-events: auto;
 }
 
-[data-pm] .catalog-library .chats-header::before,
 .catalog-library .chats-header__belt {
   display: none;
-}
-
-.catalog-library .chats-header__top {
-  position: relative;
-  isolation: isolate;
-  height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
-  padding-block: calc(var(--space-4) + var(--safe-top)) var(--space-4);
-}
-
-[data-pm] .catalog-library .chats-header__top::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--glass-fill-header);
-  -webkit-backdrop-filter: var(--glass-filter-panel);
-  backdrop-filter: var(--glass-filter-panel);
-  pointer-events: none;
-  content: '';
 }
 
 .catalog-search {
   position: absolute;
   inset-block-start: 100%;
-  inset-inline: var(--catalog-control-inset);
+  inset-inline: var(--floating-inset);
   z-index: 2;
   height: var(--catalog-search-row);
-  padding-block-start: var(--catalog-control-gap);
+  padding-block-start: var(--floating-gap);
   overflow: clip;
 }
 
@@ -71,7 +39,7 @@
   overflow: visible;
 }
 
-[data-pm] .catalog-library :is(.catalog-search .search-field, .screen-header__chips) {
+[data-pm] .catalog-library .catalog-search .search-field {
   border-radius: var(--radius-full);
   background: var(--bg-field);
   -webkit-backdrop-filter: blur(var(--space-2));
@@ -86,26 +54,7 @@
   animation: none;
   translate: 0 calc(-1 * var(--catalog-search-shift));
   opacity: var(--catalog-search-fade);
-  transition: translate var(--catalog-search-motion), opacity var(--catalog-search-motion), box-shadow var(--catalog-search-motion);
-}
-
-/* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
-[data-pm] .catalog-library .screen-header__chips {
-  --glass-fill: var(--glass-fill-header);
-  position: absolute;
-  inset-block-start: calc(100% + var(--catalog-search-row) + var(--catalog-control-gap) - var(--catalog-search-shift));
-  inset-inline: var(--catalog-control-inset);
-  height: var(--catalog-chip-row);
-  margin: 0;
-  padding: 0;
-  border: var(--space-1) solid transparent;
-  transition: inset-block-start var(--catalog-search-motion);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-pm] .catalog-library {
-    --catalog-search-motion: 0s linear;
-  }
+  transition: translate var(--floating-motion), opacity var(--floating-motion), box-shadow var(--floating-motion);
 }
 
 .catalog-library.messages .catalog-search .suggest {
@@ -180,8 +129,8 @@
 [data-pm] .catalog-library.messages .library-page__page {
   --pm-top: 0px;
   gap: var(--space-3);
-  padding: calc(var(--catalog-controls-space) + var(--space-3)) var(--page-gutter) var(--pm-bottom);
-  scroll-padding-top: calc(var(--catalog-controls-space) + var(--space-3) - var(--catalog-search-shift));
+  padding: calc(var(--floating-controls-space) + var(--space-3)) var(--page-gutter) var(--pm-bottom);
+  scroll-padding-top: calc(var(--floating-controls-space) + var(--space-3) - var(--catalog-search-shift));
 }
 
 [data-pm] .catalog-library.messages[data-selecting] .library-page__page {

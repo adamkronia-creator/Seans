@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type UIEvent } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { countText, isMember, useAllGroups } from '../../data/groups';
 import { ArchiveRow, ChatItem } from '../../components/ChatItem/ChatItem';
@@ -20,10 +20,18 @@ import { useFolders } from '../../data/folders';
 import { guardBack, navigate } from '../../router';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
+import { floatingRowProgress } from '../../utils/floatingRow';
 import './MessagesPage.css';
 
 /** 'all' или номер папки */
 type Filter = string;
+
+/** Скрытая строка архива не считается прокруткой от начала видимого списка. */
+function hiddenArchiveHeight(scroller: HTMLElement | null) {
+  const archive = scroller?.querySelector<HTMLElement>('.chat-item--archive');
+  const next = archive?.nextElementSibling;
+  return archive && next instanceof HTMLElement ? next.offsetTop - archive.offsetTop : 0;
+}
 
 /**
  * Чаты одного фильтра: страница пейджера со своей прокруткой. На странице «Все» над «Избранным» стоит строка «Архивы», но при открытии
@@ -66,10 +74,7 @@ const ChatList = memo(function ChatList({
   const others = chats.filter((c) => !c.favorites);
 
   // Высота спрятанной части: строка «Архивы» вместе с промежутком до следующей
-  const hiddenHeight = () => {
-    const archive = rows.current?.querySelector<HTMLElement>('.chat-item--archive');
-    return archive ? (archive.nextElementSibling as HTMLElement | null)?.offsetTop! - archive.offsetTop : 0;
-  };
+  const hiddenHeight = () => hiddenArchiveHeight(scroller.current);
 
   // Список должен быть выше окна не меньше чем на спрятанную часть, иначе строку нечем спрятать. Пока человек список не трогал,
   // строка остаётся спрятанной при любом пересчёте размеров (шрифты, адресная строка, поворот): иначе она бы выглядывала по умолчанию
@@ -181,6 +186,7 @@ const ChatList = memo(function ChatList({
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [storiesScrolledAway, setStoriesScrolledAway] = useState(false);
   const searchInput = useRef<HTMLInputElement>(null);
   // Системная «назад» закрывает поиск, а не уводит с вкладки
   useEffect(() => {
@@ -320,6 +326,25 @@ export function MessagesPage() {
   );
 
   const index = Math.max(0, filters.indexOf(filter));
+  const syncStoriesScroll = useCallback((scroller: HTMLElement | null) => {
+    const screen = root.current;
+    const belt = screen?.querySelector<HTMLElement>('.chats-header__belt');
+    if (!screen || !belt) return;
+    const height = belt.offsetHeight;
+    const { offset, opacity } = floatingRowProgress(height, (scroller?.scrollTop ?? 0) - hiddenArchiveHeight(scroller));
+    screen.style.setProperty('--stories-offset', `${offset}px`);
+    screen.style.setProperty('--stories-opacity', String(opacity));
+    setStoriesScrolledAway(height > 0 && offset >= height);
+  }, []);
+
+  useLayoutEffect(() => {
+    syncStoriesScroll(root.current?.querySelector<HTMLElement>('.swipe-pager__page:not([inert]) > .messages__list') ?? null);
+  }, [index, order, query, searching, selecting, syncStoriesScroll]);
+
+  const onListScroll = (event: UIEvent<HTMLElement>) => {
+    const scroller = event.target;
+    if (scroller instanceof HTMLElement && scroller.matches('.messages__list:not([inert] *)')) syncStoriesScroll(scroller);
+  };
   // Свайп по самим чипсам: с «Все» вправо — в тесты, с последнего чипса влево — в профиль (по списку это делает пейджер)
   const onChips = (origin: Element) => Boolean(origin.closest('.screen-header__chips'));
   const atStart = useRef(true);
@@ -369,13 +394,14 @@ export function MessagesPage() {
   }, [index, order, liveOrder, countsKey, searching]);
 
   return (
-    <section ref={setRoot} className="messages" data-selecting={selecting ? '' : undefined} data-searching={searching ? '' : undefined}>
+    <section ref={setRoot} className="messages messages--dialogs" data-selecting={selecting ? '' : undefined} data-searching={searching ? '' : undefined} onScrollCapture={onListScroll}>
       <ChatsHeader
         searching={searching}
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
         storiesRoot={screen}
+        storiesScrolledAway={storiesScrolledAway}
         inputRef={searchInput}
         selection={sel.header(chats)}
         chips={

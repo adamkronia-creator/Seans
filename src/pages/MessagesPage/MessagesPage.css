@@ -178,6 +178,52 @@
   }
 }
 
+/* Высота над списком резервируется сразу, а истории и чипсы двигаются вместе с прокруткой. */
+[data-pm] .messages.messages--dialogs {
+  --stories-row-height: calc(var(--space-16) + var(--space-1) * 2 + var(--space-4));
+  --floating-row: calc(var(--stories-row-height) + var(--floating-gap));
+  --floating-shift: var(--stories-offset, 0px);
+  --pm-top: var(--floating-controls-space);
+}
+
+[data-pm] .messages--dialogs:is([data-selecting], [data-searching]) {
+  --floating-row: 0px;
+  --floating-shift: 0px;
+}
+
+.messages--dialogs .messages__list {
+  padding-top: var(--pm-top);
+  scroll-padding-top: calc(var(--pm-top) - var(--floating-shift));
+}
+
+.messages--dialogs .chats-header__belt {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  display: block;
+  height: var(--floating-row);
+  padding-block-start: var(--floating-gap);
+  overflow: clip;
+  transition: none;
+}
+
+.messages--dialogs .chats-header__belt[data-collapsed] {
+  margin: 0;
+  padding: 0;
+  visibility: hidden;
+}
+
+.messages--dialogs .chats-header__belt-inner {
+  overflow: visible;
+  opacity: var(--stories-opacity, 1);
+  translate: 0 calc(-1 * var(--floating-shift));
+  transition: translate var(--floating-motion), opacity var(--floating-motion);
+}
+
+.messages--dialogs .chats-header__belt:not([inert]) .stories {
+  pointer-events: auto;
+}
+
 /* ——— Список: лежит на фоне экрана, сверху поле на высоту шапки, снизу — на нижнюю панель ——— */
 .messages__list {
   flex: 1;

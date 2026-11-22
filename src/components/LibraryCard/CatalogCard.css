@@ -58,6 +58,22 @@
   object-fit: cover;
 }
 
+.catalog-cards .lib-card__abbr {
+  --abbr-inset: calc(var(--space-1) + (var(--size-touch) - var(--space-8)) / 2);
+  position: absolute;
+  inset-block-start: var(--abbr-inset);
+  inset-inline-start: var(--abbr-inset);
+  display: grid;
+  place-items: center;
+  height: var(--space-8);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--palette-black) 62%, transparent);
+  color: var(--palette-white);
+  font: var(--type-meta);
+  font-weight: 700;
+}
+
 [data-pm] .catalog-cards > li .test-card__body {
   gap: var(--space-1);
   padding: var(--space-3) var(--space-4) var(--space-4);

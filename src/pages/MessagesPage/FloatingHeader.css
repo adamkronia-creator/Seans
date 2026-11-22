@@ -1,0 +1,65 @@
+[data-pm] :is(.catalog-library, .messages--dialogs) {
+  --floating-inset: var(--space-3);
+  --floating-gap: var(--space-2);
+  --floating-chips-height: calc(var(--space-8) + var(--space-1) * 2);
+  --floating-controls-space: calc(var(--floating-row) + var(--floating-gap) + var(--floating-chips-height));
+  --floating-motion: 120ms ease-out;
+}
+
+/* Только верхняя строка лежит на затемнённом стекле. Капсула и сворачиваемый ряд выступают над списком. */
+:is(.catalog-library, .messages--dialogs) .chats-header {
+  position: relative;
+  flex: none;
+  gap: 0;
+  padding-block: 0;
+  pointer-events: none;
+}
+
+:is(.catalog-library, .messages--dialogs) .chats-header > :is(.chats-header__top, .screen-header__chips) {
+  pointer-events: auto;
+}
+
+[data-pm] :is(.catalog-library, .messages--dialogs) .chats-header::before {
+  display: none;
+}
+
+:is(.catalog-library, .messages--dialogs) .chats-header__top {
+  position: relative;
+  isolation: isolate;
+  height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
+  padding-block: calc(var(--space-4) + var(--safe-top)) var(--space-4);
+}
+
+[data-pm] :is(.catalog-library, .messages--dialogs) .chats-header__top::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+  pointer-events: none;
+  content: '';
+}
+
+/* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
+[data-pm] :is(.catalog-library, .messages--dialogs) .screen-header__chips {
+  --glass-fill: var(--glass-fill-header);
+  position: absolute;
+  inset-block-start: calc(100% + var(--floating-row) + var(--floating-gap) - var(--floating-shift));
+  inset-inline: var(--floating-inset);
+  height: var(--floating-chips-height);
+  margin: 0;
+  padding: 0;
+  border: var(--space-1) solid transparent;
+  border-radius: var(--radius-full);
+  background: var(--bg-field);
+  -webkit-backdrop-filter: blur(var(--space-2));
+  backdrop-filter: blur(var(--space-2));
+  transition: inset-block-start var(--floating-motion);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pm] :is(.catalog-library, .messages--dialogs) {
+    --floating-motion: 0s linear;
+  }
+}

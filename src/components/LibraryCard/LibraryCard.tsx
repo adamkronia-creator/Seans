@@ -44,6 +44,7 @@ export function LibraryCard({ test, cover, description, favorite, favoriteOnAvat
       <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />
+          {cover && test.abbr && <span className="lib-card__abbr">{test.abbr}</span>}
         </span>
         <span className="lib-card__check" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
