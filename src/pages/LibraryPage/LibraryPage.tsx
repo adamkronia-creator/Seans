@@ -1,5 +1,6 @@
 import { guardBack } from '../../router';
-import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type UIEvent } from 'react';
+import { IconClose } from '../../components/ChatParts/ChatIcons';
 import { Badge } from '../../components/Badge/Badge';
 import { Chip } from '../../components/Chip/Chip';
 import { EmptyState } from '../../components/EmptyState/EmptyState';
@@ -261,6 +262,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [sheet, setSheet] = useState<null | 'filters'>(null);
   const [focused, setFocused] = useState(false);
+  const [searchCollapsed, setSearchCollapsed] = useState(false);
+  const scrollSample = useRef<{ top: number; max: number } | null>(null);
   const [toast, say] = useToast();
   const [searching, setSearching] = useState(() => readLibraryView(kind).query !== '');
   // Системная «назад» закрывает поиск, а не уводит с вкладки
@@ -330,6 +333,32 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const resetKey = `${query}|${JSON.stringify(view.filters)}`;
 
   const index = Math.max(0, sections.indexOf(section));
+  useLayoutEffect(() => {
+    scrollSample.current = null;
+    setSearchCollapsed(false);
+  }, [index, resetKey, layout]);
+
+  const onCatalogScroll = (event: UIEvent<HTMLDivElement>) => {
+    const page = event.target;
+    if (!(page instanceof HTMLElement) || !page.matches('.library-page__page:not([inert] *)')) return;
+    const max = page.scrollHeight - page.clientHeight;
+    const top = Math.min(max, Math.max(0, page.scrollTop));
+    const previous = scrollSample.current;
+    if (top === 0 || focused) {
+      scrollSample.current = { top, max };
+      setSearchCollapsed(false);
+      return;
+    }
+    // Высота области меняется во время анимации. Не считаем коррекцию прокрутки сменой направления.
+    if (previous && max < previous.max && top === max && previous.top > max) {
+      scrollSample.current = { top, max };
+      return;
+    }
+    const delta = top - (previous?.top ?? 0);
+    if (Math.abs(delta) < 12) return;
+    scrollSample.current = { top, max };
+    setSearchCollapsed(delta > 0);
+  };
   const shown = dragIndex ?? index;
   // Соседние разделы нижней панели («Задания», «Диагностика», «Диалоги»): с последнего чипса влево — в следующий, с первого вправо — в
   // предыдущий (перед заданиями раздела нет). По списку это делает пейджер, по самим чипсам — жесты ниже
@@ -413,7 +442,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
             noun={labels.noun}
             everywhere={labels.everywhere}
             empty={emptyText(marksOf(id), wholeCatalog(id), labels.emptyRecent)}
-            tokens={tokens}
+            tokens={catalogDesign ? [] : tokens}
             resetKey={resetKey}
             pinned={pinned}
             selected={sel.ids}
@@ -500,6 +529,13 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const chipNodes = (
     <>
       {catalogDesign && filterButton}
+      {catalogDesign && tokens.map((token) => (
+        <button key={token.key} type="button" className="chip chip--follow catalog-filter-chip"
+          data-filtered="" aria-label={`Убрать фильтр: ${token.group} — ${token.label}`} onClick={token.onRemove}>
+          {token.label}
+          <IconClose />
+        </button>
+      ))}
       <Chip {...chip('all', labels.all)}>Все</Chip>
       <Chip {...chip(FAVORITES, 'Избранное')}>Избранное</Chip>
       {showRecentSection && <Chip {...chip(RECENT, catalogDesign ? 'Недавние' : 'Недавнее')}>{catalogDesign ? 'Недавние' : 'Недавнее'}</Chip>}
@@ -531,7 +567,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     row.querySelectorAll('.chip').forEach((c) => watch.observe(c));
     void document.fonts?.ready.then(place);
     return () => watch.disconnect();
-  }, [chatLike, index, order, liveOrder, searching]);
+  }, [chatLike, index, order, liveOrder, searching, tokens]);
 
   const suggestions = showSuggest && (
     <SuggestPanel
@@ -549,7 +585,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   return (
-    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
+    <section ref={root} className={chatLike ? `library-page messages${catalogDesign ? ' catalog-library' : recentItems.length === 0 ? ' library-page--bare' : ''}` : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined} data-search-collapsed={catalogDesign && searchCollapsed && !focused ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={!catalogDesign && searching}
@@ -564,7 +600,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
           aside={catalogDesign ? <TestCatalogLayout layout={layout} onLayout={setLayout} /> : filterButton}
           onAvatarClick={catalogDesign ? () => switchTab('profile') : undefined}
           inlineSearch={catalogDesign ? (
-            <div className="catalog-search">
+            <div className="catalog-search" {...({ inert: searchCollapsed && !focused ? '' : undefined } as object)}>
               <SearchField
                 value={view.query}
                 onChange={(value) => setQuery(kind, value)}
@@ -609,7 +645,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
       />
       )}
 
-      <div className="library-page__body">
+      <div className="library-page__body" onScrollCapture={catalogDesign ? onCatalogScroll : undefined}>
         <SwipePager key={order} index={index} pages={pages} onIndexChange={(i) => setSection(sections[i])} onPosition={onPosition} onDrag={onDrag} onEdgeSwipe={chatLike ? (d) => (d > 0 ? switchTab(nextTab, 'slide-next') : prevTab && switchTab(prevTab, 'slide-prev')) : undefined} />
         {!catalogDesign && suggestions}
       </div>

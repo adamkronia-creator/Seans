@@ -6,16 +6,80 @@
 .catalog-library .chats-header {
   position: relative;
   flex: none;
+  gap: 0;
+  padding-top: 0;
+}
+
+[data-pm] .catalog-library .chats-header::before,
+.catalog-library .chats-header__belt {
+  display: none;
+}
+
+.catalog-library .chats-header__top {
+  position: relative;
+  isolation: isolate;
+  height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
+  padding-block: calc(var(--space-4) + var(--safe-top)) var(--space-4);
+}
+
+[data-pm] .catalog-library .chats-header__top::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass-fill-header);
+  -webkit-backdrop-filter: var(--glass-filter-panel);
+  backdrop-filter: var(--glass-filter-panel);
+  pointer-events: none;
+  content: '';
 }
 
 .catalog-search {
   position: relative;
+  z-index: 2;
+  height: var(--size-touch);
+  margin-block-end: var(--space-4);
   margin-inline: var(--page-gutter);
+  overflow: clip;
+  transition: height var(--collapse-time) var(--collapse-ease),
+    margin-block-end var(--collapse-time) var(--collapse-ease), opacity var(--collapse-time) ease-out;
 }
 
-.catalog-library .catalog-search .search-field {
+.catalog-search:has(.suggest) {
+  overflow: visible;
+}
+
+[data-pm] .catalog-library .catalog-search .search-field {
   height: var(--size-touch);
+  border: var(--hairline) solid var(--catalog-line);
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   animation: none;
+}
+
+.catalog-library[data-search-collapsed] .catalog-search {
+  height: 0;
+  margin-block-end: 0;
+  overflow: clip;
+  opacity: 0;
+}
+
+[data-pm] .catalog-library .screen-header__chips {
+  margin: 0 var(--page-gutter);
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  transition: background-color var(--collapse-time) ease-out;
+}
+
+[data-pm] .catalog-library[data-search-collapsed]:not([data-selecting]) .screen-header__chips {
+  background-color: var(--glass-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-library .catalog-search,
+  [data-pm] .catalog-library .screen-header__chips {
+    transition: none;
+  }
 }
 
 .catalog-library.messages .catalog-search .suggest {
@@ -34,11 +98,6 @@
 
 [data-pm] .screen-header__chips .catalog-filter-chip[data-filtered] {
   color: var(--action-primary-text);
-}
-
-[data-pm] .screen-header__chips .catalog-filter-chip[data-filtered]::before {
-  border-color: var(--glass-border-blue);
-  background: var(--glass-chip-active);
 }
 
 [data-pm] .catalog-library.messages .library-page__page {

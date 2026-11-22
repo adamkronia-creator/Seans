@@ -484,7 +484,8 @@ html:has([data-pm]) body {
 }
 
 /* Синее стекло: выбранный чипс (с рамкой) и круги «Избранное» и «Архивы» (без рамки; заливка круга — градиент акцента на 50%) */
-[data-pm] .chips-pill {
+[data-pm] .chips-pill,
+[data-pm] .screen-header__chips .catalog-filter-chip[data-filtered]::before {
   box-sizing: border-box;
   border: var(--active-ring-width) solid var(--active-ring-color);
   background: var(--glass-chip-active);
