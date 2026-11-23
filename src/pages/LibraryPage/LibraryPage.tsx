@@ -651,7 +651,6 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
               {suggestions}
             </div>
           }
-          belt={null}
           chips={chipNodes}
           selection={sel.header()}
         />

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type UIEvent } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { markRead, useChats } from '../../data/chatStore';
 import { countText, isMember, useAllGroups } from '../../data/groups';
 import { ChatItem } from '../../components/ChatItem/ChatItem';
@@ -20,7 +20,7 @@ import { useFolders } from '../../data/folders';
 import { guardBack, navigate } from '../../router';
 import { followChips, placePill, type PositionVia } from '../../utils/followChips';
 import { centerChips } from '../../utils/centerChips';
-import { floatingRowProgress } from '../../utils/floatingRow';
+import { StoriesRow } from '../../components/Stories/Stories';
 import './MessagesPage.css';
 
 /** 'all' или номер папки */
@@ -36,6 +36,7 @@ const ChatList = memo(function ChatList({
   found,
   onOpenFound,
   folderId,
+  storiesRoot,
   onSearchEverywhere,
   onClearQuery,
 }: {
@@ -50,6 +51,7 @@ const ChatList = memo(function ChatList({
   /** Что показано сейчас (поисковый запрос): пока он тот же, перестановка строк — движение, а не замена списка */
   view: string;
   folderId?: string;
+  storiesRoot: HTMLElement | null;
   onSearchEverywhere: () => void;
   onClearQuery: () => void;
 }) {
@@ -68,6 +70,7 @@ const ChatList = memo(function ChatList({
 
   return chats.length > 0 || found.length > 0 ? (
     <div ref={scroller} className="messages__list">
+      {storiesRoot && <StoriesRow root={storiesRoot} chats={chats} includeOwn={!folderId} />}
       <ul ref={rows} className="messages__rows">
         {favorites && <ChatItem chat={favorites} onClick={onOpen} />}
         {favorites && others.length > 0 && <li className="messages__divider" role="separator" />}
@@ -108,7 +111,6 @@ const ChatList = memo(function ChatList({
 export function MessagesPage() {
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
-  const [storiesScrolledAway, setStoriesScrolledAway] = useState(false);
   const searchInput = useRef<HTMLInputElement>(null);
   // Системная «назад» закрывает поиск, а не уводит с вкладки
   useEffect(() => {
@@ -188,7 +190,7 @@ export function MessagesPage() {
 
   // Долгое нажатие на строку включает выбор, дальше нажатие выбирает и снимает; вне выбора строка открывает чат
   const { toggle, selecting } = sel;
-  /** Когда выбрали строку долгим нажатием: список тут же сдвигается, и отпускание пальца может попасть в соседнюю строку */
+  /** При долгом нажатии отпускание пальца может попасть в соседнюю строку. */
   const heldAt = useRef(0);
   const tapChat = useCallback(
     (chat: Chat) => {
@@ -231,6 +233,7 @@ export function MessagesPage() {
           chats={lists[i]}
           found={id === 'all' ? found : []}
           folderId={id === 'all' ? undefined : id}
+          storiesRoot={searching || selecting ? null : screen}
           onOpen={tapChat}
           onMenu={holdChat}
           onOpenFound={openFound}
@@ -241,29 +244,10 @@ export function MessagesPage() {
         />
       ),
     })),
-    [filters, lists, tapChat, holdChat, sel.ids, query, found, openFound, searchEverywhere, clearQuery],
+    [filters, lists, tapChat, holdChat, sel.ids, query, found, openFound, searchEverywhere, clearQuery, searching, selecting, screen],
   );
 
   const index = Math.max(0, filters.indexOf(filter));
-  const syncStoriesScroll = useCallback((scroller: HTMLElement | null) => {
-    const screen = root.current;
-    const belt = screen?.querySelector<HTMLElement>('.chats-header__belt');
-    if (!screen || !belt) return;
-    const height = belt.offsetHeight;
-    const { offset, opacity } = floatingRowProgress(height, scroller?.scrollTop ?? 0);
-    screen.style.setProperty('--stories-offset', `${offset}px`);
-    screen.style.setProperty('--stories-opacity', String(opacity));
-    setStoriesScrolledAway(height > 0 && offset >= height);
-  }, []);
-
-  useLayoutEffect(() => {
-    syncStoriesScroll(root.current?.querySelector<HTMLElement>('.swipe-pager__page:not([inert]) > .messages__list') ?? null);
-  }, [index, order, query, searching, selecting, syncStoriesScroll]);
-
-  const onListScroll = (event: UIEvent<HTMLElement>) => {
-    const scroller = event.target;
-    if (scroller instanceof HTMLElement && scroller.matches('.messages__list:not([inert] *)')) syncStoriesScroll(scroller);
-  };
   // Свайп по самим чипсам: с «Все» вправо — в тесты, с последнего чипса влево — в профиль (по списку это делает пейджер)
   const onChips = (origin: Element) => Boolean(origin.closest('.screen-header__chips'));
   const atStart = useRef(true);
@@ -313,15 +297,13 @@ export function MessagesPage() {
   }, [index, order, liveOrder, countsKey, searching]);
 
   return (
-    <section ref={setRoot} className="messages messages--dialogs" data-selecting={selecting ? '' : undefined} data-searching={searching ? '' : undefined} onScrollCapture={onListScroll}>
+    <section ref={setRoot} className="messages messages--dialogs" data-selecting={selecting ? '' : undefined} data-searching={searching ? '' : undefined}>
       <ChatsHeader
         searching={searching}
         onSearching={setSearching}
         query={query}
         onQuery={setQuery}
         showArchive
-        storiesRoot={screen}
-        storiesScrolledAway={storiesScrolledAway}
         inputRef={searchInput}
         selection={sel.header(chats)}
         chips={

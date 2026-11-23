@@ -2,7 +2,6 @@ import { useEffect, useRef, type KeyboardEvent, type ReactNode, type Ref } from 
 import { IconArchiveMk, IconBellMk, IconSearchMk } from '../../components/ChatItem/ChatIcons';
 import { SearchField } from '../../components/SearchField/SearchField';
 import { useAvatarSrc } from '../../data/profile';
-import { StoriesRow } from '../../components/Stories/Stories';
 import { navigate } from '../../router';
 import './FloatingHeader.css';
 
@@ -13,11 +12,8 @@ interface ChatsHeaderProps {
   onQuery: (q: string) => void;
   chips: ReactNode;
   chipsRef?: Ref<HTMLDivElement>;
-  /** Экран, поверх которого открываются истории */
-  storiesRoot?: HTMLElement | null;
-  storiesScrolledAway?: boolean;
   showArchive?: boolean;
-  /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений и ряд вместо историй */
+  /** Другой раздел той же шапки (тесты): заголовок, подпись, поле поиска, кнопка справа вместо уведомлений */
   title?: string;
   status?: string;
   heading?: string;
@@ -27,8 +23,6 @@ interface ChatsHeaderProps {
   /** Постоянное поле поиска под верхней строкой, например в каталоге тестов. */
   inlineSearch?: ReactNode;
   onAvatarClick?: () => void;
-  /** Кнопка «+» справа от уведомлений: новый чат, группа или канал */
-  belt?: ReactNode;
   inputRef?: Ref<HTMLInputElement>;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -48,8 +42,6 @@ export function ChatsHeader({
   onQuery,
   chips,
   chipsRef,
-  storiesRoot = null,
-  storiesScrolledAway = false,
   showArchive = false,
   title = 'Чаты',
   status = 'Ваши диалоги',
@@ -59,7 +51,6 @@ export function ChatsHeader({
   aside,
   inlineSearch,
   onAvatarClick,
-  belt,
   inputRef,
   onFocus,
   onBlur,
@@ -70,8 +61,6 @@ export function ChatsHeader({
   const own = useRef<HTMLInputElement>(null);
   const searchButton = useRef<HTMLButtonElement>(null);
   const restoreSearchFocus = useRef(false);
-  const collapseBelt = searching || Boolean(selection) || belt === null;
-  const hideBelt = collapseBelt || storiesScrolledAway;
   const input = inputRef ?? own;
   useEffect(() => {
     if (searching) (input as { current: HTMLInputElement | null }).current?.focus({ preventScroll: true });
@@ -158,9 +147,6 @@ export function ChatsHeader({
       )}
       {!selection && inlineSearch}
       {chipsRow}
-      <div className="chats-header__belt" data-collapsed={collapseBelt ? '' : undefined} aria-hidden={hideBelt || undefined} {...({ inert: hideBelt ? '' : undefined } as object)}>
-        <div className="chats-header__belt-inner">{belt === undefined ? <StoriesRow root={storiesRoot} /> : belt}</div>
-      </div>
     </header>
   );
 }

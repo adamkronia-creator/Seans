@@ -4,7 +4,7 @@
  */
 .messages {
   /* Шапка: безопасная зона и space-4 до фото, строка с фото (size-avatar-sm), space-4 до чипсов, чипсы (space-8), space-3 и линия, как у нижней панели */
-  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-16) + var(--space-1) + var(--space-4) + var(--space-4) + var(--space-8) + var(--space-3));
+  --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
   /* Плавающая нижняя панель: высота, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
   --pm-bottom: var(--scroll-bottom-tabbar);
   /* Подсказка (уведомления папки, чат в архиве) стоит над нижней панелью */
@@ -178,51 +178,11 @@
   }
 }
 
-/* Высота над списком резервируется сразу, а истории и чипсы двигаются вместе с прокруткой. */
+/* Закреплённая капсула фильтров поверх списка, истории идут первой строкой списка. */
 [data-pm] .messages.messages--dialogs {
-  --stories-row-height: calc(var(--space-16) + var(--space-1) * 2 + var(--space-4));
-  --floating-row: calc(var(--stories-row-height) + var(--floating-gap));
-  --floating-shift: var(--stories-offset, 0px);
   --floating-chips-offset: 0px;
   --pm-top: var(--floating-controls-space);
-}
-
-[data-pm] .messages--dialogs:is([data-selecting], [data-searching]) {
   --floating-row: 0px;
-  --floating-shift: 0px;
-}
-
-.messages--dialogs .messages__list {
-  padding-top: var(--pm-top);
-  scroll-padding-top: calc(var(--pm-top) - var(--floating-shift));
-}
-
-.messages--dialogs .chats-header__belt {
-  position: absolute;
-  inset-block-start: calc(100% + var(--floating-gap) + var(--floating-chips-height));
-  inset-inline: 0;
-  display: block;
-  height: var(--floating-row);
-  padding-block-start: var(--floating-gap);
-  overflow: clip;
-  transition: none;
-}
-
-.messages--dialogs .chats-header__belt[data-collapsed] {
-  margin: 0;
-  padding: 0;
-  visibility: hidden;
-}
-
-.messages--dialogs .chats-header__belt-inner {
-  overflow: visible;
-  opacity: var(--stories-opacity, 1);
-  translate: 0 calc(-1 * var(--floating-shift));
-  transition: translate var(--floating-motion), opacity var(--floating-motion);
-}
-
-.messages--dialogs .chats-header__belt:not([inert]) .stories {
-  pointer-events: auto;
 }
 
 @media (max-width: 360px) {
@@ -290,24 +250,6 @@
   background: var(--glass-strong);
 }
 
-/* Истории сворачиваются при поиске и выборе чатов: высота плавно уходит в ноль вместе с зазором под ними, список поднимается следом */
-.chats-header__belt {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows var(--collapse-time) var(--collapse-ease), margin-bottom var(--collapse-time) var(--collapse-ease), opacity var(--collapse-fade-time) ease-out;
-}
-
-.chats-header__belt-inner {
-  min-height: 0;
-  overflow: hidden;
-}
-
-.chats-header__belt[data-collapsed] {
-  grid-template-rows: 0fr;
-  margin-bottom: calc(var(--space-4) * -1);
-  opacity: 0;
-}
-
 .messages:is([data-selecting], [data-searching], .library-page--bare) {
   --pm-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-4) + var(--space-8) + var(--space-3));
 }
@@ -317,7 +259,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chats-header__belt,
   .messages__list,
   .messages__empty {
     transition: none;
@@ -336,7 +277,7 @@
   margin-left: var(--space-3);
 }
 
-/* Строка выбора выезжает сверху вместе со сворачиванием историй, обычная после неё проявляется; число при каждом изменении чуть всплывает */
+/* Строка выбора выезжает сверху, обычная после неё проявляется; число при каждом изменении чуть всплывает */
 .chats-header__top--select {
   animation: drop-in var(--dur-base) var(--ease-ios) backwards;
 }
@@ -357,7 +298,7 @@
   }
 }
 
-/* Список не должен «держаться за строки» при сдвиге отступа (выбор чатов): иначе прокрутка сбрасывается и спрятанная строка «Архивы» выезжает */
+/* При удалении строк или скрытии историй в режиме выбора сохраняем позицию прокрутки. */
 .messages__list {
   overflow-anchor: none;
 }

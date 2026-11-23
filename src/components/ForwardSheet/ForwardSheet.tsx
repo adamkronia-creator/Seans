@@ -40,7 +40,7 @@ export function ForwardSheet({ onSend, onClose }: ForwardSheetProps) {
   return createPortal(
     <div className="fwd-page" data-pm role="dialog" aria-modal="true" aria-label="Переслать">
       <section className="messages fwd-page__in">
-        <ChatsHeader searching onSearching={(on) => !on && onClose()} query={query} onQuery={setQuery} placeholder="Кому переслать" heading="Переслать" belt={null} chips={null} />
+        <ChatsHeader searching onSearching={(on) => !on && onClose()} query={query} onQuery={setQuery} placeholder="Кому переслать" heading="Переслать" chips={null} />
         <div className="messages__list">
           <ul className="messages__rows">
             {favorites && <ChatItem chat={favorites} onClick={() => toggle(favorites.id)} selected={picked.includes(favorites.id)} />}

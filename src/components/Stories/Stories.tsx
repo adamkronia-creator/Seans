@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { addStory, isSeen, markSeen, STORY_BACKGROUNDS, useStoryAuthors, type StoryAuthor } from '../../data/stories';
+import type { Chat } from '../../data/chats';
 import { useAvatarSrc } from '../../data/profile';
 import { navigate } from '../../router';
 import { Avatar } from '../Avatar/Avatar';
@@ -15,14 +16,22 @@ const STORY_MS = 5000;
 const firstName = (name: string) => name.split(' ')[0];
 
 /**
- * Ряд историй над чипсами (как в мессенджерах): «Вы» с плюсом, затем собеседники. У непросмотренных кольцо с градиентом и число
+ * Ряд в списке чатов: собеседники в порядке чатов, в «Все» первой идёт кнопка своих историй. У непросмотренных кольцо с градиентом и число
  * непросмотренных историй, у просмотренных кольцо серое. Нажатие открывает просмотр с этого человека.
  */
-export function StoriesRow({ root }: { root: HTMLElement | null }) {
-  const authors = useStoryAuthors();
+export function StoriesRow({ root, chats, includeOwn }: { root: HTMLElement; chats: Chat[]; includeOwn: boolean }) {
+  const available = useStoryAuthors();
+  const authors = chats.flatMap((chat) => {
+    const author = available.find((item) => item.id === chat.id);
+    return author ? [author] : [];
+  });
+  const own = includeOwn && available.find((author) => author.id === 'me');
+  if (own) authors.unshift(own);
   const me = useAvatarSrc();
   const [viewing, setViewing] = useState<{ id: string; x: number; y: number } | null>(null);
   const [composing, setComposing] = useState(false);
+
+  if (!authors.length) return null;
 
   // Очередь просмотра: у кого есть истории (свои — первыми, если есть)
   const queue = authors.filter((a) => a.stories.length > 0);
@@ -30,12 +39,12 @@ export function StoriesRow({ root }: { root: HTMLElement | null }) {
   const open = (id: string, ring: Element | null) => {
     if (!queue.some((a) => a.id === id)) return;
     const from = ring?.getBoundingClientRect();
-    const to = root?.getBoundingClientRect();
+    const to = root.getBoundingClientRect();
     setViewing({ id, x: from && to ? from.left + from.width / 2 - to.left : 0, y: from && to ? from.top + from.height / 2 - to.top : 0 });
   };
 
   return (
-    <div className="stories" role="group" aria-label="Истории">
+    <div className="stories" role="group" aria-label="Истории" data-hscroll>
       {authors.map((a) => {
         const unseen = a.stories.filter((s) => !isSeen(s.id)).length;
         const has = a.stories.length > 0;
@@ -68,8 +77,8 @@ export function StoriesRow({ root }: { root: HTMLElement | null }) {
           </div>
         );
       })}
-      {viewing && root && createPortal(<StoryViewer queue={queue} startId={viewing.id} origin={viewing} onClose={() => setViewing(null)} />, root)}
-      {composing && root && createPortal(<StoryComposer onClose={() => setComposing(false)} onDone={() => setComposing(false)} />, root)}
+      {viewing && createPortal(<StoryViewer queue={queue} startId={viewing.id} origin={viewing} onClose={() => setViewing(null)} />, root)}
+      {composing && createPortal(<StoryComposer onClose={() => setComposing(false)} onDone={() => setComposing(false)} />, root)}
     </div>
   );
 }
