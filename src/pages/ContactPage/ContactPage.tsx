@@ -147,7 +147,7 @@ export function ContactPage({ chatId }: { chatId: string }) {
   ].filter((r): r is NonNullable<typeof r> => r !== null);
 
   return (
-    <section ref={setScreen} className="fp ct">
+    <section ref={setScreen} className="fp ct ct--contact">
       {/* «Назад» и «⋯» справа, как в шапке открытого чата */}
       <header className="fp__header ct__bar">
         <button type="button" className="fp__back" aria-label="Назад" onClick={back}>

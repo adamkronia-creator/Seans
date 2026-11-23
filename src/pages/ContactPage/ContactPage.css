@@ -1,6 +1,11 @@
 /* Профиль собеседника: на каркасе экрана «Настроить папку» (.fp).
    Шапка без подложки: «назад» слева и «⋯» справа, отступ от безопасной зоны 16 и поля 16, как у кнопок шапки открытого чата.
    Фото на всю ширину; снизу оно растворяется в фоне: светлая дымка при тёмном тексте и тёмная при белом (data-ink), на ней имя и роль. */
+[data-pm] .ct--contact {
+  --ct-scroll-bottom: var(--scroll-bottom-tabbar);
+  --toast-bottom: calc(var(--scroll-bottom-tabbar) + var(--space-4));
+}
+
 [data-pm] .ct .fp__header.ct__bar {
   justify-content: space-between;
   border-bottom: 0;
@@ -15,7 +20,7 @@
   --bar: var(--header-h);
   --ct-haze: color-mix(in srgb, var(--palette-white) 92%, transparent);
   gap: 0;
-  padding: 0 0 var(--scroll-bottom);
+  padding: 0 0 var(--ct-scroll-bottom, var(--scroll-bottom));
   overflow-anchor: none;
 }
 
@@ -406,6 +411,10 @@
 }
 
 /* «Личная информация» контакта: как «Описание теста» — одна рамка вокруг карточки и кнопки «Читать далее» (.ts-desc-unit), поля даёт сама колонка */
+[data-pm] .ct__personal {
+  --read-more-gap: 1px; /* grid:ok — прозрачный просвет как в профиле */
+}
+
 [data-pm] .ct__personal > .profile__card {
   margin: 0;
   border: 0;

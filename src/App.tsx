@@ -240,15 +240,7 @@ export default function App() {
           };
         }
         if (contact) {
-          return {
-            key: `chat/${chatId}/contact`,
-            pm: true,
-            build: () => (
-              <main className="app__content">
-                <ContactPage chatId={chatId} />
-              </main>
-            ),
-          };
+          return page(`chat/${chatId}/contact`, <ContactPage chatId={chatId} />, at, true);
         }
         if (kind === 'comments') {
           return {

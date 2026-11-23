@@ -505,7 +505,7 @@ html:has([data-pm]) body {
    Капсула из двух слоёв. Внешний (.tabbar-glass) стоит на месте и только размывает всё под собой. Внутренний (.tabbar) — заливка, рамка,
    тень, значки и плашка, он получает имя при переходе между экранами (motion.css). Размытие нельзя держать на самом внутреннем:
    у элемента с именем перехода Chrome его не рисует, и пока браузер снимает экран, строки под капсулой проглядывали бы чёткими */
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar-glass {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar-glass {
   display: block;
   position: absolute;
   right: var(--space-4);
@@ -517,7 +517,7 @@ html:has([data-pm]) body {
   backdrop-filter: var(--glass-filter-panel);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar {
   position: relative;
   right: auto;
   bottom: auto;
@@ -530,18 +530,18 @@ html:has([data-pm]) body {
   box-shadow: var(--glass-shadow-panel);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar__item {
   height: calc(var(--size-bar) - var(--space-2));
   border-radius: var(--radius-full);
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item--active {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar__item--active {
   background: none;
   box-shadow: none;
 }
 
 /* Плашка выбранного раздела одна на всю панель и скользит к новому разделу: ширина — четверть внутренней ширины, сдвиг — на номер раздела */
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__pill {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar__pill {
   position: absolute;
   top: var(--space-1);
   left: var(--space-1);
@@ -556,12 +556,12 @@ html:has([data-pm]) body {
   pointer-events: none;
 }
 
-[data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__item {
+[data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar__item {
   position: relative;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-pm]:is(:has(.messages), :has(.chat), :has(.profile), :has(.test-settings), :has(.events)) .tabbar__pill {
+  [data-pm]:has(.messages, .chat, .profile, .test-settings, .events, .ct--contact) .tabbar__pill {
     transition: none;
   }
 }
