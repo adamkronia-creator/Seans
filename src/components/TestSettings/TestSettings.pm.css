@@ -127,7 +127,7 @@
   font: var(--type-label);
 }
 
-/* Фон только у кнопки «Читать далее»: тот же тон, что у карточек вокруг (подложка пузыря чата --glass-bubble-in на цветном фоне выходила темнее) */
+/* Та же подложка, что у кнопки «Посмотреть» в профиле. */
 [data-pm] .ts-desc__toggle {
   background: var(--glass-card);
 }
@@ -510,11 +510,12 @@
   height: 32px;
 }
 
-/* «Читать далее» — отдельная плитка, как в описании теста: между текстом и кнопкой просвет 4, поля у плитки нет */
+/* «Читать далее» и «Скрыть» отделены от текста просветом, как в настройках теста. */
 [data-pm] .blank-card__body:has(> .cc-part) {
+  --cc-detail-gap: var(--read-more-gap, var(--space-1));
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--cc-detail-gap);
   background: none;
 }
 
@@ -527,14 +528,9 @@
   padding: 0;
 }
 
-/* Свёрнутые диапазоны не оставляют просвета */
-[data-pm] .cc-rest:not(.cc-rest--open) {
-  margin-top: calc(-1 * var(--space-1));
-}
-
-/* Развёрнутые диапазоны продолжают текст без разрыва, а внизу нет линии: просвет остаётся только перед «Скрыть» */
-[data-pm] .cc-rest--open {
-  margin-top: calc(-1 * var(--space-1));
+/* У свёрнутых диапазонов просвета нет, раскрытые продолжают предыдущий диапазон. */
+[data-pm] .cc-rest {
+  margin-top: calc(-1 * var(--cc-detail-gap));
 }
 
 [data-pm] .cc-rest .cc-level--flat:last-child {
