@@ -13,6 +13,7 @@ import './CatalogCard.css';
 interface LibraryCardProps {
   test: LibraryItem;
   cover?: string;
+  coverBadge?: string;
   description?: string;
   favorite: boolean;
   favoriteOnAvatar?: boolean;
@@ -34,7 +35,7 @@ interface LibraryCardProps {
 }
 
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
-export function LibraryCard({ test, cover, description, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
+export function LibraryCard({ test, cover, coverBadge = test.abbr, description, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
@@ -44,7 +45,7 @@ export function LibraryCard({ test, cover, description, favorite, favoriteOnAvat
       <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />
-          {cover && test.abbr && <span className="lib-card__abbr">{test.abbr}</span>}
+          {cover && coverBadge && <span className="lib-card__abbr">{coverBadge}</span>}
         </span>
         <span className="lib-card__check" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

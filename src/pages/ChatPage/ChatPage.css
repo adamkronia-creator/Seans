@@ -23,7 +23,7 @@
   /* Шапка: безопасная зона, space-4 до фото, фото (size-avatar-sm), space-3 до низа подложки, как у «Диалогов» без историй и чипсов */
   --chat-top: calc(var(--safe-top) + var(--space-4) + var(--size-avatar-sm) + var(--space-3) + var(--chat-pin, 0px));
   /* Плавающая нижняя капсула приложения: высота панели, отступ над безопасной зоной space-3 и запас space-4 под последней строкой */
-  --chat-tabs: calc(var(--size-bar) + var(--safe-bottom) + var(--space-3) + var(--space-4));
+  --chat-tabs: var(--scroll-bottom-tabbar);
   /* Подсказка стоит над капсулой */
   --toast-bottom: calc(var(--chat-tabs) + var(--space-4));
   position: relative;

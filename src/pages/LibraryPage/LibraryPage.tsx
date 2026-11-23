@@ -21,7 +21,7 @@ import { recentIds, useClientData } from '../../data/clientStore';
 import { useFolderEditing, useFrozenWhile } from '../../data/folderEdit';
 import { useFolders } from '../../data/folders';
 import type { LibraryItem } from '../../data/library';
-import { TASK_META, type Kind } from '../../data/libraryMeta';
+import { TASK_META, taskApproachLabel, type Kind } from '../../data/libraryMeta';
 import {
   catalogOf,
   countFilters,
@@ -200,6 +200,7 @@ function LibraryList(p: ListProps) {
             key={id}
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
+            coverBadge={catalog.kind === 'task' ? taskApproachLabel(id) : undefined}
             description={illustratedTest ? testCardDescription(id) : undefined}
             favorite={ctx.favorites.has(id)}
             favoriteOnAvatar={p.catalogLayout === 'list'}

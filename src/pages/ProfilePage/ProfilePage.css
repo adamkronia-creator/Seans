@@ -655,12 +655,12 @@
   object-fit: cover;
 }
 
-/* Нижний ряд панели: две стеклянные кнопки рядом, как кнопки под сообщениями с тестами (высота 40, акцентная подпись, углы 4) */
+/* Галерея и кнопки разделены прозрачным просветом, как в «Личной информации». */
 .profile__photos {
   display: flex;
   margin: 0 var(--space-4);
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
 }
 
 /* Нижние углы панели почти прямые (4), как у пузыря с кнопками: панель и кнопки читаются одним блоком */
@@ -672,7 +672,7 @@
 
 .profile__foot {
   display: flex;
-  gap: var(--space-1);
+  gap: 1px; /* grid:ok — просвет-разделитель 1 px */
 }
 
 .profile__foot-button {
@@ -685,7 +685,7 @@
   min-height: var(--row-h);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-xs);
-  background: var(--glass-bubble-in);
+  background: var(--glass-card);
   color: var(--text-link);
   font: var(--type-label);
   text-align: center;
