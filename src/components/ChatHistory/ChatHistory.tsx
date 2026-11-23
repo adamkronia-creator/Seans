@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type UIEvent } from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { EditSheet } from '../EditSheet/EditSheet';
@@ -27,6 +27,7 @@ import { findClientTaskResult } from '../../data/clientTaskResults';
 import { ScaleList } from './ScaleList';
 import { navigate } from '../../router';
 import { centerChips } from '../../utils/centerChips';
+import { useChipsDrag } from '../../utils/tabNav';
 import { followChips, type PositionVia } from '../../utils/followChips';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { paragraphsToText, textToParagraphs } from '../../data/case';
@@ -50,9 +51,6 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'task', label: 'Задания' },
   { id: 'note', label: 'Заметки' },
 ];
-
-/** Одиночные субпиксельные колебания при прокрутке не меняют направление. */
-const FILTER_SCROLL_DELTA = 8;
 
 const maxim = CHATS.find((c) => c.id === 'maxim')!;
 
@@ -180,7 +178,7 @@ function Card({ event, onEdit }: { event: HistoryEvent; onEdit: () => void }) {
 
 /**
  * События одного фильтра: страница пейджера со своей прокруткой. Как в переписке, свежее внизу и лента открывается на конце;
- * пока событий мало, они лежат у чипсов, а не у верха. У каждого фильтра свой конец и своя прокрутка, поэтому при смене фильтра
+ * пока событий мало, они лежат у нижней панели. У каждого фильтра свой конец и своя прокрутка, поэтому при смене фильтра
  * ничего не сдвигается по вертикали: страницы только скользят вбок.
  */
 const HistoryList = memo(function HistoryList({ events, onEdit }: { events: HistoryEvent[]; onEdit: (id: string) => void }) {
@@ -227,8 +225,7 @@ const HistoryList = memo(function HistoryList({ events, onEdit }: { events: Hist
 });
 
 /**
- * Вкладка «История взаимодействия» в открытом чате: лента событий (свежие внизу), под ней чипсы-фильтры, в самом низу учёт.
- * При движении к старым событиям ряд уходит вниз, а при движении к новым возвращается.
+ * Вкладка «История взаимодействия»: чипсы под шапкой, лента событий с новыми записями внизу.
  * Ленты разных фильтров — страницы пейджера: их можно листать пальцем, как разделы чата, а чипсы идут следом.
  * Пейджер вложенный: с последней ленты (и с первой, если листать назад) тот же жест листает уже разделы чата.
  */
@@ -239,8 +236,8 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const row = useRef<HTMLDivElement>(null);
-  const scrollPositions = useRef(new WeakMap<HTMLElement, { top: number; end: number }>());
-  const [filtersHidden, setFiltersHidden] = useState(false);
+  const chipPosition = useRef(0);
+  useChipsDrag(root);
   const data = useClientData();
   const events = useMemo(() => (hasData ? historyEvents(data) : []), [hasData, data]);
   const editing = events.find((e) => e.id === editingId);
@@ -254,18 +251,6 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     note: { value: n(countOf(data, 'note')) },
   };
 
-  // Панель чипсов лежит поверх лент (absolute): её высоту отдаём лентам, чтобы они кончались над ней
-  useEffect(() => {
-    const host = root.current;
-    const foot = host?.querySelector<HTMLElement>('.hist-foot');
-    if (!host || !foot) return;
-    const apply = () => host.style.setProperty('--foot-h', `${Math.round(foot.getBoundingClientRect().height)}px`);
-    const observer = new ResizeObserver(apply);
-    observer.observe(foot);
-    apply();
-    return () => observer.disconnect();
-  }, [events.length === 0]);
-
   const pages = useMemo(
     () =>
       FILTERS.map(({ id }) => ({
@@ -275,20 +260,6 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
     [events],
   );
 
-  useEffect(() => {
-    const scroller = root.current?.querySelector<HTMLElement>('.chat-history__pager > .swipe-pager__track > .swipe-pager__page:not([inert]) .chat-history');
-    if (!scroller) return;
-    const remember = () => {
-      const end = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-      scrollPositions.current.set(scroller, { top: Math.min(end, Math.max(0, scroller.scrollTop)), end });
-    };
-    remember();
-    const observer = new ResizeObserver(remember);
-    observer.observe(scroller);
-    if (scroller.firstElementChild) observer.observe(scroller.firstElementChild);
-    return () => observer.disconnect();
-  }, [filter, events.length === 0]);
-
   const index = FILTERS.findIndex((item) => item.id === filter);
   const shown = dragIndex ?? index;
 
@@ -297,38 +268,28 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   }, []);
 
   const onPosition = useCallback((position: number, via?: PositionVia) => {
+    chipPosition.current = position;
     const list = row.current;
     if (!list) return;
     followChips(list.querySelectorAll<HTMLElement>(':scope > .chip'), position, via);
     centerChips(list, position, '.chip', via);
   }, []);
 
-  const selectFilter = (id: HistoryFilter) => {
-    setFiltersHidden(false);
-    setFilter(id);
-  };
+  const hasEvents = events.length > 0;
+  useLayoutEffect(() => {
+    const list = row.current;
+    if (!list) return;
+    const place = () => onPosition(chipPosition.current);
+    place();
+    const resize = new ResizeObserver(place);
+    resize.observe(list);
+    list.querySelectorAll('.chip').forEach((chip) => resize.observe(chip));
+    return () => resize.disconnect();
+  }, [hasEvents, onPosition]);
 
-  const onHistoryScroll = (event: UIEvent<HTMLDivElement>) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement) || !target.matches('.chat-history:not([inert] *)')) return;
-    const end = Math.max(0, target.scrollHeight - target.clientHeight);
-    const top = Math.min(end, Math.max(0, target.scrollTop));
-    const previous = scrollPositions.current.get(target);
-    const nearEnd = end - top <= FILTER_SCROLL_DELTA;
-    // При открытии вкладки и изменении высоты ленты событие прокрутки приходит и без жеста.
-    if (!previous || previous.end !== end || nearEnd) {
-      scrollPositions.current.set(target, { top, end });
-      if (nearEnd && filtersHidden) setFiltersHidden(false);
-      return;
-    }
-    if (Math.abs(top - previous.top) < FILTER_SCROLL_DELTA) return;
-    scrollPositions.current.set(target, { top, end });
-    const hide = top < previous.top;
-    if (hide !== filtersHidden) setFiltersHidden(hide);
-  };
-
-  const foot = (
+  const chips = (
     <div ref={row} className="screen-header__chips hist-chips" role="group" aria-label="Фильтр событий" data-hscroll>
+      <span className="chips-pill" aria-hidden="true" />
       {FILTERS.map(({ id, label }, i) => {
         const c = counts[id];
         return (
@@ -338,7 +299,7 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
             tone="chat"
             active={shown === i}
             count={c ? (c.total ?? c.value) : undefined}
-            onClick={() => selectFilter(id)}
+            onClick={() => setFilter(id)}
             ariaLabel={c && c.total !== undefined ? `${label}: выполнено ${c.value} из ${c.total}` : c ? `${label}: ${c.value}` : label}
           >
             {label}
@@ -349,30 +310,22 @@ export function ChatHistory({ hasData }: { hasData: boolean }) {
   );
 
   return (
-    <div ref={root} className="hist-host" onScrollCapture={onHistoryScroll}>
-      {events.length === 0 ? (
+    <div ref={root} className="hist-host">
+      {!hasEvents ? (
         // Событий нет совсем: подсказка вместо пустых лент и чипсов с нулями
         <EmptyState icon={<IconTabLibrary />} title="История пока пуста" text="Здесь появятся сеансы, тесты, задания и заметки по этому клиенту." />
       ) : (
         <>
+          {chips}
           <SwipePager
             className="chat-history__pager"
             nested
             index={index}
             pages={pages}
-            onIndexChange={(i) => selectFilter(FILTERS[i].id)}
+            onIndexChange={(i) => setFilter(FILTERS[i].id)}
             onPosition={onPosition}
             onDrag={onDrag}
           />
-
-          <div
-            className="hist-foot"
-            data-hidden={filtersHidden || undefined}
-            aria-hidden={filtersHidden || undefined}
-            {...({ inert: filtersHidden ? '' : undefined } as object)}
-          >
-            {foot}
-          </div>
         </>
       )}
 

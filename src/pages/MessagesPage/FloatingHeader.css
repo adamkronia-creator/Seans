@@ -1,4 +1,4 @@
-[data-pm] :is(.catalog-library, .messages--dialogs) {
+[data-pm] :is(.catalog-library, .messages--dialogs, .hist-host) {
   --floating-inset: var(--space-3);
   --floating-gap: var(--space-2);
   --floating-chips-height: calc(var(--space-8) + var(--space-1) * 2);
@@ -42,10 +42,10 @@
 }
 
 /* Равномерная рамка задаёт скруглённую внутреннюю границу области прокрутки. */
-[data-pm] :is(.catalog-library, .messages--dialogs) .screen-header__chips {
+[data-pm] :is(.catalog-library, .messages--dialogs, .hist-host) .screen-header__chips {
   --glass-fill: var(--glass-fill-header);
   position: absolute;
-  inset-block-start: calc(100% + var(--floating-gap) + var(--floating-chips-offset, var(--floating-row) - var(--floating-shift)));
+  inset-block-start: calc(var(--floating-chips-anchor, 100%) + var(--floating-gap) + var(--floating-chips-offset, var(--floating-row) - var(--floating-shift)));
   inset-inline: var(--floating-inset);
   height: var(--floating-chips-height);
   margin: 0;
@@ -59,7 +59,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-pm] :is(.catalog-library, .messages--dialogs) {
+  [data-pm] :is(.catalog-library, .messages--dialogs, .hist-host) {
     --floating-motion: 0s linear;
   }
 }

@@ -1,17 +1,23 @@
 /*
- * Вкладка «История взаимодействия» на системе мессенджера: сверху лента событий (свежие внизу), под ней выезжающий ряд чипсов-фильтров со счётчиками
- * («6 Сеансы», «5/6 Тесты»), ниже нижняя капсула приложения. События — карточки белого стекла, слева круги цвета типа на сплошной линии времени.
- * Внутри пейджер лент по фильтрам, он во всю ширину, поэтому лента при листании уходит к краю экрана, а не обрезается у поля.
- * Верхний отступ ленты (под шапку) задаёт ChatPage.css. Размеры — токены сетки 4; вне сетки только линии в 1 px и рамка комментария 2 px.
+ * Чипсы фильтров закреплены под шапкой. Ленты фильтров прокручиваются независимо и проходят под капсулой.
+ * Новые события внизу, слева от карточек — линия времени со значками и аватарками.
  */
 .hist-host {
-  --down-gap: var(--space-3); /* кнопка «в конец» над чипсами: 12 + 4 поля ряда = 16 */
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
-  /* Ряд двигается поверх ленты, не меняя её высоту при смене направления. */
-  position: relative;
+}
+
+[data-pm] .hist-host {
+  --floating-chips-anchor: var(--chat-top);
+  --floating-chips-offset: 0px;
+  --floating-row: 0px;
+}
+
+.hist-chips {
+  z-index: 2;
 }
 
 .chat-history {
@@ -39,41 +45,6 @@
 /* Событий нет: надпись по центру свободного места, а не прижата к панели фильтров */
 .chat-history > .hist-page:has(.hist-empty) {
   margin-block: auto;
-}
-
-/* Фильтры скрываются вниз, когда человек листает к старым событиям. */
-.hist-foot {
-  position: absolute;
-  right: var(--space-4);
-  bottom: var(--page-bottom, 0px);
-  left: var(--space-4);
-  z-index: 2;
-  transition: transform var(--collapse-time) var(--collapse-ease), opacity var(--collapse-fade-time) ease-out;
-}
-
-.hist-foot[data-hidden] {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(calc(100% + var(--page-bottom, 0px)));
-}
-
-[data-pm] .screen-header__chips.hist-chips {
-  margin: 0;
-  padding: var(--space-1);
-}
-
-[data-pm] .screen-header__chips.hist-chips .chip--follow::before {
-  display: none;
-}
-
-[data-pm] .hist-chips :is(.chip--follow, .chip--follow.chip--active) {
-  color: color-mix(in srgb, var(--text-link) calc(var(--w) * 100%), var(--text-primary));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hist-foot {
-    transition: none;
-  }
 }
 
 /* Лента: значки слева (x 16), линия по центру значков, карточки событий начинаются после рейки с аватарками */
@@ -333,7 +304,8 @@
   text-align: center;
 }
 
-/* Резерв под фильтрами не меняется при их скрытии, чтобы лента не перескакивала. */
 [data-pm] .chat .chat-history {
-  padding-bottom: calc(var(--page-bottom, 0px) + var(--foot-h, 0px));
+  padding-top: calc(var(--chat-top) + var(--floating-controls-space));
+  padding-bottom: var(--page-bottom);
+  scroll-padding: calc(var(--chat-top) + var(--floating-controls-space)) 0 var(--page-bottom);
 }
