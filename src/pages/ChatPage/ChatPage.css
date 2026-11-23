@@ -263,6 +263,10 @@
 
 [data-pm] .chat .chat-tests {
   padding-top: calc(var(--chat-top) + var(--space-4));
+}
+
+/* У карточек нижний отступ внутри прокручиваемой страницы статуса, чтобы она проходила под капсулой. */
+[data-pm] .chat .chat-tests:not(.chat-tests--catalog) {
   padding-bottom: var(--page-bottom);
 }
 
