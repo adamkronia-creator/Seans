@@ -1,6 +1,7 @@
 [data-pm] :is(.catalog-library, .messages--dialogs, .hist-host) {
   --floating-inset: var(--space-3);
   --floating-gap: var(--space-2);
+  --floating-header-height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
   --floating-chips-height: calc(var(--space-8) + var(--space-1) * 2);
   --floating-controls-space: calc(var(--floating-row) + var(--floating-gap) + var(--floating-chips-height));
   --floating-motion: 120ms ease-out;
@@ -26,7 +27,7 @@
 :is(.catalog-library, .messages--dialogs) .chats-header__top {
   position: relative;
   isolation: isolate;
-  height: calc(var(--size-avatar-sm) + var(--space-4) * 2 + var(--safe-top));
+  height: var(--floating-header-height);
   padding-block: calc(var(--space-4) + var(--safe-top)) var(--space-4);
 }
 

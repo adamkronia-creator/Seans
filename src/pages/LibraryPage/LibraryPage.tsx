@@ -616,7 +616,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   );
 
   return (
-    <section ref={root} className={chatLike ? 'library-page messages catalog-library' : 'library-page'} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
+    <section ref={root} className={chatLike ? 'library-page messages catalog-library' : 'library-page'} data-catalog-kind={kind} data-selecting={chatLike && sel.selecting ? '' : undefined} data-searching={chatLike && searching ? '' : undefined}>
       {chatLike ? (
         <ChatsHeader
           searching={false}

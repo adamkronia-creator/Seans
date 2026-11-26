@@ -7,6 +7,27 @@
   --floating-shift: var(--catalog-search-shift);
 }
 
+[data-pm] .catalog-library[data-catalog-kind='test'] {
+  --catalog-header-overlap: var(--floating-header-height);
+  --catalog-header-fill: color-mix(in srgb, var(--glass-fill-header) 80%, var(--bg-canvas));
+}
+
+:root[data-bg='solid'] [data-pm] .catalog-library[data-catalog-kind='test'] {
+  --catalog-header-fill: color-mix(in srgb, var(--user-bg-color) 65%, transparent);
+}
+
+/* Список проходит за шапкой, но верхний отступ оставляет первую карточку на прежнем месте. */
+[data-pm] .catalog-library[data-catalog-kind='test'] .library-page__body {
+  margin-block-start: calc(-1 * var(--catalog-header-overlap));
+}
+
+[data-pm] .catalog-library[data-catalog-kind='test'] .chats-header__top::before {
+  background: var(--catalog-header-fill);
+  -webkit-backdrop-filter: blur(var(--space-8));
+  backdrop-filter: blur(var(--space-8));
+  opacity: calc(1 - var(--catalog-search-opacity, 1));
+}
+
 [data-pm] .catalog-library:has(.catalog-search:focus-within),
 [data-pm] .catalog-library[data-selecting] {
   --catalog-search-shift: 0px;
@@ -128,9 +149,10 @@
 
 [data-pm] .catalog-library.messages .library-page__page {
   --pm-top: 0px;
+  --catalog-start: calc(var(--catalog-header-overlap, 0px) + var(--floating-controls-space) + var(--space-3));
   gap: var(--space-3);
-  padding: calc(var(--floating-controls-space) + var(--space-3)) var(--page-gutter) var(--pm-bottom);
-  scroll-padding-top: calc(var(--floating-controls-space) + var(--space-3) - var(--catalog-search-shift));
+  padding: var(--catalog-start) var(--page-gutter) var(--pm-bottom);
+  scroll-padding-top: calc(var(--catalog-start) - var(--catalog-search-shift));
 }
 
 [data-pm] .catalog-library.messages[data-selecting] .library-page__page {
