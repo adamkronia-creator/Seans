@@ -1,6 +1,7 @@
-import { LIBRARY, setFavorites, setPinned, useFavorites, usePinned } from '../../data/library';
+import { setFavorites, setPinned, useFavorites, usePinned } from '../../data/library';
 import { navigate } from '../../router';
 import { LibraryPage } from '../LibraryPage/LibraryPage';
+import { TESTS_WITH_PROTOTYPE } from './smolPrototype';
 
 /** Раздел «Психологические тесты»: библиотека всех тестов приложения */
 export function TestsPage() {
@@ -10,7 +11,7 @@ export function TestsPage() {
       chatLike
       title="Диагностика"
       searchPlaceholder="Поиск по тестам"
-      items={LIBRARY}
+      items={TESTS_WITH_PROTOTYPE}
       favorites={useFavorites()}
       pinned={usePinned()}
       onSetFavorites={setFavorites}

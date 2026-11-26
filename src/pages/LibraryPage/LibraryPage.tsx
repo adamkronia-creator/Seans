@@ -218,7 +218,7 @@ function LibraryList(p: ListProps) {
             marks={search?.words}
             pinned={p.pinned.has(id)}
             selected={p.selected.includes(id)}
-            onLongPress={p.onHold}
+            onLongPress={entry.item.prototype ? undefined : p.onHold}
           />
         );
       })}
@@ -427,7 +427,7 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
     onSetFavorites,
     onSetPinned,
     say,
-    canSend: (item) => kind === 'test' || Boolean(taskSettings(item)),
+    canSend: (item) => !item.prototype && (kind === 'test' || Boolean(taskSettings(item))),
   });
   useLayoutEffect(() => {
     if (catalogDesign) syncCatalogScroll(root.current?.querySelector<HTMLElement>('.swipe-pager__page:not([inert]) > .library-page__page') ?? null);
@@ -436,8 +436,8 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   const tap = useCallback(
     (item: LibraryItem, origin: HTMLElement) => {
       if (sel.justHeld()) return;
-      if (sel.selecting) sel.toggle(item);
-      else open(item, origin);
+      if (!sel.selecting) open(item, origin);
+      else if (!item.prototype) sel.toggle(item);
     },
     [sel.selecting, sel.toggle, sel.justHeld, open],
   );

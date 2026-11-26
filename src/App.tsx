@@ -18,7 +18,8 @@ import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { TasksPage } from './pages/TasksPage/TasksPage';
 import { TestsPage } from './pages/TestsPage/TestsPage';
 import { TaskSettings } from './components/TestSettings/TaskSettingsLazy';
-import { TestSettings } from './components/TestSettings/TestSettingsLazy';
+import { SmolPrototypePage, TestSettings } from './components/TestSettings/TestSettingsLazy';
+import { SMOL_PROTOTYPE } from './pages/TestsPage/smolPrototype';
 import { getChat } from './data/chatStore';
 import { getFolder, type FolderScope } from './data/folders';
 import { LIBRARY, TASK_LIBRARY } from './data/library';
@@ -356,6 +357,9 @@ export default function App() {
       if (folder) return folder;
       // /tests/<тест>: настройка теста из раздела «Психологические тесты»
       const testId = path.match(/^\/tests\/([^/]+)/)?.[1];
+      if (testId === SMOL_PROTOTYPE.id) {
+        return page(`tests/${testId}`, <SmolPrototypePage onBack={() => goBack('/tests/')} />, at, true);
+      }
       const test = testId ? LIBRARY.find((t) => t.id === testId) : undefined;
       return test ? page(`tests/${test.id}`, <TestSettings test={test} onBack={() => goBack('/')} />, at, true) : page('tests', <TestsPage />, at, true);
     }

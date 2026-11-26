@@ -26,6 +26,7 @@ interface TestPreviewProps {
   result: ResultMode;
   /** Время выполнения из описания теста («15–20 мин.») */
   duration?: string;
+  message?: string;
   /** С какого этапа открыть (в подсказках — нужный экран сразу) */
   initialStage?: Stage;
   /** Только экран телефона без вкладок этапов и рамки (макеты в подсказках); кнопки внизу те же, что у клиента */
@@ -45,7 +46,7 @@ interface TestPreviewProps {
 /** Сколько первых вопросов показывает предпросмотр в окне: остальные устроены так же */
 export const PREVIEW_QUESTIONS = 5;
 
-export function TestPreview({ test, blank: fullBlank, blind, result, duration, initialStage = 'start', bare, screen, onClose }: TestPreviewProps) {
+export function TestPreview({ test, blank: fullBlank, blind, result, duration, message = '', initialStage = 'start', bare, screen, onClose }: TestPreviewProps) {
   const blank = screen ? { ...fullBlank, questions: fullBlank.questions.slice(0, PREVIEW_QUESTIONS) } : fullBlank;
   // Номер слепого теста в предпросмотре: время открытия настроек; у настоящего теста он ставится при отправке
   const [title] = useState(() => blindTitle());
@@ -125,7 +126,7 @@ export function TestPreview({ test, blank: fullBlank, blind, result, duration, i
           </div>
           <TestHeader test={test} client={{ blind, title }} onClose={onClose} status="Тест от вашего специалиста" />
           <div className="test-settings__scroll tp__screen" key={stage} ref={screenRef}>
-            {stage === 'start' && <ClientIntro message="" rules={blank.rules} facts={testFacts(total, duration)} onOpenAll={() => setJumpOpen(true)} />}
+            {stage === 'start' && <ClientIntro message={message} rules={blank.rules} facts={testFacts(total, duration)} onOpenAll={() => setJumpOpen(true)} />}
             {stage === 'progress' && (
               <PassQuestion
                 data={blank}
