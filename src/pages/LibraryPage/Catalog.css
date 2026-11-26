@@ -7,11 +7,6 @@
   --floating-shift: var(--catalog-search-shift);
 }
 
-/* Шапка показывает тот же фоновый слой, что и список карточек. */
-[data-pm] .catalog-library[data-catalog-kind="test"] .chats-header__top::before {
-  content: none;
-}
-
 [data-pm] .catalog-library:has(.catalog-search:focus-within),
 [data-pm] .catalog-library[data-selecting] {
   --catalog-search-shift: 0px;
