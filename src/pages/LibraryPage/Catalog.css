@@ -7,8 +7,9 @@
   --floating-shift: var(--catalog-search-shift);
 }
 
-[data-pm] .catalog-library[data-catalog-kind="test"] {
-  --floating-header-fill: transparent;
+/* Шапка показывает тот же фоновый слой, что и список карточек. */
+[data-pm] .catalog-library[data-catalog-kind="test"] .chats-header__top::before {
+  content: none;
 }
 
 [data-pm] .catalog-library:has(.catalog-search:focus-within),
