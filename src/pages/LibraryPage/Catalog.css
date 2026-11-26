@@ -7,6 +7,10 @@
   --floating-shift: var(--catalog-search-shift);
 }
 
+[data-pm] .catalog-library[data-catalog-kind="test"] {
+  --floating-header-fill: transparent;
+}
+
 [data-pm] .catalog-library:has(.catalog-search:focus-within),
 [data-pm] .catalog-library[data-selecting] {
   --catalog-search-shift: 0px;
