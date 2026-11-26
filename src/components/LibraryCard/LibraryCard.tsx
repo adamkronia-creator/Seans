@@ -19,7 +19,7 @@ interface LibraryCardProps {
   favoriteOnAvatar?: boolean;
   onFavoriteChange?: (on: boolean) => void;
   selecting?: boolean;
-  onClick?: (test: LibraryItem) => void;
+  onClick?: (test: LibraryItem, origin: HTMLElement) => void;
   /** Строка сведений под описанием (у задания: «Дневник · КПТ · 5–7 мин на запись») — по ней материалы различают, не открывая */
   facts?: ReactNode;
   /** Почему найдено, если в названии и описании этого нет: «Шкала: Ипохондрия (Hs)» */
@@ -42,7 +42,7 @@ export function LibraryCard({ test, cover, coverBadge = test.abbr, description, 
   const newPin = useJustOn(pinned);
   return (
     <li className={`lib-card${favorite && !onFavoriteChange ? ' lib-card--fav' : ''}${favoriteOnAvatar ? ' lib-card--favorite-on-avatar' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
-      <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test)} {...handlers}>
+      <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test, e.currentTarget.closest('li') ?? e.currentTarget)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />
           {cover && coverBadge && <span className="lib-card__abbr">{coverBadge}</span>}

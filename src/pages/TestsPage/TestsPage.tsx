@@ -15,7 +15,7 @@ export function TestsPage() {
       pinned={usePinned()}
       onSetFavorites={setFavorites}
       onSetPinned={setPinned}
-      onOpen={(t) => navigate(`/tests/${t.id}`)}
+      onOpen={(t, origin) => navigate(`/tests/${t.id}`, 'forward', undefined, origin)}
       labels={{ all: 'Все тесты', filters: 'Фильтр тестов', emptyRecent: 'Вы ещё не присылали тесты', noun: ['тест', 'теста', 'тестов'], everywhere: 'Искать во всех тестах' }}
     />
   );

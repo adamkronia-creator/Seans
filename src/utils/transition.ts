@@ -41,7 +41,7 @@ const ENTER: Partial<Record<TransitionKind, Keyframe[]>> = {
  * Выполнить смену состояния (setState, переход по адресу) с анимацией экрана.
  * Смена идёт одним синхронным обновлением, поэтому в снимок «после» попадает уже готовый экран.
  */
-export function transition(update: () => void, kind: TransitionKind = 'fade'): void {
+export function transition(update: () => void, kind: TransitionKind = 'fade', origin?: HTMLElement): void {
   if (inside || kind === 'none' || reducedMotion()) {
     update();
     return;
@@ -56,11 +56,16 @@ export function transition(update: () => void, kind: TransitionKind = 'fade'): v
 
   // Направление читают стили: html[data-transition='forward'] ...; имя снимка `app` тоже появляется только на время перехода
   const id = ++serial;
-  root.dataset.transition = kind;
+  const source = origin?.isConnected && kind === 'forward' ? origin : undefined;
+  root.removeAttribute('data-expand-ready');
+  document.querySelector('[data-expand-source]')?.removeAttribute('data-expand-source');
+  source?.setAttribute('data-expand-source', '');
+  root.dataset.transition = source ? 'expand' : kind;
   const run = start.call(document, () => {
     inside = true;
     try {
       flushSync(update);
+      if (source && id === serial) root.setAttribute('data-expand-ready', '');
     } finally {
       inside = false;
     }
@@ -69,7 +74,11 @@ export function transition(update: () => void, kind: TransitionKind = 'fade'): v
   void run.finished
     .catch(() => undefined)
     .finally(() => {
-      if (id === serial) delete root.dataset.transition;
+      if (id === serial) {
+        delete root.dataset.transition;
+        root.removeAttribute('data-expand-ready');
+        source?.removeAttribute('data-expand-source');
+      }
       // Пока шёл переход, на месте экрана были его снимки: тем, кто ищет блоки под пальцем (полоса прокрутки), пора поискать снова
       window.dispatchEvent(new Event(TRANSITION_END));
     });

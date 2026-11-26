@@ -1,3 +1,4 @@
+import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
@@ -318,7 +319,11 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             type="button"
             className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
             aria-expanded={descOpen}
-            onClick={() => setDescOpen(!descOpen)}
+            onClick={(event) => {
+              const body = descRef.current;
+              anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
+                !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
+            }}
           >
             {descOpen ? 'Скрыть' : 'Читать далее'}
           </button>

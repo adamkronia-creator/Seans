@@ -72,7 +72,7 @@ interface LibraryPageProps {
   /** Закрепить или открепить сразу несколько */
   onSetPinned: (ids: string[], on: boolean) => void;
   /** Нажатие на карточку (открыть настройку) */
-  onOpen?: (item: LibraryItem) => void;
+  onOpen?: (item: LibraryItem, origin: HTMLElement) => void;
   /** Подписи для экранных читалок и пустых состояний; noun — «тест», «теста», «тестов» */
   /** Шапка и чипсы как в «Диалогах» */
   chatLike?: boolean;
@@ -129,7 +129,7 @@ interface ListProps {
   pinned: ReadonlySet<string>;
   selected: readonly string[];
   onHold: (item: LibraryItem) => void;
-  onOpen: (item: LibraryItem) => void;
+  onOpen: (item: LibraryItem, origin: HTMLElement) => void;
   onRelax: (r: Relaxation) => void;
   onResetFilters: () => void;
   onSetFavorites?: LibraryPageProps['onSetFavorites'];
@@ -409,10 +409,10 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   }, [query, tokens]);
 
   const open = useCallback(
-    (item: LibraryItem) => {
+    (item: LibraryItem, origin: HTMLElement) => {
       // Запрос читается в момент нажатия: обработчики карточек не пересоздаются при каждой букве
       rememberQuery(kind, readLibraryView(kind).query);
-      onOpen?.(item);
+      onOpen?.(item, origin);
     },
     [kind, onOpen],
   );
@@ -434,10 +434,10 @@ export function LibraryPage({ kind, title, searchPlaceholder, items, favorites, 
   }, [catalogDesign, index, order, resetKey, layout, sel.selecting, syncCatalogScroll]);
   // Пока идёт выбор, нажатие на строку выделяет её, а не открывает
   const tap = useCallback(
-    (item: LibraryItem) => {
+    (item: LibraryItem, origin: HTMLElement) => {
       if (sel.justHeld()) return;
       if (sel.selecting) sel.toggle(item);
-      else open(item);
+      else open(item, origin);
     },
     [sel.selecting, sel.toggle, sel.justHeld, open],
   );

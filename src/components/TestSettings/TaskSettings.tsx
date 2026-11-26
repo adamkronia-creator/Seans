@@ -1,3 +1,4 @@
+import { anchorToggle } from '../../utils/anchorToggle';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { IconTestChevron, IconTestMic } from '../icons';
 import { Switch } from '../Switch/Switch';
@@ -288,7 +289,11 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
               </div>
             </CollapseCard>
             {descLong && (
-              <button type="button" className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`} aria-expanded={descOpen} onClick={() => setDescOpen(!descOpen)}>
+              <button type="button" className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`} aria-expanded={descOpen} onClick={(event) => {
+                  const body = descRef.current;
+                  anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
+                    !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
+                }}>
                 {descOpen ? 'Скрыть' : 'Читать далее'}
               </button>
             )}

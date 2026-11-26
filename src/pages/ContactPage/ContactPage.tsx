@@ -1,3 +1,4 @@
+import { anchorToggle } from '../../utils/anchorToggle';
 import { useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Collapse } from '../../components/Collapse/Collapse';
 import { ContactSheetsHost } from './ContactSheetsHost';
@@ -265,7 +266,15 @@ export function ContactPage({ chatId }: { chatId: string }) {
                   className={`ts-desc__toggle${readMore ? ' ts-desc__toggle--open' : ''}`}
                   aria-controls={moreInfoId}
                   aria-expanded={readMore}
-                  onClick={() => setReadMore(!readMore)}
+                  onClick={(event) => {
+                    const details = document.getElementById(moreInfoId);
+                    anchorToggle(
+                      event.currentTarget,
+                      details?.closest<HTMLElement>('.collapse') ?? null,
+                      () => setReadMore(!readMore),
+                      !readMore && details ? { reveal: details } : undefined,
+                    );
+                  }}
                 >
                   {readMore ? 'Скрыть' : 'Читать далее'}
                 </button>

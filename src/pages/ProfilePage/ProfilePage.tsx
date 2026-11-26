@@ -1,6 +1,6 @@
 import { useOwnStories } from '../../data/stories';
 import { StoryTile, useOwnStoryMedia } from '../../components/Profile/StoryMedia';
-import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useRef, useState, type ChangeEvent, type MouseEvent, type ReactNode } from 'react';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { FieldIcon } from '../../components/Profile/FieldIcons';
 import { PhotoViewer } from '../../components/Profile/PhotoViewer';
@@ -34,7 +34,7 @@ const PHOTOS_SHOWN = 6;
 const ALBUMS_SHOWN = 3;
 
 /** Карточка с основными сведениями: строки как у личной информации, нажатие открывает редактирование */
-function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows: { label: string; value: string; icon: ReactNode }[]; onEdit: () => void }) {
+function InfoCard({ id, title, rows, onEdit }: { id: string; title: string; rows: { label: string; value: string; icon: ReactNode }[]; onEdit: (event: MouseEvent<HTMLButtonElement>) => void }) {
   return (
     <section className="profile__card" aria-labelledby={id}>
       <header className="profile__card-head">
@@ -94,10 +94,9 @@ export function ProfilePage() {
   const colleagues = chats.filter((chat) => chat.category === 'colleagues').length;
   const shown = photos.slice(0, PHOTOS_SHOWN);
 
-  // Карандаш просто открывает редактирование с начала: без перехода к полю и без клавиатуры
-  const edit = (_target?: string) => {
-    wantEdit();
-    navigate('/profile/edit');
+  const edit = (target?: string, trigger?: HTMLElement) => {
+    wantEdit(target);
+    navigate('/profile/edit', 'forward', undefined, trigger?.closest<HTMLElement>('.profile__card') ?? trigger);
   };
 
   const onFiles = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -221,7 +220,7 @@ export function ProfilePage() {
             { label: 'Никнейм', value: username, icon: FieldIcon.at },
             { label: 'Телефон', value: phone, icon: FieldIcon.phone },
           ]}
-          onEdit={() => edit()}
+          onEdit={(e) => edit('contacts', e.currentTarget)}
         />
         <InfoCard
           id="profile-general"
@@ -233,7 +232,7 @@ export function ProfilePage() {
             { label: 'Семейное положение', value: family, icon: FieldIcon.heart },
             { label: 'Пол', value: gender, icon: FieldIcon.user },
           ]}
-          onEdit={() => edit()}
+          onEdit={(e) => edit('general', e.currentTarget)}
         />
 
         <section className="profile__card" aria-labelledby="profile-info">
@@ -241,7 +240,7 @@ export function ProfilePage() {
             <h2 id="profile-info" className="profile__card-title">
               Личная информация
             </h2>
-            <button type="button" className="profile__card-button" aria-label="Редактировать личную информацию" onClick={() => edit(fields[0]?.id ?? 'add')}>
+            <button type="button" className="profile__card-button" aria-label="Редактировать личную информацию" onClick={(e) => edit(fields[0]?.id ?? 'add', e.currentTarget)}>
               <IconPencil />
             </button>
           </header>
@@ -249,7 +248,7 @@ export function ProfilePage() {
             <ul className="profile__fields">
               {fields.map((field) => (
                 <li key={field.id}>
-                  <button type="button" className="profile__field" onClick={() => edit(field.id)}>
+                  <button type="button" className="profile__field" onClick={(e) => edit(field.id, e.currentTarget)}>
                     <span className="profile__field-label">{field.label.trim() || 'Без названия'}</span>
                     <span className={`profile__field-value${field.value.trim() ? '' : ' profile__field-value--empty'}`}>
                       {field.value.trim() || 'Не заполнено'}
@@ -261,7 +260,7 @@ export function ProfilePage() {
           ) : (
             <p className="profile__empty">Здесь может быть всё, что вы хотите о себе рассказать: образование, подход, опыт, личный анализ.</p>
           )}
-          <button type="button" className="profile__add" onClick={() => edit('add')}>
+          <button type="button" className="profile__add" onClick={(e) => edit('add', e.currentTarget)}>
             Добавить информацию
           </button>
         </section>

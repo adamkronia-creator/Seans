@@ -169,10 +169,10 @@ export function ProfileEditPage() {
       if (addCard.current) reveal(box, addCard.current);
       return;
     }
-    const found = card(target);
-    if (!found) return;
-    reveal(box, found);
-    found.querySelector<HTMLTextAreaElement>('textarea')?.focus({ preventScroll: true });
+    const found = target === 'contacts' || target === 'general'
+      ? box.querySelector<HTMLElement>(`[data-edit-section="${target}"]`)
+      : card(target);
+    if (found) reveal(box, found);
   }, [target]);
 
   useLayoutEffect(() => {
@@ -280,7 +280,7 @@ export function ProfileEditPage() {
         <div className="pe__group">
           <h2 className="pe__group-title">Контактная информация</h2>
         </div>
-        <section className="pe__card" aria-label="Контактная информация">
+        <section className="pe__card" data-edit-section="contacts" aria-label="Контактная информация">
           <TextInput icon={FieldIcon.user} label="Имя пользователя" value={name} onChange={(v) => updateBasics({ name: v })} placeholder="Как к вам обращаться" max={80} />
           <TextInput icon={FieldIcon.at} label="Никнейм" value={username} onChange={(v) => updateBasics({ username: v.replace(/\s/g, '') })} placeholder="@nickname" max={40} />
           <TextInput icon={FieldIcon.phone} label="Телефон" value={phone} onChange={(v) => updateBasics({ phone: formatPhone(v) })} placeholder="+7 (908) 943-38-19" max={18} type="tel" inputMode="tel" />
@@ -289,7 +289,7 @@ export function ProfileEditPage() {
         <div className="pe__group">
           <h2 className="pe__group-title">Общая информация</h2>
         </div>
-        <section className="pe__card" aria-label="Общая информация">
+        <section className="pe__card" data-edit-section="general" aria-label="Общая информация">
           <TextInput icon={FieldIcon.cake} label="Дата рождения" value={birthday} onChange={(v) => updateBasics({ birthday: v })} placeholder="29 июля 1998 (28 лет)" max={40} onBlur={(v) => updateBasics({ birthday: formatBirthday(v) })} />
           <TextInput icon={FieldIcon.badge} label="Специализация" value={headline} onChange={(v) => updateBasics({ headline: v })} placeholder="Например, психолог-консультант" max={120} />
           <TextInput icon={FieldIcon.city} label="Город" value={city} onChange={(v) => updateBasics({ city: v })} placeholder="Где вы принимаете" max={80} />

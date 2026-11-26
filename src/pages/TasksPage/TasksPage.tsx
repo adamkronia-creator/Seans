@@ -17,7 +17,7 @@ export function TasksPage() {
       onSetFavorites={setTaskFavorites}
       onSetPinned={setTaskPinned}
       // Настройки пока есть не у всех заданий: остальные карточки без перехода
-      onOpen={(t) => hasTaskSettings(t.id) && navigate(`/tasks/${t.id}`)}
+      onOpen={(t, origin) => hasTaskSettings(t.id) && navigate(`/tasks/${t.id}`, 'forward', undefined, origin)}
       labels={{ all: 'Все задания', filters: 'Фильтр заданий', emptyRecent: 'Вы ещё не присылали задания', noun: ['задание', 'задания', 'заданий'], everywhere: 'Искать во всех заданиях' }}
     />
   );

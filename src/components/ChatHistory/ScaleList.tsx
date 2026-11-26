@@ -1,3 +1,4 @@
+import { anchorToggle } from '../../utils/anchorToggle';
 import { useId, useState } from 'react';
 import { levelOf, levelsOf, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import '../TestSettings/TestConclusion.css';
@@ -97,7 +98,10 @@ export function ScaleList({ data, onOpen, grouping }: { data: ConclusionData; on
       </ul>
       {long && !grouping && <hr className="hist-scales__rule" />}
       {long && (
-        <button type="button" className="hist-scales__toggle" aria-expanded={open} aria-controls={restId} onClick={() => setOpen(!open)}>
+        <button type="button" className="hist-scales__toggle" aria-expanded={open} aria-controls={restId} onClick={(event) => {
+            const rest = document.getElementById(restId);
+            anchorToggle(event.currentTarget, rest, () => setOpen(!open), !open && rest ? { reveal: rest } : undefined);
+          }}>
           {open ? 'Скрыть' : `Читать далее (ещё ${scales.length - SCALES_SHOWN})`}
         </button>
       )}

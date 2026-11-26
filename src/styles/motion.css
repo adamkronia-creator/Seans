@@ -94,6 +94,53 @@ html[data-transition='fade']::view-transition-new(app) {
   }
 }
 
+/* Снимок выбранной карточки меняет размер до границ нового экрана. */
+html[data-transition='expand']:not([data-expand-ready]) [data-expand-source],
+html[data-transition='expand'][data-expand-ready] .screen[data-layer='top'] {
+  view-transition-name: expanded-card;
+}
+
+html[data-transition='expand']::view-transition-old(app),
+html[data-transition='expand']::view-transition-new(app) {
+  animation: none;
+}
+
+html[data-transition='expand']::view-transition-new(app) {
+  opacity: 0;
+}
+
+::view-transition-group(expanded-card) {
+  z-index: 2;
+  animation-duration: var(--vt-duration);
+  animation-timing-function: var(--ease-ios);
+}
+
+::view-transition-image-pair(expanded-card) {
+  overflow: clip;
+  animation: vt-open-corners var(--vt-duration) var(--ease-ios) both;
+}
+
+::view-transition-old(expanded-card),
+::view-transition-new(expanded-card) {
+  mix-blend-mode: normal;
+  object-fit: cover;
+  object-position: center top;
+}
+
+::view-transition-old(expanded-card) {
+  animation: none;
+}
+
+::view-transition-new(expanded-card) {
+  animation: vt-fade-in 0.22s ease-out 0.06s both;
+}
+
+@keyframes vt-open-corners {
+  from {
+    border-radius: var(--space-5);
+  }
+}
+
 /* ---------- Окна снизу ---------- */
 
 /* Затемнение проявляется (меняется только цвет фона, сама панель не просвечивает), панель выезжает снизу */

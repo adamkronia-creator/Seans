@@ -1,3 +1,4 @@
+import { anchorToggle } from '../../utils/anchorToggle';
 import IconLinkDescription from '../../assets/icons/solar/document-text.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import { useMemo, useState } from 'react';
@@ -283,6 +284,16 @@ function ScaleBlock({
 
 function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: ConclusionScale; onChart?: () => void }) {
   const [open, setOpen] = useState(false);
+  const toggleDetails = (trigger: HTMLButtonElement) => {
+    const body = trigger.closest('.blank-card__body');
+    const rest = body?.querySelector<HTMLElement>(':scope > .cc-rest');
+    anchorToggle(
+      trigger,
+      rest ?? null,
+      () => setOpen(!open),
+      !open && rest ? { reveal: rest } : { control: () => body?.querySelector('.cc-more > button') ?? null },
+    );
+  };
   // Вид как у СМОЛ: полоса с границами диапазонов, расшифровка с «Читать далее»
   const flat = data.overview || !!data.flat;
   const pct = Math.round((scale.score / scale.max) * 100);
@@ -352,7 +363,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
           {/* Свёрнуто — кнопка между диапазоном клиента и остальными; развёрнуто — «Скрыть» в самом конце */}
           {!open && (
             <div className="cc-more">
-              <button type="button" className="ts-desc__toggle" aria-expanded={false} onClick={() => setOpen(true)}>
+              <button type="button" className="ts-desc__toggle" aria-expanded={false} onClick={(event) => toggleDetails(event.currentTarget)}>
                 Читать далее
               </button>
             </div>
@@ -362,7 +373,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
           </div>
           {open && (
             <div className="cc-more cc-more--end">
-              <button type="button" className="ts-desc__toggle" aria-expanded onClick={() => setOpen(false)}>
+              <button type="button" className="ts-desc__toggle" aria-expanded onClick={(event) => toggleDetails(event.currentTarget)}>
                 Скрыть
               </button>
             </div>

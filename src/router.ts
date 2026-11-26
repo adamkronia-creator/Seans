@@ -60,7 +60,7 @@ export function keepTabbarOnNextShow() {
   document.documentElement.toggleAttribute('data-vt-chat', !tabbarStays);
 }
 
-function show(path: string, kind: TransitionKind, prev: string | undefined, rootTab?: TabId) {
+function show(path: string, kind: TransitionKind, prev: string | undefined, rootTab?: TabId, origin?: HTMLElement) {
   const chatFlag = tabbarStays !== undefined ? !tabbarStays : (isChatRoot(target) || isChatRoot(path)) && !sameChat(target, path);
   tabbarStays = undefined;
   document.documentElement.toggleAttribute('data-vt-chat', chatFlag);
@@ -68,7 +68,7 @@ function show(path: string, kind: TransitionKind, prev: string | undefined, root
   transition(() => {
     shown = { path, prev, rootTab };
     listeners.forEach((listener) => listener());
-  }, kind);
+  }, kind, origin);
 }
 
 /** Как показать переход назад, который начали мы сами (кнопка «назад» браузера и свайп сообщают о нём только событием) */
@@ -184,7 +184,7 @@ export function rememberRootTab(rootTab: TabId) {
 }
 
 /** Открыть экран по адресу; по умолчанию он выезжает справа, как при переходе вглубь */
-export function navigate(path: string, kind: TransitionKind = 'forward', rootTab?: TabId) {
+export function navigate(path: string, kind: TransitionKind = 'forward', rootTab?: TabId, origin?: HTMLElement) {
   if (target === path) return;
   const prev = target;
   if (guards.length) {
@@ -204,7 +204,7 @@ export function navigate(path: string, kind: TransitionKind = 'forward', rootTab
     step += 1;
     window.history.pushState({ i: step, prev, rootTab }, '', `#${path}`);
   }
-  show(path, kind, prev, rootTab);
+  show(path, kind, prev, rootTab, origin);
 }
 
 /**
