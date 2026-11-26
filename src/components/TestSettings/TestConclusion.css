@@ -654,10 +654,6 @@
   padding-top: var(--space-1);
 }
 
-.cc-more--end {
-  border-top: 0;
-}
-
 .cc-more .ts-desc__toggle {
   margin: 0;
 }

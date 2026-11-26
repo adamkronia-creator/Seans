@@ -464,6 +464,8 @@
 }
 
 .ts-select__value {
+  display: grid;
+  white-space: nowrap;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
@@ -678,6 +680,34 @@
 @media (prefers-reduced-motion: reduce) {
   .ts-desc__body,
   .ts-desc__fade {
+    transition: none;
+  }
+}
+
+.ts-select__value > span,
+.ts-read-more > span {
+  grid-area: 1 / 1;
+}
+
+.ts-select__measure {
+  visibility: hidden;
+}
+
+.ts-read-more {
+  display: grid;
+  place-items: center;
+}
+
+.ts-read-more > span {
+  transition: opacity var(--collapse-fade-time) ease;
+}
+
+.ts-read-more > [aria-hidden='true'] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-read-more > span {
     transition: none;
   }
 }

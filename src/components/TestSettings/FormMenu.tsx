@@ -66,18 +66,24 @@ interface FormMenuProps {
   format?: (v: string) => string;
   /** Как показать выбранное на кнопке, если короче, чем в окне (по умолчанию как `format`) */
   formatValue?: (v: string) => string;
+  stableWidth?: boolean;
   onChange: (form: string) => void;
 }
 
 /** Кнопка с выбранной формой бланка; по нажатию открывается меню с вариантами и пояснением */
 const same = (v: string) => v;
 
-export function FormMenu({ forms, value, hint, title = 'Форма бланка', format = same, formatValue = format, onChange }: FormMenuProps) {
+export function FormMenu({ forms, value, hint, title = 'Форма бланка', format = same, formatValue = format, stableWidth = false, onChange }: FormMenuProps) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button type="button" className="ts-select" aria-haspopup="dialog" aria-label={`${title}: ${formatValue(value)}`} onClick={() => setOpen(true)}>
-        <span className="ts-select__value">{formatValue(value)}</span>
+        <span className="ts-select__value">
+          {stableWidth && forms.filter((f) => f !== value).map((f) => (
+            <span key={f} aria-hidden="true" className="ts-select__measure">{formatValue(f)}</span>
+          ))}
+          <span>{formatValue(value)}</span>
+        </span>
         <IconTestChevronDown className="ts-select__chevron" />
       </button>
       {open && (

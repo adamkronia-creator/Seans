@@ -14,8 +14,6 @@ interface ToggleAnchor {
   /** Верх раскрываемого фрагмента, иногда с отступом до первой ранее скрытой строки. */
   reveal?: HTMLElement;
   inset?: number;
-  /** Некоторые карточки заменяют кнопку «Скрыть» новой кнопкой при сворачивании. */
-  control?: () => HTMLElement | null;
 }
 
 /** Пока меняется высота блока, держим видимым нажатый элемент или начало нового текста. */
@@ -23,7 +21,7 @@ export function anchorToggle(
   trigger: HTMLElement,
   animated: HTMLElement | null,
   update: () => void,
-  { reveal, inset = 0, control = () => trigger }: ToggleAnchor = {},
+  { reveal, inset = 0 }: ToggleAnchor = {},
 ) {
   const scroller = scrollContainer(trigger);
   if (!scroller || !animated) {
@@ -42,7 +40,6 @@ export function anchorToggle(
   const pressed = trigger.getBoundingClientRect();
   const from = pressed.top + pressed.height / 2;
   const target = Math.max(top + height * 0.35, Math.min(from, bottom - height * 0.35));
-  const hadFocus = document.activeElement === trigger;
   const previous = scroller.style.overflowAnchor;
   scroller.style.overflowAnchor = 'none';
   const interrupts = ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const;
@@ -55,12 +52,7 @@ export function anchorToggle(
   };
 
   flushSync(update);
-  const anchor = reveal ?? control();
-  if (!anchor) {
-    cleanup();
-    return;
-  }
-  if (!reveal && hadFocus && anchor !== trigger) anchor.focus({ preventScroll: true });
+  const anchor = reveal ?? trigger;
 
   const start = performance.now();
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -1,3 +1,4 @@
+import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import IconLinkDescription from '../../assets/icons/solar/document-text.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
@@ -7,7 +8,7 @@ import IconTime from '../../assets/icons/solar/clock-circle.svg?react';
 import IconDuration from '../../assets/icons/solar/stopwatch.svg?react';
 import IconAge from '../../assets/icons/solar/user.svg?react';
 import IconForm from '../../assets/icons/solar/document-text.svg?react';
-import { IconTestChevron, IconTestReportExtra, IconTestReportMain } from '../icons';
+import { IconTestReportExtra, IconTestReportMain } from '../icons';
 import { levelOf, levelsOf, showsCode, type ConclusionData, type ConclusionScale } from '../../data/conclusions';
 import { useRevealOnce } from '../../utils/useRevealOnce';
 import { ScaleSortButton, type ScaleOrder } from './ScaleSort';
@@ -291,7 +292,7 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
       trigger,
       rest ?? null,
       () => setOpen(!open),
-      !open && rest ? { reveal: rest } : { control: () => body?.querySelector('.cc-more > button') ?? null },
+      !open && rest ? { reveal: rest } : undefined,
     );
   };
   // Вид как у СМОЛ: полоса с границами диапазонов, расшифровка с «Читать далее»
@@ -360,24 +361,14 @@ function ScaleCard({ data, scale, onChart }: { data: ConclusionData; scale: Conc
       </div>
       {flat && order.length > 1 && (
         <>
-          {/* Свёрнуто — кнопка между диапазоном клиента и остальными; развёрнуто — «Скрыть» в самом конце */}
-          {!open && (
-            <div className="cc-more">
-              <button type="button" className="ts-desc__toggle" aria-expanded={false} onClick={(event) => toggleDetails(event.currentTarget)}>
-                Читать далее
-              </button>
-            </div>
-          )}
-          <div className={`cc-rest${open ? ' cc-rest--open' : ''}`}>
+          <div className={`cc-rest${open ? ' cc-rest--open' : ''}`} aria-hidden={!open}>
             <div className="cc-rest__inner">{order.slice(1).map(renderLevel)}</div>
           </div>
-          {open && (
-            <div className="cc-more cc-more--end">
-              <button type="button" className="ts-desc__toggle" aria-expanded onClick={(event) => toggleDetails(event.currentTarget)}>
-                Скрыть
-              </button>
-            </div>
-          )}
+          <div className="cc-more">
+            <button type="button" className="ts-desc__toggle" aria-expanded={open} onClick={(event) => toggleDetails(event.currentTarget)}>
+              <ReadMoreLabel open={open} />
+            </button>
+          </div>
         </>
       )}
     </CollapseCard>
@@ -407,7 +398,6 @@ export function TestConclusionActions({ onOpenBlank, onOpenDescription }: Pick<T
           <button type="button" className="ts-action" onClick={onOpen}>
             <Icon className="ts-action__icon" />
             <span className="ts-action__label">{label}</span>
-            <IconTestChevron className="ts-action__chevron" />
           </button>
         </li>
       ))}

@@ -1,8 +1,8 @@
+import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
-  IconTestChevron,
   IconTestMic,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
@@ -325,7 +325,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                 !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
             }}
           >
-            {descOpen ? 'Скрыть' : 'Читать далее'}
+            <ReadMoreLabel open={descOpen} />
           </button>
         )}
         </div>
@@ -336,7 +336,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               <button type="button" className="ts-action" onClick={openBlank}>
                 <IconLinkBlank className="ts-action__icon" />
                 <span className="ts-action__label">Бланк тестирования</span>
-                <IconTestChevron className="ts-action__chevron" />
               </button>
             </li>
             {data.scales && (
@@ -344,7 +343,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                 <button type="button" className="ts-action" onClick={openConclusion}>
                   <IconLinkConclusion className="ts-action__icon" />
                   <span className="ts-action__label">Пример заключения</span>
-                  <IconTestChevron className="ts-action__chevron" />
                 </button>
               </li>
             )}
@@ -454,9 +452,10 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               <Switch checked={shuffle} onChange={locked ? noop : setShuffle} label="Перемешать вопросы" />
             </Row>
             {conclusion && (
-              <Row Icon={IconRowResult} label="Завершение" info value={locked ? resultTitle(result) : undefined}>
-                {!locked && (
+              <Row Icon={IconRowResult} label="Завершение">
+                {locked ? <span className="ts-row__value">{resultTitle(result)}</span> : (
                   <FormMenu
+                    stableWidth
                     forms={RESULT_MODES.map((m) => m.id)}
                     value={result}
                     title="Завершение"

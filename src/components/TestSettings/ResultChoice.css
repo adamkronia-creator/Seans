@@ -63,7 +63,7 @@
 /* Итог для клиента: три кнопки в ряд (значок над названием), выбранная подсвечена */
 .result-seg {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
   padding: var(--space-4);
 }

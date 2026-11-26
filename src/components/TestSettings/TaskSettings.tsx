@@ -1,6 +1,7 @@
+import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { IconTestChevron, IconTestMic } from '../icons';
+import { IconTestMic } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { Toast } from '../Toast/Toast';
@@ -213,7 +214,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
         <button type="button" className="ts-action" onClick={() => openView(next)}>
           <Icon className="ts-action__icon" />
           <span className="ts-action__label">{label}</span>
-          <IconTestChevron className="ts-action__chevron" />
         </button>
       </li>
     );
@@ -294,7 +294,7 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
                   anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
                     !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
                 }}>
-                {descOpen ? 'Скрыть' : 'Читать далее'}
+                <ReadMoreLabel open={descOpen} />
               </button>
             )}
             </div>
