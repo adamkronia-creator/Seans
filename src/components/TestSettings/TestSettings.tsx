@@ -1,14 +1,14 @@
 import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { SwipePager } from '../SwipePager/SwipePager';
-import { ClientResultTiles } from './ClientResultTiles';
 import { ScaleChips } from './ScaleChips';
 import { followChips, type PositionVia } from '../../utils/followChips';
 import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
+  IconTestChevronDown,
   IconTestMic,
 } from '../icons';
 import { Switch } from '../Switch/Switch';
@@ -26,15 +26,14 @@ import { testBlank } from '../../data/testBlank';
 import { type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
-import { FormOptions, formatTestForm } from './FormMenu';
-import { type ResultMode } from '../../data/resultMode';
+import { formatTestForm } from './FormMenu';
+import { RESULT_MODES, blindTitle, type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
-import { blindTitle } from '../../data/resultMode';
 import { formHint, takePass } from '../../data/selfTest';
 import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
@@ -44,6 +43,7 @@ import IconRowQuestions from '../../assets/icons/solar/list-ordered.svg?react';
 import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
 import IconRowAge from '../../assets/icons/solar/user.svg?react';
 import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowResult from '../../assets/icons/solar/eye.svg?react';
 import IconRowBlind from '../../assets/icons/solar/incognito.svg?react';
 import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
 import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
@@ -65,6 +65,8 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
+const SAVE_BLANK_LABEL = 'Сохранить заполненный бланк';
+const COMPLETION_OPTIONS = RESULT_MODES.map(({ id, short }) => ({ value: id, label: id === 'thanks' ? 'Спасибо' : short }));
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка тестирования',
@@ -133,6 +135,64 @@ export function Row({
       {value !== undefined && <span className="ts-row__value">{value}</span>}
       {children}
     </li>
+  );
+}
+
+function SettingChoice<T extends string>({ Icon, label, hint, value, options, disabled, onChange }: {
+  Icon: Svg;
+  label: string;
+  hint: string;
+  value: T;
+  options: { value: T; label: string }[];
+  disabled: boolean;
+  onChange: (value: T) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const selected = options.find((option) => option.value === value)?.label ?? value;
+
+  if (options.length < 2) {
+    return <Row Icon={Icon} label={label} hint={hint}><span className="ts-row__value">{selected}</span></Row>;
+  }
+
+  return (
+    <Row Icon={Icon} label={label} hint={hint}>
+      <button
+        ref={trigger}
+        type="button"
+        className="ts-select"
+        aria-label={`${label}: ${selected}`}
+        aria-controls={panelId}
+        aria-expanded={open}
+        disabled={disabled}
+        onClick={() => setOpen(!open)}
+      >
+        <span className="ts-select__value">{selected}</span>
+        <IconTestChevronDown className="ts-select__chevron" aria-hidden="true" />
+      </button>
+      <div id={panelId} aria-hidden={!open} className={`ts-choice-panel blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`}>
+        <div className="blank-card__inner">
+          <div className="ts-choice-panel__options" role="group" aria-label={label}>
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={option.value === value}
+                disabled={!open || disabled}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                  trigger.current?.focus({ preventScroll: true });
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Row>
   );
 }
 
@@ -336,40 +396,45 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             key: 'setup',
             node: (
               <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
-                <CollapseCard title="Прохождение" badge={<OptionHelp id="features" corner />}>
+                <CollapseCard title="Прохождение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlind} label="Слепое тестирование">
+                    <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрыть название и цель теста">
                       <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
                     </Row>
-                    <Row Icon={IconRowShuffle} label="Перемешать вопросы">
+                    <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Вопросы в произвольном порядке">
                       <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
                     </Row>
                     {data.forms && (
-                      <Row Icon={IconRowForm} label="Форма бланка">
-                        {data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
-                          <div className="ts-form-options">
-                            <FormOptions
-                              forms={data.forms}
-                              value={form}
-                              title="Форма бланка"
-                              format={formatTestForm}
-                              disabled={locked}
-                              onChange={setForm}
-                            />
-                          </div>
-                        )}
-                      </Row>
+                      <SettingChoice
+                        Icon={IconRowForm}
+                        label="Форма бланка"
+                        hint="От выбранной формы бланка зависит подсчёт баллов и общий итог тестирования"
+                        value={form}
+                        options={data.forms.map((form) => ({ value: form, label: formatTestForm(form) }))}
+                        disabled={locked}
+                        onChange={setForm}
+                      />
                     )}
                   </ul>
                 </CollapseCard>
 
-                <CollapseCard title="Заключение" badge={<OptionHelp id="testConclusion" corner />}>
+                <CollapseCard title="Заключение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlank} label="Сохранить бланк">
-                      <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label="Сохранить бланк" />
+                    <Row Icon={IconRowBlank} label={SAVE_BLANK_LABEL} hint="Бланк можно посмотреть в заключении">
+                      <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label={SAVE_BLANK_LABEL} />
                     </Row>
+                    {conclusion && (
+                      <SettingChoice
+                        Icon={IconRowResult}
+                        label="Экран завершения"
+                        hint="Что видит клиент после прохождения?"
+                        value={result}
+                        options={COMPLETION_OPTIONS}
+                        disabled={locked}
+                        onChange={setResult}
+                      />
+                    )}
                   </ul>
-                  {conclusion && <ClientResultTiles value={result} onChange={setResult} disabled={locked} />}
                 </CollapseCard>
 
                 <section className="ts-card ts-message-card">
@@ -431,7 +496,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
                 {(data.questions || data.duration || data.age) && (
                   <CollapseCard title="Тестовая информация">
-                    <ul className="ts-rows">
+                    <ul className="ts-rows ts-info-rows">
                       {data.questions !== undefined && (
                         <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
                       )}
@@ -452,18 +517,18 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             node: (
               <div className="test-settings__scroll ts-settings-page">
                 {(conclusion || blank) && (
-                  <ul className="ts-actions">
+                  <ul className="ts-actions ts-actions--materials">
                     {blank && <li>
                       <button type="button" className="ts-action" onClick={openBlank}>
                         <IconLinkBlank className="ts-action__icon" />
-                        <span className="ts-action__label">Бланк</span>
+                        <span className="ts-action__label">Бланк тестирования</span>
                       </button>
                     </li>}
                     {conclusion && (
                       <li>
                         <button type="button" className="ts-action" onClick={openConclusion}>
                           <IconLinkConclusion className="ts-action__icon" />
-                          <span className="ts-action__label">Пример</span>
+                          <span className="ts-action__label">Пример заключения</span>
                         </button>
                       </li>
                     )}
