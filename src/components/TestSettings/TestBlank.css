@@ -180,7 +180,8 @@
 }
 
 /* Выбранный вариант: акцентная обводка и лёгкая заливка */
-.blank-answer:has(.blank-answer__input:checked) {
+.blank-answer:has(.blank-answer__input:checked),
+.blank-answer[aria-pressed="true"] {
   border-color: var(--action-primary);
   background: var(--tf-on);
 }

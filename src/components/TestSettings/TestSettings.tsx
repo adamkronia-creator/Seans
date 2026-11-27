@@ -6,7 +6,7 @@ import { followChips, type PositionVia } from '../../utils/followChips';
 import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
 import {
   IconTestChevronDown,
   IconTestMic,
@@ -23,7 +23,7 @@ import type { LibraryTest } from '../../data/library';
 import { DEFAULT_SENT_OPTIONS, type Message } from '../../data/messages';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
-import { type OptionHelpId } from '../../data/optionHelp';
+import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { formatTestForm } from './FormMenu';
@@ -32,6 +32,7 @@ import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
+import { ADVANCE_MS } from './TestPassSingle';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { formHint, takePass } from '../../data/selfTest';
@@ -49,8 +50,6 @@ import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
 import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconRowMain from '../../assets/icons/solar/list.svg?react';
 import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
-import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
-import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
@@ -65,7 +64,6 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
-const SAVE_BLANK_LABEL = 'Сохранить заполненный бланк';
 const COMPLETION_OPTIONS = RESULT_MODES.map(({ id, short }) => ({ value: id, label: id === 'thanks' ? 'Спасибо' : short }));
 
 const STATUS: Record<View, string> = {
@@ -157,7 +155,7 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
   }
 
   return (
-    <Row Icon={Icon} label={label} hint={hint}>
+    <Row Icon={Icon} label={label}>
       <button
         ref={trigger}
         type="button"
@@ -171,13 +169,20 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
         <span className="ts-select__value">{selected}</span>
         <IconTestChevronDown className="ts-select__chevron" aria-hidden="true" />
       </button>
-      <div id={panelId} aria-hidden={!open} className={`ts-choice-panel blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`}>
+      <div
+        id={panelId}
+        aria-hidden={!open}
+        className={`ts-choice-panel blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`}
+        style={{ '--ts-choice-close-time': `${ADVANCE_MS}ms` } as CSSProperties}
+      >
         <div className="blank-card__inner">
-          <div className="ts-choice-panel__options" role="group" aria-label={label}>
+          <p className="ts-row__hint ts-choice-panel__hint">{hint}</p>
+          <div className="blank-answers ts-choice-panel__options" role="group" aria-label={label}>
             {options.map((option) => (
               <button
                 key={option.value}
                 type="button"
+                className="blank-answer"
                 aria-pressed={option.value === value}
                 disabled={!open || disabled}
                 onClick={() => {
@@ -420,7 +425,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
                 <CollapseCard title="Заключение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlank} label={SAVE_BLANK_LABEL} hint="Бланк можно посмотреть в заключении">
+                    <Row Icon={IconRowBlank} label={SAVE_BLANK_LABEL} hint="Остается в заключении теста">
                       <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label={SAVE_BLANK_LABEL} />
                     </Row>
                     {conclusion && (
@@ -517,17 +522,15 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             node: (
               <div className="test-settings__scroll ts-settings-page">
                 {(conclusion || blank) && (
-                  <ul className="ts-actions ts-actions--materials">
+                  <ul className="ts-actions">
                     {blank && <li>
                       <button type="button" className="ts-action" onClick={openBlank}>
-                        <IconLinkBlank className="ts-action__icon" />
                         <span className="ts-action__label">Бланк тестирования</span>
                       </button>
                     </li>}
                     {conclusion && (
                       <li>
                         <button type="button" className="ts-action" onClick={openConclusion}>
-                          <IconLinkConclusion className="ts-action__icon" />
                           <span className="ts-action__label">Пример заключения</span>
                         </button>
                       </li>
