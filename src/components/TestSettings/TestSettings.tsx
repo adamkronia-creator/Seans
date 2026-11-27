@@ -6,7 +6,7 @@ import { followChips, type PositionVia } from '../../utils/followChips';
 import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
   IconTestChevronDown,
   IconTestMic,
@@ -32,7 +32,6 @@ import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
 import { TestPass } from './TestPass';
-import { ADVANCE_MS } from './TestPassSingle';
 import { TestResult } from './TestResult';
 import { conclusionFor } from '../../data/conclusions';
 import { formHint, takePass } from '../../data/selfTest';
@@ -64,6 +63,7 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
+const CHOICE_CONFIRM_MS = 420;
 const COMPLETION_OPTIONS = RESULT_MODES.map(({ id, short }) => ({ value: id, label: id === 'thanks' ? 'Спасибо' : short }));
 
 const STATUS: Record<View, string> = {
@@ -148,7 +148,9 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
+  const closeTimer = useRef<number>();
   const selected = options.find((option) => option.value === value)?.label ?? value;
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   if (options.length < 2) {
     return <Row Icon={Icon} label={label} hint={hint}><span className="ts-row__value">{selected}</span></Row>;
@@ -164,7 +166,10 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
         aria-controls={panelId}
         aria-expanded={open}
         disabled={disabled}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          window.clearTimeout(closeTimer.current);
+          setOpen(!open);
+        }}
       >
         <span className="ts-select__value">{selected}</span>
         <IconTestChevronDown className="ts-select__chevron" aria-hidden="true" />
@@ -173,7 +178,6 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
         id={panelId}
         aria-hidden={!open}
         className={`ts-choice-panel blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`}
-        style={{ '--ts-choice-close-time': `${ADVANCE_MS}ms` } as CSSProperties}
       >
         <div className="blank-card__inner">
           <p className="ts-row__hint ts-choice-panel__hint">{hint}</p>
@@ -187,7 +191,8 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
                 disabled={!open || disabled}
                 onClick={() => {
                   onChange(option.value);
-                  setOpen(false);
+                  window.clearTimeout(closeTimer.current);
+                  closeTimer.current = window.setTimeout(() => setOpen(false), CHOICE_CONFIRM_MS);
                   trigger.current?.focus({ preventScroll: true });
                 }}
               >
@@ -413,7 +418,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                       <SettingChoice
                         Icon={IconRowForm}
                         label="Форма бланка"
-                        hint="От выбранной формы бланка зависит подсчёт баллов и общий итог тестирования"
+                        hint="От выбранной формы бланка зависит подсчёт баллов и общий итог тестирования, а не только обращение вопросов"
                         value={form}
                         options={data.forms.map((form) => ({ value: form, label: formatTestForm(form) }))}
                         disabled={locked}
@@ -432,7 +437,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                       <SettingChoice
                         Icon={IconRowResult}
                         label="Экран завершения"
-                        hint="Что видит клиент после прохождения?"
+                        hint="Что видит клиент после прохождения теста? Только панель с благодарностью, баллы или полное заключение?"
                         value={result}
                         options={COMPLETION_OPTIONS}
                         disabled={locked}

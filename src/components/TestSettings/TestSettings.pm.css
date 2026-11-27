@@ -829,8 +829,8 @@
   padding-bottom: calc(var(--scroll-bottom-tabbar) + var(--space-3) + var(--size-touch));
 }
 
-.ts-settings-page--setup .blank-card__body > .ts-rows > .ts-row:last-child {
-  padding-block-end: var(--space-3);
+.ts-settings-page--setup .ts-row {
+  padding: var(--space-3);
 }
 
 .ts-settings-page--setup .blank-card .ts-row__label,
@@ -848,10 +848,17 @@
 
 [data-pm] .ts-settings-page--setup .blank-card .ts-row + .ts-row {
   --ts-row-seam: 1px; /* grid:ok — такой же прозрачный просвет, как под шапкой */
-  mask-image: linear-gradient(black, black), linear-gradient(black, black);
-  mask-size: 100% calc(100% - var(--ts-row-seam)), calc(var(--row-pad-x) + var(--size-icon-lg) + var(--row-gap)) var(--ts-row-seam);
-  mask-position: bottom left, top left;
-  mask-repeat: no-repeat;
+  border-block-start: var(--ts-row-seam) solid transparent;
+  background-clip: padding-box;
+}
+
+[data-pm] .ts-settings-page--setup .blank-card .ts-row + .ts-row::before {
+  display: block;
+  top: calc(-1 * var(--ts-row-seam));
+  inset-inline: 0 auto;
+  width: calc(var(--space-3) + var(--size-icon-lg) + var(--row-gap));
+  height: var(--ts-row-seam);
+  background: var(--glass-card);
 }
 
 [data-pm] .ts-settings-page--setup .ts-row:has(> .ts-choice-panel) {
@@ -867,10 +874,6 @@
 
 .ts-choice-panel {
   grid-column: 1 / -1;
-}
-
-.ts-choice-panel:not(.blank-card__collapse--open) {
-  --collapse-time: var(--ts-choice-close-time);
 }
 
 .ts-choice-panel__hint {
@@ -890,7 +893,7 @@
   min-height: var(--size-touch);
   padding: var(--space-1);
   color: var(--text-primary);
-  font: var(--type-caption);
+  font-size: var(--font-size-md);
   text-align: center;
   overflow-wrap: anywhere;
 }
