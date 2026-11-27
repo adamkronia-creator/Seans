@@ -845,6 +845,11 @@
   margin-block-start: var(--space-2);
 }
 
+.ts-settings-page--setup .blank-card .ts-row__label,
+.ts-settings-page--setup .client-result-tiles legend {
+  font-size: var(--font-size-lg);
+}
+
 .ts-settings-page--setup .client-result-tiles legend {
   margin-block-end: var(--space-1);
 }
