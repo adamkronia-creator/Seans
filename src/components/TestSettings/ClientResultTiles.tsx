@@ -15,7 +15,7 @@ export function ClientResultTiles({ value, onChange, disabled = false }: {
       <legend>
         <span className="client-result-tiles__legend">
           <IconEye aria-hidden="true" />
-          Что видит клиент:
+          Окно завершения
         </span>
       </legend>
       <p className="ts-row__hint client-result-tiles__hint" id={hintId}>
