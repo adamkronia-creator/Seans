@@ -7,7 +7,8 @@ import { HELP_SHOT, type HelpScene, type HelpSlide } from '../../data/optionHelp
 import { TestHeader } from '../TestSettings/TestHeader';
 import { TestPreview } from '../TestSettings/TestPreview';
 import { TestConclusion } from '../TestSettings/TestConclusion';
-import { TestBlank } from '../TestSettings/TestBlank';
+import { CollapseCard, TestBlank } from '../TestSettings/TestBlank';
+import { FormOptions, formatTestForm } from '../TestSettings/FormMenu';
 import { TaskForm } from '../TestSettings/TaskForm';
 import { Avatar } from '../Avatar/Avatar';
 import { IconBackMk, IconMenuMk } from '../ChatItem/ChatIcons';
@@ -16,6 +17,7 @@ import { MessageInput } from '../MessageInput/MessageInput';
 import { CHATS } from '../../data/chats';
 import type { Message } from '../../data/messages';
 import { roleOf } from '../../data/roles';
+import IconForm from '../../assets/icons/solar/document-text.svg?react';
 import './HelpScenes.css';
 
 /** Тест, к настройкам которого открыта подсказка: макеты в окне собираются из него, а не из снимков одного теста */
@@ -27,6 +29,8 @@ export interface HelpTest {
   blank: TestBlankData | null;
   conclusion: ConclusionData | null;
   form: string;
+  testForms?: string[];
+  formDetails?: string;
   duration?: string;
 }
 
@@ -36,12 +40,17 @@ export const useHelpTest = () => useContext(HelpContext);
 /** У теста без примера заключения нет и слайдов про строку «Посмотреть бланк» в нём */
 export function slidesFor(slides: HelpSlide[], ctx: HelpTest): HelpSlide[] {
   return slides.filter((s) => {
+    if (s.scene === 'form') return Boolean(ctx.testForms?.length);
     if (s.scene === 'blank-off' || s.scene === 'blank-on') return Boolean(ctx.conclusion);
     if (s.scene === 'blank-view') return Boolean(ctx.blank);
     // Итог для клиента есть только у тестов с заключением, остальные макеты теста — только с бланком
     if (s.scene === 'result-full') return Boolean(ctx.blank && ctx.conclusion);
     if (s.scene === 'blind-on' || s.scene === 'shuffle') return Boolean(ctx.blank);
     return true;
+  }).map((slide) => {
+    if (slide.scene !== 'form') return slide;
+    if (ctx.testForms?.length === 1) return { ...slide, text: 'У этого теста единая форма бланка. Для всех участников используется один вариант подсчёта баллов.' };
+    return ctx.formDetails ? { ...slide, text: `${slide.text}\n${ctx.formDetails}.` } : slide;
   });
 }
 
@@ -50,9 +59,10 @@ const MARKS: Partial<Record<HelpScene, string>> = {
   'blind-off': '.test-settings__peer',
   'blind-on': '.test-settings__peer',
   'blind-chat': '.tcard',
-  'blank-on': '.ts-row--link',
+  'blank-on': '.ts-action',
   'result-thanks': '.tp__done',
   'result-score': '.tp__sample',
+  form: '.ts-row',
   'comment-on': '.blank-card',
   'comment-result': '.blank-card',
   'state-on': '.blank-card',
@@ -161,6 +171,28 @@ function Body({ scene, ctx }: { scene: HelpScene; ctx: HelpTest }) {
   if (TASK_SCENES.includes(scene) && ctx.task) return <TaskBody scene={scene} ctx={ctx} />;
   const { blank, conclusion, form, duration } = ctx;
   const test = ctx.test as LibraryTest;
+  if (scene === 'form' && ctx.testForms) {
+    return (
+      <section className="test-settings hs__screen">
+        <TestHeader test={test} status="Настройка тестирования" />
+        <div className="test-settings__scroll ts-settings-page--setup hs__scroll">
+          <CollapseCard title="Прохождение">
+            <ul className="ts-rows">
+              <li className="ts-row">
+                <IconForm className="ts-row__icon" />
+                <span className="ts-row__label">Форма бланка</span>
+                {ctx.testForms.length === 1 ? <span className="ts-row__value">{form}</span> : (
+                  <div className="ts-form-options">
+                    <FormOptions forms={ctx.testForms} value={form} title="Форма бланка" format={formatTestForm} onChange={NOOP} disabled />
+                  </div>
+                )}
+              </li>
+            </ul>
+          </CollapseCard>
+        </div>
+      </section>
+    );
+  }
   if (scene === 'shuffle') {
     // Вопросы не по порядку: с конца и через один, чтобы на экране был заметно «чужой» вопрос
     const order = blank ? [...blank.questions.keys()].reverse() : [];

@@ -20,6 +20,10 @@ interface FormSheetProps {
 
 const same = (v: string) => v;
 
+const TEST_FORM_LABELS: Record<string, string> = { Мужская: 'Мужской', Женская: 'Женский' };
+
+export const formatTestForm = (form: string) => TEST_FORM_LABELS[form] ?? form;
+
 export function FormOptions({ forms, value, title, format = same, onChange, disabled = false }: {
   forms: string[];
   value: string;

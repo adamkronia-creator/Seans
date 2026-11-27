@@ -26,7 +26,7 @@ import { testBlank } from '../../data/testBlank';
 import { type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
-import { FormOptions } from './FormMenu';
+import { FormOptions, formatTestForm } from './FormMenu';
 import { type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
@@ -44,6 +44,9 @@ import IconRowQuestions from '../../assets/icons/solar/list-ordered.svg?react';
 import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
 import IconRowAge from '../../assets/icons/solar/user.svg?react';
 import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowBlind from '../../assets/icons/solar/incognito.svg?react';
+import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
+import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconRowMain from '../../assets/icons/solar/list.svg?react';
 import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
@@ -62,9 +65,6 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
-const FORM_LABELS: Record<string, string> = { Мужская: 'Мужской', Женская: 'Женский' };
-const FORM_DESCRIPTION = 'В зависимости от формы бланка меняется система подсчета баллов, что влияет на итоги тестирования';
-
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка тестирования',
@@ -121,7 +121,7 @@ export function Row({
   const title = help ? labelWithHelp(label, help) : label;
   return (
     <li className={`ts-row${info || value !== undefined ? ' ts-row--info' : ''}`}>
-      {Icon && <Icon className="ts-row__icon" />}
+      {Icon && <Icon className="ts-row__icon" aria-hidden="true" />}
       {hint ? (
         <span className="ts-row__text">
           <span className="ts-row__label">{title}</span>
@@ -177,8 +177,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const data = testSettings(test);
   const sentOptions = sent ? (sent.testOptions ?? DEFAULT_SENT_OPTIONS) : undefined;
   const locked = Boolean(sent);
-  const formDetails = locked ? '' : formHint(test.id);
-  // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
   const [form, setForm] = useState(sentOptions?.form ?? (passRequest?.form || (data.forms?.[0] ?? '')));
@@ -286,7 +284,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const live = Boolean(passRequest) && view === 'pass';
 
   return (
-    <HelpContext.Provider value={{ test, blank: blank ?? null, conclusion: conclusion ?? null, form, duration: data.duration }}>
+    <HelpContext.Provider value={{ test, blank: blank ?? null, conclusion: conclusion ?? null, form, testForms: data.forms, formDetails: formHint(test.id), duration: data.duration }}>
     <section className={`test-settings${locked ? ' test-settings--sent' : ''}`}>
       <TestHeader
         test={test}
@@ -338,27 +336,26 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             key: 'setup',
             node: (
               <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
-                <CollapseCard title="Прохождение">
+                <CollapseCard title="Прохождение" badge={<OptionHelp id="features" corner />}>
                   <ul className="ts-rows">
-                    <Row label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
+                    <Row Icon={IconRowBlind} label="Слепое тестирование">
                       <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
                     </Row>
-                    <Row label="Перемешать вопросы" hint="Перемешивает тестовые вопросы в произвольном порядке. Так тест сложнее распознать, если проходишь его повторно">
+                    <Row Icon={IconRowShuffle} label="Перемешать вопросы">
                       <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
                     </Row>
                     {data.forms && (
-                      <Row label="Форма бланка" hint={FORM_DESCRIPTION}>
+                      <Row Icon={IconRowForm} label="Форма бланка">
                         {data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
                           <div className="ts-form-options">
                             <FormOptions
                               forms={data.forms}
                               value={form}
                               title="Форма бланка"
-                              format={(option) => FORM_LABELS[option] ?? option}
+                              format={formatTestForm}
                               disabled={locked}
                               onChange={setForm}
                             />
-                            {formDetails && <p className="ts-row__hint">{formDetails}</p>}
                           </div>
                         )}
                       </Row>
@@ -366,9 +363,9 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                   </ul>
                 </CollapseCard>
 
-                <CollapseCard title="Заключение">
+                <CollapseCard title="Заключение" badge={<OptionHelp id="testConclusion" corner />}>
                   <ul className="ts-rows">
-                    <Row label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы">
+                    <Row Icon={IconRowBlank} label="Сохранить бланк">
                       <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label="Сохранить бланк" />
                     </Row>
                   </ul>
