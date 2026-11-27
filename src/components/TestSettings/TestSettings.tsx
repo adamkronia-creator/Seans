@@ -340,7 +340,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             key: 'setup',
             node: (
               <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
-                <CollapseCard title="Прохождение" badge={<OptionHelp id="features" corner />}>
+                <CollapseCard title="Прохождение">
                   <ul className="ts-rows">
                     <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
                       <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />

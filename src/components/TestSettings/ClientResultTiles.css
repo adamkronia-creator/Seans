@@ -24,6 +24,10 @@
   height: var(--size-icon-lg);
 }
 
+.client-result-tiles__hint {
+  margin: 0 0 var(--space-2);
+}
+
 .client-result-tiles__choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
