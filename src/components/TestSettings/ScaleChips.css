@@ -32,19 +32,14 @@ button.scale-chip:active {
   background: var(--bg-subtle);
 }
 
-.scale-chip:focus-visible,
-.scale-sheet__sources a:focus-visible {
+.scale-chip:focus-visible {
   outline: var(--active-ring-width) solid var(--text-link);
   outline-offset: var(--hairline);
 }
 
-.scale-sheet__description,
-.scale-sheet__sources {
+.scale-sheet__description {
   display: grid;
   gap: var(--space-2);
-}
-
-.scale-sheet__description {
   padding: var(--space-4);
   color: var(--text-primary);
   font: var(--type-body);
@@ -53,16 +48,4 @@ button.scale-chip:active {
 
 .scale-sheet__description p {
   margin: 0;
-}
-
-.scale-sheet__sources {
-  margin: var(--space-1) 0 0;
-  padding: 0;
-  list-style: none;
-  font: var(--type-caption);
-}
-
-.scale-sheet__sources a {
-  color: var(--text-link);
-  text-decoration: underline;
 }
