@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { IconTestChevronDown } from '../icons';
 import { SheetOverlay } from '../EditSheet/SheetOverlay';
 import { useSheet } from '../EditSheet/useSheet';
@@ -18,6 +18,32 @@ interface FormSheetProps {
   onClose: () => void;
 }
 
+const same = (v: string) => v;
+
+export function FormOptions({ forms, value, title, format = same, onChange, disabled = false }: {
+  forms: string[];
+  value: string;
+  title: string;
+  format?: (v: string) => string;
+  onChange: (form: string) => void;
+  disabled?: boolean;
+}) {
+  const name = useId();
+  return (
+    <ul className="blank-answers" role="radiogroup" aria-label={title}>
+      {forms.map((f) => (
+        <li key={f}>
+          <label className={disabled ? 'blank-answer blank-answer--locked' : 'blank-answer'}>
+            <input type="radio" className="blank-answer__input" name={name} checked={value === f} disabled={disabled} onChange={() => onChange(f)} />
+            <span className="blank-answer__radio" aria-hidden="true" />
+            <span className="blank-answer__text">{format(f)}</span>
+          </label>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Окно выбора формы бланка: пояснение, зачем форма нужна, как вопрос и варианты («Мужская» / «Женская») как ответы */
 function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormSheetProps) {
   useSheet(onClose);
@@ -32,17 +58,7 @@ function FormSheet({ forms, value, hint, title, format, onPick, onClose }: FormS
             {/* Как вопрос и ответы при прохождении: подпись (если есть) — вопрос, варианты — радиокнопки в рамке выбора */}
             <div className="form-menu__question">
               {hint && <p className="blank-question__prompt">{hint}</p>}
-              <ul className="blank-answers" role="radiogroup" aria-label={title}>
-                {forms.map((f) => (
-                  <li key={f}>
-                    <label className="blank-answer">
-                      <input type="radio" className="blank-answer__input" name="form-menu" checked={value === f} onChange={() => onPick(f)} />
-                      <span className="blank-answer__radio" aria-hidden="true" />
-                      <span className="blank-answer__text">{format(f)}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
+              <FormOptions forms={forms} value={value} title={title} format={format} onChange={onPick} />
             </div>
           </section>
         </div>
@@ -71,8 +87,6 @@ interface FormMenuProps {
 }
 
 /** Кнопка с выбранной формой бланка; по нажатию открывается меню с вариантами и пояснением */
-const same = (v: string) => v;
-
 export function FormMenu({ forms, value, hint, title = 'Форма бланка', format = same, formatValue = format, stableWidth = false, onChange }: FormMenuProps) {
   const [open, setOpen] = useState(false);
   return (

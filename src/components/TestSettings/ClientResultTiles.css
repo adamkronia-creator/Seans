@@ -12,6 +12,18 @@
   font: var(--type-label);
 }
 
+.client-result-tiles__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.client-result-tiles__legend svg {
+  flex-shrink: 0;
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
+}
+
 .client-result-tiles__choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

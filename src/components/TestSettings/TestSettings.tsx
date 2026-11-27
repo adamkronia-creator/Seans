@@ -25,7 +25,7 @@ import { testBlank } from '../../data/testBlank';
 import { type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
-import { FormMenu } from './FormMenu';
+import { FormOptions } from './FormMenu';
 import { type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
@@ -64,6 +64,8 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
 const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
+const FORM_LABELS: Record<string, string> = { Мужская: 'Мужской', Женская: 'Женский' };
+const FORM_DESCRIPTION = 'В зависимости от формы бланка меняется система подсчета баллов, что влияет на итоги тестирования';
 
 
 const STATUS: Record<View, string> = {
@@ -177,6 +179,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const data = testSettings(test);
   const sentOptions = sent ? (sent.testOptions ?? DEFAULT_SENT_OPTIONS) : undefined;
   const locked = Boolean(sent);
+  const formDetails = locked ? '' : formHint(test.id);
   // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
@@ -339,19 +342,29 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
                 <CollapseCard title="Прохождение" badge={<OptionHelp id="features" corner />}>
                   <ul className="ts-rows">
-                    {data.forms && (
-                      <Row Icon={IconRowForm} label="Форма бланка" hint="В зависимости от формы бланка меняется система подсчета баллов, что влияет на итоги тестирования">
-                        {locked || data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
-                          <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={setForm} stableWidth />
-                        )}
-                      </Row>
-                    )}
                     <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
                       <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
                     </Row>
                     <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Перемешивает тестовые вопросы в произвольном порядке. Так тест сложнее распознать, если проходишь его повторно">
                       <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
                     </Row>
+                    {data.forms && (
+                      <Row Icon={IconRowForm} label="Форма бланка" hint={FORM_DESCRIPTION}>
+                        {data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
+                          <div className="ts-form-options">
+                            <FormOptions
+                              forms={data.forms}
+                              value={form}
+                              title="Форма бланка"
+                              format={(option) => FORM_LABELS[option] ?? option}
+                              disabled={locked}
+                              onChange={setForm}
+                            />
+                            {formDetails && <p className="ts-row__hint">{formDetails}</p>}
+                          </div>
+                        )}
+                      </Row>
+                    )}
                   </ul>
                 </CollapseCard>
 
