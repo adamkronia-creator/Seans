@@ -599,11 +599,6 @@
   overflow: hidden;
 }
 
-/* Начало новой группы шкал (5PFQ: пять дополнительных на каждую основную): лишний отступ над первой шкалой группы */
-.ts-scale__list .ts-scale__gap {
-  margin-top: var(--space-3);
-}
-
 /* Тест добавлен в избранное: сердечко вырастает с пружинкой и оседает (класс is-pop ставит TestHeader на время анимации) */
 .test-settings__button.is-pop svg {
   animation: heart-pop 0.46s var(--ease-ios);

@@ -2,6 +2,7 @@ import { ClientResultTiles } from '../../components/TestSettings/ClientResultTil
 import { useState, type ReactNode } from 'react';
 import { Switch } from '../../components/Switch/Switch';
 import { FormMenu } from '../../components/TestSettings/FormMenu';
+import { ScaleChips } from '../../components/TestSettings/ScaleChips';
 import { PreviewSheet } from '../../components/TestSettings/SendSheet';
 import { TestBlank } from '../../components/TestSettings/TestBlank';
 import { TestConclusion } from '../../components/TestSettings/TestConclusion';
@@ -171,9 +172,9 @@ export default function SmolPrototypePage({ onBack }: { onBack: () => void }) {
                     <Panel title="Шкалы СМОЛ">
                       <div className="smol-prototype__scales">
                         <h3>Основные</h3>
-                        <ul>{data.scales.main.map((scale) => <li key={scale}>{scale}</li>)}</ul>
+                        <ScaleChips testId={SMOL.id} scales={data.scales.main} />
                         <h3>Шкалы достоверности</h3>
-                        <ul>{data.scales.extra.map((scale) => <li key={scale}>{scale}</li>)}</ul>
+                        <ScaleChips testId={SMOL.id} scales={data.scales.extra} />
                       </div>
                     </Panel>
                   )}

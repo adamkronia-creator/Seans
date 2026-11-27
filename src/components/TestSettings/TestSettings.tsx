@@ -2,6 +2,7 @@ import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
 import { SwipePager } from '../SwipePager/SwipePager';
 import { ClientResultTiles } from './ClientResultTiles';
+import { ScaleChips } from './ScaleChips';
 import { followChips, type PositionVia } from '../../utils/followChips';
 import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
@@ -482,14 +483,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                         <IconRowMain className="ts-row__icon" />
                         <div className="ts-scale">
                           <p className="ts-scale__title">Основные шкалы:</p>
-                          <ul className="ts-scale__list">
-                            {data.scales.main.map((s) => (
-                              <li key={s}>
-                                <span className="ts-dot ts-dot--text" />
-                                {s}
-                              </li>
-                            ))}
-                          </ul>
+                          <ScaleChips testId={test.id} scales={data.scales.main} />
                         </div>
                       </li>
                       {data.scales.extra.length > 0 && (
@@ -497,14 +491,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                         <IconRowQuestions className="ts-row__icon" />
                         <div className="ts-scale">
                           <p className="ts-scale__title">Дополнительные шкалы:</p>
-                          <ul className="ts-scale__list">
-                            {data.scales.extra.map((s, i) => (
-                              <li key={s} className={data.extraGroup && i > 0 && i % data.extraGroup === 0 ? 'ts-scale__gap' : undefined}>
-                                <span className="ts-dot ts-dot--text" />
-                                {s}
-                              </li>
-                            ))}
-                          </ul>
+                          <ScaleChips testId={test.id} scales={data.scales.extra} groupSize={data.extraGroup} />
                         </div>
                       </li>
                       )}
