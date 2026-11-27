@@ -330,7 +330,9 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         ))}
       </div>
       <div className="ts-settings-tabs" data-no-swipe-back>
-        <SwipePager index={settingsTab} onIndexChange={setSettingsTab} onPosition={syncChips} pages={[
+        <SwipePager index={settingsTab} onIndexChange={setSettingsTab} onPosition={syncChips} onEdgeSwipe={(direction) => {
+          if (direction < 0) onBack();
+        }} pages={[
           {
             key: 'setup',
             node: (
