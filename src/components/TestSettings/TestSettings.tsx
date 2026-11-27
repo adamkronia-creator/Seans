@@ -136,71 +136,125 @@ export function Row({
   );
 }
 
-function SettingChoice<T extends string>({ Icon, label, hint, value, options, disabled, onChange }: {
+function SettingChoice<T extends string>({ Icon, label, hint, value, options, disabled, active, onChange }: {
   Icon: Svg;
   label: string;
   hint: string;
   value: T;
   options: { value: T; label: string }[];
   disabled: boolean;
+  active: boolean;
   onChange: (value: T) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const panelId = useId();
+  const menuId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<number>();
   const selected = options.find((option) => option.value === value)?.label ?? value;
-  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const button = trigger.current;
+    if (!menu || !button) return;
+
+    const position = () => {
+      const anchor = button.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportTop = viewport?.offsetTop ?? 0;
+      const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight);
+      const above = anchor.top - viewportTop;
+      const below = viewportBottom - anchor.bottom;
+      const styles = getComputedStyle(menu);
+      const space = parseFloat(styles.getPropertyValue('--space-1'));
+      const rowHeight = parseFloat(styles.getPropertyValue('--size-touch')) + space;
+      const opensAbove = below < options.length * rowHeight + 2 * space && above > below;
+      menu.style.top = opensAbove ? 'auto' : `${anchor.bottom + space}px`;
+      menu.style.bottom = opensAbove ? `${window.innerHeight - anchor.top + space}px` : 'auto';
+      menu.style.right = `${Math.max(0, document.documentElement.clientWidth - anchor.right)}px`;
+      menu.style.minWidth = `${anchor.width}px`;
+      menu.style.maxHeight = `${Math.max(0, (opensAbove ? above : below) - 2 * space)}px`;
+    };
+
+    const beforeToggle = (event: ToggleEvent) => {
+      if (event.newState === 'open') position();
+    };
+    const onToggle = () => {
+      window.clearTimeout(closeTimer.current);
+      setOpen(menu.matches(':popover-open'));
+    };
+    const onScroll = (event: Event) => {
+      if (!menu.contains(event.target as Node) && menu.matches(':popover-open')) menu.hidePopover();
+    };
+    menu.addEventListener('beforetoggle', beforeToggle);
+    menu.addEventListener('toggle', onToggle);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', position);
+    return () => {
+      window.clearTimeout(closeTimer.current);
+      menu.removeEventListener('beforetoggle', beforeToggle);
+      menu.removeEventListener('toggle', onToggle);
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', position);
+    };
+  }, [options.length]);
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!active && menu?.matches(':popover-open')) menu.hidePopover();
+  }, [active]);
 
   if (options.length < 2) {
     return <Row Icon={Icon} label={label} hint={hint}><span className="ts-row__value">{selected}</span></Row>;
   }
 
+  if (typeof HTMLElement.prototype.showPopover !== 'function') {
+    return (
+      <Row Icon={Icon} label={label} hint={hint}>
+        <select className="ts-select" aria-label={label} disabled={disabled} value={value} onChange={(event) => {
+          const option = options.find((option) => option.value === event.currentTarget.value);
+          if (option) onChange(option.value);
+        }}>
+          {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+      </Row>
+    );
+  }
+
   return (
-    <Row Icon={Icon} label={label}>
+    <Row Icon={Icon} label={label} hint={hint}>
       <button
         ref={trigger}
         type="button"
         className="ts-select"
         aria-label={`${label}: ${selected}`}
-        aria-controls={panelId}
+        aria-controls={menuId}
         aria-expanded={open}
         disabled={disabled}
-        onClick={() => {
-          window.clearTimeout(closeTimer.current);
-          setOpen(!open);
-        }}
+        {...{ popovertarget: menuId }}
       >
         <span className="ts-select__value">{selected}</span>
         <IconTestChevronDown className="ts-select__chevron" aria-hidden="true" />
       </button>
-      <div
-        id={panelId}
-        aria-hidden={!open}
-        className={`ts-choice-panel blank-card__collapse${open ? ' blank-card__collapse--open' : ''}`}
-      >
-        <div className="blank-card__inner">
-          <p className="ts-row__hint ts-choice-panel__hint">{hint}</p>
-          <div className="blank-answers ts-choice-panel__options" role="group" aria-label={label}>
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className="blank-answer"
-                aria-pressed={option.value === value}
-                disabled={!open || disabled}
-                onClick={() => {
-                  onChange(option.value);
-                  window.clearTimeout(closeTimer.current);
-                  closeTimer.current = window.setTimeout(() => setOpen(false), CHOICE_CONFIRM_MS);
-                  trigger.current?.focus({ preventScroll: true });
-                }}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div ref={menuRef} id={menuId} className="blank-answers ts-choice-menu" role="group" aria-label={label} {...{ popover: 'auto' }}>
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className="blank-answer"
+            aria-pressed={option.value === value}
+            onClick={() => {
+              onChange(option.value);
+              window.clearTimeout(closeTimer.current);
+              closeTimer.current = window.setTimeout(() => {
+                const menu = menuRef.current;
+                if (menu?.matches(':popover-open')) menu.hidePopover();
+              }, CHOICE_CONFIRM_MS);
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </Row>
   );
@@ -418,10 +472,11 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                       <SettingChoice
                         Icon={IconRowForm}
                         label="Форма бланка"
-                        hint="От выбранной формы бланка зависит подсчёт баллов и общий итог тестирования, а не только обращение вопросов"
+                        hint="Особенности подсчёта"
                         value={form}
                         options={data.forms.map((form) => ({ value: form, label: formatTestForm(form) }))}
                         disabled={locked}
+                        active={settingsTab === 0}
                         onChange={setForm}
                       />
                     )}
@@ -437,10 +492,11 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                       <SettingChoice
                         Icon={IconRowResult}
                         label="Экран завершения"
-                        hint="Что видит клиент после прохождения теста? Только панель с благодарностью, баллы или полное заключение?"
+                        hint="Что видит клиент"
                         value={result}
                         options={COMPLETION_OPTIONS}
                         disabled={locked}
+                        active={settingsTab === 0}
                         onChange={setResult}
                       />
                     )}

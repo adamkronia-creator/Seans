@@ -846,55 +846,34 @@
   padding-block: 0;
 }
 
-[data-pm] .ts-settings-page--setup .blank-card .ts-row + .ts-row {
-  --ts-row-seam: 1px; /* grid:ok — такой же прозрачный просвет, как под шапкой */
-  border-block-start: var(--ts-row-seam) solid transparent;
-  background-clip: padding-box;
-}
-
-[data-pm] .ts-settings-page--setup .blank-card .ts-row + .ts-row::before {
-  display: block;
-  top: calc(-1 * var(--ts-row-seam));
-  inset-inline: 0 auto;
-  width: calc(var(--space-3) + var(--size-icon-lg) + var(--row-gap));
-  height: var(--ts-row-seam);
-  background: var(--glass-card);
-}
-
-[data-pm] .ts-settings-page--setup .ts-row:has(> .ts-choice-panel) {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  row-gap: 0;
-}
-
-.ts-settings-page--setup .ts-row > .ts-row__value,
-.ts-settings-page--setup .ts-row > .ts-select {
-  justify-self: end;
-}
-
-.ts-choice-panel {
-  grid-column: 1 / -1;
-}
-
-.ts-choice-panel__hint {
-  margin: var(--space-1) 0 var(--space-2);
-}
-
-.ts-choice-panel__options {
-  flex-direction: row;
+.ts-choice-menu {
+  position: fixed;
+  inset: auto;
+  display: none;
+  width: max-content;
+  max-width: calc(100vw - var(--space-4));
+  box-sizing: border-box;
   gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-float);
 }
 
-.ts-choice-panel__options .blank-answer {
-  flex: 1 1 0;
+.ts-choice-menu:popover-open {
+  display: flex;
+}
+
+.ts-choice-menu .blank-answer {
   align-items: center;
-  justify-content: center;
-  min-width: 0;
   min-height: var(--size-touch);
-  padding: var(--space-1);
+  padding: var(--space-2);
   color: var(--text-primary);
-  font-size: var(--font-size-md);
-  text-align: center;
   overflow-wrap: anywhere;
 }
 
