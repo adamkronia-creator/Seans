@@ -370,7 +370,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
                 <CollapseCard title="Заключение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlank} label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы и ответы">
+                    <Row Icon={IconRowBlank} label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы">
                       <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label="Сохранить бланк" />
                     </Row>
                   </ul>

@@ -837,9 +837,12 @@
   background: none;
 }
 
+.ts-settings-page--setup .blank-card__body > .ts-rows:last-child > .ts-row:last-child {
+  padding-block-end: var(--space-3);
+}
+
 .ts-settings-page--setup .client-result-tiles {
   margin-block-start: var(--space-2);
-  padding-block-end: var(--space-2);
 }
 
 .ts-settings-page--setup .client-result-tiles legend {
