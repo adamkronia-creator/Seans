@@ -3,8 +3,6 @@ import { EmptyState } from '../EmptyState/EmptyState';
 import { SwipePager } from '../SwipePager/SwipePager';
 import { ScaleChips } from './ScaleChips';
 import { followChips, type PositionVia } from '../../utils/followChips';
-import { ReadMoreLabel } from './ReadMoreLabel';
-import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
@@ -52,11 +50,6 @@ import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
-
-/** Строка текста для чтения (--line-height-read, typography.css): описание 16/25 */
-const DESC_LINE = 25;
-/** Высота свёрнутого описания: 6 строк и промежуток между абзацами 12, одинаково у всех тестов и заданий */
-const DESC_COLLAPSED = 6 * DESC_LINE + 12;
 
 type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -169,6 +162,7 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
       const space = parseFloat(styles.getPropertyValue('--space-1'));
       const rowHeight = parseFloat(styles.getPropertyValue('--size-touch')) + space;
       const opensAbove = below < options.length * rowHeight + 2 * space && above > below;
+      menu.dataset.side = opensAbove ? 'above' : 'below';
       menu.style.top = opensAbove ? 'auto' : `${anchor.bottom + space}px`;
       menu.style.bottom = opensAbove ? `${window.innerHeight - anchor.top + space}px` : 'auto';
       menu.style.right = `${Math.max(0, document.documentElement.clientWidth - anchor.right)}px`;
@@ -211,7 +205,7 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
   if (typeof HTMLElement.prototype.showPopover !== 'function') {
     return (
       <Row Icon={Icon} label={label} hint={hint}>
-        <select className="ts-select" aria-label={label} disabled={disabled} value={value} onChange={(event) => {
+        <select className="ts-select ts-select--settings" aria-label={label} disabled={disabled} value={value} onChange={(event) => {
           const option = options.find((option) => option.value === event.currentTarget.value);
           if (option) onChange(option.value);
         }}>
@@ -226,7 +220,7 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
       <button
         ref={trigger}
         type="button"
-        className="ts-select"
+        className="ts-select ts-select--settings"
         aria-label={`${label}: ${selected}`}
         aria-controls={menuId}
         aria-expanded={open}
@@ -316,7 +310,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const [view, setView] = useState<View>(passRequest && testBlank(test.id) ? 'pass' : 'settings');
   // Результат только что пройденного теста: открывается вместо настроек, «назад» возвращает к ним
   const [resultId, setResultId] = useState<string | null>(null);
-  // Длинное описание свёрнуто до шести строк, пока его не раскроют
   const [settingsTab, setSettingsTab] = useState(0);
   const chips = useRef<HTMLDivElement>(null);
   const chipPosition = useRef(0);
@@ -324,10 +317,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
     chipPosition.current = position;
     if (chips.current) followChips(chips.current.querySelectorAll<HTMLButtonElement>('.chip'), position, via);
   }, []);
-  const [descOpen, setDescOpen] = useState(false);
-  const [descFull, setDescFull] = useState(0);
-  const descRef = useRef<HTMLDivElement>(null);
-  const descLong = descFull > DESC_COLLAPSED + DESC_LINE;
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
@@ -355,21 +344,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const copyUrl = (url: string) => void copyText(url).then((ok) => notify(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
 
   const chars = message.length;
-  // Полная высота описания нужна, чтобы понять, длинное ли оно, и плавно раскрыть до нужной высоты
-  useLayoutEffect(() => {
-    const el = descRef.current;
-    if (!el) return;
-    const measure = () => setDescFull(el.scrollHeight);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    window.addEventListener('resize', measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, [view, resultId, settingsTab]);
-
   useLayoutEffect(() => {
     const row = chips.current;
     if (!row) return;
@@ -532,34 +506,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             key: 'description',
             node: (
               <div className="test-settings__scroll ts-settings-page">
-                <div className="ts-desc-unit">
-                <CollapseCard title="Описание теста">
-                  <div className="ts-desc">
-                    <div className="ts-desc__clip">
-                      <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
-                        <TestDescription intro={data.intro} lead={data.lead} />
-                      </div>
-                      {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
-                      {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
-                    </div>
-                  </div>
-                </CollapseCard>
-                {descLong && (
-                  <button
-                    type="button"
-                    className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
-                    aria-expanded={descOpen}
-                    onClick={(event) => {
-                      const body = descRef.current;
-                      anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
-                        !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
-                    }}
-                  >
-                    <ReadMoreLabel open={descOpen} />
-                  </button>
-                )}
-                </div>
-
                 {(data.questions || data.duration || data.age) && (
                   <CollapseCard title="Тестовая информация">
                     <ul className="ts-rows ts-info-rows">
@@ -575,6 +521,11 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                     </ul>
                   </CollapseCard>
                 )}
+                <CollapseCard title="Описание теста">
+                  <div className="ts-desc">
+                    <TestDescription intro={data.intro} lead={data.lead} />
+                  </div>
+                </CollapseCard>
               </div>
             ),
           },
@@ -583,16 +534,16 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             node: (
               <div className="test-settings__scroll ts-settings-page">
                 {(conclusion || blank) && (
-                  <ul className="ts-actions">
+                  <ul className="ts-actions ts-actions--materials">
                     {blank && <li>
                       <button type="button" className="ts-action" onClick={openBlank}>
-                        <span className="ts-action__label">Бланк тестирования</span>
+                        <span className="ts-action__label">Бланк<br />тестирования</span>
                       </button>
                     </li>}
                     {conclusion && (
                       <li>
                         <button type="button" className="ts-action" onClick={openConclusion}>
-                          <span className="ts-action__label">Пример заключения</span>
+                          <span className="ts-action__label">Пример<br />заключения</span>
                         </button>
                       </li>
                     )}
