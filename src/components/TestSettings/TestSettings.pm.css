@@ -872,11 +872,6 @@
   grid-area: 1 / 2;
 }
 
-/* Сохраняем высоту строки заголовка, пока переключатель центрируется по двум строкам. */
-.ts-settings-page--setup .ts-row:has(.ts-row__hint):has(> .switch) {
-  grid-template-rows: minmax(var(--space-7), auto) auto;
-}
-
 .ts-settings-page--setup .ts-row:has(> .switch) .ts-row__text > .ts-row__hint {
   grid-column-end: 2;
 }
