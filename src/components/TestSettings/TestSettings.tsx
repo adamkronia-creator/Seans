@@ -46,9 +46,6 @@ import IconRowAge from '../../assets/icons/solar/user.svg?react';
 import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
 import IconRowMain from '../../assets/icons/solar/list.svg?react';
 import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
-import IconRowBlind from '../../assets/icons/solar/incognito.svg?react';
-import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
-import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
@@ -343,14 +340,14 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
               <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
                 <CollapseCard title="Прохождение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
+                    <Row label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
                       <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
                     </Row>
-                    <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Перемешивает тестовые вопросы в произвольном порядке. Так тест сложнее распознать, если проходишь его повторно">
+                    <Row label="Перемешать вопросы" hint="Перемешивает тестовые вопросы в произвольном порядке. Так тест сложнее распознать, если проходишь его повторно">
                       <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
                     </Row>
                     {data.forms && (
-                      <Row Icon={IconRowForm} label="Форма бланка" hint={FORM_DESCRIPTION}>
+                      <Row label="Форма бланка" hint={FORM_DESCRIPTION}>
                         {data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
                           <div className="ts-form-options">
                             <FormOptions
@@ -371,7 +368,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
 
                 <CollapseCard title="Заключение">
                   <ul className="ts-rows">
-                    <Row Icon={IconRowBlank} label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы">
+                    <Row label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы">
                       <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label="Сохранить бланк" />
                     </Row>
                   </ul>

@@ -13,18 +13,6 @@
   font-weight: normal;
 }
 
-.client-result-tiles__legend {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.client-result-tiles__legend svg {
-  flex-shrink: 0;
-  width: var(--size-icon-lg);
-  height: var(--size-icon-lg);
-}
-
 .client-result-tiles__hint {
   margin: 0 0 var(--space-2);
 }
