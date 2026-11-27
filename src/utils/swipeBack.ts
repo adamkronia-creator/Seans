@@ -12,7 +12,7 @@ import { canScrollSideways, edgeTouch, SWIPE_DOMINANCE, swipeCommits, VelocityTr
 /* Пороги общие для всех свайпов (utils/swipe.ts): перевес над вертикальным 1,2, засчитывается 30% ширины экрана с учётом скорости */
 
 // Кнопки-переключатели (радио, флажки) жест не блокируют: они занимают целые строки бланка
-const NOT_FROM = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-swipe-lock~="right"], [data-hscroll], .sheet, [role="dialog"]';
+const NOT_FROM = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]), textarea, select, [contenteditable]:not([contenteditable="false"]), [data-no-swipe], [data-swipe-lock~="right"], [data-no-swipe-back], [data-hscroll], .sheet, [role="dialog"]';
 
 /** Пока `enabled`, свайп вправо внутри `scope` (селектор экрана) вызывает `onBack` */
 export function useSwipeBack(scope: string, enabled: boolean, onBack: () => void) {

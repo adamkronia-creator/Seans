@@ -49,8 +49,7 @@
   height: var(--size-icon-sm);
 }
 
-.smol-prototype__tabs,
-.smol-prototype__choices {
+.smol-prototype__tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -123,56 +122,6 @@
   flex-shrink: 0;
 }
 
-.smol-prototype__result {
-  min-width: 0;
-  margin: 0;
-  padding: 0 var(--space-4) var(--space-3);
-  border: 0;
-}
-
-.smol-prototype__result legend {
-  margin-bottom: var(--space-2);
-  padding: 0;
-  color: var(--text-secondary);
-  font: var(--type-label);
-}
-
-.smol-prototype__choices {
-  gap: var(--space-1);
-}
-
-.smol-prototype__choices label {
-  position: relative;
-  display: grid;
-  align-items: stretch;
-  min-height: var(--size-touch);
-  cursor: pointer;
-}
-
-.smol-prototype__choices input {
-  position: absolute;
-  opacity: 0;
-}
-
-.smol-prototype__choices span {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
-  background: var(--bg-subtle);
-  color: var(--text-secondary);
-  font: var(--type-caption);
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-
-.smol-prototype__choices input:checked + span {
-  background: var(--action-primary);
-  color: var(--action-primary-text);
-}
-
-.smol-prototype__choices input:focus-visible + span,
 .smol-prototype__tabs button:focus-visible {
   outline: var(--active-ring-width) solid var(--text-link);
   outline-offset: var(--hairline);
@@ -243,7 +192,6 @@
 
 @media (max-width: 360px) {
   .smol-prototype__tabs button { font: var(--type-caption); }
-  .smol-prototype__choices span { font: var(--type-meta); }
 }
 
 @media (prefers-reduced-motion: reduce) {

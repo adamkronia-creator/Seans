@@ -1,7 +1,12 @@
+import { Chip } from '../Chip/Chip';
+import { EmptyState } from '../EmptyState/EmptyState';
+import { SwipePager } from '../SwipePager/SwipePager';
+import { ClientResultTiles } from './ClientResultTiles';
+import { followChips, type PositionVia } from '../../utils/followChips';
 import { ReadMoreLabel } from './ReadMoreLabel';
 import { anchorToggle } from '../../utils/anchorToggle';
 import { TestDescription } from './TestDescription';
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
   IconTestMic,
 } from '../icons';
@@ -17,11 +22,11 @@ import type { LibraryTest } from '../../data/library';
 import { DEFAULT_SENT_OPTIONS, type Message } from '../../data/messages';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
 import { testBlank } from '../../data/testBlank';
-import { SAVE_BLANK_LABEL, type OptionHelpId } from '../../data/optionHelp';
+import { type OptionHelpId } from '../../data/optionHelp';
 import { CollapseCard, TestBlank } from './TestBlank';
 import { TestConclusion } from './TestConclusion';
 import { FormMenu } from './FormMenu';
-import { RESULT_MODES, type ResultMode } from '../../data/resultMode';
+import { type ResultMode } from '../../data/resultMode';
 import { TestHeader } from './TestHeader';
 import { TestPreview } from './TestPreview';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
@@ -45,7 +50,6 @@ import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
 import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
 import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
 import IconLinkConclusion from '../../assets/icons/solar/notebook.svg?react';
-import IconRowResult from '../../assets/icons/solar/checklist-minimalistic.svg?react';
 import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
@@ -59,6 +63,8 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
+const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
+
 
 const STATUS: Record<View, string> = {
   settings: 'Настройка тестирования',
@@ -76,7 +82,6 @@ interface TestSettingsProps {
   onBack: () => void;
 }
 
-const resultTitle = (id: string) => RESULT_MODES.find((m) => m.id === id)?.title ?? id;
 
 /** Название строки с «?» в конце: значок прижат к последнему слову, и при переносе они не расходятся по разным строкам */
 function labelWithHelp(label: string, help: OptionHelpId) {
@@ -132,7 +137,7 @@ export function Row({
 }
 
 /** Поле, которое растёт по тексту */
-export function MessageField({ value, onChange, limit = MESSAGE_LIMIT, id = 'ts-message' }: { value: string; onChange: (v: string) => void; limit?: number; id?: string }) {
+export function MessageField({ value, onChange, limit = MESSAGE_LIMIT, id = 'ts-message', readOnly = false }: { value: string; onChange: (v: string) => void; limit?: number; id?: string; readOnly?: boolean }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fit = () => {
     const el = ref.current;
@@ -157,6 +162,7 @@ export function MessageField({ value, onChange, limit = MESSAGE_LIMIT, id = 'ts-
       rows={1}
       maxLength={limit}
       value={value}
+      readOnly={readOnly}
       aria-label="Сообщение для клиента"
       onChange={(e) => onChange(e.target.value)}
     />
@@ -171,9 +177,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const data = testSettings(test);
   const sentOptions = sent ? (sent.testOptions ?? DEFAULT_SENT_OPTIONS) : undefined;
   const locked = Boolean(sent);
-  const noop = () => undefined;
   // «Особенности тестирования» в новом виде (пробный запуск): короткие названия и «?» с подсказкой вместо описаний
-  const blankLabel = SAVE_BLANK_LABEL;
   // Тест, отправленный себе, открывается сразу прохождением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takePass(test.id));
   const [form, setForm] = useState(sentOptions?.form ?? (passRequest?.form || (data.forms?.[0] ?? '')));
@@ -190,6 +194,13 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   // Результат только что пройденного теста: открывается вместо настроек, «назад» возвращает к ним
   const [resultId, setResultId] = useState<string | null>(null);
   // Длинное описание свёрнуто до шести строк, пока его не раскроют
+  const [settingsTab, setSettingsTab] = useState(0);
+  const chips = useRef<HTMLDivElement>(null);
+  const chipPosition = useRef(0);
+  const syncChips = useCallback((position: number, via?: PositionVia) => {
+    chipPosition.current = position;
+    if (chips.current) followChips(chips.current.querySelectorAll<HTMLButtonElement>('.chip'), position, via);
+  }, []);
   const [descOpen, setDescOpen] = useState(false);
   const [descFull, setDescFull] = useState(0);
   const descRef = useRef<HTMLDivElement>(null);
@@ -234,7 +245,18 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [view, resultId]);
+  }, [view, resultId, settingsTab]);
+
+  useLayoutEffect(() => {
+    const row = chips.current;
+    if (!row) return;
+    const place = () => syncChips(chipPosition.current);
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(row);
+    row.querySelectorAll('.chip').forEach((chip) => observer.observe(chip));
+    return () => observer.disconnect();
+  }, [view, resultId, syncChips]);
   // Бланк, заключение и прохождение открываются как следующий экран: выезжают справа, «назад» возвращает к настройкам
   const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
   const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
@@ -301,197 +323,209 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         </ScrollHost>
       ) : (
       <>
-      <div className="test-settings__scroll">
-        <div className="ts-desc-unit">
-        <CollapseCard title="Описание теста">
-          <div className="ts-desc">
-            <div className="ts-desc__clip">
-              <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
-                <TestDescription intro={data.intro} lead={data.lead} />
-              </div>
-              {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
-              {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
-            </div>
-          </div>
-        </CollapseCard>
-        {descLong && (
-          <button
-            type="button"
-            className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
-            aria-expanded={descOpen}
-            onClick={(event) => {
-              const body = descRef.current;
-              anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
-                !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
-            }}
-          >
-            <ReadMoreLabel open={descOpen} />
-          </button>
-        )}
-        </div>
-
-        {(data.scales || blank) && (
-          <ul className="ts-actions">
-            <li>
-              <button type="button" className="ts-action" onClick={openBlank}>
-                <IconLinkBlank className="ts-action__icon" />
-                <span className="ts-action__label">Бланк тестирования</span>
-              </button>
-            </li>
-            {data.scales && (
-              <li>
-                <button type="button" className="ts-action" onClick={openConclusion}>
-                  <IconLinkConclusion className="ts-action__icon" />
-                  <span className="ts-action__label">Пример заключения</span>
-                </button>
-              </li>
-            )}
-          </ul>
-        )}
-
-        {(data.questions || data.duration || data.age || data.forms) && (
-          <CollapseCard title="Тестовая информация">
-            <ul className="ts-rows">
-              {data.questions !== undefined && (
-                <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
-              )}
-              {data.duration && (
-                <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
-              )}
-              {data.age && (
-                <Row Icon={IconRowAge} label="Возраст" value={data.age} />
-              )}
-              {data.forms && (
-                <Row Icon={IconRowForm} label="Форма бланка" info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
-                  {!locked && data.forms.length > 1 && (
-                    <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={locked ? noop : setForm} />
-                  )}
-                </Row>
-              )}
-            </ul>
-          </CollapseCard>
-        )}
-
-        {data.scales && (
-          <CollapseCard title="Шкалы и баллы">
-            <ul className="ts-rows">
-              <li className="ts-row ts-row--top">
-                <IconRowMain className="ts-row__icon" />
-                <div className="ts-scale">
-                  <p className="ts-scale__title">Основные шкалы:</p>
-                  <ul className="ts-scale__list">
-                    {data.scales.main.map((s) => (
-                      <li key={s}>
-                        <span className="ts-dot ts-dot--text" />
-                        {s}
-                      </li>
-                    ))}
+      <div ref={chips} className="screen-header__chips ts-settings-chips" role="group" aria-label="Разделы настройки теста" data-hscroll>
+        <span className="chips-pill" aria-hidden="true" />
+        {SETTINGS_TABS.map((label, index) => (
+          <Chip key={label} tone="chat" follow active={index === settingsTab} onClick={() => setSettingsTab(index)}>{label}</Chip>
+        ))}
+      </div>
+      <div className="ts-settings-tabs" data-no-swipe-back>
+        <SwipePager index={settingsTab} onIndexChange={setSettingsTab} onPosition={syncChips} pages={[
+          {
+            key: 'setup',
+            node: (
+              <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
+                <CollapseCard title="Прохождение" badge={<OptionHelp id="features" corner />}>
+                  <ul className="ts-rows">
+                    {data.forms && (
+                      <Row Icon={IconRowForm} label="Форма бланка" hint="В зависимости от формы бланка меняется система подсчета баллов, что влияет на итоги тестирования">
+                        {locked || data.forms.length === 1 ? <span className="ts-row__value">{form}</span> : (
+                          <FormMenu forms={data.forms} value={form} hint={formHint(test.id) || undefined} onChange={setForm} stableWidth />
+                        )}
+                      </Row>
+                    )}
+                    <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрывает название и назначение теста для пользователя. Иногда, когда не знаешь какой тест выполняешь, — ответы честнее">
+                      <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
+                    </Row>
+                    <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Перемешивает тестовые вопросы в произвольном порядке. Так тест сложнее распознать, если проходишь его повторно">
+                      <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
+                    </Row>
                   </ul>
-                </div>
-              </li>
-              {data.scales.extra.length > 0 && (
-              <li className="ts-row ts-row--top">
-                <IconRowQuestions className="ts-row__icon" />
-                <div className="ts-scale">
-                  <p className="ts-scale__title">Дополнительные шкалы:</p>
-                  <ul className="ts-scale__list">
-                    {data.scales.extra.map((s, i) => (
-                      <li key={s} className={data.extraGroup && i > 0 && i % data.extraGroup === 0 ? 'ts-scale__gap' : undefined}>
-                        <span className="ts-dot ts-dot--text" />
-                        {s}
-                      </li>
-                    ))}
+                </CollapseCard>
+
+                <CollapseCard title="Заключение">
+                  <ul className="ts-rows">
+                    <Row Icon={IconRowBlank} label="Сохранить бланк" hint="Сохраняет бланк тестирования, заполненный пользователем, в заключении. Помогает посмотреть критически важные вопросы и ответы">
+                      <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label="Сохранить бланк" />
+                    </Row>
                   </ul>
-                </div>
-              </li>
-              )}
-              {(
-                [
-                  [data.scoring, data.scoringExtra ? 'Система баллов (Осн. шкалы):' : 'Система баллов:'],
-                  [data.scoringExtra, 'Система баллов (Доп. шкалы):'],
-                ] as const
-              ).map(
-                ([items, title]) =>
-                  items && (
-                    <li key={title} className="ts-row ts-row--top">
-                      <IconRowPoints className="ts-row__icon" />
-                      <div className="ts-scale">
-                        <p className="ts-scale__title">{title}</p>
-                        <ul className="ts-scale__list">
-                          {items.map(({ range, label, tone }) => (
-                            <li key={label}>
-                              <span className={`ts-dot ts-dot--${tone}`} />
-                              {tone === 'text' ? `${label} — ${range}` : `${range} — ${label}`}
-                            </li>
-                          ))}
-                        </ul>
+                  {conclusion && <ClientResultTiles value={result} onChange={setResult} disabled={locked} />}
+                </CollapseCard>
+
+                <section className="ts-card ts-message-card">
+                  <ul className="ts-rows">
+                    <Row Icon={IconRowMessage} label="Сообщение для клиента">
+                      <Switch checked={messageOn} disabled={locked} onChange={setMessageOn} label="Сообщение для клиента" />
+                    </Row>
+                  </ul>
+                  <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
+                    <div className="blank-card__inner">
+                      <div className="blank-card__body ts-message">
+                        <MessageField value={message} readOnly={locked} onChange={setMessage} />
+                        <div className="ts-message__foot">
+                          <span className="ts-message__count">
+                            {chars} / {MESSAGE_LIMIT}
+                          </span>
+                          <button type="button" disabled={locked} className="ts-message__mic" aria-label="Надиктовать сообщение">
+                            <IconTestMic />
+                          </button>
+                        </div>
                       </div>
-                    </li>
-                  ),
-              )}
-            </ul>
-          </CollapseCard>
-        )}
-
-        <CollapseCard title="Особенности тестирования" badge={<OptionHelp id="features" corner />}>
-          <ul className="ts-rows">
-            {/* Строки без описаний, пояснения в подсказке «?» со скриншотами */}
-            <Row
-              Icon={IconRowBlind}
-              label="Слепое тестирование"
-            >
-              <Switch checked={blind} onChange={locked ? noop : setBlind} label="Слепое тестирование" />
-            </Row>
-            <Row
-              Icon={IconRowBlank}
-              label={blankLabel}
-            >
-              <Switch checked={saveBlank} onChange={locked ? noop : setSaveBlank} label={blankLabel} />
-            </Row>
-            <Row Icon={IconRowShuffle} label="Перемешать вопросы">
-              <Switch checked={shuffle} onChange={locked ? noop : setShuffle} label="Перемешать вопросы" />
-            </Row>
-            {conclusion && (
-              <Row Icon={IconRowResult} label="Завершение">
-                {locked ? <span className="ts-row__value">{resultTitle(result)}</span> : (
-                  <FormMenu
-                    stableWidth
-                    forms={RESULT_MODES.map((m) => m.id)}
-                    value={result}
-                    title="Завершение"
-                    format={resultTitle}
-                    formatValue={(v) => RESULT_MODES.find((m) => m.id === v)?.short ?? v}
-                    onChange={(v) => setResult(v as ResultMode)}
-                  />
-                )}
-              </Row>
-            )}
-          </ul>
-        </CollapseCard>
-
-        <section className="ts-card ts-message-card">
-          <ul className="ts-rows">
-            <Row Icon={IconRowMessage} label="Сообщение для клиента">
-              <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
-            </Row>
-          </ul>
-          <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
-            <div className="blank-card__inner">
-              <div className="blank-card__body ts-message">
-                <MessageField value={message} onChange={locked ? noop : setMessage} />
-                <div className="ts-message__foot">
-                  <span className="ts-message__count">
-                    {chars} / {MESSAGE_LIMIT}
-                  </span>
-                  <button type="button" className="ts-message__mic" aria-label="Надиктовать сообщение">
-                    <IconTestMic />
-                  </button>
-                </div>
+                    </div>
+                  </div>
+                </section>
               </div>
-            </div>
-          </div>
-        </section>
+            ),
+          },
+          {
+            key: 'description',
+            node: (
+              <div className="test-settings__scroll ts-settings-page">
+                <div className="ts-desc-unit">
+                <CollapseCard title="Описание теста">
+                  <div className="ts-desc">
+                    <div className="ts-desc__clip">
+                      <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
+                        <TestDescription intro={data.intro} lead={data.lead} />
+                      </div>
+                      {/* Свёрнуто: последние строки плавно уходят в белый, кнопка стоит под ними на белом */}
+                      {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
+                    </div>
+                  </div>
+                </CollapseCard>
+                {descLong && (
+                  <button
+                    type="button"
+                    className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`}
+                    aria-expanded={descOpen}
+                    onClick={(event) => {
+                      const body = descRef.current;
+                      anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
+                        !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
+                    }}
+                  >
+                    <ReadMoreLabel open={descOpen} />
+                  </button>
+                )}
+                </div>
 
+                {(data.questions || data.duration || data.age) && (
+                  <CollapseCard title="Тестовая информация">
+                    <ul className="ts-rows">
+                      {data.questions !== undefined && (
+                        <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
+                      )}
+                      {data.duration && (
+                        <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
+                      )}
+                      {data.age && (
+                        <Row Icon={IconRowAge} label="Возраст" value={data.age} />
+                      )}
+                    </ul>
+                  </CollapseCard>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: 'materials',
+            node: (
+              <div className="test-settings__scroll ts-settings-page">
+                {(conclusion || blank) && (
+                  <ul className="ts-actions">
+                    {blank && <li>
+                      <button type="button" className="ts-action" onClick={openBlank}>
+                        <IconLinkBlank className="ts-action__icon" />
+                        <span className="ts-action__label">Бланк</span>
+                      </button>
+                    </li>}
+                    {conclusion && (
+                      <li>
+                        <button type="button" className="ts-action" onClick={openConclusion}>
+                          <IconLinkConclusion className="ts-action__icon" />
+                          <span className="ts-action__label">Пример</span>
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                )}
+
+                {data.scales && (
+                  <CollapseCard title="Шкалы и баллы">
+                    <ul className="ts-rows">
+                      <li className="ts-row ts-row--top">
+                        <IconRowMain className="ts-row__icon" />
+                        <div className="ts-scale">
+                          <p className="ts-scale__title">Основные шкалы:</p>
+                          <ul className="ts-scale__list">
+                            {data.scales.main.map((s) => (
+                              <li key={s}>
+                                <span className="ts-dot ts-dot--text" />
+                                {s}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </li>
+                      {data.scales.extra.length > 0 && (
+                      <li className="ts-row ts-row--top">
+                        <IconRowQuestions className="ts-row__icon" />
+                        <div className="ts-scale">
+                          <p className="ts-scale__title">Дополнительные шкалы:</p>
+                          <ul className="ts-scale__list">
+                            {data.scales.extra.map((s, i) => (
+                              <li key={s} className={data.extraGroup && i > 0 && i % data.extraGroup === 0 ? 'ts-scale__gap' : undefined}>
+                                <span className="ts-dot ts-dot--text" />
+                                {s}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </li>
+                      )}
+                      {(
+                        [
+                          [data.scoring, data.scoringExtra ? 'Система баллов (Осн. шкалы):' : 'Система баллов:'],
+                          [data.scoringExtra, 'Система баллов (Доп. шкалы):'],
+                        ] as const
+                      ).map(
+                        ([items, title]) =>
+                          items && (
+                            <li key={title} className="ts-row ts-row--top">
+                              <IconRowPoints className="ts-row__icon" />
+                              <div className="ts-scale">
+                                <p className="ts-scale__title">{title}</p>
+                                <ul className="ts-scale__list">
+                                  {items.map(({ range, label, tone }) => (
+                                    <li key={label}>
+                                      <span className={`ts-dot ts-dot--${tone}`} />
+                                      {tone === 'text' ? `${label} — ${range}` : `${range} — ${label}`}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </li>
+                          ),
+                      )}
+                    </ul>
+                  </CollapseCard>
+                )}
+
+                {!blank && !conclusion && !data.scales && <EmptyState icon={<IconRowForm />} title="Материалы пока недоступны" />}
+              </div>
+            ),
+          },
+        ]} />
       </div>
 
       {locked ? (

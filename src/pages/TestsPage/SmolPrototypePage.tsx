@@ -1,3 +1,4 @@
+import { ClientResultTiles } from '../../components/TestSettings/ClientResultTiles';
 import { useState, type ReactNode } from 'react';
 import { Switch } from '../../components/Switch/Switch';
 import { FormMenu } from '../../components/TestSettings/FormMenu';
@@ -8,7 +9,7 @@ import { TestDescription } from '../../components/TestSettings/TestDescription';
 import { TestHeader } from '../../components/TestSettings/TestHeader';
 import { TestPreview } from '../../components/TestSettings/TestPreview';
 import { conclusionFor } from '../../data/conclusions';
-import { RESULT_MODES, type ResultMode } from '../../data/resultMode';
+import { type ResultMode } from '../../data/resultMode';
 import { formHint, questionOrder } from '../../data/selfTest';
 import { testBlank } from '../../data/testBlank';
 import { MESSAGE_LIMIT, testSettings } from '../../data/testSettings';
@@ -127,17 +128,7 @@ export default function SmolPrototypePage({ onBack }: { onBack: () => void }) {
                   </Panel>
 
                   <Panel title="После теста">
-                    <fieldset className="smol-prototype__result">
-                      <legend>Что увидит клиент</legend>
-                      <div className="smol-prototype__choices">
-                        {RESULT_MODES.map(({ id, short, title }) => (
-                          <label key={id}>
-                            <input type="radio" name="smol-prototype-result" checked={result === id} onChange={() => setResult(id)} aria-label={title} />
-                            <span>{id === 'thanks' ? 'Спасибо' : short}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </fieldset>
+                    <ClientResultTiles value={result} onChange={setResult} />
                     <ToggleRow label="Сохранять бланк" hint="Ответы останутся доступны специалисту." checked={saveBlank} onChange={setSaveBlank} />
                   </Panel>
 
