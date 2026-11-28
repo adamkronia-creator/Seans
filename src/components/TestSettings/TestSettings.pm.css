@@ -794,8 +794,20 @@
   text-wrap: balance;
 }
 
-[data-pm] .ts-actions--materials .ts-action {
-  box-shadow: var(--active-ring);
+[data-pm] .ts-materials .ts-row--link {
+  width: 100%;
+  min-height: var(--row-h);
+  padding-inline: var(--row-pad-x);
+  background: var(--glass-card);
+  text-align: start;
+}
+
+[data-pm] .ts-materials :is(.ts-row__icon, .ts-row__link) {
+  color: var(--text-link);
+}
+
+[data-pm] .ts-materials .ts-row__chevron {
+  color: var(--text-secondary);
 }
 
 [data-pm] .screen-header__chips.ts-settings-chips {

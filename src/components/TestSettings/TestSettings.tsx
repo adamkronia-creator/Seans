@@ -49,6 +49,9 @@ import IconRowMain from '../../assets/icons/test-settings/primary-scales.svg?rea
 import IconRowExtra from '../../assets/icons/test-settings/additional-scales.svg?react';
 import IconRowPoints from '../../assets/icons/test-settings/scoring.svg?react';
 import IconRowMessage from '../../assets/icons/test-settings/client-message.svg?react';
+import IconMaterialBlank from '../../assets/icons/test-settings/blank.svg?react';
+import IconMaterialConclusion from '../../assets/icons/test-settings/conclusion.svg?react';
+import IconMaterialChevron from '../../assets/icons/test-settings/chevron-right.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
 
@@ -535,16 +538,20 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
             node: (
               <div className="test-settings__scroll ts-settings-page">
                 {(conclusion || blank) && (
-                  <ul className="ts-actions ts-actions--materials">
+                  <ul className="ts-card ts-materials">
                     {blank && <li>
-                      <button type="button" className="ts-action" onClick={openBlank}>
-                        <span className="ts-action__label">Бланк<br />тестирования</span>
+                      <button type="button" className="ts-row ts-row--link" onClick={openBlank}>
+                        <IconMaterialBlank className="ts-row__icon" aria-hidden="true" />
+                        <span className="ts-row__link">Бланк тестирования</span>
+                        <IconMaterialChevron className="ts-row__chevron" aria-hidden="true" />
                       </button>
                     </li>}
                     {conclusion && (
                       <li>
-                        <button type="button" className="ts-action" onClick={openConclusion}>
-                          <span className="ts-action__label">Пример<br />заключения</span>
+                        <button type="button" className="ts-row ts-row--link" onClick={openConclusion}>
+                          <IconMaterialConclusion className="ts-row__icon" aria-hidden="true" />
+                          <span className="ts-row__link">Пример заключения</span>
+                          <IconMaterialChevron className="ts-row__chevron" aria-hidden="true" />
                         </button>
                       </li>
                     )}

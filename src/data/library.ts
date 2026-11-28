@@ -62,8 +62,6 @@ export interface LibraryItem<C extends string = string> {
   catalogDescription?: string;
   /** Иллюстрация для крупной карточки в библиотеке. */
   catalogCover?: string;
-  /** Демонстрация интерфейса в каталоге без отправки клиенту. */
-  prototype?: true;
   /** Краткое описание задания для карточки в чате (две-три строки) */
   blurb?: string;
   icon: string;
