@@ -1,10 +1,9 @@
-import { Chip } from '../Chip/Chip';
 import { EmptyState } from '../EmptyState/EmptyState';
-import { SwipePager } from '../SwipePager/SwipePager';
 import { ScaleChips } from './ScaleChips';
-import { followChips, type PositionVia } from '../../utils/followChips';
 import { TestDescription } from './TestDescription';
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { SettingsTabs } from './SettingsTabs';
+import { SettingsMaterials } from './SettingsMaterials';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import {
   IconTestChevronDown,
   IconTestMic,
@@ -49,9 +48,6 @@ import IconRowMain from '../../assets/icons/test-settings/primary-scales.svg?rea
 import IconRowExtra from '../../assets/icons/test-settings/additional-scales.svg?react';
 import IconRowPoints from '../../assets/icons/test-settings/scoring.svg?react';
 import IconRowMessage from '../../assets/icons/test-settings/client-message.svg?react';
-import IconMaterialBlank from '../../assets/icons/test-settings/blank.svg?react';
-import IconMaterialConclusion from '../../assets/icons/test-settings/conclusion.svg?react';
-import IconMaterialChevron from '../../assets/icons/test-settings/chevron-right.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
 
@@ -59,7 +55,6 @@ type Svg = ComponentType<SVGProps<SVGSVGElement>>;
 
 /** Что показано под шапкой: настройки, бланк, пример заключения или прохождение теста */
 type View = 'settings' | 'blank' | 'conclusion' | 'pass';
-const SETTINGS_TABS = ['Настройки', 'Описание', 'Материалы'];
 const CHOICE_CONFIRM_MS = 420;
 const COMPLETION_OPTIONS = RESULT_MODES.map(({ id, short }) => ({ value: id, label: id === 'thanks' ? 'Спасибо' : short }));
 
@@ -133,10 +128,10 @@ export function Row({
   );
 }
 
-function SettingChoice<T extends string>({ Icon, label, hint, value, options, disabled, active, onChange }: {
+export function SettingChoice<T extends string>({ Icon, label, hint, value, options, disabled, active, onChange }: {
   Icon: Svg;
   label: string;
-  hint: string;
+  hint?: string;
   value: T;
   options: { value: T; label: string }[];
   disabled: boolean;
@@ -154,6 +149,7 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
     const menu = menuRef.current;
     const button = trigger.current;
     if (!menu || !button) return;
+    const scrollHost = button.closest('.test-settings__scroll');
 
     const position = () => {
       const anchor = button.getBoundingClientRect();
@@ -182,7 +178,14 @@ function SettingChoice<T extends string>({ Icon, label, hint, value, options, di
       setOpen(menu.matches(':popover-open'));
     };
     const onScroll = (event: Event) => {
-      if (!menu.contains(event.target as Node) && menu.matches(':popover-open')) menu.hidePopover();
+      if (!menu.matches(':popover-open') || (event.target instanceof Node && menu.contains(event.target))) return;
+      const anchor = button.getBoundingClientRect();
+      const bounds = scrollHost?.getBoundingClientRect();
+      if (anchor.bottom <= (bounds?.top ?? 0) || anchor.top >= (bounds?.bottom ?? window.innerHeight)) {
+        menu.hidePopover();
+      } else {
+        position();
+      }
     };
     menu.addEventListener('beforetoggle', beforeToggle);
     menu.addEventListener('toggle', onToggle);
@@ -315,12 +318,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   // Результат только что пройденного теста: открывается вместо настроек, «назад» возвращает к ним
   const [resultId, setResultId] = useState<string | null>(null);
   const [settingsTab, setSettingsTab] = useState(0);
-  const chips = useRef<HTMLDivElement>(null);
-  const chipPosition = useRef(0);
-  const syncChips = useCallback((position: number, via?: PositionVia) => {
-    chipPosition.current = position;
-    if (chips.current) followChips(chips.current.querySelectorAll<HTMLButtonElement>('.chip'), position, via);
-  }, []);
   const blank = testBlank(test.id);
   const conclusion = conclusionFor(test.id);
   const toastTimer = useRef<number>();
@@ -348,16 +345,6 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
   const copyUrl = (url: string) => void copyText(url).then((ok) => notify(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
 
   const chars = message.length;
-  useLayoutEffect(() => {
-    const row = chips.current;
-    if (!row) return;
-    const place = () => syncChips(chipPosition.current);
-    place();
-    const observer = new ResizeObserver(place);
-    observer.observe(row);
-    row.querySelectorAll('.chip').forEach((chip) => observer.observe(chip));
-    return () => observer.disconnect();
-  }, [view, resultId, syncChips]);
   // Бланк, заключение и прохождение открываются как следующий экран: выезжают справа, «назад» возвращает к настройкам
   const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
   const openConclusion = () => (conclusion ? openView('conclusion') : notify('Пример заключения этого теста пока недоступен'));
@@ -424,193 +411,163 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
         </ScrollHost>
       ) : (
       <>
-      <div ref={chips} className="screen-header__chips ts-settings-chips" role="group" aria-label="Разделы настройки теста" data-hscroll>
-        <span className="chips-pill" aria-hidden="true" />
-        {SETTINGS_TABS.map((label, index) => (
-          <Chip key={label} tone="chat" follow active={index === settingsTab} onClick={() => setSettingsTab(index)}>{label}</Chip>
-        ))}
-      </div>
-      <div className="ts-settings-tabs" data-no-swipe-back>
-        <SwipePager index={settingsTab} onIndexChange={setSettingsTab} onPosition={syncChips} onEdgeSwipe={(direction) => {
-          if (direction < 0) onBack();
-        }} pages={[
-          {
-            key: 'setup',
-            node: (
-              <div className="test-settings__scroll ts-settings-page ts-settings-page--setup">
-                <CollapseCard title="Прохождение">
-                  <ul className="ts-rows">
-                    <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрыть название и цель теста">
-                      <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
-                    </Row>
-                    <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Вопросы в произвольном порядке">
-                      <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
-                    </Row>
-                    {data.forms && (
-                      <SettingChoice
-                        Icon={IconRowForm}
-                        label="Форма бланка"
-                        hint="Особенности подсчёта"
-                        value={form}
-                        options={data.forms.map((form) => ({ value: form, label: formatTestForm(form) }))}
-                        disabled={locked}
-                        active={settingsTab === 0}
-                        onChange={setForm}
-                      />
-                    )}
-                  </ul>
-                </CollapseCard>
+      <SettingsTabs
+        label="Разделы настройки теста"
+        index={settingsTab}
+        onIndexChange={setSettingsTab}
+        onBack={onBack}
+        setup={
+          <>
+            <CollapseCard title="Прохождение">
+              <ul className="ts-rows">
+                <Row Icon={IconRowBlind} label="Слепое тестирование" hint="Скрыть название и цель теста">
+                  <Switch checked={blind} disabled={locked} onChange={setBlind} label="Слепое тестирование" />
+                </Row>
+                <Row Icon={IconRowShuffle} label="Перемешать вопросы" hint="Вопросы в произвольном порядке">
+                  <Switch checked={shuffle} disabled={locked} onChange={setShuffle} label="Перемешать вопросы" />
+                </Row>
+                {data.forms && (
+                  <SettingChoice
+                    Icon={IconRowForm}
+                    label="Форма бланка"
+                    hint="Особенности подсчёта"
+                    value={form}
+                    options={data.forms.map((form) => ({ value: form, label: formatTestForm(form) }))}
+                    disabled={locked}
+                    active={settingsTab === 0}
+                    onChange={setForm}
+                  />
+                )}
+              </ul>
+            </CollapseCard>
 
-                <CollapseCard title="Заключение">
-                  <ul className="ts-rows">
-                    <Row Icon={IconRowBlank} label={SAVE_BLANK_LABEL} hint="Остается в заключении теста">
-                      <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label={SAVE_BLANK_LABEL} />
-                    </Row>
-                    {conclusion && (
-                      <SettingChoice
-                        Icon={IconRowResult}
-                        label="Экран завершения"
-                        hint="Что видит клиент"
-                        value={result}
-                        options={COMPLETION_OPTIONS}
-                        disabled={locked}
-                        active={settingsTab === 0}
-                        onChange={setResult}
-                      />
-                    )}
-                  </ul>
-                </CollapseCard>
+            <CollapseCard title="Заключение">
+              <ul className="ts-rows">
+                <Row Icon={IconRowBlank} label={SAVE_BLANK_LABEL} hint="Остается в заключении теста">
+                  <Switch checked={saveBlank} disabled={locked} onChange={setSaveBlank} label={SAVE_BLANK_LABEL} />
+                </Row>
+                {conclusion && (
+                  <SettingChoice
+                    Icon={IconRowResult}
+                    label="Экран завершения"
+                    hint="Что видит клиент"
+                    value={result}
+                    options={COMPLETION_OPTIONS}
+                    disabled={locked}
+                    active={settingsTab === 0}
+                    onChange={setResult}
+                  />
+                )}
+              </ul>
+            </CollapseCard>
 
-                <section className="ts-card ts-message-card">
-                  <ul className="ts-rows">
-                    <Row Icon={IconRowMessage} label="Сообщение для клиента">
-                      <Switch checked={messageOn} disabled={locked} onChange={setMessageOn} label="Сообщение для клиента" />
-                    </Row>
-                  </ul>
-                  <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
-                    <div className="blank-card__inner">
-                      <div className="blank-card__body ts-message">
-                        <MessageField value={message} readOnly={locked} onChange={setMessage} />
-                        <div className="ts-message__foot">
-                          <span className="ts-message__count">
-                            {chars} / {MESSAGE_LIMIT}
-                          </span>
-                          <button type="button" disabled={locked} className="ts-message__mic" aria-label="Надиктовать сообщение">
-                            <IconTestMic />
-                          </button>
-                        </div>
-                      </div>
+            <section className="ts-card ts-message-card">
+              <ul className="ts-rows">
+                <Row Icon={IconRowMessage} label="Сообщение для клиента">
+                  <Switch checked={messageOn} disabled={locked} onChange={setMessageOn} label="Сообщение для клиента" />
+                </Row>
+              </ul>
+              <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
+                <div className="blank-card__inner">
+                  <div className="blank-card__body ts-message">
+                    <MessageField value={message} readOnly={locked} onChange={setMessage} />
+                    <div className="ts-message__foot">
+                      <span className="ts-message__count">
+                        {chars} / {MESSAGE_LIMIT}
+                      </span>
+                      <button type="button" disabled={locked} className="ts-message__mic" aria-label="Надиктовать сообщение">
+                        <IconTestMic />
+                      </button>
                     </div>
                   </div>
-                </section>
+                </div>
               </div>
-            ),
-          },
-          {
-            key: 'description',
-            node: (
-              <div className="test-settings__scroll ts-settings-page">
-                {(data.questions || data.duration || data.age) && (
-                  <CollapseCard title="Тестовая информация">
-                    <ul className="ts-rows ts-info-rows">
-                      {data.questions !== undefined && (
-                        <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
-                      )}
-                      {data.duration && (
-                        <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
-                      )}
-                      {data.age && (
-                        <Row Icon={IconRowAge} label="Возраст" value={data.age} />
-                      )}
-                    </ul>
-                  </CollapseCard>
-                )}
-                <CollapseCard title="Описание теста">
-                  <div className="ts-desc">
-                    <TestDescription intro={data.intro} lead={data.lead} />
-                  </div>
-                </CollapseCard>
+            </section>
+          </>
+        }
+        description={
+          <>
+            {(data.questions || data.duration || data.age) && (
+              <CollapseCard title="Тестовая информация">
+                <ul className="ts-rows ts-info-rows">
+                  {data.questions !== undefined && (
+                    <Row Icon={IconRowQuestions} label="Количество вопросов" value={data.questions} />
+                  )}
+                  {data.duration && (
+                    <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
+                  )}
+                  {data.age && (
+                    <Row Icon={IconRowAge} label="Возраст" value={data.age} />
+                  )}
+                </ul>
+              </CollapseCard>
+            )}
+            <CollapseCard title="Описание теста">
+              <div className="ts-desc">
+                <TestDescription intro={data.intro} lead={data.lead} />
               </div>
-            ),
-          },
-          {
-            key: 'materials',
-            node: (
-              <div className="test-settings__scroll ts-settings-page">
-                {(conclusion || blank) && (
-                  <ul className="ts-card ts-materials">
-                    {blank && <li>
-                      <button type="button" className="ts-row ts-row--link" onClick={openBlank}>
-                        <IconMaterialBlank className="ts-row__icon" aria-hidden="true" />
-                        <span className="ts-row__link">Бланк тестирования</span>
-                        <IconMaterialChevron className="ts-row__chevron" aria-hidden="true" />
-                      </button>
-                    </li>}
-                    {conclusion && (
-                      <li>
-                        <button type="button" className="ts-row ts-row--link" onClick={openConclusion}>
-                          <IconMaterialConclusion className="ts-row__icon" aria-hidden="true" />
-                          <span className="ts-row__link">Пример заключения</span>
-                          <IconMaterialChevron className="ts-row__chevron" aria-hidden="true" />
-                        </button>
-                      </li>
-                    )}
-                  </ul>
-                )}
+            </CollapseCard>
+          </>
+        }
+        materials={
+          <>
+            <SettingsMaterials
+              blankLabel="Бланк тестирования"
+              exampleLabel="Пример заключения"
+              onBlank={blank ? openBlank : undefined}
+              onExample={conclusion ? openConclusion : undefined}
+            />
+            {data.scales && (
+              <CollapseCard title="Шкалы и баллы">
+                <ul className="ts-rows">
+                  <li className="ts-row ts-row--top">
+                    <IconRowMain className="ts-row__icon" aria-hidden="true" />
+                    <div className="ts-scale">
+                      <p className="ts-scale__title">Основные шкалы:</p>
+                      <ScaleChips testId={test.id} scales={data.scales.main} />
+                    </div>
+                  </li>
+                  {data.scales.extra.length > 0 && (
+                  <li className="ts-row ts-row--top">
+                    <IconRowExtra className="ts-row__icon" aria-hidden="true" />
+                    <div className="ts-scale">
+                      <p className="ts-scale__title">Дополнительные шкалы:</p>
+                      <ScaleChips testId={test.id} scales={data.scales.extra} groupSize={data.extraGroup} />
+                    </div>
+                  </li>
+                  )}
+                  {(
+                    [
+                      [data.scoring, data.scoringExtra ? 'Система баллов (Осн. шкалы):' : 'Система баллов:'],
+                      [data.scoringExtra, 'Система баллов (Доп. шкалы):'],
+                    ] as const
+                  ).map(
+                    ([items, title]) =>
+                      items && (
+                        <li key={title} className="ts-row ts-row--top">
+                          <IconRowPoints className="ts-row__icon" aria-hidden="true" />
+                          <div className="ts-scale">
+                            <p className="ts-scale__title">{title}</p>
+                            <ul className="ts-scale__list">
+                              {items.map(({ range, label, tone }) => (
+                                <li key={label}>
+                                  <span className={`ts-dot ts-dot--${tone}`} />
+                                  {tone === 'text' ? `${label} — ${range}` : `${range} — ${label}`}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </li>
+                      ),
+                  )}
+                </ul>
+              </CollapseCard>
+            )}
 
-                {data.scales && (
-                  <CollapseCard title="Шкалы и баллы">
-                    <ul className="ts-rows">
-                      <li className="ts-row ts-row--top">
-                        <IconRowMain className="ts-row__icon" aria-hidden="true" />
-                        <div className="ts-scale">
-                          <p className="ts-scale__title">Основные шкалы:</p>
-                          <ScaleChips testId={test.id} scales={data.scales.main} />
-                        </div>
-                      </li>
-                      {data.scales.extra.length > 0 && (
-                      <li className="ts-row ts-row--top">
-                        <IconRowExtra className="ts-row__icon" aria-hidden="true" />
-                        <div className="ts-scale">
-                          <p className="ts-scale__title">Дополнительные шкалы:</p>
-                          <ScaleChips testId={test.id} scales={data.scales.extra} groupSize={data.extraGroup} />
-                        </div>
-                      </li>
-                      )}
-                      {(
-                        [
-                          [data.scoring, data.scoringExtra ? 'Система баллов (Осн. шкалы):' : 'Система баллов:'],
-                          [data.scoringExtra, 'Система баллов (Доп. шкалы):'],
-                        ] as const
-                      ).map(
-                        ([items, title]) =>
-                          items && (
-                            <li key={title} className="ts-row ts-row--top">
-                              <IconRowPoints className="ts-row__icon" aria-hidden="true" />
-                              <div className="ts-scale">
-                                <p className="ts-scale__title">{title}</p>
-                                <ul className="ts-scale__list">
-                                  {items.map(({ range, label, tone }) => (
-                                    <li key={label}>
-                                      <span className={`ts-dot ts-dot--${tone}`} />
-                                      {tone === 'text' ? `${label} — ${range}` : `${range} — ${label}`}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </li>
-                          ),
-                      )}
-                    </ul>
-                  </CollapseCard>
-                )}
-
-                {!blank && !conclusion && !data.scales && <EmptyState icon={<IconRowForm />} title="Материалы пока недоступны" />}
-              </div>
-            ),
-          },
-        ]} />
-      </div>
+            {!blank && !conclusion && !data.scales && <EmptyState icon={<IconRowForm />} title="Материалы пока недоступны" />}
+          </>
+        }
+      />
 
       {locked ? (
         <div className="ts-watermark" aria-hidden="true" />

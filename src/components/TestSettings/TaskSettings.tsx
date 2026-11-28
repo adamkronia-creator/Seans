@@ -1,6 +1,4 @@
-import { ReadMoreLabel } from './ReadMoreLabel';
-import { anchorToggle } from '../../utils/anchorToggle';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IconTestMic } from '../icons';
 import { Switch } from '../Switch/Switch';
 import { ScrollHost } from '../ScrollHost/ScrollHost';
@@ -9,10 +7,11 @@ import { SELF_ID } from './TestActions';
 import { PreviewSheet, SendSheet } from './SendSheet';
 import { copyText } from '../../utils/clipboard';
 import { CollapseCard } from './TestBlank';
-import { FormMenu } from './FormMenu';
-import { MessageField, Row } from './TestSettings';
+import { formatTestForm } from './FormMenu';
+import { MessageField, Row, SettingChoice } from './TestSettings';
+import { SettingsTabs } from './SettingsTabs';
+import { SettingsMaterials } from './SettingsMaterials';
 import { HelpContext } from '../OptionHelp/HelpScenes';
-import { OptionHelp } from '../OptionHelp/OptionHelp';
 import { TestHeader } from './TestHeader';
 import { TaskForm } from './TaskForm';
 import { Paragraphs } from './TaskParts';
@@ -42,19 +41,13 @@ import './TestSettings.css';
 import './TestSettings.pm.css';
 import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
 import IconRowAge from '../../assets/icons/solar/user.svg?react';
-import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowForm from '../../assets/icons/test-settings/form.svg?react';
+import IconRowVolume from '../../assets/icons/test-settings/question-count.svg?react';
 import IconRowComment from '../../assets/icons/solar/chat-round.svg?react';
 import IconRowState from '../../assets/icons/solar/smile-circle.svg?react';
 import IconRowPermanent from '../../assets/icons/solar/restart.svg?react';
-import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
-import IconLinkBlank from '../../assets/icons/solar/clipboard-list.svg?react';
-import IconLinkExample from '../../assets/icons/solar/notebook.svg?react';
+import IconRowMessage from '../../assets/icons/test-settings/client-message.svg?react';
 import './TaskSettings.css';
-
-/** Строка текста для чтения (--line-height-read, typography.css): описание 16/25 */
-const DESC_LINE = 25;
-/** Высота свёрнутого описания: 6 строк и промежуток между абзацами 12, одинаково у всех тестов и заданий */
-const DESC_COLLAPSED = 6 * DESC_LINE + 12;
 
 /** Что показано под шапкой: настройки, бланк, пример выполнения или выполнение самому */
 type View = 'settings' | 'blank' | 'example' | 'pass';
@@ -122,7 +115,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const data = taskSettings(task);
   const so = sent?.taskOptions;
   const locked = Boolean(sent);
-  const noop = () => undefined;
   // Задание, отправленное себе, открывается сразу выполнением, как у клиента; «назад» возвращает в чат
   const [passRequest] = useState(() => takeTaskPass(task.id));
   const [form, setForm] = useState(so?.form ?? (passRequest?.form || (data?.defaultForm ?? data?.forms?.[0] ?? '')));
@@ -140,10 +132,8 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   // Результат только что выполненного задания: открывается вместо настроек, «назад» возвращает к ним
   const [resultId, setResultId] = useState<string | null>(null);
   const toastTimer = useRef<number>();
-  const [descOpen, setDescOpen] = useState(false);
-  const [descFull, setDescFull] = useState(0);
-  const descRef = useRef<HTMLDivElement>(null);
-  const descLong = descFull > DESC_COLLAPSED + DESC_LINE;
+  const [settingsTab, setSettingsTab] = useState(0);
+  const [stripSlot, setStripSlot] = useState<HTMLDivElement | null>(null);
 
   const notify = (text: string) => {
     setToast(text);
@@ -151,20 +141,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
     toastTimer.current = window.setTimeout(() => setToast(null), 2600);
   };
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
-
-  useLayoutEffect(() => {
-    const el = descRef.current;
-    if (!el) return;
-    const measure = () => setDescFull(el.scrollHeight);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    window.addEventListener('resize', measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, [view, resultId]);
 
   // Бланк, пример, выполнение и предпросмотр открываются как следующий экран: выезжают справа, «назад» возвращает к настройкам
   const openView = (next: View) => transition(() => setView(next), next === 'settings' ? 'back' : 'forward');
@@ -207,18 +183,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
   const taskUrl = `${window.location.href.split('#')[0]}#/tasks/${task.id}`;
   const copyUrl = (url: string) => void copyText(url).then((ok) => notify(ok ? 'Ссылка скопирована' : 'Не удалось скопировать'));
 
-  const link = (label: string, next: View) => {
-    const Icon = next === 'blank' ? IconLinkBlank : IconLinkExample;
-    return (
-      <li>
-        <button type="button" className="ts-action" onClick={() => openView(next)}>
-          <Icon className="ts-action__icon" />
-          <span className="ts-action__label">{label}</span>
-        </button>
-      </li>
-    );
-  };
-
   if (resultId) {
     return (
       <>
@@ -230,8 +194,6 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
 
   // Задание, отправленное себе, открыто как у клиента: тот же интерфейс, только без «избранного» в шапке, с сообщением специалиста и «Спасибо» в конце
   const live = Boolean(passRequest) && view === 'pass';
-  // Полоса шагов лежит внутри шапки: шапка и она — одна стеклянная панель
-  const [stripSlot, setStripSlot] = useState<HTMLDivElement | null>(null);
 
   return (
     <HelpContext.Provider value={{ test: task, task: { data }, blank: null, conclusion: null, form, duration: data.duration }}>
@@ -276,113 +238,119 @@ export function TaskSettings({ task, chatId, sent, onBack }: TaskSettingsProps) 
         </ScrollHost>
       ) : (
         <>
-          <div className="test-settings__scroll">
-            <div className="ts-desc-unit">
-            <CollapseCard title="Описание задания">
-              <div className="ts-desc">
-                <div className="ts-desc__clip">
-                  <div ref={descRef} className="ts-desc__body" style={descLong ? { maxHeight: descOpen ? descFull : DESC_COLLAPSED } : undefined}>
+          <SettingsTabs
+            label="Разделы настройки задания"
+            index={settingsTab}
+            onIndexChange={setSettingsTab}
+            onBack={onBack}
+            setup={
+              <>
+                <CollapseCard title="Выполнение">
+                  <ul className="ts-rows">
+                    <Row Icon={IconRowPermanent} label="Назначить постоянным" hint="Клиент сможет возвращаться к заданию">
+                      <Switch checked={permanent} disabled={locked} onChange={setPermanent} label="Назначить постоянным" />
+                    </Row>
+                    {data.forms && (
+                      <SettingChoice
+                        Icon={IconRowForm}
+                        label={formLabel}
+                        hint={data.formHint ?? 'Меняет обращение в бланке'}
+                        value={form}
+                        options={data.forms.map((value) => ({
+                          value,
+                          label: data.formCount ? formText(data, value) : formatTestForm(value),
+                        }))}
+                        disabled={locked}
+                        active={settingsTab === 0}
+                        onChange={setForm}
+                      />
+                    )}
+                  </ul>
+                </CollapseCard>
+
+                <CollapseCard title="Завершение">
+                  <ul className="ts-rows">
+                    <Row Icon={IconRowComment} label="Комментарий клиента" hint="Клиент сможет оставить комментарий">
+                      <Switch checked={comment} disabled={locked} onChange={setComment} label="Комментарий клиента" />
+                    </Row>
+                    <Row Icon={IconRowState} label="Оценить состояние" hint="Клиент отметит своё самочувствие">
+                      <Switch checked={state} disabled={locked} onChange={setState} label="Оценить состояние" />
+                    </Row>
+                  </ul>
+                </CollapseCard>
+
+                <section className="ts-card ts-message-card">
+                  <ul className="ts-rows">
+                    <Row Icon={IconRowMessage} label="Сообщение для клиента">
+                      <Switch checked={messageOn} disabled={locked} onChange={setMessageOn} label="Сообщение для клиента" />
+                    </Row>
+                  </ul>
+                  <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
+                    <div className="blank-card__inner">
+                      <div className="blank-card__body ts-message">
+                        <MessageField value={message} readOnly={locked} onChange={setMessage} limit={TASK_MESSAGE_LIMIT} />
+                        <div className="ts-message__foot">
+                          <span className="ts-message__count">
+                            {message.length} / {TASK_MESSAGE_LIMIT}
+                          </span>
+                          <button type="button" disabled={locked} className="ts-message__mic" aria-label="Надиктовать сообщение">
+                            <IconTestMic />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </>
+            }
+            description={
+              <>
+                <CollapseCard title="Общая информация">
+                  <ul className="ts-rows ts-info-rows">
+                    <Row Icon={IconRowVolume} label={data.volume.label} value={data.formCount ? form : data.volume.value} />
+                    <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
+                    <Row Icon={IconRowAge} label="Возраст" value={data.age} />
+                  </ul>
+                </CollapseCard>
+
+                <CollapseCard title="Описание задания">
+                  <div className="ts-desc">
                     <Paragraphs text={data.intro} lead={data.lead} />
                   </div>
-                  {descLong && <span className={`ts-desc__fade${descOpen ? ' ts-desc__fade--hidden' : ''}`} aria-hidden="true" />}
-                </div>
-              </div>
-            </CollapseCard>
-            {descLong && (
-              <button type="button" className={`ts-desc__toggle${descOpen ? ' ts-desc__toggle--open' : ''}`} aria-expanded={descOpen} onClick={(event) => {
-                  const body = descRef.current;
-                  anchorToggle(event.currentTarget, body, () => setDescOpen(!descOpen),
-                    !descOpen && body ? { reveal: body, inset: body.offsetHeight } : undefined);
-                }}>
-                <ReadMoreLabel open={descOpen} />
-              </button>
-            )}
-            </div>
-
-            <ul className="ts-actions">
-              {link('Бланк задания', 'blank')}
-              {link('Пример выполнения', 'example')}
-            </ul>
-
-            <CollapseCard title="Общая информация">
-              <ul className="ts-rows">
-                <Row Icon={IconRowTime} label="Время выполнения" value={data.duration} />
-                <Row Icon={IconRowAge} label="Возраст" value={data.age} />
-              </ul>
-            </CollapseCard>
-
-            <CollapseCard title="Интерпретация задания">
-              <ul className="ts-rows">
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Цель задания:</p>
-                    <div className="task-pad task-pad--inline">
-                      <Paragraphs text={data.goal} />
-                    </div>
-                  </div>
-                </li>
-                <li className="ts-row ts-row--top">
-                  <div className="ts-scale">
-                    <p className="ts-scale__title">Анализ материалов:</p>
-                    <div className="task-pad task-pad--inline">
-                      <Paragraphs text={data.analysis} />
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </CollapseCard>
-
-            <CollapseCard title="Особенности задания" badge={<OptionHelp id="taskFeatures" corner />}>
-              <ul className="ts-rows">
-                {/* Выбор формы бланка (у заданий с записями — «Количество записей») */}
-                {data.formCount && data.forms ? (
-                  <Row Icon={IconRowForm} label={formLabel} info value={locked ? formText(data, form) : undefined}>
-                    {!locked && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} format={(v) => formText(data, v)} onChange={setForm} />}
-                  </Row>
-                ) : (
-                  data.forms && (
-                    <Row Icon={IconRowForm} label={formLabel} info value={locked ? form : data.forms.length === 1 ? data.forms[0] : undefined}>
-                      {!locked && data.forms.length > 1 && <FormMenu forms={data.forms} value={form} title={formLabel} hint={data.formHint} onChange={setForm} />}
-                    </Row>
-                  )
-                )}
-                <Row Icon={IconRowComment} label="Комментарий клиента">
-                  <Switch checked={comment} onChange={locked ? noop : setComment} label="Комментарий клиента" />
-                </Row>
-                <Row Icon={IconRowState} label="Оценить состояние">
-                  <Switch checked={state} onChange={locked ? noop : setState} label="Оценить состояние" />
-                </Row>
-                <Row Icon={IconRowPermanent} label="Назначить постоянным">
-                  <Switch checked={permanent} onChange={locked ? noop : setPermanent} label="Назначить постоянным" />
-                </Row>
-              </ul>
-            </CollapseCard>
-
-
-            <section className="ts-card ts-message-card">
-              <ul className="ts-rows">
-                <Row Icon={IconRowMessage} label="Сообщение для клиента">
-                  <Switch checked={messageOn} onChange={locked ? noop : setMessageOn} label="Сообщение для клиента" />
-                </Row>
-              </ul>
-              <div className={`blank-card__collapse${messageOn ? ' blank-card__collapse--open' : ''}`} aria-hidden={!messageOn}>
-                <div className="blank-card__inner">
-                  <div className="blank-card__body ts-message">
-                    <MessageField value={message} onChange={locked ? noop : setMessage} limit={TASK_MESSAGE_LIMIT} />
-                    <div className="ts-message__foot">
-                      <span className="ts-message__count">
-                        {message.length} / {TASK_MESSAGE_LIMIT}
-                      </span>
-                      <button type="button" className="ts-message__mic" aria-label="Надиктовать сообщение">
-                        <IconTestMic />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-          </div>
+                </CollapseCard>
+              </>
+            }
+            materials={
+              <>
+                <SettingsMaterials
+                  blankLabel="Бланк задания"
+                  exampleLabel="Пример выполнения"
+                  onBlank={() => openView('blank')}
+                  onExample={() => openView('example')}
+                />
+                <CollapseCard title="Интерпретация задания">
+                  <ul className="ts-rows">
+                    <li className="ts-row ts-row--top">
+                      <div className="ts-scale">
+                        <p className="ts-scale__title">Цель задания:</p>
+                        <div className="task-pad task-pad--inline">
+                          <Paragraphs text={data.goal} />
+                        </div>
+                      </div>
+                    </li>
+                    <li className="ts-row ts-row--top">
+                      <div className="ts-scale">
+                        <p className="ts-scale__title">Анализ материалов:</p>
+                        <div className="task-pad task-pad--inline">
+                          <Paragraphs text={data.analysis} />
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </CollapseCard>
+              </>
+            }
+          />
 
           {locked ? (
             <div className="ts-watermark ts-watermark--task" aria-hidden="true" />

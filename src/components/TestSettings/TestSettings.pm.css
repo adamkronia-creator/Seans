@@ -865,13 +865,12 @@
 .ts-select--settings {
   border-radius: var(--radius-pill);
   background: var(--bg-field);
-  color: var(--text-primary);
-  transition: background var(--dur-quick) ease, color var(--dur-quick) ease;
+  color: var(--text-link);
+  transition: background var(--dur-quick) ease, box-shadow var(--dur-quick) ease;
 }
 
 .ts-select--settings[aria-expanded="true"] {
-  background: var(--glass-chip-active);
-  color: var(--action-primary-text);
+  background: var(--bg-subtle);
   box-shadow: var(--active-ring);
 }
 
