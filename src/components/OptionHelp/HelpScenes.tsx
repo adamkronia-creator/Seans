@@ -17,7 +17,7 @@ import { MessageInput } from '../MessageInput/MessageInput';
 import { CHATS } from '../../data/chats';
 import type { Message } from '../../data/messages';
 import { roleOf } from '../../data/roles';
-import IconForm from '../../assets/icons/solar/document-text.svg?react';
+import IconForm from '../../assets/icons/test-settings/form.svg?react';
 import './HelpScenes.css';
 
 /** Тест, к настройкам которого открыта подсказка: макеты в окне собираются из него, а не из снимков одного теста */

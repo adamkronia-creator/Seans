@@ -37,17 +37,18 @@ import { Toast } from '../Toast/Toast';
 import { useBackHandler } from '../../utils/backHandler';
 import { useSwipeBack } from '../../utils/swipeBack';
 import { transition } from '../../utils/transition';
-import IconRowQuestions from '../../assets/icons/solar/list-ordered.svg?react';
+import IconRowQuestions from '../../assets/icons/test-settings/question-count.svg?react';
 import IconRowTime from '../../assets/icons/solar/clock-circle.svg?react';
 import IconRowAge from '../../assets/icons/solar/user.svg?react';
-import IconRowForm from '../../assets/icons/solar/document-text.svg?react';
+import IconRowForm from '../../assets/icons/test-settings/form.svg?react';
 import IconRowResult from '../../assets/icons/solar/eye.svg?react';
 import IconRowBlind from '../../assets/icons/solar/incognito.svg?react';
 import IconRowBlank from '../../assets/icons/solar/clipboard-check.svg?react';
 import IconRowShuffle from '../../assets/icons/solar/shuffle.svg?react';
-import IconRowMain from '../../assets/icons/solar/list.svg?react';
-import IconRowPoints from '../../assets/icons/solar/tuning-2.svg?react';
-import IconRowMessage from '../../assets/icons/solar/chat-round-dots.svg?react';
+import IconRowMain from '../../assets/icons/test-settings/primary-scales.svg?react';
+import IconRowExtra from '../../assets/icons/test-settings/additional-scales.svg?react';
+import IconRowPoints from '../../assets/icons/test-settings/scoring.svg?react';
+import IconRowMessage from '../../assets/icons/test-settings/client-message.svg?react';
 import './TestSettings.css';
 import './TestSettings.pm.css';
 
@@ -554,7 +555,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                   <CollapseCard title="Шкалы и баллы">
                     <ul className="ts-rows">
                       <li className="ts-row ts-row--top">
-                        <IconRowMain className="ts-row__icon" />
+                        <IconRowMain className="ts-row__icon" aria-hidden="true" />
                         <div className="ts-scale">
                           <p className="ts-scale__title">Основные шкалы:</p>
                           <ScaleChips testId={test.id} scales={data.scales.main} />
@@ -562,7 +563,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                       </li>
                       {data.scales.extra.length > 0 && (
                       <li className="ts-row ts-row--top">
-                        <IconRowQuestions className="ts-row__icon" />
+                        <IconRowExtra className="ts-row__icon" aria-hidden="true" />
                         <div className="ts-scale">
                           <p className="ts-scale__title">Дополнительные шкалы:</p>
                           <ScaleChips testId={test.id} scales={data.scales.extra} groupSize={data.extraGroup} />
@@ -578,7 +579,7 @@ export function TestSettings({ test, chatId, sent, onBack }: TestSettingsProps) 
                         ([items, title]) =>
                           items && (
                             <li key={title} className="ts-row ts-row--top">
-                              <IconRowPoints className="ts-row__icon" />
+                              <IconRowPoints className="ts-row__icon" aria-hidden="true" />
                               <div className="ts-scale">
                                 <p className="ts-scale__title">{title}</p>
                                 <ul className="ts-scale__list">
