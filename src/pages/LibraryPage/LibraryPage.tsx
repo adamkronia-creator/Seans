@@ -200,6 +200,7 @@ function LibraryList(p: ListProps) {
             key={id}
             test={entry.item}
             cover={p.catalogLayout === 'cards' ? entry.item.catalogCover : undefined}
+            overlayText={illustratedTest}
             coverBadge={catalog.kind === 'task' ? taskApproachLabel(id) : undefined}
             description={illustratedTest ? testCardDescription(id) : undefined}
             favorite={ctx.favorites.has(id)}

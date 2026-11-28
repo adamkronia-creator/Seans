@@ -185,6 +185,10 @@
   contain-intrinsic-size: auto 224px;
 }
 
+[data-pm] .catalog-library .library-page__list--cards .lib-card--overlay {
+  contain-intrinsic-size: auto var(--catalog-cover-height);
+}
+
 [data-pm] .catalog-library .library-page__list--cards :is(.lib-card__check, .lib-card__heart) {
   top: var(--space-3);
   right: var(--space-3);

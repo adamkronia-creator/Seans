@@ -90,3 +90,65 @@
   font: var(--type-label);
   font-weight: 400;
 }
+
+/* Обложка заполняет карточку. Верхняя зона остаётся открытой, даже если описание или результат поиска занимают больше строк. */
+.catalog-cards > .lib-card--overlay {
+  --catalog-cover-height: calc(var(--space-16) * 4 + var(--space-4));
+}
+
+[data-pm] .catalog-cards > .lib-card--overlay .test-card {
+  position: relative;
+  justify-content: flex-end;
+  min-block-size: var(--catalog-cover-height);
+  padding-block-start: calc(var(--space-16) + var(--space-12));
+}
+
+[data-pm] .catalog-cards > .lib-card--overlay .test-card__avatar {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+[data-pm] .catalog-cards > .lib-card--overlay .test-card__body {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  padding: var(--space-4);
+}
+
+/* На границе текстового блока градиент уже достаточно плотный для белого текста на светлой обложке. */
+.lib-card--overlay .test-card__body::before {
+  --fade: var(--space-16);
+  position: absolute;
+  inset: calc(var(--fade) * -1) 0 0;
+  z-index: -1;
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--palette-black) 70%, transparent) var(--fade),
+    color-mix(in srgb, var(--palette-black) 84%, transparent)
+  );
+  content: '';
+}
+
+[data-pm] .catalog-cards > .lib-card--overlay .test-card__title {
+  display: -webkit-box;
+  color: var(--palette-white);
+  white-space: normal;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 3;
+}
+
+[data-pm] .catalog-cards > .lib-card--overlay :is(.test-card__description, .lib-card__facts, .lib-card__why, .lib-card__pin) {
+  color: color-mix(in srgb, var(--palette-white) 88%, transparent);
+  white-space: normal;
+}
+
+[data-pm] .lib-card--overlay .lib-mark {
+  background: color-mix(in srgb, var(--palette-white) 85%, transparent);
+  color: var(--palette-black);
+}
+
+.lib-card--overlay .test-card:is(:active, [data-pressed]) .lib-card__cover {
+  filter: brightness(0.9);
+}
