@@ -95,6 +95,7 @@
 .catalog-cards > .lib-card--overlay {
   --catalog-cover-height: calc(var(--space-16) * 4 + var(--space-4));
   --catalog-cover-top: calc(var(--space-16) + var(--space-12));
+  --catalog-cover-pad: var(--space-4);
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay .test-card {
@@ -114,18 +115,25 @@
   position: relative;
   isolation: isolate;
   flex: 0 0 auto;
-  padding: var(--space-4);
+  padding: var(--catalog-cover-pad);
 }
 
-/* Маска открывает размытую копию обложки от прозрачного края до начала текста. */
+/* Половина высоты строки заголовка задаёт начало плавного перехода. */
 .lib-card__glass {
-  --glass-fade: var(--space-12);
-  --glass-mask: linear-gradient(transparent, var(--palette-black) var(--glass-fade));
+  --glass-start: calc(var(--catalog-cover-pad) + 0.5lh);
+  --glass-mask: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--palette-black) 15%, transparent) var(--space-4),
+    color-mix(in srgb, var(--palette-black) 50%, transparent) var(--space-8),
+    color-mix(in srgb, var(--palette-black) 85%, transparent) var(--space-12),
+    var(--palette-black) var(--space-16)
+  );
   position: absolute;
-  inset: calc(var(--glass-fade) * -1) 0 0;
+  inset: var(--glass-start) 0 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  font: var(--type-headline);
   -webkit-mask-image: var(--glass-mask);
   mask-image: var(--glass-mask);
 }
@@ -135,16 +143,22 @@
   position: absolute;
   inset: auto 0 0;
   width: 100%;
-  height: max(var(--catalog-cover-height), calc(100% + var(--catalog-cover-top) - var(--glass-fade)));
+  height: max(var(--catalog-cover-height), calc(100% + var(--catalog-cover-top) + var(--glass-start)));
   object-fit: cover;
   filter: blur(var(--space-3));
   transform: scale(1.1);
 }
 
-.lib-card__glass::after {
+/* Светлая вуаль поддерживает контраст первой строки ещё до начала размытия. */
+.lib-card--overlay .test-card__body::after {
   position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--palette-white) 38%, transparent);
+  inset: calc(var(--space-4) * -1) 0 0;
+  z-index: -1;
+  background: linear-gradient(
+    transparent,
+    color-mix(in srgb, var(--palette-white) 48%, transparent) calc(var(--space-4) + var(--catalog-cover-pad))
+  );
+  pointer-events: none;
   content: '';
 }
 
