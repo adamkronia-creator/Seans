@@ -137,7 +137,7 @@
   width: 100%;
   height: max(var(--catalog-cover-height), calc(100% + var(--catalog-cover-top) - var(--glass-fade)));
   object-fit: cover;
-  filter: blur(var(--space-4));
+  filter: blur(var(--space-3));
   transform: scale(1.1);
 }
 
