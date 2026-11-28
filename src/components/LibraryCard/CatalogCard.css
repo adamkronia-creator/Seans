@@ -116,23 +116,30 @@
   padding: var(--space-4);
 }
 
-/* На границе текстового блока градиент уже достаточно плотный для белого текста на светлой обложке. */
+/* Размывается сама обложка. Маска постепенно проявляет стекло к началу текста. */
 .lib-card--overlay .test-card__body::before {
-  --fade: var(--space-16);
+  --glass-fade: var(--space-12);
   position: absolute;
-  inset: calc(var(--fade) * -1) 0 0;
+  inset: calc(var(--glass-fade) * -1) 0 0;
   z-index: -1;
-  background: linear-gradient(
-    transparent,
-    color-mix(in srgb, var(--palette-black) 70%, transparent) var(--fade),
-    color-mix(in srgb, var(--palette-black) 84%, transparent)
-  );
+  background: linear-gradient(transparent, color-mix(in srgb, var(--palette-white) 64%, transparent) var(--glass-fade));
   content: '';
+}
+
+@supports (backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0)) {
+  .lib-card--overlay .test-card__body::before {
+    --glass-mask: linear-gradient(transparent, var(--palette-black) var(--glass-fade));
+    background: color-mix(in srgb, var(--palette-white) 38%, transparent);
+    -webkit-backdrop-filter: blur(var(--space-4));
+    backdrop-filter: blur(var(--space-4));
+    -webkit-mask-image: var(--glass-mask);
+    mask-image: var(--glass-mask);
+  }
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay .test-card__title {
   display: -webkit-box;
-  color: var(--palette-white);
+  color: var(--palette-black);
   white-space: normal;
   text-wrap: pretty;
   overflow-wrap: anywhere;
@@ -140,12 +147,12 @@
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay :is(.test-card__description, .lib-card__facts, .lib-card__why, .lib-card__pin) {
-  color: color-mix(in srgb, var(--palette-white) 88%, transparent);
+  color: color-mix(in srgb, var(--palette-black) 88%, transparent);
   white-space: normal;
 }
 
 [data-pm] .lib-card--overlay .lib-mark {
-  background: color-mix(in srgb, var(--palette-white) 85%, transparent);
+  background: color-mix(in srgb, var(--palette-blue) 24%, var(--palette-white));
   color: var(--palette-black);
 }
 
