@@ -38,11 +38,12 @@ interface LibraryCardProps {
 /** Строка теста или задания в библиотеке: вид как у чата в списке «Диалогов», сердечко отмечает избранное (см. LibraryCard.css) */
 export function LibraryCard({ test, cover, overlayText, coverBadge = test.abbr, description, favorite, favoriteOnAvatar, onFavoriteChange, selecting, onClick, facts, why, marks, pinned = false, selected = false, onLongPress }: LibraryCardProps) {
   const { handlers, swallow } = useLongPress(onLongPress ? () => onLongPress(test) : undefined);
+  const glassCover = overlayText ? cover : undefined;
   // Отметили избранным или закрепили, пока строка на экране: значок выскакивает с пружинкой
   const newFav = useJustOn(favorite);
   const newPin = useJustOn(pinned);
   return (
-    <li className={`lib-card${cover && overlayText ? ' lib-card--overlay' : ''}${favorite && !onFavoriteChange ? ' lib-card--fav' : ''}${favoriteOnAvatar ? ' lib-card--favorite-on-avatar' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
+    <li className={`lib-card${glassCover ? ' lib-card--overlay' : ''}${favorite && !onFavoriteChange ? ' lib-card--fav' : ''}${favoriteOnAvatar ? ' lib-card--favorite-on-avatar' : ''}${selected ? ' lib-card--selected' : ''}${newFav ? ' lib-card--fav-new' : ''}${newPin ? ' lib-card--pin-new' : ''}`} data-item={test.id}>
       <button type="button" className="test-card" aria-description={favorite ? 'В избранном' : undefined} onClick={(e) => !swallow(e) && onClick?.(test, e.currentTarget.closest('li') ?? e.currentTarget)} {...handlers}>
         <span className="test-card__avatar" style={{ '--tint': test.tint } as CSSProperties}>
           <img className={cover ? 'lib-card__cover' : 'test-card__icon'} src={cover ?? test.icon} alt="" loading="lazy" decoding="async" />
@@ -54,6 +55,11 @@ export function LibraryCard({ test, cover, overlayText, coverBadge = test.abbr, 
           </svg>
         </span>
         <span className="test-card__body">
+          {glassCover && (
+            <span className="lib-card__glass" aria-hidden="true">
+              <img src={glassCover} alt="" loading="lazy" decoding="async" />
+            </span>
+          )}
           <span className="test-card__top lib-card__top">
             <span className="test-card__title">
               <Highlight text={test.title} words={marks} />

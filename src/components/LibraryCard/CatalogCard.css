@@ -94,13 +94,14 @@
 /* Обложка заполняет карточку. Верхняя зона остаётся открытой, даже если описание или результат поиска занимают больше строк. */
 .catalog-cards > .lib-card--overlay {
   --catalog-cover-height: calc(var(--space-16) * 4 + var(--space-4));
+  --catalog-cover-top: calc(var(--space-16) + var(--space-12));
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay .test-card {
   position: relative;
   justify-content: flex-end;
   min-block-size: var(--catalog-cover-height);
-  padding-block-start: calc(var(--space-16) + var(--space-12));
+  padding-block-start: var(--catalog-cover-top);
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay .test-card__avatar {
@@ -116,25 +117,35 @@
   padding: var(--space-4);
 }
 
-/* Размывается сама обложка. Маска постепенно проявляет стекло к началу текста. */
-.lib-card--overlay .test-card__body::before {
+/* Маска открывает размытую копию обложки от прозрачного края до начала текста. */
+.lib-card__glass {
   --glass-fade: var(--space-12);
+  --glass-mask: linear-gradient(transparent, var(--palette-black) var(--glass-fade));
   position: absolute;
   inset: calc(var(--glass-fade) * -1) 0 0;
   z-index: -1;
-  background: linear-gradient(transparent, color-mix(in srgb, var(--palette-white) 64%, transparent) var(--glass-fade));
-  content: '';
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: var(--glass-mask);
+  mask-image: var(--glass-mask);
 }
 
-@supports (backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0)) {
-  .lib-card--overlay .test-card__body::before {
-    --glass-mask: linear-gradient(transparent, var(--palette-black) var(--glass-fade));
-    background: color-mix(in srgb, var(--palette-white) 38%, transparent);
-    -webkit-backdrop-filter: blur(var(--space-4));
-    backdrop-filter: blur(var(--space-4));
-    -webkit-mask-image: var(--glass-mask);
-    mask-image: var(--glass-mask);
-  }
+/* Копия повторяет высоту карточки, в том числе когда подписи занимают больше строк. */
+.lib-card__glass img {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: max(var(--catalog-cover-height), calc(100% + var(--catalog-cover-top) - var(--glass-fade)));
+  object-fit: cover;
+  filter: blur(var(--space-4));
+  transform: scale(1.1);
+}
+
+.lib-card__glass::after {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--palette-white) 38%, transparent);
+  content: '';
 }
 
 [data-pm] .catalog-cards > .lib-card--overlay .test-card__title {
@@ -156,6 +167,6 @@
   color: var(--palette-black);
 }
 
-.lib-card--overlay .test-card:is(:active, [data-pressed]) .lib-card__cover {
+.lib-card--overlay .test-card:is(:active, [data-pressed]) :is(.lib-card__cover, .lib-card__glass) {
   filter: brightness(0.9);
 }
